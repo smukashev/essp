@@ -16,6 +16,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.MetaData;
 import kz.bsbnb.usci.eav.model.metadata.Type;
@@ -49,7 +50,8 @@ public class PostgreSQLMetaDataDaoImpl extends AbstractDBDao implements IMetaDat
 	public MetaData loadMetaData(String metaClassName) {
 		MetaData meta = new MetaData(metaClassName);
 	    
-	    String query = "SELECT a.id, a.name, a.type_code, a.is_key, a.is_nullable FROM " + 
+	    String query = "SELECT a.id, a.name, a.type_code, a.is_key, a.is_nullable, a.is_array, " +
+	    		"a.array_key_type, a.complex_key_type FROM " + 
 				classesTableName + " c, " + attributesTableName + " a " + 
                 " WHERE c.name = \'" + metaClassName + "\'";
 	    
@@ -57,13 +59,17 @@ public class PostgreSQLMetaDataDaoImpl extends AbstractDBDao implements IMetaDat
 	    
 	    List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
 		for (Map<String, Object> row : rows) {
-	    	meta.setId((Integer)row.get("id"));
+	    	Type t = new Type(
+                    DataTypes.valueOf((String)row.get("type_code")),
+                    (Boolean)row.get("is_key"),
+                    (Boolean)row.get("is_nullable")
+                );
+	    	t.setArray((Boolean)row.get("is_array"));
+	    	t.setArrayKeyType(ComplexKeyTypes.valueOf((String)row.get("array_key_type")));
+	    	t.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
+			meta.setId((Integer)row.get("id"));
 	    	meta.setType((String)row.get("name"), 
-	                new Type(
-	                    DataTypes.valueOf((String)row.get("type_code")),
-	                    (Boolean)row.get("is_key"),
-	                    (Boolean)row.get("is_nullable")
-	                ));
+	                t);
 	    }
 	    
 	    return meta;
@@ -129,12 +135,16 @@ public class PostgreSQLMetaDataDaoImpl extends AbstractDBDao implements IMetaDat
 	    for(String typeName : addNames)
 	    {
 	    	query = "INSERT INTO " + attributesTableName +
-                    " (class_id, name, type_code, is_key, is_nullable) VALUES (" +
+                    " (class_id, name, type_code, is_key, is_nullable, " +
+                    "is_array, array_key_type, complex_key_type) VALUES (" +
                     metaId + ", " +
                     "\'" + typeName + "\', " +
                     "\'" + meta.getType(typeName).getTypeCode() + "\', " +
                     "\'" + meta.getType(typeName).isKey() + "\', " +
-                    "\'" + meta.getType(typeName).isNullable() + "\' " +
+                    "\'" + meta.getType(typeName).isNullable() + "\', " +
+                    "\'" + meta.getType(typeName).isArray() + "\', " +
+                    "\'" + meta.getType(typeName).getArrayKeyType() + "\', " +
+                    "\'" + meta.getType(typeName).getComplexKeyType() + "\' " +
                     		")";
 	    	
 	    	logger.debug(query);
@@ -162,7 +172,10 @@ public class PostgreSQLMetaDataDaoImpl extends AbstractDBDao implements IMetaDat
 		    	query = "UPDATE " + attributesTableName +
 	                    " set type_code = \'" + meta.getType(typeName).getTypeCode() + "\', " +  
 	                    " is_key = \'" + meta.getType(typeName).isKey() + "\', " +
-	                    " is_nullable = \'" + meta.getType(typeName).isNullable() + "\' " +
+	                    " is_nullable = \'" + meta.getType(typeName).isNullable() + "\', " +
+	                    " is_array = \'" + meta.getType(typeName).isArray() + "\', " +
+	                    " array_key_type = \'" + meta.getType(typeName).getArrayKeyType() + "\', " +
+	                    " complex_key_type = \'" + meta.getType(typeName).getComplexKeyType() + "\' " +
 	                    " where class_id = " +
 	    	            	metaId + " and name = " +
 	    	                "\'" + typeName + "\'";

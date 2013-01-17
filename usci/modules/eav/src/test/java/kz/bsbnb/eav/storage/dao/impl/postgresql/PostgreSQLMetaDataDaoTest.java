@@ -6,6 +6,7 @@ package kz.bsbnb.eav.storage.dao.impl.postgresql;
 
 import static org.junit.Assert.*;
 
+import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.MetaData;
 import kz.bsbnb.usci.eav.model.metadata.Type;
@@ -59,16 +60,30 @@ public class PostgreSQLMetaDataDaoTest {
 	        metaCreate.setType("testDate", new Type(DataTypes.DATE, false, false));
 	        metaCreate.setType("testInteger", new Type(DataTypes.INTEGER, false, false));
 	        metaCreate.setType("testDouble", new Type(DataTypes.DOUBLE, false, false));
-	        metaCreate.setType("testBoolean", new Type(DataTypes.BOOLEAN, false, false));
-	        metaCreate.setType("testString", new Type(DataTypes.STRING, false, false));
+	        Type t = new Type(DataTypes.BOOLEAN, false, false);
+	        t.setArray(true);
+	        t.setComplexKeyType(ComplexKeyTypes.ANY);
+	        metaCreate.setType("testBoolean", t);
+	        t = new Type(DataTypes.STRING, false, false);
+	        t.setArray(true);
+	        t.setArrayKeyType(ComplexKeyTypes.ANY);
+	        t.setComplexKeyType(ComplexKeyTypes.ANY);
+	        metaCreate.setType("testString", t);
 	        
 	        MetaData expResultCreate = new MetaData("testClass");
 	        
 	        expResultCreate.setType("testDate", new Type(DataTypes.DATE, false, false));
 	        expResultCreate.setType("testInteger", new Type(DataTypes.INTEGER, false, false));
 	        expResultCreate.setType("testDouble", new Type(DataTypes.DOUBLE, false, false));
-	        expResultCreate.setType("testBoolean", new Type(DataTypes.BOOLEAN, false, false));
-	        expResultCreate.setType("testString", new Type(DataTypes.STRING, false, false));
+	        t = new Type(DataTypes.BOOLEAN, false, false);
+	        t.setArray(true);
+	        t.setComplexKeyType(ComplexKeyTypes.ANY);
+	        expResultCreate.setType("testBoolean", t);
+	        t = new Type(DataTypes.STRING, false, false);
+	        t.setArray(true);
+	        t.setArrayKeyType(ComplexKeyTypes.ANY);
+	        t.setComplexKeyType(ComplexKeyTypes.ANY);
+	        expResultCreate.setType("testString", t);
 	        
 	        postgreSQLMetaDataDaoImpl.saveMetaData(metaCreate);
 	        
@@ -97,17 +112,31 @@ public class PostgreSQLMetaDataDaoTest {
 	        
 	        metaDelete.setType("testDate", new Type(DataTypes.DATE, false, false));
 	        metaDelete.setType("testInteger", new Type(DataTypes.INTEGER, false, false));
-	        metaDelete.setType("testDouble", new Type(DataTypes.DOUBLE, false, false));
+	        Type t = new Type(DataTypes.DOUBLE, false, false);
+	        t.setArray(true);
+	        t.setArrayKeyType(ComplexKeyTypes.ANY);
+	        t.setComplexKeyType(ComplexKeyTypes.ANY);
+	        metaDelete.setType("testDouble", t);
 	        //metaDelete.setType("testBoolean", new Type(DataTypes.BOOLEAN));
-	        metaDelete.setType("testString", new Type(DataTypes.STRING, false, false));
+	        t = new Type(DataTypes.STRING, false, false);
+	        t.setArray(true);
+	        t.setComplexKeyType(ComplexKeyTypes.ANY);
+	        metaDelete.setType("testString", t);
 	        
 	        MetaData expResultDelete = new MetaData("testClass");
 	        
 	        expResultDelete.setType("testDate", new Type(DataTypes.DATE, false, false));
 	        expResultDelete.setType("testInteger", new Type(DataTypes.INTEGER, false, false));
-	        expResultDelete.setType("testDouble", new Type(DataTypes.DOUBLE, false, false));
+	        t = new Type(DataTypes.DOUBLE, false, false);
+	        t.setArray(true);
+	        t.setArrayKeyType(ComplexKeyTypes.ANY);
+	        t.setComplexKeyType(ComplexKeyTypes.ANY);
+	        expResultDelete.setType("testDouble", t);
 	        //expResultDelete.setType("testBoolean", new Type(DataTypes.BOOLEAN));
-	        expResultDelete.setType("testString", new Type(DataTypes.STRING, false, false));
+	        t = new Type(DataTypes.STRING, false, false);
+	        t.setArray(true);
+	        t.setComplexKeyType(ComplexKeyTypes.ANY);
+	        expResultDelete.setType("testString", t);
 	        
 	        postgreSQLMetaDataDaoImpl.saveMetaData(metaDelete);
 	        
@@ -137,16 +166,30 @@ public class PostgreSQLMetaDataDaoTest {
 	        
 	        metaUpdate.setType("testDate", new Type(DataTypes.DATE, false, false));
 	        metaUpdate.setType("testInteger", new Type(DataTypes.INTEGER, true, false));
-	        metaUpdate.setType("testDouble", new Type(DataTypes.DOUBLE, false, true));
+	        Type t = new Type(DataTypes.DOUBLE, false, true);
+	        t.setArray(true);
+	        t.setArrayKeyType(ComplexKeyTypes.ANY);
+	        t.setComplexKeyType(ComplexKeyTypes.ANY);
+	        metaUpdate.setType("testDouble", t);
 	        //metaDelete.setType("testBoolean", new Type(DataTypes.BOOLEAN));
-	        metaUpdate.setType("testString", new Type(DataTypes.INTEGER, false, false));
+	        t = new Type(DataTypes.INTEGER, false, false);
+	        t.setArray(true);
+	        t.setComplexKeyType(ComplexKeyTypes.ANY);
+	        metaUpdate.setType("testString", t);
 	        
 	        MetaData expResultUpdate = new MetaData("testClass");
 	        
 	        expResultUpdate.setType("testDate", new Type(DataTypes.DATE, false, false));
 	        expResultUpdate.setType("testInteger", new Type(DataTypes.INTEGER, true, false));
-	        expResultUpdate.setType("testDouble", new Type(DataTypes.DOUBLE, false, true));
+	        t = new Type(DataTypes.DOUBLE, false, true);
+	        t.setArray(true);
+	        t.setArrayKeyType(ComplexKeyTypes.ANY);
+	        t.setComplexKeyType(ComplexKeyTypes.ANY);
+	        expResultUpdate.setType("testDouble", t);
 	        //expResultDelete.setType("testBoolean", new Type(DataTypes.BOOLEAN));
+	        t = new Type(DataTypes.INTEGER, false, false);
+	        t.setArray(true);
+	        t.setComplexKeyType(ComplexKeyTypes.ANY);
 	        expResultUpdate.setType("testString", new Type(DataTypes.INTEGER, false, false));
 	        
 	        postgreSQLMetaDataDaoImpl.saveMetaData(metaUpdate);

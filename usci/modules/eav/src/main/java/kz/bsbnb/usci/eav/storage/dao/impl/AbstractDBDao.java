@@ -21,13 +21,18 @@ public abstract class AbstractDBDao {
 	protected String tablePrefix;
 	
 	protected String classesTableName;
+	protected String arrayKeyFilterTableName;
+	protected String arrayKeyFilterValuesTableName;
     protected String attributesTableName;
     protected String entitiesTableName;
 
 	
 	public static final int classNameLength = 64;
-	public static final int typeNameLength = 64;
+	public static final int attributeNameLength = 64;
 	public static final int typeCodeLength = 16;
+	public static final int arrayKeyTypeCodeLength = 16;
+	public static final int complexKeyTypeCodeLength = 16;
+	public static final int arrayKeyFilterValueLength = 128;
 	
 	@PostConstruct
 	public void init()
@@ -35,6 +40,8 @@ public abstract class AbstractDBDao {
 		classesTableName = tablePrefix + "classes";
 	    attributesTableName = tablePrefix + "attributes";
 	    entitiesTableName = tablePrefix + "entities";
+	    arrayKeyFilterTableName = tablePrefix + "array_key_filter";
+		arrayKeyFilterValuesTableName = tablePrefix + "array_key_filter_values";
 	}
 
 	public String getTablePrefix() {

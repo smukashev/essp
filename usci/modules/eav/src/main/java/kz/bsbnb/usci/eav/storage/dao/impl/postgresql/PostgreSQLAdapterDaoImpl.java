@@ -33,10 +33,13 @@ public class PostgreSQLAdapterDaoImpl extends AbstractDBDao implements IAdapterD
                 " (" + 
                   "id serial NOT NULL," +
                   "class_id int references " + classesTableName + "(id) ON DELETE CASCADE, " +
-                  "name character varying(" + typeNameLength  + ") NOT NULL," + 
+                  "name character varying(" + attributeNameLength  + ") NOT NULL," + 
                   "type_code character varying(" + typeCodeLength  + ") NOT NULL," +
                   "is_key boolean NOT NULL," +
                   "is_nullable boolean NOT NULL," +
+                  "is_array boolean NOT NULL," +
+                  "array_key_type character varying(" + arrayKeyTypeCodeLength  + ")," +
+                  "complex_key_type character varying(" + complexKeyTypeCodeLength  + ")," +
                   "CONSTRAINT " + attributesTableName + "_primary_key_index PRIMARY KEY (id )" + 
                 ")";
 	    
@@ -54,10 +57,40 @@ public class PostgreSQLAdapterDaoImpl extends AbstractDBDao implements IAdapterD
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
+	    
+	    query = "CREATE TABLE IF NOT EXISTS " + arrayKeyFilterTableName + 
+                " (" + 
+                  "id serial NOT NULL," + 
+                  "attribute_id int references " + attributesTableName + "(id) ON DELETE CASCADE, " +
+                  "attribute_name character varying(" + attributeNameLength  + ") NOT NULL," + 
+                  "CONSTRAINT " + arrayKeyFilterTableName + "_primary_key_index PRIMARY KEY (id )" + 
+                ")";
+
+		logger.debug(query);
+		
+		jdbcTemplate.execute(query);
+		
+		query = "CREATE TABLE IF NOT EXISTS " + arrayKeyFilterValuesTableName + 
+                " (" + 
+                  "id serial NOT NULL," + 
+                  "filter_id int references " + arrayKeyFilterTableName + "(id) ON DELETE CASCADE, " +
+                  "value character varying(" + arrayKeyFilterValueLength  + ") NOT NULL," + 
+                  "CONSTRAINT " + arrayKeyFilterValuesTableName + "_primary_key_index PRIMARY KEY (id )" + 
+                ")";
+
+		logger.debug(query);
+		
+		jdbcTemplate.execute(query);
 	}
 
 	public void dropStructure() {
-	    String query = "DROP TABLE IF EXISTS " + attributesTableName;
+		String query = "DROP TABLE IF EXISTS " + arrayKeyFilterValuesTableName;
+	    logger.debug(query);
+	    jdbcTemplate.execute(query);
+	    query = "DROP TABLE IF EXISTS " + arrayKeyFilterTableName;
+	    logger.debug(query);
+	    jdbcTemplate.execute(query);
+		query = "DROP TABLE IF EXISTS " + attributesTableName;
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
 	    query = "DROP TABLE IF EXISTS " + entitiesTableName;
