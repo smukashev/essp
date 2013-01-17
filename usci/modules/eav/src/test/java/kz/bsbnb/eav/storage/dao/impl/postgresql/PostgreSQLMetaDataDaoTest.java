@@ -48,12 +48,10 @@ public class PostgreSQLMetaDataDaoTest {
     }
 
     @Test
-    public void testLoadMetaData() throws Exception {
-        System.out.println("loadMetaData");
+    public void loadMetaData() throws Exception {
         try {
         	postgreSQLAdapterDaoImpl.createStructure();
 	        
-	        //---------------- Create metadata
 	        logger.debug("Create metadata test");
 	        
 	        MetaData metaCreate = new MetaData("testClass");
@@ -75,9 +73,24 @@ public class PostgreSQLMetaDataDaoTest {
 	        postgreSQLMetaDataDaoImpl.saveMetaData(metaCreate);
 	        
 	        MetaData loadedMetaCreate = postgreSQLMetaDataDaoImpl.loadMetaData("testClass");
+
+	        assertTrue(expResultCreate.equals(loadedMetaCreate));
+        }
+        catch(Exception e)
+        {
+        	fail("Exception: " + e.getMessage());
+        }
+        finally
+        {
+        	postgreSQLAdapterDaoImpl.dropStructure();
+        }
+    }
+    
+    @Test
+    public void deleteFieldsMetaData() throws Exception {
+        try {
+        	postgreSQLAdapterDaoImpl.createStructure();
 	        
-	        //-----------------------------------------
-	        //---------------- Delete metadata attribute
 	        logger.debug("Delete metadata attribute test");
 	        
 	        MetaData metaDelete = new MetaData("testClass");
@@ -100,8 +113,24 @@ public class PostgreSQLMetaDataDaoTest {
 	        
 	        MetaData loadedMetaDelete = postgreSQLMetaDataDaoImpl.loadMetaData("testClass");
 	        
-	        //-----------------------------------------
-	        //---------------- Update metadata attribute
+	        assertTrue(expResultDelete.equals(loadedMetaDelete));
+        }
+        catch(Exception e)
+        {
+        	fail("Exception: " + e.getMessage());
+        }
+        finally
+        {
+        	postgreSQLAdapterDaoImpl.dropStructure();
+        }
+    }
+    
+    @Test
+    public void updateFieldsMetaData() throws Exception {
+        System.out.println("loadMetaData");
+        try {
+        	postgreSQLAdapterDaoImpl.createStructure();
+	        
 	        logger.debug("Delete metadata attribute test");
 	        
 	        MetaData metaUpdate = new MetaData("testClass");
@@ -124,9 +153,6 @@ public class PostgreSQLMetaDataDaoTest {
 	        
 	        MetaData loadedMetaUpdate = postgreSQLMetaDataDaoImpl.loadMetaData("testClass");
 	        
-	        //-----------------------------------------
-	        assertTrue(expResultCreate.equals(loadedMetaCreate));
-	        assertTrue(expResultDelete.equals(loadedMetaDelete));
 	        assertTrue(expResultUpdate.equals(loadedMetaUpdate));
         }
         catch(Exception e)

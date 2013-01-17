@@ -44,7 +44,7 @@ public class BaseEntity {
         
         if(type.getTypeCode() != DataTypes.DATE) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded date, got: " + 
+                    meta.getClassName() + ". Nedded " + DataTypes.DATE + ", got: " + 
                     type.getTypeCode());
         }
         
@@ -68,7 +68,7 @@ public class BaseEntity {
         
         if(type.getTypeCode() != DataTypes.STRING) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded String, got: " + 
+                    meta.getClassName() + ". Nedded " + DataTypes.STRING + ", got: " + 
                     type.getTypeCode());
         }
         
@@ -92,7 +92,7 @@ public class BaseEntity {
         
         if(type.getTypeCode() != DataTypes.INTEGER) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded Integer, got: " + 
+                    meta.getClassName() + ". Nedded " + DataTypes.INTEGER + ", got: " + 
                     type.getTypeCode());
         }
         
@@ -116,7 +116,7 @@ public class BaseEntity {
         
         if(type.getTypeCode() != DataTypes.DOUBLE) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded Double, got: " + 
+                    meta.getClassName() + ". Nedded " + DataTypes.DOUBLE + ", got: " + 
                     type.getTypeCode());
         }
         
@@ -140,7 +140,7 @@ public class BaseEntity {
         
         if(type.getTypeCode() != DataTypes.BOOLEAN) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded Boolean, got: " + 
+                    meta.getClassName() + ". Nedded " + DataTypes.BOOLEAN + ", got: " + 
                     type.getTypeCode());
         }
         
@@ -151,6 +151,30 @@ public class BaseEntity {
         }
         
         return (Boolean)obj;
+    }
+    
+    public BaseEntity getComplex(String name)
+    {
+        Type type = meta.getType(name);
+        
+        if(type == null) {
+            throw new IllegalArgumentException("Type: " + name + 
+                    ", not found in class: " + meta.getClassName());
+        }
+        
+        if(type.getTypeCode() != DataTypes.COMPLEX) {
+            throw new IllegalArgumentException("Type missmatch in class: " + 
+                    meta.getClassName() + ". Nedded " + DataTypes.COMPLEX + ", got: " + 
+                    type.getTypeCode());
+        }
+        
+        Object obj = data.get(name);
+        
+        if(obj == null) {
+            return null;
+        }
+        
+        return (BaseEntity)obj;
     }
     
     public void set(String name, Date value)
@@ -164,7 +188,7 @@ public class BaseEntity {
         
         if(type.getTypeCode() != DataTypes.DATE) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded Date, got: " + 
+                    meta.getClassName() + ". Nedded " + DataTypes.DATE + ", got: " + 
                     type.getTypeCode());
         }
         
@@ -182,7 +206,7 @@ public class BaseEntity {
         
         if(type.getTypeCode() != DataTypes.STRING) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded String, got: " + 
+                    meta.getClassName() + ". Nedded " + DataTypes.STRING + ", got: " + 
                     type.getTypeCode());
         }
         
@@ -200,7 +224,7 @@ public class BaseEntity {
         
         if(type.getTypeCode() != DataTypes.INTEGER) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded Integer, got: " + 
+                    meta.getClassName() + ". Nedded " + DataTypes.INTEGER + ", got: " + 
                     type.getTypeCode());
         }
         
@@ -218,7 +242,7 @@ public class BaseEntity {
         
         if(type.getTypeCode() != DataTypes.DOUBLE) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded Double, got: " + 
+                    meta.getClassName() + ". Nedded " + DataTypes.DOUBLE + ", got: " + 
                     type.getTypeCode());
         }
         
@@ -236,7 +260,25 @@ public class BaseEntity {
         
         if(type.getTypeCode() != DataTypes.BOOLEAN) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded Boolean, got: " + 
+                    meta.getClassName() + ". Nedded " + DataTypes.BOOLEAN + ", got: " + 
+                    type.getTypeCode());
+        }
+        
+        data.put(name, value);
+    }
+    
+    public void set(String name, BaseEntity value)
+    {
+        Type type = meta.getType(name);
+        
+        if(type == null) {
+            throw new IllegalArgumentException("Type: " + name + 
+                    ", not found in class: " + meta.getClassName());
+        }
+        
+        if(type.getTypeCode() != DataTypes.COMPLEX) {
+            throw new IllegalArgumentException("Type missmatch in class: " + 
+                    meta.getClassName() + ". Nedded " + DataTypes.COMPLEX + ", got: " + 
                     type.getTypeCode());
         }
         

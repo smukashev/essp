@@ -32,10 +32,54 @@ public class BaseEntityTest {
     @AfterClass
     public static void tearDown() throws Exception {
     }
+    
+    @Test
+    public void getComplex() {
+    	String name = "testClass";
+        BaseEntity instance = new BaseEntity(name);
+        BaseEntity expResult;
+        
+        expResult = new BaseEntity("testClass");
+        expResult.getMeta().setType("testField1", new Type(DataTypes.DATE, false, false));
+        expResult.getMeta().setType("testField2", new Type(DataTypes.INTEGER, false, false));
+        
+        instance.getMeta().setType("testComplex", new Type(DataTypes.COMPLEX, false, false));
+        instance.getMeta().setType("testNotComplex", new Type(DataTypes.INTEGER, false, false));
+        instance.set("testComplex", expResult);
+        
+        
+        BaseEntity result = instance.getComplex("testComplex");
+        assertEquals(expResult, result);
+        
+        boolean pass = false;
+        try {
+            instance.getComplex("unknownName");
+        }
+        catch(IllegalArgumentException e)
+        {
+            pass = true;
+        }
+        
+        if(!pass) {
+            fail("Gives Complex with unknown name");
+        }
+        
+        pass = false;
+        try {
+            instance.getComplex("testNotComplex");
+        }
+        catch(IllegalArgumentException e)
+        {
+            pass = true;
+        }
+        
+        if(!pass) {
+            fail("Gives Complex with illegal type");
+        }
+    }
 
     @Test
-    public void testGetDate() {
-        System.out.println("getDate");
+    public void getDate() {
         String name = "testClass";
         BaseEntity instance = new BaseEntity(name);
         Date expResult;
@@ -77,8 +121,7 @@ public class BaseEntityTest {
     }
     
     @Test
-    public void testGetInteger() {
-        System.out.println("getInteger");
+    public void getInteger() {
         String name = "testClass";
         BaseEntity instance = new BaseEntity(name);
         Integer expResult;
@@ -120,8 +163,7 @@ public class BaseEntityTest {
     }
     
     @Test
-    public void testGetString() {
-        System.out.println("getString");
+    public void getString() {
         String name = "testClass";
         BaseEntity instance = new BaseEntity(name);
         String expResult;
@@ -163,8 +205,7 @@ public class BaseEntityTest {
     }
     
     @Test
-    public void testGetDouble() {
-        System.out.println("getDouble");
+    public void getDouble() {
         String name = "testClass";
         BaseEntity instance = new BaseEntity(name);
         Double expResult;
@@ -206,8 +247,7 @@ public class BaseEntityTest {
     }
     
     @Test
-    public void testGetBoolean() {
-        System.out.println("getBoolean");
+    public void getBoolean() {
         String name = "testClass";
         BaseEntity instance = new BaseEntity(name);
         Boolean expResult;

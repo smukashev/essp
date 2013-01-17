@@ -41,18 +41,22 @@ public class PostgreSQLAdapterDaoTest {
     public static void tearDown() throws Exception {
     }
 
-    /**
-     * Connects, creates db and drops it
-     */
     @Test
-    public void testConnect() {
-        System.out.println("Connect, create, drop");
-        
+    public void connect() {
         if(postgreSQLAdapterDaoImpl == null)
         	fail("postgreSQLAdapterDaoImpl is null");
         
 		assertEquals(postgreSQLAdapterDaoImpl.testConnection(), true);
        	postgreSQLAdapterDaoImpl.createStructure();
+       	postgreSQLAdapterDaoImpl.dropStructure();
+    }
+    
+    @Test
+    public void createDropStructure() {
+        if(postgreSQLAdapterDaoImpl == null)
+        	fail("postgreSQLAdapterDaoImpl is null");
+        
+		postgreSQLAdapterDaoImpl.createStructure();
        	postgreSQLAdapterDaoImpl.dropStructure();
     }
 }

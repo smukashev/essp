@@ -9,5 +9,6 @@ public enum DataTypes {
     DATE,
     STRING,
     BOOLEAN,
-    DOUBLE
+    DOUBLE,
+    COMPLEX
 }
