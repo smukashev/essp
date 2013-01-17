@@ -51,9 +51,11 @@ public class PostgreSQLMetaDataDaoImpl extends AbstractDBDao implements IMetaDat
 		MetaData meta = new MetaData(metaClassName);
 	    
 	    String query = "SELECT a.id, a.name, a.type_code, a.is_key, a.is_nullable, a.is_array, " +
-	    		"a.array_key_type, a.complex_key_type FROM " + 
-				classesTableName + " c, " + attributesTableName + " a " + 
-                " WHERE c.name = \'" + metaClassName + "\'";
+	    		"a.array_key_type, a.complex_key_type, ak.id akid, ak.attribute_name akname FROM " + 
+				classesTableName + " c LEFT JOIN " + attributesTableName + " a ON c.id = a.class_id " +
+				" LEFT JOIN " + arrayKeyFilterTableName + " ak ON a.id = ak.attribute_id " +  
+                " WHERE c.name = \'" + metaClassName + "\' " +
+                "and a.id IS NOT NULL";
 	    
 	    logger.debug(query);
 	    
@@ -67,9 +69,15 @@ public class PostgreSQLMetaDataDaoImpl extends AbstractDBDao implements IMetaDat
 	    	t.setArray((Boolean)row.get("is_array"));
 	    	t.setArrayKeyType(ComplexKeyTypes.valueOf((String)row.get("array_key_type")));
 	    	t.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
+	    	
+	    	if(row.get("akid") != null)
+	    	{
+	    		//TODO: add list of filter values from db
+	    		t.addArrayKeyFilterValues((String)row.get("akname"), null);
+	    	}
+	    	
 			meta.setId((Integer)row.get("id"));
-	    	meta.setType((String)row.get("name"), 
-	                t);
+	    	meta.setType((String)row.get("name"), t);
 	    }
 	    
 	    return meta;

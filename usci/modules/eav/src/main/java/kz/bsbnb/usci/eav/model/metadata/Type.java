@@ -66,6 +66,11 @@ public class Type {
      */
     HashMap<String, ArrayList<String>> arrayKeyFilter = new HashMap<String, ArrayList<String>>();
     
+    public void addArrayKeyFilterValues(String attributeName, ArrayList<String> values)
+    {
+    	arrayKeyFilter.put(attributeName, values);
+    }
+    
     /**
      * 
      * @param typeCode code of the attribute's type 
