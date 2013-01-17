@@ -34,6 +34,12 @@ public class BaseEntityTest {
     }
     
     @Test
+    public void typesCount()
+    {
+    	assertEquals(DataTypes.values().length, 6);
+    }
+    
+    @Test
     public void getComplex() {
     	String name = "testClass";
         BaseEntity instance = new BaseEntity(name);

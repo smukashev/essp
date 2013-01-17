@@ -1,19 +1,38 @@
 package kz.bsbnb.usci.eav.model.metadata;
 
 /**
+ * Represents EAV entity attribute's type metadata 
  *
  * @author a.tkachenko
+ * @version 1.0, 17.01.2013
  */
 public class Type {
+	/**
+	 * Attributes type's code
+	 */
     DataTypes typeCode;
+    
+    /**
+     * <code>true</code> if attribute is a key attribute (used by DAO to find persisted entity)
+     */
     boolean isKey;
+    /**
+     * <code>true</code> if attribute can have <code>null</code> value
+     * key attributes have this flag always set to false 
+     */
     boolean isNullable;
     
+    /**
+     * 
+     * @param typeCode code of the attribute's type 
+     * @param isKey <code>true</code> when attribute is a key for search 
+     * @param isNullable <code>true</code> when attribute can have <code>null</code> value
+     */
     public Type(DataTypes typeCode, boolean isKey, boolean isNullable)
     {
         this.typeCode = typeCode;
         this.isKey = isKey;
-        this.isNullable = isNullable;
+        this.isNullable = isNullable && !isKey;
     }
     
     public DataTypes getTypeCode() {
@@ -30,6 +49,7 @@ public class Type {
 
 	public void setKey(boolean isKey) {
 		this.isKey = isKey;
+		this.isNullable = isNullable && !isKey;
 	}
 
 	public boolean isNullable() {
@@ -37,7 +57,7 @@ public class Type {
 	}
 
 	public void setNullable(boolean isNullable) {
-		this.isNullable = isNullable;
+		this.isNullable = isNullable && !isKey;
 	}
 	
 	public boolean equals(Object obj) {
