@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
-import kz.bsbnb.usci.eav.model.metadata.Type;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 
 /**
  *
@@ -46,11 +46,11 @@ public class BaseEntityTest {
         BaseEntity expResult;
         
         expResult = new BaseEntity("testClass");
-        expResult.getMeta().setType("testField1", new Type(DataTypes.DATE, false, false));
-        expResult.getMeta().setType("testField2", new Type(DataTypes.INTEGER, false, false));
+        expResult.getMeta().setType("testField1", new MetaValue(DataTypes.DATE, false, false));
+        expResult.getMeta().setType("testField2", new MetaValue(DataTypes.INTEGER, false, false));
         
-        instance.getMeta().setType("testComplex", new Type(DataTypes.COMPLEX, false, false));
-        instance.getMeta().setType("testNotComplex", new Type(DataTypes.INTEGER, false, false));
+        instance.getMeta().setType("testComplex", new MetaValue(DataTypes.COMPLEX, false, false));
+        instance.getMeta().setType("testNotComplex", new MetaValue(DataTypes.INTEGER, false, false));
         instance.set("testComplex", expResult);
         
         
@@ -91,8 +91,8 @@ public class BaseEntityTest {
         Date expResult;
         
         expResult = new Date();
-        instance.getMeta().setType("testDate", new Type(DataTypes.DATE, false, false));
-        instance.getMeta().setType("testNotDate", new Type(DataTypes.INTEGER, false, false));
+        instance.getMeta().setType("testDate", new MetaValue(DataTypes.DATE, false, false));
+        instance.getMeta().setType("testNotDate", new MetaValue(DataTypes.INTEGER, false, false));
         instance.set("testDate", expResult);
         
         
@@ -133,8 +133,8 @@ public class BaseEntityTest {
         Integer expResult;
         
         expResult = new Integer(7);
-        instance.getMeta().setType("testInteger", new Type(DataTypes.INTEGER, false, false));
-        instance.getMeta().setType("testNotInteger", new Type(DataTypes.DATE, false, false));
+        instance.getMeta().setType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+        instance.getMeta().setType("testNotInteger", new MetaValue(DataTypes.DATE, false, false));
         instance.set("testInteger", expResult);
         
         
@@ -175,8 +175,8 @@ public class BaseEntityTest {
         String expResult;
         
         expResult = "testString";
-        instance.getMeta().setType("testString", new Type(DataTypes.STRING, false, false));
-        instance.getMeta().setType("testNotString", new Type(DataTypes.INTEGER, false, false));
+        instance.getMeta().setType("testString", new MetaValue(DataTypes.STRING, false, false));
+        instance.getMeta().setType("testNotString", new MetaValue(DataTypes.INTEGER, false, false));
         instance.set("testString", expResult);
         
         
@@ -217,8 +217,8 @@ public class BaseEntityTest {
         Double expResult;
         
         expResult = new Double(1.);
-        instance.getMeta().setType("testDouble", new Type(DataTypes.DOUBLE, false, false));
-        instance.getMeta().setType("testNotDouble", new Type(DataTypes.INTEGER, false, false));
+        instance.getMeta().setType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+        instance.getMeta().setType("testNotDouble", new MetaValue(DataTypes.INTEGER, false, false));
         instance.set("testDouble", expResult);
         
         
@@ -259,8 +259,8 @@ public class BaseEntityTest {
         Boolean expResult;
         
         expResult = true;
-        instance.getMeta().setType("testBoolean", new Type(DataTypes.BOOLEAN, false, false));
-        instance.getMeta().setType("testNotBoolean", new Type(DataTypes.INTEGER, false, false));
+        instance.getMeta().setType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+        instance.getMeta().setType("testNotBoolean", new MetaValue(DataTypes.INTEGER, false, false));
         instance.set("testBoolean", expResult);
         
         

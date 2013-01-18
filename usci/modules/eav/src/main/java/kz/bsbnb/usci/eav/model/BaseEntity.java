@@ -4,8 +4,9 @@ import java.util.Date;
 import java.util.HashMap;
 
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
-import kz.bsbnb.usci.eav.model.metadata.MetaData;
-import kz.bsbnb.usci.eav.model.metadata.Type;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 
 /**
  * Implements EAV entity object. 
@@ -26,7 +27,7 @@ public class BaseEntity {
      * Holds data about entity structure
      * @see MetaData
      */
-    MetaData meta;
+    MetaClass meta;
     
     /**
      * Holds attributes values
@@ -40,7 +41,7 @@ public class BaseEntity {
      */
     public BaseEntity(String className)
     {
-        meta = new MetaData(className);
+        meta = new MetaClass(className);
     }
 
     /**
@@ -48,7 +49,7 @@ public class BaseEntity {
      * 
      * @return Object structure
      */
-    public MetaData getMeta() {
+    public MetaClass getMeta() {
         return meta;
     }
 
@@ -82,17 +83,24 @@ public class BaseEntity {
      */
     public Date getDate(String name)
     {
-        Type type = meta.getType(name);
+        IMetaType type = meta.getMemberType(name);
         
         if(type == null) {
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
         }
         
-        if(type.getTypeCode() != DataTypes.DATE) {
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name + 
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+        
+        MetaValue simpleType = (MetaValue)type;
+        
+        if(simpleType.getTypeCode() != DataTypes.DATE) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
                     meta.getClassName() + ". Nedded " + DataTypes.DATE + ", got: " + 
-                    type.getTypeCode());
+                    simpleType.getTypeCode());
         }
         
         Object obj = data.get(name);
@@ -115,17 +123,24 @@ public class BaseEntity {
      */
     public String getString(String name)
     {
-        Type type = meta.getType(name);
+    	IMetaType type = meta.getMemberType(name);
         
         if(type == null) {
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
         }
         
-        if(type.getTypeCode() != DataTypes.STRING) {
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name + 
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+        
+        MetaValue simpleType = (MetaValue)type;
+        
+        if(simpleType.getTypeCode() != DataTypes.STRING) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
                     meta.getClassName() + ". Nedded " + DataTypes.STRING + ", got: " + 
-                    type.getTypeCode());
+                    simpleType.getTypeCode());
         }
         
         Object obj = data.get(name);
@@ -148,17 +163,24 @@ public class BaseEntity {
      */
     public Integer getInteger(String name)
     {
-        Type type = meta.getType(name);
+    	IMetaType type = meta.getMemberType(name);
         
         if(type == null) {
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
         }
         
-        if(type.getTypeCode() != DataTypes.INTEGER) {
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name + 
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+        
+        MetaValue simpleType = (MetaValue)type;
+        
+        if(simpleType.getTypeCode() != DataTypes.INTEGER) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
                     meta.getClassName() + ". Nedded " + DataTypes.INTEGER + ", got: " + 
-                    type.getTypeCode());
+                    simpleType.getTypeCode());
         }
         
         Object obj = data.get(name);
@@ -181,17 +203,24 @@ public class BaseEntity {
      */
     public Double getDouble(String name)
     {
-        Type type = meta.getType(name);
+    	IMetaType type = meta.getMemberType(name);
         
         if(type == null) {
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
         }
         
-        if(type.getTypeCode() != DataTypes.DOUBLE) {
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name + 
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+        
+        MetaValue simpleType = (MetaValue)type;
+        
+        if(simpleType.getTypeCode() != DataTypes.DOUBLE) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
                     meta.getClassName() + ". Nedded " + DataTypes.DOUBLE + ", got: " + 
-                    type.getTypeCode());
+                    simpleType.getTypeCode());
         }
         
         Object obj = data.get(name);
@@ -214,17 +243,24 @@ public class BaseEntity {
      */
     public Boolean getBoolean(String name)
     {
-        Type type = meta.getType(name);
+    	IMetaType type = meta.getMemberType(name);
         
         if(type == null) {
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
         }
         
-        if(type.getTypeCode() != DataTypes.BOOLEAN) {
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name + 
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+        
+        MetaValue simpleType = (MetaValue)type;
+        
+        if(simpleType.getTypeCode() != DataTypes.BOOLEAN) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
                     meta.getClassName() + ". Nedded " + DataTypes.BOOLEAN + ", got: " + 
-                    type.getTypeCode());
+                    simpleType.getTypeCode());
         }
         
         Object obj = data.get(name);
@@ -247,17 +283,17 @@ public class BaseEntity {
      */
     public BaseEntity getComplex(String name)
     {
-        Type type = meta.getType(name);
+        IMetaType type = meta.getMemberType(name);
         
         if(type == null) {
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
         }
         
-        if(type.getTypeCode() != DataTypes.COMPLEX) {
-            throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded " + DataTypes.COMPLEX + ", got: " + 
-                    type.getTypeCode());
+        if(!type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name + 
+                    ", is not an object of class. It's a simple value with type " + 
+            		((MetaValue)type).getTypeCode());
         }
         
         Object obj = data.get(name);
@@ -280,17 +316,24 @@ public class BaseEntity {
      */
     public void set(String name, Date value)
     {
-        Type type = meta.getType(name);
+    	IMetaType type = meta.getMemberType(name);
         
         if(type == null) {
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
         }
         
-        if(type.getTypeCode() != DataTypes.DATE) {
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name + 
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+        
+        MetaValue simpleType = (MetaValue)type;
+        
+        if(simpleType.getTypeCode() != DataTypes.DATE) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
                     meta.getClassName() + ". Nedded " + DataTypes.DATE + ", got: " + 
-                    type.getTypeCode());
+                    simpleType.getTypeCode());
         }
         
         data.put(name, value);
@@ -307,17 +350,24 @@ public class BaseEntity {
      */
     public void set(String name, String value)
     {
-        Type type = meta.getType(name);
+    	IMetaType type = meta.getMemberType(name);
         
         if(type == null) {
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
         }
         
-        if(type.getTypeCode() != DataTypes.STRING) {
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name + 
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+        
+        MetaValue simpleType = (MetaValue)type;
+        
+        if(simpleType.getTypeCode() != DataTypes.STRING) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
                     meta.getClassName() + ". Nedded " + DataTypes.STRING + ", got: " + 
-                    type.getTypeCode());
+                    simpleType.getTypeCode());
         }
         
         data.put(name, value);
@@ -334,17 +384,24 @@ public class BaseEntity {
      */
     public void set(String name, Integer value)
     {
-        Type type = meta.getType(name);
+    	IMetaType type = meta.getMemberType(name);
         
         if(type == null) {
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
         }
         
-        if(type.getTypeCode() != DataTypes.INTEGER) {
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name + 
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+        
+        MetaValue simpleType = (MetaValue)type;
+        
+        if(simpleType.getTypeCode() != DataTypes.INTEGER) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
                     meta.getClassName() + ". Nedded " + DataTypes.INTEGER + ", got: " + 
-                    type.getTypeCode());
+                    simpleType.getTypeCode());
         }
         
         data.put(name, value);
@@ -361,17 +418,24 @@ public class BaseEntity {
      */
     public void set(String name, Double value)
     {
-        Type type = meta.getType(name);
+    	IMetaType type = meta.getMemberType(name);
         
         if(type == null) {
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
         }
         
-        if(type.getTypeCode() != DataTypes.DOUBLE) {
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name + 
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+        
+        MetaValue simpleType = (MetaValue)type;
+        
+        if(simpleType.getTypeCode() != DataTypes.DOUBLE) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
                     meta.getClassName() + ". Nedded " + DataTypes.DOUBLE + ", got: " + 
-                    type.getTypeCode());
+                    simpleType.getTypeCode());
         }
         
         data.put(name, value);
@@ -388,17 +452,24 @@ public class BaseEntity {
      */
     public void set(String name, Boolean value)
     {
-        Type type = meta.getType(name);
+    	IMetaType type = meta.getMemberType(name);
         
         if(type == null) {
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
         }
         
-        if(type.getTypeCode() != DataTypes.BOOLEAN) {
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name + 
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+        
+        MetaValue simpleType = (MetaValue)type;
+        
+        if(simpleType.getTypeCode() != DataTypes.BOOLEAN) {
             throw new IllegalArgumentException("Type missmatch in class: " + 
                     meta.getClassName() + ". Nedded " + DataTypes.BOOLEAN + ", got: " + 
-                    type.getTypeCode());
+                    simpleType.getTypeCode());
         }
         
         data.put(name, value);
@@ -415,17 +486,17 @@ public class BaseEntity {
      */
     public void set(String name, BaseEntity value)
     {
-        Type type = meta.getType(name);
+    	IMetaType type = meta.getMemberType(name);
         
         if(type == null) {
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
         }
         
-        if(type.getTypeCode() != DataTypes.COMPLEX) {
-            throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded " + DataTypes.COMPLEX + ", got: " + 
-                    type.getTypeCode());
+        if(!type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name + 
+                    ", is not an object of class. It's a simple value with type " + 
+            		((MetaValue)type).getTypeCode());
         }
         
         data.put(name, value);

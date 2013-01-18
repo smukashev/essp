@@ -1,9 +1,10 @@
-package kz.bsbnb.usci.eav.storage.dao.impl.postgresql;
+package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.storage;
 
 
 
-import kz.bsbnb.usci.eav.storage.dao.IAdapterDao;
-import kz.bsbnb.usci.eav.storage.dao.impl.AbstractDBDao;
+import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
+import kz.bsbnb.usci.eav.persistance.storage.IStorage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -14,10 +15,11 @@ import org.springframework.stereotype.Repository;
  * @author a.tkachenko
  */
 @Repository
-public class PostgreSQLAdapterDaoImpl extends AbstractDBDao implements IAdapterDao {
-	final Logger logger = LoggerFactory.getLogger(PostgreSQLAdapterDaoImpl.class);
+public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
+	final Logger logger = LoggerFactory.getLogger(PostgreSQLStorageImpl.class);
 	
-	public void createStructure() {
+	@Override
+	public void initialize() {
 	    String query = "CREATE TABLE IF NOT EXISTS " + classesTableName + 
 	                    " (" + 
 	                      "id serial NOT NULL," + 
@@ -83,7 +85,8 @@ public class PostgreSQLAdapterDaoImpl extends AbstractDBDao implements IAdapterD
 		jdbcTemplate.execute(query);
 	}
 
-	public void dropStructure() {
+	@Override
+	public void clear() {
 		String query = "DROP TABLE IF EXISTS " + arrayKeyFilterValuesTableName;
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
@@ -101,13 +104,9 @@ public class PostgreSQLAdapterDaoImpl extends AbstractDBDao implements IAdapterD
 	    jdbcTemplate.execute(query);
 	}
 
-	public boolean testConnection() {
-	    String query = "SELECT 1";
-	    
-	    logger.debug(query);
-	    
-	    jdbcTemplate.execute(query);
-	
-	    return true;
+	@Override
+	public void empty() {
+		// TODO Auto-generated method stub
+		
 	}
 }

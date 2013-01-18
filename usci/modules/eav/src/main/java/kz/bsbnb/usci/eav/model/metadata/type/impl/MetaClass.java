@@ -1,0 +1,115 @@
+package kz.bsbnb.usci.eav.model.metadata.type.impl;
+
+import java.util.HashMap;
+import java.util.Set;
+
+import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
+
+public class MetaClass extends AbstractMetaType {
+	/**
+	 * Name of the metadata. Used as a key value for database search if <code>id</code> is 0 
+	 */
+	String className;
+	
+	/**
+	 * Holds type values. Keys of hash are type names.
+	 */
+	HashMap<String, IMetaType> members = new HashMap<String, IMetaType>();
+	
+	/**
+     * When attribute is an entity, and is a key attribute - sets key usage strategy.
+     * Defaults to <code>ArrayKeyTypes.ALL</code>
+     * @see ComplexKeyTypes
+     */
+    ComplexKeyTypes complexKeyType = ComplexKeyTypes.ALL;
+    
+    /**
+	 * When additional searching logic is needed. This attribute could be set to stored procedure name.
+	 * This SP will get key attributes of entity and return entities from BD.
+	 */
+	String searchProcedureName = null;
+	
+	public MetaClass(String className) {
+		this.className = className;
+	}
+
+	public MetaClass(String className, boolean isKey, boolean isNullable) {
+		super(isKey, isNullable);
+		this.className = className;
+	}
+
+	@Override
+	public boolean isArray() {
+		return false;
+	}
+
+	@Override
+	public boolean isComplex() {
+		return true;
+	}
+
+	public ComplexKeyTypes getComplexKeyType() {
+		return complexKeyType;
+	}
+
+	public void setComplexKeyType(ComplexKeyTypes complexKeyType) {
+		this.complexKeyType = complexKeyType;
+	}
+	
+	/**
+	 * Used to get entity class name
+	 * 
+	 * @return entity class name
+	 */
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
+	}
+	
+	/**
+	 * Used to retrieve all attribute names 
+	 * 
+	 * @return list of attribute names
+	 */
+	public Set<String> getMemberNames() {
+		return members.keySet();
+	}
+	
+	/**
+	 * Used to get type of the attribute with name <code>name</code>
+	 * 
+	 * @param name name of the attribute
+	 * @return type of that attribute
+	 * @see MetaValue
+	 */
+	public IMetaType getMemberType(String name) {
+		return members.get(name);
+	}
+	
+	public void removeMemberType(String name) {
+		members.remove(name);
+	}
+
+	/**
+	 * Used to set attribute type. If there is no such attribute, then creates one.
+	 * 
+	 * @param name attributes name
+	 * @param type type to be set
+	 * @see MetaValue
+	 */
+	public void setMemberType(String name, IMetaType type) {
+		members.put(name, type);
+	}
+
+	public String getSearchProcedureName() {
+		return searchProcedureName;
+	}
+
+	public void setSearchProcedureName(String searchProcedureName) {
+		this.searchProcedureName = searchProcedureName;
+	}
+}

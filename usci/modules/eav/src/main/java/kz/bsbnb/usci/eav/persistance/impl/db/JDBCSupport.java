@@ -1,4 +1,6 @@
-package kz.bsbnb.usci.eav.storage.dao.impl;
+package kz.bsbnb.usci.eav.persistance.impl.db;
+
+import java.sql.SQLException;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -7,16 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public abstract class AbstractDBDao {
-
+public class JDBCSupport {
 	protected JdbcTemplate jdbcTemplate;
-
-	@Autowired
-    public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
-
-
+	
 	@Value("${ds.table.prefix}") 
 	protected String tablePrefix;
 	
@@ -50,5 +45,19 @@ public abstract class AbstractDBDao {
 
 	public void setTablePrefix(String tablePrefix) {
 		this.tablePrefix = tablePrefix;
+	}
+
+	@Autowired
+    public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+	
+	public boolean testConnection()
+	{
+		try {
+			return !jdbcTemplate.getDataSource().getConnection().isClosed();
+		} catch (SQLException e) {
+			return false;
+		}
 	}
 }

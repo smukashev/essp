@@ -1,32 +1,23 @@
-package kz.bsbnb.usci.eav.storage.dao.impl.postgresql;
+package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
+import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
-import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
-import kz.bsbnb.usci.eav.model.metadata.DataTypes;
-import kz.bsbnb.usci.eav.model.metadata.MetaData;
-import kz.bsbnb.usci.eav.model.metadata.Type;
-import kz.bsbnb.usci.eav.storage.dao.IMetaDataDao;
-import kz.bsbnb.usci.eav.storage.dao.impl.AbstractDBDao;
-import kz.bsbnb.usci.eav.util.SetUtils;
 
 @Repository
-public class PostgreSQLMetaDataDaoImpl extends AbstractDBDao implements IMetaDataDao {
-	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaDataDaoImpl.class);
+public class PostgreSQLMetaClassDao extends JDBCSupport implements IMetaClassDao {
+	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDao.class);
 	
 	class InsertMetaDataPreparedStatementCreator implements PreparedStatementCreator {
 		String className;
@@ -47,43 +38,7 @@ public class PostgreSQLMetaDataDaoImpl extends AbstractDBDao implements IMetaDat
 	    }
 	}
 	
-	public MetaData loadMetaData(String metaClassName) {
-		MetaData meta = new MetaData(metaClassName);
-	    
-	    String query = "SELECT a.id, a.name, a.type_code, a.is_key, a.is_nullable, a.is_array, " +
-	    		"a.array_key_type, a.complex_key_type, ak.id akid, ak.attribute_name akname FROM " + 
-				classesTableName + " c LEFT JOIN " + attributesTableName + " a ON c.id = a.class_id " +
-				" LEFT JOIN " + arrayKeyFilterTableName + " ak ON a.id = ak.attribute_id " +  
-                " WHERE c.name = \'" + metaClassName + "\' " +
-                "and a.id IS NOT NULL";
-	    
-	    logger.debug(query);
-	    
-	    List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
-		for (Map<String, Object> row : rows) {
-	    	Type t = new Type(
-                    DataTypes.valueOf((String)row.get("type_code")),
-                    (Boolean)row.get("is_key"),
-                    (Boolean)row.get("is_nullable")
-                );
-	    	t.setArray((Boolean)row.get("is_array"));
-	    	t.setArrayKeyType(ComplexKeyTypes.valueOf((String)row.get("array_key_type")));
-	    	t.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
-	    	
-	    	if(row.get("akid") != null)
-	    	{
-	    		//TODO: add list of filter values from db
-	    		t.addArrayKeyFilterValues((String)row.get("akname"), null);
-	    	}
-	    	
-			meta.setId((Integer)row.get("id"));
-	    	meta.setType((String)row.get("name"), t);
-	    }
-	    
-	    return meta;
-	}
-	
-	private long getMetaDataId(MetaData meta)
+	/*private long getMetaDataId(MetaData meta)
 	{
 		long metaId = 0;
 	    
@@ -195,5 +150,74 @@ public class PostgreSQLMetaDataDaoImpl extends AbstractDBDao implements IMetaDat
 	    }
 	    
 	    return true;
+	}*/
+
+	@Override
+	public MetaClass load(String className) {
+		MetaClass meta = new MetaClass(className);
+	    
+	    String query = "SELECT a.id, a.name, a.type_code, a.is_key, a.is_nullable, a.is_array, " +
+	    		"a.array_key_type, a.complex_key_type, ak.id akid, ak.attribute_name akname FROM " + 
+				classesTableName + " c LEFT JOIN " + attributesTableName + " a ON c.id = a.class_id " +
+				" LEFT JOIN " + arrayKeyFilterTableName + " ak ON a.id = ak.attribute_id " +  
+                " WHERE c.name = \'" + className + "\' " +
+                "and a.id IS NOT NULL";
+	    
+	    logger.debug(query);
+	    
+	    List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+		/*for (Map<String, Object> row : rows) {
+			IMetaType attribute;
+			boolean isArray = (Boolean)row.get("is_array");
+			boolean isClass = 
+			
+	    	MetaValue t = new MetaValue(
+                    DataTypes.valueOf((String)row.get("type_code")),
+                    (Boolean)row.get("is_key"),
+                    (Boolean)row.get("is_nullable")
+                );
+	    	t.setArrayKeyType(ComplexKeyTypes.valueOf((String)row.get("array_key_type")));
+	    	t.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
+	    	
+	    	if(row.get("akid") != null)
+	    	{
+	    		//TODO: add list of filter values from db
+	    		t.addArrayKeyFilterValues((String)row.get("akname"), null);
+	    	}
+	    	
+			meta.setId((Integer)row.get("id"));
+	    	meta.setType((String)row.get("name"), t);
+	    }*/
+	    
+	    return meta;
+	}
+
+	@Override
+	public boolean testConnection() {
+	    String query = "SELECT 1";
+	    
+	    logger.debug(query);
+	    
+	    jdbcTemplate.execute(query);
+	
+	    return true;
+	}
+
+	@Override
+	public MetaClass load(long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public long save(MetaClass persitable) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void remove(long id) {
+		// TODO Auto-generated method stub
+		
 	}
 }

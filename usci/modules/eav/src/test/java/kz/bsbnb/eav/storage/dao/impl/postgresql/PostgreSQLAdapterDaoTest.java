@@ -6,7 +6,8 @@ package kz.bsbnb.eav.storage.dao.impl.postgresql;
 
 import static org.junit.Assert.*;
 
-import kz.bsbnb.usci.eav.storage.dao.IAdapterDao;
+import kz.bsbnb.usci.eav.persistance.dao.IAdapterDao;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
