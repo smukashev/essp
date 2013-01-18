@@ -2,43 +2,24 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package kz.bsbnb.eav.storage.dao.impl.postgresql;
-
-import static org.junit.Assert.*;
-
-import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
-import kz.bsbnb.usci.eav.model.metadata.DataTypes;
-import kz.bsbnb.usci.eav.model.metadata.MetaData;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
-import kz.bsbnb.usci.eav.persistance.dao.IAdapterDao;
-import kz.bsbnb.usci.eav.persistance.dao.IMetaDataDao;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
 /**
  *
  * @author a.tkachenko
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-public class PostgreSQLMetaDataDaoTest {
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(locations = {"classpath:applicationContext.xml"})
+public class PostgreSQLMetaClassDaoImplTest {
 	
-	@Autowired
+	/*@Autowired
 	IAdapterDao postgreSQLAdapterDaoImpl;
 	@Autowired
 	IMetaDataDao postgreSQLMetaDataDaoImpl;
 	
-	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaDataDaoTest.class);
+	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
 	
-	public PostgreSQLMetaDataDaoTest() {
+	public PostgreSQLMetaClassDaoImplTest() {
     }
 	
     @BeforeClass
@@ -207,5 +188,5 @@ public class PostgreSQLMetaDataDaoTest {
         {
         	postgreSQLAdapterDaoImpl.dropStructure();
         }
-    }
+    }*/
 }

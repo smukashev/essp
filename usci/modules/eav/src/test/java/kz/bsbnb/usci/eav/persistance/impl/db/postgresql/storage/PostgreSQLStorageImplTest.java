@@ -2,11 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package kz.bsbnb.eav.storage.dao.impl.postgresql;
+package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.storage;
 
-import static org.junit.Assert.*;
-
-import kz.bsbnb.usci.eav.persistance.dao.IAdapterDao;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -24,14 +24,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-public class PostgreSQLAdapterDaoTest {
+public class PostgreSQLStorageImplTest {
 	
 	@Autowired
-	IAdapterDao postgreSQLAdapterDaoImpl;
+	IStorage postgreSQLStorageImpl;
 	
-	final Logger logger = LoggerFactory.getLogger(PostgreSQLAdapterDaoTest.class);
+	final Logger logger = LoggerFactory.getLogger(PostgreSQLStorageImplTest.class);
 	
-	public PostgreSQLAdapterDaoTest() {
+	public PostgreSQLStorageImplTest() {
     }
 	
     @BeforeClass
@@ -44,20 +44,18 @@ public class PostgreSQLAdapterDaoTest {
 
     @Test
     public void connect() {
-        if(postgreSQLAdapterDaoImpl == null)
+        if(postgreSQLStorageImpl == null)
         	fail("postgreSQLAdapterDaoImpl is null");
         
-		assertEquals(postgreSQLAdapterDaoImpl.testConnection(), true);
-       	postgreSQLAdapterDaoImpl.createStructure();
-       	postgreSQLAdapterDaoImpl.dropStructure();
+		assertEquals(postgreSQLStorageImpl.testConnection(), true);
     }
     
     @Test
     public void createDropStructure() {
-        if(postgreSQLAdapterDaoImpl == null)
+        if(postgreSQLStorageImpl == null)
         	fail("postgreSQLAdapterDaoImpl is null");
         
-		postgreSQLAdapterDaoImpl.createStructure();
-       	postgreSQLAdapterDaoImpl.dropStructure();
+        postgreSQLStorageImpl.initialize();
+        postgreSQLStorageImpl.clear();
     }
 }

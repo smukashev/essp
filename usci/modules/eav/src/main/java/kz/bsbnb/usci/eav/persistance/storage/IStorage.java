@@ -2,10 +2,11 @@ package kz.bsbnb.usci.eav.persistance.storage;
 
 public interface IStorage {
 
-	public abstract void initialize();
+	public void initialize();
 
-	public abstract void clear();
+	public void clear();
 
-	public abstract void empty();
+	public void empty();
 
+	public boolean testConnection();
 }

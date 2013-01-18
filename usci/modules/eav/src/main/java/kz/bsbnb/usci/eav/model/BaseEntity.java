@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
+import kz.bsbnb.usci.eav.persistance.Persistable;
 
 /**
  * Implements EAV entity object. 
@@ -16,13 +17,8 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
  * @see MetaData
  * @see DataTypes
  */
-public class BaseEntity {
+public class BaseEntity extends Persistable {
 	
-	/**
-	 * Holds database id attribute value.
-	 */
-    long id = 0;
-    
     /**
      * Holds data about entity structure
      * @see MetaData
@@ -53,25 +49,6 @@ public class BaseEntity {
         return meta;
     }
 
-    /**
-     * Used to get object database id.
-     * 
-     * @return database id
-     */
-    public long getId() {
-        return id;
-    }
-
-    /**
-     * Used by DAO object to set database connection attribute.
-     * Do not use it outside DAO objects
-     * 
-     * @param id database id
-     */
-    public void setId(long id) {
-        this.id = id;
-    }
-    
     /**
      * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>
      * 

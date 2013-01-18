@@ -16,8 +16,8 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PostgreSQLMetaClassDao extends JDBCSupport implements IMetaClassDao {
-	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDao.class);
+public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
+	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImplTest.class);
 	
 	class InsertMetaDataPreparedStatementCreator implements PreparedStatementCreator {
 		String className;
