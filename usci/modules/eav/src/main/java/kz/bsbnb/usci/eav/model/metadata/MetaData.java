@@ -25,6 +25,12 @@ public class MetaData {
 	 * Holds type values. Keys of hash are type names.
 	 */
 	HashMap<String, Type> storage = new HashMap<String, Type>();
+	
+	/**
+	 * When additional searching logic is needed. This attribute could be set to stored procedure name.
+	 * This SP will get key attributes of entity and return entities from BD.
+	 */
+	String searchProcedureName = null;
 
 	/**
 	 * Used to get id field of persisted entity. Used only on objects retrieved from 
