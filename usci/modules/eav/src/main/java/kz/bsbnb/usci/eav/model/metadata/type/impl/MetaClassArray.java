@@ -33,4 +33,28 @@ public class MetaClassArray extends GenericMetaArray<MetaClass> {
     {
     	arrayKeyFilter.put(attributeName, values);
     }
+	
+	public boolean equals(Object obj) {
+		if (obj == this)
+			return true;
+
+		if (obj == null)
+			return false;
+
+		if (!(getClass() == obj.getClass()))
+			return false;
+		else {
+			MetaClassArray tmp = (MetaClassArray) obj;
+			if (tmp.isKey() != this.isKey() ||
+				tmp.isNullable() != this.isNullable() ||
+				!tmp.arrayKeyType.equals(this.arrayKeyType) ||
+				!tmp.memberType.equals(this.memberType) ||
+				!tmp.arrayKeyFilter.equals(this.arrayKeyFilter))
+			{
+				return false;
+			}
+			
+			return true;
+		}
+	}
 }

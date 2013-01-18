@@ -112,4 +112,27 @@ public class MetaClass extends AbstractMetaType {
 	public void setSearchProcedureName(String searchProcedureName) {
 		this.searchProcedureName = searchProcedureName;
 	}
+	
+	public boolean equals(Object obj) {
+		if (obj == this)
+			return true;
+
+		if (obj == null)
+			return false;
+
+		if (!(getClass() == obj.getClass()))
+			return false;
+		else {
+			MetaClass tmp = (MetaClass) obj;
+			if (tmp.isKey() != this.isKey() ||
+				tmp.isNullable() != this.isNullable() ||
+				!tmp.members.equals(this.members) ||
+				!tmp.complexKeyType.equals(this.complexKeyType))
+			{
+				return false;
+			}
+			
+			return true;
+		}
+	}
 }

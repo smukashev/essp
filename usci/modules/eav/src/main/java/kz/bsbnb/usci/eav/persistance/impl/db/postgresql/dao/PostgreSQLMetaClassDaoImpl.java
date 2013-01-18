@@ -5,24 +5,34 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
+import kz.bsbnb.usci.eav.util.MetaTypeHelper;
+import kz.bsbnb.usci.eav.util.SetUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImplTest.class);
 	
-	class InsertMetaDataPreparedStatementCreator implements PreparedStatementCreator {
+	class InsertMetaClassPreparedStatementCreator implements PreparedStatementCreator {
 		String className;
 		
-	    public InsertMetaDataPreparedStatementCreator(String className) {
+	    public InsertMetaClassPreparedStatementCreator(String className) {
 			this.className = className;
 		}
 
@@ -38,9 +48,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    }
 	}
 	
-	/*private long getMetaDataId(MetaData meta)
+	private long getMetaClassId(MetaClass meta)
 	{
 		long metaId = 0;
+		
+		if(meta.getId() > 0)
+			return meta.getId(); 
 	    
 	    String query = "SELECT id FROM " + classesTableName + 
 	    		" WHERE name = \'" + meta.getClassName() + "\' limit 1"; 
@@ -57,7 +70,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    {
 	    	KeyHolder keyHolder = new GeneratedKeyHolder();
 		    
-	    	jdbcTemplate.update(new InsertMetaDataPreparedStatementCreator(meta.getClassName()), keyHolder);
+	    	jdbcTemplate.update(new InsertMetaClassPreparedStatementCreator(meta.getClassName()), keyHolder);
 		    
             metaId = keyHolder.getKey().longValue();
             
@@ -71,13 +84,13 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	}
 	
 	@Transactional
-	public boolean saveMetaData(MetaData meta) {
+	public boolean saveMetaClass(MetaClass meta) {
 	    long metaId = meta.getId();
 	    String query = "";
 	    
 	    if(meta.getId() < 1)
 	    {
-	    	metaId = getMetaDataId(meta);
+	    	metaId = getMetaClassId(meta);
 	    	meta.setId(metaId);
 	    }
 	    
@@ -86,10 +99,10 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    	throw new IllegalArgumentException("Can't determine metadata id");
 	    }
 	    
-	    MetaData oldMeta = loadMetaData(meta.getClassName());
+	    MetaClass oldMeta = load(metaId);
 	    
-	    Set<String> oldNames = oldMeta.getTypeNames();
-	    Set<String> newNames = meta.getTypeNames();
+	    Set<String> oldNames = oldMeta.getMemberNames();
+	    Set<String> newNames = meta.getMemberNames();
 	    
 	    Set<String> updateNames = SetUtils.intersection(oldNames, newNames);
 	    Set<String> deleteNames = SetUtils.difference(oldNames, newNames);
@@ -97,17 +110,22 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    
 	    for(String typeName : addNames)
 	    {
+	    	IMetaType metaType = meta.getMemberType(typeName);
+	    	
 	    	query = "INSERT INTO " + attributesTableName +
                     " (class_id, name, type_code, is_key, is_nullable, " +
                     "is_array, array_key_type, complex_key_type) VALUES (" +
                     metaId + ", " +
                     "\'" + typeName + "\', " +
-                    "\'" + meta.getType(typeName).getTypeCode() + "\', " +
-                    "\'" + meta.getType(typeName).isKey() + "\', " +
-                    "\'" + meta.getType(typeName).isNullable() + "\', " +
-                    "\'" + meta.getType(typeName).isArray() + "\', " +
-                    "\'" + meta.getType(typeName).getArrayKeyType() + "\', " +
-                    "\'" + meta.getType(typeName).getComplexKeyType() + "\' " +
+                    (MetaTypeHelper.getDataType(metaType) == null ? 
+                    	"NULL" : "'" + MetaTypeHelper.getDataType(metaType) + "'") + ", " +
+                    "\'" + meta.getMemberType(typeName).isKey() + "\', " +
+                    "\'" + meta.getMemberType(typeName).isNullable() + "\', " +
+                    "\'" + meta.getMemberType(typeName).isArray() + "\', " +
+                    (MetaTypeHelper.getArrayKeyType(metaType) == null ? 
+                    	"NULL" : "'" + MetaTypeHelper.getArrayKeyType(metaType) + "'") + ", " +
+                    (MetaTypeHelper.getArrayKeyType(metaType) == null ? 
+                    	"NULL" : "'" + MetaTypeHelper.getClassKeyType(metaType) + "'") + " " +
                     		")";
 	    	
 	    	logger.debug(query);
@@ -130,15 +148,20 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    
 	    for(String typeName : updateNames)
 	    {
-	    	if(!meta.getType(typeName).equals(oldMeta.getType(typeName)))
+	    	if(!meta.getMemberType(typeName).equals(oldMeta.getMemberType(typeName)))
 	    	{
+	    		IMetaType metaType = meta.getMemberType(typeName);
+	    		
 		    	query = "UPDATE " + attributesTableName +
-	                    " set type_code = \'" + meta.getType(typeName).getTypeCode() + "\', " +  
-	                    " is_key = \'" + meta.getType(typeName).isKey() + "\', " +
-	                    " is_nullable = \'" + meta.getType(typeName).isNullable() + "\', " +
-	                    " is_array = \'" + meta.getType(typeName).isArray() + "\', " +
-	                    " array_key_type = \'" + meta.getType(typeName).getArrayKeyType() + "\', " +
-	                    " complex_key_type = \'" + meta.getType(typeName).getComplexKeyType() + "\' " +
+	                    " set type_code = " + (MetaTypeHelper.getDataType(metaType) == null ? 
+	                        	"NULL" : "'" + MetaTypeHelper.getDataType(metaType) + "'") + ", " +  
+	                    " is_key = \'" + metaType.isKey() + "\', " +
+	                    " is_nullable = \'" + metaType.isNullable() + "\', " +
+	                    " is_array = \'" + metaType.isArray() + "\', " +
+	                    " array_key_type = " + (MetaTypeHelper.getArrayKeyType(metaType) == null ? 
+	                        	"NULL" : "'" + MetaTypeHelper.getArrayKeyType(metaType) + "'") + ", " +
+	                    " complex_key_type = " + (MetaTypeHelper.getArrayKeyType(metaType) == null ? 
+	                        	"NULL" : "'" + MetaTypeHelper.getClassKeyType(metaType) + "'") +
 	                    " where class_id = " +
 	    	            	metaId + " and name = " +
 	    	                "\'" + typeName + "\'";
@@ -150,7 +173,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    }
 	    
 	    return true;
-	}*/
+	}
 
 	@Override
 	public MetaClass load(String className) {

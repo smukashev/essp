@@ -4,6 +4,22 @@
  */
 package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
+import static org.junit.Assert.*;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
+import kz.bsbnb.usci.eav.model.metadata.DataTypes;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
+import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav.persistance.storage.IStorage;
+
 /**
  *
  * @author a.tkachenko
@@ -12,10 +28,10 @@ package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 //@ContextConfiguration(locations = {"classpath:applicationContext.xml"})
 public class PostgreSQLMetaClassDaoImplTest {
 	
-	/*@Autowired
-	IAdapterDao postgreSQLAdapterDaoImpl;
 	@Autowired
-	IMetaDataDao postgreSQLMetaDataDaoImpl;
+	IStorage postgreSQLStorageImpl;
+	@Autowired
+	IMetaClassDao postgreSQLMetaClassDaoImpl;
 	
 	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
 	
@@ -31,47 +47,35 @@ public class PostgreSQLMetaClassDaoImplTest {
     }
 
     @Test
-    public void loadMetaData() throws Exception {
+    public void loadMetaClass() throws Exception {
         try {
-        	postgreSQLAdapterDaoImpl.createStructure();
+        	postgreSQLStorageImpl.initialize();
 	        
 	        logger.debug("Create metadata test");
 	        
-	        MetaData metaCreate = new MetaData("testClass");
+	        MetaClass metaCreate = new MetaClass("testClass");
 	        
-	        metaCreate.setType("testDate", new MetaValue(DataTypes.DATE, false, false));
-	        metaCreate.setType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
-	        metaCreate.setType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-	        MetaValue t = new MetaValue(DataTypes.BOOLEAN, false, false);
-	        t.setArray(true);
-	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        metaCreate.setType("testBoolean", t);
-	        t = new MetaValue(DataTypes.STRING, false, false);
-	        t.setArray(true);
-	        t.setArrayKeyType(ComplexKeyTypes.ANY);
-	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        metaCreate.setType("testString", t);
+	        metaCreate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
+	        metaCreate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+	        metaCreate.setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+	        metaCreate.setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+	        metaCreate.setMemberType("testString", new MetaValue(DataTypes.STRING, false, false));
 	        
-	        MetaData expResultCreate = new MetaData("testClass");
+	        MetaClass expResultCreate = new MetaClass("testClass");
 	        
-	        expResultCreate.setType("testDate", new MetaValue(DataTypes.DATE, false, false));
-	        expResultCreate.setType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
-	        expResultCreate.setType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-	        t = new MetaValue(DataTypes.BOOLEAN, false, false);
-	        t.setArray(true);
-	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        expResultCreate.setType("testBoolean", t);
-	        t = new MetaValue(DataTypes.STRING, false, false);
-	        t.setArray(true);
-	        t.setArrayKeyType(ComplexKeyTypes.ANY);
-	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        expResultCreate.setType("testString", t);
+	        expResultCreate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
+	        expResultCreate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+	        expResultCreate.setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+	        expResultCreate.setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+	        expResultCreate.setMemberType("testString", new MetaValue(DataTypes.STRING, false, false));
 	        
-	        postgreSQLMetaDataDaoImpl.saveMetaData(metaCreate);
+	        long id = postgreSQLMetaClassDaoImpl.save(metaCreate);
 	        
-	        MetaData loadedMetaCreate = postgreSQLMetaDataDaoImpl.loadMetaData("testClass");
+	        MetaClass loadedByNameMetaCreate = postgreSQLMetaClassDaoImpl.load("testClass");
+	        MetaClass loadedByIdMetaCreate = postgreSQLMetaClassDaoImpl.load(id);
 
-	        assertTrue(expResultCreate.equals(loadedMetaCreate));
+	        assertTrue(expResultCreate.equals(loadedByNameMetaCreate));
+	        assertTrue(expResultCreate.equals(loadedByIdMetaCreate));
         }
         catch(Exception e)
         {
@@ -79,50 +83,50 @@ public class PostgreSQLMetaClassDaoImplTest {
         }
         finally
         {
-        	postgreSQLAdapterDaoImpl.dropStructure();
+        	postgreSQLStorageImpl.clear();
         }
     }
     
-    @Test
-    public void deleteFieldsMetaData() throws Exception {
+    /*@Test
+    public void deleteFieldsMetaClass() throws Exception {
         try {
-        	postgreSQLAdapterDaoImpl.createStructure();
+        	postgreSQLStorageImpl.initialize();
 	        
 	        logger.debug("Delete metadata attribute test");
 	        
-	        MetaData metaDelete = new MetaData("testClass");
+	        MetaClass metaDelete = new MetaClass("testClass");
 	        
-	        metaDelete.setType("testDate", new MetaValue(DataTypes.DATE, false, false));
-	        metaDelete.setType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+	        metaDelete.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
+	        metaDelete.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
 	        MetaValue t = new MetaValue(DataTypes.DOUBLE, false, false);
 	        t.setArray(true);
 	        t.setArrayKeyType(ComplexKeyTypes.ANY);
 	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        metaDelete.setType("testDouble", t);
-	        //metaDelete.setType("testBoolean", new Type(DataTypes.BOOLEAN));
+	        metaDelete.setMemberType("testDouble", t);
+	        //metaDelete.setMemberType("testBoolean", new Type(DataTypes.BOOLEAN));
 	        t = new MetaValue(DataTypes.STRING, false, false);
 	        t.setArray(true);
 	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        metaDelete.setType("testString", t);
+	        metaDelete.setMemberType("testString", t);
 	        
-	        MetaData expResultDelete = new MetaData("testClass");
+	        MetaClass expResultDelete = new MetaClass("testClass");
 	        
-	        expResultDelete.setType("testDate", new MetaValue(DataTypes.DATE, false, false));
-	        expResultDelete.setType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+	        expResultDelete.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
+	        expResultDelete.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
 	        t = new MetaValue(DataTypes.DOUBLE, false, false);
 	        t.setArray(true);
 	        t.setArrayKeyType(ComplexKeyTypes.ANY);
 	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        expResultDelete.setType("testDouble", t);
-	        //expResultDelete.setType("testBoolean", new Type(DataTypes.BOOLEAN));
+	        expResultDelete.setMemberType("testDouble", t);
+	        //expResultDelete.setMemberType("testBoolean", new Type(DataTypes.BOOLEAN));
 	        t = new MetaValue(DataTypes.STRING, false, false);
 	        t.setArray(true);
 	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        expResultDelete.setType("testString", t);
+	        expResultDelete.setMemberType("testString", t);
 	        
-	        postgreSQLMetaDataDaoImpl.saveMetaData(metaDelete);
+	        postgreSQLMetaClassDaoImpl.saveMetaClass(metaDelete);
 	        
-	        MetaData loadedMetaDelete = postgreSQLMetaDataDaoImpl.loadMetaData("testClass");
+	        MetaClass loadedMetaDelete = postgreSQLMetaClassDaoImpl.loadMetaClass("testClass");
 	        
 	        assertTrue(expResultDelete.equals(loadedMetaDelete));
         }
@@ -132,51 +136,51 @@ public class PostgreSQLMetaClassDaoImplTest {
         }
         finally
         {
-        	postgreSQLAdapterDaoImpl.dropStructure();
+        	postgreSQLStorageImpl.clear();
         }
     }
     
     @Test
-    public void updateFieldsMetaData() throws Exception {
-        System.out.println("loadMetaData");
+    public void updateFieldsMetaClass() throws Exception {
+        System.out.println("loadMetaClass");
         try {
-        	postgreSQLAdapterDaoImpl.createStructure();
+        	postgreSQLStorageImpl.initialize();
 	        
 	        logger.debug("Delete metadata attribute test");
 	        
-	        MetaData metaUpdate = new MetaData("testClass");
+	        MetaClass metaUpdate = new MetaClass("testClass");
 	        
-	        metaUpdate.setType("testDate", new MetaValue(DataTypes.DATE, false, false));
-	        metaUpdate.setType("testInteger", new MetaValue(DataTypes.INTEGER, true, false));
+	        metaUpdate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
+	        metaUpdate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, true, false));
 	        MetaValue t = new MetaValue(DataTypes.DOUBLE, false, true);
 	        t.setArray(true);
 	        t.setArrayKeyType(ComplexKeyTypes.ANY);
 	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        metaUpdate.setType("testDouble", t);
-	        //metaDelete.setType("testBoolean", new Type(DataTypes.BOOLEAN));
+	        metaUpdate.setMemberType("testDouble", t);
+	        //metaDelete.setMemberType("testBoolean", new Type(DataTypes.BOOLEAN));
 	        t = new MetaValue(DataTypes.INTEGER, false, false);
 	        t.setArray(true);
 	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        metaUpdate.setType("testString", t);
+	        metaUpdate.setMemberType("testString", t);
 	        
-	        MetaData expResultUpdate = new MetaData("testClass");
+	        MetaClass expResultUpdate = new MetaClass("testClass");
 	        
-	        expResultUpdate.setType("testDate", new MetaValue(DataTypes.DATE, false, false));
-	        expResultUpdate.setType("testInteger", new MetaValue(DataTypes.INTEGER, true, false));
+	        expResultUpdate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
+	        expResultUpdate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, true, false));
 	        t = new MetaValue(DataTypes.DOUBLE, false, true);
 	        t.setArray(true);
 	        t.setArrayKeyType(ComplexKeyTypes.ANY);
 	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        expResultUpdate.setType("testDouble", t);
-	        //expResultDelete.setType("testBoolean", new Type(DataTypes.BOOLEAN));
+	        expResultUpdate.setMemberType("testDouble", t);
+	        //expResultDelete.setMemberType("testBoolean", new Type(DataTypes.BOOLEAN));
 	        t = new MetaValue(DataTypes.INTEGER, false, false);
 	        t.setArray(true);
 	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        expResultUpdate.setType("testString", new MetaValue(DataTypes.INTEGER, false, false));
+	        expResultUpdate.setMemberType("testString", new MetaValue(DataTypes.INTEGER, false, false));
 	        
-	        postgreSQLMetaDataDaoImpl.saveMetaData(metaUpdate);
+	        postgreSQLMetaClassDaoImpl.saveMetaClass(metaUpdate);
 	        
-	        MetaData loadedMetaUpdate = postgreSQLMetaDataDaoImpl.loadMetaData("testClass");
+	        MetaClass loadedMetaUpdate = postgreSQLMetaClassDaoImpl.loadMetaClass("testClass");
 	        
 	        assertTrue(expResultUpdate.equals(loadedMetaUpdate));
         }
@@ -186,7 +190,7 @@ public class PostgreSQLMetaClassDaoImplTest {
         }
         finally
         {
-        	postgreSQLAdapterDaoImpl.dropStructure();
+        	postgreSQLStorageImpl.clear();
         }
     }*/
 }

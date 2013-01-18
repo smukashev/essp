@@ -52,7 +52,9 @@ public class MetaValue extends AbstractMetaType {
 			if (tmp.getTypeCode() != this.getTypeCode() ||
 					tmp.isKey() != this.isKey() ||
 					tmp.isNullable() != this.isNullable())
+			{
 				return false;
+			}
 			
 			return true;
 		}
