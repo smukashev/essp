@@ -19,6 +19,11 @@ public class JDBCSupport {
 	protected String arrayKeyFilterTableName;
 	protected String arrayKeyFilterValuesTableName;
     protected String attributesTableName;
+    protected String simpleAttributesTableName;
+    protected String complexAttributesTableName;
+    protected String arrayTableName;
+    protected String complexArrayTableName;
+    protected String simpleArrayTableName;
     protected String entitiesTableName;
 
 	
@@ -34,9 +39,14 @@ public class JDBCSupport {
 	{
 		classesTableName = tablePrefix + "classes";
 	    attributesTableName = tablePrefix + "attributes";
+	    simpleAttributesTableName = tablePrefix + "simple_attributes";
 	    entitiesTableName = tablePrefix + "entities";
 	    arrayKeyFilterTableName = tablePrefix + "array_key_filter";
 		arrayKeyFilterValuesTableName = tablePrefix + "array_key_filter_values";
+		complexAttributesTableName = tablePrefix + "complex_attributes";
+		arrayTableName = tablePrefix + "array";
+	    complexArrayTableName = tablePrefix + "complex_array";
+	    simpleArrayTableName = tablePrefix + "simple_array";
 	}
 
 	public String getTablePrefix() {

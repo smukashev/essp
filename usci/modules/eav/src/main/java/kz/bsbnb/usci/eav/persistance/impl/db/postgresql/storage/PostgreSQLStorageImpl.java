@@ -30,25 +30,69 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
-	    
+	    //----------------------------------------------
+	    //basic attribute
 	    query = "CREATE TABLE IF NOT EXISTS " + attributesTableName + 
                 " (" + 
                   "id serial NOT NULL," +
-                  "class_id int references " + classesTableName + "(id) ON DELETE CASCADE, " +
+                  "containing_class_id int references " + classesTableName + "(id) ON DELETE CASCADE, " +
                   "name character varying(" + attributeNameLength  + ") NOT NULL," + 
-                  "type_code character varying(" + typeCodeLength  + ") NOT NULL," +
                   "is_key boolean NOT NULL," +
                   "is_nullable boolean NOT NULL," +
-                  "is_array boolean NOT NULL," +
-                  "array_key_type character varying(" + arrayKeyTypeCodeLength  + ")," +
-                  "complex_key_type character varying(" + complexKeyTypeCodeLength  + ")," +
                   "CONSTRAINT " + attributesTableName + "_primary_key_index PRIMARY KEY (id )" + 
                 ")";
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
+	    //simple attributes
+	    query = "CREATE TABLE IF NOT EXISTS " + simpleAttributesTableName + 
+                " (" + 
+                  "type_code character varying(" + typeCodeLength  + ")" +
+                ") INHERITS (" + attributesTableName + ")";
 	    
+	    logger.debug(query);
+	    
+	    jdbcTemplate.execute(query);
+	    
+	    //complex attributes
+	    query = "CREATE TABLE IF NOT EXISTS " + complexAttributesTableName + 
+                " (" + 
+                  "complex_key_type character varying(" + complexKeyTypeCodeLength  + ")" +
+                ") INHERITS (" + attributesTableName + ")";
+	    
+	    logger.debug(query);
+	    
+	    jdbcTemplate.execute(query);
+	    //array
+	    query = "CREATE TABLE IF NOT EXISTS " + arrayTableName + 
+                " (" + 
+                  "array_key_type character varying(" + arrayKeyTypeCodeLength  + ")" +
+                ") INHERITS (" + attributesTableName + ")";
+	    
+	    logger.debug(query);
+	    
+	    jdbcTemplate.execute(query);
+	    
+	    //simple array
+	    query = "CREATE TABLE IF NOT EXISTS " + simpleArrayTableName + 
+                " (" + 
+                  "array_key_type character varying(" + arrayKeyTypeCodeLength  + ")" +
+                ") INHERITS (" + arrayTableName + ", " + simpleAttributesTableName + ")";
+	    
+	    logger.debug(query);
+	    
+	    jdbcTemplate.execute(query);
+	    //complex array
+	    query = "CREATE TABLE IF NOT EXISTS " + complexArrayTableName + 
+                " (" + 
+                  "array_key_type character varying(" + arrayKeyTypeCodeLength  + ")" +
+                ") INHERITS (" + arrayTableName + ", " + complexAttributesTableName + ")";
+	    
+	    logger.debug(query);
+	    
+	    jdbcTemplate.execute(query);
+	    //------------------------------------------------
 	    query = "CREATE TABLE IF NOT EXISTS " + entitiesTableName + 
                 " (" + 
                   "id serial NOT NULL," +
@@ -93,7 +137,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    query = "DROP TABLE IF EXISTS " + arrayKeyFilterTableName;
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
-		query = "DROP TABLE IF EXISTS " + attributesTableName;
+		query = "DROP TABLE IF EXISTS " + attributesTableName + " CASCADE";
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
 	    query = "DROP TABLE IF EXISTS " + entitiesTableName;

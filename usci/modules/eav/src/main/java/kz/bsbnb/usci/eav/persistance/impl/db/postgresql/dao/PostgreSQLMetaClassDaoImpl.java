@@ -9,6 +9,7 @@ import java.util.Set;
 
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -133,7 +134,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    	jdbcTemplate.execute(query);
 	    }
 	    
-	    //TODO: Add bulk delete
+	    //TODO: Add bulk delete by id list
 	    for(String typeName : deleteNames)
 	    {
 	    	query = "DELETE FROM " + attributesTableName +
@@ -192,7 +193,30 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 		/*for (Map<String, Object> row : rows) {
 			IMetaType attribute;
 			boolean isArray = (Boolean)row.get("is_array");
-			boolean isClass = 
+			boolean isClass = row.get("type_code") == null ? true : false;
+			
+			if (isArray)
+			{
+				if(isClass)
+				{
+					attribute = new MetaClassArray(query, isClass, isClass);
+				}
+				else
+				{
+					
+				}
+			}
+			else
+			{
+				if(isClass)
+				{
+					
+				}
+				else
+				{
+					
+				}
+			}
 			
 	    	MetaValue t = new MetaValue(
                     DataTypes.valueOf((String)row.get("type_code")),
