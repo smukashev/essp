@@ -45,16 +45,12 @@ public class MetaClassArray extends GenericMetaArray<MetaClass> {
 			return false;
 		else {
 			MetaClassArray tmp = (MetaClassArray) obj;
-			if (tmp.isKey() != this.isKey() ||
-				tmp.isNullable() != this.isNullable() ||
-				!tmp.arrayKeyType.equals(this.arrayKeyType) ||
-				!tmp.memberType.equals(this.memberType) ||
-				!tmp.arrayKeyFilter.equals(this.arrayKeyFilter))
-			{
-				return false;
-			}
-			
-			return true;
-		}
+            return !(tmp.isKey() != this.isKey() ||
+                    tmp.isNullable() != this.isNullable() ||
+                    !tmp.arrayKeyType.equals(this.arrayKeyType) ||
+                    !tmp.memberType.equals(this.memberType) ||
+                    !tmp.arrayKeyFilter.equals(this.arrayKeyFilter));
+
+        }
 	}
 }

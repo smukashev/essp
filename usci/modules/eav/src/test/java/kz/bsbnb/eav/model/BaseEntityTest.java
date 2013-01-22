@@ -133,7 +133,7 @@ public class BaseEntityTest {
         BaseEntity instance = new BaseEntity(name);
         Integer expResult;
         
-        expResult = new Integer(7);
+        expResult = 7;
         instance.getMeta().setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
         instance.getMeta().setMemberType("testNotInteger", new MetaValue(DataTypes.DATE, false, false));
         instance.set("testInteger", expResult);
@@ -217,7 +217,7 @@ public class BaseEntityTest {
         BaseEntity instance = new BaseEntity(name);
         Double expResult;
         
-        expResult = new Double(1.);
+        expResult = 1.;
         instance.getMeta().setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
         instance.getMeta().setMemberType("testNotDouble", new MetaValue(DataTypes.INTEGER, false, false));
         instance.set("testDouble", expResult);

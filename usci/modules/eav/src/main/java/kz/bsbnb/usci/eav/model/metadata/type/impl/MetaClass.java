@@ -124,15 +124,11 @@ public class MetaClass extends AbstractMetaType {
 			return false;
 		else {
 			MetaClass tmp = (MetaClass) obj;
-			if (tmp.isKey() != this.isKey() ||
-				tmp.isNullable() != this.isNullable() ||
-				!tmp.members.equals(this.members) ||
-				!tmp.complexKeyType.equals(this.complexKeyType))
-			{
-				return false;
-			}
-			
-			return true;
-		}
+            return !(tmp.isKey() != this.isKey() ||
+                    tmp.isNullable() != this.isNullable() ||
+                    !tmp.members.equals(this.members) ||
+                    !tmp.complexKeyType.equals(this.complexKeyType));
+
+        }
 	}
 }

@@ -49,15 +49,11 @@ public class MetaValue extends AbstractMetaType {
 			return false;
 		else {
 			MetaValue tmp = (MetaValue) obj;
-			if (tmp.getTypeCode() != this.getTypeCode() ||
-					tmp.isKey() != this.isKey() ||
-					tmp.isNullable() != this.isNullable())
-			{
-				return false;
-			}
-			
-			return true;
-		}
+            return !(tmp.getTypeCode() != this.getTypeCode() ||
+                    tmp.isKey() != this.isKey() ||
+                    tmp.isNullable() != this.isNullable());
+
+        }
 	}
 
 	@Override

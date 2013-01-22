@@ -48,7 +48,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	
 	private long getMetaClassId(MetaClass meta)
 	{
-		long metaId = 0;
+		long metaId;
 		
 		if(meta.getId() > 0)
 			return meta.getId(); 
@@ -84,7 +84,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	@Transactional
 	public boolean saveMetaClass(MetaClass meta) {
 	    long metaId = meta.getId();
-	    String query = "";
+	    String query;
 	    
 	    if(meta.getId() < 1)
 	    {

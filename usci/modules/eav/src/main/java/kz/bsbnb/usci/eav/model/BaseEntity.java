@@ -14,14 +14,14 @@ import kz.bsbnb.usci.eav.persistance.Persistable;
  *
  * @version 1.0, 17.01.2013
  * @author a.tkachenko
- * @see MetaData
+ * @see MetaClass
  * @see DataTypes
  */
 public class BaseEntity extends Persistable {
 	
     /**
      * Holds data about entity structure
-     * @see MetaData
+     * @see MetaClass
      */
     MetaClass meta;
     
