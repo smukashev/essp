@@ -9,9 +9,6 @@ import java.util.Set;
 
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.MetaTypeHelper;
@@ -28,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
-	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImplTest.class);
+	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
 	
 	class InsertMetaClassPreparedStatementCreator implements PreparedStatementCreator {
 		String className;
