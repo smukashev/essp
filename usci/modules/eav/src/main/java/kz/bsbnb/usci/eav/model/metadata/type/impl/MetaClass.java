@@ -29,7 +29,10 @@ public class MetaClass extends AbstractMetaType {
 	 * This SP will get key attributes of entity and return entities from BD.
 	 */
 	String searchProcedureName = null;
-	
+
+    public MetaClass() {
+    }
+
 	public MetaClass(String className) {
 		this.className = className;
 	}

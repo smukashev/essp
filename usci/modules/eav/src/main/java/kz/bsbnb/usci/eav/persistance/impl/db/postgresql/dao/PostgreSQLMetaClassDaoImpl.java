@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.MetaTypeHelper;
@@ -46,15 +48,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    }
 	}
 	
-	private long getMetaClassId(MetaClass meta)
+	private long getMetaClassId(String className)
 	{
 		long metaId;
 		
-		if(meta.getId() > 0)
-			return meta.getId(); 
-	    
-	    String query = "SELECT id FROM " + classesTableName + 
-	    		" WHERE name = \'" + meta.getClassName() + "\' limit 1"; 
+	    String query = "SELECT id FROM " + classesTableName +
+	    		" WHERE name = \'" + className + "\' LIMIT 1";
 	    		
 	    logger.debug(query);
 	    
@@ -68,7 +67,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    {
 	    	KeyHolder keyHolder = new GeneratedKeyHolder();
 		    
-	    	jdbcTemplate.update(new InsertMetaClassPreparedStatementCreator(meta.getClassName()), keyHolder);
+	    	jdbcTemplate.update(new InsertMetaClassPreparedStatementCreator(className), keyHolder);
 		    
             metaId = keyHolder.getKey().longValue();
             
@@ -82,13 +81,13 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	}
 	
 	@Transactional
-	public boolean saveMetaClass(MetaClass meta) {
+	public long save(MetaClass meta) {
 	    long metaId = meta.getId();
 	    String query;
 	    
 	    if(meta.getId() < 1)
 	    {
-	    	metaId = getMetaClassId(meta);
+            metaId = getMetaClassId(meta.getClassName());
 	    	meta.setId(metaId);
 	    }
 	    
@@ -105,29 +104,63 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    Set<String> updateNames = SetUtils.intersection(oldNames, newNames);
 	    Set<String> deleteNames = SetUtils.difference(oldNames, newNames);
 	    Set<String> addNames = SetUtils.difference(newNames, oldNames);
-	    
+
+        //TODO: make bulk insert
 	    for(String typeName : addNames)
 	    {
 	    	IMetaType metaType = meta.getMemberType(typeName);
+
+            if(metaType.isComplex())
+            {
+                if(metaType.isArray())
+                {
+                    query = "";
+                }
+                else
+                {
+                    query = "";
+                }
+            }
+            else
+            {
+                if(metaType.isArray())
+                {
+                    query = "";
+                }
+                else
+                {
+                    MetaValue metaValue = (MetaValue)metaType;
+
+                    query = "INSERT INTO " + simpleAttributesTableName +
+                        " (containing_class_id, name, type_code, is_key, is_nullable) VALUES " +
+                        " ( " +
+                                    metaId   +               " , " +
+                            " '" + typeName                + "', " +
+                            " '" + metaValue.getTypeCode() + "', " +
+                            " '" + metaValue.isKey()       + "', " +
+                            " '" + metaValue.isNullable()  + "'  " +
+                   		" ) ";
+                }
+            }
 	    	
-	    	query = "INSERT INTO " + attributesTableName +
-                    " (class_id, name, type_code, is_key, is_nullable, " +
-                    "is_array, array_key_type, complex_key_type) VALUES (" +
-                    metaId + ", " +
-                    "\'" + typeName + "\', " +
-                    (MetaTypeHelper.getDataType(metaType) == null ? 
-                    	"NULL" : "'" + MetaTypeHelper.getDataType(metaType) + "'") + ", " +
-                    "\'" + meta.getMemberType(typeName).isKey() + "\', " +
-                    "\'" + meta.getMemberType(typeName).isNullable() + "\', " +
-                    "\'" + meta.getMemberType(typeName).isArray() + "\', " +
-                    (MetaTypeHelper.getArrayKeyType(metaType) == null ? 
-                    	"NULL" : "'" + MetaTypeHelper.getArrayKeyType(metaType) + "'") + ", " +
-                    (MetaTypeHelper.getArrayKeyType(metaType) == null ? 
-                    	"NULL" : "'" + MetaTypeHelper.getClassKeyType(metaType) + "'") + " " +
-                    		")";
-	    	
+//	    	query = "INSERT INTO " + attributesTableName +
+//                    " (class_id, name, type_code, is_key, is_nullable, " +
+//                    "is_array, array_key_type, complex_key_type) VALUES (" +
+//                    metaId + ", " +
+//                    "\'" + typeName + "\', " +
+//                    (MetaTypeHelper.getDataType(metaType) == null ?
+//                    	"NULL" : "'" + MetaTypeHelper.getDataType(metaType) + "'") + ", " +
+//                    "\'" + meta.getMemberType(typeName).isKey() + "\', " +
+//                    "\'" + meta.getMemberType(typeName).isNullable() + "\', " +
+//                    "\'" + meta.getMemberType(typeName).isArray() + "\', " +
+//                    (MetaTypeHelper.getArrayKeyType(metaType) == null ?
+//                    	"NULL" : "'" + MetaTypeHelper.getArrayKeyType(metaType) + "'") + ", " +
+//                    (MetaTypeHelper.getArrayKeyType(metaType) == null ?
+//                    	"NULL" : "'" + MetaTypeHelper.getClassKeyType(metaType) + "'") + " " +
+//                    		")";
+//
 	    	logger.debug(query);
-	    	
+
 	    	jdbcTemplate.execute(query);
 	    }
 	    
@@ -135,9 +168,9 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    for(String typeName : deleteNames)
 	    {
 	    	query = "DELETE FROM " + attributesTableName +
-                    " where class_id = " +
-                    metaId + " and name = " +
-                    "\'" + typeName + "\'";
+                    " WHERE class_id = " +
+                    metaId + " AND name = " +
+                    "\'" + typeName + "\' CASCADE ";
 	    	
 	    	logger.debug(query);
 	    	
@@ -151,7 +184,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    		IMetaType metaType = meta.getMemberType(typeName);
 	    		
 		    	query = "UPDATE " + attributesTableName +
-	                    " set type_code = " + (MetaTypeHelper.getDataType(metaType) == null ? 
+	                    " SET type_code = " + (MetaTypeHelper.getDataType(metaType) == null ?
 	                        	"NULL" : "'" + MetaTypeHelper.getDataType(metaType) + "'") + ", " +  
 	                    " is_key = \'" + metaType.isKey() + "\', " +
 	                    " is_nullable = \'" + metaType.isNullable() + "\', " +
@@ -160,8 +193,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	                        	"NULL" : "'" + MetaTypeHelper.getArrayKeyType(metaType) + "'") + ", " +
 	                    " complex_key_type = " + (MetaTypeHelper.getArrayKeyType(metaType) == null ? 
 	                        	"NULL" : "'" + MetaTypeHelper.getClassKeyType(metaType) + "'") +
-	                    " where class_id = " +
-	    	            	metaId + " and name = " +
+	                    " WHERE class_id = " +
+	    	            	metaId + " AND name = " +
 	    	                "\'" + typeName + "\'";
 		    	
 		    	logger.debug(query);
@@ -170,69 +203,16 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    	}
 	    }
 	    
-	    return true;
+	    return metaId;
 	}
 
 	@Override
 	public MetaClass load(String className) {
-		MetaClass meta = new MetaClass(className);
-	    
-	    String query = "SELECT a.id, a.name, a.type_code, a.is_key, a.is_nullable, a.is_array, " +
-	    		"a.array_key_type, a.complex_key_type, ak.id akid, ak.attribute_name akname FROM " + 
-				classesTableName + " c LEFT JOIN " + attributesTableName + " a ON c.id = a.class_id " +
-				" LEFT JOIN " + arrayKeyFilterTableName + " ak ON a.id = ak.attribute_id " +  
-                " WHERE c.name = \'" + className + "\' " +
-                "and a.id IS NOT NULL";
-	    
-	    logger.debug(query);
-	    
-	    List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
-		/*for (Map<String, Object> row : rows) {
-			IMetaType attribute;
-			boolean isArray = (Boolean)row.get("is_array");
-			boolean isClass = row.get("type_code") == null ? true : false;
-			
-			if (isArray)
-			{
-				if(isClass)
-				{
-					attribute = new MetaClassArray(query, isClass, isClass);
-				}
-				else
-				{
-					
-				}
-			}
-			else
-			{
-				if(isClass)
-				{
-					
-				}
-				else
-				{
-					
-				}
-			}
-			
-	    	MetaValue t = new MetaValue(
-                    DataTypes.valueOf((String)row.get("type_code")),
-                    (Boolean)row.get("is_key"),
-                    (Boolean)row.get("is_nullable")
-                );
-	    	t.setArrayKeyType(ComplexKeyTypes.valueOf((String)row.get("array_key_type")));
-	    	t.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
-	    	
-	    	if(row.get("akid") != null)
-	    	{
-	    		//TODO: add list of filter values from db
-	    		t.addArrayKeyFilterValues((String)row.get("akname"), null);
-	    	}
-	    	
-			meta.setId((Integer)row.get("id"));
-	    	meta.setType((String)row.get("name"), t);
-	    }*/
-	    
+		long id = getMetaClassId(className);
+
+        MetaClass meta = load(id);
+        meta.setClassName(className);
+
 	    return meta;
 	}
 
@@ -249,14 +229,27 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
 	@Override
 	public MetaClass load(long id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        MetaClass meta = new MetaClass();
 
-	@Override
-	public long save(MetaClass persitable) {
-		// TODO Auto-generated method stub
-		return 0;
+        //load simple attributes
+        String query = "SELECT * FROM " +
+                simpleAttributesTableName +
+                " WHERE containing_class_id = " + id;
+
+        logger.debug(query);
+
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+        for (Map<String, Object> row : rows) {
+            MetaValue attribute = new MetaValue(
+                    DataTypes.valueOf((String) row.get("type_code")),
+                    (Boolean)row.get("is_key"),
+                    (Boolean)row.get("is_nullable"));
+
+            meta.setId((Integer)row.get("id"));
+            meta.setMemberType((String)row.get("name"), attribute);
+        }
+
+        return meta;
 	}
 
 	@Override

@@ -20,6 +20,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	
 	@Override
 	public void initialize() {
+        //add unique constraint on name
 	    String query = "CREATE TABLE IF NOT EXISTS " + classesTableName + 
 	                    " (" + 
 	                      "id serial NOT NULL," + 
@@ -32,6 +33,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    jdbcTemplate.execute(query);
 	    //----------------------------------------------
 	    //basic attribute
+        //TODO: add unique constraint on containing_class_id and name
 	    query = "CREATE TABLE IF NOT EXISTS " + attributesTableName + 
                 " (" + 
                   "id serial NOT NULL," +
