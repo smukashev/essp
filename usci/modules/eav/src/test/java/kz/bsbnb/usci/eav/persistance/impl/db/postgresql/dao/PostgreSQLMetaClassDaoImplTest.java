@@ -6,6 +6,8 @@ package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
 import static org.junit.Assert.*;
 
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -63,6 +65,20 @@ public class PostgreSQLMetaClassDaoImplTest {
 	        metaCreate.setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
 	        metaCreate.setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
 	        metaCreate.setMemberType("testString", new MetaValue(DataTypes.STRING, false, false));
+
+            MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
+            metaCreate.setMemberType("testArray", metaValueArray);
+
+            MetaClass metaClass = new MetaClass("innerClass", true, false);
+            metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+            metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+            metaCreate.setMemberType("testInnerClass", metaClass);
+
+            MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
+            metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+            metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+            MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
+            metaCreate.setMemberType("testInnerClassArray", metaClassArray);
 	        
 	        MetaClass expResultCreate = new MetaClass("testClass");
 	        
@@ -71,18 +87,28 @@ public class PostgreSQLMetaClassDaoImplTest {
 	        expResultCreate.setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
 	        expResultCreate.setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
 	        expResultCreate.setMemberType("testString", new MetaValue(DataTypes.STRING, false, false));
+
+            MetaValueArray metaValueArrayLoaded = new MetaValueArray(DataTypes.STRING, false, false);
+            expResultCreate.setMemberType("testArray", metaValueArrayLoaded);
+
+            MetaClass metaClassLoaded = new MetaClass("innerClass", true, false);
+            metaClassLoaded.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+            metaClassLoaded.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+            expResultCreate.setMemberType("testInnerClass", metaClassLoaded);
+
+            MetaClass metaClassForArrayLoaded = new MetaClass("innerClassForArray", true, false);
+            metaClassForArrayLoaded.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+            metaClassForArrayLoaded.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+            MetaClassArray metaClassArrayLoaded = new MetaClassArray(metaClassForArrayLoaded);
+            expResultCreate.setMemberType("testInnerClassArray", metaClassArrayLoaded);
 	        
 	        long id = postgreSQLMetaClassDaoImpl.save(metaCreate);
 	        
 	        MetaClass loadedByNameMetaCreate = postgreSQLMetaClassDaoImpl.load("testClass");
-	        //MetaClass loadedByIdMetaCreate = postgreSQLMetaClassDaoImpl.load(id);
+	        MetaClass loadedByIdMetaCreate = postgreSQLMetaClassDaoImpl.load(id);
 
 	        assertTrue(expResultCreate.equals(loadedByNameMetaCreate));
-	        //assertTrue(expResultCreate.equals(loadedByIdMetaCreate));
-        }
-        catch(Exception e)
-        {
-        	fail("Exception: " + e.getMessage());
+	        assertTrue(expResultCreate.equals(loadedByIdMetaCreate));
         }
         finally
         {

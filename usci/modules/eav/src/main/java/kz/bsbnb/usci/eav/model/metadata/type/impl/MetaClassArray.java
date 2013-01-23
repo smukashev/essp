@@ -3,6 +3,7 @@ package kz.bsbnb.usci.eav.model.metadata.type.impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 
 public class MetaClassArray extends GenericMetaArray<MetaClass> {
@@ -24,14 +25,28 @@ public class MetaClassArray extends GenericMetaArray<MetaClass> {
      */
     HashMap<String, ArrayList<String>> arrayKeyFilter = new HashMap<String, ArrayList<String>>();
 
+    public MetaClassArray(MetaClass memberClass) {
+        super(memberClass);
+    }
+
 	public MetaClassArray(String className, boolean isKey, boolean isNullable) {
-		super(isKey, isNullable);
+		super(new MetaClass(), isKey, isNullable);
 		memberType.setClassName(className);
 	}
 
 	public void addArrayKeyFilterValues(String attributeName, ArrayList<String> values)
     {
     	arrayKeyFilter.put(attributeName, values);
+    }
+
+    public ComplexKeyTypes getComplexKeyType()
+    {
+        return memberType.getComplexKeyType();
+    }
+
+    public void setComplexKeyType(ComplexKeyTypes type)
+    {
+        memberType.setComplexKeyType(type);
     }
 	
 	public boolean equals(Object obj) {

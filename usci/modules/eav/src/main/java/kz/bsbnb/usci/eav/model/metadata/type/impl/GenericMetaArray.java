@@ -2,8 +2,13 @@ package kz.bsbnb.usci.eav.model.metadata.type.impl;
 
 public class GenericMetaArray<T extends AbstractMetaType> extends AbstractMetaArray {
 	T memberType;
-	
-	public GenericMetaArray(boolean isKey, boolean isNullable) {
+
+    public GenericMetaArray(T memberType) {
+        this.memberType = memberType;
+    }
+
+	public GenericMetaArray(T memberType, boolean isKey, boolean isNullable) {
+        this.memberType = memberType;
 		memberType.setKey(isKey);
 		memberType.setNullable(isNullable);
 	}
@@ -33,4 +38,11 @@ public class GenericMetaArray<T extends AbstractMetaType> extends AbstractMetaAr
 		return memberType.isComplex();
 	}
 
+    public T getMembersType() {
+        return memberType;
+    }
+
+    public void setMembersType(T memberType) {
+        this.memberType = memberType;
+    }
 }

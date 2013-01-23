@@ -7,10 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.MetaTypeHelper;
@@ -79,6 +82,24 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    
 	    return metaId;
 	}
+
+    private String getMetaClassName(long id)
+    {
+        String name;
+
+        String query = "SELECT name FROM " + classesTableName +
+                " WHERE id = " + id + " LIMIT 1";
+
+        logger.debug(query);
+
+        try {
+            name = jdbcTemplate.queryForObject(query, String.class);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            name = null;
+        }
+
+        return name;
+    }
 	
 	@Transactional
 	public long save(MetaClass meta) {
@@ -114,18 +135,56 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             {
                 if(metaType.isArray())
                 {
-                    query = "";
+                    MetaClassArray metaClassArray = (MetaClassArray)metaType;
+
+                    long innerId = save(metaClassArray.getMembersType());
+
+                    query = "INSERT INTO " + complexArrayTableName +
+                            " (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id, array_key_type) VALUES " +
+                            " ( " +
+                                   metaId                              + " , " +
+                            " '" + typeName                            + "', " +
+                            " '" + metaClassArray.isKey()              + "', " +
+                            " '" + metaClassArray.isNullable()         + "', " +
+                            " '" + metaClassArray.getComplexKeyType()  + "', " +
+                            "  " + innerId                             + " , " +
+                            " '" + metaClassArray.getArrayKeyType()    + "'  " +
+                            " ) ";
                 }
                 else
                 {
-                    query = "";
+                    MetaClass metaClass = (MetaClass)metaType;
+
+                    long innerId = save(metaClass);
+
+                    query = "INSERT INTO " + complexAttributesTableName +
+                            " (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id) VALUES " +
+                            " ( " +
+                                   metaId                         + " , " +
+                            " '" + typeName                       + "', " +
+                            " '" + metaClass.isKey()              + "', " +
+                            " '" + metaClass.isNullable()         + "', " +
+                            " '" + metaClass.getComplexKeyType()  + "', " +
+                            "  " + innerId                        + "   " +
+                            " ) ";
                 }
             }
             else
             {
                 if(metaType.isArray())
                 {
-                    query = "";
+                    MetaValueArray metaValueArray = (MetaValueArray)metaType;
+
+                    query = "INSERT INTO " + simpleArrayTableName +
+                            " (containing_class_id, name, type_code, is_key, is_nullable, array_key_type) VALUES " +
+                            " ( " +
+                                   metaId                            + " , " +
+                            " '" + typeName                          + "', " +
+                            " '" + metaValueArray.getTypeCode()      + "', " +
+                            " '" + metaValueArray.isKey()            + "', " +
+                            " '" + metaValueArray.isNullable()       + "', " +
+                            " '" + metaValueArray.getArrayKeyType()  + "'  " +
+                            " ) ";
                 }
                 else
                 {
@@ -134,7 +193,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     query = "INSERT INTO " + simpleAttributesTableName +
                         " (containing_class_id, name, type_code, is_key, is_nullable) VALUES " +
                         " ( " +
-                                    metaId   +               " , " +
+                                    metaId                 + " , " +
                             " '" + typeName                + "', " +
                             " '" + metaValue.getTypeCode() + "', " +
                             " '" + metaValue.isKey()       + "', " +
@@ -143,22 +202,6 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 }
             }
 	    	
-//	    	query = "INSERT INTO " + attributesTableName +
-//                    " (class_id, name, type_code, is_key, is_nullable, " +
-//                    "is_array, array_key_type, complex_key_type) VALUES (" +
-//                    metaId + ", " +
-//                    "\'" + typeName + "\', " +
-//                    (MetaTypeHelper.getDataType(metaType) == null ?
-//                    	"NULL" : "'" + MetaTypeHelper.getDataType(metaType) + "'") + ", " +
-//                    "\'" + meta.getMemberType(typeName).isKey() + "\', " +
-//                    "\'" + meta.getMemberType(typeName).isNullable() + "\', " +
-//                    "\'" + meta.getMemberType(typeName).isArray() + "\', " +
-//                    (MetaTypeHelper.getArrayKeyType(metaType) == null ?
-//                    	"NULL" : "'" + MetaTypeHelper.getArrayKeyType(metaType) + "'") + ", " +
-//                    (MetaTypeHelper.getArrayKeyType(metaType) == null ?
-//                    	"NULL" : "'" + MetaTypeHelper.getClassKeyType(metaType) + "'") + " " +
-//                    		")";
-//
 	    	logger.debug(query);
 
 	    	jdbcTemplate.execute(query);
@@ -230,6 +273,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	@Override
 	public MetaClass load(long id) {
         MetaClass meta = new MetaClass();
+        meta.setId(id);
+        meta.setClassName(getMetaClassName(id));
 
         //load simple attributes
         String query = "SELECT * FROM " +
@@ -245,8 +290,66 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     (Boolean)row.get("is_key"),
                     (Boolean)row.get("is_nullable"));
 
-            meta.setId((Integer)row.get("id"));
             meta.setMemberType((String)row.get("name"), attribute);
+        }
+
+        //load simple attributes arrays
+        query = "SELECT * FROM " +
+                simpleArrayTableName +
+                " WHERE containing_class_id = " + id;
+
+        logger.debug(query);
+
+        rows = jdbcTemplate.queryForList(query);
+        for (Map<String, Object> row : rows) {
+            MetaValueArray attribute = new MetaValueArray(
+                    DataTypes.valueOf((String) row.get("type_code")),
+                    (Boolean)row.get("is_key"),
+                    (Boolean)row.get("is_nullable"));
+
+            attribute.setArrayKeyType(ComplexKeyTypes.valueOf((String) row.get("array_key_type")));
+
+            meta.setMemberType((String)row.get("name"), attribute);
+        }
+
+        //load complex attributes
+        query = "SELECT * FROM " +
+                complexAttributesTableName +
+                " WHERE containing_class_id = " + id;
+
+        logger.debug(query);
+
+        rows = jdbcTemplate.queryForList(query);
+        for (Map<String, Object> row : rows) {
+            MetaClass attribute = load((Integer)row.get("class_id"));
+
+            attribute.setClassName(getMetaClassName((Integer)row.get("class_id")));
+            attribute.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
+            attribute.setKey((Boolean)row.get("is_key"));
+            attribute.setNullable((Boolean) row.get("is_nullable"));
+
+            meta.setMemberType((String)row.get("name"), attribute);
+        }
+
+        //load complex attributes
+        query = "SELECT * FROM " +
+                complexArrayTableName +
+                " WHERE containing_class_id = " + id;
+
+        logger.debug(query);
+
+        rows = jdbcTemplate.queryForList(query);
+        for (Map<String, Object> row : rows) {
+            MetaClass attribute = load((Integer)row.get("class_id"));
+
+            attribute.setClassName(getMetaClassName((Integer)row.get("class_id")));
+            attribute.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
+            attribute.setKey((Boolean)row.get("is_key"));
+            attribute.setNullable((Boolean) row.get("is_nullable"));
+
+            MetaClassArray metaClassArray = new MetaClassArray(attribute);
+
+            meta.setMemberType((String)row.get("name"), metaClassArray);
         }
 
         return meta;

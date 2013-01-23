@@ -37,6 +37,11 @@ public class MetaClass extends AbstractMetaType {
 		this.className = className;
 	}
 
+    public MetaClass(boolean isKey, boolean isNullable) {
+        super(isKey, isNullable);
+        this.className = className;
+    }
+
 	public MetaClass(String className, boolean isKey, boolean isNullable) {
 		super(isKey, isNullable);
 		this.className = className;
@@ -123,13 +128,25 @@ public class MetaClass extends AbstractMetaType {
 		if (obj == null)
 			return false;
 
-		if (!(getClass() == obj.getClass()))
+        if (!(getClass() == obj.getClass()))
 			return false;
 		else {
 			MetaClass tmp = (MetaClass) obj;
+
+            Set<String> thisNames = this.members.keySet();
+
+            for (String name : thisNames)
+            {
+                if(!(this.getMemberType(name).equals(tmp.getMemberType(name))))
+                {
+                    return false;
+                }
+            }
+
             return !(tmp.isKey() != this.isKey() ||
                     tmp.isNullable() != this.isNullable() ||
-                    !tmp.members.equals(this.members) ||
+                    !tmp.getClassName().equals(this.getClassName()) ||
+                    //!tmp.members.values().equals(this.members.values()) ||
                     !tmp.complexKeyType.equals(this.complexKeyType));
 
         }
