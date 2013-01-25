@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav.model.metadata.type.impl;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -11,6 +13,10 @@ public class MetaClass extends AbstractMetaType {
 	 * Name of the metadata. Used as a key value for database search if <code>id</code> is 0 
 	 */
 	String className;
+
+    Timestamp beginDate = new Timestamp(java.util.Calendar.getInstance().getTimeInMillis());
+
+    boolean isDisabled = false;
 	
 	/**
 	 * Holds type values. Keys of hash are type names.
@@ -31,6 +37,15 @@ public class MetaClass extends AbstractMetaType {
 	String searchProcedureName = null;
 
     public MetaClass() {
+    }
+
+    public MetaClass(MetaClass meta) {
+        this.className = meta.className;
+        this.id = meta.id;
+        this.isDisabled = meta.isDisabled;
+        this.beginDate = meta.beginDate;
+
+        members.putAll(meta.members);
     }
 
 	public MetaClass(String className) {
@@ -143,12 +158,34 @@ public class MetaClass extends AbstractMetaType {
                 }
             }
 
-            return !(tmp.isKey() != this.isKey() ||
+            return !(tmp.isDisabled() != this.isDisabled() ||
+                    !tmp.getBeginDate().equals(this.getBeginDate()) ||
+                    tmp.isKey() != this.isKey() ||
                     tmp.isNullable() != this.isNullable() ||
                     !tmp.getClassName().equals(this.getClassName()) ||
-                    //!tmp.members.values().equals(this.members.values()) ||
                     !tmp.complexKeyType.equals(this.complexKeyType));
 
         }
 	}
+
+    public Timestamp getBeginDate() {
+        return beginDate;
+    }
+
+    public void setBeginDate(Timestamp beginDate) {
+        this.beginDate = beginDate;
+    }
+
+    public boolean isDisabled() {
+        return isDisabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        isDisabled = disabled;
+    }
+
+    public void removeMembers()
+    {
+        members.clear();
+    }
 }

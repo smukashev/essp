@@ -4,7 +4,7 @@ public class Persistable {
 	/**
 	 * id fields value of the persisted object
 	 */
-	private long id = 0;
+	protected long id = 0;
 
 	public long getId() {
 		return id;

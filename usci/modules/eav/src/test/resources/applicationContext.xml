@@ -44,5 +44,6 @@
         <property name="initialSize" value="${ds.pool.initialSize}"/>
         <property name="maxActive" value="${ds.pool.maxActive}"/>
     </bean>
-        
+
+    <bean id="JDBCConfig" class="kz.bsbnb.usci.eav.persistance.impl.db.JDBCConfig"/>
 </beans>

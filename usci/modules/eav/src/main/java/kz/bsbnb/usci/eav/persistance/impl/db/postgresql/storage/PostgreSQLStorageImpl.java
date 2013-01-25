@@ -21,11 +21,14 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	@Override
 	public void initialize() {
         //add unique constraint on name
-	    String query = "CREATE TABLE IF NOT EXISTS " + classesTableName + 
+	    String query = "CREATE TABLE IF NOT EXISTS " + getConfig().getClassesTableName() +
 	                    " (" + 
-	                      "id serial NOT NULL," + 
-	                      "name character varying(" + classNameLength  + ") NOT NULL," + 
-	                      "CONSTRAINT " + classesTableName + "_primary_key_index PRIMARY KEY (id )" + 
+	                      "id serial NOT NULL, " +
+                          "begin_date TIMESTAMP WITH TIME ZONE NOT NULL, " +
+                          "is_disabled BOOLEAN NOT NULL, " +
+	                      "name character varying(" + getConfig().getClassNameLength()  + ") NOT NULL," +
+	                      "CONSTRAINT " + getConfig().getClassesTableName() + "_primary_key_index PRIMARY KEY (id ), " +
+                          "UNIQUE (name) " +
 	                    ")";
 	    
 	    logger.debug(query);
@@ -34,93 +37,93 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    //----------------------------------------------
 	    //basic attribute
         //TODO: add unique constraint on containing_class_id and name
-	    query = "CREATE TABLE IF NOT EXISTS " + attributesTableName + 
+	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getAttributesTableName() +
                 " (" + 
                   "id serial NOT NULL," +
-                  "containing_class_id int references " + classesTableName + "(id) ON DELETE CASCADE, " +
-                  "name character varying(" + attributeNameLength  + ") NOT NULL," + 
+                  "containing_class_id int references " + getConfig().getClassesTableName() + "(id) ON DELETE CASCADE, " +
+                  "name character varying(" + getConfig().getAttributeNameLength() + ") NOT NULL," +
                   "is_key boolean NOT NULL," +
                   "is_nullable boolean NOT NULL," +
-                  "CONSTRAINT " + attributesTableName + "_primary_key_index PRIMARY KEY (id )" + 
+                  "CONSTRAINT " + getConfig().getAttributesTableName() + "_primary_key_index PRIMARY KEY (id ) " +
                 ")";
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    //simple attributes
-	    query = "CREATE TABLE IF NOT EXISTS " + simpleAttributesTableName + 
+	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getSimpleAttributesTableName() +
                 " (" + 
-                  "type_code character varying(" + typeCodeLength  + ")" +
-                ") INHERITS (" + attributesTableName + ")";
+                  "type_code character varying(" + getConfig().getTypeCodeLength() + ")" +
+                ") INHERITS (" + getConfig().getAttributesTableName() + ")";
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    
 	    //complex attributes
-	    query = "CREATE TABLE IF NOT EXISTS " + complexAttributesTableName + 
+	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getComplexAttributesTableName() +
                 " (" + 
-                  "complex_key_type character varying(" + complexKeyTypeCodeLength  + "), " +
-                  "class_id int references " + classesTableName + "(id) ON DELETE CASCADE " +
-                ") INHERITS (" + attributesTableName + ")";
+                  "complex_key_type character varying(" + getConfig().getComplexKeyTypeCodeLength() + "), " +
+                  "class_id int references " + getConfig().getClassesTableName() + "(id) ON DELETE CASCADE " +
+                ") INHERITS (" + getConfig().getAttributesTableName() + ")";
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    //array
-	    query = "CREATE TABLE IF NOT EXISTS " + arrayTableName + 
+	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getArrayTableName() +
                 " (" + 
-                  "array_key_type character varying(" + arrayKeyTypeCodeLength  + ")" +
-                ") INHERITS (" + attributesTableName + ")";
+                  "array_key_type character varying(" + getConfig().getArrayKeyTypeCodeLength() + ")" +
+                ") INHERITS (" + getConfig().getAttributesTableName() + ")";
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    
 	    //simple array
-	    query = "CREATE TABLE IF NOT EXISTS " + simpleArrayTableName + 
-                " () INHERITS (" + arrayTableName + ", " + simpleAttributesTableName + ")";
+	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getSimpleArrayTableName() +
+                " () INHERITS (" + getConfig().getArrayTableName() + ", " + getConfig().getSimpleAttributesTableName() + ")";
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    //complex array
-	    query = "CREATE TABLE IF NOT EXISTS " + complexArrayTableName + 
-                " () INHERITS (" + arrayTableName + ", " + complexAttributesTableName + ")";
+	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getComplexArrayTableName() +
+                " () INHERITS (" + getConfig().getArrayTableName() + ", " + getConfig().getComplexAttributesTableName() + ")";
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    //------------------------------------------------
-	    query = "CREATE TABLE IF NOT EXISTS " + entitiesTableName + 
+	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getEntitiesTableName() +
                 " (" + 
                   "id serial NOT NULL," +
-                  "class_id int references " + classesTableName + "(id) ON DELETE CASCADE, " +
-                  "CONSTRAINT " + entitiesTableName + "_primary_key_index PRIMARY KEY (id )" + 
+                  "class_id int references " + getConfig().getClassesTableName() + "(id) ON DELETE CASCADE, " +
+                  "CONSTRAINT " + getConfig().getEntitiesTableName() + "_primary_key_index PRIMARY KEY (id )" +
                 ")";
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    
-	    query = "CREATE TABLE IF NOT EXISTS " + arrayKeyFilterTableName + 
+	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getArrayKeyFilterTableName() +
                 " (" + 
                   "id serial NOT NULL," + 
-                  "attribute_id int references " + attributesTableName + "(id) ON DELETE CASCADE, " +
-                  "attribute_name character varying(" + attributeNameLength  + ") NOT NULL," + 
-                  "CONSTRAINT " + arrayKeyFilterTableName + "_primary_key_index PRIMARY KEY (id )" + 
+                  "attribute_id int references " + getConfig().getAttributesTableName() + "(id) ON DELETE CASCADE, " +
+                  "attribute_name character varying(" + getConfig().getAttributeNameLength() + ") NOT NULL," +
+                  "CONSTRAINT " + getConfig().getArrayKeyFilterTableName() + "_primary_key_index PRIMARY KEY (id )" +
                 ")";
 
 		logger.debug(query);
 		
 		jdbcTemplate.execute(query);
 		
-		query = "CREATE TABLE IF NOT EXISTS " + arrayKeyFilterValuesTableName + 
+		query = "CREATE TABLE IF NOT EXISTS " + getConfig().getArrayKeyFilterValuesTableName() +
                 " (" + 
                   "id serial NOT NULL," + 
-                  "filter_id int references " + arrayKeyFilterTableName + "(id) ON DELETE CASCADE, " +
-                  "value character varying(" + arrayKeyFilterValueLength  + ") NOT NULL," + 
-                  "CONSTRAINT " + arrayKeyFilterValuesTableName + "_primary_key_index PRIMARY KEY (id )" + 
+                  "filter_id int references " + getConfig().getArrayKeyFilterTableName() + "(id) ON DELETE CASCADE, " +
+                  "value character varying(" + getConfig().getArrayKeyFilterValueLength() + ") NOT NULL," +
+                  "CONSTRAINT " + getConfig().getArrayKeyFilterValuesTableName() + "_primary_key_index PRIMARY KEY (id )" +
                 ")";
 
 		logger.debug(query);
@@ -130,19 +133,19 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
 	@Override
 	public void clear() {
-		String query = "DROP TABLE IF EXISTS " + arrayKeyFilterValuesTableName;
+		String query = "DROP TABLE IF EXISTS " + getConfig().getArrayKeyFilterValuesTableName();
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
-	    query = "DROP TABLE IF EXISTS " + arrayKeyFilterTableName;
+	    query = "DROP TABLE IF EXISTS " + getConfig().getArrayKeyFilterTableName();
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
-		query = "DROP TABLE IF EXISTS " + attributesTableName + " CASCADE";
+		query = "DROP TABLE IF EXISTS " + getConfig().getAttributesTableName() + " CASCADE";
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
-	    query = "DROP TABLE IF EXISTS " + entitiesTableName;
+	    query = "DROP TABLE IF EXISTS " + getConfig().getEntitiesTableName();
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
-	    query = "DROP TABLE IF EXISTS " + classesTableName;
+	    query = "DROP TABLE IF EXISTS " + getConfig().getClassesTableName();
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
 	}

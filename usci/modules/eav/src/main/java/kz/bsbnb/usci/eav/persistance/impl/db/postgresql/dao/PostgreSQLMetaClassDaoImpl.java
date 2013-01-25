@@ -1,12 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
@@ -16,11 +9,10 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
-import kz.bsbnb.usci.eav.util.MetaTypeHelper;
 import kz.bsbnb.usci.eav.util.SetUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -28,108 +20,128 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 @Repository
 public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
 	
 	class InsertMetaClassPreparedStatementCreator implements PreparedStatementCreator {
-		String className;
+		MetaClass metaClass;
 		
-	    public InsertMetaClassPreparedStatementCreator(String className) {
-			this.className = className;
+	    public InsertMetaClassPreparedStatementCreator(MetaClass metaClass) {
+			this.metaClass = metaClass;
 		}
 
 		public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 	        PreparedStatement ps = con.prepareStatement(
-	        		"INSERT INTO " + classesTableName +
-	                " (name) VALUES ( ? )", new String[] {"id"});
-	        ps.setString(1, className);
+	        		"INSERT INTO " + getConfig().getClassesTableName() +
+	                " (name, begin_date, is_disabled) VALUES ( ?, ?, ? )", new String[] {"id"});
+	        ps.setString(1, metaClass.getClassName());
+            ps.setTimestamp(2, metaClass.getBeginDate());
+            ps.setBoolean(3, metaClass.isDisabled());
 	        
 	        logger.debug(ps.toString());
 	        
 	        return ps;
 	    }
 	}
-	
-	private long getMetaClassId(String className)
-	{
-		long metaId;
-		
-	    String query = "SELECT id FROM " + classesTableName +
-	    		" WHERE name = \'" + className + "\' LIMIT 1";
-	    		
-	    logger.debug(query);
-	    
-	    try {
-	    	metaId = jdbcTemplate.queryForInt(query);
-	    } catch (IncorrectResultSizeDataAccessException e) {
-	    	metaId = 0;
-	    }
-	    
-	    if(metaId == 0)
-	    {
-	    	KeyHolder keyHolder = new GeneratedKeyHolder();
-		    
-	    	jdbcTemplate.update(new InsertMetaClassPreparedStatementCreator(className), keyHolder);
-		    
-            metaId = keyHolder.getKey().longValue();
-            
-            if(metaId == 0)
-	        {
-	        	logger.error("Can't get className id");
-	        }
-	    }
-	    
-	    return metaId;
-	}
 
-    private String getMetaClassName(long id)
+    private void loadClass(MetaClass metaClass)
     {
-        String name;
+        String query;
+        if(metaClass.getId() < 1)
+        {
+            if(metaClass.getClassName() == null)
+            {
+                throw new IllegalArgumentException("Meta class does not have name or id. Can't load.");
+            }
 
-        String query = "SELECT name FROM " + classesTableName +
-                " WHERE id = " + id + " LIMIT 1";
+            query = "SELECT * FROM " + getConfig().getClassesTableName() +
+                    " WHERE name = '" + metaClass.getClassName() + "' ";
+        }
+        else
+        {
+            query = "SELECT * FROM " + getConfig().getClassesTableName() +
+                    " WHERE id = " + metaClass.getId();
+        }
 
         logger.debug(query);
 
-        try {
-            name = jdbcTemplate.queryForObject(query, String.class);
-        } catch (IncorrectResultSizeDataAccessException e) {
-            name = null;
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+
+        if (rows.size() > 1)
+        {
+            throw new IllegalArgumentException("More then one class found. Can't load.");
         }
 
-        return name;
+        if (rows.size() < 1)
+        {
+            throw new IllegalArgumentException("Class not found. Can't load.");
+        }
+
+        Map<String, Object> row = rows.get(0);
+
+        if(row != null)
+        {
+            metaClass.setDisabled((Boolean)row.get("is_disabled"));
+            metaClass.setBeginDate((Timestamp)row.get("begin_date"));
+            metaClass.setId((Integer)row.get("id"));
+            metaClass.setClassName((String)row.get("name"));
+        }
+        else
+        {
+            logger.error("Can't load metaClass, empty data set.");
+        }
     }
 	
-	@Transactional
-	public long save(MetaClass meta) {
-	    long metaId = meta.getId();
-	    String query;
-	    
-	    if(meta.getId() < 1)
-	    {
-            metaId = getMetaClassId(meta.getClassName());
-	    	meta.setId(metaId);
-	    }
-	    
-	    if(metaId < 1)
-	    {
-	    	throw new IllegalArgumentException("Can't determine metadata id");
-	    }
-	    
-	    MetaClass oldMeta = load(metaId);
-	    
-	    Set<String> oldNames = oldMeta.getMemberNames();
-	    Set<String> newNames = meta.getMemberNames();
-	    
-	    Set<String> updateNames = SetUtils.intersection(oldNames, newNames);
-	    Set<String> deleteNames = SetUtils.difference(oldNames, newNames);
-	    Set<String> addNames = SetUtils.difference(newNames, oldNames);
+	private long createClass(MetaClass metaClass)
+    {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
 
+        try
+        {
+            jdbcTemplate.update(new InsertMetaClassPreparedStatementCreator(metaClass), keyHolder);
+        }
+        catch (DuplicateKeyException e)
+        {
+            logger.error("Duplicate name for class: " + metaClass.getClassName());
+            throw new IllegalArgumentException("Duplicate name for class: " + metaClass.getClassName());
+        }
+
+        long metaId = keyHolder.getKey().longValue();
+
+        metaClass.setId(metaId);
+
+        if(metaId < 1)
+        {
+            logger.error("Can't create class");
+            return 0;
+        }
+//        {
+//            logger.error("Can't create class with name: " + metaClass.getClassName() +
+//                    ", because there is a class with such name, with id: " + metaId);
+//            throw new IllegalArgumentException("Can't create class with name: " + metaClass.getClassName() +
+//                    ", because there is a class with such name, with id: " + metaId);
+//        }
+
+        return metaId;
+    }
+
+    private void insertAttributes(Set<String> addNames, MetaClass meta)
+    {
+        String query;
+        if(meta.getId() < 1)
+        {
+            throw new IllegalArgumentException("MetaClass must have an id filled before attributes insertion to DB");
+        }
         //TODO: make bulk insert
-	    for(String typeName : addNames)
-	    {
-	    	IMetaType metaType = meta.getMemberType(typeName);
+        for(String typeName : addNames)
+        {
+            IMetaType metaType = meta.getMemberType(typeName);
 
             if(metaType.isComplex())
             {
@@ -139,10 +151,10 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
                     long innerId = save(metaClassArray.getMembersType());
 
-                    query = "INSERT INTO " + complexArrayTableName +
+                    query = "INSERT INTO " + getConfig().getComplexArrayTableName() +
                             " (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id, array_key_type) VALUES " +
                             " ( " +
-                                   metaId                              + " , " +
+                            meta.getId()                               + " , " +
                             " '" + typeName                            + "', " +
                             " '" + metaClassArray.isKey()              + "', " +
                             " '" + metaClassArray.isNullable()         + "', " +
@@ -157,10 +169,10 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
                     long innerId = save(metaClass);
 
-                    query = "INSERT INTO " + complexAttributesTableName +
+                    query = "INSERT INTO " + getConfig().getComplexAttributesTableName() +
                             " (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id) VALUES " +
                             " ( " +
-                                   metaId                         + " , " +
+                            meta.getId()                          + " , " +
                             " '" + typeName                       + "', " +
                             " '" + metaClass.isKey()              + "', " +
                             " '" + metaClass.isNullable()         + "', " +
@@ -175,10 +187,10 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 {
                     MetaValueArray metaValueArray = (MetaValueArray)metaType;
 
-                    query = "INSERT INTO " + simpleArrayTableName +
+                    query = "INSERT INTO " + getConfig().getSimpleArrayTableName() +
                             " (containing_class_id, name, type_code, is_key, is_nullable, array_key_type) VALUES " +
                             " ( " +
-                                   metaId                            + " , " +
+                            meta.getId()                             + " , " +
                             " '" + typeName                          + "', " +
                             " '" + metaValueArray.getTypeCode()      + "', " +
                             " '" + metaValueArray.isKey()            + "', " +
@@ -190,95 +202,56 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 {
                     MetaValue metaValue = (MetaValue)metaType;
 
-                    query = "INSERT INTO " + simpleAttributesTableName +
-                        " (containing_class_id, name, type_code, is_key, is_nullable) VALUES " +
-                        " ( " +
-                                    metaId                 + " , " +
+                    query = "INSERT INTO " + getConfig().getSimpleAttributesTableName() +
+                            " (containing_class_id, name, type_code, is_key, is_nullable) VALUES " +
+                            " ( " +
+                            meta.getId()                   + " , " +
                             " '" + typeName                + "', " +
                             " '" + metaValue.getTypeCode() + "', " +
                             " '" + metaValue.isKey()       + "', " +
                             " '" + metaValue.isNullable()  + "'  " +
-                   		" ) ";
+                            " ) ";
                 }
             }
-	    	
-	    	logger.debug(query);
 
-	    	jdbcTemplate.execute(query);
-	    }
-	    
-	    //TODO: Add bulk delete by id list
-	    for(String typeName : deleteNames)
-	    {
-	    	query = "DELETE FROM " + attributesTableName +
+            logger.debug(query);
+
+            jdbcTemplate.execute(query);
+        }
+    }
+
+    private void deleteAttributes(Set<String> deleteNames, MetaClass meta)
+    {
+        String query;
+        if(meta.getId() < 1)
+        {
+            throw new IllegalArgumentException("MetaClass must have an id filled before attributes deletion to DB");
+        }
+
+        //TODO: Add bulk delete by id list
+        for(String typeName : deleteNames)
+        {
+            query = "DELETE FROM " + getConfig().getAttributesTableName() +
                     " WHERE class_id = " +
-                    metaId + " AND name = " +
+                    meta.getId() + " AND name = " +
                     "\'" + typeName + "\' CASCADE ";
-	    	
-	    	logger.debug(query);
-	    	
-	    	jdbcTemplate.execute(query);
-	    }
-	    
-	    for(String typeName : updateNames)
-	    {
-	    	if(!meta.getMemberType(typeName).equals(oldMeta.getMemberType(typeName)))
-	    	{
-	    		IMetaType metaType = meta.getMemberType(typeName);
-	    		
-		    	query = "UPDATE " + attributesTableName +
-	                    " SET type_code = " + (MetaTypeHelper.getDataType(metaType) == null ?
-	                        	"NULL" : "'" + MetaTypeHelper.getDataType(metaType) + "'") + ", " +  
-	                    " is_key = \'" + metaType.isKey() + "\', " +
-	                    " is_nullable = \'" + metaType.isNullable() + "\', " +
-	                    " is_array = \'" + metaType.isArray() + "\', " +
-	                    " array_key_type = " + (MetaTypeHelper.getArrayKeyType(metaType) == null ? 
-	                        	"NULL" : "'" + MetaTypeHelper.getArrayKeyType(metaType) + "'") + ", " +
-	                    " complex_key_type = " + (MetaTypeHelper.getArrayKeyType(metaType) == null ? 
-	                        	"NULL" : "'" + MetaTypeHelper.getClassKeyType(metaType) + "'") +
-	                    " WHERE class_id = " +
-	    	            	metaId + " AND name = " +
-	    	                "\'" + typeName + "\'";
-		    	
-		    	logger.debug(query);
-		    	
-		    	jdbcTemplate.execute(query);
-	    	}
-	    }
-	    
-	    return metaId;
-	}
 
-	@Override
-	public MetaClass load(String className) {
-		long id = getMetaClassId(className);
+            logger.debug(query);
 
-        MetaClass meta = load(id);
-        meta.setClassName(className);
+            jdbcTemplate.execute(query);
+        }
+    }
 
-	    return meta;
-	}
+    public void loadAttributes(MetaClass meta) {
+        if(meta.getId() < 1)
+            return;
 
-	@Override
-	public boolean testConnection() {
-	    String query = "SELECT 1";
-	    
-	    logger.debug(query);
-	    
-	    jdbcTemplate.execute(query);
-	
-	    return true;
-	}
-
-	@Override
-	public MetaClass load(long id) {
-        MetaClass meta = new MetaClass();
-        meta.setId(id);
-        meta.setClassName(getMetaClassName(id));
+        long id = meta.getId();
+        meta.removeMembers();
 
         //load simple attributes
         String query = "SELECT * FROM " +
-                simpleAttributesTableName +
+                getConfig().getSimpleAttributesTableName() +
                 " WHERE containing_class_id = " + id;
 
         logger.debug(query);
@@ -295,7 +268,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         //load simple attributes arrays
         query = "SELECT * FROM " +
-                simpleArrayTableName +
+                getConfig().getSimpleArrayTableName() +
                 " WHERE containing_class_id = " + id;
 
         logger.debug(query);
@@ -313,8 +286,9 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
 
         //load complex attributes
-        query = "SELECT * FROM " +
-                complexAttributesTableName +
+        query = "SELECT ca.*, c.name cname FROM " +
+                getConfig().getComplexAttributesTableName() + " ca LEFT JOIN " + getConfig().getClassesTableName() +
+                    " c ON ca.class_id = c.id " +
                 " WHERE containing_class_id = " + id;
 
         logger.debug(query);
@@ -323,7 +297,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         for (Map<String, Object> row : rows) {
             MetaClass attribute = load((Integer)row.get("class_id"));
 
-            attribute.setClassName(getMetaClassName((Integer)row.get("class_id")));
+            attribute.setClassName((String)row.get("cname"));
             attribute.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
             attribute.setKey((Boolean)row.get("is_key"));
             attribute.setNullable((Boolean) row.get("is_nullable"));
@@ -332,8 +306,9 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
 
         //load complex attributes
-        query = "SELECT * FROM " +
-                complexArrayTableName +
+        query = "SELECT ca.*, c.name cname FROM " +
+                getConfig().getComplexArrayTableName() + " ca LEFT JOIN " + getConfig().getClassesTableName() +
+                    " c ON ca.class_id = c.id " +
                 " WHERE containing_class_id = " + id;
 
         logger.debug(query);
@@ -342,7 +317,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         for (Map<String, Object> row : rows) {
             MetaClass attribute = load((Integer)row.get("class_id"));
 
-            attribute.setClassName(getMetaClassName((Integer)row.get("class_id")));
+            attribute.setClassName((String)row.get("cname"));
             attribute.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
             attribute.setKey((Boolean)row.get("is_key"));
             attribute.setNullable((Boolean) row.get("is_nullable"));
@@ -351,6 +326,89 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             meta.setMemberType((String)row.get("name"), metaClassArray);
         }
+    }
+
+    public long create(MetaClass meta)
+    {
+        createClass(meta);
+        save(meta);
+
+        return meta.getId();
+    }
+
+    //TODO: add active period to classes
+	@Transactional
+	public long save(MetaClass meta) {
+	    String query;
+        MetaClass dbMeta = new MetaClass(meta);
+
+        try
+        {
+            loadClass(dbMeta);
+            loadAttributes(dbMeta);
+        }
+        catch(IllegalArgumentException e)
+        {
+            logger.debug("Class: " + meta.getClassName() + " not found.");
+            createClass(dbMeta);
+            dbMeta.removeMembers();
+            logger.debug("Class: " + meta.getClassName() + " not created.");
+        }
+
+	    if(dbMeta.getId() < 1)
+	    {
+	    	throw new IllegalArgumentException("Can't determine metadata id");
+	    }
+
+        meta.setId(dbMeta.getId());
+
+	    Set<String> oldNames = dbMeta.getMemberNames();
+	    Set<String> newNames = meta.getMemberNames();
+	    
+	    Set<String> updateNames = SetUtils.intersection(oldNames, newNames);
+	    Set<String> deleteNames = SetUtils.difference(oldNames, newNames);
+	    Set<String> addNames = SetUtils.difference(newNames, oldNames);
+
+        deleteNames.addAll(updateNames);
+        addNames.addAll(updateNames);
+
+        deleteAttributes(deleteNames, dbMeta);
+        insertAttributes(addNames, meta);
+
+	    return dbMeta.getId();
+	}
+
+	@Override
+	public MetaClass load(String className) {
+		MetaClass meta = new MetaClass(className);
+
+        loadClass(meta);
+        loadAttributes(meta);
+
+	    return meta;
+	}
+
+	@Override
+	public boolean testConnection() {
+	    String query = "SELECT 1";
+	    
+	    logger.debug(query);
+	    
+	    jdbcTemplate.execute(query);
+	
+	    return true;
+	}
+
+	@Override
+	public MetaClass load(long id) {
+        if(id < 1)
+            return null;
+
+        MetaClass meta = new MetaClass();
+        meta.setId(id);
+
+        loadClass(meta);
+        loadAttributes(meta);
 
         return meta;
 	}
