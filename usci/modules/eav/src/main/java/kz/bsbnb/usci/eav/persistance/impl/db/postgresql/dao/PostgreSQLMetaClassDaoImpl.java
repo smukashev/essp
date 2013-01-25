@@ -13,14 +13,17 @@ import kz.bsbnb.usci.eav.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.*;
+import javax.annotation.PostConstruct;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +31,59 @@ import java.util.Set;
 @Repository
 public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
+
+    private String INSERT_CLASS_SQL;
+    private String SELECT_CLASS_BY_NAME_SQL;
+    private String SELECT_CLASS_BY_ID_SQL;
+    private String UPDATE_CLASS_BY_ID;
+    private String INSERT_COMPLEX_ARRAY;
+    private String INSERT_COMPLEX_ATTRIBUTE;
+    private String INSERT_SIMPLE_ARRAY;
+    private String INSERT_SIMPLE_ATTRIBUTE;
+    private String DELETE_ATTRIBUTE;
+    private String SELECT_SIMPLE_ATTRIBUTES;
+
+    @PostConstruct
+    public void init()
+    {
+        INSERT_CLASS_SQL = "INSERT INTO " + getConfig().getClassesTableName() +
+                           " (name, begin_date, is_disabled) VALUES ( ?, ?, ? )";
+
+        SELECT_CLASS_BY_NAME_SQL = "SELECT * FROM " + getConfig().getClassesTableName() +
+                                   " WHERE name = ? ";
+
+        SELECT_CLASS_BY_ID_SQL = "SELECT * FROM " + getConfig().getClassesTableName() +
+                                 " WHERE id = ? ";
+
+        UPDATE_CLASS_BY_ID = "UPDATE " + getConfig().getClassesTableName() + " SET " +
+                             " name = ?, " +
+                             " begin_date = ?, " +
+                             " is_disabled = ? " +
+                             " WHERE id = ?";
+
+        INSERT_COMPLEX_ARRAY = "INSERT INTO " + getConfig().getComplexArrayTableName() +
+                " (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id, array_key_type) VALUES " +
+                " ( ?, ?, ?, ?, ?, ?, ?) ";
+
+        INSERT_COMPLEX_ATTRIBUTE = "INSERT INTO " + getConfig().getComplexAttributesTableName() +
+                " (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id) VALUES " +
+                " ( ?, ?, ?, ?, ?, ?) ";
+
+        INSERT_SIMPLE_ARRAY = "INSERT INTO " + getConfig().getSimpleArrayTableName() +
+                " (containing_class_id, name, type_code, is_key, is_nullable, array_key_type) VALUES " +
+                " ( ?, ?, ?, ?, ?, ?) ";
+
+        INSERT_SIMPLE_ATTRIBUTE = "INSERT INTO " + getConfig().getSimpleAttributesTableName() +
+                " (containing_class_id, name, type_code, is_key, is_nullable) VALUES " +
+                " ( ?, ?, ?, ?, ?) ";
+
+        DELETE_ATTRIBUTE = "DELETE FROM " + getConfig().getAttributesTableName() +
+                " WHERE containing_class_id = ? AND name = ? ";
+
+        SELECT_SIMPLE_ATTRIBUTES = "SELECT * FROM " +
+                getConfig().getSimpleAttributesTableName() +
+                " WHERE containing_class_id = ?";
+    }
 	
 	class InsertMetaClassPreparedStatementCreator implements PreparedStatementCreator {
 		MetaClass metaClass;
@@ -38,8 +94,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
 		public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 	        PreparedStatement ps = con.prepareStatement(
-	        		"INSERT INTO " + getConfig().getClassesTableName() +
-	                " (name, begin_date, is_disabled) VALUES ( ?, ?, ? )", new String[] {"id"});
+	        		INSERT_CLASS_SQL, new String[] {"id"});
 	        ps.setString(1, metaClass.getClassName());
             ps.setTimestamp(2, metaClass.getBeginDate());
             ps.setBoolean(3, metaClass.isDisabled());
@@ -53,6 +108,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     private void loadClass(MetaClass metaClass)
     {
         String query;
+        Object[] args;
+
         if(metaClass.getId() < 1)
         {
             if(metaClass.getClassName() == null)
@@ -60,18 +117,20 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 throw new IllegalArgumentException("Meta class does not have name or id. Can't load.");
             }
 
-            query = "SELECT * FROM " + getConfig().getClassesTableName() +
-                    " WHERE name = '" + metaClass.getClassName() + "' ";
+            query = SELECT_CLASS_BY_NAME_SQL;
+
+            args = new Object[] { metaClass.getClassName() };
         }
         else
         {
-            query = "SELECT * FROM " + getConfig().getClassesTableName() +
-                    " WHERE id = " + metaClass.getId();
+            query = SELECT_CLASS_BY_ID_SQL;
+
+            args = new Object[] {metaClass.getId()};
         }
 
         logger.debug(query);
 
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, args);
 
         if (rows.size() > 1)
         {
@@ -121,12 +180,6 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             logger.error("Can't create class");
             return 0;
         }
-//        {
-//            logger.error("Can't create class with name: " + metaClass.getClassName() +
-//                    ", because there is a class with such name, with id: " + metaId);
-//            throw new IllegalArgumentException("Can't create class with name: " + metaClass.getClassName() +
-//                    ", because there is a class with such name, with id: " + metaId);
-//        }
 
         return metaId;
     }
@@ -140,11 +193,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         String query;
 
-        query = "UPDATE " + getConfig().getClassesTableName() + " SET " +
-                " name = ?, " +
-                " begin_date = ?, " +
-                " is_disabled = ? " +
-                " WHERE id = ?";
+        query = UPDATE_CLASS_BY_ID;
 
         Object[] args = {metaClass.getClassName(), metaClass.getBeginDate(), metaClass.isDisabled(), metaClass.getId()};
 
@@ -159,10 +208,11 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             throw new IllegalArgumentException("MetaClass must have an id filled before attributes insertion to DB");
         }
-        //TODO: make bulk insert
+
         for(String typeName : addNames)
         {
             IMetaType metaType = meta.getMemberType(typeName);
+            Object[] args;
 
             if(metaType.isComplex())
             {
@@ -172,17 +222,11 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
                     long innerId = save(metaClassArray.getMembersType());
 
-                    query = "INSERT INTO " + getConfig().getComplexArrayTableName() +
-                            " (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id, array_key_type) VALUES " +
-                            " ( " +
-                            meta.getId()                               + " , " +
-                            " '" + typeName                            + "', " +
-                            " '" + metaClassArray.isKey()              + "', " +
-                            " '" + metaClassArray.isNullable()         + "', " +
-                            " '" + metaClassArray.getComplexKeyType()  + "', " +
-                            "  " + innerId                             + " , " +
-                            " '" + metaClassArray.getArrayKeyType()    + "'  " +
-                            " ) ";
+                    query = INSERT_COMPLEX_ARRAY;
+
+                    args = new Object[] {meta.getId(), typeName, metaClassArray.isKey(), metaClassArray.isNullable(),
+                            metaClassArray.getComplexKeyType().toString(), innerId,
+                            metaClassArray.getArrayKeyType().toString()};
                 }
                 else
                 {
@@ -190,16 +234,10 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
                     long innerId = save(metaClass);
 
-                    query = "INSERT INTO " + getConfig().getComplexAttributesTableName() +
-                            " (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id) VALUES " +
-                            " ( " +
-                            meta.getId()                          + " , " +
-                            " '" + typeName                       + "', " +
-                            " '" + metaClass.isKey()              + "', " +
-                            " '" + metaClass.isNullable()         + "', " +
-                            " '" + metaClass.getComplexKeyType()  + "', " +
-                            "  " + innerId                        + "   " +
-                            " ) ";
+                    query = INSERT_COMPLEX_ATTRIBUTE;
+
+                    args = new Object[] {meta.getId(), typeName, metaClass.isKey(), metaClass.isNullable(),
+                            metaClass.getComplexKeyType().toString(), innerId};
                 }
             }
             else
@@ -208,36 +246,26 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 {
                     MetaValueArray metaValueArray = (MetaValueArray)metaType;
 
-                    query = "INSERT INTO " + getConfig().getSimpleArrayTableName() +
-                            " (containing_class_id, name, type_code, is_key, is_nullable, array_key_type) VALUES " +
-                            " ( " +
-                            meta.getId()                             + " , " +
-                            " '" + typeName                          + "', " +
-                            " '" + metaValueArray.getTypeCode()      + "', " +
-                            " '" + metaValueArray.isKey()            + "', " +
-                            " '" + metaValueArray.isNullable()       + "', " +
-                            " '" + metaValueArray.getArrayKeyType()  + "'  " +
-                            " ) ";
+                    query = INSERT_SIMPLE_ARRAY;
+
+                    args = new Object[] {meta.getId(), typeName, metaValueArray.getTypeCode().toString(),
+                            metaValueArray.isKey(), metaValueArray.isNullable(),
+                            metaValueArray.getArrayKeyType().toString()};
                 }
                 else
                 {
                     MetaValue metaValue = (MetaValue)metaType;
 
-                    query = "INSERT INTO " + getConfig().getSimpleAttributesTableName() +
-                            " (containing_class_id, name, type_code, is_key, is_nullable) VALUES " +
-                            " ( " +
-                            meta.getId()                   + " , " +
-                            " '" + typeName                + "', " +
-                            " '" + metaValue.getTypeCode() + "', " +
-                            " '" + metaValue.isKey()       + "', " +
-                            " '" + metaValue.isNullable()  + "'  " +
-                            " ) ";
+                    query = INSERT_SIMPLE_ATTRIBUTE;
+
+                    args = new Object[] {meta.getId(), typeName, metaValue.getTypeCode().toString(),
+                            metaValue.isKey(), metaValue.isNullable()};
                 }
             }
 
             logger.debug(query);
 
-            jdbcTemplate.execute(query);
+            jdbcTemplate.update(query, args);
         }
     }
 
@@ -249,17 +277,13 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             throw new IllegalArgumentException("MetaClass must have an id filled before attributes deletion to DB");
         }
 
-        //TODO: Add bulk delete by id list
         for(String typeName : deleteNames)
         {
-            query = "DELETE FROM " + getConfig().getAttributesTableName() +
-                    " WHERE containing_class_id = " +
-                    meta.getId() + " AND name = " +
-                    "\'" + typeName + "\' ";
+            query = DELETE_ATTRIBUTE;
 
             logger.debug(query);
 
-            jdbcTemplate.execute(query);
+            jdbcTemplate.update(query, new Object[] {meta.getId(), typeName});
         }
     }
 
@@ -271,13 +295,11 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         meta.removeMembers();
 
         //load simple attributes
-        String query = "SELECT * FROM " +
-                getConfig().getSimpleAttributesTableName() +
-                " WHERE containing_class_id = " + id;
+        String query = SELECT_SIMPLE_ATTRIBUTES;
 
         logger.debug(query);
 
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, new Object[] {id});
         for (Map<String, Object> row : rows) {
             MetaValue attribute = new MetaValue(
                     DataTypes.valueOf((String) row.get("type_code")),
