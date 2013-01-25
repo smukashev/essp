@@ -131,6 +131,27 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         return metaId;
     }
 
+    private void updateClass(MetaClass metaClass)
+    {
+        if(metaClass.getId() < 1)
+        {
+            throw new IllegalArgumentException("MetaClass must have id to be updated");
+        }
+
+        String query;
+
+        query = "UPDATE " + getConfig().getClassesTableName() + " SET " +
+                " name = ?, " +
+                " begin_date = ?, " +
+                " is_disabled = ? " +
+                " WHERE id = ?";
+
+        Object[] args = {metaClass.getClassName(), metaClass.getBeginDate(), metaClass.isDisabled(), metaClass.getId()};
+
+        logger.debug(query);
+        jdbcTemplate.update(query, args);
+    }
+
     private void insertAttributes(Set<String> addNames, MetaClass meta)
     {
         String query;
@@ -232,9 +253,9 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         for(String typeName : deleteNames)
         {
             query = "DELETE FROM " + getConfig().getAttributesTableName() +
-                    " WHERE class_id = " +
+                    " WHERE containing_class_id = " +
                     meta.getId() + " AND name = " +
-                    "\'" + typeName + "\' CASCADE ";
+                    "\'" + typeName + "\' ";
 
             logger.debug(query);
 
@@ -328,14 +349,6 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
     }
 
-    public long create(MetaClass meta)
-    {
-        createClass(meta);
-        save(meta);
-
-        return meta.getId();
-    }
-
     //TODO: add active period to classes
 	@Transactional
 	public long save(MetaClass meta) {
@@ -346,12 +359,15 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             loadClass(dbMeta);
             loadAttributes(dbMeta);
+            meta.setId(dbMeta.getId());
+            updateClass(meta);
         }
         catch(IllegalArgumentException e)
         {
             logger.debug("Class: " + meta.getClassName() + " not found.");
             createClass(dbMeta);
             dbMeta.removeMembers();
+            meta.setId(dbMeta.getId());
             logger.debug("Class: " + meta.getClassName() + " not created.");
         }
 
@@ -360,8 +376,6 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    	throw new IllegalArgumentException("Can't determine metadata id");
 	    }
 
-        meta.setId(dbMeta.getId());
-
 	    Set<String> oldNames = dbMeta.getMemberNames();
 	    Set<String> newNames = meta.getMemberNames();
 	    
@@ -369,8 +383,14 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    Set<String> deleteNames = SetUtils.difference(oldNames, newNames);
 	    Set<String> addNames = SetUtils.difference(newNames, oldNames);
 
-        deleteNames.addAll(updateNames);
-        addNames.addAll(updateNames);
+        for (String name : updateNames)
+        {
+            if(!meta.getMemberType(name).equals(dbMeta.getMemberType(name)))
+            {
+                deleteNames.add(name);
+                addNames.add(name);
+            }
+        }
 
         deleteAttributes(deleteNames, dbMeta);
         insertAttributes(addNames, meta);

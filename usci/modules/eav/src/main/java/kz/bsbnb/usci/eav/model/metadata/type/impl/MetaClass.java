@@ -112,7 +112,7 @@ public class MetaClass extends AbstractMetaType {
 	public IMetaType getMemberType(String name) {
 		return members.get(name);
 	}
-	
+
 	public void removeMemberType(String name) {
 		members.remove(name);
 	}
