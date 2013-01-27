@@ -17,114 +17,82 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	final Logger logger = LoggerFactory.getLogger(PostgreSQLStorageImpl.class);
-	
+
+    final static String CLASSES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, begin_date TIMESTAMP WITH TIME ZONE NOT NULL, is_disabled BOOLEAN NOT NULL, name character varying(%d) NOT NULL,CONSTRAINT %s_primary_key_index PRIMARY KEY (id ), UNIQUE (name) )";
+    final static String ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL,containing_class_id int references %s(id) ON DELETE CASCADE, name character varying(%d) NOT NULL,is_key boolean NOT NULL,is_nullable boolean NOT NULL,CONSTRAINT %s_primary_key_index PRIMARY KEY (id ), UNIQUE (containing_class_id, name) )";
+    final static String SIMPLE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (type_code character varying(%d)) INHERITS (%s)";
+    final static String COMPLEX_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (complex_key_type character varying(%d), class_id int references %s(id) ON DELETE CASCADE ) INHERITS (%s)";
+    final static String ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s (array_key_type character varying(%d)) INHERITS (%s)";
+    final static String SIMPLE_ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s () INHERITS (%s, %s)";
+    final static String COMPLEX_ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s () INHERITS (%s, %s)";
+    final static String ENTITIES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL,class_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id ))";
+    final static String ARRAY_KEY_FILTER_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL,attribute_id int references %s(id) ON DELETE CASCADE, attribute_name character varying(%d) NOT NULL,CONSTRAINT %s_primary_key_index PRIMARY KEY (id ))";
+    final static String ARRAY_KEY_FILTER_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL,filter_id int references %s(id) ON DELETE CASCADE, value character varying(%d) NOT NULL,CONSTRAINT %s_primary_key_index PRIMARY KEY (id ))";
+    final static String DROP_TABLE = "DROP TABLE IF EXISTS %s";
+    final static String DROP_TABLE_CASCADE = "DROP TABLE IF EXISTS %s CASCADE";
+
 	@Override
 	public void initialize() {
         //add unique constraint on name
-	    String query = "CREATE TABLE IF NOT EXISTS " + getConfig().getClassesTableName() +
-	                    " (" + 
-	                      "id serial NOT NULL, " +
-                          "begin_date TIMESTAMP WITH TIME ZONE NOT NULL, " +
-                          "is_disabled BOOLEAN NOT NULL, " +
-	                      "name character varying(" + getConfig().getClassNameLength()  + ") NOT NULL," +
-	                      "CONSTRAINT " + getConfig().getClassesTableName() + "_primary_key_index PRIMARY KEY (id ), " +
-                          "UNIQUE (name) " +
-	                    ")";
+	    String query = String.format(CLASSES_TABLE,
+                getConfig().getClassesTableName(), getConfig().getClassNameLength(), getConfig().getClassesTableName());
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    //----------------------------------------------
 	    //basic attribute
-        //TODO: add unique constraint on containing_class_id and name
-	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getAttributesTableName() +
-                " (" + 
-                  "id serial NOT NULL," +
-                  "containing_class_id int references " + getConfig().getClassesTableName() + "(id) ON DELETE CASCADE, " +
-                  "name character varying(" + getConfig().getAttributeNameLength() + ") NOT NULL," +
-                  "is_key boolean NOT NULL," +
-                  "is_nullable boolean NOT NULL," +
-                  "CONSTRAINT " + getConfig().getAttributesTableName() + "_primary_key_index PRIMARY KEY (id ) " +
-                ")";
+	    query = String.format(ATTRIBUTES_TABLE, getConfig().getAttributesTableName(), getConfig().getClassesTableName(), getConfig().getAttributeNameLength(), getConfig().getAttributesTableName());
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    //simple attributes
-	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getSimpleAttributesTableName() +
-                " (" + 
-                  "type_code character varying(" + getConfig().getTypeCodeLength() + ")" +
-                ") INHERITS (" + getConfig().getAttributesTableName() + ")";
+	    query = String.format(SIMPLE_ATTRIBUTES_TABLE, getConfig().getSimpleAttributesTableName(), getConfig().getTypeCodeLength(), getConfig().getAttributesTableName());
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    
 	    //complex attributes
-	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getComplexAttributesTableName() +
-                " (" + 
-                  "complex_key_type character varying(" + getConfig().getComplexKeyTypeCodeLength() + "), " +
-                  "class_id int references " + getConfig().getClassesTableName() + "(id) ON DELETE CASCADE " +
-                ") INHERITS (" + getConfig().getAttributesTableName() + ")";
+	    query = String.format(COMPLEX_ATTRIBUTES_TABLE, getConfig().getComplexAttributesTableName(), getConfig().getComplexKeyTypeCodeLength(), getConfig().getClassesTableName(), getConfig().getAttributesTableName());
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    //array
-	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getArrayTableName() +
-                " (" + 
-                  "array_key_type character varying(" + getConfig().getArrayKeyTypeCodeLength() + ")" +
-                ") INHERITS (" + getConfig().getAttributesTableName() + ")";
+	    query = String.format(ARRAY_TABLE, getConfig().getArrayTableName(), getConfig().getArrayKeyTypeCodeLength(), getConfig().getAttributesTableName());
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    
 	    //simple array
-	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getSimpleArrayTableName() +
-                " () INHERITS (" + getConfig().getArrayTableName() + ", " + getConfig().getSimpleAttributesTableName() + ")";
+	    query = String.format(SIMPLE_ARRAY_TABLE, getConfig().getSimpleArrayTableName(), getConfig().getArrayTableName(), getConfig().getSimpleAttributesTableName());
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    //complex array
-	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getComplexArrayTableName() +
-                " () INHERITS (" + getConfig().getArrayTableName() + ", " + getConfig().getComplexAttributesTableName() + ")";
+	    query = String.format(COMPLEX_ARRAY_TABLE, getConfig().getComplexArrayTableName(), getConfig().getArrayTableName(), getConfig().getComplexAttributesTableName());
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    //------------------------------------------------
-	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getEntitiesTableName() +
-                " (" + 
-                  "id serial NOT NULL," +
-                  "class_id int references " + getConfig().getClassesTableName() + "(id) ON DELETE CASCADE, " +
-                  "CONSTRAINT " + getConfig().getEntitiesTableName() + "_primary_key_index PRIMARY KEY (id )" +
-                ")";
+	    query = String.format(ENTITIES_TABLE, getConfig().getEntitiesTableName(), getConfig().getClassesTableName(), getConfig().getEntitiesTableName());
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    
-	    query = "CREATE TABLE IF NOT EXISTS " + getConfig().getArrayKeyFilterTableName() +
-                " (" + 
-                  "id serial NOT NULL," + 
-                  "attribute_id int references " + getConfig().getAttributesTableName() + "(id) ON DELETE CASCADE, " +
-                  "attribute_name character varying(" + getConfig().getAttributeNameLength() + ") NOT NULL," +
-                  "CONSTRAINT " + getConfig().getArrayKeyFilterTableName() + "_primary_key_index PRIMARY KEY (id )" +
-                ")";
+	    query = String.format(ARRAY_KEY_FILTER_TABLE, getConfig().getArrayKeyFilterTableName(), getConfig().getAttributesTableName(), getConfig().getAttributeNameLength(), getConfig().getArrayKeyFilterTableName());
 
 		logger.debug(query);
 		
 		jdbcTemplate.execute(query);
 		
-		query = "CREATE TABLE IF NOT EXISTS " + getConfig().getArrayKeyFilterValuesTableName() +
-                " (" + 
-                  "id serial NOT NULL," + 
-                  "filter_id int references " + getConfig().getArrayKeyFilterTableName() + "(id) ON DELETE CASCADE, " +
-                  "value character varying(" + getConfig().getArrayKeyFilterValueLength() + ") NOT NULL," +
-                  "CONSTRAINT " + getConfig().getArrayKeyFilterValuesTableName() + "_primary_key_index PRIMARY KEY (id )" +
-                ")";
+		query = String.format(ARRAY_KEY_FILTER_VALUES_TABLE, getConfig().getArrayKeyFilterValuesTableName(), getConfig().getArrayKeyFilterTableName(), getConfig().getArrayKeyFilterValueLength(), getConfig().getArrayKeyFilterValuesTableName());
 
 		logger.debug(query);
 		
@@ -133,19 +101,19 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
 	@Override
 	public void clear() {
-		String query = "DROP TABLE IF EXISTS " + getConfig().getArrayKeyFilterValuesTableName();
+		String query = String.format(DROP_TABLE, getConfig().getArrayKeyFilterValuesTableName());
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
-	    query = "DROP TABLE IF EXISTS " + getConfig().getArrayKeyFilterTableName();
+	    query = String.format(DROP_TABLE, getConfig().getArrayKeyFilterTableName());
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
-		query = "DROP TABLE IF EXISTS " + getConfig().getAttributesTableName() + " CASCADE";
+		query = String.format(DROP_TABLE_CASCADE, getConfig().getAttributesTableName());
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
-	    query = "DROP TABLE IF EXISTS " + getConfig().getEntitiesTableName();
+	    query = String.format(DROP_TABLE, getConfig().getEntitiesTableName());
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
-	    query = "DROP TABLE IF EXISTS " + getConfig().getClassesTableName();
+	    query = String.format(DROP_TABLE, getConfig().getClassesTableName());
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
 	}

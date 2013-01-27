@@ -50,57 +50,19 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     @PostConstruct
     public void init()
     {
-        INSERT_CLASS_SQL = "INSERT INTO " + getConfig().getClassesTableName() +
-                           " (name, begin_date, is_disabled) VALUES ( ?, ?, ? )";
-
-        SELECT_CLASS_BY_NAME_SQL = "SELECT * FROM " + getConfig().getClassesTableName() +
-                                   " WHERE name = ? ";
-
-        SELECT_CLASS_BY_ID_SQL = "SELECT * FROM " + getConfig().getClassesTableName() +
-                                 " WHERE id = ? ";
-
-        UPDATE_CLASS_BY_ID = "UPDATE " + getConfig().getClassesTableName() + " SET " +
-                             " name = ?, " +
-                             " begin_date = ?, " +
-                             " is_disabled = ? " +
-                             " WHERE id = ?";
-
-        INSERT_COMPLEX_ARRAY = "INSERT INTO " + getConfig().getComplexArrayTableName() +
-                " (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id, array_key_type) VALUES " +
-                " ( ?, ?, ?, ?, ?, ?, ?) ";
-
-        INSERT_COMPLEX_ATTRIBUTE = "INSERT INTO " + getConfig().getComplexAttributesTableName() +
-                " (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id) VALUES " +
-                " ( ?, ?, ?, ?, ?, ?) ";
-
-        INSERT_SIMPLE_ARRAY = "INSERT INTO " + getConfig().getSimpleArrayTableName() +
-                " (containing_class_id, name, type_code, is_key, is_nullable, array_key_type) VALUES " +
-                " ( ?, ?, ?, ?, ?, ?) ";
-
-        INSERT_SIMPLE_ATTRIBUTE = "INSERT INTO " + getConfig().getSimpleAttributesTableName() +
-                " (containing_class_id, name, type_code, is_key, is_nullable) VALUES " +
-                " ( ?, ?, ?, ?, ?) ";
-
-        DELETE_ATTRIBUTE = "DELETE FROM " + getConfig().getAttributesTableName() +
-                " WHERE containing_class_id = ? AND name = ? ";
-
-        SELECT_SIMPLE_ATTRIBUTES = "SELECT * FROM " +
-                getConfig().getSimpleAttributesTableName() +
-                " WHERE containing_class_id = ?";
-
-        SELECT_SIMPLE_ARRAY = "SELECT * FROM " +
-                getConfig().getSimpleArrayTableName() +
-                " WHERE containing_class_id = ?";
-
-        SELECT_COMPLEX_ARRAY = "SELECT ca.*, c.name cname FROM " +
-                getConfig().getComplexAttributesTableName() + " ca LEFT JOIN " + getConfig().getClassesTableName() +
-                " c ON ca.class_id = c.id " +
-                " WHERE containing_class_id = ?";
-
-        SELECT_COMPLEX_ATTRIBUTE = "SELECT ca.*, c.name cname FROM " +
-                getConfig().getComplexArrayTableName() + " ca LEFT JOIN " + getConfig().getClassesTableName() +
-                " c ON ca.class_id = c.id " +
-                " WHERE containing_class_id = ?";
+        INSERT_CLASS_SQL = String.format("INSERT INTO %s (name, begin_date, is_disabled) VALUES ( ?, ?, ? )", getConfig().getClassesTableName());
+        SELECT_CLASS_BY_NAME_SQL = String.format("SELECT * FROM %s WHERE name = ? ", getConfig().getClassesTableName());
+        SELECT_CLASS_BY_ID_SQL = String.format("SELECT * FROM %s WHERE id = ? ", getConfig().getClassesTableName());
+        UPDATE_CLASS_BY_ID = String.format("UPDATE %s SET  name = ?,  begin_date = ?,  is_disabled = ?  WHERE id = ?", getConfig().getClassesTableName());
+        INSERT_COMPLEX_ARRAY = String.format("INSERT INTO %s (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id, array_key_type) VALUES  ( ?, ?, ?, ?, ?, ?, ?) ", getConfig().getComplexArrayTableName());
+        INSERT_COMPLEX_ATTRIBUTE = String.format("INSERT INTO %s (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id) VALUES  ( ?, ?, ?, ?, ?, ?) ", getConfig().getComplexAttributesTableName());
+        INSERT_SIMPLE_ARRAY = String.format("INSERT INTO %s (containing_class_id, name, type_code, is_key, is_nullable, array_key_type) VALUES  ( ?, ?, ?, ?, ?, ?) ", getConfig().getSimpleArrayTableName());
+        INSERT_SIMPLE_ATTRIBUTE = String.format("INSERT INTO %s (containing_class_id, name, type_code, is_key, is_nullable) VALUES  ( ?, ?, ?, ?, ?) ", getConfig().getSimpleAttributesTableName());
+        DELETE_ATTRIBUTE = String.format("DELETE FROM %s WHERE containing_class_id = ? AND name = ? ", getConfig().getAttributesTableName());
+        SELECT_SIMPLE_ATTRIBUTES = String.format("SELECT * FROM %s WHERE containing_class_id = ?", getConfig().getSimpleAttributesTableName());
+        SELECT_SIMPLE_ARRAY = String.format("SELECT * FROM %s WHERE containing_class_id = ?", getConfig().getSimpleArrayTableName());
+        SELECT_COMPLEX_ARRAY = String.format("SELECT ca.*, c.name cname FROM %s ca LEFT JOIN %s c ON ca.class_id = c.id  WHERE containing_class_id = ?", getConfig().getComplexAttributesTableName(), getConfig().getClassesTableName());
+        SELECT_COMPLEX_ATTRIBUTE = String.format("SELECT ca.*, c.name cname FROM %s ca LEFT JOIN %s c ON ca.class_id = c.id  WHERE containing_class_id = ?", getConfig().getComplexArrayTableName(), getConfig().getClassesTableName());
     }
 	
 	class InsertMetaClassPreparedStatementCreator implements PreparedStatementCreator {

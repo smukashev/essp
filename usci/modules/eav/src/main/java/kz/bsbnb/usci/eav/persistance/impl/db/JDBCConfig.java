@@ -24,12 +24,12 @@ public class JDBCConfig {
     protected String entitiesTableName;
 
 
-    public static final int classNameLength = 64;
-    public static final int attributeNameLength = 64;
-    public static final int typeCodeLength = 16;
-    public static final int arrayKeyTypeCodeLength = 16;
-    public static final int complexKeyTypeCodeLength = 16;
-    public static final int arrayKeyFilterValueLength = 128;
+    protected final int classNameLength = 64;
+    protected final int attributeNameLength = 64;
+    protected final int typeCodeLength = 16;
+    protected final int arrayKeyTypeCodeLength = 16;
+    protected final int complexKeyTypeCodeLength = 16;
+    protected final int arrayKeyFilterValueLength = 128;
 
     @PostConstruct
     public void init()
@@ -44,15 +44,6 @@ public class JDBCConfig {
         arrayTableName = tablePrefix + "array";
         complexArrayTableName = tablePrefix + "complex_array";
         simpleArrayTableName = tablePrefix + "simple_array";
-    }
-
-    public String getTablePrefix() {
-        return tablePrefix;
-    }
-
-    public void setTablePrefix(String tablePrefix) {
-        this.tablePrefix = tablePrefix;
-        init();
     }
 
     public String getClassesTableName() {
@@ -95,27 +86,27 @@ public class JDBCConfig {
         return entitiesTableName;
     }
 
-    public static int getClassNameLength() {
+    public int getClassNameLength() {
         return classNameLength;
     }
 
-    public static int getAttributeNameLength() {
+    public int getAttributeNameLength() {
         return attributeNameLength;
     }
 
-    public static int getTypeCodeLength() {
+    public int getTypeCodeLength() {
         return typeCodeLength;
     }
 
-    public static int getArrayKeyTypeCodeLength() {
+    public int getArrayKeyTypeCodeLength() {
         return arrayKeyTypeCodeLength;
     }
 
-    public static int getComplexKeyTypeCodeLength() {
+    public int getComplexKeyTypeCodeLength() {
         return complexKeyTypeCodeLength;
     }
 
-    public static int getArrayKeyFilterValueLength() {
+    public int getArrayKeyFilterValueLength() {
         return arrayKeyFilterValueLength;
     }
 }
