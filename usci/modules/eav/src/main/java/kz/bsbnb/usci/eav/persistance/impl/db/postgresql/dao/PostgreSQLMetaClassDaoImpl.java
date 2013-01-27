@@ -42,6 +42,10 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     private String INSERT_SIMPLE_ATTRIBUTE;
     private String DELETE_ATTRIBUTE;
     private String SELECT_SIMPLE_ATTRIBUTES;
+    private String SELECT_SIMPLE_ARRAY;
+    private String SELECT_COMPLEX_ARRAY;
+    private String SELECT_COMPLEX_ATTRIBUTE;
+
 
     @PostConstruct
     public void init()
@@ -82,6 +86,20 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         SELECT_SIMPLE_ATTRIBUTES = "SELECT * FROM " +
                 getConfig().getSimpleAttributesTableName() +
+                " WHERE containing_class_id = ?";
+
+        SELECT_SIMPLE_ARRAY = "SELECT * FROM " +
+                getConfig().getSimpleArrayTableName() +
+                " WHERE containing_class_id = ?";
+
+        SELECT_COMPLEX_ARRAY = "SELECT ca.*, c.name cname FROM " +
+                getConfig().getComplexAttributesTableName() + " ca LEFT JOIN " + getConfig().getClassesTableName() +
+                " c ON ca.class_id = c.id " +
+                " WHERE containing_class_id = ?";
+
+        SELECT_COMPLEX_ATTRIBUTE = "SELECT ca.*, c.name cname FROM " +
+                getConfig().getComplexArrayTableName() + " ca LEFT JOIN " + getConfig().getClassesTableName() +
+                " c ON ca.class_id = c.id " +
                 " WHERE containing_class_id = ?";
     }
 	
@@ -283,7 +301,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             logger.debug(query);
 
-            jdbcTemplate.update(query, new Object[] {meta.getId(), typeName});
+            jdbcTemplate.update(query, meta.getId(), typeName);
         }
     }
 
@@ -299,7 +317,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         logger.debug(query);
 
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, new Object[] {id});
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, id);
         for (Map<String, Object> row : rows) {
             MetaValue attribute = new MetaValue(
                     DataTypes.valueOf((String) row.get("type_code")),
@@ -310,13 +328,11 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
 
         //load simple attributes arrays
-        query = "SELECT * FROM " +
-                getConfig().getSimpleArrayTableName() +
-                " WHERE containing_class_id = " + id;
+        query = SELECT_SIMPLE_ARRAY;
 
         logger.debug(query);
 
-        rows = jdbcTemplate.queryForList(query);
+        rows = jdbcTemplate.queryForList(query, id);
         for (Map<String, Object> row : rows) {
             MetaValueArray attribute = new MetaValueArray(
                     DataTypes.valueOf((String) row.get("type_code")),
@@ -329,14 +345,11 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
 
         //load complex attributes
-        query = "SELECT ca.*, c.name cname FROM " +
-                getConfig().getComplexAttributesTableName() + " ca LEFT JOIN " + getConfig().getClassesTableName() +
-                    " c ON ca.class_id = c.id " +
-                " WHERE containing_class_id = " + id;
+        query = SELECT_COMPLEX_ARRAY;
 
         logger.debug(query);
 
-        rows = jdbcTemplate.queryForList(query);
+        rows = jdbcTemplate.queryForList(query, id);
         for (Map<String, Object> row : rows) {
             MetaClass attribute = load((Integer)row.get("class_id"));
 
@@ -349,14 +362,11 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
 
         //load complex attributes
-        query = "SELECT ca.*, c.name cname FROM " +
-                getConfig().getComplexArrayTableName() + " ca LEFT JOIN " + getConfig().getClassesTableName() +
-                    " c ON ca.class_id = c.id " +
-                " WHERE containing_class_id = " + id;
+        query = SELECT_COMPLEX_ATTRIBUTE;
 
         logger.debug(query);
 
-        rows = jdbcTemplate.queryForList(query);
+        rows = jdbcTemplate.queryForList(query, id);
         for (Map<String, Object> row : rows) {
             MetaClass attribute = load((Integer)row.get("class_id"));
 
@@ -374,7 +384,6 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     //TODO: add active period to classes
 	@Transactional
 	public long save(MetaClass meta) {
-	    String query;
         MetaClass dbMeta = new MetaClass(meta);
 
         try
@@ -428,17 +437,6 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         loadAttributes(meta);
 
 	    return meta;
-	}
-
-	@Override
-	public boolean testConnection() {
-	    String query = "SELECT 1";
-	    
-	    logger.debug(query);
-	    
-	    jdbcTemplate.execute(query);
-	
-	    return true;
 	}
 
 	@Override
