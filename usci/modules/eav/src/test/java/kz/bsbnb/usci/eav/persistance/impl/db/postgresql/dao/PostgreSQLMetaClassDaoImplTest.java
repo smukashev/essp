@@ -4,10 +4,13 @@
  */
 package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
-import static org.junit.Assert.*;
-
+import kz.bsbnb.usci.eav.model.metadata.DataTypes;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
+import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -15,19 +18,14 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
-import kz.bsbnb.usci.eav.model.metadata.DataTypes;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
-import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Calendar;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  *
@@ -228,111 +226,65 @@ public class PostgreSQLMetaClassDaoImplTest {
             postgreSQLStorageImpl.clear();
         }
     }
-    
-    /*@Test
-    public void deleteFieldsMetaClass() throws Exception {
+
+    @Test
+    public void deleteMetaClass() throws Exception {
         try {
-        	postgreSQLStorageImpl.initialize();
-	        
-	        logger.debug("Delete metadata attribute test");
-	        
-	        MetaClass metaDelete = new MetaClass("testClass");
-	        
-	        metaDelete.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
-	        metaDelete.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
-	        MetaValue t = new MetaValue(DataTypes.DOUBLE, false, false);
-	        t.setArray(true);
-	        t.setArrayKeyType(ComplexKeyTypes.ANY);
-	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        metaDelete.setMemberType("testDouble", t);
-	        //metaDelete.setMemberType("testBoolean", new Type(DataTypes.BOOLEAN));
-	        t = new MetaValue(DataTypes.STRING, false, false);
-	        t.setArray(true);
-	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        metaDelete.setMemberType("testString", t);
-	        
-	        MetaClass expResultDelete = new MetaClass("testClass");
-	        
-	        expResultDelete.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
-	        expResultDelete.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
-	        t = new MetaValue(DataTypes.DOUBLE, false, false);
-	        t.setArray(true);
-	        t.setArrayKeyType(ComplexKeyTypes.ANY);
-	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        expResultDelete.setMemberType("testDouble", t);
-	        //expResultDelete.setMemberType("testBoolean", new Type(DataTypes.BOOLEAN));
-	        t = new MetaValue(DataTypes.STRING, false, false);
-	        t.setArray(true);
-	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        expResultDelete.setMemberType("testString", t);
-	        
-	        postgreSQLMetaClassDaoImpl.saveMetaClass(metaDelete);
-	        
-	        MetaClass loadedMetaDelete = postgreSQLMetaClassDaoImpl.loadMetaClass("testClass");
-	        
-	        assertTrue(expResultDelete.equals(loadedMetaDelete));
-        }
-        catch(Exception e)
-        {
-        	fail("Exception: " + e.getMessage());
+            postgreSQLStorageImpl.initialize();
+
+            logger.debug("Delete metadata test");
+
+            long time = Calendar.getInstance().getTimeInMillis();
+
+            MetaClass metaCreate = new MetaClass("testClass");
+            metaCreate.setBeginDate(new Timestamp(time));
+            metaCreate.setDisabled(false);
+
+            metaCreate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
+            metaCreate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+            metaCreate.setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+            metaCreate.setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+            metaCreate.setMemberType("testString", new MetaValue(DataTypes.STRING, false, false));
+
+            MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
+            metaCreate.setMemberType("testArray", metaValueArray);
+
+            MetaClass metaClass = new MetaClass("innerClass", true, false);
+            metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+            metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+            metaCreate.setMemberType("testInnerClass", metaClass);
+
+            MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
+            metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+            metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+            MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
+            metaCreate.setMemberType("testInnerClassArray", metaClassArray);
+
+            postgreSQLMetaClassDaoImpl.save(metaCreate);
+
+            try
+            {
+                postgreSQLMetaClassDaoImpl.load(metaCreate.getId());
+            }
+            catch(IllegalArgumentException e)
+            {
+                fail(String.format("Can't load MetaClass: %s", e.getMessage()));
+            }
+
+            postgreSQLMetaClassDaoImpl.remove(metaCreate);
+
+            try
+            {
+                postgreSQLMetaClassDaoImpl.load(metaCreate.getId());
+                fail("Loaded removed class");
+            }
+            catch(IllegalArgumentException e)
+            {
+            }
         }
         finally
         {
-        	postgreSQLStorageImpl.clear();
+            postgreSQLStorageImpl.clear();
         }
     }
-    
-    @Test
-    public void updateFieldsMetaClass() throws Exception {
-        System.out.println("loadMetaClass");
-        try {
-        	postgreSQLStorageImpl.initialize();
-	        
-	        logger.debug("Delete metadata attribute test");
-	        
-	        MetaClass metaUpdate = new MetaClass("testClass");
-	        
-	        metaUpdate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
-	        metaUpdate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, true, false));
-	        MetaValue t = new MetaValue(DataTypes.DOUBLE, false, true);
-	        t.setArray(true);
-	        t.setArrayKeyType(ComplexKeyTypes.ANY);
-	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        metaUpdate.setMemberType("testDouble", t);
-	        //metaDelete.setMemberType("testBoolean", new Type(DataTypes.BOOLEAN));
-	        t = new MetaValue(DataTypes.INTEGER, false, false);
-	        t.setArray(true);
-	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        metaUpdate.setMemberType("testString", t);
-	        
-	        MetaClass expResultUpdate = new MetaClass("testClass");
-	        
-	        expResultUpdate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
-	        expResultUpdate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, true, false));
-	        t = new MetaValue(DataTypes.DOUBLE, false, true);
-	        t.setArray(true);
-	        t.setArrayKeyType(ComplexKeyTypes.ANY);
-	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        expResultUpdate.setMemberType("testDouble", t);
-	        //expResultDelete.setMemberType("testBoolean", new Type(DataTypes.BOOLEAN));
-	        t = new MetaValue(DataTypes.INTEGER, false, false);
-	        t.setArray(true);
-	        t.setComplexKeyType(ComplexKeyTypes.ANY);
-	        expResultUpdate.setMemberType("testString", new MetaValue(DataTypes.INTEGER, false, false));
-	        
-	        postgreSQLMetaClassDaoImpl.saveMetaClass(metaUpdate);
-	        
-	        MetaClass loadedMetaUpdate = postgreSQLMetaClassDaoImpl.loadMetaClass("testClass");
-	        
-	        assertTrue(expResultUpdate.equals(loadedMetaUpdate));
-        }
-        catch(Exception e)
-        {
-        	fail("Exception: " + e.getMessage());
-        }
-        finally
-        {
-        	postgreSQLStorageImpl.clear();
-        }
-    }*/
 }

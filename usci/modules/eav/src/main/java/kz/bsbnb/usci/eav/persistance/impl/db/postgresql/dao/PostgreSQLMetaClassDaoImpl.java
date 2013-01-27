@@ -33,9 +33,10 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
 
     private String INSERT_CLASS_SQL;
-    private String SELECT_CLASS_BY_NAME_SQL;
-    private String SELECT_CLASS_BY_ID_SQL;
+    private String SELECT_CLASS_BY_NAME;
+    private String SELECT_CLASS_BY_ID;
     private String UPDATE_CLASS_BY_ID;
+    private String DELETE_CLASS_BY_ID;
     private String INSERT_COMPLEX_ARRAY;
     private String INSERT_COMPLEX_ATTRIBUTE;
     private String INSERT_SIMPLE_ARRAY;
@@ -51,9 +52,10 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     public void init()
     {
         INSERT_CLASS_SQL = String.format("INSERT INTO %s (name, begin_date, is_disabled) VALUES ( ?, ?, ? )", getConfig().getClassesTableName());
-        SELECT_CLASS_BY_NAME_SQL = String.format("SELECT * FROM %s WHERE name = ? ", getConfig().getClassesTableName());
-        SELECT_CLASS_BY_ID_SQL = String.format("SELECT * FROM %s WHERE id = ? ", getConfig().getClassesTableName());
+        SELECT_CLASS_BY_NAME = String.format("SELECT * FROM %s WHERE name = ? ", getConfig().getClassesTableName());
+        SELECT_CLASS_BY_ID = String.format("SELECT * FROM %s WHERE id = ? ", getConfig().getClassesTableName());
         UPDATE_CLASS_BY_ID = String.format("UPDATE %s SET  name = ?,  begin_date = ?,  is_disabled = ?  WHERE id = ?", getConfig().getClassesTableName());
+        DELETE_CLASS_BY_ID = String.format("DELETE FROM %s WHERE id = ?", getConfig().getClassesTableName());
         INSERT_COMPLEX_ARRAY = String.format("INSERT INTO %s (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id, array_key_type) VALUES  ( ?, ?, ?, ?, ?, ?, ?) ", getConfig().getComplexArrayTableName());
         INSERT_COMPLEX_ATTRIBUTE = String.format("INSERT INTO %s (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id) VALUES  ( ?, ?, ?, ?, ?, ?) ", getConfig().getComplexAttributesTableName());
         INSERT_SIMPLE_ARRAY = String.format("INSERT INTO %s (containing_class_id, name, type_code, is_key, is_nullable, array_key_type) VALUES  ( ?, ?, ?, ?, ?, ?) ", getConfig().getSimpleArrayTableName());
@@ -97,13 +99,13 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 throw new IllegalArgumentException("Meta class does not have name or id. Can't load.");
             }
 
-            query = SELECT_CLASS_BY_NAME_SQL;
+            query = SELECT_CLASS_BY_NAME;
 
             args = new Object[] { metaClass.getClassName() };
         }
         else
         {
-            query = SELECT_CLASS_BY_ID_SQL;
+            query = SELECT_CLASS_BY_ID;
 
             args = new Object[] {metaClass.getId()};
         }
@@ -416,8 +418,17 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	}
 
 	@Override
-	public void remove(long id) {
-		// TODO Auto-generated method stub
-		
+	public void remove(MetaClass metaClass) {
+		if(metaClass.getId() < 1)
+        {
+            throw new IllegalArgumentException("Can't remove MetaClass without id");
+        }
+
+        String query;
+
+        query = DELETE_CLASS_BY_ID;
+
+        logger.debug(query);
+        jdbcTemplate.update(query, metaClass.getId());
 	}
 }
