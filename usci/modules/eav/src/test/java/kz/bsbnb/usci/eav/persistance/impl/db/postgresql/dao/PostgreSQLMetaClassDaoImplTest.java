@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav.persistance.impl.db.postgresql.storage.PostgreSQLStorageImpl;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -36,9 +37,9 @@ import static org.junit.Assert.fail;
 public class PostgreSQLMetaClassDaoImplTest {
 	
 	@Autowired
-	IStorage postgreSQLStorageImpl;
+    IStorage postgreSQLStorageImpl;
 	@Autowired
-	IMetaClassDao postgreSQLMetaClassDaoImpl;
+    IMetaClassDao postgreSQLMetaClassDaoImpl;
 	
 	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
 	

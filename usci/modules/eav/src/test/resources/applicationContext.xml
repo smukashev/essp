@@ -8,6 +8,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
 
 	<context:component-scan base-package="kz.bsbnb.usci.eav.persistance.impl.db.postgresql" />
+    <context:component-scan base-package="kz.bsbnb.usci.eav.model.metadata.impl" />
 	
 	<context:annotation-config/>
 	<!-- Add this tag to enable annotations transactions -->

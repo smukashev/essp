@@ -27,7 +27,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class PostgreSQLStorageImplTest {
 	
 	@Autowired
-	IStorage postgreSQLStorageImpl;
+    PostgreSQLStorageImpl postgreSQLStorageImpl;
 	
 	final Logger logger = LoggerFactory.getLogger(PostgreSQLStorageImplTest.class);
 	
