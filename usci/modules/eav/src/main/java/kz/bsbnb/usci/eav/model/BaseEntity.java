@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -7,6 +8,7 @@ import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 
 /**
@@ -477,5 +479,276 @@ public class BaseEntity extends Persistable {
         }
         
         data.put(name, value);
+    }
+
+    //arrays
+
+    /**
+     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>
+     *
+     * @param name attribute name. Must exist in entity metadata
+     * @return attribute value, null if value is not set
+     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
+     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
+     * @see DataTypes
+     */
+    public ArrayList<Date> getDateArray(String name)
+    {
+        IMetaType type = meta.getMemberType(name);
+
+        if(type == null) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", not found in class: " + meta.getClassName());
+        }
+
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+
+        if(!type.isArray()) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", is not an array");
+        }
+
+        MetaValueArray simpleType = (MetaValueArray)type;
+
+        if(simpleType.getTypeCode() != DataTypes.DATE) {
+            throw new IllegalArgumentException("Type missmatch in class: " +
+                    meta.getClassName() + ". Nedded " + DataTypes.DATE + ", got: " +
+                    simpleType.getTypeCode());
+        }
+
+        Object obj = data.get(name);
+
+        if(obj == null) {
+            obj = new ArrayList<Date>();
+            data.put(name, obj);
+        }
+
+        return (ArrayList<Date>)obj;
+    }
+
+    /**
+     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.STRING</code>
+     *
+     * @param name attribute name. Must exist in entity metadata
+     * @return attribute value, null if value is not set
+     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
+     * 	                                or attribute has type different from <code>DataTypes.STRING</code>
+     * @see DataTypes
+     */
+    public ArrayList<String> getStringArray(String name)
+    {
+        IMetaType type = meta.getMemberType(name);
+
+        if(type == null) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", not found in class: " + meta.getClassName());
+        }
+
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+
+        if(!type.isArray()) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", is not an array");
+        }
+
+        MetaValueArray simpleType = (MetaValueArray)type;
+
+        if(simpleType.getTypeCode() != DataTypes.STRING) {
+            throw new IllegalArgumentException("Type missmatch in class: " +
+                    meta.getClassName() + ". Nedded " + DataTypes.STRING + ", got: " +
+                    simpleType.getTypeCode());
+        }
+
+        Object obj = data.get(name);
+
+        if(obj == null) {
+            obj = new ArrayList<String>();
+            data.put(name, obj);
+        }
+
+        return (ArrayList<String>)obj;
+    }
+
+    /**
+     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.INTEGER</code>
+     *
+     * @param name attribute name. Must exist in entity metadata
+     * @return attribute value, null if value is not set
+     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
+     * 	                                or attribute has type different from <code>DataTypes.INTEGER</code>
+     * @see DataTypes
+     */
+    public ArrayList<Integer> getIntegerArray(String name)
+    {
+        IMetaType type = meta.getMemberType(name);
+
+        if(type == null) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", not found in class: " + meta.getClassName());
+        }
+
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+
+        if(!type.isArray()) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", is not an array");
+        }
+
+        MetaValueArray simpleType = (MetaValueArray)type;
+
+        if(simpleType.getTypeCode() != DataTypes.INTEGER) {
+            throw new IllegalArgumentException("Type missmatch in class: " +
+                    meta.getClassName() + ". Nedded " + DataTypes.INTEGER + ", got: " +
+                    simpleType.getTypeCode());
+        }
+
+        Object obj = data.get(name);
+
+        if(obj == null) {
+            obj = new ArrayList<Integer>();
+            data.put(name, obj);
+        }
+
+        return (ArrayList<Integer>)obj;
+    }
+
+    /**
+     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DOUBLE</code>
+     *
+     * @param name attribute name. Must exist in entity metadata
+     * @return attribute value, null if value is not set
+     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
+     * 	                                or attribute has type different from <code>DataTypes.DOUBLE</code>
+     * @see DataTypes
+     */
+    public ArrayList<Double> getDoubleArray(String name)
+    {
+        IMetaType type = meta.getMemberType(name);
+
+        if(type == null) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", not found in class: " + meta.getClassName());
+        }
+
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+
+        if(!type.isArray()) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", is not an array");
+        }
+
+        MetaValueArray simpleType = (MetaValueArray)type;
+
+        if(simpleType.getTypeCode() != DataTypes.DOUBLE) {
+            throw new IllegalArgumentException("Type missmatch in class: " +
+                    meta.getClassName() + ". Nedded " + DataTypes.DOUBLE + ", got: " +
+                    simpleType.getTypeCode());
+        }
+
+        Object obj = data.get(name);
+
+        if(obj == null) {
+            obj = new ArrayList<Double>();
+            data.put(name, obj);
+        }
+
+        return (ArrayList<Double>)obj;
+    }
+
+    /**
+     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.BOOLEAN</code>
+     *
+     * @param name attribute name. Must exist in entity metadata
+     * @return attribute value, null if value is not set
+     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
+     * 	                                or attribute has type different from <code>DataTypes.BOOLEAN</code>
+     * @see DataTypes
+     */
+    public ArrayList<Boolean> getBooleanArray(String name)
+    {
+        IMetaType type = meta.getMemberType(name);
+
+        if(type == null) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", not found in class: " + meta.getClassName());
+        }
+
+        if(type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", is an object of class: " + ((MetaClass)type).getClassName());
+        }
+
+        if(!type.isArray()) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", is not an array");
+        }
+
+        MetaValueArray simpleType = (MetaValueArray)type;
+
+        if(simpleType.getTypeCode() != DataTypes.BOOLEAN) {
+            throw new IllegalArgumentException("Type missmatch in class: " +
+                    meta.getClassName() + ". Nedded " + DataTypes.BOOLEAN + ", got: " +
+                    simpleType.getTypeCode());
+        }
+
+        Object obj = data.get(name);
+
+        if(obj == null) {
+            obj = new ArrayList<Boolean>();
+            data.put(name, obj);
+        }
+
+        return (ArrayList<Boolean>)obj;
+    }
+
+    /**
+     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.COMPLEX</code>
+     *
+     * @param name attribute name. Must exist in entity metadata
+     * @return attribute value, null if value is not set
+     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
+     * 	                                or attribute has type different from <code>DataTypes.COMPLEX</code>
+     * @see DataTypes
+     */
+    public ArrayList<BaseEntity> getComplexArray(String name)
+    {
+        IMetaType type = meta.getMemberType(name);
+
+        if(type == null) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", not found in class: " + meta.getClassName());
+        }
+
+        if(!type.isComplex()) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", is not an object of class. It's a simple value with type " +
+                    ((MetaValue)type).getTypeCode());
+        }
+
+        if(!type.isArray()) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", is not an array");
+        }
+
+        Object obj = data.get(name);
+
+        if(obj == null) {
+            obj = new ArrayList<BaseEntity>();
+            data.put(name, obj);
+        }
+
+        return (ArrayList<BaseEntity>)obj;
     }
 }
