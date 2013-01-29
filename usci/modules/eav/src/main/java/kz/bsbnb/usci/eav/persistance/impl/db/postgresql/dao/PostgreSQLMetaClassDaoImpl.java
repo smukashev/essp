@@ -63,8 +63,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         DELETE_ATTRIBUTE = String.format("DELETE FROM %s WHERE containing_class_id = ? AND name = ? ", getConfig().getAttributesTableName());
         SELECT_SIMPLE_ATTRIBUTES = String.format("SELECT * FROM %s WHERE containing_class_id = ?", getConfig().getSimpleAttributesTableName());
         SELECT_SIMPLE_ARRAY = String.format("SELECT * FROM %s WHERE containing_class_id = ?", getConfig().getSimpleArrayTableName());
-        SELECT_COMPLEX_ARRAY = String.format("SELECT ca.*, c.name cname FROM %s ca LEFT JOIN %s c ON ca.class_id = c.id  WHERE containing_class_id = ?", getConfig().getComplexAttributesTableName(), getConfig().getClassesTableName());
-        SELECT_COMPLEX_ATTRIBUTE = String.format("SELECT ca.*, c.name cname FROM %s ca LEFT JOIN %s c ON ca.class_id = c.id  WHERE containing_class_id = ?", getConfig().getComplexArrayTableName(), getConfig().getClassesTableName());
+        SELECT_COMPLEX_ARRAY = String.format("SELECT ca.*, c.name cname FROM %s ca LEFT JOIN %s c ON ca.class_id = c.id  WHERE containing_class_id = ?", getConfig().getComplexArrayTableName(), getConfig().getClassesTableName());
+        SELECT_COMPLEX_ATTRIBUTE = String.format("SELECT ca.*, c.name cname FROM %s ca LEFT JOIN %s c ON ca.class_id = c.id  WHERE containing_class_id = ?", getConfig().getComplexAttributesTableName(), getConfig().getClassesTableName());
     }
 	
 	class InsertMetaClassPreparedStatementCreator implements PreparedStatementCreator {
@@ -309,7 +309,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
 
         //load complex attributes
-        query = SELECT_COMPLEX_ARRAY;
+        query = SELECT_COMPLEX_ATTRIBUTE;
 
         logger.debug(query);
 
@@ -325,8 +325,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             meta.setMemberType((String)row.get("name"), attribute);
         }
 
-        //load complex attributes
-        query = SELECT_COMPLEX_ATTRIBUTE;
+        //load complex attributes array
+        query = SELECT_COMPLEX_ARRAY;
 
         logger.debug(query);
 
@@ -340,6 +340,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             attribute.setNullable((Boolean) row.get("is_nullable"));
 
             MetaClassArray metaClassArray = new MetaClassArray(attribute);
+            metaClassArray.setArrayKeyType(ComplexKeyTypes.valueOf((String)row.get("array_key_type")));
 
             meta.setMemberType((String)row.get("name"), metaClassArray);
         }

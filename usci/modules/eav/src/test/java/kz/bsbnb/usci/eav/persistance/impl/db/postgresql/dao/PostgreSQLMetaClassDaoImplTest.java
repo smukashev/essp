@@ -4,6 +4,7 @@
  */
 package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
+import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
@@ -81,6 +82,7 @@ public class PostgreSQLMetaClassDaoImplTest {
             metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
             metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
             MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
+            metaClassArray.setComplexKeyType(ComplexKeyTypes.ANY);
             metaCreate.setMemberType("testInnerClassArray", metaClassArray);
 
             long id;

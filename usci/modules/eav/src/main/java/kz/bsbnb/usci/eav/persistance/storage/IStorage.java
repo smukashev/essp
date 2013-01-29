@@ -9,4 +9,6 @@ public interface IStorage {
 	public void empty();
 
 	public boolean testConnection();
+
+    public boolean isClean();
 }

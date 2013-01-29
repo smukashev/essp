@@ -20,16 +20,19 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
     final static String CLASSES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, begin_date TIMESTAMP WITH TIME ZONE NOT NULL, is_disabled BOOLEAN NOT NULL, name character varying(%d) NOT NULL,CONSTRAINT %s_primary_key_index PRIMARY KEY (id ), UNIQUE (name) )";
     final static String ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL,containing_class_id int references %s(id) ON DELETE CASCADE, name character varying(%d) NOT NULL,is_key boolean NOT NULL,is_nullable boolean NOT NULL,CONSTRAINT %s_primary_key_index PRIMARY KEY (id ), UNIQUE (containing_class_id, name) )";
-    final static String SIMPLE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (type_code character varying(%d)) INHERITS (%s)";
-    final static String COMPLEX_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (complex_key_type character varying(%d), class_id int references %s(id) ON DELETE CASCADE ) INHERITS (%s)";
-    final static String ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s (array_key_type character varying(%d)) INHERITS (%s)";
-    final static String SIMPLE_ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s () INHERITS (%s, %s)";
-    final static String COMPLEX_ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s () INHERITS (%s, %s)";
+
+    final static String SIMPLE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (type_code character varying(%d), CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    final static String COMPLEX_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (complex_key_type character varying(%d), class_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE ) INHERITS (%s)";
+    final static String ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s (array_key_type character varying(%d), CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    final static String SIMPLE_ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s, %s)";
+    final static String COMPLEX_ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s, %s)";
+
     final static String ENTITIES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL,class_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id ))";
     final static String ARRAY_KEY_FILTER_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL,attribute_id int references %s(id) ON DELETE CASCADE, attribute_name character varying(%d) NOT NULL,CONSTRAINT %s_primary_key_index PRIMARY KEY (id ))";
     final static String ARRAY_KEY_FILTER_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL,filter_id int references %s(id) ON DELETE CASCADE, value character varying(%d) NOT NULL,CONSTRAINT %s_primary_key_index PRIMARY KEY (id ))";
     final static String DROP_TABLE = "DROP TABLE IF EXISTS %s";
     final static String DROP_TABLE_CASCADE = "DROP TABLE IF EXISTS %s CASCADE";
+    final static String COUNT_TABLE = "SELECT count(*) FROM %s";
 
 	@Override
 	public void initialize() {
@@ -42,39 +45,51 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    jdbcTemplate.execute(query);
 	    //----------------------------------------------
 	    //basic attribute
-	    query = String.format(ATTRIBUTES_TABLE, getConfig().getAttributesTableName(), getConfig().getClassesTableName(), getConfig().getAttributeNameLength(), getConfig().getAttributesTableName());
+	    query = String.format(ATTRIBUTES_TABLE, getConfig().getAttributesTableName(), getConfig().getClassesTableName(),
+                getConfig().getAttributeNameLength(), getConfig().getAttributesTableName());
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    //simple attributes
-	    query = String.format(SIMPLE_ATTRIBUTES_TABLE, getConfig().getSimpleAttributesTableName(), getConfig().getTypeCodeLength(), getConfig().getAttributesTableName());
+	    query = String.format(SIMPLE_ATTRIBUTES_TABLE, getConfig().getSimpleAttributesTableName(),
+                getConfig().getTypeCodeLength(), getConfig().getSimpleAttributesTableName(),
+                getConfig().getClassesTableName(), getConfig().getAttributesTableName());
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    
 	    //complex attributes
-	    query = String.format(COMPLEX_ATTRIBUTES_TABLE, getConfig().getComplexAttributesTableName(), getConfig().getComplexKeyTypeCodeLength(), getConfig().getClassesTableName(), getConfig().getAttributesTableName());
+	    query = String.format(COMPLEX_ATTRIBUTES_TABLE, getConfig().getComplexAttributesTableName(),
+                getConfig().getComplexKeyTypeCodeLength(), getConfig().getClassesTableName(),
+                getConfig().getComplexAttributesTableName(), getConfig().getClassesTableName(),
+                getConfig().getAttributesTableName());
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    //array
-	    query = String.format(ARRAY_TABLE, getConfig().getArrayTableName(), getConfig().getArrayKeyTypeCodeLength(), getConfig().getAttributesTableName());
+	    query = String.format(ARRAY_TABLE, getConfig().getArrayTableName(), getConfig().getArrayKeyTypeCodeLength(),
+                getConfig().getArrayTableName(), getConfig().getClassesTableName(),
+                getConfig().getAttributesTableName());
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    
 	    //simple array
-	    query = String.format(SIMPLE_ARRAY_TABLE, getConfig().getSimpleArrayTableName(), getConfig().getArrayTableName(), getConfig().getSimpleAttributesTableName());
+	    query = String.format(SIMPLE_ARRAY_TABLE, getConfig().getSimpleArrayTableName(),
+                getConfig().getSimpleArrayTableName(), getConfig().getClassesTableName(),
+                getConfig().getArrayTableName(), getConfig().getSimpleAttributesTableName());
 	    
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
 	    //complex array
-	    query = String.format(COMPLEX_ARRAY_TABLE, getConfig().getComplexArrayTableName(), getConfig().getArrayTableName(), getConfig().getComplexAttributesTableName());
+	    query = String.format(COMPLEX_ARRAY_TABLE, getConfig().getComplexArrayTableName(),
+                getConfig().getComplexArrayTableName(), getConfig().getClassesTableName(),
+                getConfig().getArrayTableName(), getConfig().getComplexAttributesTableName());
 	    
 	    logger.debug(query);
 	    
@@ -123,4 +138,30 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 		// TODO Auto-generated method stub
 		
 	}
+
+    @Override
+    public boolean isClean() {
+        String query = String.format(COUNT_TABLE, getConfig().getArrayKeyFilterValuesTableName());
+        logger.debug(query);
+        if(jdbcTemplate.queryForInt(query) > 0)
+            return false;
+        query = String.format(COUNT_TABLE, getConfig().getArrayKeyFilterTableName());
+        logger.debug(query);
+        if(jdbcTemplate.queryForInt(query) > 0)
+            return false;
+        query = String.format(COUNT_TABLE, getConfig().getAttributesTableName());
+        logger.debug(query);
+        if(jdbcTemplate.queryForInt(query) > 0)
+            return false;
+        query = String.format(COUNT_TABLE, getConfig().getEntitiesTableName());
+        logger.debug(query);
+        if(jdbcTemplate.queryForInt(query) > 0)
+            return false;
+        query = String.format(COUNT_TABLE, getConfig().getClassesTableName());
+        logger.debug(query);
+        if(jdbcTemplate.queryForInt(query) > 0)
+            return false;
+
+        return true;
+    }
 }
