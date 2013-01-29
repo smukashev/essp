@@ -42,17 +42,9 @@ public class PostgreSQLMetaClassDaoImplTest {
 	@Autowired
     IMetaClassDao postgreSQLMetaClassDaoImpl;
 	
-	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
+	private final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
 	
 	public PostgreSQLMetaClassDaoImplTest() {
-    }
-	
-    @BeforeClass
-    public static void setUp() throws Exception {
-    }
-    
-    @AfterClass
-    public static void tearDown() throws Exception {
     }
 
     @Test

@@ -24,15 +24,7 @@ public class BaseEntityTest {
     
     public BaseEntityTest() {
     }
-    
-    @BeforeClass
-    public static void setUp() throws Exception {
-    }
-    
-    @AfterClass
-    public static void tearDown() throws Exception {
-    }
-    
+
     @Test
     public void typesCount()
     {

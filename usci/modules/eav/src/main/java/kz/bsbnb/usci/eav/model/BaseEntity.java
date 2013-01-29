@@ -25,12 +25,12 @@ public class BaseEntity extends Persistable {
      * Holds data about entity structure
      * @see MetaClass
      */
-    MetaClass meta;
+    private MetaClass meta;
     
     /**
      * Holds attributes values
      */
-    HashMap<String, Object> data = new HashMap<String, Object>();
+    private HashMap<String, Object> data = new HashMap<String, Object>();
     
     /**
      * Initializes entity with a class name.

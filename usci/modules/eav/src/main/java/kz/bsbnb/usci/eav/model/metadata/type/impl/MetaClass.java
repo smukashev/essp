@@ -12,29 +12,29 @@ public class MetaClass extends AbstractMetaType {
 	/**
 	 * Name of the metadata. Used as a key value for database search if <code>id</code> is 0 
 	 */
-	String className;
+    private String className;
 
-    Timestamp beginDate = new Timestamp(java.util.Calendar.getInstance().getTimeInMillis());
+    private Timestamp beginDate = new Timestamp(java.util.Calendar.getInstance().getTimeInMillis());
 
-    boolean isDisabled = false;
+    private boolean isDisabled = false;
 	
 	/**
 	 * Holds type values. Keys of hash are type names.
 	 */
-	HashMap<String, IMetaType> members = new HashMap<String, IMetaType>();
+    private HashMap<String, IMetaType> members = new HashMap<String, IMetaType>();
 	
 	/**
      * When attribute is an entity, and is a key attribute - sets key usage strategy.
      * Defaults to <code>ArrayKeyTypes.ALL</code>
      * @see ComplexKeyTypes
      */
-    ComplexKeyTypes complexKeyType = ComplexKeyTypes.ALL;
+    private ComplexKeyTypes complexKeyType = ComplexKeyTypes.ALL;
     
     /**
 	 * When additional searching logic is needed. This attribute could be set to stored procedure name.
 	 * This SP will get key attributes of entity and return entities from BD.
 	 */
-	String searchProcedureName = null;
+    private String searchProcedureName = null;
 
     public MetaClass() {
     }

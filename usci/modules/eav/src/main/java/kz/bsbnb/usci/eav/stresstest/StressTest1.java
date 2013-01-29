@@ -1,14 +1,7 @@
 package kz.bsbnb.usci.eav.stresstest;
 
-import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
-import kz.bsbnb.usci.eav.model.metadata.DataTypes;
-import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao.PostgreSQLMetaClassDaoImpl;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +9,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Random;
 
 public class StressTest1 {
-    final static Logger logger = LoggerFactory.getLogger(StressTest1.class);
+    private final static Logger logger = LoggerFactory.getLogger(StressTest1.class);
 
-    final static int dataSize = 10000;
+    private final static int dataSize = 100;
 
     public static void main(String[] args) {
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
@@ -31,8 +23,8 @@ public class StressTest1 {
         ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextStressTest1.xml");
 
         // instantiate our spring dao object from the application context
-        IStorage storage = (IStorage)ctx.getBean(IStorage.class);
-        IMetaClassDao dao = (IMetaClassDao)ctx.getBean(IMetaClassDao.class);
+        IStorage storage = ctx.getBean(IStorage.class);
+        IMetaClassDao dao = ctx.getBean(IMetaClassDao.class);
 
         ArrayList<MetaClass> data = new ArrayList<MetaClass>();
 
@@ -56,12 +48,9 @@ public class StressTest1 {
                 dao.save(metaClass);
                 data.add(i, metaClass);
 
-                if(dataSize / 10 > 0)
+                if(i % (dataSize / 10) == 0)
                 {
-                    if(i % (dataSize / 10) == 0)
-                    {
-                        System.out.print(".");
-                    }
+                    System.out.print(".");
                 }
             }
             System.out.println();

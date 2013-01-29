@@ -23,7 +23,7 @@ public class MetaClassArray extends GenericMetaArray<MetaClass> {
      * 
      * @see DataTypes
      */
-    HashMap<String, ArrayList<String>> arrayKeyFilter = new HashMap<String, ArrayList<String>>();
+    private HashMap<String, ArrayList<String>> arrayKeyFilter = new HashMap<String, ArrayList<String>>();
 
     public MetaClassArray(MetaClass memberClass) {
         super(memberClass);

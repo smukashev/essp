@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 @Repository
 public class BasicMetaClassRepositoryImpl implements IMetaClassRepository {
-    protected HashMap<String, MetaClass> cache = new HashMap<String, MetaClass>();
+    private HashMap<String, MetaClass> cache = new HashMap<String, MetaClass>();
 
     @Autowired
     IMetaClassDao storage;

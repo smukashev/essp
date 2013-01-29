@@ -12,7 +12,7 @@ public class MetaValue extends AbstractMetaType {
 	/**
 	 * Attributes type's code
 	 */
-    DataTypes typeCode;
+    private DataTypes typeCode;
 
     public MetaValue()
     {

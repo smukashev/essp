@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
 public class BasicMetaClassRepositoryImplTest {
 
-    final Logger logger = LoggerFactory.getLogger(BasicMetaClassRepositoryImplTest.class);
+    private final Logger logger = LoggerFactory.getLogger(BasicMetaClassRepositoryImplTest.class);
 
     @Autowired
     BasicMetaClassRepositoryImpl basicMetaClassRepositoryImpl;

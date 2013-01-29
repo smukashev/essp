@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class SetUtils {
-	public static <T> Set<T> union(Set<T> setA, Set<T> setB) {
+	private static <T> Set<T> union(Set<T> setA, Set<T> setB) {
 		Set<T> tmp = new TreeSet<T>(setA);
 		tmp.addAll(setB);
 		return tmp;

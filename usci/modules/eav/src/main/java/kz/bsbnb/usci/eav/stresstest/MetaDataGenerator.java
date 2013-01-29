@@ -11,29 +11,31 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MetaDataGenerator {
-    Random rand = new Random();
+class MetaDataGenerator {
+    private Random rand = new Random();
 
-    int maxAttributes = 25;
-    int maxRecursion = 2;
-    int classesNumber = 0;
+    private int maxAttributes = 25;
+    private int maxRecursion = 2;
+    private int classesNumber = 0;
 
     String getNextClassName()
     {
         return "class_" + ++classesNumber;
     }
 
-    int simpleTypeCount = 0;
-    int complexTypeCount = 0;
+    private int simpleTypeCount = 0;
+    private int complexTypeCount = 0;
+    private int simpleTypeArrayCount = 0;
+    private int complexTypeArrayCount = 0;
 
-    ArrayList<MetaClass> metaClasses = new ArrayList<MetaClass>();
+    private ArrayList<MetaClass> metaClasses = new ArrayList<MetaClass>();
 
     public MetaDataGenerator(int maxAttributes, int maxRecursion) {
         this.maxAttributes = maxAttributes;
         this.maxRecursion = maxRecursion;
     }
 
-    public IMetaType generateMetaType(int rec)
+    IMetaType generateMetaType(int rec)
     {
         IMetaType type;
         int switcher = rand.nextInt(4);
@@ -66,6 +68,7 @@ public class MetaDataGenerator {
                 a.setArrayKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
 
                 type = a;
+                simpleTypeArrayCount++;
                 break;
             case 2:
                 //complex array
@@ -74,12 +77,12 @@ public class MetaDataGenerator {
                 ca.setArrayKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
 
                 type = ca;
+                complexTypeArrayCount++;
                 break;
             default:
                 //simple attribute
-                MetaValue mv = new MetaValue(DataTypes.values()[rand.nextInt(DataTypes.values().length)], rand.nextBoolean(),
+                type = new MetaValue(DataTypes.values()[rand.nextInt(DataTypes.values().length)], rand.nextBoolean(),
                         rand.nextBoolean());
-                type = mv;
                 simpleTypeCount++;
                 break;
         }
@@ -108,8 +111,10 @@ public class MetaDataGenerator {
 
     public void printStats()
     {
-        System.out.println("Simple  types: " + simpleTypeCount);
-        System.out.println("Complex types: " + complexTypeCount);
+        System.out.println("Simple  types      : " + simpleTypeCount);
+        System.out.println("Complex types      : " + complexTypeCount);
+        System.out.println("Simple  type arrays: " + simpleTypeArrayCount);
+        System.out.println("Complex type arrays: " + complexTypeArrayCount);
     }
 
     public ArrayList<MetaClass> getMetaClasses() {

@@ -12,24 +12,24 @@ public class JDBCConfig {
     @Value("${ds.table.prefix}")
     protected String tablePrefix;
 
-    protected String classesTableName;
-    protected String arrayKeyFilterTableName;
-    protected String arrayKeyFilterValuesTableName;
-    protected String attributesTableName;
-    protected String simpleAttributesTableName;
-    protected String complexAttributesTableName;
-    protected String arrayTableName;
-    protected String complexArrayTableName;
-    protected String simpleArrayTableName;
-    protected String entitiesTableName;
+    private String classesTableName;
+    private String arrayKeyFilterTableName;
+    private String arrayKeyFilterValuesTableName;
+    private String attributesTableName;
+    private String simpleAttributesTableName;
+    private String complexAttributesTableName;
+    private String arrayTableName;
+    private String complexArrayTableName;
+    private String simpleArrayTableName;
+    private String entitiesTableName;
 
 
-    protected final int classNameLength = 64;
-    protected final int attributeNameLength = 64;
-    protected final int typeCodeLength = 16;
-    protected final int arrayKeyTypeCodeLength = 16;
-    protected final int complexKeyTypeCodeLength = 16;
-    protected final int arrayKeyFilterValueLength = 128;
+    private final int classNameLength = 64;
+    private final int attributeNameLength = 64;
+    private final int typeCodeLength = 16;
+    private final int arrayKeyTypeCodeLength = 16;
+    private final int complexKeyTypeCodeLength = 16;
+    private final int arrayKeyFilterValueLength = 128;
 
     @PostConstruct
     public void init()

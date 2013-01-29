@@ -12,7 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class JDBCSupport {
 	protected JdbcTemplate jdbcTemplate;
 
-    JDBCConfig config;
+    private JDBCConfig config;
 	
 	@Autowired
     public void setDataSource(DataSource dataSource) {
@@ -28,7 +28,7 @@ public class JDBCSupport {
 		}
 	}
 
-    public JDBCConfig getConfig() {
+    protected JDBCConfig getConfig() {
         return config;
     }
 

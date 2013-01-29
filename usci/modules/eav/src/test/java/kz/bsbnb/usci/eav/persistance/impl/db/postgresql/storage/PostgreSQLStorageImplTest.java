@@ -29,17 +29,9 @@ public class PostgreSQLStorageImplTest {
 	@Autowired
     PostgreSQLStorageImpl postgreSQLStorageImpl;
 	
-	final Logger logger = LoggerFactory.getLogger(PostgreSQLStorageImplTest.class);
+	private final Logger logger = LoggerFactory.getLogger(PostgreSQLStorageImplTest.class);
 	
 	public PostgreSQLStorageImplTest() {
-    }
-	
-    @BeforeClass
-    public static void setUp() throws Exception {
-    }
-    
-    @AfterClass
-    public static void tearDown() throws Exception {
     }
 
     @Test

@@ -9,18 +9,18 @@ public abstract class AbstractMetaType extends Persistable implements IMetaType/
 	 * if an attribute has type DataTypes.COMPLEX then all it's key values will be used
 	 * Defaults to <code>false</code>
 	 */
-	protected boolean isKey = false;
+    private boolean isKey = false;
 	/**
 	 * <code>true</code> if attribute can have <code>null</code> value
 	 * key attributes have this flag always set to false
 	 * Defaults to <code>true</code> 
 	 */
-	protected boolean isNullable = true;
+    private boolean isNullable = true;
 	
-	public AbstractMetaType() {
+	AbstractMetaType() {
 	}
 
-	public AbstractMetaType(boolean isKey, boolean isNullable) {
+	AbstractMetaType(boolean isKey, boolean isNullable) {
 		this.isKey = isKey;
         this.isNullable = isNullable && !isKey;
 	}

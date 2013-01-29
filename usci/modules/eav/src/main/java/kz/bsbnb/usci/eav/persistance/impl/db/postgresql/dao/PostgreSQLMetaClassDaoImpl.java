@@ -30,7 +30,7 @@ import java.util.Set;
 
 @Repository
 public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
-	final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
+	private final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
 
     private String INSERT_CLASS_SQL;
     private String SELECT_CLASS_BY_NAME;
@@ -269,7 +269,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
     }
 
-    public void loadAttributes(MetaClass meta) {
+    void loadAttributes(MetaClass meta) {
         if(meta.getId() < 1)
             return;
 
