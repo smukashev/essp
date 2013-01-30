@@ -9,9 +9,11 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
+import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -47,6 +49,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     private String SELECT_COMPLEX_ARRAY;
     private String SELECT_COMPLEX_ATTRIBUTE;
 
+    @Autowired
+    SQLQueriesStats sqlStats;
 
     @PostConstruct
     public void init()
@@ -112,7 +116,16 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         logger.debug(query);
 
+        long t = 0;
+        if(sqlStats != null)
+        {
+            t = System.currentTimeMillis();
+        }
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, args);
+        if(sqlStats != null)
+        {
+            sqlStats.put(query, System.currentTimeMillis() - t);
+        }
 
         if (rows.size() > 1)
         {
@@ -180,7 +193,17 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         Object[] args = {metaClass.getClassName(), metaClass.getBeginDate(), metaClass.isDisabled(), metaClass.getId()};
 
         logger.debug(query);
+
+        long t = 0;
+        if(sqlStats != null)
+        {
+            t = System.currentTimeMillis();
+        }
         jdbcTemplate.update(query, args);
+        if(sqlStats != null)
+        {
+            sqlStats.put(query, System.currentTimeMillis() - t);
+        }
     }
 
     private void insertAttributes(Set<String> addNames, MetaClass meta)
@@ -247,7 +270,16 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             logger.debug(query);
 
+            long t = 0;
+            if(sqlStats != null)
+            {
+                t = System.currentTimeMillis();
+            }
             jdbcTemplate.update(query, args);
+            if(sqlStats != null)
+            {
+                sqlStats.put(query, System.currentTimeMillis() - t);
+            }
         }
     }
 
@@ -265,7 +297,16 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             logger.debug(query);
 
+            long t = 0;
+            if(sqlStats != null)
+            {
+                t = System.currentTimeMillis();
+            }
             jdbcTemplate.update(query, meta.getId(), typeName);
+            if(sqlStats != null)
+            {
+                sqlStats.put(query, System.currentTimeMillis() - t);
+            }
         }
     }
 
@@ -281,7 +322,17 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         logger.debug(query);
 
+        long t = 0;
+        if(sqlStats != null)
+        {
+            t = System.currentTimeMillis();
+        }
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, id);
+        if(sqlStats != null)
+        {
+            sqlStats.put(query, System.currentTimeMillis() - t);
+        }
+
         for (Map<String, Object> row : rows) {
             MetaValue attribute = new MetaValue(
                     DataTypes.valueOf((String) row.get("type_code")),
@@ -296,7 +347,16 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         logger.debug(query);
 
+        if(sqlStats != null)
+        {
+            t = System.currentTimeMillis();
+        }
         rows = jdbcTemplate.queryForList(query, id);
+        if(sqlStats != null)
+        {
+            sqlStats.put(query, System.currentTimeMillis() - t);
+        }
+
         for (Map<String, Object> row : rows) {
             MetaValueArray attribute = new MetaValueArray(
                     DataTypes.valueOf((String) row.get("type_code")),
@@ -313,7 +373,16 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         logger.debug(query);
 
+        if(sqlStats != null)
+        {
+            t = System.currentTimeMillis();
+        }
         rows = jdbcTemplate.queryForList(query, id);
+        if(sqlStats != null)
+        {
+            sqlStats.put(query, System.currentTimeMillis() - t);
+        }
+
         for (Map<String, Object> row : rows) {
             MetaClass attribute = load((Integer)row.get("class_id"));
 
@@ -330,7 +399,16 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         logger.debug(query);
 
+        if(sqlStats != null)
+        {
+            t = System.currentTimeMillis();
+        }
         rows = jdbcTemplate.queryForList(query, id);
+        if(sqlStats != null)
+        {
+            sqlStats.put(query, System.currentTimeMillis() - t);
+        }
+
         for (Map<String, Object> row : rows) {
             MetaClass attribute = load((Integer)row.get("class_id"));
 
@@ -430,6 +508,24 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         query = DELETE_CLASS_BY_ID;
 
         logger.debug(query);
+
+        long t = 0;
+        if(sqlStats != null)
+        {
+            t = System.currentTimeMillis();
+        }
         jdbcTemplate.update(query, metaClass.getId());
+        if(sqlStats != null)
+        {
+            sqlStats.put(query, System.currentTimeMillis() - t);
+        }
 	}
+
+    public SQLQueriesStats getSqlStats() {
+        return sqlStats;
+    }
+
+    public void setSqlStats(SQLQueriesStats sqlStats) {
+        this.sqlStats = sqlStats;
+    }
 }

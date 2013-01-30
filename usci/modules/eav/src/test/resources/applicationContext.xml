@@ -47,4 +47,5 @@
     </bean>
 
     <bean id="JDBCConfig" class="kz.bsbnb.usci.eav.persistance.impl.db.JDBCConfig"/>
+    <bean id="SQLStats" class="kz.bsbnb.usci.eav.stats.SQLQueriesStats"/>
 </beans>

@@ -3,6 +3,8 @@ package kz.bsbnb.usci.eav.stresstest;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
+import kz.bsbnb.usci.eav.stats.QueryEntry;
+import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -13,7 +15,7 @@ import java.util.Calendar;
 public class StressTest1 {
     private final static Logger logger = LoggerFactory.getLogger(StressTest1.class);
 
-    private final static int dataSize = 100;
+    private final static int dataSize = 1000;
 
     public static void main(String[] args) {
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
@@ -112,6 +114,22 @@ public class StressTest1 {
         System.out.println();
         System.out.println("Test ended at: " + Calendar.getInstance().getTime());
         gen.printStats();
+
+        System.out.println("-------------------------------------");
+        SQLQueriesStats sqlStats = ctx.getBean(SQLQueriesStats.class);
+
+        if(sqlStats != null)
+        {
+            for (String query : sqlStats.getStats().keySet())
+            {
+                QueryEntry qe = sqlStats.getStats().get(query);
+                System.out.println("c: " + qe.count + ", a: " + (qe.totalTime / qe.count) + ", q: " + query);
+            }
+        }
+        else
+        {
+            System.out.println("SQL stats off");
+        }
     }
 
 }
