@@ -57,7 +57,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     public void init()
     {
         INSERT_CLASS_SQL = String.format("INSERT INTO %s (name, begin_date, is_disabled) VALUES ( ?, ?, ? )", getConfig().getClassesTableName());
-        SELECT_CLASS_BY_NAME = String.format("SELECT * FROM %s WHERE name = ? and begin_date <= ? ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
+        SELECT_CLASS_BY_NAME = String.format("SELECT * FROM %s WHERE name = ? and begin_date <= ? and is_disabled = FALSE ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
         SELECT_CLASS_BY_NAME_STRICT = String.format("SELECT * FROM %s WHERE name = ? and begin_date = ? ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
         SELECT_CLASS_BY_ID = String.format("SELECT * FROM %s WHERE id = ?", getConfig().getClassesTableName());
         UPDATE_CLASS_BY_ID = String.format("UPDATE %s SET  name = ?,  begin_date = ?,  is_disabled = ?  WHERE id = ?", getConfig().getClassesTableName());

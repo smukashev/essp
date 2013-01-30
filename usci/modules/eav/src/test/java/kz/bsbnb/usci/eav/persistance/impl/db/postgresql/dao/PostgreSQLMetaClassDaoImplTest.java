@@ -293,13 +293,22 @@ public class PostgreSQLMetaClassDaoImplTest {
 
             Thread.sleep(200);
 
+            MetaClass metaCreateNextDisabled = new MetaClass("testClass");
+
+            metaCreateNextDisabled.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+            metaCreateNextDisabled.setMemberType("testInteger1", new MetaValue(DataTypes.INTEGER, false, false));
+            metaCreateNextDisabled.setDisabled(true);
+
+            Thread.sleep(200);
+
             MetaClass metaCreateNext = new MetaClass("testClass");
 
             metaCreateNext.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
-            metaCreateNext.setMemberType("testInteger1", new MetaValue(DataTypes.INTEGER, false, false));
+            metaCreateNext.setMemberType("testInteger2", new MetaValue(DataTypes.INTEGER, false, false));
 
             postgreSQLMetaClassDaoImpl.save(metaCreate);
             postgreSQLMetaClassDaoImpl.save(metaCreateNext);
+            postgreSQLMetaClassDaoImpl.save(metaCreateNextDisabled);
 
             Thread.sleep(200);
 
@@ -307,7 +316,8 @@ public class PostgreSQLMetaClassDaoImplTest {
 
             assertTrue(metaCreateNext.equals(loadedMetaCreateNext));
 
-            MetaClass loadedMetaCreate = postgreSQLMetaClassDaoImpl.load(metaCreate.getClassName(), metaCreate.getBeginDate());
+            MetaClass loadedMetaCreate = postgreSQLMetaClassDaoImpl.load(metaCreateNextDisabled.getClassName(),
+                    metaCreateNextDisabled.getBeginDate());
 
             assertTrue(metaCreate.equals(loadedMetaCreate));
         }
