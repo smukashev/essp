@@ -52,6 +52,11 @@ public class MetaClass extends AbstractMetaType {
 		this.className = className;
 	}
 
+    public MetaClass(String className, Timestamp beginDate) {
+        this.className = className;
+        this.beginDate = beginDate;
+    }
+
     public MetaClass(boolean isKey, boolean isNullable) {
         super(isKey, isNullable);
         this.className = className;

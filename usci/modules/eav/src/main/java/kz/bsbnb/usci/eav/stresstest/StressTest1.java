@@ -15,7 +15,7 @@ import java.util.Calendar;
 public class StressTest1 {
     private final static Logger logger = LoggerFactory.getLogger(StressTest1.class);
 
-    private final static int dataSize = 1000;
+    private final static int dataSize = 10;
 
     public static void main(String[] args) {
         System.out.println("Test started at: " + Calendar.getInstance().getTime());

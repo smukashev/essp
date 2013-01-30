@@ -95,6 +95,8 @@ class MetaDataGenerator {
         MetaClass metaClass = new MetaClass(getNextClassName());
         int attributesCount = rand.nextInt(maxAttributes + 1) + 5;
 
+        metaClass.setDisabled(rand.nextBoolean());
+
         for (int j = 5; j < attributesCount; j++)
         {
             IMetaType type;

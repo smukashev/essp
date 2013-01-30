@@ -11,10 +11,7 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav.persistance.impl.db.postgresql.storage.PostgreSQLStorageImpl;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -276,6 +273,43 @@ public class PostgreSQLMetaClassDaoImplTest {
             catch(IllegalArgumentException e)
             {
             }
+        }
+        finally
+        {
+            postgreSQLStorageImpl.clear();
+        }
+    }
+
+    @Test
+    public void beginDateMetaClass() throws Exception {
+        try {
+            postgreSQLStorageImpl.initialize();
+
+            logger.debug("Create multiple metadata test");
+
+            MetaClass metaCreate = new MetaClass("testClass");
+
+            metaCreate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+
+            Thread.sleep(200);
+
+            MetaClass metaCreateNext = new MetaClass("testClass");
+
+            metaCreateNext.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+            metaCreateNext.setMemberType("testInteger1", new MetaValue(DataTypes.INTEGER, false, false));
+
+            postgreSQLMetaClassDaoImpl.save(metaCreate);
+            postgreSQLMetaClassDaoImpl.save(metaCreateNext);
+
+            Thread.sleep(200);
+
+            MetaClass loadedMetaCreateNext = postgreSQLMetaClassDaoImpl.load(metaCreateNext.getClassName());
+
+            assertTrue(metaCreateNext.equals(loadedMetaCreateNext));
+
+            MetaClass loadedMetaCreate = postgreSQLMetaClassDaoImpl.load(metaCreate.getClassName(), metaCreate.getBeginDate());
+
+            assertTrue(metaCreate.equals(loadedMetaCreate));
         }
         finally
         {

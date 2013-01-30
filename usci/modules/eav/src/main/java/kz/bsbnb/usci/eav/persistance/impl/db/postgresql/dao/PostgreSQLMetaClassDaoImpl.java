@@ -36,6 +36,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
     private String INSERT_CLASS_SQL;
     private String SELECT_CLASS_BY_NAME;
+    private String SELECT_CLASS_BY_NAME_STRICT;
     private String SELECT_CLASS_BY_ID;
     private String UPDATE_CLASS_BY_ID;
     private String DELETE_CLASS_BY_ID;
@@ -56,8 +57,9 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     public void init()
     {
         INSERT_CLASS_SQL = String.format("INSERT INTO %s (name, begin_date, is_disabled) VALUES ( ?, ?, ? )", getConfig().getClassesTableName());
-        SELECT_CLASS_BY_NAME = String.format("SELECT * FROM %s WHERE name = ? ", getConfig().getClassesTableName());
-        SELECT_CLASS_BY_ID = String.format("SELECT * FROM %s WHERE id = ? ", getConfig().getClassesTableName());
+        SELECT_CLASS_BY_NAME = String.format("SELECT * FROM %s WHERE name = ? and begin_date <= ? ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
+        SELECT_CLASS_BY_NAME_STRICT = String.format("SELECT * FROM %s WHERE name = ? and begin_date = ? ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
+        SELECT_CLASS_BY_ID = String.format("SELECT * FROM %s WHERE id = ?", getConfig().getClassesTableName());
         UPDATE_CLASS_BY_ID = String.format("UPDATE %s SET  name = ?,  begin_date = ?,  is_disabled = ?  WHERE id = ?", getConfig().getClassesTableName());
         DELETE_CLASS_BY_ID = String.format("DELETE FROM %s WHERE id = ?", getConfig().getClassesTableName());
         INSERT_COMPLEX_ARRAY = String.format("INSERT INTO %s (containing_class_id, name, is_key, is_nullable, complex_key_type, class_id, array_key_type) VALUES  ( ?, ?, ?, ?, ?, ?, ?) ", getConfig().getComplexArrayTableName());
@@ -91,7 +93,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    }
 	}
 
-    private void loadClass(MetaClass metaClass)
+    private void loadClass(MetaClass metaClass, boolean beginDateStrict)
     {
         String query;
         Object[] args;
@@ -103,15 +105,22 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 throw new IllegalArgumentException("Meta class does not have name or id. Can't load.");
             }
 
-            query = SELECT_CLASS_BY_NAME;
+            if(beginDateStrict)
+            {
+                query = SELECT_CLASS_BY_NAME_STRICT;
+            }
+            else
+            {
+                query = SELECT_CLASS_BY_NAME;
+            }
 
-            args = new Object[] { metaClass.getClassName() };
+            args = new Object[] { metaClass.getClassName(), metaClass.getBeginDate() };
         }
         else
         {
             query = SELECT_CLASS_BY_ID;
 
-            args = new Object[] {metaClass.getId()};
+            args = new Object[] { metaClass.getId() };
         }
 
         logger.debug(query);
@@ -431,7 +440,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         try
         {
-            loadClass(dbMeta);
+            loadClass(dbMeta, true);
             loadAttributes(dbMeta);
             meta.setId(dbMeta.getId());
             updateClass(meta);
@@ -442,7 +451,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             createClass(dbMeta);
             dbMeta.removeMembers();
             meta.setId(dbMeta.getId());
-            logger.debug("Class: " + meta.getClassName() + " not created.");
+            logger.debug("Class: " + meta.getClassName() + " created.");
         }
 
 	    if(dbMeta.getId() < 1)
@@ -476,11 +485,21 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	public MetaClass load(String className) {
 		MetaClass meta = new MetaClass(className);
 
-        loadClass(meta);
+        loadClass(meta, false);
         loadAttributes(meta);
 
 	    return meta;
 	}
+
+    @Override
+    public MetaClass load(String className, Timestamp beginDate) {
+        MetaClass meta = new MetaClass(className, beginDate);
+
+        loadClass(meta, false);
+        loadAttributes(meta);
+
+        return meta;
+    }
 
 	@Override
 	public MetaClass load(long id) {
@@ -490,7 +509,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         MetaClass meta = new MetaClass();
         meta.setId(id);
 
-        loadClass(meta);
+        loadClass(meta, false);
         loadAttributes(meta);
 
         return meta;
