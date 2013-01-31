@@ -15,7 +15,7 @@ import java.util.Calendar;
 public class StressTest1 {
     private final static Logger logger = LoggerFactory.getLogger(StressTest1.class);
 
-    private final static int dataSize = 10;
+    private final static int dataSize = 100;
 
     public static void main(String[] args) {
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
@@ -66,16 +66,29 @@ public class StressTest1 {
             for(MetaClass mc : data)
             {
                 MetaClass loadedMetaClassById = dao.load(mc.getId());
-                MetaClass loadedMetaClassByName = dao.load(mc.getClassName());
 
                 if(!mc.equals(loadedMetaClassById))
                 {
                     logger.error("Mismatch with loaded by Id");
                 }
 
-                if(!mc.equals(loadedMetaClassByName))
+                try {
+                    MetaClass loadedMetaClassByName = dao.load(mc.getClassName());
+                    if(!mc.equals(loadedMetaClassByName))
+                    {
+                        logger.error("Mismatch with loaded by Name");
+                    }
+                }
+                catch(IllegalArgumentException e)
                 {
-                    logger.error("Mismatch with loaded by Name");
+                    if(mc.isDisabled())
+                    {
+                        logger.debug("Disabled class skipped");
+                    }
+                    else
+                    {
+                        logger.error("Can't load class: " + e.getMessage());
+                    }
                 }
                 i++;
                 if(i > delta)
@@ -88,7 +101,7 @@ public class StressTest1 {
 
 
             System.out.println("Removing  : ..........");
-            System.out.print(  "Progress  : ");
+            System.out.print("Progress  : ");
             delta = gen.getMetaClasses().size() / 10;
             i = 0;
             for(MetaClass mc : gen.getMetaClasses())
@@ -120,11 +133,15 @@ public class StressTest1 {
 
         if(sqlStats != null)
         {
+            System.out.println("+---------+-----+-----------+");
+            System.out.println("|  count  | avg |   total   |");
+            System.out.println("+---------+-----+-----------+");
             for (String query : sqlStats.getStats().keySet())
             {
                 QueryEntry qe = sqlStats.getStats().get(query);
-                System.out.println("c: " + qe.count + ", a: " + (qe.totalTime / qe.count) + ", q: " + query);
+                System.out.printf("| %7d | %3d | %9d | %s%n", qe.count, qe.totalTime / qe.count, qe.totalTime, query);
             }
+            System.out.println("+-------+-----+----------+");
         }
         else
         {
