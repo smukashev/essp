@@ -37,6 +37,11 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
     private final static String DROP_TABLE_CASCADE = "DROP TABLE IF EXISTS %s CASCADE";
     private final static String COUNT_TABLE = "SELECT count(*) FROM %s";
 
+    private final static String BATCHES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, receipt_date TIMESTAMP WITH TIME ZONE NOT NULL, begin_date TIMESTAMP WITH TIME ZONE NOT NULL, end_date TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
+    private final static String BATCH_FILES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, file_data BYTEA NOT NULL, file_size double precision NOT NULL, file_name character varying(%d), batch_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
+    private final static String VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, batch_id int references %s(id) ON DELETE CASCADE, entity_id int references %s(id) ON DELETE CASCADE, attribute_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
+    private final static String DATE_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (date_value DATE NOT NULL, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+
     private final static String INDEXES_QUERY = "select pg_index.indexrelid::regclass, 'create index ' || relname || '_' ||\n" +
             "         array_to_string(column_name_list, '_') || '_idx on ' || conrelid ||\n" +
             "         ' (' || array_to_string(column_name_list, ',') || ')' as query\n" +
@@ -129,6 +134,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
+
 	    //complex array
 	    query = String.format(COMPLEX_ARRAY_TABLE, getConfig().getComplexArrayTableName(),
                 getConfig().getComplexArrayTableName(), getConfig().getClassesTableName(),
@@ -137,6 +143,38 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    logger.debug(query);
 	    
 	    jdbcTemplate.execute(query);
+
+        //batches
+        query = String.format(BATCHES_TABLE, getConfig().getBatchesTableName(),
+                getConfig().getBatchesTableName());
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
+
+        //entities
+        query = String.format(ENTITIES_TABLE, getConfig().getEntitiesTableName(),
+                getConfig().getClassesTableName(), getConfig().getEntitiesTableName());
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
+
+        //values
+        query = String.format(VALUES_TABLE, getConfig().getValuesTableName(),
+                getConfig().getBatchesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getAttributesTableName(), getConfig().getValuesTableName());
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
+
+        //date values
+        query = String.format(DATE_VALUES_TABLE, getConfig().getDateValuesTableName(),
+                getConfig().getDateValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getDateValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getDateValuesTableName(), getConfig().getAttributesTableName(),
+                getConfig().getValuesTableName());
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
 	    //------------------------------------------------
 	    query = String.format(ENTITIES_TABLE, getConfig().getEntitiesTableName(), getConfig().getClassesTableName(), getConfig().getEntitiesTableName());
 	    
@@ -167,6 +205,15 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    query = String.format(DROP_TABLE, getConfig().getArrayKeyFilterTableName());
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
+        query = String.format(DROP_TABLE, getConfig().getDateValuesTableName());
+        logger.debug(query);
+        jdbcTemplate.execute(query);
+        query = String.format(DROP_TABLE, getConfig().getValuesTableName());
+        logger.debug(query);
+        jdbcTemplate.execute(query);
+        query = String.format(DROP_TABLE, getConfig().getEntitiesTableName());
+        logger.debug(query);
+        jdbcTemplate.execute(query);
 		query = String.format(DROP_TABLE_CASCADE, getConfig().getAttributesTableName());
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
@@ -175,7 +222,10 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    jdbcTemplate.execute(query);
 	    query = String.format(DROP_TABLE, getConfig().getClassesTableName());
 	    logger.debug(query);
-	    jdbcTemplate.execute(query);
+        jdbcTemplate.execute(query);
+        query = String.format(DROP_TABLE, getConfig().getBatchesTableName());
+        logger.debug(query);
+        jdbcTemplate.execute(query);
 	}
 
 	@Override
@@ -190,21 +240,43 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         logger.debug(query);
         if(jdbcTemplate.queryForInt(query) > 0)
             return false;
+
+        //array key filter
         query = String.format(COUNT_TABLE, getConfig().getArrayKeyFilterTableName());
         logger.debug(query);
         if(jdbcTemplate.queryForInt(query) > 0)
             return false;
+
+        //attributes
         query = String.format(COUNT_TABLE, getConfig().getAttributesTableName());
         logger.debug(query);
         if(jdbcTemplate.queryForInt(query) > 0)
             return false;
+
+        //entities
         query = String.format(COUNT_TABLE, getConfig().getEntitiesTableName());
         logger.debug(query);
         if(jdbcTemplate.queryForInt(query) > 0)
             return false;
+
+        //classes
         query = String.format(COUNT_TABLE, getConfig().getClassesTableName());
         logger.debug(query);
-        return jdbcTemplate.queryForInt(query) <= 0;
+        if(jdbcTemplate.queryForInt(query) > 0)
+            return false;
 
+        //batches
+        query = String.format(COUNT_TABLE, getConfig().getBatchesTableName());
+        logger.debug(query);
+        if(jdbcTemplate.queryForInt(query) > 0)
+            return false;
+
+        //values
+        query = String.format(COUNT_TABLE, getConfig().getValuesTableName());
+        logger.debug(query);
+        if(jdbcTemplate.queryForInt(query) > 0)
+            return false;
+
+        return true;
     }
 }

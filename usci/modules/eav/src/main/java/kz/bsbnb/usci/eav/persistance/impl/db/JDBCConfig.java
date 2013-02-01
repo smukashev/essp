@@ -3,6 +3,7 @@ package kz.bsbnb.usci.eav.persistance.impl.db;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import sun.security.krb5.internal.ktab.KeyTab;
 
 import javax.annotation.PostConstruct;
 
@@ -22,6 +23,9 @@ public class JDBCConfig {
     private String complexArrayTableName;
     private String simpleArrayTableName;
     private String entitiesTableName;
+    private String batchesTableName;
+    private String valuesTableName;
+    private String dateValuesTableName;
 
 
     private final int classNameLength = 64;
@@ -30,6 +34,7 @@ public class JDBCConfig {
     private final int arrayKeyTypeCodeLength = 16;
     private final int complexKeyTypeCodeLength = 16;
     private final int arrayKeyFilterValueLength = 128;
+    private final int stringAttributeValueLength = 1024;
 
     @PostConstruct
     public void init()
@@ -44,6 +49,9 @@ public class JDBCConfig {
         arrayTableName = tablePrefix + "array";
         complexArrayTableName = tablePrefix + "complex_array";
         simpleArrayTableName = tablePrefix + "simple_array";
+        batchesTableName = tablePrefix + "batches";
+        valuesTableName = tablePrefix + "values";
+        dateValuesTableName = tablePrefix + "date_values";
     }
 
     public String getClassesTableName() {
@@ -86,6 +94,18 @@ public class JDBCConfig {
         return entitiesTableName;
     }
 
+    public String getBatchesTableName() {
+        return batchesTableName;
+    }
+
+    public String getValuesTableName() {
+        return valuesTableName;
+    }
+
+    public String getDateValuesTableName() {
+        return dateValuesTableName;
+    }
+
     public int getClassNameLength() {
         return classNameLength;
     }
@@ -109,4 +129,9 @@ public class JDBCConfig {
     public int getArrayKeyFilterValueLength() {
         return arrayKeyFilterValueLength;
     }
+
+    public int getStringAttributeValueLength() {
+        return stringAttributeValueLength;
+    }
+
 }
