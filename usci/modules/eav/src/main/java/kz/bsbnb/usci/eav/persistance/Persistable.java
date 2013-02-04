@@ -13,4 +13,22 @@ public class Persistable {
 	public void setId(long id) {
 		this.id = id;
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Persistable)) return false;
+
+        Persistable that = (Persistable) o;
+
+        if (id != that.id) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
+    }
+
 }

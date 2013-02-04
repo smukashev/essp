@@ -33,12 +33,14 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
 
     private String INSERT_ENTITY_SQL;
     private String INSERT_DATE_VALUE_SQL;
+    private String DELETE_ENTITY_BY_ID_SQL;
 
     @PostConstruct
     public void init()
     {
         INSERT_ENTITY_SQL = String.format("INSERT INTO %s (containing_class_id) VALUES ( ? )", getConfig().getEntitiesTableName());
         INSERT_DATE_VALUE_SQL = String.format("INSERT INTO %s (entity_id, batch_id, attribute_id, date_value) VALUES ( ?, ?, ?, ? )", getConfig().getDateValuesTableName());
+        DELETE_ENTITY_BY_ID_SQL = String.format("DELETE FROM %s WHERE id = ?", getConfig().getEntitiesTableName());
     }
 
     class InsertBaseEntityPreparedStatementCreator implements PreparedStatementCreator {
@@ -87,8 +89,13 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
     }
 
     @Override
-    public void remove(BaseEntity persistable) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void remove(BaseEntity baseEntity) {
+        if(baseEntity.getId() < 1)
+        {
+            throw new IllegalArgumentException("Can't remove BaseEntity without id");
+        }
+
+        updateWithStats(DELETE_ENTITY_BY_ID_SQL, baseEntity.getId());
     }
 
     @Override
@@ -146,7 +153,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
         batchArgs.add(attributeIds);
         batchArgs.add(attributeValues);
 
-        jdbcTemplate.batchUpdate(INSERT_DATE_VALUE_SQL, batchArgs);
+        batchUpdateWithStats(INSERT_DATE_VALUE_SQL, batchArgs);
     }
 
 }
