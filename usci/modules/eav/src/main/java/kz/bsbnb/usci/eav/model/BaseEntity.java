@@ -44,6 +44,17 @@ public class BaseEntity extends Persistable {
     }
 
     /**
+     * Initializes entity with a class name and batch information.
+     *
+     * @param className the class name.
+     * @param batch information about batch
+     */
+    public BaseEntity(String className, Batch batch) {
+        this(className);
+        this.batch = batch;
+    }
+
+    /**
      * Used to retrieve object structure description. Can be used to modify metadata.
      * 
      * @return Object structure
