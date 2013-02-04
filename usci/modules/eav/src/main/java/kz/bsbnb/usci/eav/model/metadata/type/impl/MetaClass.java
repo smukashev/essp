@@ -3,9 +3,12 @@ package kz.bsbnb.usci.eav.model.metadata.type.impl;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
+import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 
 public class MetaClass extends AbstractMetaType {
@@ -193,4 +196,85 @@ public class MetaClass extends AbstractMetaType {
     {
         members.clear();
     }
+
+    /**
+     * Used to get list of the attribute names with type <code>dataType</code>
+     *
+     * @param dataType type of the attribute
+     * @return list of the attribute names
+     * @see DataTypes
+     * @see MetaValue
+     */
+    public Set<String> getSimpleAttributesNames(DataTypes dataType) {
+        if (!this.isComplex()) {
+            throw new UnsupportedOperationException("Simple types can be contained only in complex types.");
+        }
+
+        Set<String> allAttributeNames = this.members.keySet();
+        Set<String> filteredAttributeNames = new HashSet<String>();
+
+        Iterator<String> it = allAttributeNames.iterator();
+        while (it.hasNext()) {
+            String attributeName = it.next();
+            IMetaType type = this.getMemberType(attributeName);
+            if (!type.isArray() && !type.isComplex()) {
+                MetaValue metaValue = (MetaValue)type;
+                if (metaValue.getTypeCode().equals(dataType)) {
+                    filteredAttributeNames.add(attributeName);
+                }
+            }
+        }
+        return filteredAttributeNames;
+    }
+
+    /**
+     * Used to get list of the attribute names with type <code>DataTypes.BOOLEAN</code>.
+     *
+     * @return list of the attribute names
+     * @see MetaValue
+     */
+    public Set<String> getBooleanAttributeNames() {
+        return getSimpleAttributesNames(DataTypes.BOOLEAN);
+    }
+
+    /**
+     * Used to get list of the attribute names with type <code>DataTypes.DATE</code>.
+     *
+     * @return list of the attribute names
+     * @see MetaValue
+     */
+    public Set<String> getDateAttributeNames() {
+        return getSimpleAttributesNames(DataTypes.DATE);
+    }
+
+    /**
+     * Used to get list of the attribute names with type <code>DataTypes.DOUBLE</code>.
+     *
+     * @return list of the attribute names
+     * @see MetaValue
+     */
+    public Set<String> getDoubleAttributeNames() {
+        return getSimpleAttributesNames(DataTypes.DOUBLE);
+    }
+
+    /**
+     * Used to get list of the attribute names with type <code>DataTypes.DOUBLE</code>.
+     *
+     * @return list of the attribute names
+     * @see MetaValue
+     */
+    public Set<String> getIntegerAttributeNames() {
+        return getSimpleAttributesNames(DataTypes.INTEGER);
+    }
+
+    /**
+     * Used to get list of the attribute names with type <code>DataTypes.STRING</code>.
+     *
+     * @return list of the attribute names
+     * @see MetaValue
+     */
+    public Set<String> getStringAttributeNames() {
+        return getSimpleAttributesNames(DataTypes.STRING);
+    }
+
 }

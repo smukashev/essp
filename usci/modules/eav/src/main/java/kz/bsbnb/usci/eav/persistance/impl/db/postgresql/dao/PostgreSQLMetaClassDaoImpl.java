@@ -50,9 +50,6 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     private String SELECT_COMPLEX_ARRAY;
     private String SELECT_COMPLEX_ATTRIBUTE;
 
-    @Autowired
-    SQLQueriesStats sqlStats;
-
     @PostConstruct
     public void init()
     {

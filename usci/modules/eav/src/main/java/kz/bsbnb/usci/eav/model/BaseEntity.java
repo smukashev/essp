@@ -1,8 +1,6 @@
 package kz.bsbnb.usci.eav.model;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
@@ -10,6 +8,7 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.Persistable;
+import kz.bsbnb.usci.eav.util.SetUtils;
 
 /**
  * Implements EAV entity object. 
@@ -26,6 +25,8 @@ public class BaseEntity extends Persistable {
      * @see MetaClass
      */
     private MetaClass meta;
+
+    private Batch batch;
     
     /**
      * Holds attributes values
@@ -751,4 +752,21 @@ public class BaseEntity extends Persistable {
 
         return (ArrayList<BaseEntity>)obj;
     }
+
+    public Set<String> getPresentSimpleAttributeNames(DataTypes dataType) {
+        if (!this.meta.isComplex()) {
+            throw new UnsupportedOperationException("Simple types can be contained only in complex types.");
+        }
+
+        return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), data.keySet());
+    }
+
+    public Set<String> getPresentDateAttributeNames() {
+        return getPresentSimpleAttributeNames(DataTypes.DATE);
+    }
+
+    public Batch getBatch() {
+        return batch;
+    }
+
 }
