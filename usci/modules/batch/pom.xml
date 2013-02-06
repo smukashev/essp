@@ -75,6 +75,11 @@
             <artifactId>spring-batch-core</artifactId>
             <version>${spring.batch.version}</version>
         </dependency>
+        <dependency>
+            <groupId>kz.bsbnb.usci</groupId>
+            <artifactId>eav</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     
 </project>

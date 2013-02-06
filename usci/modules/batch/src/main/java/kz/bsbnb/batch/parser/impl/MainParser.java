@@ -1,6 +1,8 @@
 package kz.bsbnb.batch.parser.impl;
 
+import kz.bsbnb.batch.exception.UnknownTagException;
 import kz.bsbnb.batch.parser.AbstractParser;
+import kz.bsbnb.usci.eav.model.BaseEntity;
 import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -18,6 +20,10 @@ public class MainParser extends AbstractParser
     private InputSource inputSource;
 
     private Logger logger = Logger.getLogger(MainParser.class);
+
+    private EntityParser entityParser;
+
+    private BaseEntity currentEntity;
 
     public MainParser(byte[] xmlBytes)
     {
@@ -48,13 +54,48 @@ public class MainParser extends AbstractParser
     public void startElement(String uri, String localName, String qName,
             Attributes attributes) throws SAXException
     {
-        logger.info(localName);
+        contents.reset();
+
+        if(localName.equalsIgnoreCase("batch"))
+        {
+        }
+        else if(localName.equalsIgnoreCase("entities"))
+        {
+        }
+        else if(localName.equalsIgnoreCase("entity"))
+        {
+            currentEntity = new BaseEntity(attributes.getValue("class"));
+
+            entityParser = new EntityParser();
+            entityParser.parse(xmlReader, this, attributes.getValue("class"), currentEntity);
+
+            xmlReader.setContentHandler(entityParser);
+        }
+        else
+        {
+            throw new UnknownTagException(localName);
+        }
     }
 
     @Override
     public void endElement(String uri, String localName, String qName)
             throws SAXException
     {
-        logger.info(localName);
+        if(localName.equalsIgnoreCase("batch"))
+        {
+
+        }
+        else if(localName.equalsIgnoreCase("entities"))
+        {
+            logger.info("entities");
+        }
+        else if(localName.equalsIgnoreCase("entity"))
+        {
+
+        }
+        else
+        {
+            throw new UnknownTagException(localName);
+        }
     }
 }
