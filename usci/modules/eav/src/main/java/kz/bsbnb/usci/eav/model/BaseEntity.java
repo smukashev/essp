@@ -2,6 +2,8 @@ package kz.bsbnb.usci.eav.model;
 
 import java.util.*;
 
+import kz.bsbnb.usci.eav.model.batchdata.IGenericBatchValue;
+import kz.bsbnb.usci.eav.model.batchdata.impl.GenericBatchValue;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
@@ -34,7 +36,10 @@ public class BaseEntity extends Persistable
     /**
      * Holds attributes values
      */
-    private HashMap<String, Object> data = new HashMap<String, Object>();
+    private HashMap<String, IGenericBatchValue> data =
+            new HashMap<String, IGenericBatchValue>();
+    private HashMap<String, ArrayList<IGenericBatchValue>> dataForArray =
+            new HashMap<String, ArrayList<IGenericBatchValue>>();
 
     /**
      * Initializes entity.
@@ -88,7 +93,7 @@ public class BaseEntity extends Persistable
     /**
      * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>
      * 
-     * @param name attribute name. Must exist in entity metadata 
+     * @param name attribute name. Must exist in entity metadata
      * @return attribute value, null if value is not set
      * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
      * 	                                or attribute has type different from <code>DataTypes.DATE</code>
@@ -149,12 +154,12 @@ public class BaseEntity extends Persistable
                     meta.getClassName() + ". Needed " + DataTypes.STRING + ", got: " + 
                     simpleType.getTypeCode());
         
-        Object obj = data.get(name);
+        IGenericBatchValue<String> batchValue = data.get(name);
         
-        if(obj == null)
+        if(batchValue == null)
             return null;
         
-        return (String)obj;
+        return batchValue.getValue();
     }
     
     /**
@@ -184,13 +189,13 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type mismatch in class: " + 
                     meta.getClassName() + ". Needed " + DataTypes.INTEGER + ", got: " + 
                     simpleType.getTypeCode());
-        
-        Object obj = data.get(name);
-        
-        if(obj == null)
+
+        IGenericBatchValue<Integer> batchValue = data.get(name);
+
+        if(batchValue == null)
             return null;
-        
-        return (Integer)obj;
+
+        return batchValue.getValue();
     }
     
     /**
@@ -220,13 +225,13 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type mismatch in class: " + 
                     meta.getClassName() + ". Needed " + DataTypes.DOUBLE + ", got: " + 
                     simpleType.getTypeCode());
-        
-        Object obj = data.get(name);
-        
-        if(obj == null)
+
+        IGenericBatchValue<Double> batchValue = data.get(name);
+
+        if(batchValue == null)
             return null;
-        
-        return (Double)obj;
+
+        return batchValue.getValue();
     }
     
     /**
@@ -256,13 +261,13 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type mismatch in class: " + 
                     meta.getClassName() + ". Needed " + DataTypes.BOOLEAN + ", got: " + 
                     simpleType.getTypeCode());
-        
-        Object obj = data.get(name);
-        
-        if(obj == null)
+
+        IGenericBatchValue<Boolean> batchValue = data.get(name);
+
+        if(batchValue == null)
             return null;
-        
-        return (Boolean)obj;
+
+        return batchValue.getValue();
     }
     
     /**
@@ -286,25 +291,47 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name + 
                     ", is not an object of class. It's a simple value with type " + 
             		((MetaValue)type).getTypeCode());
-        
-        Object obj = data.get(name);
-        
-        if(obj == null)
+
+        IGenericBatchValue<BaseEntity> batchValue = data.get(name);
+
+        if(batchValue == null)
             return null;
 
-        return (BaseEntity)obj;
+        return batchValue.getValue();
     }
-    
+
+    /**
+     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>.
+     * Uses default <code>Batch</code>.
+     *
+     * @param name name attribute name. Must exist in entity metadata
+     * @param index the index of value
+     * @param value new value of the attribute
+     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
+     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
+     * @throws IllegalStateException if default <code>Batch</code> is not set
+     * @see DataTypes
+     */
+    public void set(String name, long index, Date value)
+    {
+        if (defaultBatch == null) {
+            throw new IllegalStateException("Default Batch is not set.");
+        }
+        set(name, defaultBatch, index, value);
+    }
+
     /**
      * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>
      * 
      * @param name name attribute name. Must exist in entity metadata
+     * @param batch information about the origin of this value
+     * @param index the index of value
      * @param value new value of the attribute
      * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
      * 	                                or attribute has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public void set(String name, Date value)
+    public void set(String name, Batch batch, long index, Date value)
     {
     	IMetaType type = meta.getMemberType(name);
         
@@ -323,19 +350,42 @@ public class BaseEntity extends Persistable
                     meta.getClassName() + ". Needed " + DataTypes.DATE + ", got: " +
                     simpleType.getTypeCode());
         
-        data.put(name, value);
+        data.put(name, new GenericBatchValue<Date>(batch, index, value));
+    }
+
+    /**
+     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>.
+     * Uses default <code>Batch</code>.
+     *
+     * @param name name attribute name. Must exist in entity metadata
+     * @param index the index of value
+     * @param value new value of the attribute
+     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
+     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
+     * @throws IllegalStateException if default <code>Batch</code> is not set
+     * @see DataTypes
+     */
+    public void set(String name, long index, String value)
+    {
+        if (defaultBatch == null)
+        {
+            throw new IllegalStateException("Default Batch is not set.");
+        }
+        set(name, defaultBatch, index, value);
     }
     
     /**
      * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.STRING</code>
      * 
      * @param name name attribute name. Must exist in entity metadata
+     * @param batch information about the origin of this value
+     * @param index the index of value
      * @param value new value of the attribute
      * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
      * 	                                or attribute has type different from <code>DataTypes.STRING</code>
      * @see DataTypes
      */
-    public void set(String name, String value)
+    public void set(String name, Batch batch, long index, String value)
     {
     	IMetaType type = meta.getMemberType(name);
         
@@ -354,19 +404,42 @@ public class BaseEntity extends Persistable
                     meta.getClassName() + ". Needed " + DataTypes.STRING + ", got: " + 
                     simpleType.getTypeCode());
         
-        data.put(name, value);
+        data.put(name, new GenericBatchValue<String>(batch, index, value));
     }
-    
+
+    /**
+     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>.
+     * Uses default <code>Batch</code>.
+     *
+     * @param name name attribute name. Must exist in entity metadata
+     * @param index the index of value
+     * @param value new value of the attribute
+     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
+     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
+     * @throws IllegalStateException if default <code>Batch</code> is not set
+     * @see DataTypes
+     */
+    public void set(String name, long index, Integer value)
+    {
+        if (defaultBatch == null)
+        {
+            throw new IllegalStateException("Default Batch is not set.");
+        }
+        set(name, defaultBatch, index, value);
+    }
+
     /**
      * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.INTEGER</code>
      * 
      * @param name name attribute name. Must exist in entity metadata
+     * @param batch information about the origin of this value
+     * @param index the index of value
      * @param value new value of the attribute
      * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
      * 	                                or attribute has type different from <code>DataTypes.INTEGER</code>
      * @see DataTypes
      */
-    public void set(String name, Integer value)
+    public void set(String name, Batch batch, long index, Integer value)
     {
     	IMetaType type = meta.getMemberType(name);
         
@@ -385,19 +458,42 @@ public class BaseEntity extends Persistable
                     meta.getClassName() + ". Needed " + DataTypes.INTEGER + ", got: " + 
                     simpleType.getTypeCode());
         
-        data.put(name, value);
+        data.put(name, new GenericBatchValue<Integer>(batch, index, value));
     }
-    
+
+    /**
+     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>.
+     * Uses default <code>Batch</code>.
+     *
+     * @param name name attribute name. Must exist in entity metadata
+     * @param index the index of value
+     * @param value new value of the attribute
+     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
+     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
+     * @throws IllegalStateException if default <code>Batch</code> is not set
+     * @see DataTypes
+     */
+    public void set(String name, long index, Double value)
+    {
+        if (defaultBatch == null)
+        {
+            throw new IllegalStateException("Default Batch is not set.");
+        }
+        set(name, defaultBatch, index, value);
+    }
+
     /**
      * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DOUBLE</code>
      * 
      * @param name name attribute name. Must exist in entity metadata
+     * @param batch information about the origin of this value
+     * @param index the index of value
      * @param value new value of the attribute
      * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
      * 	                                or attribute has type different from <code>DataTypes.DOUBLE</code>
      * @see DataTypes
      */
-    public void set(String name, Double value)
+    public void set(String name, Batch batch, long index, Double value)
     {
     	IMetaType type = meta.getMemberType(name);
         
@@ -416,19 +512,42 @@ public class BaseEntity extends Persistable
                     meta.getClassName() + ". Needed " + DataTypes.DOUBLE + ", got: " + 
                     simpleType.getTypeCode());
         
-        data.put(name, value);
+        data.put(name, new GenericBatchValue<Double>(batch, index, value));
     }
-    
+
+    /**
+     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>.
+     * Uses default <code>Batch</code>.
+     *
+     * @param name name attribute name. Must exist in entity metadata
+     * @param index the index of value
+     * @param value new value of the attribute
+     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
+     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
+     * @throws IllegalStateException if default <code>Batch</code> is not set
+     * @see DataTypes
+     */
+    public void set(String name, long index, Boolean value)
+    {
+        if (defaultBatch == null)
+        {
+            throw new IllegalStateException("Default Batch is not set.");
+        }
+        set(name, defaultBatch, index, value);
+    }
+
     /**
      * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.BOOLEAN</code>
      * 
      * @param name name attribute name. Must exist in entity metadata
+     * @param batch information about the origin of this value
+     * @param index the index of value
      * @param value new value of the attribute
      * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
      * 	                                or attribute has type different from <code>DataTypes.BOOLEAN</code>
      * @see DataTypes
      */
-    public void set(String name, Boolean value)
+    public void set(String name, Batch batch, long index,  Boolean value)
     {
     	IMetaType type = meta.getMemberType(name);
         
@@ -447,19 +566,42 @@ public class BaseEntity extends Persistable
                     meta.getClassName() + ". Needed " + DataTypes.BOOLEAN + ", got: " + 
                     simpleType.getTypeCode());
         
-        data.put(name, value);
+        data.put(name, new GenericBatchValue<Boolean>(batch, index, value));
     }
-    
+
+    /**
+     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>.
+     * Uses default <code>Batch</code>.
+     *
+     * @param name name attribute name. Must exist in entity metadata
+     * @param index the index of value
+     * @param value new value of the attribute
+     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
+     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
+     * @throws IllegalStateException if default <code>Batch</code> is not set
+     * @see DataTypes
+     */
+    public void set(String name, long index, BaseEntity value)
+    {
+        if (defaultBatch == null)
+        {
+            throw new IllegalStateException("Default Batch is not set.");
+        }
+        set(name, defaultBatch, index, value);
+    }
+
     /**
      * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.COMPLEX</code>
      * 
      * @param name name attribute name. Must exist in entity metadata
+     * @param batch information about the origin of this value
+     * @param index the index of value
      * @param value new value of the attribute
      * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
      * 	                                or attribute has type different from <code>DataTypes.COMPLEX</code>
      * @see DataTypes
      */
-    public void set(String name, BaseEntity value)
+    public void set(String name, Batch batch, long index, BaseEntity value)
     {
     	IMetaType type = meta.getMemberType(name);
         
@@ -472,7 +614,7 @@ public class BaseEntity extends Persistable
                     ", is not an object of class. It's a simple value with type " + 
             		((MetaValue)type).getTypeCode());
 
-        data.put(name, value);
+        data.put(name, new GenericBatchValue<BaseEntity>(batch, index, value));
     }
 
     //arrays
@@ -486,7 +628,7 @@ public class BaseEntity extends Persistable
      * 	                                or attribute has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public ArrayList<Date> getDateArray(String name)
+    public ArrayList<IGenericBatchValue> getDateArray(String name)
     {
         IMetaType type = meta.getMemberType(name);
 
@@ -509,15 +651,15 @@ public class BaseEntity extends Persistable
                     meta.getClassName() + ". Needed " + DataTypes.DATE + ", got: " +
                     simpleType.getTypeCode());
 
-        Object obj = data.get(name);
+        ArrayList<IGenericBatchValue> batchValues = dataForArray.get(name);
 
-        if(obj == null)
+        if(batchValues == null)
         {
-            obj = new ArrayList<Date>();
-            data.put(name, obj);
+            batchValues = new ArrayList<IGenericBatchValue>();
+            dataForArray.put(name, batchValues);
         }
 
-        return (ArrayList<Date>)obj;
+        return batchValues;
     }
 
     /**
@@ -529,7 +671,7 @@ public class BaseEntity extends Persistable
      * 	                                or attribute has type different from <code>DataTypes.STRING</code>
      * @see DataTypes
      */
-    public ArrayList<String> getStringArray(String name)
+    public ArrayList<IGenericBatchValue> getStringArray(String name)
     {
         IMetaType type = meta.getMemberType(name);
 
@@ -552,15 +694,15 @@ public class BaseEntity extends Persistable
                     meta.getClassName() + ". Needed " + DataTypes.STRING + ", got: " +
                     simpleType.getTypeCode());
 
-        Object obj = data.get(name);
+        ArrayList<IGenericBatchValue> batchValues = dataForArray.get(name);
 
-        if(obj == null)
+        if(batchValues == null)
         {
-            obj = new ArrayList<String>();
-            data.put(name, obj);
+            batchValues = new ArrayList<IGenericBatchValue>();
+            dataForArray.put(name, batchValues);
         }
 
-        return (ArrayList<String>)obj;
+        return batchValues;
     }
 
     /**
@@ -572,7 +714,7 @@ public class BaseEntity extends Persistable
      * 	                                or attribute has type different from <code>DataTypes.INTEGER</code>
      * @see DataTypes
      */
-    public ArrayList<Integer> getIntegerArray(String name)
+    public List<IGenericBatchValue> getIntegerArray(String name)
     {
         IMetaType type = meta.getMemberType(name);
 
@@ -595,15 +737,15 @@ public class BaseEntity extends Persistable
                     meta.getClassName() + ". Needed " + DataTypes.INTEGER + ", got: " +
                     simpleType.getTypeCode());
 
-        Object obj = data.get(name);
+        ArrayList<IGenericBatchValue> batchValues = dataForArray.get(name);
 
-        if(obj == null)
+        if(batchValues == null)
         {
-            obj = new ArrayList<Integer>();
-            data.put(name, obj);
+            batchValues = new ArrayList<IGenericBatchValue>();
+            dataForArray.put(name, batchValues);
         }
 
-        return (ArrayList<Integer>)obj;
+        return batchValues;
     }
 
     /**
@@ -615,7 +757,7 @@ public class BaseEntity extends Persistable
      * 	                                or attribute has type different from <code>DataTypes.DOUBLE</code>
      * @see DataTypes
      */
-    public ArrayList<Double> getDoubleArray(String name)
+    public List<IGenericBatchValue> getDoubleArray(String name)
     {
         IMetaType type = meta.getMemberType(name);
 
@@ -638,15 +780,15 @@ public class BaseEntity extends Persistable
                     meta.getClassName() + ". Needed " + DataTypes.DOUBLE + ", got: " +
                     simpleType.getTypeCode());
 
-        Object obj = data.get(name);
+        ArrayList<IGenericBatchValue> batchValues = dataForArray.get(name);
 
-        if(obj == null)
+        if(batchValues == null)
         {
-            obj = new ArrayList<Double>();
-            data.put(name, obj);
+            batchValues = new ArrayList<IGenericBatchValue>();
+            dataForArray.put(name, batchValues);
         }
 
-        return (ArrayList<Double>)obj;
+        return batchValues;
     }
 
     /**
@@ -658,7 +800,7 @@ public class BaseEntity extends Persistable
      * 	                                or attribute has type different from <code>DataTypes.BOOLEAN</code>
      * @see DataTypes
      */
-    public ArrayList<Boolean> getBooleanArray(String name)
+    public ArrayList<IGenericBatchValue> getBooleanArray(String name)
     {
         IMetaType type = meta.getMemberType(name);
 
@@ -681,15 +823,15 @@ public class BaseEntity extends Persistable
                     meta.getClassName() + ". Needed " + DataTypes.BOOLEAN + ", got: " +
                     simpleType.getTypeCode());
 
-        Object obj = data.get(name);
+        ArrayList<IGenericBatchValue> batchValues = dataForArray.get(name);
 
-        if(obj == null)
+        if(batchValues == null)
         {
-            obj = new ArrayList<Boolean>();
-            data.put(name, obj);
+            batchValues = new ArrayList<IGenericBatchValue>();
+            dataForArray.put(name, batchValues);
         }
 
-        return (ArrayList<Boolean>)obj;
+        return batchValues;
     }
 
     /**
@@ -701,7 +843,7 @@ public class BaseEntity extends Persistable
      * 	                                or attribute has type different from <code>DataTypes.COMPLEX</code>
      * @see DataTypes
      */
-    public ArrayList<BaseEntity> getComplexArray(String name)
+    public ArrayList<IGenericBatchValue> getComplexArray(String name)
     {
         IMetaType type = meta.getMemberType(name);
 
@@ -718,15 +860,15 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an array");
 
-        Object obj = data.get(name);
+        ArrayList<IGenericBatchValue> batchValues = dataForArray.get(name);
 
-        if(obj == null)
+        if(batchValues == null)
         {
-            obj = new ArrayList<BaseEntity>();
-            data.put(name, obj);
+            batchValues = new ArrayList<IGenericBatchValue>();
+            dataForArray.put(name, batchValues);
         }
 
-        return (ArrayList<BaseEntity>)obj;
+        return batchValues;
     }
 
     public Set<String> getPresentSimpleAttributeNames(DataTypes dataType)
@@ -745,4 +887,5 @@ public class BaseEntity extends Persistable
     public Batch getDefaultBatch() {
         return defaultBatch;
     }
+
 }
