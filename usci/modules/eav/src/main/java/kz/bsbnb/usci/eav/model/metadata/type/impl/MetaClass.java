@@ -62,7 +62,6 @@ public class MetaClass extends AbstractMetaType {
 
     public MetaClass(boolean isKey, boolean isNullable) {
         super(isKey, isNullable);
-        this.className = className;
     }
 
 	public MetaClass(String className, boolean isKey, boolean isNullable) {

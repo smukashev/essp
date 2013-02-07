@@ -11,5 +11,6 @@
   	<module>modules/core</module>
   	<module>modules/parent</module>
   	<module>modules/eav</module>
+    <module>modules/batch</module>
   </modules>
 </project>

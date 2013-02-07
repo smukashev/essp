@@ -18,8 +18,8 @@ import kz.bsbnb.usci.eav.util.SetUtils;
  * @see MetaClass
  * @see DataTypes
  */
-public class BaseEntity extends Persistable {
-	
+public class BaseEntity extends Persistable
+{
     /**
      * Holds data about entity structure
      * @see MetaClass
@@ -60,7 +60,8 @@ public class BaseEntity extends Persistable {
      * @param className the class name.
      * @param defaultBatch information about batch
      */
-    public BaseEntity(String className, Batch defaultBatch) {
+    public BaseEntity(String className, Batch defaultBatch)
+    {
         this(className);
         this.defaultBatch = defaultBatch;
     }
@@ -70,7 +71,8 @@ public class BaseEntity extends Persistable {
      * 
      * @return Object structure
      */
-    public MetaClass getMeta() {
+    public MetaClass getMeta()
+    {
         return meta;
     }
 
@@ -96,29 +98,25 @@ public class BaseEntity extends Persistable {
     {
         IMetaType type = meta.getMemberType(name);
         
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
-        }
-        
-        if(type.isComplex()) {
+
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name + 
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
         
         MetaValue simpleType = (MetaValue)type;
         
-        if(simpleType.getTypeCode() != DataTypes.DATE) {
-            throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded " + DataTypes.DATE + ", got: " + 
+        if(simpleType.getTypeCode() != DataTypes.DATE)
+            throw new IllegalArgumentException("Type mismatch in class: " + 
+                    meta.getClassName() + ". Needed " + DataTypes.DATE + ", got: " + 
                     simpleType.getTypeCode());
-        }
         
         Object obj = data.get(name);
         
-        if(obj == null) {
+        if(obj == null)
             return null;
-        }
         
         return (Date)obj;
     }
@@ -136,29 +134,25 @@ public class BaseEntity extends Persistable {
     {
     	IMetaType type = meta.getMemberType(name);
         
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
-        }
         
-        if(type.isComplex()) {
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name + 
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
         
         MetaValue simpleType = (MetaValue)type;
         
-        if(simpleType.getTypeCode() != DataTypes.STRING) {
-            throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded " + DataTypes.STRING + ", got: " + 
+        if(simpleType.getTypeCode() != DataTypes.STRING)
+            throw new IllegalArgumentException("Type mismatch in class: " + 
+                    meta.getClassName() + ". Needed " + DataTypes.STRING + ", got: " + 
                     simpleType.getTypeCode());
-        }
         
         Object obj = data.get(name);
         
-        if(obj == null) {
+        if(obj == null)
             return null;
-        }
         
         return (String)obj;
     }
@@ -176,29 +170,25 @@ public class BaseEntity extends Persistable {
     {
     	IMetaType type = meta.getMemberType(name);
         
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
-        }
         
-        if(type.isComplex()) {
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name + 
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
         
         MetaValue simpleType = (MetaValue)type;
         
-        if(simpleType.getTypeCode() != DataTypes.INTEGER) {
-            throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded " + DataTypes.INTEGER + ", got: " + 
+        if(simpleType.getTypeCode() != DataTypes.INTEGER)
+            throw new IllegalArgumentException("Type mismatch in class: " + 
+                    meta.getClassName() + ". Needed " + DataTypes.INTEGER + ", got: " + 
                     simpleType.getTypeCode());
-        }
         
         Object obj = data.get(name);
         
-        if(obj == null) {
+        if(obj == null)
             return null;
-        }
         
         return (Integer)obj;
     }
@@ -216,29 +206,25 @@ public class BaseEntity extends Persistable {
     {
     	IMetaType type = meta.getMemberType(name);
         
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
-        }
         
-        if(type.isComplex()) {
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name + 
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
         
         MetaValue simpleType = (MetaValue)type;
         
-        if(simpleType.getTypeCode() != DataTypes.DOUBLE) {
-            throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded " + DataTypes.DOUBLE + ", got: " + 
+        if(simpleType.getTypeCode() != DataTypes.DOUBLE)
+            throw new IllegalArgumentException("Type mismatch in class: " + 
+                    meta.getClassName() + ". Needed " + DataTypes.DOUBLE + ", got: " + 
                     simpleType.getTypeCode());
-        }
         
         Object obj = data.get(name);
         
-        if(obj == null) {
+        if(obj == null)
             return null;
-        }
         
         return (Double)obj;
     }
@@ -256,29 +242,25 @@ public class BaseEntity extends Persistable {
     {
     	IMetaType type = meta.getMemberType(name);
         
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
-        }
         
-        if(type.isComplex()) {
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name + 
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
         
         MetaValue simpleType = (MetaValue)type;
         
-        if(simpleType.getTypeCode() != DataTypes.BOOLEAN) {
-            throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded " + DataTypes.BOOLEAN + ", got: " + 
+        if(simpleType.getTypeCode() != DataTypes.BOOLEAN)
+            throw new IllegalArgumentException("Type mismatch in class: " + 
+                    meta.getClassName() + ". Needed " + DataTypes.BOOLEAN + ", got: " + 
                     simpleType.getTypeCode());
-        }
         
         Object obj = data.get(name);
         
-        if(obj == null) {
+        if(obj == null)
             return null;
-        }
         
         return (Boolean)obj;
     }
@@ -296,23 +278,20 @@ public class BaseEntity extends Persistable {
     {
         IMetaType type = meta.getMemberType(name);
         
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
-        }
         
-        if(!type.isComplex()) {
+        if(!type.isComplex())
             throw new IllegalArgumentException("Type: " + name + 
                     ", is not an object of class. It's a simple value with type " + 
             		((MetaValue)type).getTypeCode());
-        }
         
         Object obj = data.get(name);
         
-        if(obj == null) {
+        if(obj == null)
             return null;
-        }
-        
+
         return (BaseEntity)obj;
     }
     
@@ -329,23 +308,20 @@ public class BaseEntity extends Persistable {
     {
     	IMetaType type = meta.getMemberType(name);
         
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
-        }
         
-        if(type.isComplex()) {
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name + 
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
         
         MetaValue simpleType = (MetaValue)type;
         
-        if(simpleType.getTypeCode() != DataTypes.DATE) {
-            throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded " + DataTypes.DATE + ", got: " + 
+        if(simpleType.getTypeCode() != DataTypes.DATE)
+            throw new IllegalArgumentException("Type mismatch in class: " +
+                    meta.getClassName() + ". Needed " + DataTypes.DATE + ", got: " +
                     simpleType.getTypeCode());
-        }
         
         data.put(name, value);
     }
@@ -363,23 +339,20 @@ public class BaseEntity extends Persistable {
     {
     	IMetaType type = meta.getMemberType(name);
         
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
-        }
         
-        if(type.isComplex()) {
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name + 
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
-        
+
         MetaValue simpleType = (MetaValue)type;
         
-        if(simpleType.getTypeCode() != DataTypes.STRING) {
-            throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded " + DataTypes.STRING + ", got: " + 
+        if(simpleType.getTypeCode() != DataTypes.STRING)
+            throw new IllegalArgumentException("Type mismatch in class: " + 
+                    meta.getClassName() + ". Needed " + DataTypes.STRING + ", got: " + 
                     simpleType.getTypeCode());
-        }
         
         data.put(name, value);
     }
@@ -397,23 +370,20 @@ public class BaseEntity extends Persistable {
     {
     	IMetaType type = meta.getMemberType(name);
         
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
-        }
         
-        if(type.isComplex()) {
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name + 
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
         
         MetaValue simpleType = (MetaValue)type;
         
-        if(simpleType.getTypeCode() != DataTypes.INTEGER) {
-            throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded " + DataTypes.INTEGER + ", got: " + 
+        if(simpleType.getTypeCode() != DataTypes.INTEGER)
+            throw new IllegalArgumentException("Type mismatch in class: " + 
+                    meta.getClassName() + ". Needed " + DataTypes.INTEGER + ", got: " + 
                     simpleType.getTypeCode());
-        }
         
         data.put(name, value);
     }
@@ -431,23 +401,20 @@ public class BaseEntity extends Persistable {
     {
     	IMetaType type = meta.getMemberType(name);
         
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
-        }
         
-        if(type.isComplex()) {
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name + 
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
         
         MetaValue simpleType = (MetaValue)type;
         
-        if(simpleType.getTypeCode() != DataTypes.DOUBLE) {
-            throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded " + DataTypes.DOUBLE + ", got: " + 
+        if(simpleType.getTypeCode() != DataTypes.DOUBLE)
+            throw new IllegalArgumentException("Type mismatch in class: " + 
+                    meta.getClassName() + ". Needed " + DataTypes.DOUBLE + ", got: " + 
                     simpleType.getTypeCode());
-        }
         
         data.put(name, value);
     }
@@ -465,23 +432,20 @@ public class BaseEntity extends Persistable {
     {
     	IMetaType type = meta.getMemberType(name);
         
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
-        }
         
-        if(type.isComplex()) {
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name + 
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
         
         MetaValue simpleType = (MetaValue)type;
         
-        if(simpleType.getTypeCode() != DataTypes.BOOLEAN) {
-            throw new IllegalArgumentException("Type missmatch in class: " + 
-                    meta.getClassName() + ". Nedded " + DataTypes.BOOLEAN + ", got: " + 
+        if(simpleType.getTypeCode() != DataTypes.BOOLEAN)
+            throw new IllegalArgumentException("Type mismatch in class: " + 
+                    meta.getClassName() + ". Needed " + DataTypes.BOOLEAN + ", got: " + 
                     simpleType.getTypeCode());
-        }
         
         data.put(name, value);
     }
@@ -499,17 +463,15 @@ public class BaseEntity extends Persistable {
     {
     	IMetaType type = meta.getMemberType(name);
         
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name + 
                     ", not found in class: " + meta.getClassName());
-        }
         
-        if(!type.isComplex()) {
+        if(!type.isComplex())
             throw new IllegalArgumentException("Type: " + name + 
                     ", is not an object of class. It's a simple value with type " + 
             		((MetaValue)type).getTypeCode());
-        }
-        
+
         data.put(name, value);
     }
 
@@ -528,32 +490,29 @@ public class BaseEntity extends Persistable {
     {
         IMetaType type = meta.getMemberType(name);
 
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
-        }
 
-        if(type.isComplex()) {
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name +
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
 
-        if(!type.isArray()) {
+        if(!type.isArray())
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an array");
-        }
 
         MetaValueArray simpleType = (MetaValueArray)type;
 
-        if(simpleType.getTypeCode() != DataTypes.DATE) {
-            throw new IllegalArgumentException("Type missmatch in class: " +
-                    meta.getClassName() + ". Nedded " + DataTypes.DATE + ", got: " +
+        if(simpleType.getTypeCode() != DataTypes.DATE)
+            throw new IllegalArgumentException("Type mismatch in class: " +
+                    meta.getClassName() + ". Needed " + DataTypes.DATE + ", got: " +
                     simpleType.getTypeCode());
-        }
 
         Object obj = data.get(name);
 
-        if(obj == null) {
+        if(obj == null)
+        {
             obj = new ArrayList<Date>();
             data.put(name, obj);
         }
@@ -574,32 +533,29 @@ public class BaseEntity extends Persistable {
     {
         IMetaType type = meta.getMemberType(name);
 
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
-        }
 
-        if(type.isComplex()) {
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name +
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
 
-        if(!type.isArray()) {
+        if(!type.isArray())
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an array");
-        }
 
         MetaValueArray simpleType = (MetaValueArray)type;
 
-        if(simpleType.getTypeCode() != DataTypes.STRING) {
-            throw new IllegalArgumentException("Type missmatch in class: " +
-                    meta.getClassName() + ". Nedded " + DataTypes.STRING + ", got: " +
+        if(simpleType.getTypeCode() != DataTypes.STRING)
+            throw new IllegalArgumentException("Type mismatch in class: " +
+                    meta.getClassName() + ". Needed " + DataTypes.STRING + ", got: " +
                     simpleType.getTypeCode());
-        }
 
         Object obj = data.get(name);
 
-        if(obj == null) {
+        if(obj == null)
+        {
             obj = new ArrayList<String>();
             data.put(name, obj);
         }
@@ -620,32 +576,29 @@ public class BaseEntity extends Persistable {
     {
         IMetaType type = meta.getMemberType(name);
 
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
-        }
 
-        if(type.isComplex()) {
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name +
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
 
-        if(!type.isArray()) {
+        if(!type.isArray())
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an array");
-        }
 
         MetaValueArray simpleType = (MetaValueArray)type;
 
-        if(simpleType.getTypeCode() != DataTypes.INTEGER) {
-            throw new IllegalArgumentException("Type missmatch in class: " +
-                    meta.getClassName() + ". Nedded " + DataTypes.INTEGER + ", got: " +
+        if(simpleType.getTypeCode() != DataTypes.INTEGER)
+            throw new IllegalArgumentException("Type mismatch in class: " +
+                    meta.getClassName() + ". Needed " + DataTypes.INTEGER + ", got: " +
                     simpleType.getTypeCode());
-        }
 
         Object obj = data.get(name);
 
-        if(obj == null) {
+        if(obj == null)
+        {
             obj = new ArrayList<Integer>();
             data.put(name, obj);
         }
@@ -666,32 +619,29 @@ public class BaseEntity extends Persistable {
     {
         IMetaType type = meta.getMemberType(name);
 
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
-        }
 
-        if(type.isComplex()) {
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name +
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
 
-        if(!type.isArray()) {
+        if(!type.isArray())
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an array");
-        }
 
         MetaValueArray simpleType = (MetaValueArray)type;
 
-        if(simpleType.getTypeCode() != DataTypes.DOUBLE) {
-            throw new IllegalArgumentException("Type missmatch in class: " +
-                    meta.getClassName() + ". Nedded " + DataTypes.DOUBLE + ", got: " +
+        if(simpleType.getTypeCode() != DataTypes.DOUBLE)
+            throw new IllegalArgumentException("Type mismatch in class: " +
+                    meta.getClassName() + ". Needed " + DataTypes.DOUBLE + ", got: " +
                     simpleType.getTypeCode());
-        }
 
         Object obj = data.get(name);
 
-        if(obj == null) {
+        if(obj == null)
+        {
             obj = new ArrayList<Double>();
             data.put(name, obj);
         }
@@ -712,32 +662,29 @@ public class BaseEntity extends Persistable {
     {
         IMetaType type = meta.getMemberType(name);
 
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
-        }
 
-        if(type.isComplex()) {
+        if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name +
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        }
 
-        if(!type.isArray()) {
+        if(!type.isArray())
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an array");
-        }
 
         MetaValueArray simpleType = (MetaValueArray)type;
 
-        if(simpleType.getTypeCode() != DataTypes.BOOLEAN) {
-            throw new IllegalArgumentException("Type missmatch in class: " +
-                    meta.getClassName() + ". Nedded " + DataTypes.BOOLEAN + ", got: " +
+        if(simpleType.getTypeCode() != DataTypes.BOOLEAN)
+            throw new IllegalArgumentException("Type mismatch in class: " +
+                    meta.getClassName() + ". Needed " + DataTypes.BOOLEAN + ", got: " +
                     simpleType.getTypeCode());
-        }
 
         Object obj = data.get(name);
 
-        if(obj == null) {
+        if(obj == null)
+        {
             obj = new ArrayList<Boolean>();
             data.put(name, obj);
         }
@@ -758,25 +705,23 @@ public class BaseEntity extends Persistable {
     {
         IMetaType type = meta.getMemberType(name);
 
-        if(type == null) {
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
-        }
 
-        if(!type.isComplex()) {
+        if(!type.isComplex())
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an object of class. It's a simple value with type " +
                     ((MetaValue)type).getTypeCode());
-        }
 
-        if(!type.isArray()) {
+        if(!type.isArray())
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an array");
-        }
 
         Object obj = data.get(name);
 
-        if(obj == null) {
+        if(obj == null)
+        {
             obj = new ArrayList<BaseEntity>();
             data.put(name, obj);
         }
@@ -784,20 +729,20 @@ public class BaseEntity extends Persistable {
         return (ArrayList<BaseEntity>)obj;
     }
 
-    public Set<String> getPresentSimpleAttributeNames(DataTypes dataType) {
-        if (!this.meta.isComplex()) {
+    public Set<String> getPresentSimpleAttributeNames(DataTypes dataType)
+    {
+        if (!this.meta.isComplex())
             throw new UnsupportedOperationException("Simple types can be contained only in complex types.");
-        }
 
         return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), data.keySet());
     }
 
-    public Set<String> getPresentDateAttributeNames() {
+    public Set<String> getPresentDateAttributeNames()
+    {
         return getPresentSimpleAttributeNames(DataTypes.DATE);
     }
 
     public Batch getDefaultBatch() {
         return defaultBatch;
     }
-
 }

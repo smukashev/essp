@@ -11,8 +11,8 @@ import java.sql.Timestamp;
  *
  * @author a.motov
  */
-public class Batch extends Persistable {
-
+public class Batch extends Persistable
+{
     /**
      * Date and time of receipt of the batch.
      */
@@ -21,7 +21,8 @@ public class Batch extends Persistable {
     /**
      * Initializes batch with the default values.
      */
-    public Batch() {
+    public Batch()
+    {
     }
 
     /**
@@ -29,20 +30,24 @@ public class Batch extends Persistable {
      *
      * @param receiptDate the date and time of receipt of the batch.
      */
-    public Batch(Timestamp receiptDate) {
+    public Batch(Timestamp receiptDate)
+    {
         this.receiptDate = receiptDate;
     }
 
-    public void setReceiptDate(Timestamp receiptDate) {
+    public void setReceiptDate(Timestamp receiptDate)
+    {
         this.receiptDate = receiptDate;
     }
 
-    public Timestamp getReceiptDate() {
+    public Timestamp getReceiptDate()
+    {
         return receiptDate;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
         if (this == o) return true;
         if (!(o instanceof Batch)) return false;
         if (!super.equals(o)) return false;
@@ -55,7 +60,8 @@ public class Batch extends Persistable {
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         int result = super.hashCode();
         result = 31 * result + receiptDate.hashCode();
         return result;

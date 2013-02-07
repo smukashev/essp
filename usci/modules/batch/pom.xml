@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>kz.bsbnb</groupId>
+    <groupId>kz.bsbnb.usci</groupId>
     <artifactId>batch</artifactId>
     <version>1.0</version>
 
@@ -74,6 +74,11 @@
             <groupId>org.springframework.batch</groupId>
             <artifactId>spring-batch-core</artifactId>
             <version>${spring.batch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>kz.bsbnb.usci</groupId>
+            <artifactId>eav</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
     

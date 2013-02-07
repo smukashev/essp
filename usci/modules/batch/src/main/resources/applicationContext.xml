@@ -22,4 +22,7 @@
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
+    <!-- helpers -->
+    <bean id="fileHelper" class="kz.bsbnb.batch.helper.impl.FileHelper" />
+
 </beans>
