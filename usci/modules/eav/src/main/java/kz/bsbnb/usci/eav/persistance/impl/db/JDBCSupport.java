@@ -69,7 +69,7 @@ public class JDBCSupport {
         return counts;
     }
 
-    protected List<Map<String, Object>> queryForList(String sql, Object... args) {
+    protected List<Map<String, Object>> queryForListWithStats(String sql, Object... args) {
         long t = 0;
         if(sqlStats != null)
         {

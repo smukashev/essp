@@ -26,13 +26,24 @@ public class BaseEntity extends Persistable {
      */
     private MetaClass meta;
 
-    private Batch batch;
+    /**
+     * <code>Batch</code> that is used by default when adding values.
+     */
+    private Batch defaultBatch = null;
     
     /**
      * Holds attributes values
      */
     private HashMap<String, Object> data = new HashMap<String, Object>();
-    
+
+    /**
+     * Initializes entity.
+     */
+    public BaseEntity()
+    {
+
+    }
+
     /**
      * Initializes entity with a class name.
      * 
@@ -47,11 +58,11 @@ public class BaseEntity extends Persistable {
      * Initializes entity with a class name and batch information.
      *
      * @param className the class name.
-     * @param batch information about batch
+     * @param defaultBatch information about batch
      */
-    public BaseEntity(String className, Batch batch) {
+    public BaseEntity(String className, Batch defaultBatch) {
         this(className);
-        this.batch = batch;
+        this.defaultBatch = defaultBatch;
     }
 
     /**
@@ -61,6 +72,15 @@ public class BaseEntity extends Persistable {
      */
     public MetaClass getMeta() {
         return meta;
+    }
+
+    /**
+     * Used to set object structure description.
+     *
+     * @param meta Object structure
+     */
+    public void setMeta(MetaClass meta) {
+        this.meta = meta;
     }
 
     /**
@@ -776,8 +796,8 @@ public class BaseEntity extends Persistable {
         return getPresentSimpleAttributeNames(DataTypes.DATE);
     }
 
-    public Batch getBatch() {
-        return batch;
+    public Batch getDefaultBatch() {
+        return defaultBatch;
     }
 
 }
