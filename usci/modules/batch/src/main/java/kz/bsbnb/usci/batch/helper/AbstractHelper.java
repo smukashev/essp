@@ -1,4 +1,4 @@
-package kz.bsbnb.batch.helper;
+package kz.bsbnb.usci.batch.helper;
 
 /**
  * @author k.tulbassiyev

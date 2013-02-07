@@ -1,6 +1,6 @@
-package kz.bsbnb.batch.helper.impl;
+package kz.bsbnb.usci.batch.helper.impl;
 
-import kz.bsbnb.batch.helper.AbstractHelper;
+import kz.bsbnb.usci.batch.helper.AbstractHelper;
 
 import java.io.File;
 import java.io.FileInputStream;

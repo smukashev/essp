@@ -1,6 +1,6 @@
-package kz.bsbnb.batch.parser;
+package kz.bsbnb.usci.batch.parser;
 
-import kz.bsbnb.batch.common.Global;
+import kz.bsbnb.usci.batch.common.Global;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;

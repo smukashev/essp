@@ -1,7 +1,6 @@
-package kz.bsbnb.batch.parser.impl;
+package kz.bsbnb.usci.batch.parser.impl;
 
-import kz.bsbnb.batch.exception.UnknownTagException;
-import kz.bsbnb.batch.parser.AbstractParser;
+import kz.bsbnb.usci.batch.parser.AbstractParser;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
@@ -41,7 +40,7 @@ public class EntityParser extends AbstractParser
             EntityParser entityParser = new EntityParser();
 
             entityParser.parse(xmlReader, this, attributes.getValue("class"),
-                    new BaseEntity(attributes.getValue("class")));
+                    new BaseEntity(""));
         }
         else
         {

@@ -11,7 +11,8 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import java.util.ArrayList;
 import java.util.Random;
 
-class MetaDataGenerator {
+class MetaDataGenerator
+{
     private Random rand = new Random();
 
     private int maxAttributes = 25;
@@ -30,7 +31,8 @@ class MetaDataGenerator {
 
     private ArrayList<MetaClass> metaClasses = new ArrayList<MetaClass>();
 
-    public MetaDataGenerator(int maxAttributes, int maxRecursion) {
+    public MetaDataGenerator(int maxAttributes, int maxRecursion)
+    {
         this.maxAttributes = maxAttributes;
         this.maxRecursion = maxRecursion;
     }
@@ -43,9 +45,7 @@ class MetaDataGenerator {
         if(switcher == 0 || switcher == 2)
         {
             if(rand.nextInt(3) != 2)
-            {
                 switcher = 3;
-            }
         }
 
         if(rec > maxRecursion)
@@ -63,8 +63,9 @@ class MetaDataGenerator {
                 break;
             case 1:
                 //simple array
-                MetaValueArray a = new MetaValueArray(DataTypes.values()[rand.nextInt(DataTypes.values().length)], rand.nextBoolean(),
-                        rand.nextBoolean());
+                MetaValueArray a = new MetaValueArray(DataTypes.values()[rand.nextInt(DataTypes.values().length)],
+                        rand.nextBoolean(), rand.nextBoolean());
+
                 a.setArrayKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
 
                 type = a;
@@ -119,7 +120,8 @@ class MetaDataGenerator {
         System.out.println("Complex type arrays: " + complexTypeArrayCount);
     }
 
-    public ArrayList<MetaClass> getMetaClasses() {
+    public ArrayList<MetaClass> getMetaClasses()
+    {
         return metaClasses;
     }
 }

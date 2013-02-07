@@ -28,17 +28,15 @@ public class SQLQueriesStats {
             qe.count++;
             qe.totalTime += time;
             if(time > qe.maxTime)
-            {
                 qe.maxTime = time;
-            }
+
             if(time < qe.minTime)
-            {
                 qe.minTime = time;
-            }
         }
     }
 
-    public HashMap<String, QueryEntry> getStats() {
+    public HashMap<String, QueryEntry> getStats()
+    {
         return stats;
     }
 }

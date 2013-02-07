@@ -10,7 +10,7 @@
        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
     <context:annotation-config/>
-    <context:component-scan base-package="kz.bsbnb.batch"/>
+    <context:component-scan base-package="kz.bsbnb.usci.batch"/>
     <context:property-placeholder location="classpath:properties/jdbc.properties"/>
 
     <import resource="classpath:database/dataSource.xml" />
@@ -23,6 +23,6 @@
     </bean>
 
     <!-- helpers -->
-    <bean id="fileHelper" class="kz.bsbnb.batch.helper.impl.FileHelper" />
+    <bean id="fileHelper" class="kz.bsbnb.usci.batch.helper.impl.FileHelper" />
 
 </beans>

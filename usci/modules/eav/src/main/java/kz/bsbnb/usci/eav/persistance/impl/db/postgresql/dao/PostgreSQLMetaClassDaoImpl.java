@@ -13,7 +13,6 @@ import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -98,9 +97,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         if(metaClass.getId() < 1)
         {
             if(metaClass.getClassName() == null)
-            {
                 throw new IllegalArgumentException("Meta class does not have name or id. Can't load.");
-            }
 
             if(beginDateStrict)
             {

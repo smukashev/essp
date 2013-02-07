@@ -6,7 +6,8 @@ package kz.bsbnb.usci.eav.model.metadata;
  * @author a.tkachenko
  * @version 1.0, 17.01.2013
  */
-public enum DataTypes {
+public enum DataTypes
+{
     INTEGER,
     DATE,
     STRING,

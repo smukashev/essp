@@ -1,4 +1,4 @@
-package kz.bsbnb.batch.exception;
+package kz.bsbnb.usci.batch.exception;
 
 import org.xml.sax.SAXException;
 

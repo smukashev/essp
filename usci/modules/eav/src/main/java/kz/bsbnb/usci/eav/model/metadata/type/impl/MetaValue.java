@@ -8,7 +8,8 @@ import kz.bsbnb.usci.eav.model.metadata.DataTypes;
  * @author a.tkachenko
  * @version 1.1, 17.01.2013
  */
-public class MetaValue extends AbstractMetaType {
+public class MetaValue extends AbstractMetaType
+{
 	/**
 	 * Attributes type's code
 	 */
@@ -30,7 +31,8 @@ public class MetaValue extends AbstractMetaType {
         this.typeCode = typeCode;
     }
     
-	public DataTypes getTypeCode() {
+	public DataTypes getTypeCode()
+    {
         return typeCode;
     }
 
@@ -38,11 +40,13 @@ public class MetaValue extends AbstractMetaType {
      * 
      * @param type attributes type code
      */
-    public void setTypeCode(DataTypes type) {
+    public void setTypeCode(DataTypes type)
+    {
         this.typeCode = type;
     }
 
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj)
+    {
 		if (obj == this)
 			return true;
 
@@ -61,12 +65,14 @@ public class MetaValue extends AbstractMetaType {
 	}
 
 	@Override
-	public boolean isArray() {
+	public boolean isArray()
+    {
 		return false;
 	}
 
 	@Override
-	public boolean isComplex() {
+	public boolean isComplex()
+    {
 		return false;
 	}
 }

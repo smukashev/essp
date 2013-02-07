@@ -1,4 +1,4 @@
-package kz.bsbnb.batch.common;
+package kz.bsbnb.usci.batch.common;
 
 /**
  * @author k.tulbassiyev

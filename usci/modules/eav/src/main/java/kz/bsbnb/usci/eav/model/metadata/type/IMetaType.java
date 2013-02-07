@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.eav.model.metadata.type;
 
-public interface IMetaType {
-
+public interface IMetaType
+{
 	/**
 	 * 
 	 * @return <code>true</code>, when attribute is a key attribute 

@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.model.metadata.type.impl;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -275,5 +274,4 @@ public class MetaClass extends AbstractMetaType {
     public Set<String> getStringAttributeNames() {
         return getSimpleAttributesNames(DataTypes.STRING);
     }
-
 }

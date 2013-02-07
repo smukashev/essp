@@ -1,21 +1,25 @@
 package kz.bsbnb.usci.eav.persistance;
 
-public class Persistable {
+public class Persistable
+{
 	/**
 	 * id fields value of the persisted object
 	 */
 	protected long id = 0;
 
-	public long getId() {
+	public long getId()
+    {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(long id)
+    {
 		this.id = id;
 	}
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
         if (this == o) return true;
         if (!(o instanceof Persistable)) return false;
 
@@ -27,8 +31,8 @@ public class Persistable {
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return (int) (id ^ (id >>> 32));
     }
-
 }

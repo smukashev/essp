@@ -44,6 +44,16 @@ public class BaseEntity extends Persistable
     }
 
     /**
+     * Initializes entity with a class name.
+     *
+     * @param meta MetaClass of the entity..
+     */
+    public BaseEntity(MetaClass meta)
+    {
+        this.meta = meta;
+    }
+
+    /**
      * Initializes entity with a class name and batch information.
      *
      * @param className the class name.
