@@ -188,7 +188,7 @@ public class BaseEntity extends Persistable
                     meta.getClassName() + ". Needed " + DataTypes.DATE + ", got: " +
                     simpleType.getTypeCode());*/
 
-        data.put(name, new GenericBatchValue<T>(batch, index, value));
+        data.put(name, new GenericBatchValue(batch, index, value));
     }
 
     //arrays
