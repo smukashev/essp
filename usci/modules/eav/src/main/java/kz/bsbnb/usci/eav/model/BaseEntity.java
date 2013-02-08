@@ -111,11 +111,11 @@ public class BaseEntity extends Persistable
      * 	                                or attribute has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public <T> T getGenericValue(String name)
+    public IGenericBatchValue getGenericValue(String name)
     {
         IMetaType type = meta.getMemberType(name);
 
-        if(type == null)
+        /*if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
@@ -128,14 +128,14 @@ public class BaseEntity extends Persistable
         if(simpleType.getTypeCode() != DataTypes.STRING)
             throw new IllegalArgumentException("Type mismatch in class: " +
                     meta.getClassName() + ". Needed " + DataTypes.STRING + ", got: " +
-                    simpleType.getTypeCode());
+                    simpleType.getTypeCode());*/
 
-        IGenericBatchValue<T> batchValue = data.get(name);
+        IGenericBatchValue batchValue = data.get(name);
 
         if(batchValue == null)
             return null;
 
-        return batchValue.getValue();
+        return batchValue;
     }
 
     /**
@@ -173,7 +173,7 @@ public class BaseEntity extends Persistable
     {
         IMetaType type = meta.getMemberType(name);
 
-        if(type == null)
+        /*if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
@@ -186,7 +186,7 @@ public class BaseEntity extends Persistable
         if(simpleType.getTypeCode() != DataTypes.DATE)
             throw new IllegalArgumentException("Type mismatch in class: " +
                     meta.getClassName() + ". Needed " + DataTypes.DATE + ", got: " +
-                    simpleType.getTypeCode());
+                    simpleType.getTypeCode());*/
 
         data.put(name, new GenericBatchValue<T>(batch, index, value));
     }

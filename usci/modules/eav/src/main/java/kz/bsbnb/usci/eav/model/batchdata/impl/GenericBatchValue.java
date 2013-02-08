@@ -6,9 +6,8 @@ import kz.bsbnb.usci.eav.model.batchdata.IGenericBatchValue;
 /**
  * @author a.motov
  */
-public class GenericBatchValue<T>
-        implements IGenericBatchValue<T> {
-
+public class GenericBatchValue implements IGenericBatchValue
+{
     private long index;
 
     /**
@@ -19,7 +18,7 @@ public class GenericBatchValue<T>
     /**
      * The value can be a simple type, an array or a complex type.
      */
-    private T value;
+    private Object value;
 
     /**
      * Initializes batch value with a batch information, index and value.
@@ -28,41 +27,45 @@ public class GenericBatchValue<T>
      * @param value the value. May be is null.
      * @throws IllegalArgumentException if <code>Batch</code> is null or <code>Batch</code> has no id
      */
-    public GenericBatchValue(Batch batch, long index, T value) {
-        if (batch == null) {
+    public GenericBatchValue(Batch batch, long index, Object value) {
+        /*if (batch == null) {
             throw new IllegalArgumentException("Batch is null. Initialization of the GenericBatchValue ​​is not possible.");
         }
         if (batch.getId() < 0) {
             throw new IllegalArgumentException("Batch has no id. Initialization of the GenericBatchValue ​​is not possible.");
-        }
+        }*/
 
         this.batch = batch;
         this.value = value;
     }
 
     @Override
-    public Batch getBatch() {
+    public Batch getBatch()
+    {
         return batch;
     }
 
     @Override
-    public long getIndex() {
+    public long getIndex()
+    {
         return index;
     }
 
     @Override
-    public void setIndex(long index) {
+    public void setIndex(long index)
+    {
         this.index = index;
     }
 
     @Override
-    public T getValue() {
+    public Object getValue()
+    {
         return value;
     }
 
     @Override
-    public void setValue(T value) {
+    public void setValue(Object value)
+    {
         this.value = value;
     }
-
 }

@@ -5,8 +5,8 @@ import kz.bsbnb.usci.eav.model.Batch;
 /**
  * @author a.motov
  */
-public interface IGenericBatchValue<T> {
-
+public interface IGenericBatchValue
+{
     /**
      * Returns the <code>Batch</code> that contains information about the origin of this value.
      * @return <code>Batch</code> that contains information about the origin of this value.
@@ -32,8 +32,8 @@ public interface IGenericBatchValue<T> {
      * @see kz.bsbnb.usci.eav.model.metadata.DataTypes
      * @see kz.bsbnb.usci.eav.model.BaseEntity
      */
-    public T getValue();
+    public Object getValue();
 
-    public void setValue(T value);
+    public void setValue(Object value);
 
 }

@@ -22,7 +22,7 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
  */
 public class BaseEntityTest {
     
-    public BaseEntityTest() {
+/*    public BaseEntityTest() {
     }
 
     @Test
@@ -288,5 +288,5 @@ public class BaseEntityTest {
         if(!pass) {
             fail("Gives Boolean with illegal type");
         }
-    }
+    }*/
 }
