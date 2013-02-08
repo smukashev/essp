@@ -29,13 +29,13 @@ public class BatchValue implements IBatchValue
      */
     public BatchValue(Batch batch, long index, Object value)
     {
-        if (batch == null)
+        /*if (batch == null)
             throw new IllegalArgumentException
                     ("Batch is null. Initialization of the BatchValue ​​is not possible.");
 
         if (batch.getId() < 0)
             throw new IllegalArgumentException
-                    ("Batch has no id. Initialization of the BatchValue ​​is not possible.");
+                    ("Batch has no id. Initialization of the BatchValue ​​is not possible.");*/
 
 
         this.batch = batch;

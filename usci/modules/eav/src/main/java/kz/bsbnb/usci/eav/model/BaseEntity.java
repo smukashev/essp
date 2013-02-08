@@ -114,7 +114,7 @@ public class BaseEntity extends Persistable
     {
         IMetaType type = meta.getMemberType(name);
 
-        if(type == null)
+        /*if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
@@ -127,7 +127,7 @@ public class BaseEntity extends Persistable
         if(simpleType.getTypeCode() != DataTypes.STRING)
             throw new IllegalArgumentException("Type mismatch in class: " +
                     meta.getClassName() + ". Needed " + DataTypes.STRING + ", got: " +
-                    simpleType.getTypeCode());
+                    simpleType.getTypeCode());*/
 
         IBatchValue batchValue = data.get(name);
 
@@ -151,8 +151,8 @@ public class BaseEntity extends Persistable
      */
     public <T> void set(String name, long index, T value)
     {
-        if (defaultBatch == null)
-            throw new IllegalStateException("Default Batch is not set.");
+        /*if (defaultBatch == null)
+            throw new IllegalStateException("Default Batch is not set.");*/
 
         set(name, defaultBatch, index, value);
     }
@@ -172,7 +172,7 @@ public class BaseEntity extends Persistable
     {
         IMetaType type = meta.getMemberType(name);
 
-        if(type == null)
+        /*if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
@@ -185,7 +185,7 @@ public class BaseEntity extends Persistable
         if(simpleType.getTypeCode() != DataTypes.DATE)
             throw new IllegalArgumentException("Type mismatch in class: " +
                     meta.getClassName() + ". Needed " + DataTypes.DATE + ", got: " +
-                    simpleType.getTypeCode());
+                    simpleType.getTypeCode());*/
 
         data.put(name, new BatchValue(batch, index, value));
     }
@@ -205,7 +205,7 @@ public class BaseEntity extends Persistable
     {
         IMetaType type = meta.getMemberType(name);
 
-        if(type == null)
+        /*if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
@@ -216,7 +216,7 @@ public class BaseEntity extends Persistable
         if(!type.isArray())
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an array");
-
+*/
         ArrayList<IBatchValue> batchValues = dataForArray.get(name);
 
         if(batchValues == null)

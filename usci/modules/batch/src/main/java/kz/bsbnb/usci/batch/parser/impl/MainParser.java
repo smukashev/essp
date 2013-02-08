@@ -110,7 +110,6 @@ public class MainParser extends AbstractParser
                 {
                     parentEntity = stack.peek();
                 }
-
             }
             catch(EmptyStackException ex)
             {
