@@ -46,12 +46,12 @@ public class BaseEntityTest {
         instance.set("testComplex", new Batch(), 1, expResult);
         
         
-        BaseEntity result = instance.getGenericValue("testComplex"); //instance.getComplex("testComplex");
+        BaseEntity result = instance.getBatchValue("testComplex"); //instance.getComplex("testComplex");
         assertEquals(expResult, result);
         
         boolean pass = false;
         try {
-            instance.getGenericValue("uknownName");
+            instance.getBatchValue("uknownName");
             //instance.getComplex("unknownName");
         }
         catch(IllegalArgumentException e)
@@ -65,7 +65,7 @@ public class BaseEntityTest {
         
         pass = false;
         try {
-            instance.getGenericValue("testNotComplex");
+            instance.getBatchValue("testNotComplex");
             // instance.getComplex("testNotComplex");
         }
         catch(IllegalArgumentException e)
@@ -91,13 +91,13 @@ public class BaseEntityTest {
         
         
         // Date result = instance.getDate("testDate");
-        Date result = instance.getGenericValue("testDate");
+        Date result = instance.getBatchValue("testDate");
         assertEquals(expResult, result);
         
         boolean pass = false;
         try {
             // instance.getDate("unknownName");
-            instance.getGenericValue("unknownName");
+            instance.getBatchValue("unknownName");
         }
         catch(IllegalArgumentException e)
         {
@@ -110,7 +110,7 @@ public class BaseEntityTest {
         
         pass = false;
         try {
-            instance.getGenericValue("testNotDate");
+            instance.getBatchValue("testNotDate");
         }
         catch(IllegalArgumentException e)
         {
@@ -134,12 +134,12 @@ public class BaseEntityTest {
         instance.set("testInteger", new Batch(), 1, expResult);
         
         
-        Integer result = instance.getGenericValue("testInteger");
+        Integer result = instance.getBatchValue("testInteger");
         assertEquals(expResult, result);
         
         boolean pass = false;
         try {
-            instance.getGenericValue("unknownName");
+            instance.getBatchValue("unknownName");
         }
         catch(IllegalArgumentException e)
         {
@@ -152,7 +152,7 @@ public class BaseEntityTest {
         
         pass = false;
         try {
-            instance.getGenericValue("testNotInteger");
+            instance.getBatchValue("testNotInteger");
         }
         catch(IllegalArgumentException e)
         {
@@ -176,12 +176,12 @@ public class BaseEntityTest {
         instance.set("testString", new Batch(), 1, expResult);
         
         
-        String result = instance.getGenericValue("testString");
+        String result = instance.getBatchValue("testString");
         assertEquals(expResult, result);
         
         boolean pass = false;
         try {
-            instance.getGenericValue("unknownName");
+            instance.getBatchValue("unknownName");
         }
         catch(IllegalArgumentException e)
         {
@@ -194,7 +194,7 @@ public class BaseEntityTest {
         
         pass = false;
         try {
-            instance.getGenericValue("testNotDate");
+            instance.getBatchValue("testNotDate");
         }
         catch(IllegalArgumentException e)
         {
@@ -218,12 +218,12 @@ public class BaseEntityTest {
         instance.set("testDouble", new Batch(), 1, expResult);
         
         
-        Double result = instance.getGenericValue("testDouble");
+        Double result = instance.getBatchValue("testDouble");
         assertEquals(expResult, result);
         
         boolean pass = false;
         try {
-            instance.getGenericValue("unknownName");
+            instance.getBatchValue("unknownName");
         }
         catch(IllegalArgumentException e)
         {
@@ -236,7 +236,7 @@ public class BaseEntityTest {
         
         pass = false;
         try {
-            instance.getGenericValue("testNotDate");
+            instance.getBatchValue("testNotDate");
         }
         catch(IllegalArgumentException e)
         {
@@ -260,12 +260,12 @@ public class BaseEntityTest {
         instance.set("testBoolean", new Batch(), 1, expResult);
         
         
-        Boolean result = instance.getGenericValue("testBoolean");
+        Boolean result = instance.getBatchValue("testBoolean");
         assertEquals(expResult, result);
         
         boolean pass = false;
         try {
-            instance.getGenericValue("unknownName");
+            instance.getBatchValue("unknownName");
         }
         catch(IllegalArgumentException e)
         {
@@ -278,7 +278,7 @@ public class BaseEntityTest {
         
         pass = false;
         try {
-            instance.getGenericValue("testNotDate");
+            instance.getBatchValue("testNotDate");
         }
         catch(IllegalArgumentException e)
         {

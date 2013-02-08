@@ -110,7 +110,7 @@ public class BaseEntity extends Persistable
      * 	                                or attribute has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public IBatchValue getGenericValue(String name)
+    public IBatchValue getBatchValue(String name)
     {
         IMetaType type = meta.getMemberType(name);
 
@@ -180,12 +180,18 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name +
                     ", is an object of class: " + ((MetaClass)type).getClassName());
 
-        MetaValue simpleType = (MetaValue)type;
+        if (value != null)
+        {
+            MetaValue simpleType = (MetaValue)type;
 
-        if(simpleType.getTypeCode() != DataTypes.DATE)
-            throw new IllegalArgumentException("Type mismatch in class: " +
-                    meta.getClassName() + ". Needed " + DataTypes.DATE + ", got: " +
-                    simpleType.getTypeCode());
+            Class<?> valueClass = value.getClass();
+            Class<?> expValueClass = simpleType.getTypeCode().getDataTypeClass();
+
+            if(!expValueClass.isAssignableFrom(valueClass))
+                throw new IllegalArgumentException("Type mismatch in class: " +
+                        meta.getClassName() + ". Needed " + expValueClass + ", got: " +
+                        valueClass);
+        }
 
         data.put(name, new BatchValue(batch, index, value));
     }
@@ -201,7 +207,7 @@ public class BaseEntity extends Persistable
      * 	                                or attribute has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public ArrayList<IBatchValue> getGenericArray(String name)
+    public ArrayList<IBatchValue> getBatchValueArray(String name)
     {
         IMetaType type = meta.getMemberType(name);
 
