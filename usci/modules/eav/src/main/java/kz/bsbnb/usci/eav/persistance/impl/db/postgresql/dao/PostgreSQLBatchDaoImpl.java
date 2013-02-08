@@ -112,7 +112,7 @@ public class PostgreSQLBatchDaoImpl extends JDBCSupport
 
     private void loadBatch(Batch batch) {
         logger.debug(SELECT_BATCH_BY_ID_SQL);
-        List<Map<String, Object>> rows = queryForList(SELECT_BATCH_BY_ID_SQL, batch.getId());
+        List<Map<String, Object>> rows = queryForListWithStats(SELECT_BATCH_BY_ID_SQL, batch.getId());
 
         if (rows.size() > 1)
         {
