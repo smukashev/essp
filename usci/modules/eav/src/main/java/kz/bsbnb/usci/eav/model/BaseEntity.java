@@ -122,13 +122,6 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name +
                     ", is an object of class: " + ((MetaClass)type).getClassName());
 
-        MetaValue simpleType = (MetaValue)type;
-
-        if(simpleType.getTypeCode() != DataTypes.STRING)
-            throw new IllegalArgumentException("Type mismatch in class: " +
-                    meta.getClassName() + ". Needed " + DataTypes.STRING + ", got: " +
-                    simpleType.getTypeCode());
-
         IBatchValue batchValue = data.get(name);
 
         if(batchValue == null)
@@ -151,8 +144,8 @@ public class BaseEntity extends Persistable
      */
     public <T> void set(String name, long index, T value)
     {
-        if (defaultBatch == null)
-            throw new IllegalStateException("Default Batch is not set.");
+        /*if (defaultBatch == null)
+            throw new IllegalStateException("Default Batch is not set.");*/
 
         set(name, defaultBatch, index, value);
     }

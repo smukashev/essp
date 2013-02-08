@@ -21,40 +21,15 @@ public class Main
 {
     static Logger logger = Logger.getLogger(Main.class);
 
-    static class First<T>
-    {
-        T value;
-
-        public First(T value)
-        {
-            this.value = value;
-        }
-
-        public T getValue() {
-            return value;
-        }
-
-        public void setValue(T value) {
-            this.value = value;
-        }
-    }
-
     public static void main(String args[]) throws IOException, SAXException
     {
-        /*ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 
         FileHelper fileHelper = (FileHelper) ctx.getBean("fileHelper");
 
         MainParser mainParser = new MainParser(
                 fileHelper.getFileBytes(new File("/opt/xmls/1.xml")));
 
-        mainParser.parse();*/
-
-        First fDate = new First<String>("   ");
-
-        fDate.setValue(new Date());
-
-        System.out.println(fDate.getValue().getClass());
-
+        mainParser.parse();
     }
 }
