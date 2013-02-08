@@ -190,17 +190,19 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
     }
 
     public void loadDateAttributeValues(BaseEntity baseEntity) {
-        /*List<Map<String, Object>> rows = queryForListWithStats(SELECT_DATE_VALUES_BY_ENTITY_ID_SQL, baseEntity.getId());
+        List<Map<String, Object>> rows = queryForListWithStats(SELECT_DATE_VALUES_BY_ENTITY_ID_SQL, baseEntity.getId());
 
         Iterator<Map<String, Object>> it = rows.iterator();
         while (it.hasNext())
         {
             Map<String, Object> row = it.next();
-                baseEntity.set(
-                        (String) row.get("attribute_name"),
-                        new Date(((java.sql.Date) row.get("date_value")).getTime())
-                );
-        }*/
+            // todo: clarify and check
+            baseEntity.set(
+                    (String) row.get("attribute_name"),
+                    0L,
+                    new Date(((java.sql.Date) row.get("date_value")).getTime())
+            );
+        }
     }
 
     private void loadBaseEntity(BaseEntity baseEntity) {

@@ -42,10 +42,6 @@ public class EntityParser extends AbstractParser
             entityParser.parse(xmlReader, this, attributes.getValue("class"),
                     new BaseEntity(""));
         }
-        else
-        {
-
-        }
     }
 
     @Override
@@ -57,7 +53,8 @@ public class EntityParser extends AbstractParser
         }
         else
         {
-            parentEntity.set(localName, contents.toString());
+            // todo: put here Batch object
+            parentEntity.set(localName, 0L, contents.toString());
         }
     }
 }

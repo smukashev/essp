@@ -38,6 +38,7 @@ public class BaseEntity extends Persistable
      */
     private HashMap<String, IGenericBatchValue> data =
             new HashMap<String, IGenericBatchValue>();
+
     private HashMap<String, ArrayList<IGenericBatchValue>> dataForArray =
             new HashMap<String, ArrayList<IGenericBatchValue>>();
 
@@ -96,213 +97,40 @@ public class BaseEntity extends Persistable
      *
      * @param meta Object structure
      */
-    public void setMeta(MetaClass meta) {
+    public void setMeta(MetaClass meta)
+    {
         this.meta = meta;
     }
 
     /**
      * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>
-     * 
+     *
      * @param name attribute name. Must exist in entity metadata
      * @return attribute value, null if value is not set
      * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
      * 	                                or attribute has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public Date getDate(String name)
+    public <T> T getGenericValue(String name)
     {
         IMetaType type = meta.getMemberType(name);
-        
+
         if(type == null)
-            throw new IllegalArgumentException("Type: " + name + 
+            throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
         if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name + 
+            throw new IllegalArgumentException("Type: " + name +
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        
+
         MetaValue simpleType = (MetaValue)type;
-        
-        if(simpleType.getTypeCode() != DataTypes.DATE)
-            throw new IllegalArgumentException("Type mismatch in class: " + 
-                    meta.getClassName() + ". Needed " + DataTypes.DATE + ", got: " + 
-                    simpleType.getTypeCode());
 
-        IGenericBatchValue<Date> batchValue = data.get(name);
-
-        if(batchValue == null)
-            return null;
-
-        return batchValue.getValue();
-    }
-    
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.STRING</code>
-     * 
-     * @param name attribute name. Must exist in entity metadata 
-     * @return attribute value, null if value is not set
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.STRING</code>
-     * @see DataTypes
-     */
-    public String getString(String name)
-    {
-    	IMetaType type = meta.getMemberType(name);
-        
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", not found in class: " + meta.getClassName());
-        
-        if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
-        
-        MetaValue simpleType = (MetaValue)type;
-        
         if(simpleType.getTypeCode() != DataTypes.STRING)
-            throw new IllegalArgumentException("Type mismatch in class: " + 
-                    meta.getClassName() + ". Needed " + DataTypes.STRING + ", got: " + 
-                    simpleType.getTypeCode());
-        
-        IGenericBatchValue<String> batchValue = data.get(name);
-        
-        if(batchValue == null)
-            return null;
-        
-        return batchValue.getValue();
-    }
-    
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.INTEGER</code>
-     * 
-     * @param name attribute name. Must exist in entity metadata 
-     * @return attribute value, null if value is not set
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.INTEGER</code>
-     * @see DataTypes
-     */
-    public Integer getInteger(String name)
-    {
-    	IMetaType type = meta.getMemberType(name);
-        
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", not found in class: " + meta.getClassName());
-        
-        if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
-        
-        MetaValue simpleType = (MetaValue)type;
-        
-        if(simpleType.getTypeCode() != DataTypes.INTEGER)
-            throw new IllegalArgumentException("Type mismatch in class: " + 
-                    meta.getClassName() + ". Needed " + DataTypes.INTEGER + ", got: " + 
+            throw new IllegalArgumentException("Type mismatch in class: " +
+                    meta.getClassName() + ". Needed " + DataTypes.STRING + ", got: " +
                     simpleType.getTypeCode());
 
-        IGenericBatchValue<Integer> batchValue = data.get(name);
-
-        if(batchValue == null)
-            return null;
-
-        return batchValue.getValue();
-    }
-    
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DOUBLE</code>
-     * 
-     * @param name attribute name. Must exist in entity metadata 
-     * @return attribute value, null if value is not set
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.DOUBLE</code>
-     * @see DataTypes
-     */
-    public Double getDouble(String name)
-    {
-    	IMetaType type = meta.getMemberType(name);
-        
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", not found in class: " + meta.getClassName());
-        
-        if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
-        
-        MetaValue simpleType = (MetaValue)type;
-        
-        if(simpleType.getTypeCode() != DataTypes.DOUBLE)
-            throw new IllegalArgumentException("Type mismatch in class: " + 
-                    meta.getClassName() + ". Needed " + DataTypes.DOUBLE + ", got: " + 
-                    simpleType.getTypeCode());
-
-        IGenericBatchValue<Double> batchValue = data.get(name);
-
-        if(batchValue == null)
-            return null;
-
-        return batchValue.getValue();
-    }
-    
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.BOOLEAN</code>
-     * 
-     * @param name attribute name. Must exist in entity metadata 
-     * @return attribute value, null if value is not set
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.BOOLEAN</code>
-     * @see DataTypes
-     */
-    public Boolean getBoolean(String name)
-    {
-    	IMetaType type = meta.getMemberType(name);
-        
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", not found in class: " + meta.getClassName());
-        
-        if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
-        
-        MetaValue simpleType = (MetaValue)type;
-        
-        if(simpleType.getTypeCode() != DataTypes.BOOLEAN)
-            throw new IllegalArgumentException("Type mismatch in class: " + 
-                    meta.getClassName() + ". Needed " + DataTypes.BOOLEAN + ", got: " + 
-                    simpleType.getTypeCode());
-
-        IGenericBatchValue<Boolean> batchValue = data.get(name);
-
-        if(batchValue == null)
-            return null;
-
-        return batchValue.getValue();
-    }
-    
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.COMPLEX</code>
-     * 
-     * @param name attribute name. Must exist in entity metadata 
-     * @return attribute value, null if value is not set
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.COMPLEX</code>
-     * @see DataTypes
-     */
-    public BaseEntity getComplex(String name)
-    {
-        IMetaType type = meta.getMemberType(name);
-        
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", not found in class: " + meta.getClassName());
-        
-        if(!type.isComplex())
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", is not an object of class. It's a simple value with type " + 
-            		((MetaValue)type).getTypeCode());
-
-        IGenericBatchValue<BaseEntity> batchValue = data.get(name);
+        IGenericBatchValue<T> batchValue = data.get(name);
 
         if(batchValue == null)
             return null;
@@ -311,7 +139,7 @@ public class BaseEntity extends Persistable
     }
 
     /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>.
+     * Retrieves attribute titled <code>name</code>.
      * Uses default <code>Batch</code>.
      *
      * @param name name attribute name. Must exist in entity metadata
@@ -322,17 +150,17 @@ public class BaseEntity extends Persistable
      * @throws IllegalStateException if default <code>Batch</code> is not set
      * @see DataTypes
      */
-    public void set(String name, long index, Date value)
+    public <T> void set(String name, long index, T value)
     {
-        if (defaultBatch == null) {
+        if (defaultBatch == null)
             throw new IllegalStateException("Default Batch is not set.");
-        }
+
         set(name, defaultBatch, index, value);
     }
 
     /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>
-     * 
+     * Retrieves attribute titled <code>name</code>.
+     *
      * @param name name attribute name. Must exist in entity metadata
      * @param batch information about the origin of this value
      * @param index the index of value
@@ -341,290 +169,26 @@ public class BaseEntity extends Persistable
      * 	                                or attribute has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public void set(String name, Batch batch, long index, Date value)
+    public <T> void set(String name, Batch batch, long index, T value)
     {
-    	IMetaType type = meta.getMemberType(name);
-        
+        IMetaType type = meta.getMemberType(name);
+
         if(type == null)
-            throw new IllegalArgumentException("Type: " + name + 
+            throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
-        
+
         if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name + 
+            throw new IllegalArgumentException("Type: " + name +
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-        
+
         MetaValue simpleType = (MetaValue)type;
-        
+
         if(simpleType.getTypeCode() != DataTypes.DATE)
             throw new IllegalArgumentException("Type mismatch in class: " +
                     meta.getClassName() + ". Needed " + DataTypes.DATE + ", got: " +
                     simpleType.getTypeCode());
-        
-        data.put(name, new GenericBatchValue<Date>(batch, index, value));
-    }
 
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>.
-     * Uses default <code>Batch</code>.
-     *
-     * @param name name attribute name. Must exist in entity metadata
-     * @param index the index of value
-     * @param value new value of the attribute
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
-     * @throws IllegalStateException if default <code>Batch</code> is not set
-     * @see DataTypes
-     */
-    public void set(String name, long index, String value)
-    {
-        if (defaultBatch == null)
-        {
-            throw new IllegalStateException("Default Batch is not set.");
-        }
-        set(name, defaultBatch, index, value);
-    }
-    
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.STRING</code>
-     * 
-     * @param name name attribute name. Must exist in entity metadata
-     * @param batch information about the origin of this value
-     * @param index the index of value
-     * @param value new value of the attribute
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.STRING</code>
-     * @see DataTypes
-     */
-    public void set(String name, Batch batch, long index, String value)
-    {
-    	IMetaType type = meta.getMemberType(name);
-        
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", not found in class: " + meta.getClassName());
-        
-        if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
-
-        MetaValue simpleType = (MetaValue)type;
-        
-        if(simpleType.getTypeCode() != DataTypes.STRING)
-            throw new IllegalArgumentException("Type mismatch in class: " + 
-                    meta.getClassName() + ". Needed " + DataTypes.STRING + ", got: " + 
-                    simpleType.getTypeCode());
-        
-        data.put(name, new GenericBatchValue<String>(batch, index, value));
-    }
-
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>.
-     * Uses default <code>Batch</code>.
-     *
-     * @param name name attribute name. Must exist in entity metadata
-     * @param index the index of value
-     * @param value new value of the attribute
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
-     * @throws IllegalStateException if default <code>Batch</code> is not set
-     * @see DataTypes
-     */
-    public void set(String name, long index, Integer value)
-    {
-        if (defaultBatch == null)
-        {
-            throw new IllegalStateException("Default Batch is not set.");
-        }
-        set(name, defaultBatch, index, value);
-    }
-
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.INTEGER</code>
-     * 
-     * @param name name attribute name. Must exist in entity metadata
-     * @param batch information about the origin of this value
-     * @param index the index of value
-     * @param value new value of the attribute
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.INTEGER</code>
-     * @see DataTypes
-     */
-    public void set(String name, Batch batch, long index, Integer value)
-    {
-    	IMetaType type = meta.getMemberType(name);
-        
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", not found in class: " + meta.getClassName());
-        
-        if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
-        
-        MetaValue simpleType = (MetaValue)type;
-        
-        if(simpleType.getTypeCode() != DataTypes.INTEGER)
-            throw new IllegalArgumentException("Type mismatch in class: " + 
-                    meta.getClassName() + ". Needed " + DataTypes.INTEGER + ", got: " + 
-                    simpleType.getTypeCode());
-        
-        data.put(name, new GenericBatchValue<Integer>(batch, index, value));
-    }
-
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>.
-     * Uses default <code>Batch</code>.
-     *
-     * @param name name attribute name. Must exist in entity metadata
-     * @param index the index of value
-     * @param value new value of the attribute
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
-     * @throws IllegalStateException if default <code>Batch</code> is not set
-     * @see DataTypes
-     */
-    public void set(String name, long index, Double value)
-    {
-        if (defaultBatch == null)
-        {
-            throw new IllegalStateException("Default Batch is not set.");
-        }
-        set(name, defaultBatch, index, value);
-    }
-
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DOUBLE</code>
-     * 
-     * @param name name attribute name. Must exist in entity metadata
-     * @param batch information about the origin of this value
-     * @param index the index of value
-     * @param value new value of the attribute
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.DOUBLE</code>
-     * @see DataTypes
-     */
-    public void set(String name, Batch batch, long index, Double value)
-    {
-    	IMetaType type = meta.getMemberType(name);
-        
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", not found in class: " + meta.getClassName());
-        
-        if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
-        
-        MetaValue simpleType = (MetaValue)type;
-        
-        if(simpleType.getTypeCode() != DataTypes.DOUBLE)
-            throw new IllegalArgumentException("Type mismatch in class: " + 
-                    meta.getClassName() + ". Needed " + DataTypes.DOUBLE + ", got: " + 
-                    simpleType.getTypeCode());
-        
-        data.put(name, new GenericBatchValue<Double>(batch, index, value));
-    }
-
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>.
-     * Uses default <code>Batch</code>.
-     *
-     * @param name name attribute name. Must exist in entity metadata
-     * @param index the index of value
-     * @param value new value of the attribute
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
-     * @throws IllegalStateException if default <code>Batch</code> is not set
-     * @see DataTypes
-     */
-    public void set(String name, long index, Boolean value)
-    {
-        if (defaultBatch == null)
-        {
-            throw new IllegalStateException("Default Batch is not set.");
-        }
-        set(name, defaultBatch, index, value);
-    }
-
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.BOOLEAN</code>
-     * 
-     * @param name name attribute name. Must exist in entity metadata
-     * @param batch information about the origin of this value
-     * @param index the index of value
-     * @param value new value of the attribute
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.BOOLEAN</code>
-     * @see DataTypes
-     */
-    public void set(String name, Batch batch, long index,  Boolean value)
-    {
-    	IMetaType type = meta.getMemberType(name);
-        
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", not found in class: " + meta.getClassName());
-        
-        if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
-        
-        MetaValue simpleType = (MetaValue)type;
-        
-        if(simpleType.getTypeCode() != DataTypes.BOOLEAN)
-            throw new IllegalArgumentException("Type mismatch in class: " + 
-                    meta.getClassName() + ". Needed " + DataTypes.BOOLEAN + ", got: " + 
-                    simpleType.getTypeCode());
-        
-        data.put(name, new GenericBatchValue<Boolean>(batch, index, value));
-    }
-
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>.
-     * Uses default <code>Batch</code>.
-     *
-     * @param name name attribute name. Must exist in entity metadata
-     * @param index the index of value
-     * @param value new value of the attribute
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
-     * @throws IllegalStateException if default <code>Batch</code> is not set
-     * @see DataTypes
-     */
-    public void set(String name, long index, BaseEntity value)
-    {
-        if (defaultBatch == null)
-        {
-            throw new IllegalStateException("Default Batch is not set.");
-        }
-        set(name, defaultBatch, index, value);
-    }
-
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.COMPLEX</code>
-     * 
-     * @param name name attribute name. Must exist in entity metadata
-     * @param batch information about the origin of this value
-     * @param index the index of value
-     * @param value new value of the attribute
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.COMPLEX</code>
-     * @see DataTypes
-     */
-    public void set(String name, Batch batch, long index, BaseEntity value)
-    {
-    	IMetaType type = meta.getMemberType(name);
-        
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", not found in class: " + meta.getClassName());
-        
-        if(!type.isComplex())
-            throw new IllegalArgumentException("Type: " + name + 
-                    ", is not an object of class. It's a simple value with type " + 
-            		((MetaValue)type).getTypeCode());
-
-        data.put(name, new GenericBatchValue<BaseEntity>(batch, index, value));
+        data.put(name, new GenericBatchValue<T>(batch, index, value));
     }
 
     //arrays
@@ -638,7 +202,7 @@ public class BaseEntity extends Persistable
      * 	                                or attribute has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public ArrayList<IGenericBatchValue> getDateArray(String name)
+    public ArrayList<IGenericBatchValue> getGenericArray(String name)
     {
         IMetaType type = meta.getMemberType(name);
 
@@ -649,222 +213,6 @@ public class BaseEntity extends Persistable
         if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name +
                     ", is an object of class: " + ((MetaClass)type).getClassName());
-
-        if(!type.isArray())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is not an array");
-
-        MetaValueArray simpleType = (MetaValueArray)type;
-
-        if(simpleType.getTypeCode() != DataTypes.DATE)
-            throw new IllegalArgumentException("Type mismatch in class: " +
-                    meta.getClassName() + ". Needed " + DataTypes.DATE + ", got: " +
-                    simpleType.getTypeCode());
-
-        ArrayList<IGenericBatchValue> batchValues = dataForArray.get(name);
-
-        if(batchValues == null)
-        {
-            batchValues = new ArrayList<IGenericBatchValue>();
-            dataForArray.put(name, batchValues);
-        }
-
-        return batchValues;
-    }
-
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.STRING</code>
-     *
-     * @param name attribute name. Must exist in entity metadata
-     * @return attribute value, null if value is not set
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.STRING</code>
-     * @see DataTypes
-     */
-    public ArrayList<IGenericBatchValue> getStringArray(String name)
-    {
-        IMetaType type = meta.getMemberType(name);
-
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name +
-                    ", not found in class: " + meta.getClassName());
-
-        if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
-
-        if(!type.isArray())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is not an array");
-
-        MetaValueArray simpleType = (MetaValueArray)type;
-
-        if(simpleType.getTypeCode() != DataTypes.STRING)
-            throw new IllegalArgumentException("Type mismatch in class: " +
-                    meta.getClassName() + ". Needed " + DataTypes.STRING + ", got: " +
-                    simpleType.getTypeCode());
-
-        ArrayList<IGenericBatchValue> batchValues = dataForArray.get(name);
-
-        if(batchValues == null)
-        {
-            batchValues = new ArrayList<IGenericBatchValue>();
-            dataForArray.put(name, batchValues);
-        }
-
-        return batchValues;
-    }
-
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.INTEGER</code>
-     *
-     * @param name attribute name. Must exist in entity metadata
-     * @return attribute value, null if value is not set
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.INTEGER</code>
-     * @see DataTypes
-     */
-    public List<IGenericBatchValue> getIntegerArray(String name)
-    {
-        IMetaType type = meta.getMemberType(name);
-
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name +
-                    ", not found in class: " + meta.getClassName());
-
-        if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
-
-        if(!type.isArray())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is not an array");
-
-        MetaValueArray simpleType = (MetaValueArray)type;
-
-        if(simpleType.getTypeCode() != DataTypes.INTEGER)
-            throw new IllegalArgumentException("Type mismatch in class: " +
-                    meta.getClassName() + ". Needed " + DataTypes.INTEGER + ", got: " +
-                    simpleType.getTypeCode());
-
-        ArrayList<IGenericBatchValue> batchValues = dataForArray.get(name);
-
-        if(batchValues == null)
-        {
-            batchValues = new ArrayList<IGenericBatchValue>();
-            dataForArray.put(name, batchValues);
-        }
-
-        return batchValues;
-    }
-
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DOUBLE</code>
-     *
-     * @param name attribute name. Must exist in entity metadata
-     * @return attribute value, null if value is not set
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.DOUBLE</code>
-     * @see DataTypes
-     */
-    public List<IGenericBatchValue> getDoubleArray(String name)
-    {
-        IMetaType type = meta.getMemberType(name);
-
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name +
-                    ", not found in class: " + meta.getClassName());
-
-        if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
-
-        if(!type.isArray())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is not an array");
-
-        MetaValueArray simpleType = (MetaValueArray)type;
-
-        if(simpleType.getTypeCode() != DataTypes.DOUBLE)
-            throw new IllegalArgumentException("Type mismatch in class: " +
-                    meta.getClassName() + ". Needed " + DataTypes.DOUBLE + ", got: " +
-                    simpleType.getTypeCode());
-
-        ArrayList<IGenericBatchValue> batchValues = dataForArray.get(name);
-
-        if(batchValues == null)
-        {
-            batchValues = new ArrayList<IGenericBatchValue>();
-            dataForArray.put(name, batchValues);
-        }
-
-        return batchValues;
-    }
-
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.BOOLEAN</code>
-     *
-     * @param name attribute name. Must exist in entity metadata
-     * @return attribute value, null if value is not set
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.BOOLEAN</code>
-     * @see DataTypes
-     */
-    public ArrayList<IGenericBatchValue> getBooleanArray(String name)
-    {
-        IMetaType type = meta.getMemberType(name);
-
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name +
-                    ", not found in class: " + meta.getClassName());
-
-        if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
-
-        if(!type.isArray())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is not an array");
-
-        MetaValueArray simpleType = (MetaValueArray)type;
-
-        if(simpleType.getTypeCode() != DataTypes.BOOLEAN)
-            throw new IllegalArgumentException("Type mismatch in class: " +
-                    meta.getClassName() + ". Needed " + DataTypes.BOOLEAN + ", got: " +
-                    simpleType.getTypeCode());
-
-        ArrayList<IGenericBatchValue> batchValues = dataForArray.get(name);
-
-        if(batchValues == null)
-        {
-            batchValues = new ArrayList<IGenericBatchValue>();
-            dataForArray.put(name, batchValues);
-        }
-
-        return batchValues;
-    }
-
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.COMPLEX</code>
-     *
-     * @param name attribute name. Must exist in entity metadata
-     * @return attribute value, null if value is not set
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.COMPLEX</code>
-     * @see DataTypes
-     */
-    public ArrayList<IGenericBatchValue> getComplexArray(String name)
-    {
-        IMetaType type = meta.getMemberType(name);
-
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name +
-                    ", not found in class: " + meta.getClassName());
-
-        if(!type.isComplex())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is not an object of class. It's a simple value with type " +
-                    ((MetaValue)type).getTypeCode());
 
         if(!type.isArray())
             throw new IllegalArgumentException("Type: " + name +
@@ -894,8 +242,8 @@ public class BaseEntity extends Persistable
         return getPresentSimpleAttributeNames(DataTypes.DATE);
     }
 
-    public Batch getDefaultBatch() {
+    public Batch getDefaultBatch()
+    {
         return defaultBatch;
     }
-
 }

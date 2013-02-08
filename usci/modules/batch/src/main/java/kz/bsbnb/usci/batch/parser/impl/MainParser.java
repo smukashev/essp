@@ -89,10 +89,6 @@ public class MainParser extends AbstractParser
         {
             logger.info("entities");
         }
-        else if(localName.equalsIgnoreCase("entity"))
-        {
-
-        }
         else
         {
             throw new UnknownTagException(localName);
