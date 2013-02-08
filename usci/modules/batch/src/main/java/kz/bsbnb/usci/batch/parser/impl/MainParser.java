@@ -54,10 +54,12 @@ public class MainParser extends AbstractParser
     public void startElement(String uri, String localName, String qName,
             Attributes attributes) throws SAXException
     {
+        // todo: complete
         contents.reset();
 
         if(localName.equalsIgnoreCase("batch"))
         {
+            logger.info("batch");
         }
         else if(localName.equalsIgnoreCase("entities"))
         {
@@ -81,9 +83,10 @@ public class MainParser extends AbstractParser
     public void endElement(String uri, String localName, String qName)
             throws SAXException
     {
+        // todo: complete
         if(localName.equalsIgnoreCase("batch"))
         {
-
+           logger.info("batch");
         }
         else if(localName.equalsIgnoreCase("entities"))
         {

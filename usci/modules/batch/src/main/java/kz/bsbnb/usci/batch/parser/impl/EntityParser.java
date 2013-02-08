@@ -11,6 +11,7 @@ import org.xml.sax.XMLReader;
 /**
  * @author k.tulbassiyev
  */
+// todo: complete
 public class EntityParser extends AbstractParser
 {
     private Logger logger = Logger.getLogger(EntityParser.class);
