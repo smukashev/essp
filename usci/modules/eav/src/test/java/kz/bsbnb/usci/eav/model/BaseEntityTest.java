@@ -43,7 +43,7 @@ public class BaseEntityTest {
         
         instance.getMeta().setMemberType("testComplex", new MetaClass("some_class", false, false));
         instance.getMeta().setMemberType("testNotComplex", new MetaValue(DataTypes.INTEGER, false, false));
-        instance.set("testComplex", expResult);
+        instance.set("testComplex", new Batch(), 1, expResult);
         
         
         BaseEntity result = instance.getComplex("testComplex");
@@ -85,7 +85,7 @@ public class BaseEntityTest {
         expResult = new Date();
         instance.getMeta().setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
         instance.getMeta().setMemberType("testNotDate", new MetaValue(DataTypes.INTEGER, false, false));
-        instance.set("testDate", expResult);
+        instance.set("testDate", new Batch(), 1, expResult);
         
         
         Date result = instance.getDate("testDate");
@@ -127,7 +127,7 @@ public class BaseEntityTest {
         expResult = 7;
         instance.getMeta().setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
         instance.getMeta().setMemberType("testNotInteger", new MetaValue(DataTypes.DATE, false, false));
-        instance.set("testInteger", expResult);
+        instance.set("testInteger", new Batch(), 1, expResult);
         
         
         Integer result = instance.getInteger("testInteger");
@@ -169,7 +169,7 @@ public class BaseEntityTest {
         expResult = "testString";
         instance.getMeta().setMemberType("testString", new MetaValue(DataTypes.STRING, false, false));
         instance.getMeta().setMemberType("testNotString", new MetaValue(DataTypes.INTEGER, false, false));
-        instance.set("testString", expResult);
+        instance.set("testString", new Batch(), 1, expResult);
         
         
         String result = instance.getString("testString");
@@ -211,7 +211,7 @@ public class BaseEntityTest {
         expResult = 1.;
         instance.getMeta().setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
         instance.getMeta().setMemberType("testNotDouble", new MetaValue(DataTypes.INTEGER, false, false));
-        instance.set("testDouble", expResult);
+        instance.set("testDouble", new Batch(), 1, expResult);
         
         
         Double result = instance.getDouble("testDouble");
@@ -253,7 +253,7 @@ public class BaseEntityTest {
         expResult = true;
         instance.getMeta().setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
         instance.getMeta().setMemberType("testNotBoolean", new MetaValue(DataTypes.INTEGER, false, false));
-        instance.set("testBoolean", expResult);
+        instance.set("testBoolean", new Batch(), 1, expResult);
         
         
         Boolean result = instance.getBoolean("testBoolean");

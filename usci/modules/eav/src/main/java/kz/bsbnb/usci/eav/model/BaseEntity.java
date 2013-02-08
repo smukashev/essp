@@ -127,13 +127,13 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type mismatch in class: " + 
                     meta.getClassName() + ". Needed " + DataTypes.DATE + ", got: " + 
                     simpleType.getTypeCode());
-        
-        Object obj = data.get(name);
-        
-        if(obj == null)
+
+        IGenericBatchValue<Date> batchValue = data.get(name);
+
+        if(batchValue == null)
             return null;
-        
-        return (Date)obj;
+
+        return batchValue.getValue();
     }
     
     /**
