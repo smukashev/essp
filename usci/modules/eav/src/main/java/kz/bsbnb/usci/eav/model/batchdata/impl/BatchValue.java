@@ -1,12 +1,12 @@
 package kz.bsbnb.usci.eav.model.batchdata.impl;
 
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.batchdata.IGenericBatchValue;
+import kz.bsbnb.usci.eav.model.batchdata.IBatchValue;
 
 /**
  * @author a.motov
  */
-public class GenericBatchValue implements IGenericBatchValue
+public class BatchValue implements IBatchValue
 {
     private long index;
 
@@ -27,13 +27,16 @@ public class GenericBatchValue implements IGenericBatchValue
      * @param value the value. May be is null.
      * @throws IllegalArgumentException if <code>Batch</code> is null or <code>Batch</code> has no id
      */
-    public GenericBatchValue(Batch batch, long index, Object value) {
-        /*if (batch == null) {
-            throw new IllegalArgumentException("Batch is null. Initialization of the GenericBatchValue ​​is not possible.");
-        }
-        if (batch.getId() < 0) {
-            throw new IllegalArgumentException("Batch has no id. Initialization of the GenericBatchValue ​​is not possible.");
-        }*/
+    public BatchValue(Batch batch, long index, Object value)
+    {
+        if (batch == null)
+            throw new IllegalArgumentException
+                    ("Batch is null. Initialization of the BatchValue ​​is not possible.");
+
+        if (batch.getId() < 0)
+            throw new IllegalArgumentException
+                    ("Batch has no id. Initialization of the BatchValue ​​is not possible.");
+
 
         this.batch = batch;
         this.value = value;

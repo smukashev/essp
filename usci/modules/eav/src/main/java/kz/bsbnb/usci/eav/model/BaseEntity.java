@@ -2,13 +2,12 @@ package kz.bsbnb.usci.eav.model;
 
 import java.util.*;
 
-import kz.bsbnb.usci.eav.model.batchdata.IGenericBatchValue;
-import kz.bsbnb.usci.eav.model.batchdata.impl.GenericBatchValue;
+import kz.bsbnb.usci.eav.model.batchdata.IBatchValue;
+import kz.bsbnb.usci.eav.model.batchdata.impl.BatchValue;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 import kz.bsbnb.usci.eav.util.SetUtils;
 
@@ -36,11 +35,11 @@ public class BaseEntity extends Persistable
     /**
      * Holds attributes values
      */
-    private HashMap<String, IGenericBatchValue> data =
-            new HashMap<String, IGenericBatchValue>();
+    private HashMap<String, IBatchValue> data =
+            new HashMap<String, IBatchValue>();
 
-    private HashMap<String, ArrayList<IGenericBatchValue>> dataForArray =
-            new HashMap<String, ArrayList<IGenericBatchValue>>();
+    private HashMap<String, ArrayList<IBatchValue>> dataForArray =
+            new HashMap<String, ArrayList<IBatchValue>>();
 
     /**
      * Initializes entity.
@@ -111,11 +110,11 @@ public class BaseEntity extends Persistable
      * 	                                or attribute has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public IGenericBatchValue getGenericValue(String name)
+    public IBatchValue getGenericValue(String name)
     {
         IMetaType type = meta.getMemberType(name);
 
-        /*if(type == null)
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
@@ -128,9 +127,9 @@ public class BaseEntity extends Persistable
         if(simpleType.getTypeCode() != DataTypes.STRING)
             throw new IllegalArgumentException("Type mismatch in class: " +
                     meta.getClassName() + ". Needed " + DataTypes.STRING + ", got: " +
-                    simpleType.getTypeCode());*/
+                    simpleType.getTypeCode());
 
-        IGenericBatchValue batchValue = data.get(name);
+        IBatchValue batchValue = data.get(name);
 
         if(batchValue == null)
             return null;
@@ -173,7 +172,7 @@ public class BaseEntity extends Persistable
     {
         IMetaType type = meta.getMemberType(name);
 
-        /*if(type == null)
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
@@ -186,9 +185,9 @@ public class BaseEntity extends Persistable
         if(simpleType.getTypeCode() != DataTypes.DATE)
             throw new IllegalArgumentException("Type mismatch in class: " +
                     meta.getClassName() + ". Needed " + DataTypes.DATE + ", got: " +
-                    simpleType.getTypeCode());*/
+                    simpleType.getTypeCode());
 
-        data.put(name, new GenericBatchValue(batch, index, value));
+        data.put(name, new BatchValue(batch, index, value));
     }
 
     //arrays
@@ -202,7 +201,7 @@ public class BaseEntity extends Persistable
      * 	                                or attribute has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public ArrayList<IGenericBatchValue> getGenericArray(String name)
+    public ArrayList<IBatchValue> getGenericArray(String name)
     {
         IMetaType type = meta.getMemberType(name);
 
@@ -218,11 +217,11 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an array");
 
-        ArrayList<IGenericBatchValue> batchValues = dataForArray.get(name);
+        ArrayList<IBatchValue> batchValues = dataForArray.get(name);
 
         if(batchValues == null)
         {
-            batchValues = new ArrayList<IGenericBatchValue>();
+            batchValues = new ArrayList<IBatchValue>();
             dataForArray.put(name, batchValues);
         }
 

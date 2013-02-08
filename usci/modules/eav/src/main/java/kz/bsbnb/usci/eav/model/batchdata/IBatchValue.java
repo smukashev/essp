@@ -5,7 +5,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 /**
  * @author a.motov
  */
-public interface IGenericBatchValue
+public interface IBatchValue
 {
     /**
      * Returns the <code>Batch</code> that contains information about the origin of this value.
