@@ -41,7 +41,9 @@ public class EntityParser extends AbstractParser
             EntityParser entityParser = new EntityParser();
 
             entityParser.parse(xmlReader, this, attributes.getValue("class"),
-                    new BaseEntity(""));
+                    childEntity);
+
+            logger.info("aaa");
         }
     }
 
@@ -50,6 +52,7 @@ public class EntityParser extends AbstractParser
     {
         if(localName.equalsIgnoreCase("entity"))
         {
+
             xmlReader.setContentHandler(contentHandler);
         }
         else

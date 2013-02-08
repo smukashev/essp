@@ -21,8 +21,6 @@ public class MainParser extends AbstractParser
 
     private Logger logger = Logger.getLogger(MainParser.class);
 
-    private EntityParser entityParser;
-
     private BaseEntity currentEntity;
 
     public MainParser(byte[] xmlBytes)
@@ -68,7 +66,7 @@ public class MainParser extends AbstractParser
         {
             currentEntity = new BaseEntity(attributes.getValue("class"));
 
-            entityParser = new EntityParser();
+            EntityParser entityParser = new EntityParser();
             entityParser.parse(xmlReader, this, attributes.getValue("class"), currentEntity);
 
             xmlReader.setContentHandler(entityParser);
