@@ -7,6 +7,13 @@ public class Persistable
 	 */
 	protected long id = 0;
 
+    protected Persistable() {
+    }
+
+    protected Persistable(long id) {
+        this.id = id;
+    }
+
 	public long getId()
     {
 		return id;

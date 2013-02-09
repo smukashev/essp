@@ -39,6 +39,7 @@ public class BatchValue implements IBatchValue
 
 
         this.batch = batch;
+        this.index = index;
         this.value = value;
     }
 

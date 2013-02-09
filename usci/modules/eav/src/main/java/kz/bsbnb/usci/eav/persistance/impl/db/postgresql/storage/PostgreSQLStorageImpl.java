@@ -39,8 +39,8 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
     private final static String BATCHES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, receipt_date TIMESTAMP WITH TIME ZONE NOT NULL, begin_date TIMESTAMP WITH TIME ZONE, end_date TIMESTAMP WITH TIME ZONE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
     private final static String BATCH_FILES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, file_data BYTEA NOT NULL, file_size double precision NOT NULL, file_name character varying(%d), batch_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
-    private final static String VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, batch_id int references %s(id) ON DELETE CASCADE, entity_id int references %s(id) ON DELETE CASCADE, attribute_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
-    private final static String DATE_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (date_value DATE NOT NULL, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    private final static String VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, entity_id int references %s(id) ON DELETE CASCADE, batch_id int references %s(id) ON DELETE CASCADE, attribute_id int references %s(id) ON DELETE CASCADE, index bigint, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
+    private final static String DATE_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (date_value DATE NOT NULL, CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)"; //CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE
 
     private final static String INDEXES_QUERY = "select pg_index.indexrelid::regclass, 'create index ' || relname || '_' ||\n" +
             "         array_to_string(column_name_list, '_') || '_idx on ' || conrelid ||\n" +
@@ -160,7 +160,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
         //values
         query = String.format(VALUES_TABLE, getConfig().getValuesTableName(),
-                getConfig().getBatchesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getEntitiesTableName(), getConfig().getBatchesTableName(),
                 getConfig().getAttributesTableName(), getConfig().getValuesTableName());
         logger.debug(query);
 
@@ -168,9 +168,9 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
         //date values
         query = String.format(DATE_VALUES_TABLE, getConfig().getDateValuesTableName(),
-                getConfig().getDateValuesTableName(), getConfig().getBatchesTableName(),
                 getConfig().getDateValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getDateValuesTableName(), getConfig().getAttributesTableName(),
+                getConfig().getDateValuesTableName(), getConfig().getBatchesTableName(),
+                /*getConfig().getDateValuesTableName(), getConfig().getAttributesTableName(),*/
                 getConfig().getValuesTableName());
         logger.debug(query);
 

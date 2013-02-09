@@ -2,6 +2,8 @@ package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.batchdata.IBatchValue;
+import kz.bsbnb.usci.eav.model.batchdata.impl.BatchValue;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
@@ -44,19 +46,21 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
     @PostConstruct
     public void init()
     {
-        INSERT_ENTITY_SQL = String.format("INSERT INTO %s (containing_class_id) VALUES ( ? )", getConfig().getEntitiesTableName());
+        INSERT_ENTITY_SQL = String.format("INSERT INTO %s (class_id) VALUES ( ? )", getConfig().getEntitiesTableName());
         SELECT_ENTITY_BY_ID_SQL = String.format("SELECT * FROM %s WHERE id = ?", getConfig().getEntitiesTableName());
         DELETE_ENTITY_BY_ID_SQL = String.format("DELETE FROM %s WHERE id = ?", getConfig().getEntitiesTableName());
-        INSERT_DATE_VALUE_SQL = String.format("INSERT INTO %s (entity_id, batch_id, attribute_id, date_value) VALUES ( ?, ?, ?, ? )", getConfig().getDateValuesTableName());
+        INSERT_DATE_VALUE_SQL = String.format("INSERT INTO %s (entity_id, batch_id, attribute_id, index, date_value) VALUES ( ?, ?, ?, ?, ? )", getConfig().getDateValuesTableName());
         SELECT_DATE_VALUES_BY_ENTITY_ID_SQL = String.format(
                 "SELECT savpp.batch_id,\n" +
                 "       savpp.attribute_name,\n" +
+                "       savpp.index,\n" +
                 "       savpp.date_value\n" +
                 "  FROM (SELECT (rank() over(PARTITION BY sav.attribute_id ORDER BY sav.batch_id DESC)) AS num_pp,\n" +
                 "               sav.*\n" +
                 "          FROM (SELECT dv.batch_id,\n" +
                 "                       dv.attribute_id,\n" +
-                "                       dv.name as attribute_name,\n" +
+                "                       sa.name as attribute_name,\n" +
+                "                       dv.index,\n" +
                 "                       dv.date_value\n" +
                 "                  FROM %s dv,\n" +
                 "                       %s sa\n" +
@@ -155,38 +159,32 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
     }
 
     private void insertDateAttributeValues(BaseEntity baseEntity, Set<String> attributeNames) {
-        /*MetaClass metaClass = baseEntity.getMeta();
-
-        Long[] entityIds = new Long[attributeNames.size()];
-        Long[] batchIds = new Long[attributeNames.size()];
-        Long[] attributeIds = new Long[attributeNames.size()];
-        Date[] attributeValues = new Date[attributeNames.size()];
+        MetaClass metaClass = baseEntity.getMeta();
 
         int i = 0;
         Iterator<String> it = attributeNames.iterator();
+        List<Object[]> batchArgs = new ArrayList<Object[]>();
         while (it.hasNext()) {
             String attributeNameForInsert = it.next();
 
             IMetaType metaType = metaClass.getMemberType(attributeNameForInsert);
             MetaValue metaValue = (MetaValue)metaType;
 
-            entityIds[i] = baseEntity.getId();
-            batchIds[i] = batch.getId();
-            attributeIds[i] = metaValue.getId();
-            attributeValues[i] = baseEntity.getDate(attributeNameForInsert);
+            IBatchValue batchValue = baseEntity.getBatchValue(attributeNameForInsert);
 
+            Object[] insertArgs = new Object[] {
+                    baseEntity.getId(),
+                    batchValue.getBatch().getId(),
+                    metaValue.getId(),
+                    batchValue.getIndex(),
+                    (Date)batchValue.getValue()
+            };
+
+            batchArgs.add(insertArgs);
             i++;
         }
 
-        List<Object[]> batchArgs = new ArrayList<Object[]>();
-        batchArgs.add(entityIds);
-        batchArgs.add(batchIds);
-        batchArgs.add(attributeIds);
-        batchArgs.add(attributeValues);
-
-        batchUpdateWithStats(INSERT_DATE_VALUE_SQL, batchArgs);*/
-
-        throw new UnsupportedOperationException("Not supported yet.");
+        batchUpdateWithStats(INSERT_DATE_VALUE_SQL, batchArgs);
     }
 
     public void loadDateAttributeValues(BaseEntity baseEntity) {
@@ -199,7 +197,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
             // todo: clarify and check
             baseEntity.set(
                     (String) row.get("attribute_name"),
-                    0L,
+                    (Long) row.get("index"),
                     new Date(((java.sql.Date) row.get("date_value")).getTime())
             );
         }

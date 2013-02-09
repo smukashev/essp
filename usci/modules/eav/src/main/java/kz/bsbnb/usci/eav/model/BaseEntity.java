@@ -81,6 +81,12 @@ public class BaseEntity extends Persistable
         this.defaultBatch = defaultBatch;
     }
 
+    public BaseEntity(MetaClass meta, Batch defaultBatch)
+    {
+        this.meta = meta;
+        this.defaultBatch = defaultBatch;
+    }
+
     /**
      * Used to retrieve object structure description. Can be used to modify metadata.
      * 

@@ -30,6 +30,19 @@ public class MetaValue extends AbstractMetaType
     	super(isKey, isNullable);
         this.typeCode = typeCode;
     }
+
+    /**
+     *
+     * @param id identifier
+     * @param typeCode code of the attribute's type
+     * @param isKey <code>true</code> when attribute is a key for search
+     * @param isNullable <code>true</code> when attribute can have <code>null</code> value
+     */
+    public MetaValue(long id, DataTypes typeCode, boolean isKey, boolean isNullable)
+    {
+        super(id, isKey, isNullable);
+        this.typeCode = typeCode;
+    }
     
 	public DataTypes getTypeCode()
     {

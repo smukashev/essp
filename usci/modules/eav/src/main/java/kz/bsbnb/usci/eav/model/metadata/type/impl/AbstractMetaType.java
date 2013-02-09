@@ -27,6 +27,13 @@ public abstract class AbstractMetaType extends Persistable implements IMetaType/
         this.isNullable = isNullable && !isKey;
 	}
 
+    AbstractMetaType(long id, boolean isKey, boolean isNullable)
+    {
+        super(id);
+        this.isKey = isKey;
+        this.isNullable = isNullable && !isKey;
+    }
+
 	@Override
 	public boolean isKey()
     {
