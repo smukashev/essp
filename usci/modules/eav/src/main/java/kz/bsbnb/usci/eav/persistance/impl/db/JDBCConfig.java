@@ -26,7 +26,11 @@ public class JDBCConfig {
     private String batchesTableName;
     private String valuesTableName;
     private String dateValuesTableName;
-
+    private String doubleValuesTableName;
+    private String integerValuesTableName;
+    private String booleanValuesTableName;
+    private String stringValuesTableName;
+    private String complexValuesTableName;
 
     private final int classNameLength = 64;
     private final int attributeNameLength = 64;
@@ -34,7 +38,7 @@ public class JDBCConfig {
     private final int arrayKeyTypeCodeLength = 16;
     private final int complexKeyTypeCodeLength = 16;
     private final int arrayKeyFilterValueLength = 128;
-    private final int stringAttributeValueLength = 1024;
+    private final int stringValueLength = 1024;
 
     @PostConstruct
     public void init()
@@ -52,6 +56,11 @@ public class JDBCConfig {
         batchesTableName = tablePrefix + "batches";
         valuesTableName = tablePrefix + "values";
         dateValuesTableName = tablePrefix + "date_values";
+        doubleValuesTableName = tablePrefix + "double_values";
+        integerValuesTableName = tablePrefix + "integer_values";
+        booleanValuesTableName  = tablePrefix + "boolean_values";
+        stringValuesTableName = tablePrefix + "string_values";
+        complexValuesTableName = tablePrefix + "complex_values";
     }
 
     public String getClassesTableName() {
@@ -106,6 +115,26 @@ public class JDBCConfig {
         return dateValuesTableName;
     }
 
+    public String getDoubleValuesTableName() {
+        return doubleValuesTableName;
+    }
+
+    public String getIntegerValuesTableName() {
+        return integerValuesTableName;
+    }
+
+    public String getBooleanValuesTableName() {
+        return booleanValuesTableName;
+    }
+
+    public String getStringValuesTableName() {
+        return stringValuesTableName;
+    }
+
+    public String getComplexValuesTableName() {
+        return complexValuesTableName;
+    }
+
     public int getClassNameLength() {
         return classNameLength;
     }
@@ -130,8 +159,8 @@ public class JDBCConfig {
         return arrayKeyFilterValueLength;
     }
 
-    public int getStringAttributeValueLength() {
-        return stringAttributeValueLength;
+    public int getStringValueLength() {
+        return stringValueLength;
     }
 
 }

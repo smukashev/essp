@@ -40,7 +40,13 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
     private final static String BATCHES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, receipt_date TIMESTAMP WITH TIME ZONE NOT NULL, begin_date TIMESTAMP WITH TIME ZONE, end_date TIMESTAMP WITH TIME ZONE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
     private final static String BATCH_FILES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, file_data BYTEA NOT NULL, file_size double precision NOT NULL, file_name character varying(%d), batch_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
     private final static String VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, entity_id int references %s(id) ON DELETE CASCADE, batch_id int references %s(id) ON DELETE CASCADE, attribute_id int references %s(id) ON DELETE CASCADE, index bigint, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
-    private final static String DATE_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (date_value DATE NOT NULL, CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)"; //CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE
+    private final static String DATE_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (date_value DATE, CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    private final static String DOUBLE_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (double_value double precision, CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    private final static String INTEGER_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (integer_value integer, CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    private final static String BOOLEAN_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (boolean_value boolean, CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    private final static String STRING_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (string_value character varying(%d), CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    private final static String COMPLEX_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (entity_value_id int references %s(id), CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+
 
     private final static String INDEXES_QUERY = "select pg_index.indexrelid::regclass, 'create index ' || relname || '_' ||\n" +
             "         array_to_string(column_name_list, '_') || '_idx on ' || conrelid ||\n" +
@@ -176,6 +182,58 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         logger.debug(query);
 
         jdbcTemplate.execute(query);
+
+        //double values
+        query = String.format(DOUBLE_VALUES_TABLE, getConfig().getDoubleValuesTableName(),
+                getConfig().getDoubleValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getDoubleValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getDoubleValuesTableName(), getConfig().getSimpleAttributesTableName(),
+                getConfig().getValuesTableName());
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
+
+        //integer values
+        query = String.format(INTEGER_VALUES_TABLE, getConfig().getIntegerValuesTableName(),
+                getConfig().getIntegerValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getIntegerValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getIntegerValuesTableName(), getConfig().getSimpleAttributesTableName(),
+                getConfig().getValuesTableName());
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
+
+        //boolean values
+        query = String.format(BOOLEAN_VALUES_TABLE, getConfig().getBooleanValuesTableName(),
+                getConfig().getBooleanValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBooleanValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBooleanValuesTableName(), getConfig().getSimpleAttributesTableName(),
+                getConfig().getValuesTableName());
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
+
+        //string values
+        query = String.format(STRING_VALUES_TABLE, getConfig().getStringValuesTableName(),
+                getConfig().getStringValueLength(),
+                getConfig().getStringValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getStringValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getStringValuesTableName(), getConfig().getSimpleAttributesTableName(),
+                getConfig().getValuesTableName());
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
+
+        //complex values
+        query = String.format(COMPLEX_VALUES_TABLE, getConfig().getComplexValuesTableName(),
+                getConfig().getEntitiesTableName(),
+                getConfig().getComplexValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getComplexValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getComplexValuesTableName(), getConfig().getSimpleAttributesTableName(),
+                getConfig().getValuesTableName());
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
 	    //------------------------------------------------
 	    query = String.format(ENTITIES_TABLE, getConfig().getEntitiesTableName(), getConfig().getClassesTableName(), getConfig().getEntitiesTableName());
 	    
@@ -207,6 +265,21 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
         query = String.format(DROP_TABLE, getConfig().getDateValuesTableName());
+        logger.debug(query);
+        jdbcTemplate.execute(query);
+        query = String.format(DROP_TABLE, getConfig().getDoubleValuesTableName());
+        logger.debug(query);
+        jdbcTemplate.execute(query);
+        query = String.format(DROP_TABLE, getConfig().getIntegerValuesTableName());
+        logger.debug(query);
+        jdbcTemplate.execute(query);
+        query = String.format(DROP_TABLE, getConfig().getBooleanValuesTableName());
+        logger.debug(query);
+        jdbcTemplate.execute(query);
+        query = String.format(DROP_TABLE, getConfig().getStringValuesTableName());
+        logger.debug(query);
+        jdbcTemplate.execute(query);
+        query = String.format(DROP_TABLE, getConfig().getComplexValuesTableName());
         logger.debug(query);
         jdbcTemplate.execute(query);
         query = String.format(DROP_TABLE, getConfig().getValuesTableName());
