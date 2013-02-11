@@ -25,7 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -71,6 +74,9 @@ public class PostgreSQLBaseEntityDaoImplTest {
             metaCreate.setMemberType("testDate1", new MetaValue(DataTypes.DATE, false, true));
             metaCreate.setMemberType("testDate2", new MetaValue(DataTypes.DATE, false, true));
             metaCreate.setMemberType("testDate3", new MetaValue(DataTypes.DATE, false, true));
+            metaCreate.setMemberType("testDouble1", new MetaValue(DataTypes.DOUBLE, false, true));
+            metaCreate.setMemberType("testDouble2", new MetaValue(DataTypes.DOUBLE, false, true));
+            metaCreate.setMemberType("testDouble3", new MetaValue(DataTypes.DOUBLE, false, true));
 
             long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
             MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
@@ -79,35 +85,79 @@ public class PostgreSQLBaseEntityDaoImplTest {
             long batchId = postgreSQLBatchEntityDaoImpl.save(batchCreate);
             Batch batchLoad = postgreSQLBatchEntityDaoImpl.load(batchId);
 
+            Random random = new Random();
 
             BaseEntity entityCreate = new BaseEntity(metaLoad, batchLoad);
-            Date testDate1 = new Date();
-            entityCreate.set("testDate1", 1L, testDate1);
-            Date testDate2 = new Date();
-            entityCreate.set("testDate2", 2L, testDate2);
-            Date testDate3 = new Date();
-            entityCreate.set("testDate3", 3L, testDate3);
+            entityCreate.set("testDate1", 1L, DateUtils.nowPlus(Calendar.DATE, 1));
+            entityCreate.set("testDate2", 2L, DateUtils.nowPlus(Calendar.DATE, 2));
+            entityCreate.set("testDate3", 3L, null);
+            entityCreate.set("testDouble1", 4L, random.nextDouble());
+            entityCreate.set("testDouble2", 5L, null);
+            entityCreate.set("testDouble3", 6L, random.nextDouble());
             long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
             BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
 
-            for (String dateAttributeName: entityCreate.getPresentSimpleAttributeNames(DataTypes.DATE)) {
-                IBatchValue batchValue = entityLoad.getBatchValue(dateAttributeName);
-                assertNotNull("One of the date values ​​are not saved or loaded.", batchValue);
+            Set<String> attributeNamesCreate = entityCreate.getPresentDateAttributeNames();
+            Set<String> attributeNamesLoad = entityLoad.getPresentDateAttributeNames();
+            assertEquals("One of the date values ​​are not saved or loaded. " +
+                    "Expected date values count: " + attributeNamesCreate.size() +
+                    ", actual date values count: " + attributeNamesLoad.size(),
+                    attributeNamesCreate.size(), attributeNamesLoad.size());
 
-                if (batchValue != null) {
+            for (String dateAttributeName: attributeNamesCreate)
+            {
+                IBatchValue batchValue = entityLoad.getBatchValue(dateAttributeName);
+                if (batchValue != null)
+                {
                     IBatchValue batchValueCreate = entityCreate.getBatchValue(dateAttributeName);
                     assertEquals(
                             "Not properly saved or loaded an index field of one of the date values.",
                             batchValueCreate.getIndex(), batchValue.getIndex());
+
+                    Date valueCreate = (Date)batchValueCreate.getValue();
+                    Date valueLoad = (Date)batchValue.getValue();
+
                     assertTrue(
                             "Not properly saved or loaded date value.",
-                            DateUtils.compareBeginningOfTheDay((Date)batchValueCreate.getValue(), (Date)batchValue.getValue()) == 0);
+                            valueCreate == null && valueLoad == null ?
+                                    true :
+                                    valueCreate != null && valueLoad != null ?
+                                            DateUtils.compareBeginningOfTheDay(valueCreate, valueLoad) == 0 :
+                                            false);
+                }
+            }
+
+            attributeNamesCreate = entityCreate.getPresentDoubleAttributeNames();
+            attributeNamesLoad = entityLoad.getPresentDoubleAttributeNames();
+            assertEquals("One of the double values ​​are not saved or loaded. " +
+                    "Expected double values count: " + attributeNamesCreate.size() +
+                    ", actual double values count: " + attributeNamesLoad.size(),
+                    attributeNamesCreate.size(), attributeNamesLoad.size());
+
+            for (String dateAttributeName: attributeNamesCreate) {
+                IBatchValue batchValue = entityLoad.getBatchValue(dateAttributeName);
+                if (batchValue != null) {
+                    IBatchValue batchValueCreate = entityCreate.getBatchValue(dateAttributeName);
+                    assertEquals(
+                            "Not properly saved or loaded an index field of one of the double values.",
+                            batchValueCreate.getIndex(), batchValue.getIndex());
+
+                    Double valueCreate = (Double)batchValueCreate.getValue();
+                    Double valueLoad = (Double)batchValue.getValue();
+
+                    assertTrue(
+                            "Not properly saved or loaded double value.",
+                            valueCreate == null && valueLoad == null ?
+                                    true :
+                                    valueCreate != null && valueLoad != null ?
+                                            valueCreate.equals(valueLoad) :
+                                            false);
                 }
             }
         }
         finally
         {
-            postgreSQLStorageImpl.clear();
+            //postgreSQLStorageImpl.clear();
         }
     }
 

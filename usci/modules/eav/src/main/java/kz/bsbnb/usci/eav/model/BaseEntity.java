@@ -246,6 +246,11 @@ public class BaseEntity extends Persistable
         return getPresentSimpleAttributeNames(DataTypes.DATE);
     }
 
+    public Set<String> getPresentDoubleAttributeNames()
+    {
+        return getPresentSimpleAttributeNames(DataTypes.DOUBLE);
+    }
+
     public Batch getDefaultBatch()
     {
         return defaultBatch;
