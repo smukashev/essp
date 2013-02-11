@@ -77,6 +77,9 @@ public class PostgreSQLBaseEntityDaoImplTest {
             metaCreate.setMemberType("testDouble1", new MetaValue(DataTypes.DOUBLE, false, true));
             metaCreate.setMemberType("testDouble2", new MetaValue(DataTypes.DOUBLE, false, true));
             metaCreate.setMemberType("testDouble3", new MetaValue(DataTypes.DOUBLE, false, true));
+            metaCreate.setMemberType("testInteger1", new MetaValue(DataTypes.INTEGER, false, true));
+            metaCreate.setMemberType("testInteger2", new MetaValue(DataTypes.INTEGER, false, true));
+            metaCreate.setMemberType("testInteger3", new MetaValue(DataTypes.INTEGER, false, true));
 
             long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
             MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
@@ -94,9 +97,13 @@ public class PostgreSQLBaseEntityDaoImplTest {
             entityCreate.set("testDouble1", 4L, random.nextDouble());
             entityCreate.set("testDouble2", 5L, null);
             entityCreate.set("testDouble3", 6L, random.nextDouble());
+            entityCreate.set("testInteger1", 7L, null);
+            entityCreate.set("testInteger2", 8L, random.nextInt());
+            entityCreate.set("testInteger3", 9L, random.nextInt());
             long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
             BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
 
+            // DATE
             Set<String> attributeNamesCreate = entityCreate.getPresentDateAttributeNames();
             Set<String> attributeNamesLoad = entityLoad.getPresentDateAttributeNames();
             assertEquals("One of the date values ​​are not saved or loaded. " +
@@ -127,6 +134,7 @@ public class PostgreSQLBaseEntityDaoImplTest {
                 }
             }
 
+            // DOUBLE
             attributeNamesCreate = entityCreate.getPresentDoubleAttributeNames();
             attributeNamesLoad = entityLoad.getPresentDoubleAttributeNames();
             assertEquals("One of the double values ​​are not saved or loaded. " +
@@ -154,10 +162,39 @@ public class PostgreSQLBaseEntityDaoImplTest {
                                             false);
                 }
             }
+
+            // INTEGER
+            attributeNamesCreate = entityCreate.getPresentIntegerAttributeNames();
+            attributeNamesLoad = entityLoad.getPresentIntegerAttributeNames();
+            assertEquals("One of the integer values ​​are not saved or loaded. " +
+                    "Expected integer values count: " + attributeNamesCreate.size() +
+                    ", actual integer values count: " + attributeNamesLoad.size(),
+                    attributeNamesCreate.size(), attributeNamesLoad.size());
+
+            for (String dateAttributeName: attributeNamesCreate) {
+                IBatchValue batchValue = entityLoad.getBatchValue(dateAttributeName);
+                if (batchValue != null) {
+                    IBatchValue batchValueCreate = entityCreate.getBatchValue(dateAttributeName);
+                    assertEquals(
+                            "Not properly saved or loaded an index field of one of the integer values.",
+                            batchValueCreate.getIndex(), batchValue.getIndex());
+
+                    Integer valueCreate = (Integer)batchValueCreate.getValue();
+                    Integer valueLoad = (Integer)batchValue.getValue();
+
+                    assertTrue(
+                            "Not properly saved or loaded integer value.",
+                            valueCreate == null && valueLoad == null ?
+                                    true :
+                                    valueCreate != null && valueLoad != null ?
+                                            valueCreate.equals(valueLoad) :
+                                            false);
+                }
+            }
         }
         finally
         {
-            //postgreSQLStorageImpl.clear();
+            postgreSQLStorageImpl.clear();
         }
     }
 

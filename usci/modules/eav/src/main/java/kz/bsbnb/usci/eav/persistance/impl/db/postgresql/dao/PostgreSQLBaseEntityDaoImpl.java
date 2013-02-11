@@ -44,6 +44,9 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
     private String INSERT_STRING_VALUE_SQL;
     private String SELECT_DATE_VALUES_BY_ENTITY_ID_SQL;
     private String SELECT_DOUBLE_VALUES_BY_ENTITY_ID_SQL;
+    private String SELECT_INTEGER_VALUES_BY_ENTITY_ID_SQL;
+    private String SELECT_BOOLEAN_VALUES_BY_ENTITY_ID_SQL;
+    private String SELECT_STRING_VALUES_BY_ENTITY_ID_SQL;
 
     @Autowired
     private IMetaClassDao postgreSQLMetaClassDaoImpl;
@@ -95,6 +98,24 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
                         "                   AND dv.attribute_id = sa.id) sav\n" +
                         "         ) savpp\n" +
                         " WHERE savpp.num_pp = 1\n", getConfig().getDoubleValuesTableName(), getConfig().getSimpleAttributesTableName());
+        SELECT_INTEGER_VALUES_BY_ENTITY_ID_SQL = String.format(
+                "SELECT savpp.batch_id,\n" +
+                        "       savpp.attribute_name,\n" +
+                        "       savpp.index,\n" +
+                        "       savpp.integer_value\n" +
+                        "  FROM (SELECT (rank() over(PARTITION BY sav.attribute_id ORDER BY sav.batch_id DESC)) AS num_pp,\n" +
+                        "               sav.*\n" +
+                        "          FROM (SELECT dv.batch_id,\n" +
+                        "                       dv.attribute_id,\n" +
+                        "                       sa.name as attribute_name,\n" +
+                        "                       dv.index,\n" +
+                        "                       dv.integer_value\n" +
+                        "                  FROM %s dv,\n" +
+                        "                       %s sa\n" +
+                        "                 WHERE dv.entity_id = ?\n" +
+                        "                   AND dv.attribute_id = sa.id) sav\n" +
+                        "         ) savpp\n" +
+                        " WHERE savpp.num_pp = 1\n", getConfig().getIntegerValuesTableName(), getConfig().getSimpleAttributesTableName());
     }
 
     class InsertBaseEntityPreparedStatementCreator implements PreparedStatementCreator {
@@ -126,6 +147,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
         loadBaseEntity(baseEntity);
         loadDateAttributeValues(baseEntity);
         loadDoubleAttributeValues(baseEntity);
+        loadIntegerAttributeValues(baseEntity);
 
         return baseEntity;
     }
@@ -144,14 +166,21 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
             baseEntity.setId(baseEntityId);
         }
 
-        Set<String> dateAttributeNames = baseEntity.getPresentDateAttributeNames();
-        if (!dateAttributeNames.isEmpty()) {
-            insertDateAttributeValues(baseEntity, dateAttributeNames);
+        Set<String> attributeNames = null;
+
+        attributeNames = baseEntity.getPresentDateAttributeNames();
+        if (!attributeNames.isEmpty()) {
+            insertDateAttributeValues(baseEntity, attributeNames);
         }
 
-        Set<String> doubleAttributeNames = baseEntity.getPresentDoubleAttributeNames();
-        if (!doubleAttributeNames.isEmpty()) {
-            insertDoubleAttributeValues(baseEntity, doubleAttributeNames);
+        attributeNames = baseEntity.getPresentDoubleAttributeNames();
+        if (!attributeNames.isEmpty()) {
+            insertDoubleAttributeValues(baseEntity, attributeNames);
+        }
+
+        attributeNames = baseEntity.getPresentIntegerAttributeNames();
+        if (!attributeNames.isEmpty()) {
+            insertIntegerAttributeValues(baseEntity, attributeNames);
         }
 
         return baseEntityId;
@@ -251,6 +280,36 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
         batchUpdateWithStats(INSERT_DOUBLE_VALUE_SQL, batchArgs);
     }
 
+    private void insertIntegerAttributeValues(BaseEntity baseEntity, Set<String> attributeNames) {
+        MetaClass metaClass = baseEntity.getMeta();
+
+        int i = 0;
+        Iterator<String> it = attributeNames.iterator();
+        List<Object[]> batchArgs = new ArrayList<Object[]>();
+        while (it.hasNext()) {
+            String attributeNameForInsert = it.next();
+
+            IMetaType metaType = metaClass.getMemberType(attributeNameForInsert);
+            MetaValue metaValue = (MetaValue)metaType;
+
+            IBatchValue batchValue = baseEntity.getBatchValue(attributeNameForInsert);
+
+            Object[] insertArgs = new Object[] {
+                    baseEntity.getId(),
+                    batchValue.getBatch().getId(),
+                    metaValue.getId(),
+                    batchValue.getIndex(),
+                    (Integer)batchValue.getValue()
+            };
+
+            batchArgs.add(insertArgs);
+            i++;
+        }
+
+        logger.debug(INSERT_INTEGER_VALUE_SQL);
+        batchUpdateWithStats(INSERT_INTEGER_VALUE_SQL, batchArgs);
+    }
+
     public void loadDateAttributeValues(BaseEntity baseEntity) {
         List<Map<String, Object>> rows = queryForListWithStats(SELECT_DATE_VALUES_BY_ENTITY_ID_SQL, baseEntity.getId());
 
@@ -261,7 +320,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
             baseEntity.set(
                     (String) row.get("attribute_name"),
                     (Long) row.get("index"),
-                    (Date)row.get("date_value")
+                    row.get("date_value")
             );
         }
     }
@@ -276,7 +335,22 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
             baseEntity.set(
                     (String) row.get("attribute_name"),
                     (Long) row.get("index"),
-                    (Double)row.get("double_value")
+                    row.get("double_value")
+            );
+        }
+    }
+
+    public void loadIntegerAttributeValues(BaseEntity baseEntity) {
+        List<Map<String, Object>> rows = queryForListWithStats(SELECT_INTEGER_VALUES_BY_ENTITY_ID_SQL, baseEntity.getId());
+
+        Iterator<Map<String, Object>> it = rows.iterator();
+        while (it.hasNext())
+        {
+            Map<String, Object> row = it.next();
+            baseEntity.set(
+                    (String) row.get("attribute_name"),
+                    (Long) row.get("index"),
+                    row.get("integer_value")
             );
         }
     }
