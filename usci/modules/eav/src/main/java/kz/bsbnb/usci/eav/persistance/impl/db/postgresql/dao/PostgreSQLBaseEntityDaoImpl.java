@@ -184,6 +184,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
             i++;
         }
 
+        logger.debug(INSERT_DATE_VALUE_SQL);
         batchUpdateWithStats(INSERT_DATE_VALUE_SQL, batchArgs);
     }
 
