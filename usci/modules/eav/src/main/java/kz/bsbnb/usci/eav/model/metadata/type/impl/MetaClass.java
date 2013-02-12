@@ -204,8 +204,8 @@ public class MetaClass extends AbstractMetaType {
      * @see MetaValue
      */
     public Set<String> getSimpleAttributesNames(DataTypes dataType) {
-        if (!this.isComplex()) {
-            throw new UnsupportedOperationException("This method can only be done for complex types.");
+        if (!this.isComplex() || this.isArray()) {
+            throw new UnsupportedOperationException("Simple attributes can be contained only in complex types.");
         }
 
         Set<String> allAttributeNames = this.members.keySet();
@@ -274,4 +274,24 @@ public class MetaClass extends AbstractMetaType {
     public Set<String> getStringAttributeNames() {
         return getSimpleAttributesNames(DataTypes.STRING);
     }
+
+    public Set<String> getComplexAttributesNames() {
+        if (!this.isComplex() || this.isArray()) {
+            throw new UnsupportedOperationException("Simple attributes can be contained only in complex types.");
+        }
+
+        Set<String> allAttributeNames = this.members.keySet();
+        Set<String> filteredAttributeNames = new HashSet<String>();
+
+        Iterator it = allAttributeNames.iterator();
+        while (it.hasNext()) {
+            String attributeName = (String)it.next();
+            IMetaType type = this.getMemberType(attributeName);
+            if (!type.isArray() && type.isComplex()) {
+                filteredAttributeNames.add(attributeName);
+            }
+        }
+        return filteredAttributeNames;
+    }
+
 }

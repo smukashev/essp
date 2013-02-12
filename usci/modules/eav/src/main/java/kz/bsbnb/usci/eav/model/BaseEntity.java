@@ -150,8 +150,8 @@ public class BaseEntity extends Persistable
      */
     public <T> void set(String name, long index, T value)
     {
-        /*if (defaultBatch == null)
-            throw new IllegalStateException("Default Batch is not set.");*/
+        if (defaultBatch == null)
+            throw new IllegalStateException("Default Batch is not set.");
 
         set(name, defaultBatch, index, value);
     }
@@ -255,6 +255,10 @@ public class BaseEntity extends Persistable
     {
         return getPresentSimpleAttributeNames(DataTypes.INTEGER);
     }
+
+    /*public Set<String> getPresentComplexAttributeNames() {
+
+    }*/
 
     public Batch getDefaultBatch()
     {

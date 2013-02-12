@@ -48,5 +48,6 @@
 
     <bean id="JDBCConfig" class="kz.bsbnb.usci.eav.persistance.impl.db.JDBCConfig"/>
     <bean id="SQLStats" class="kz.bsbnb.usci.eav.stats.SQLQueriesStats"/>
+    <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav.model.batchdata.impl.BatchRepository"/>
 
 </beans>

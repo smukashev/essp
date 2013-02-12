@@ -6,6 +6,7 @@ package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.batchdata.IBatchRepository;
 import kz.bsbnb.usci.eav.model.batchdata.IBatchValue;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
@@ -41,6 +42,8 @@ import static org.junit.Assert.*;
 public class PostgreSQLBaseEntityDaoImplTest {
 
     @Autowired
+    IBatchRepository batchRepository;
+    @Autowired
     IStorage postgreSQLStorageImpl;
     @Autowired
     IMetaClassDao postgreSQLMetaClassDaoImpl;
@@ -69,44 +72,81 @@ public class PostgreSQLBaseEntityDaoImplTest {
         try {
             postgreSQLStorageImpl.initialize();
 
-            MetaClass metaCreate = new MetaClass();
-            metaCreate.setClassName("testMetaClass");
+            MetaClass metaCreate = new MetaClass("testMetaClass");
+
+            // DATE
             metaCreate.setMemberType("testDate1", new MetaValue(DataTypes.DATE, false, true));
             metaCreate.setMemberType("testDate2", new MetaValue(DataTypes.DATE, false, true));
             metaCreate.setMemberType("testDate3", new MetaValue(DataTypes.DATE, false, true));
+
+            // DOUBLE
             metaCreate.setMemberType("testDouble1", new MetaValue(DataTypes.DOUBLE, false, true));
             metaCreate.setMemberType("testDouble2", new MetaValue(DataTypes.DOUBLE, false, true));
             metaCreate.setMemberType("testDouble3", new MetaValue(DataTypes.DOUBLE, false, true));
+
+            // INTEGER
             metaCreate.setMemberType("testInteger1", new MetaValue(DataTypes.INTEGER, false, true));
             metaCreate.setMemberType("testInteger2", new MetaValue(DataTypes.INTEGER, false, true));
             metaCreate.setMemberType("testInteger3", new MetaValue(DataTypes.INTEGER, false, true));
 
+            // BOOLEAN
+            metaCreate.setMemberType("testBoolean1", new MetaValue(DataTypes.BOOLEAN, false, true));
+            metaCreate.setMemberType("testBoolean2", new MetaValue(DataTypes.BOOLEAN, false, true));
+            metaCreate.setMemberType("testBoolean3", new MetaValue(DataTypes.BOOLEAN, false, true));
+
+            // STRING
+            metaCreate.setMemberType("testString1", new MetaValue(DataTypes.STRING, false, true));
+            metaCreate.setMemberType("testString2", new MetaValue(DataTypes.STRING, false, true));
+            metaCreate.setMemberType("testString3", new MetaValue(DataTypes.STRING, false, true));
+
+            // COMPLEX TYPE
+            metaCreate.setMemberType("testComplex1", new MetaClass("testMetaClass1"));
+            metaCreate.setMemberType("testComplex2", new MetaClass("testMetaClass2"));
+            metaCreate.setMemberType("testComplex3", new MetaClass("testMetaClass3"));
+
             long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
             MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
-            Batch batchCreate = new Batch();
-            long batchId = postgreSQLBatchEntityDaoImpl.save(batchCreate);
-            Batch batchLoad = postgreSQLBatchEntityDaoImpl.load(batchId);
 
+            Batch batch = batchRepository.addBatch(new Batch());
+            BaseEntity entityCreate = new BaseEntity(metaLoad, batch);
             Random random = new Random();
 
-            BaseEntity entityCreate = new BaseEntity(metaLoad, batchLoad);
+            // DATE
             entityCreate.set("testDate1", 1L, DateUtils.nowPlus(Calendar.DATE, 1));
             entityCreate.set("testDate2", 2L, DateUtils.nowPlus(Calendar.DATE, 2));
             entityCreate.set("testDate3", 3L, null);
-            entityCreate.set("testDouble1", 4L, random.nextDouble());
+
+            // DOUBLE
+            entityCreate.set("testDouble1", 4L, 100000 * random.nextDouble());
             entityCreate.set("testDouble2", 5L, null);
-            entityCreate.set("testDouble3", 6L, random.nextDouble());
+            entityCreate.set("testDouble3", 6L, 100000 * random.nextDouble());
+
+            // INTEGER
             entityCreate.set("testInteger1", 7L, null);
             entityCreate.set("testInteger2", 8L, random.nextInt());
             entityCreate.set("testInteger3", 9L, random.nextInt());
+
+            // BOOLEAN
+            entityCreate.set("testBoolean1", 10L, false);
+            entityCreate.set("testBoolean2", 11L, true);
+            entityCreate.set("testBoolean3", 12L, null);
+
+            // STRING
+            entityCreate.set("testString1", 13L, "Test value with a string type.");
+            entityCreate.set("testString2", 14L, null);
+            entityCreate.set("testString3", 15L, "Test value with a string type.");
+
             long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
             BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
 
+            for(DataTypes type: DataTypes.values()) {
+
+            }
             // DATE
             Set<String> attributeNamesCreate = entityCreate.getPresentDateAttributeNames();
             Set<String> attributeNamesLoad = entityLoad.getPresentDateAttributeNames();
-            assertEquals("One of the date values ​​are not saved or loaded. " +
+            assertEquals("One of the date values are not saved or loaded. " +
                     "Expected date values count: " + attributeNamesCreate.size() +
                     ", actual date values count: " + attributeNamesLoad.size(),
                     attributeNamesCreate.size(), attributeNamesLoad.size());
@@ -126,18 +166,16 @@ public class PostgreSQLBaseEntityDaoImplTest {
 
                     assertTrue(
                             "Not properly saved or loaded date value.",
-                            valueCreate == null && valueLoad == null ?
-                                    true :
-                                    valueCreate != null && valueLoad != null ?
-                                            DateUtils.compareBeginningOfTheDay(valueCreate, valueLoad) == 0 :
-                                            false);
+                            (valueCreate == null && valueLoad == null) ||
+                                    (valueCreate != null && valueLoad != null
+                                            && (DateUtils.compareBeginningOfTheDay(valueCreate, valueLoad) == 0)));
                 }
             }
 
             // DOUBLE
             attributeNamesCreate = entityCreate.getPresentDoubleAttributeNames();
             attributeNamesLoad = entityLoad.getPresentDoubleAttributeNames();
-            assertEquals("One of the double values ​​are not saved or loaded. " +
+            assertEquals("One of the double values are not saved or loaded. " +
                     "Expected double values count: " + attributeNamesCreate.size() +
                     ", actual double values count: " + attributeNamesLoad.size(),
                     attributeNamesCreate.size(), attributeNamesLoad.size());
@@ -155,18 +193,15 @@ public class PostgreSQLBaseEntityDaoImplTest {
 
                     assertTrue(
                             "Not properly saved or loaded double value.",
-                            valueCreate == null && valueLoad == null ?
-                                    true :
-                                    valueCreate != null && valueLoad != null ?
-                                            valueCreate.equals(valueLoad) :
-                                            false);
+                            valueCreate == null && valueLoad == null ||
+                                    (valueCreate != null && valueLoad != null && valueCreate.equals(valueLoad)));
                 }
             }
 
             // INTEGER
             attributeNamesCreate = entityCreate.getPresentIntegerAttributeNames();
             attributeNamesLoad = entityLoad.getPresentIntegerAttributeNames();
-            assertEquals("One of the integer values ​​are not saved or loaded. " +
+            assertEquals("One of the integer values are not saved or loaded. " +
                     "Expected integer values count: " + attributeNamesCreate.size() +
                     ", actual integer values count: " + attributeNamesLoad.size(),
                     attributeNamesCreate.size(), attributeNamesLoad.size());
@@ -184,11 +219,8 @@ public class PostgreSQLBaseEntityDaoImplTest {
 
                     assertTrue(
                             "Not properly saved or loaded integer value.",
-                            valueCreate == null && valueLoad == null ?
-                                    true :
-                                    valueCreate != null && valueLoad != null ?
-                                            valueCreate.equals(valueLoad) :
-                                            false);
+                            valueCreate == null && valueLoad == null ||
+                                    (valueCreate != null && valueLoad != null && valueCreate.equals(valueLoad)));
                 }
             }
         }
