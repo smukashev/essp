@@ -4,5 +4,9 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 
 public interface IMetaClassRepository
 {
+
     public MetaClass getMetaClass(String className);
+
+    public MetaClass getMetaClass(long id);
+
 }

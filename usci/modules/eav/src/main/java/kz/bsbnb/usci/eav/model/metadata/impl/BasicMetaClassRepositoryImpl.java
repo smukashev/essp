@@ -26,4 +26,10 @@ public class BasicMetaClassRepositoryImpl implements IMetaClassRepository
 
         return metaClass;
     }
+
+    @Override
+    public MetaClass getMetaClass(long id) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 }

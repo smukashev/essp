@@ -132,10 +132,17 @@ public class PostgreSQLBaseEntityDaoImplTest {
             entityCreate.set("testBoolean2", 11L, true);
             entityCreate.set("testBoolean3", 12L, null);
 
-            // STRING
+            // string
             entityCreate.set("testString1", 13L, "Test value with a string type.");
             entityCreate.set("testString2", 14L, null);
             entityCreate.set("testString3", 15L, "Test value with a string type.");
+
+            // complex values
+            BaseEntity childBaseEntity1 = new BaseEntity((MetaClass)metaLoad.getMemberType("testComplex1"), batch);
+            entityCreate.set("testComplex1", 16L, childBaseEntity1);
+
+            BaseEntity childBaseEntity2 = new BaseEntity((MetaClass)metaLoad.getMemberType("testComplex2"), batch);
+            entityCreate.set("testComplex2", 17L, childBaseEntity2);
 
             long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
             BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
@@ -228,6 +235,11 @@ public class PostgreSQLBaseEntityDaoImplTest {
         {
             postgreSQLStorageImpl.clear();
         }
+    }
+
+    @Test
+    public void multipleBatchSave() throws Exception {
+
     }
 
 }

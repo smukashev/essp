@@ -124,10 +124,6 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
-        if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
-
         IBatchValue batchValue = data.get(name);
 
         if(batchValue == null)
@@ -175,18 +171,22 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
-        if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
-
         if (value != null)
         {
-            MetaValue simpleType = (MetaValue)type;
-
             Class<?> valueClass = value.getClass();
-            Class<?> expValueClass = simpleType.getTypeCode().getDataTypeClass();
+            Class<?> expValueClass = null;
 
-            if(!expValueClass.isAssignableFrom(valueClass))
+            if (type.isComplex())
+            {
+                expValueClass = BaseEntity.class;
+            }
+            else
+            {
+                MetaValue metaValue = (MetaValue)type;
+                expValueClass = metaValue.getTypeCode().getDataTypeClass();
+            }
+
+            if(expValueClass == null || !expValueClass.isAssignableFrom(valueClass))
                 throw new IllegalArgumentException("Type mismatch in class: " +
                         meta.getClassName() + ". Needed " + expValueClass + ", got: " +
                         valueClass);
@@ -256,9 +256,9 @@ public class BaseEntity extends Persistable
         return getPresentSimpleAttributeNames(DataTypes.INTEGER);
     }
 
-    /*public Set<String> getPresentComplexAttributeNames() {
-
-    }*/
+    public Set<String> getPresentComplexAttributeNames() {
+        return SetUtils.intersection(meta.getComplexAttributesNames(), data.keySet());
+    }
 
     public Batch getDefaultBatch()
     {
