@@ -3,10 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>eav</artifactId>
+  <name>USCI eav</name>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
-
-  <name>EAV</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

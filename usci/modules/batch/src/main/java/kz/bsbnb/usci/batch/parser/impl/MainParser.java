@@ -98,34 +98,54 @@ public class MainParser extends AbstractParser
         }
         else if(localName.equalsIgnoreCase("entity"))
         {
-            BaseEntity parentEntity;
+            BaseEntity entity;
 
-            try
+            if(stack.size() == level)
             {
-                if(stack.size() == level)
+                try
                 {
-                    parentEntity = stack.pop();
+                    entity = stack.pop();
                 }
-                else
+                catch(EmptyStackException ex)
+                {
+                    entity = null;
+                }
+
+                BaseEntity parentEntity;
+
+                try
                 {
                     parentEntity = stack.peek();
                 }
-            }
-            catch(EmptyStackException ex)
-            {
-                parentEntity = null;
-            }
+                catch (EmptyStackException ex)
+                {
+                    parentEntity = null;
+                }
 
-            if(parentEntity != null)
-            {
-                parentEntity.set(currentEntity.getMeta().getClassName(), null, 0L, currentEntity);
+                if(parentEntity != null)
+                {
+                    parentEntity.set(entity.getMeta().getClassName(), null, 0L, entity);
+                }
+                else
+                {
+                    entities.add(entity);
+                }
             }
             else
             {
-               entities.add(currentEntity);
-               currentEntity = null;
+                try
+                {
+                    entity = stack.peek();
+                }
+                catch(EmptyStackException ex)
+                {
+                    entity = null;
+                }
+
+                entity.set(currentEntity.getMeta().getClassName(), null, 0L, currentEntity);
             }
 
+            currentEntity = null;
             level--;
         }
         else
