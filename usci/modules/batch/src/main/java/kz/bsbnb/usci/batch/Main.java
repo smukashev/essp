@@ -28,7 +28,7 @@ public class Main
         FileHelper fileHelper = (FileHelper) ctx.getBean("fileHelper");
 
         MainParser mainParser = new MainParser(
-                fileHelper.getFileBytes(new File("/opt/xmls/1.xml")));
+                fileHelper.getFileBytes(new File("/opt/xmls/simple.xml")));
 
         mainParser.parse();
     }

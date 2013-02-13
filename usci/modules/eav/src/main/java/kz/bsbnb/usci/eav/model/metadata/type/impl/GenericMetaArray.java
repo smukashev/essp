@@ -1,48 +1,58 @@
 package kz.bsbnb.usci.eav.model.metadata.type.impl;
 
-public class GenericMetaArray<T extends AbstractMetaType> extends AbstractMetaArray {
+public class GenericMetaArray<T extends AbstractMetaType> extends AbstractMetaArray
+{
 	T memberType;
 
-    GenericMetaArray(T memberType) {
+    GenericMetaArray(T memberType)
+    {
         this.memberType = memberType;
     }
 
-	GenericMetaArray(T memberType, boolean isKey, boolean isNullable) {
+	GenericMetaArray(T memberType, boolean isKey, boolean isNullable)
+    {
         this.memberType = memberType;
 		this.memberType.setKey(isKey);
 		this.memberType.setNullable(isNullable);
 	}
 
 	@Override
-	public boolean isKey() {
+	public boolean isKey()
+    {
 		return memberType.isKey();
 	}
 
 	@Override
-	public void setKey(boolean isKey) {
+	public void setKey(boolean isKey)
+    {
 		memberType.setKey(isKey);
 	}
 
 	@Override
-	public boolean isNullable() {
+	public boolean isNullable()
+    {
 		return memberType.isNullable();
 	}
 
 	@Override
-	public void setNullable(boolean isNullable) {
+	public void setNullable(boolean isNullable)
+    {
 		memberType.setNullable(isNullable);
 	}
 
 	@Override
-	public boolean isComplex() {
+	public boolean isComplex()
+    {
 		return memberType.isComplex();
 	}
 
-    public T getMembersType() {
+    public T getMembersType()
+    {
         return memberType;
     }
 
-    public void setMembersType(T memberType) {
+    public void setMembersType(T memberType)
+    {
         this.memberType = memberType;
     }
 }

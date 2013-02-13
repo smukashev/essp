@@ -4,7 +4,7 @@ import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 
-public abstract class AbstractMetaArray extends Persistable implements IMetaType/*, IPersistable*/
+public abstract class AbstractMetaArray extends Persistable implements IMetaType
 {
 	/**
      * When attribute is an array, and is a key attribute - sets key usage strategy.

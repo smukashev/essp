@@ -82,8 +82,9 @@ class MetaDataGenerator
                 break;
             default:
                 //simple attribute
-                type = new MetaValue(DataTypes.values()[rand.nextInt(DataTypes.values().length)], rand.nextBoolean(),
-                        rand.nextBoolean());
+                type = new MetaValue(DataTypes.values()[rand.nextInt(DataTypes.values().length)],
+                        rand.nextBoolean(), rand.nextBoolean());
+
                 simpleTypeCount++;
                 break;
         }

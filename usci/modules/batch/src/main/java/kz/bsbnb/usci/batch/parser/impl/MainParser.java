@@ -50,7 +50,6 @@ public class MainParser extends AbstractParser
     public void startDocument() throws SAXException
     {
         logger.info("started");
-
     }
 
     @Override
@@ -79,7 +78,6 @@ public class MainParser extends AbstractParser
                 stack.push(currentEntity);
 
             currentEntity = new BaseEntity(attributes.getValue("class"));
-
             level++;
         }
     }

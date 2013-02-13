@@ -6,8 +6,8 @@ import java.util.HashMap;
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 
-public class MetaClassArray extends GenericMetaArray<MetaClass> {
-	
+public class MetaClassArray extends GenericMetaArray<MetaClass>
+{
 	/**
      * When attribute is an array, and is a key attribute, and has type DataTypes.COMPLEX - 
      * sets array elements filter.
@@ -25,11 +25,13 @@ public class MetaClassArray extends GenericMetaArray<MetaClass> {
      */
     private HashMap<String, ArrayList<String>> arrayKeyFilter = new HashMap<String, ArrayList<String>>();
 
-    public MetaClassArray(MetaClass memberClass) {
+    public MetaClassArray(MetaClass memberClass)
+    {
         super(memberClass);
     }
 
-	public MetaClassArray(String className, boolean isKey, boolean isNullable) {
+	public MetaClassArray(String className, boolean isKey, boolean isNullable)
+    {
 		super(new MetaClass(), isKey, isNullable);
 		memberType.setClassName(className);
 	}
@@ -49,7 +51,8 @@ public class MetaClassArray extends GenericMetaArray<MetaClass> {
         memberType.setComplexKeyType(type);
     }
 	
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj)
+    {
 		if (obj == this)
 			return true;
 
@@ -58,7 +61,8 @@ public class MetaClassArray extends GenericMetaArray<MetaClass> {
 
 		if (!(getClass() == obj.getClass()))
 			return false;
-		else {
+		else
+        {
 			MetaClassArray tmp = (MetaClassArray) obj;
             return !(tmp.isKey() != this.isKey() ||
                     tmp.isNullable() != this.isNullable() ||

@@ -11,7 +11,7 @@ import javax.annotation.PostConstruct;
 @Scope(value = "singleton")
 public class JDBCConfig {
     @Value("${ds.table.prefix}")
-    protected String tablePrefix;
+    protected String tablePrefix = "eav_";
 
     private String classesTableName;
     private String arrayKeyFilterTableName;

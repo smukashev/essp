@@ -17,6 +17,7 @@ public class MetaValue extends AbstractMetaType
 
     public MetaValue()
     {
+        super();
     }
     
     /**

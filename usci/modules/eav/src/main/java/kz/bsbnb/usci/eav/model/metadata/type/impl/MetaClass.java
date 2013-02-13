@@ -10,8 +10,8 @@ import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 
-public class MetaClass extends AbstractMetaType {
-	/**
+public class MetaClass extends AbstractMetaType
+{	/**
 	 * Name of the metadata. Used as a key value for database search if <code>id</code> is 0 
 	 */
     private String className;
@@ -38,10 +38,13 @@ public class MetaClass extends AbstractMetaType {
 	 */
     private String searchProcedureName = null;
 
-    public MetaClass() {
+    public MetaClass()
+    {
+        super();
     }
 
-    public MetaClass(MetaClass meta) {
+    public MetaClass(MetaClass meta)
+    {
         this.className = meta.className;
         this.id = meta.id;
         this.isDisabled = meta.isDisabled;
@@ -50,39 +53,47 @@ public class MetaClass extends AbstractMetaType {
         members.putAll(meta.members);
     }
 
-	public MetaClass(String className) {
+	public MetaClass(String className)
+    {
 		this.className = className;
 	}
 
-    public MetaClass(String className, Timestamp beginDate) {
+    public MetaClass(String className, Timestamp beginDate)
+    {
         this.className = className;
         this.beginDate = beginDate;
     }
 
-    public MetaClass(boolean isKey, boolean isNullable) {
+    public MetaClass(boolean isKey, boolean isNullable)
+    {
         super(isKey, isNullable);
     }
 
-	public MetaClass(String className, boolean isKey, boolean isNullable) {
+	public MetaClass(String className, boolean isKey, boolean isNullable)
+    {
 		super(isKey, isNullable);
 		this.className = className;
 	}
 
 	@Override
-	public boolean isArray() {
+	public boolean isArray()
+    {
 		return false;
 	}
 
 	@Override
-	public boolean isComplex() {
+	public boolean isComplex()
+    {
 		return true;
 	}
 
-	public ComplexKeyTypes getComplexKeyType() {
+	public ComplexKeyTypes getComplexKeyType()
+    {
 		return complexKeyType;
 	}
 
-	public void setComplexKeyType(ComplexKeyTypes complexKeyType) {
+	public void setComplexKeyType(ComplexKeyTypes complexKeyType)
+    {
 		this.complexKeyType = complexKeyType;
 	}
 	
@@ -91,11 +102,13 @@ public class MetaClass extends AbstractMetaType {
 	 * 
 	 * @return entity class name
 	 */
-	public String getClassName() {
+	public String getClassName()
+    {
 		return className;
 	}
 
-	public void setClassName(String className) {
+	public void setClassName(String className)
+    {
 		this.className = className;
 	}
 	
@@ -104,7 +117,8 @@ public class MetaClass extends AbstractMetaType {
 	 * 
 	 * @return list of attribute names
 	 */
-	public Set<String> getMemberNames() {
+	public Set<String> getMemberNames()
+    {
 		return members.keySet();
 	}
 	
@@ -115,11 +129,13 @@ public class MetaClass extends AbstractMetaType {
 	 * @return type of that attribute
 	 * @see MetaValue
 	 */
-	public IMetaType getMemberType(String name) {
+	public IMetaType getMemberType(String name)
+    {
 		return members.get(name);
 	}
 
-	public void removeMemberType(String name) {
+	public void removeMemberType(String name)
+    {
 		members.remove(name);
 	}
 
@@ -130,19 +146,23 @@ public class MetaClass extends AbstractMetaType {
 	 * @param type type to be set
 	 * @see MetaValue
 	 */
-	public void setMemberType(String name, IMetaType type) {
+	public void setMemberType(String name, IMetaType type)
+    {
 		members.put(name, type);
 	}
 
-	public String getSearchProcedureName() {
+	public String getSearchProcedureName()
+    {
 		return searchProcedureName;
 	}
 
-	public void setSearchProcedureName(String searchProcedureName) {
+	public void setSearchProcedureName(String searchProcedureName)
+    {
 		this.searchProcedureName = searchProcedureName;
 	}
 	
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj)
+    {
 		if (obj == this)
 			return true;
 
@@ -159,9 +179,7 @@ public class MetaClass extends AbstractMetaType {
             for (String name : thisNames)
             {
                 if(!(this.getMemberType(name).equals(tmp.getMemberType(name))))
-                {
                     return false;
-                }
             }
 
             return !(tmp.isDisabled() != this.isDisabled() ||

@@ -25,4 +25,11 @@
     <!-- helpers -->
     <bean id="fileHelper" class="kz.bsbnb.usci.batch.helper.impl.FileHelper" />
 
+    <context:component-scan base-package="kz.bsbnb.usci.eav.persistance.impl.db.postgresql" />
+    <context:component-scan base-package="kz.bsbnb.usci.eav.model.metadata.impl" />
+
+    <bean id="JDBCConfig" class="kz.bsbnb.usci.eav.persistance.impl.db.JDBCConfig"/>
+    <bean id="SQLStats" class="kz.bsbnb.usci.eav.stats.SQLQueriesStats"/>
+    <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav.model.batchdata.impl.BatchRepository"/>
+
 </beans>

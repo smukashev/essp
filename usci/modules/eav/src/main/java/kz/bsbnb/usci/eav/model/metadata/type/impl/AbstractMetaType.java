@@ -3,7 +3,8 @@ package kz.bsbnb.usci.eav.model.metadata.type.impl;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 
-public abstract class AbstractMetaType extends Persistable implements IMetaType/*, IPersistable*/ {
+public abstract class AbstractMetaType extends Persistable implements IMetaType
+{
 	/**
 	 * <code>true</code> if attribute is a key attribute (used by DAO to find persisted entity)
 	 * if an attribute has type DataTypes.COMPLEX then all it's key values will be used
@@ -19,6 +20,7 @@ public abstract class AbstractMetaType extends Persistable implements IMetaType/
 	
 	AbstractMetaType()
     {
+        super();
 	}
 
 	AbstractMetaType(boolean isKey, boolean isNullable)

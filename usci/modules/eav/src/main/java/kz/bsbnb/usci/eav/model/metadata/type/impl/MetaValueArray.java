@@ -2,9 +2,10 @@ package kz.bsbnb.usci.eav.model.metadata.type.impl;
 
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 
-public class MetaValueArray extends GenericMetaArray<MetaValue> {
-	
-	public MetaValueArray(DataTypes typeCode, boolean isKey, boolean isNullable) {
+public class MetaValueArray extends GenericMetaArray<MetaValue>
+{
+	public MetaValueArray(DataTypes typeCode, boolean isKey, boolean isNullable)
+    {
 		super(new MetaValue(), isKey, isNullable);
 		memberType.setTypeCode(typeCode);
 	}
@@ -14,7 +15,8 @@ public class MetaValueArray extends GenericMetaArray<MetaValue> {
 		return memberType.getTypeCode();
 	}
 	
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj)
+    {
 		if (obj == this)
 			return true;
 
@@ -23,7 +25,8 @@ public class MetaValueArray extends GenericMetaArray<MetaValue> {
 
 		if (!(getClass() == obj.getClass()))
 			return false;
-		else {
+		else
+        {
 			MetaValueArray tmp = (MetaValueArray) obj;
             return !(tmp.getTypeCode() != this.getTypeCode() ||
                     tmp.isKey() != this.isKey() ||
