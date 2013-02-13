@@ -15,18 +15,20 @@ import java.util.HashMap;
  */
 @Component
 @Scope(value = "singleton")
-public class BatchRepository implements IBatchRepository {
-
+public class BatchRepository implements IBatchRepository
+{
     @Autowired
     private IBatchDao postgreSQLBatchDaoImpl;
 
     private HashMap<Long, Batch> cache = new HashMap<Long, Batch>();
 
     @Override
-    public Batch getBatch(long batchId) {
-        if (cache.containsKey(batchId)) {
+    public Batch getBatch(long batchId)
+    {
+        if (cache.containsKey(batchId))
             return cache.get(batchId);
-        } else {
+        else
+        {
             Batch batch = postgreSQLBatchDaoImpl.load(batchId);
             cache.put(batchId, batch);
 
@@ -35,14 +37,14 @@ public class BatchRepository implements IBatchRepository {
     }
 
     @Override
-    public Batch addBatch(Batch batch) {
+    public Batch addBatch(Batch batch)
+    {
         long batchId = batch.getId();
-        if (batch.getId() < 1)  {
+
+        if (batch.getId() < 1)
             batchId = postgreSQLBatchDaoImpl.save(batch);
-        }
 
         //TODO: Здесь можно сразу же обновить или создать новый метод только для обновления
         return getBatch(batchId);
     }
-
 }
