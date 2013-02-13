@@ -119,10 +119,10 @@ public class BaseEntity extends Persistable
     public IBatchValue getBatchValue(String name)
     {
         IMetaType type = meta.getMemberType(name);
-/*
+
         if(type == null)
             throw new IllegalArgumentException("Type: " + name +
-                    ", not found in class: " + meta.getClassName());*/
+                    ", not found in class: " + meta.getClassName());
 
         IBatchValue batchValue = data.get(name);
 
@@ -146,8 +146,8 @@ public class BaseEntity extends Persistable
      */
     public <T> void set(String name, long index, T value)
     {
-      /*  if (defaultBatch == null)
-            throw new IllegalStateException("Default Batch is not set.");*/
+        if (defaultBatch == null)
+            throw new IllegalStateException("Default Batch is not set.");
 
         set(name, defaultBatch, index, value);
     }
@@ -167,7 +167,7 @@ public class BaseEntity extends Persistable
     {
         IMetaType type = meta.getMemberType(name);
 
-        /*if(type == null)
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
@@ -177,9 +177,7 @@ public class BaseEntity extends Persistable
             Class<?> expValueClass = null;
 
             if (type.isComplex())
-            {
                 expValueClass = BaseEntity.class;
-            }
             else
             {
                 MetaValue metaValue = (MetaValue)type;
@@ -190,7 +188,7 @@ public class BaseEntity extends Persistable
                 throw new IllegalArgumentException("Type mismatch in class: " +
                         meta.getClassName() + ". Needed " + expValueClass + ", got: " +
                         valueClass);
-        }*/
+        }
 
         data.put(name, new BatchValue(batch, index, value));
     }
@@ -210,7 +208,7 @@ public class BaseEntity extends Persistable
     {
         IMetaType type = meta.getMemberType(name);
 
-        /*if(type == null)
+        if(type == null)
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
@@ -221,7 +219,6 @@ public class BaseEntity extends Persistable
         if(!type.isArray())
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an array");
-*/
         ArrayList<IBatchValue> batchValues = dataForArray.get(name);
 
         if(batchValues == null)
@@ -235,8 +232,8 @@ public class BaseEntity extends Persistable
 
     public Set<String> getPresentSimpleAttributeNames(DataTypes dataType)
     {
-        /*if (!this.meta.isComplex())
-            throw new UnsupportedOperationException("Simple types can be contained only in complex types.");*/
+        if (!this.meta.isComplex())
+            throw new UnsupportedOperationException("Simple types can be contained only in complex types.");
 
         return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), data.keySet());
     }
@@ -256,7 +253,8 @@ public class BaseEntity extends Persistable
         return getPresentSimpleAttributeNames(DataTypes.INTEGER);
     }
 
-    public Set<String> getPresentComplexAttributeNames() {
+    public Set<String> getPresentComplexAttributeNames()
+    {
         return SetUtils.intersection(meta.getComplexAttributesNames(), data.keySet());
     }
 
@@ -266,7 +264,8 @@ public class BaseEntity extends Persistable
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return meta.getClassName();
     }
 }
