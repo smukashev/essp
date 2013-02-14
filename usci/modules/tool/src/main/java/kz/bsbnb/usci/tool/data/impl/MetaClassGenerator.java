@@ -1,17 +1,19 @@
-package kz.bsbnb.usci.tool.data;
+package kz.bsbnb.usci.tool.data.impl;
 
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
+import kz.bsbnb.usci.tool.data.AbstractGenerator;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MetaClassGenerator
+/**
+ * @author a.tkachenko
+ */
+public class MetaClassGenerator  extends AbstractGenerator
 {
-    private Random rand = new Random();
-
     private int maxAttributes = 25;
     private int maxRecursion = 2;
     private int classesNumber = 0;

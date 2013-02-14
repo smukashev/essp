@@ -3,9 +3,9 @@ package kz.bsbnb.usci.batch.parser;
 import kz.bsbnb.usci.batch.common.Global;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import org.xml.sax.XMLReader;
 import java.io.CharArrayWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -13,14 +13,14 @@ import java.text.SimpleDateFormat;
 /**
  * @author k.tulbassiyev
  */
-public abstract class AbstractParser extends DefaultHandler
+public class CommonParser extends DefaultHandler
 {
     protected XMLReader xmlReader;
     protected ContentHandler contentHandler;
     protected CharArrayWriter contents = new CharArrayWriter();
     protected DateFormat dateFormat = new SimpleDateFormat(Global.DATE_FORMAT);
 
-    public AbstractParser()
+    public CommonParser()
     {
         super();
     }

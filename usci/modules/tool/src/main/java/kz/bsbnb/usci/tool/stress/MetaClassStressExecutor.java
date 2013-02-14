@@ -5,7 +5,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
-import kz.bsbnb.usci.tool.data.MetaClassGenerator;
+import kz.bsbnb.usci.tool.data.impl.MetaClassGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -26,9 +26,8 @@ public class MetaClassStressExecutor
         MetaClassGenerator gen = new MetaClassGenerator(25, 2);
 
         ClassPathXmlApplicationContext ctx
-                = new ClassPathXmlApplicationContext("applicationContextStressTest1.xml");
+                = new ClassPathXmlApplicationContext("stressApplicationContext.xml");
 
-        // instantiate our spring dao object from the application context
         IStorage storage = ctx.getBean(IStorage.class);
         IMetaClassDao dao = ctx.getBean(IMetaClassDao.class);
 
@@ -138,6 +137,7 @@ public class MetaClassStressExecutor
         System.out.println("-------------------------------------");
 
         SQLQueriesStats sqlStats = ctx.getBean(SQLQueriesStats.class);
+            storage.clear();
 
         if(sqlStats != null)
         {
@@ -153,7 +153,7 @@ public class MetaClassStressExecutor
                         qe.totalTime / qe.count, qe.totalTime, query);
             }
 
-            System.out.println("+-------+-----+----------+");
+            System.out.println("+---------+-----+-----------+");
         }
         else
         {

@@ -1,17 +1,14 @@
 package kz.bsbnb.usci.batch;
 
-import kz.bsbnb.usci.batch.helper.impl.FileHelper;
+import kz.bsbnb.usci.batch.parser.IParser;
+import kz.bsbnb.usci.batch.parser.IParserFactory;
 import kz.bsbnb.usci.batch.parser.impl.MainParser;
-import kz.bsbnb.usci.eav.model.BaseEntity;
-import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.xml.sax.SAXException;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 
 /**
  *
@@ -25,11 +22,10 @@ public class Main
     {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 
-        FileHelper fileHelper = (FileHelper) ctx.getBean("fileHelper");
+        IParserFactory parserFactory = ctx.getBean(IParserFactory.class);
 
-        MainParser mainParser = new MainParser(
-                fileHelper.getFileBytes(new File("/opt/xmls/simple.xml")));
+        IParser parser = parserFactory.getIParser("/opt/xmls/simple.xml");
 
-        mainParser.parse();
+        parser.parse();
     }
 }

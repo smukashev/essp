@@ -17,7 +17,7 @@
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>classpath:properties/datasourceStressTest1.properties</value>
+                <value>classpath:properties/stressDataSource.properties</value>
             </list>
         </property>
     </bean>

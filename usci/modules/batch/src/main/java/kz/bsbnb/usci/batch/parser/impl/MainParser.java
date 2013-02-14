@@ -1,16 +1,17 @@
 package kz.bsbnb.usci.batch.parser.impl;
 
-import kz.bsbnb.usci.batch.exception.UnknownTagException;
-import kz.bsbnb.usci.batch.parser.AbstractParser;
+import kz.bsbnb.usci.batch.helper.impl.FileHelper;
+import kz.bsbnb.usci.batch.parser.IParser;
+import kz.bsbnb.usci.batch.parser.CommonParser;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.Stack;
 /**
  * @author k.tulbassiyev
  */
-public class MainParser extends AbstractParser
+public class MainParser extends CommonParser implements IParser
 {
     private InputSource inputSource;
 
