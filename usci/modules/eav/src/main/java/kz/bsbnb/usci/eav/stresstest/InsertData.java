@@ -48,7 +48,7 @@ public class InsertData
 
         IMetaFactory metaFactory = ctx.getBean(IMetaFactory.class);
 
-        BaseEntity documentEntity = metaFactory.getBaseEntity("document");
+        BaseEntity documentEntity = metaFactory.getBaseEntity("document", null);
         documentEntity.set("type", 0L, "RNN");
         documentEntity.set("no", 0L, "1234567890");
 

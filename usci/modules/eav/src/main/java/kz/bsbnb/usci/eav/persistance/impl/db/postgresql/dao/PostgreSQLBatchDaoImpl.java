@@ -23,8 +23,8 @@ import java.util.Map;
  *
  */
 @Repository
-public class PostgreSQLBatchDaoImpl extends JDBCSupport
-        implements IBatchDao {
+public class PostgreSQLBatchDaoImpl extends JDBCSupport implements IBatchDao
+{
     private final Logger logger = LoggerFactory.getLogger(PostgreSQLBatchDaoImpl.class);
 
     private String INSERT_BATCH_SQL;

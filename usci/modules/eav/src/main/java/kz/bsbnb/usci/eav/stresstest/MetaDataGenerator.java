@@ -40,10 +40,8 @@ class MetaDataGenerator
         int switcher = rand.nextInt(4);
 
         if(switcher == 0 || switcher == 2)
-        {
             if(rand.nextInt(3) != 2)
                 switcher = 3;
-        }
 
         if(rec > maxRecursion)
             if(switcher == 0 || switcher == 2)
