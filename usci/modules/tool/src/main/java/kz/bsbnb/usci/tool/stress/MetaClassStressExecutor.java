@@ -1,11 +1,11 @@
-package kz.bsbnb.usci.tool.entry;
+package kz.bsbnb.usci.tool.stress;
 
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
-import kz.bsbnb.usci.tool.data.MetaDataGenerator;
+import kz.bsbnb.usci.tool.data.MetaClassGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -13,9 +13,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class StressTest1
+public class MetaClassStressExecutor
 {
-    private final static Logger logger = LoggerFactory.getLogger(StressTest1.class);
+    private final static Logger logger = LoggerFactory.getLogger(MetaClassStressExecutor.class);
 
     private final static int dataSize = 100;
 
@@ -23,7 +23,7 @@ public class StressTest1
     {
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
 
-        MetaDataGenerator gen = new MetaDataGenerator(25, 2);
+        MetaClassGenerator gen = new MetaClassGenerator(25, 2);
 
         ClassPathXmlApplicationContext ctx
                 = new ClassPathXmlApplicationContext("applicationContextStressTest1.xml");
@@ -65,8 +65,10 @@ public class StressTest1
 
             System.out.println("Testing   : ..........");
             System.out.print(  "Progress  : ");
+
             int delta = data.size() / 10;
             int i = 0;
+
             for(MetaClass mc : data)
             {
                 MetaClass loadedMetaClassById = dao.load(mc.getId());
@@ -134,6 +136,7 @@ public class StressTest1
         gen.printStats();
 
         System.out.println("-------------------------------------");
+
         SQLQueriesStats sqlStats = ctx.getBean(SQLQueriesStats.class);
 
         if(sqlStats != null)
@@ -157,5 +160,4 @@ public class StressTest1
             System.out.println("SQL stats off");
         }
     }
-
 }

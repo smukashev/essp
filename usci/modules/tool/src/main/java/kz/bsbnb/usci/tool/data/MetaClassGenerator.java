@@ -8,7 +8,7 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MetaDataGenerator
+public class MetaClassGenerator
 {
     private Random rand = new Random();
 
@@ -28,7 +28,7 @@ public class MetaDataGenerator
 
     private ArrayList<MetaClass> metaClasses = new ArrayList<MetaClass>();
 
-    public MetaDataGenerator(int maxAttributes, int maxRecursion)
+    public MetaClassGenerator(int maxAttributes, int maxRecursion)
     {
         this.maxAttributes = maxAttributes;
         this.maxRecursion = maxRecursion;
