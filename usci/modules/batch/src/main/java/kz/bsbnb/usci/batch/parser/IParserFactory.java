@@ -1,9 +1,11 @@
 package kz.bsbnb.usci.batch.parser;
 
+import kz.bsbnb.usci.eav.model.Batch;
+
 /**
  * @author k.tulbassiyev
  */
 public interface IParserFactory
 {
-    public IParser getIParser(String fileName);
+    public IParser getIParser(String fileName, Batch batch);
 }
