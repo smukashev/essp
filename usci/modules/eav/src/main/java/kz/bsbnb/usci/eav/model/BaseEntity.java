@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.model.batchdata.impl.BatchValue;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 import kz.bsbnb.usci.eav.util.SetUtils;
@@ -212,13 +213,14 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
-        if(type.isComplex())
+        /*if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name +
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
+                    ", is an object of class: " + ((MetaClass)type).getClassName());*/
 
         if(!type.isArray())
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an array");
+
         ArrayList<IBatchValue> batchValues = dataForArray.get(name);
 
         if(batchValues == null)
