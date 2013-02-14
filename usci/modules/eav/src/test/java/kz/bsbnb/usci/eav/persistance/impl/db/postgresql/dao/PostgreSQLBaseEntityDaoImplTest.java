@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.model.batchdata.IBatchRepository;
 import kz.bsbnb.usci.eav.model.batchdata.IBatchValue;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassHolder;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
@@ -74,35 +75,35 @@ public class PostgreSQLBaseEntityDaoImplTest {
 
             MetaClass metaCreate = new MetaClass("testMetaClass");
 
-            // DATE
+            // date values
             metaCreate.setMemberType("testDate1", new MetaValue(DataTypes.DATE, false, true));
             metaCreate.setMemberType("testDate2", new MetaValue(DataTypes.DATE, false, true));
             metaCreate.setMemberType("testDate3", new MetaValue(DataTypes.DATE, false, true));
 
-            // DOUBLE
+            //  double values
             metaCreate.setMemberType("testDouble1", new MetaValue(DataTypes.DOUBLE, false, true));
             metaCreate.setMemberType("testDouble2", new MetaValue(DataTypes.DOUBLE, false, true));
             metaCreate.setMemberType("testDouble3", new MetaValue(DataTypes.DOUBLE, false, true));
 
-            // INTEGER
+            // integer values
             metaCreate.setMemberType("testInteger1", new MetaValue(DataTypes.INTEGER, false, true));
             metaCreate.setMemberType("testInteger2", new MetaValue(DataTypes.INTEGER, false, true));
             metaCreate.setMemberType("testInteger3", new MetaValue(DataTypes.INTEGER, false, true));
 
-            // BOOLEAN
+            // boolean values
             metaCreate.setMemberType("testBoolean1", new MetaValue(DataTypes.BOOLEAN, false, true));
             metaCreate.setMemberType("testBoolean2", new MetaValue(DataTypes.BOOLEAN, false, true));
             metaCreate.setMemberType("testBoolean3", new MetaValue(DataTypes.BOOLEAN, false, true));
 
-            // STRING
+            // string values
             metaCreate.setMemberType("testString1", new MetaValue(DataTypes.STRING, false, true));
             metaCreate.setMemberType("testString2", new MetaValue(DataTypes.STRING, false, true));
             metaCreate.setMemberType("testString3", new MetaValue(DataTypes.STRING, false, true));
 
-            // COMPLEX TYPE
-            metaCreate.setMemberType("testComplex1", new MetaClass("testMetaClass1"));
-            metaCreate.setMemberType("testComplex2", new MetaClass("testMetaClass2"));
-            metaCreate.setMemberType("testComplex3", new MetaClass("testMetaClass3"));
+            // complex values
+            metaCreate.setMemberType("testComplex1", new MetaClassHolder("testMetaClass1"));
+            metaCreate.setMemberType("testComplex2", new MetaClassHolder("testMetaClass2"));
+            metaCreate.setMemberType("testComplex3", new MetaClassHolder("testMetaClass3"));
 
             long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
             MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
@@ -112,122 +113,100 @@ public class PostgreSQLBaseEntityDaoImplTest {
             BaseEntity entityCreate = new BaseEntity(metaLoad, batch);
             Random random = new Random();
 
-            // DATE
+            // date values
             entityCreate.set("testDate1", 1L, DateUtils.nowPlus(Calendar.DATE, 1));
             entityCreate.set("testDate2", 2L, DateUtils.nowPlus(Calendar.DATE, 2));
             entityCreate.set("testDate3", 3L, null);
 
-            // DOUBLE
+            // double values
             entityCreate.set("testDouble1", 4L, 100000 * random.nextDouble());
             entityCreate.set("testDouble2", 5L, null);
             entityCreate.set("testDouble3", 6L, 100000 * random.nextDouble());
 
-            // INTEGER
+            // integer values
             entityCreate.set("testInteger1", 7L, null);
             entityCreate.set("testInteger2", 8L, random.nextInt());
             entityCreate.set("testInteger3", 9L, random.nextInt());
 
-            // BOOLEAN
+            // boolean values
             entityCreate.set("testBoolean1", 10L, false);
             entityCreate.set("testBoolean2", 11L, true);
             entityCreate.set("testBoolean3", 12L, null);
 
-            // string
+            // string values
             entityCreate.set("testString1", 13L, "Test value with a string type.");
             entityCreate.set("testString2", 14L, null);
             entityCreate.set("testString3", 15L, "Test value with a string type.");
 
             // complex values
-            BaseEntity childBaseEntity1 = new BaseEntity((MetaClass)metaLoad.getMemberType("testComplex1"), batch);
+            BaseEntity childBaseEntity1 =
+                    new BaseEntity(((MetaClassHolder)metaLoad.getMemberType("testComplex1")).getMeta(), batch);
             entityCreate.set("testComplex1", 16L, childBaseEntity1);
-
-            BaseEntity childBaseEntity2 = new BaseEntity((MetaClass)metaLoad.getMemberType("testComplex2"), batch);
+            BaseEntity childBaseEntity2 =
+                    new BaseEntity(((MetaClassHolder)metaLoad.getMemberType("testComplex2")).getMeta(), batch);
             entityCreate.set("testComplex2", 17L, childBaseEntity2);
 
             long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
             BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
 
-            for(DataTypes type: DataTypes.values()) {
+            // simple values
+            for (DataTypes dataType: DataTypes.values()) {
+                Set<String> attributeNamesCreate = entityCreate.getPresentSimpleAttributeNames(dataType);
+                Set<String> attributeNamesLoad = entityLoad.getPresentSimpleAttributeNames(dataType);
+                assertEquals(
+                        String.format("One of the values with type %s are not saved or loaded.", dataType),
+                        attributeNamesCreate.size(), attributeNamesLoad.size());
 
-            }
-            // DATE
-            Set<String> attributeNamesCreate = entityCreate.getPresentDateAttributeNames();
-            Set<String> attributeNamesLoad = entityLoad.getPresentDateAttributeNames();
-            assertEquals("One of the date values are not saved or loaded. " +
-                    "Expected date values count: " + attributeNamesCreate.size() +
-                    ", actual date values count: " + attributeNamesLoad.size(),
-                    attributeNamesCreate.size(), attributeNamesLoad.size());
-
-            for (String dateAttributeName: attributeNamesCreate)
-            {
-                IBatchValue batchValue = entityLoad.getBatchValue(dateAttributeName);
-                if (batchValue != null)
+                for (String attributeName: attributeNamesCreate)
                 {
-                    IBatchValue batchValueCreate = entityCreate.getBatchValue(dateAttributeName);
-                    assertEquals(
-                            "Not properly saved or loaded an index field of one of the date values.",
-                            batchValueCreate.getIndex(), batchValue.getIndex());
+                    IBatchValue batchValueLoad = entityLoad.getBatchValue(attributeName);
+                    if (batchValueLoad != null)
+                    {
+                        IBatchValue batchValueCreate = entityCreate.getBatchValue(attributeName);
+                        assertEquals(
+                                String.format(
+                                        "Not properly saved or loaded an index field of one of the values with type %s.",
+                                        dataType),
+                                batchValueCreate.getIndex(), batchValueLoad.getIndex());
 
-                    Date valueCreate = (Date)batchValueCreate.getValue();
-                    Date valueLoad = (Date)batchValue.getValue();
+                        Batch batchCreate = batchValueCreate.getBatch();
+                        Batch batchLoad = batchValueLoad.getBatch();
 
-                    assertTrue(
-                            "Not properly saved or loaded date value.",
-                            (valueCreate == null && valueLoad == null) ||
-                                    (valueCreate != null && valueLoad != null
-                                            && (DateUtils.compareBeginningOfTheDay(valueCreate, valueLoad) == 0)));
-                }
-            }
+                        assertNotNull(
+                                String.format(
+                                        "When loading a simple attribute value to the type %s the Batch was equal to null",
+                                        dataType),
+                                batchLoad
+                        );
 
-            // DOUBLE
-            attributeNamesCreate = entityCreate.getPresentDoubleAttributeNames();
-            attributeNamesLoad = entityLoad.getPresentDoubleAttributeNames();
-            assertEquals("One of the double values are not saved or loaded. " +
-                    "Expected double values count: " + attributeNamesCreate.size() +
-                    ", actual double values count: " + attributeNamesLoad.size(),
-                    attributeNamesCreate.size(), attributeNamesLoad.size());
+                        assertEquals(
+                                String.format(
+                                        "Not properly saved or loaded an batch field of one of the values with type %s.",
+                                        dataType),
+                                batchCreate, batchLoad);
 
-            for (String dateAttributeName: attributeNamesCreate) {
-                IBatchValue batchValue = entityLoad.getBatchValue(dateAttributeName);
-                if (batchValue != null) {
-                    IBatchValue batchValueCreate = entityCreate.getBatchValue(dateAttributeName);
-                    assertEquals(
-                            "Not properly saved or loaded an index field of one of the double values.",
-                            batchValueCreate.getIndex(), batchValue.getIndex());
+                        assertEquals(
+                                String.format(
+                                        "Not properly saved or loaded an index field of one of the values with type %s.",
+                                        dataType),
+                                batchValueCreate.getIndex(), batchValueLoad.getIndex());
 
-                    Double valueCreate = (Double)batchValueCreate.getValue();
-                    Double valueLoad = (Double)batchValue.getValue();
+                        Object valueCreate = batchValueCreate.getValue();
+                        Object valueLoad = batchValueLoad.getValue();
 
-                    assertTrue(
-                            "Not properly saved or loaded double value.",
-                            valueCreate == null && valueLoad == null ||
-                                    (valueCreate != null && valueLoad != null && valueCreate.equals(valueLoad)));
-                }
-            }
-
-            // INTEGER
-            attributeNamesCreate = entityCreate.getPresentIntegerAttributeNames();
-            attributeNamesLoad = entityLoad.getPresentIntegerAttributeNames();
-            assertEquals("One of the integer values are not saved or loaded. " +
-                    "Expected integer values count: " + attributeNamesCreate.size() +
-                    ", actual integer values count: " + attributeNamesLoad.size(),
-                    attributeNamesCreate.size(), attributeNamesLoad.size());
-
-            for (String dateAttributeName: attributeNamesCreate) {
-                IBatchValue batchValue = entityLoad.getBatchValue(dateAttributeName);
-                if (batchValue != null) {
-                    IBatchValue batchValueCreate = entityCreate.getBatchValue(dateAttributeName);
-                    assertEquals(
-                            "Not properly saved or loaded an index field of one of the integer values.",
-                            batchValueCreate.getIndex(), batchValue.getIndex());
-
-                    Integer valueCreate = (Integer)batchValueCreate.getValue();
-                    Integer valueLoad = (Integer)batchValue.getValue();
-
-                    assertTrue(
-                            "Not properly saved or loaded integer value.",
-                            valueCreate == null && valueLoad == null ||
-                                    (valueCreate != null && valueLoad != null && valueCreate.equals(valueLoad)));
+                        if (dataType.equals(DataTypes.DATE)) {
+                            assertTrue(
+                                    String.format("Not properly saved or loaded value with type %s.", DataTypes.DATE),
+                                    (valueCreate == null && valueLoad == null) ||
+                                            (valueCreate != null && valueLoad != null
+                                                    && (DateUtils.compareBeginningOfTheDay((Date)valueCreate, (Date)valueLoad) == 0)));
+                        } else {
+                            assertTrue(
+                                    String.format("Not properly saved or loaded value with type %s.", dataType),
+                                    (valueCreate == null && valueLoad == null) ||
+                                            (valueCreate != null && valueLoad != null && valueCreate.equals(valueLoad)));
+                        }
+                    }
                 }
             }
         }

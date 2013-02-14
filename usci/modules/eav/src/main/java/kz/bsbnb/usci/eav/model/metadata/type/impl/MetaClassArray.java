@@ -6,8 +6,8 @@ import java.util.HashMap;
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 
-public class MetaClassArray extends GenericMetaArray<MetaClass>
-{
+public class MetaClassArray extends GenericMetaArray<MetaClassHolder> {
+
 	/**
      * When attribute is an array, and is a key attribute, and has type DataTypes.COMPLEX - 
      * sets array elements filter.
@@ -25,15 +25,12 @@ public class MetaClassArray extends GenericMetaArray<MetaClass>
      */
     private HashMap<String, ArrayList<String>> arrayKeyFilter = new HashMap<String, ArrayList<String>>();
 
-    public MetaClassArray(MetaClass memberClass)
-    {
+    public MetaClassArray(MetaClassHolder memberClass) {
         super(memberClass);
     }
 
-	public MetaClassArray(String className, boolean isKey, boolean isNullable)
-    {
-		super(new MetaClass(), isKey, isNullable);
-		memberType.setClassName(className);
+	public MetaClassArray(String className, boolean isKey, boolean isNullable) {
+		super(new MetaClassHolder(new MetaClass(className), isKey, isNullable));
 	}
 
 	public void addArrayKeyFilterValues(String attributeName, ArrayList<String> values)
@@ -41,15 +38,15 @@ public class MetaClassArray extends GenericMetaArray<MetaClass>
     	arrayKeyFilter.put(attributeName, values);
     }
 
-    public ComplexKeyTypes getComplexKeyType()
+    /*public ComplexKeyTypes getComplexKeyType()
     {
-        return memberType.getComplexKeyType();
+        return memberType.getMeta().getComplexKeyType();
     }
 
     public void setComplexKeyType(ComplexKeyTypes type)
     {
-        memberType.setComplexKeyType(type);
-    }
+        memberType.getMeta().setComplexKeyType(type);
+    }*/
 	
 	public boolean equals(Object obj)
     {

@@ -9,9 +9,10 @@ import java.util.Set;
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
+import kz.bsbnb.usci.eav.persistance.Persistable;
 
-public class MetaClass extends AbstractMetaType
-{	/**
+public class MetaClass extends Persistable {
+	/**
 	 * Name of the metadata. Used as a key value for database search if <code>id</code> is 0 
 	 */
     private String className;
@@ -49,6 +50,7 @@ public class MetaClass extends AbstractMetaType
         this.id = meta.id;
         this.isDisabled = meta.isDisabled;
         this.beginDate = meta.beginDate;
+        this.complexKeyType = meta.complexKeyType;
 
         members.putAll(meta.members);
     }
@@ -64,31 +66,7 @@ public class MetaClass extends AbstractMetaType
         this.beginDate = beginDate;
     }
 
-    public MetaClass(boolean isKey, boolean isNullable)
-    {
-        super(isKey, isNullable);
-    }
-
-	public MetaClass(String className, boolean isKey, boolean isNullable)
-    {
-		super(isKey, isNullable);
-		this.className = className;
-	}
-
-	@Override
-	public boolean isArray()
-    {
-		return false;
-	}
-
-	@Override
-	public boolean isComplex()
-    {
-		return true;
-	}
-
-	public ComplexKeyTypes getComplexKeyType()
-    {
+	public ComplexKeyTypes getComplexKeyType() {
 		return complexKeyType;
 	}
 
@@ -184,8 +162,6 @@ public class MetaClass extends AbstractMetaType
 
             return !(tmp.isDisabled() != this.isDisabled() ||
                     !tmp.getBeginDate().equals(this.getBeginDate()) ||
-                    tmp.isKey() != this.isKey() ||
-                    tmp.isNullable() != this.isNullable() ||
                     !tmp.getClassName().equals(this.getClassName()) ||
                     !tmp.complexKeyType.equals(this.complexKeyType));
 
@@ -222,10 +198,6 @@ public class MetaClass extends AbstractMetaType
      * @see MetaValue
      */
     public Set<String> getSimpleAttributesNames(DataTypes dataType) {
-        if (!this.isComplex() || this.isArray()) {
-            throw new UnsupportedOperationException("Simple attributes can be contained only in complex types.");
-        }
-
         Set<String> allAttributeNames = this.members.keySet();
         Set<String> filteredAttributeNames = new HashSet<String>();
 
@@ -294,10 +266,6 @@ public class MetaClass extends AbstractMetaType
     }
 
     public Set<String> getComplexAttributesNames() {
-        if (!this.isComplex() || this.isArray()) {
-            throw new UnsupportedOperationException("Simple attributes can be contained only in complex types.");
-        }
-
         Set<String> allAttributeNames = this.members.keySet();
         Set<String> filteredAttributeNames = new HashSet<String>();
 

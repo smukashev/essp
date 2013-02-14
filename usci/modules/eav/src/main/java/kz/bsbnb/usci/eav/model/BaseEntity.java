@@ -232,9 +232,6 @@ public class BaseEntity extends Persistable
 
     public Set<String> getPresentSimpleAttributeNames(DataTypes dataType)
     {
-        if (!this.meta.isComplex())
-            throw new UnsupportedOperationException("Simple types can be contained only in complex types.");
-
         return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), data.keySet());
     }
 
@@ -253,8 +250,17 @@ public class BaseEntity extends Persistable
         return getPresentSimpleAttributeNames(DataTypes.INTEGER);
     }
 
-    public Set<String> getPresentComplexAttributeNames()
+    public Set<String> getPresentBooleanAttributeNames()
     {
+        return getPresentSimpleAttributeNames(DataTypes.BOOLEAN);
+    }
+
+    public Set<String> getPresentStringAttributeNames()
+    {
+        return getPresentSimpleAttributeNames(DataTypes.STRING);
+    }
+
+    public Set<String> getPresentComplexAttributeNames() {
         return SetUtils.intersection(meta.getComplexAttributesNames(), data.keySet());
     }
 

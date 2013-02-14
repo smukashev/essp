@@ -1,10 +1,7 @@
 package kz.bsbnb.usci.eav.model.metadata.impl;
 
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import org.junit.Test;
@@ -52,15 +49,17 @@ public class BasicMetaClassRepositoryImplTest {
             MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
             metaCreate.setMemberType("testArray", metaValueArray);
 
-            MetaClass metaClass = new MetaClass("innerClass", true, false);
+            MetaClass metaClass = new MetaClass("innerClass");
             metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
             metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            metaCreate.setMemberType("testInnerClass", metaClass);
+            MetaClassHolder metaClassHolder = new MetaClassHolder(metaClass, true, false);
+            metaCreate.setMemberType("testInnerClass", metaClassHolder);
 
-            MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
+            MetaClass metaClassForArray = new MetaClass("innerClassForArray");
             metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
             metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
+            MetaClassHolder metaClassHolderForArray = new MetaClassHolder(metaClass, true, false);
+            MetaClassArray metaClassArray = new MetaClassArray(metaClassHolderForArray);
             metaCreate.setMemberType("testInnerClassArray", metaClassArray);
 
             long id = metaClassDaoImpl.save(metaCreate);

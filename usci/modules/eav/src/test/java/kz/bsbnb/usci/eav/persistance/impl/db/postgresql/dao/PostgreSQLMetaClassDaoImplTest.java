@@ -6,10 +6,7 @@ package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import org.junit.Test;
@@ -62,16 +59,19 @@ public class PostgreSQLMetaClassDaoImplTest {
             MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
             metaCreate.setMemberType("testArray", metaValueArray);
 
-            MetaClass metaClass = new MetaClass("innerClass", true, false);
+            MetaClass metaClass = new MetaClass("innerClass");
             metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
             metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            metaCreate.setMemberType("testInnerClass", metaClass);
+            MetaClassHolder metaClassHolder = new MetaClassHolder(metaClass, true, false);
+            metaCreate.setMemberType("testInnerClass", metaClassHolder);
 
-            MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
+            MetaClass metaClassForArray = new MetaClass("innerClassForArray");
             metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
             metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
-            metaClassArray.setComplexKeyType(ComplexKeyTypes.ANY);
+            metaClassForArray.setComplexKeyType(ComplexKeyTypes.ANY);
+            MetaClassHolder metaClassHolderForArray = new MetaClassHolder(metaClassForArray, true, false);
+            MetaClassArray metaClassArray = new MetaClassArray(metaClassHolderForArray);
+            //metaClassArray.setComplexKeyType(ComplexKeyTypes.ANY);
             metaCreate.setMemberType("testInnerClassArray", metaClassArray);
 
             long id;
@@ -124,15 +124,17 @@ public class PostgreSQLMetaClassDaoImplTest {
             MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
             metaCreate.setMemberType("testArray", metaValueArray);
 
-            MetaClass metaClass = new MetaClass("innerClass", true, false);
+            MetaClass metaClass = new MetaClass("innerClass");
+            MetaClassHolder metaClassHolder = new MetaClassHolder(metaClass, true, false);
             metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
             metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            metaCreate.setMemberType("testInnerClass", metaClass);
+            metaCreate.setMemberType("testInnerClass", metaClassHolder);
 
-            MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
+            MetaClass metaClassForArray = new MetaClass("innerClassForArray");
+            MetaClassHolder metaClassHolderForArray = new MetaClassHolder(metaClassForArray, true, false);
             metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
             metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
+            MetaClassArray metaClassArray = new MetaClassArray(metaClassHolderForArray);
             metaCreate.setMemberType("testInnerClassArray", metaClassArray);
 	        
             long id;
@@ -187,15 +189,17 @@ public class PostgreSQLMetaClassDaoImplTest {
             MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
             metaCreate.setMemberType("testArray", metaValueArray);
 
-            MetaClass metaClass = new MetaClass("innerClass", true, false);
+            MetaClass metaClass = new MetaClass("innerClass");
             metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
             metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            metaCreate.setMemberType("testInnerClass", metaClass);
+            MetaClassHolder metaClassHolder = new MetaClassHolder(metaClass, true, false);
+            metaCreate.setMemberType("testInnerClass", metaClassHolder);
 
-            MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
+            MetaClass metaClassForArray = new MetaClass("innerClassForArray");
             metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
             metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
+            MetaClassHolder metaClassHolderForArray = new MetaClassHolder(metaClassForArray, true, false);
+            MetaClassArray metaClassArray = new MetaClassArray(metaClassHolderForArray);
             metaCreate.setMemberType("testInnerClassArray", metaClassArray);
 
             postgreSQLMetaClassDaoImpl.save(metaCreate);
@@ -241,15 +245,17 @@ public class PostgreSQLMetaClassDaoImplTest {
             MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
             metaCreate.setMemberType("testArray", metaValueArray);
 
-            MetaClass metaClass = new MetaClass("innerClass", true, false);
+            MetaClass metaClass = new MetaClass("innerClass");
             metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
             metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            metaCreate.setMemberType("testInnerClass", metaClass);
+            MetaClassHolder metaClassHolder = new MetaClassHolder(metaClass, true, false);
+            metaCreate.setMemberType("testInnerClass", metaClassHolder);
 
-            MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
+            MetaClass metaClassForArray = new MetaClass("innerClassForArray");
             metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
             metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
+            MetaClassHolder metaClassHolderForArray = new MetaClassHolder(metaClassForArray, true, false);
+            MetaClassArray metaClassArray = new MetaClassArray(metaClassHolderForArray);
             metaCreate.setMemberType("testInnerClassArray", metaClassArray);
 
             postgreSQLMetaClassDaoImpl.save(metaCreate);
