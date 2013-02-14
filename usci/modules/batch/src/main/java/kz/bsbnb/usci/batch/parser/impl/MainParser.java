@@ -34,11 +34,11 @@ public class MainParser extends CommonParser
 
     private Stack<BaseEntity> stack = new Stack<BaseEntity>();
 
-    private List<BaseEntity> entities = new ArrayList<BaseEntity>();
-
     private BaseEntity currentEntity;
 
     private int level = 0;
+
+    private long index = 1;
 
     public MainParser(byte[] xmlBytes, Batch batch)
     {
@@ -134,11 +134,12 @@ public class MainParser extends CommonParser
 
                 if(parentEntity != null)
                 {
-                    parentEntity.set(entity.getMeta().getClassName(), batch, 0L, entity);
+                    parentEntity.set(entity.getMeta().getClassName(), batch, index, entity);
                 }
                 else
                 {
-                    entities.add(entity);
+                    baseEntityDao.save(entity);
+                    index++;
                 }
             }
             else
@@ -155,7 +156,7 @@ public class MainParser extends CommonParser
                 if(entity == null)
                     throw new NullPointerException("Entity is NULL!");
 
-                entity.set(currentEntity.getMeta().getClassName(), batch, 0L, currentEntity);
+                entity.set(currentEntity.getMeta().getClassName(), batch, index, currentEntity);
             }
 
             currentEntity = null;
@@ -163,7 +164,7 @@ public class MainParser extends CommonParser
         }
         else
         {
-            currentEntity.set(localName, batch, 0L, contents.toString());
+            currentEntity.set(localName, batch, index, contents.toString());
         }
     }
 }
