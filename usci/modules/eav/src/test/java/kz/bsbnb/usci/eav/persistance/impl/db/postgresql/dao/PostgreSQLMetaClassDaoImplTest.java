@@ -12,6 +12,8 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -44,286 +46,256 @@ public class PostgreSQLMetaClassDaoImplTest {
 	public PostgreSQLMetaClassDaoImplTest() {
     }
 
+    @Before
+    public void setUp() throws Exception {
+        postgreSQLStorageImpl.initialize();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        postgreSQLStorageImpl.clear();
+    }
+
     @Test
     public void saveMetaClass() throws Exception {
-        try {
-            postgreSQLStorageImpl.initialize();
+        logger.debug("Create metadata test");
 
-            logger.debug("Create metadata test");
+        MetaClass metaCreate = new MetaClass("testClass");
 
-            MetaClass metaCreate = new MetaClass("testClass");
+        metaCreate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
+        metaCreate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+        metaCreate.setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+        metaCreate.setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+        metaCreate.setMemberType("testString", new MetaValue(DataTypes.STRING, false, false));
 
-            metaCreate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
-            metaCreate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
-            metaCreate.setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            metaCreate.setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
-            metaCreate.setMemberType("testString", new MetaValue(DataTypes.STRING, false, false));
+        MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
+        metaCreate.setMemberType("testArray", metaValueArray);
 
-            MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
-            metaCreate.setMemberType("testArray", metaValueArray);
+        MetaClass metaClass = new MetaClass("innerClass", true, false);
+        metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+        metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+        metaCreate.setMemberType("testInnerClass", metaClass);
 
-            MetaClass metaClass = new MetaClass("innerClass", true, false);
-            metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
-            metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            metaCreate.setMemberType("testInnerClass", metaClass);
+        MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
+        metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+        metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+        MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
+        metaClassArray.setComplexKeyType(ComplexKeyTypes.ANY);
+        metaCreate.setMemberType("testInnerClassArray", metaClassArray);
 
-            MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
-            metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
-            metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
-            metaClassArray.setComplexKeyType(ComplexKeyTypes.ANY);
-            metaCreate.setMemberType("testInnerClassArray", metaClassArray);
+        long id;
+        MetaClass loadClassNotExists;
 
-            long id;
-            MetaClass loadClassNotExists;
-
-            try
-            {
-                loadClassNotExists = postgreSQLMetaClassDaoImpl.load("testClass");
-            }
-            catch (IllegalArgumentException e)
-            {
-                logger.debug("Can't load not existing class, and that's ok");
-                loadClassNotExists = null;
-            }
-            assertTrue(loadClassNotExists == null);
-
-            id = postgreSQLMetaClassDaoImpl.save(metaCreate);
-
-            MetaClass loadedByNameMetaCreate = postgreSQLMetaClassDaoImpl.load("testClass");
-            MetaClass loadedByIdMetaCreate = postgreSQLMetaClassDaoImpl.load(id);
-
-            assertTrue(metaCreate.equals(loadedByNameMetaCreate));
-            assertTrue(metaCreate.equals(loadedByIdMetaCreate));
-        }
-        finally
+        try
         {
-            postgreSQLStorageImpl.clear();
+            loadClassNotExists = postgreSQLMetaClassDaoImpl.load("testClass");
         }
+        catch (IllegalArgumentException e)
+        {
+            logger.debug("Can't load not existing class, and that's ok");
+            loadClassNotExists = null;
+        }
+        assertTrue(loadClassNotExists == null);
+
+        id = postgreSQLMetaClassDaoImpl.save(metaCreate);
+
+        MetaClass loadedByNameMetaCreate = postgreSQLMetaClassDaoImpl.load("testClass");
+        MetaClass loadedByIdMetaCreate = postgreSQLMetaClassDaoImpl.load(id);
+
+        assertTrue(metaCreate.equals(loadedByNameMetaCreate));
+        assertTrue(metaCreate.equals(loadedByIdMetaCreate));
     }
 
     @Test
     public void loadMetaClass() throws Exception {
-        try {
-        	postgreSQLStorageImpl.initialize();
-	        
-	        logger.debug("Load metadata test");
+        logger.debug("Load metadata test");
 
-            long time = Calendar.getInstance().getTimeInMillis();
+        long time = Calendar.getInstance().getTimeInMillis();
 
-            MetaClass metaCreate = new MetaClass("testClass");
-            metaCreate.setBeginDate(new Timestamp(time));
-            metaCreate.setDisabled(false);
-	        
-	        metaCreate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
-	        metaCreate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
-	        metaCreate.setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-	        metaCreate.setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
-	        metaCreate.setMemberType("testString", new MetaValue(DataTypes.STRING, false, false));
+        MetaClass metaCreate = new MetaClass("testClass");
+        metaCreate.setBeginDate(new Timestamp(time));
+        metaCreate.setDisabled(false);
 
-            MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
-            metaCreate.setMemberType("testArray", metaValueArray);
+        metaCreate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
+        metaCreate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+        metaCreate.setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+        metaCreate.setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+        metaCreate.setMemberType("testString", new MetaValue(DataTypes.STRING, false, false));
 
-            MetaClass metaClass = new MetaClass("innerClass", true, false);
-            metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
-            metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            metaCreate.setMemberType("testInnerClass", metaClass);
+        MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
+        metaCreate.setMemberType("testArray", metaValueArray);
 
-            MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
-            metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
-            metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
-            metaCreate.setMemberType("testInnerClassArray", metaClassArray);
-	        
-            long id;
+        MetaClass metaClass = new MetaClass("innerClass", true, false);
+        metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+        metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+        metaCreate.setMemberType("testInnerClass", metaClass);
 
-            MetaClass loadClassNotExists;
+        MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
+        metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+        metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+        MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
+        metaCreate.setMemberType("testInnerClassArray", metaClassArray);
 
-            try
-            {
-                loadClassNotExists = postgreSQLMetaClassDaoImpl.load("testClass");
-            }
-            catch (IllegalArgumentException e)
-            {
-                logger.debug("Class not found, but it's ok.");
-                loadClassNotExists = null;
-            }
+        long id;
 
-            assertTrue(loadClassNotExists == null);
+        MetaClass loadClassNotExists;
 
-	        id = postgreSQLMetaClassDaoImpl.save(metaCreate);
-
-	        MetaClass loadedByNameMetaCreate = postgreSQLMetaClassDaoImpl.load("testClass");
-	        MetaClass loadedByIdMetaCreate = postgreSQLMetaClassDaoImpl.load(id);
-
-	        assertTrue(metaCreate.equals(loadedByNameMetaCreate));
-	        assertTrue(metaCreate.equals(loadedByIdMetaCreate));
-        }
-        finally
+        try
         {
-        	postgreSQLStorageImpl.clear();
+            loadClassNotExists = postgreSQLMetaClassDaoImpl.load("testClass");
         }
+        catch (IllegalArgumentException e)
+        {
+            logger.debug("Class not found, but it's ok.");
+            loadClassNotExists = null;
+        }
+
+        assertTrue(loadClassNotExists == null);
+
+        id = postgreSQLMetaClassDaoImpl.save(metaCreate);
+
+        MetaClass loadedByNameMetaCreate = postgreSQLMetaClassDaoImpl.load("testClass");
+        MetaClass loadedByIdMetaCreate = postgreSQLMetaClassDaoImpl.load(id);
+
+        assertTrue(metaCreate.equals(loadedByNameMetaCreate));
+        assertTrue(metaCreate.equals(loadedByIdMetaCreate));
     }
 
     @Test
     public void updateMetaClass() throws Exception {
-        try {
-            postgreSQLStorageImpl.initialize();
+        logger.debug("Update metadata test");
 
-            logger.debug("Update metadata test");
+        long time = Calendar.getInstance().getTimeInMillis();
 
-            long time = Calendar.getInstance().getTimeInMillis();
+        MetaClass metaCreate = new MetaClass("testClass");
+        metaCreate.setBeginDate(new Timestamp(time));
+        metaCreate.setDisabled(false);
 
-            MetaClass metaCreate = new MetaClass("testClass");
-            metaCreate.setBeginDate(new Timestamp(time));
-            metaCreate.setDisabled(false);
+        metaCreate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
+        metaCreate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+        metaCreate.setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+        metaCreate.setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+        metaCreate.setMemberType("testString", new MetaValue(DataTypes.STRING, false, false));
 
-            metaCreate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
-            metaCreate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
-            metaCreate.setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            metaCreate.setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
-            metaCreate.setMemberType("testString", new MetaValue(DataTypes.STRING, false, false));
+        MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
+        metaCreate.setMemberType("testArray", metaValueArray);
 
-            MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
-            metaCreate.setMemberType("testArray", metaValueArray);
+        MetaClass metaClass = new MetaClass("innerClass", true, false);
+        metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+        metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+        metaCreate.setMemberType("testInnerClass", metaClass);
 
-            MetaClass metaClass = new MetaClass("innerClass", true, false);
-            metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
-            metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            metaCreate.setMemberType("testInnerClass", metaClass);
+        MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
+        metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+        metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+        MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
+        metaCreate.setMemberType("testInnerClassArray", metaClassArray);
 
-            MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
-            metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
-            metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
-            metaCreate.setMemberType("testInnerClassArray", metaClassArray);
+        postgreSQLMetaClassDaoImpl.save(metaCreate);
 
-            postgreSQLMetaClassDaoImpl.save(metaCreate);
+        metaCreate.setDisabled(true);
+        metaCreate.setBeginDate(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 
-            metaCreate.setDisabled(true);
-            metaCreate.setBeginDate(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+        metaCreate.getMemberType("testDate").setKey(true);
+        metaCreate.setMemberType("testNewDate", new MetaValue(DataTypes.DATE, false, false));
+        metaCreate.removeMemberType("testDouble");
 
-            metaCreate.getMemberType("testDate").setKey(true);
-            metaCreate.setMemberType("testNewDate", new MetaValue(DataTypes.DATE, false, false));
-            metaCreate.removeMemberType("testDouble");
+        postgreSQLMetaClassDaoImpl.save(metaCreate);
 
-            postgreSQLMetaClassDaoImpl.save(metaCreate);
+        MetaClass loaded = postgreSQLMetaClassDaoImpl.load(metaCreate.getId());
 
-            MetaClass loaded = postgreSQLMetaClassDaoImpl.load(metaCreate.getId());
-
-            assertTrue(metaCreate.equals(loaded));
-        }
-        finally
-        {
-            postgreSQLStorageImpl.clear();
-        }
+        assertTrue(metaCreate.equals(loaded));
     }
 
     @Test
     public void deleteMetaClass() throws Exception {
-        try {
-            postgreSQLStorageImpl.initialize();
+        logger.debug("Delete metadata test");
 
-            logger.debug("Delete metadata test");
+        long time = Calendar.getInstance().getTimeInMillis();
 
-            long time = Calendar.getInstance().getTimeInMillis();
+        MetaClass metaCreate = new MetaClass("testClass");
+        metaCreate.setBeginDate(new Timestamp(time));
+        metaCreate.setDisabled(false);
 
-            MetaClass metaCreate = new MetaClass("testClass");
-            metaCreate.setBeginDate(new Timestamp(time));
-            metaCreate.setDisabled(false);
+        metaCreate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
+        metaCreate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+        metaCreate.setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+        metaCreate.setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+        metaCreate.setMemberType("testString", new MetaValue(DataTypes.STRING, false, false));
 
-            metaCreate.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
-            metaCreate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
-            metaCreate.setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            metaCreate.setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
-            metaCreate.setMemberType("testString", new MetaValue(DataTypes.STRING, false, false));
+        MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
+        metaCreate.setMemberType("testArray", metaValueArray);
 
-            MetaValueArray metaValueArray = new MetaValueArray(DataTypes.STRING, false, false);
-            metaCreate.setMemberType("testArray", metaValueArray);
+        MetaClass metaClass = new MetaClass("innerClass", true, false);
+        metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+        metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+        metaCreate.setMemberType("testInnerClass", metaClass);
 
-            MetaClass metaClass = new MetaClass("innerClass", true, false);
-            metaClass.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
-            metaClass.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            metaCreate.setMemberType("testInnerClass", metaClass);
+        MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
+        metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
+        metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
+        MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
+        metaCreate.setMemberType("testInnerClassArray", metaClassArray);
 
-            MetaClass metaClassForArray = new MetaClass("innerClassForArray", true, false);
-            metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
-            metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
-            MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
-            metaCreate.setMemberType("testInnerClassArray", metaClassArray);
+        postgreSQLMetaClassDaoImpl.save(metaCreate);
 
-            postgreSQLMetaClassDaoImpl.save(metaCreate);
-
-            try
-            {
-                postgreSQLMetaClassDaoImpl.load(metaCreate.getId());
-            }
-            catch(IllegalArgumentException e)
-            {
-                fail(String.format("Can't load MetaClass: %s", e.getMessage()));
-            }
-
-            postgreSQLMetaClassDaoImpl.remove(metaCreate);
-
-            try
-            {
-                postgreSQLMetaClassDaoImpl.load(metaCreate.getId());
-                fail("Loaded removed class");
-            }
-            catch(IllegalArgumentException e)
-            {
-            }
-        }
-        finally
+        try
         {
-            postgreSQLStorageImpl.clear();
+            postgreSQLMetaClassDaoImpl.load(metaCreate.getId());
+        }
+        catch(IllegalArgumentException e)
+        {
+            fail(String.format("Can't load MetaClass: %s", e.getMessage()));
+        }
+
+        postgreSQLMetaClassDaoImpl.remove(metaCreate);
+
+        try
+        {
+            postgreSQLMetaClassDaoImpl.load(metaCreate.getId());
+            fail("Loaded removed class");
+        }
+        catch(IllegalArgumentException e)
+        {
         }
     }
 
     @Test
     public void beginDateMetaClass() throws Exception {
-        try {
-            postgreSQLStorageImpl.initialize();
+        logger.debug("Create multiple metadata test");
 
-            logger.debug("Create multiple metadata test");
+        MetaClass metaCreate = new MetaClass("testClass");
 
-            MetaClass metaCreate = new MetaClass("testClass");
+        metaCreate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
 
-            metaCreate.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+        Thread.sleep(200);
 
-            Thread.sleep(200);
+        MetaClass metaCreateNextDisabled = new MetaClass("testClass");
 
-            MetaClass metaCreateNextDisabled = new MetaClass("testClass");
+        metaCreateNextDisabled.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+        metaCreateNextDisabled.setMemberType("testInteger1", new MetaValue(DataTypes.INTEGER, false, false));
+        metaCreateNextDisabled.setDisabled(true);
 
-            metaCreateNextDisabled.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
-            metaCreateNextDisabled.setMemberType("testInteger1", new MetaValue(DataTypes.INTEGER, false, false));
-            metaCreateNextDisabled.setDisabled(true);
+        Thread.sleep(200);
 
-            Thread.sleep(200);
+        MetaClass metaCreateNext = new MetaClass("testClass");
 
-            MetaClass metaCreateNext = new MetaClass("testClass");
+        metaCreateNext.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
+        metaCreateNext.setMemberType("testInteger2", new MetaValue(DataTypes.INTEGER, false, false));
 
-            metaCreateNext.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
-            metaCreateNext.setMemberType("testInteger2", new MetaValue(DataTypes.INTEGER, false, false));
+        postgreSQLMetaClassDaoImpl.save(metaCreate);
+        postgreSQLMetaClassDaoImpl.save(metaCreateNext);
+        postgreSQLMetaClassDaoImpl.save(metaCreateNextDisabled);
 
-            postgreSQLMetaClassDaoImpl.save(metaCreate);
-            postgreSQLMetaClassDaoImpl.save(metaCreateNext);
-            postgreSQLMetaClassDaoImpl.save(metaCreateNextDisabled);
+        Thread.sleep(200);
 
-            Thread.sleep(200);
+        MetaClass loadedMetaCreateNext = postgreSQLMetaClassDaoImpl.load(metaCreateNext.getClassName());
 
-            MetaClass loadedMetaCreateNext = postgreSQLMetaClassDaoImpl.load(metaCreateNext.getClassName());
+        assertTrue(metaCreateNext.equals(loadedMetaCreateNext));
 
-            assertTrue(metaCreateNext.equals(loadedMetaCreateNext));
+        MetaClass loadedMetaCreate = postgreSQLMetaClassDaoImpl.load(metaCreateNextDisabled.getClassName(),
+                metaCreateNextDisabled.getBeginDate());
 
-            MetaClass loadedMetaCreate = postgreSQLMetaClassDaoImpl.load(metaCreateNextDisabled.getClassName(),
-                    metaCreateNextDisabled.getBeginDate());
-
-            assertTrue(metaCreate.equals(loadedMetaCreate));
-        }
-        finally
-        {
-            postgreSQLStorageImpl.clear();
-        }
+        assertTrue(metaCreate.equals(loadedMetaCreate));
     }
 }
