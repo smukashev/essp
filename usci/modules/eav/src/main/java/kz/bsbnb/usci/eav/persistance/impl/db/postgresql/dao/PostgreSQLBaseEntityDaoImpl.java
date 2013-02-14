@@ -31,8 +31,8 @@ import java.util.*;
  * @author a.motov
  */
 @Repository
-public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
-            implements IBaseEntityDao {
+public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao
+{
     private final Logger logger = LoggerFactory.getLogger(PostgreSQLBaseEntityDaoImpl.class);
 
     private String INSERT_ENTITY_SQL;
@@ -55,6 +55,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport
 
     @Autowired
     IBatchRepository batchRepository;
+
     @Autowired
     IMetaClassRepository metaClassRepository;
 
