@@ -3,7 +3,6 @@ package kz.bsbnb.usci.eav.persistance.impl.db;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import sun.security.krb5.internal.ktab.KeyTab;
 
 import javax.annotation.PostConstruct;
 

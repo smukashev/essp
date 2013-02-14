@@ -21,11 +21,11 @@ import java.util.Map;
 public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	private final Logger logger = LoggerFactory.getLogger(PostgreSQLStorageImpl.class);
 
-    private final static String CLASSES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, begin_date TIMESTAMP WITH TIME ZONE NOT NULL, is_disabled BOOLEAN NOT NULL, name character varying(%d) NOT NULL,CONSTRAINT %s_primary_key_index PRIMARY KEY (id ), UNIQUE (name, begin_date) )";
+    private final static String CLASSES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, complex_key_type character varying(%d),begin_date TIMESTAMP WITH TIME ZONE NOT NULL, is_disabled BOOLEAN NOT NULL, name character varying(%d) NOT NULL,CONSTRAINT %s_primary_key_index PRIMARY KEY (id ), UNIQUE (name, begin_date) )";
     private final static String ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL,containing_class_id int references %s(id) ON DELETE CASCADE, name character varying(%d) NOT NULL,is_key boolean NOT NULL,is_nullable boolean NOT NULL, CONSTRAINT %s_primary_key_index PRIMARY KEY (id ), UNIQUE (containing_class_id, name) )";
 
     private final static String SIMPLE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (type_code character varying(%d), CONSTRAINT %s_primary_key_index PRIMARY KEY (id), CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
-    private final static String COMPLEX_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (complex_key_type character varying(%d), class_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE ) INHERITS (%s)";
+    private final static String COMPLEX_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_primary_key_index PRIMARY KEY (id), class_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE ) INHERITS (%s)";
     private final static String ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s (array_key_type character varying(%d), CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
     private final static String SIMPLE_ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s, %s)";
     private final static String COMPLEX_ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s, %s)";
@@ -47,7 +47,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
     private final static String BOOLEAN_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value boolean, CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
     private final static String STRING_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value character varying(%d), CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
 
-    private final static String COMPLEX_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (entity_value_id int references %s(id), CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    private final static String COMPLEX_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (entity_value_id bigint references %s(id), CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
 
 
     private final static String INDEXES_QUERY = "select pg_index.indexrelid::regclass, 'create index ' || relname || '_' ||\n" +
@@ -94,7 +94,8 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	public void initialize() {
         //add unique constraint on name
 	    String query = String.format(CLASSES_TABLE,
-                getConfig().getClassesTableName(), getConfig().getClassNameLength(), getConfig().getClassesTableName());
+                getConfig().getClassesTableName(), getConfig().getComplexKeyTypeCodeLength(),
+                getConfig().getClassNameLength(), getConfig().getClassesTableName());
 	    
 	    logger.debug(query);
 	    
@@ -119,7 +120,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    
 	    //complex attributes
 	    query = String.format(COMPLEX_ATTRIBUTES_TABLE, getConfig().getComplexAttributesTableName(),
-                getConfig().getComplexKeyTypeCodeLength(), getConfig().getClassesTableName(),
+                getConfig().getComplexAttributesTableName(), getConfig().getClassesTableName(),
                 getConfig().getComplexAttributesTableName(), getConfig().getClassesTableName(),
                 getConfig().getAttributesTableName());
 	    
@@ -231,7 +232,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
                 getConfig().getEntitiesTableName(),
                 getConfig().getComplexValuesTableName(), getConfig().getEntitiesTableName(),
                 getConfig().getComplexValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getComplexValuesTableName(), getConfig().getSimpleAttributesTableName(),
+                getConfig().getComplexValuesTableName(), getConfig().getComplexAttributesTableName(),
                 getConfig().getValuesTableName());
         logger.debug(query);
 

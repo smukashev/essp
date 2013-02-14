@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.model.batchdata.impl.BatchValue;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 import kz.bsbnb.usci.eav.util.SetUtils;
@@ -212,6 +213,8 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
+        // todo: check
+        // there is an error: Cannot convert type(MetaClassArray) to MetaClass
         if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name +
                     ", is an object of class: " + ((MetaClass)type).getClassName());
@@ -219,6 +222,7 @@ public class BaseEntity extends Persistable
         if(!type.isArray())
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an array");
+
         ArrayList<IBatchValue> batchValues = dataForArray.get(name);
 
         if(batchValues == null)
@@ -232,9 +236,6 @@ public class BaseEntity extends Persistable
 
     public Set<String> getPresentSimpleAttributeNames(DataTypes dataType)
     {
-        if (!this.meta.isComplex())
-            throw new UnsupportedOperationException("Simple types can be contained only in complex types.");
-
         return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), data.keySet());
     }
 
@@ -253,8 +254,17 @@ public class BaseEntity extends Persistable
         return getPresentSimpleAttributeNames(DataTypes.INTEGER);
     }
 
-    public Set<String> getPresentComplexAttributeNames()
+    public Set<String> getPresentBooleanAttributeNames()
     {
+        return getPresentSimpleAttributeNames(DataTypes.BOOLEAN);
+    }
+
+    public Set<String> getPresentStringAttributeNames()
+    {
+        return getPresentSimpleAttributeNames(DataTypes.STRING);
+    }
+
+    public Set<String> getPresentComplexAttributeNames() {
         return SetUtils.intersection(meta.getComplexAttributesNames(), data.keySet());
     }
 

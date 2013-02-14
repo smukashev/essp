@@ -12,7 +12,8 @@ import java.io.IOException;
  */
 public class FileHelper extends AbstractHelper
 {
-    public byte[] getFileBytes(File file) {
+    public byte[] getFileBytes(File file)
+    {
         FileInputStream fii = null;
         byte bytes[] = null;
 

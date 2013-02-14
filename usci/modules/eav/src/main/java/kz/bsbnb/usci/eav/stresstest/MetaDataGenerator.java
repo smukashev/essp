@@ -3,10 +3,7 @@ package kz.bsbnb.usci.eav.stresstest;
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -43,10 +40,8 @@ class MetaDataGenerator
         int switcher = rand.nextInt(4);
 
         if(switcher == 0 || switcher == 2)
-        {
             if(rand.nextInt(3) != 2)
                 switcher = 3;
-        }
 
         if(rec > maxRecursion)
             if(switcher == 0 || switcher == 2)
@@ -56,8 +51,9 @@ class MetaDataGenerator
         {
             case 0:
                 //complex attribute
-                MetaClass c = generateMetaClass(rec + 1);
-                c.setComplexKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
+                MetaClass metaClass = generateMetaClass(rec + 1);
+                metaClass.setComplexKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
+                MetaClassHolder c = new MetaClassHolder(metaClass);
 
                 type = c;
                 break;
@@ -73,8 +69,7 @@ class MetaDataGenerator
                 break;
             case 2:
                 //complex array
-                MetaClassArray ca = new MetaClassArray(generateMetaClass(rec + 1));
-                ca.setComplexKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
+                MetaClassArray ca = new MetaClassArray(generateMetaClassHolder(rec + 1));
                 ca.setArrayKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
 
                 type = ca;
@@ -92,12 +87,17 @@ class MetaDataGenerator
         return type;
     }
 
+    public MetaClassHolder generateMetaClassHolder(int rec) {
+        return new MetaClassHolder(generateMetaClass(rec));
+    }
+
     public MetaClass generateMetaClass(int rec)
     {
         MetaClass metaClass = new MetaClass(getNextClassName());
         int attributesCount = rand.nextInt(maxAttributes + 1) + 5;
 
         metaClass.setDisabled(rand.nextBoolean());
+        metaClass.setComplexKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
 
         for (int j = 5; j < attributesCount; j++)
         {
