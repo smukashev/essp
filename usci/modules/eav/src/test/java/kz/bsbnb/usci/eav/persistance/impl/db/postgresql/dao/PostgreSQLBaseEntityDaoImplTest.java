@@ -9,9 +9,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.batchdata.IBatchRepository;
 import kz.bsbnb.usci.eav.model.batchdata.IBatchValue;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassHolder;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -76,34 +74,49 @@ public class PostgreSQLBaseEntityDaoImplTest {
             MetaClass metaCreate = new MetaClass("testMetaClass");
 
             // date values
-            metaCreate.setMemberType("testDate1", new MetaValue(DataTypes.DATE, false, true));
-            metaCreate.setMemberType("testDate2", new MetaValue(DataTypes.DATE, false, true));
-            metaCreate.setMemberType("testDate3", new MetaValue(DataTypes.DATE, false, true));
+            metaCreate.setMemberType("date_first", new MetaValue(DataTypes.DATE, false, true));
+            metaCreate.setMemberType("date_second", new MetaValue(DataTypes.DATE, false, true));
+            metaCreate.setMemberType("date_third", new MetaValue(DataTypes.DATE, false, true));
 
             //  double values
-            metaCreate.setMemberType("testDouble1", new MetaValue(DataTypes.DOUBLE, false, true));
-            metaCreate.setMemberType("testDouble2", new MetaValue(DataTypes.DOUBLE, false, true));
-            metaCreate.setMemberType("testDouble3", new MetaValue(DataTypes.DOUBLE, false, true));
+            metaCreate.setMemberType("double_first", new MetaValue(DataTypes.DOUBLE, false, true));
+            metaCreate.setMemberType("double_second", new MetaValue(DataTypes.DOUBLE, false, true));
+            metaCreate.setMemberType("double_third", new MetaValue(DataTypes.DOUBLE, false, true));
 
             // integer values
-            metaCreate.setMemberType("testInteger1", new MetaValue(DataTypes.INTEGER, false, true));
-            metaCreate.setMemberType("testInteger2", new MetaValue(DataTypes.INTEGER, false, true));
-            metaCreate.setMemberType("testInteger3", new MetaValue(DataTypes.INTEGER, false, true));
+            metaCreate.setMemberType("integer_first", new MetaValue(DataTypes.INTEGER, false, true));
+            metaCreate.setMemberType("integer_second", new MetaValue(DataTypes.INTEGER, false, true));
+            metaCreate.setMemberType("integer_third", new MetaValue(DataTypes.INTEGER, false, true));
 
             // boolean values
-            metaCreate.setMemberType("testBoolean1", new MetaValue(DataTypes.BOOLEAN, false, true));
-            metaCreate.setMemberType("testBoolean2", new MetaValue(DataTypes.BOOLEAN, false, true));
-            metaCreate.setMemberType("testBoolean3", new MetaValue(DataTypes.BOOLEAN, false, true));
+            metaCreate.setMemberType("boolean_first", new MetaValue(DataTypes.BOOLEAN, false, true));
+            metaCreate.setMemberType("boolean_second", new MetaValue(DataTypes.BOOLEAN, false, true));
+            metaCreate.setMemberType("boolean_third", new MetaValue(DataTypes.BOOLEAN, false, true));
 
             // string values
-            metaCreate.setMemberType("testString1", new MetaValue(DataTypes.STRING, false, true));
-            metaCreate.setMemberType("testString2", new MetaValue(DataTypes.STRING, false, true));
-            metaCreate.setMemberType("testString3", new MetaValue(DataTypes.STRING, false, true));
+            metaCreate.setMemberType("string_first", new MetaValue(DataTypes.STRING, false, true));
+            metaCreate.setMemberType("string_second", new MetaValue(DataTypes.STRING, false, true));
+            metaCreate.setMemberType("string_third", new MetaValue(DataTypes.STRING, false, true));
 
             // complex values
-            metaCreate.setMemberType("testComplex1", new MetaClassHolder("testMetaClass1"));
-            metaCreate.setMemberType("testComplex2", new MetaClassHolder("testMetaClass2"));
-            metaCreate.setMemberType("testComplex3", new MetaClassHolder("testMetaClass3"));
+            metaCreate.setMemberType("complex_first", new MetaClassHolder("inner_meta_class_first"));
+            metaCreate.setMemberType("complex_second", new MetaClassHolder("inner_meta_class_second"));
+            metaCreate.setMemberType("complex_third", new MetaClassHolder("inner_meta_class_third"));
+
+            // date array values
+            metaCreate.setMemberType("date_array", new MetaValueArray(DataTypes.DATE));
+
+            // double array values
+            metaCreate.setMemberType("double_array", new MetaValueArray(DataTypes.DOUBLE));
+
+            // integer array values
+            metaCreate.setMemberType("integer_array", new MetaValueArray(DataTypes.INTEGER));
+
+            // boolean array values
+            metaCreate.setMemberType("boolean_array", new MetaValueArray(DataTypes.BOOLEAN));
+
+            // string array values
+            metaCreate.setMemberType("string_array", new MetaValueArray(DataTypes.STRING));
 
             long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
             MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
@@ -114,37 +127,62 @@ public class PostgreSQLBaseEntityDaoImplTest {
             Random random = new Random();
 
             // date values
-            entityCreate.set("testDate1", 1L, DateUtils.nowPlus(Calendar.DATE, 1));
-            entityCreate.set("testDate2", 2L, DateUtils.nowPlus(Calendar.DATE, 2));
-            entityCreate.set("testDate3", 3L, null);
+            entityCreate.set("date_first", 1L, DateUtils.nowPlus(Calendar.DATE, 1));
+            entityCreate.set("date_second", 2L, DateUtils.nowPlus(Calendar.DATE, 2));
+            entityCreate.set("date_third", 3L, null);
 
             // double values
-            entityCreate.set("testDouble1", 4L, 100000 * random.nextDouble());
-            entityCreate.set("testDouble2", 5L, null);
-            entityCreate.set("testDouble3", 6L, 100000 * random.nextDouble());
+            entityCreate.set("double_first", 4L, random.nextInt() * random.nextDouble());
+            entityCreate.set("double_second", 5L, null);
+            entityCreate.set("double_third", 6L, random.nextInt() * random.nextDouble());
 
             // integer values
-            entityCreate.set("testInteger1", 7L, null);
-            entityCreate.set("testInteger2", 8L, random.nextInt());
-            entityCreate.set("testInteger3", 9L, random.nextInt());
+            entityCreate.set("integer_first", 7L, null);
+            entityCreate.set("integer_second", 8L, random.nextInt());
+            entityCreate.set("integer_third", 9L, random.nextInt());
 
             // boolean values
-            entityCreate.set("testBoolean1", 10L, false);
-            entityCreate.set("testBoolean2", 11L, true);
-            entityCreate.set("testBoolean3", 12L, null);
+            entityCreate.set("boolean_first", 10L, false);
+            entityCreate.set("boolean_second", 11L, true);
+            entityCreate.set("boolean_third", 12L, null);
 
             // string values
-            entityCreate.set("testString1", 13L, "Test value with a string type.");
-            entityCreate.set("testString2", 14L, null);
-            entityCreate.set("testString3", 15L, "Test value with a string type.");
+            entityCreate.set("string_first", 13L, "Test value with a string type for attribute string_first.");
+            entityCreate.set("string_second", 14L, null);
+            entityCreate.set("string_third", 15L, "Test value with a string type for attribute string_third.");
 
             // complex values
             BaseEntity childBaseEntity1 =
-                    new BaseEntity(((MetaClassHolder)metaLoad.getMemberType("testComplex1")).getMeta(), batch);
-            entityCreate.set("testComplex1", 16L, childBaseEntity1);
+                    new BaseEntity(((MetaClassHolder)metaLoad.getMemberType("complex_first")).getMeta(), batch);
+            entityCreate.set("complex_first", 16L, childBaseEntity1);
             BaseEntity childBaseEntity2 =
-                    new BaseEntity(((MetaClassHolder)metaLoad.getMemberType("testComplex2")).getMeta(), batch);
-            entityCreate.set("testComplex2", 17L, childBaseEntity2);
+                    new BaseEntity(((MetaClassHolder)metaLoad.getMemberType("complex_second")).getMeta(), batch);
+            entityCreate.set("complex_second", 17L, childBaseEntity2);
+
+            // date array values
+            entityCreate.add("date_array", 18L, DateUtils.nowPlus(Calendar.DATE, 3));
+            entityCreate.add("date_array", 19L, DateUtils.nowPlus(Calendar.DATE, 5));
+            entityCreate.add("date_array", 20L, DateUtils.nowPlus(Calendar.DATE, 7));
+
+            // double array values
+            entityCreate.add("double_array", 21L, random.nextInt() * random.nextDouble());
+            entityCreate.add("double_array", 22L, random.nextInt() * random.nextDouble());
+            entityCreate.add("double_array", 23L, random.nextInt() * random.nextDouble());
+
+            // integer array values
+            entityCreate.add("integer_array", 24L, random.nextInt());
+            entityCreate.add("integer_array", 25L, random.nextInt());
+            entityCreate.add("integer_array", 26L, random.nextInt());
+
+            // boolean array values
+            entityCreate.add("boolean_array", 27L, random.nextBoolean());
+            entityCreate.add("boolean_array", 28L, random.nextBoolean());
+            entityCreate.add("boolean_array", 29L, random.nextBoolean());
+
+            // string array values
+            entityCreate.add("string_array", 30L, "First element of string array.");
+            entityCreate.add("string_array", 31L, "Second element of string array.");
+            entityCreate.add("string_array", 32L, "Third element of string array.");
 
             long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
             BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);

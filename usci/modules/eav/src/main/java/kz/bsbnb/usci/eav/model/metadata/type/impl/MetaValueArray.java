@@ -4,6 +4,19 @@ import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 
 public class MetaValueArray extends GenericMetaArray<MetaValue>
 {
+
+    public MetaValueArray(DataTypes typeCode)
+    {
+        super(new MetaValue());
+        memberType.setTypeCode(typeCode);
+    }
+
+    public MetaValueArray(long id, DataTypes typeCode, boolean isKey, boolean isNullable)
+    {
+        super(id, new MetaValue(), isKey, isNullable);
+        memberType.setTypeCode(typeCode);
+    }
+
 	public MetaValueArray(DataTypes typeCode, boolean isKey, boolean isNullable)
     {
 		super(new MetaValue(), isKey, isNullable);
