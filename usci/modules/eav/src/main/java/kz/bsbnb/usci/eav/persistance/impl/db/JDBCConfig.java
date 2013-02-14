@@ -25,11 +25,17 @@ public class JDBCConfig {
     private String batchesTableName;
     private String valuesTableName;
     private String dateValuesTableName;
+    private String dateArrayValuesTableName;
     private String doubleValuesTableName;
+    private String doubleArrayValuesTableName;
     private String integerValuesTableName;
+    private String integerArrayValuesTableName;
     private String booleanValuesTableName;
+    private String booleanArrayValuesTableName;
     private String stringValuesTableName;
+    private String stringArrayValuesTableName;
     private String complexValuesTableName;
+    private String complexArrayValuesTableName;
 
     private final int classNameLength = 64;
     private final int attributeNameLength = 64;
@@ -60,6 +66,12 @@ public class JDBCConfig {
         booleanValuesTableName  = tablePrefix + "boolean_values";
         stringValuesTableName = tablePrefix + "string_values";
         complexValuesTableName = tablePrefix + "complex_values";
+        dateArrayValuesTableName = tablePrefix + "date_array_values";
+        doubleArrayValuesTableName = tablePrefix + "double_array_values";
+        integerArrayValuesTableName = tablePrefix + "integer_array_values";
+        booleanArrayValuesTableName  = tablePrefix + "boolean_array_values";
+        stringArrayValuesTableName = tablePrefix + "string_array_values";
+        complexArrayValuesTableName = tablePrefix + "complex_array_values";
     }
 
     public String getClassesTableName() {
@@ -132,6 +144,30 @@ public class JDBCConfig {
 
     public String getComplexValuesTableName() {
         return complexValuesTableName;
+    }
+
+    public String getDateArrayValuesTableName() {
+        return dateArrayValuesTableName;
+    }
+
+    public String getDoubleArrayValuesTableName() {
+        return doubleArrayValuesTableName;
+    }
+
+    public String getIntegerArrayValuesTableName() {
+        return integerArrayValuesTableName;
+    }
+
+    public String getBooleanArrayValuesTableName() {
+        return booleanArrayValuesTableName;
+    }
+
+    public String getStringArrayValuesTableName() {
+        return stringArrayValuesTableName;
+    }
+
+    public String getComplexArrayValuesTableName() {
+        return complexArrayValuesTableName;
     }
 
     public int getClassNameLength() {

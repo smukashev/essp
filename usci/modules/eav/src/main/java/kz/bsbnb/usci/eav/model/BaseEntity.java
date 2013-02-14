@@ -9,6 +9,7 @@ import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 import kz.bsbnb.usci.eav.util.SetUtils;
 
@@ -181,8 +182,16 @@ public class BaseEntity extends Persistable
                 expValueClass = BaseEntity.class;
             else
             {
-                MetaValue metaValue = (MetaValue)type;
-                expValueClass = metaValue.getTypeCode().getDataTypeClass();
+                if (type.isArray())
+                {
+                    MetaValueArray metaClassArray = (MetaValueArray)type;
+                    expValueClass = metaClassArray.getTypeCode().getDataTypeClass();
+                }
+                else
+                {
+                    MetaValue metaValue = (MetaValue)type;
+                    expValueClass = metaValue.getTypeCode().getDataTypeClass();
+                }
             }
 
             if(expValueClass == null || !expValueClass.isAssignableFrom(valueClass))
@@ -234,6 +243,57 @@ public class BaseEntity extends Persistable
         return batchValues;
     }
 
+    public <T> void add(String name, long index, T value)
+    {
+        if (defaultBatch == null)
+            throw new IllegalStateException("Default Batch is not set.");
+
+        add(name, defaultBatch, index, value);
+    }
+
+    public <T> void add(String name, Batch batch, long index, T value) {
+
+        IMetaType type = meta.getMemberType(name);
+
+        if(type == null)
+            throw new IllegalArgumentException("Type: " + name +
+                    ", not found in class: " + meta.getClassName());
+
+        if(!type.isArray())
+            throw new IllegalArgumentException("Type: " + name +
+                    ", is not an array");
+
+        if (value == null)
+            throw new IllegalArgumentException("Element of the array can not be equal to null.");
+
+        Class<?> valueClass = value.getClass();
+        Class<?> expValueClass = null;
+
+        if (type.isComplex())
+            expValueClass = BaseEntity.class;
+        else
+        {
+            if (type.isArray())
+            {
+                MetaValueArray metaClassArray = (MetaValueArray)type;
+                expValueClass = metaClassArray.getTypeCode().getDataTypeClass();
+            }
+            else
+            {
+                MetaValue metaValue = (MetaValue)type;
+                expValueClass = metaValue.getTypeCode().getDataTypeClass();
+            }
+        }
+
+        if(expValueClass == null || !expValueClass.isAssignableFrom(valueClass))
+            throw new IllegalArgumentException("Type mismatch in class: " +
+                    meta.getClassName() + ". Needed " + expValueClass + ", got: " +
+                    valueClass);
+
+
+        this.getBatchValueArray(name).add(new BatchValue(batch, index, value));
+    }
+
     public Set<String> getPresentSimpleAttributeNames(DataTypes dataType)
     {
         return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), data.keySet());
@@ -266,6 +326,10 @@ public class BaseEntity extends Persistable
 
     public Set<String> getPresentComplexAttributeNames() {
         return SetUtils.intersection(meta.getComplexAttributesNames(), data.keySet());
+    }
+
+    public Set<String> getPresentSimpleArrayAttributeNames(DataTypes dataType) {
+        return SetUtils.intersection(meta.getSimpleArrayAttributesNames(dataType), dataForArray.keySet());
     }
 
     public Batch getDefaultBatch()

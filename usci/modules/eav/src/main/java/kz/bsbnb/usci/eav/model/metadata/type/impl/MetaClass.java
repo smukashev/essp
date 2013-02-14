@@ -280,4 +280,22 @@ public class MetaClass extends Persistable {
         return filteredAttributeNames;
     }
 
+    public Set<String> getSimpleArrayAttributesNames(DataTypes dataType) {
+        Set<String> allAttributeNames = this.members.keySet();
+        Set<String> filteredAttributeNames = new HashSet<String>();
+
+        Iterator it = allAttributeNames.iterator();
+        while (it.hasNext()) {
+            String attributeName = (String)it.next();
+            IMetaType type = this.getMemberType(attributeName);
+            if (type.isArray() && !type.isComplex()) {
+                MetaValueArray metaValueArray = (MetaValueArray)type;
+                if (metaValueArray.getTypeCode().equals(dataType)) {
+                    filteredAttributeNames.add(attributeName);
+                }
+            }
+        }
+        return filteredAttributeNames;
+    }
+
 }
