@@ -87,7 +87,8 @@ public class MetaDataGenerator
         return type;
     }
 
-    public MetaClassHolder generateMetaClassHolder(int rec) {
+    public MetaClassHolder generateMetaClassHolder(int rec)
+    {
         return new MetaClassHolder(generateMetaClass(rec));
     }
 
@@ -110,6 +111,7 @@ public class MetaDataGenerator
 
         complexTypeCount++;
         metaClasses.add(metaClass);
+
         return metaClass;
     }
 
