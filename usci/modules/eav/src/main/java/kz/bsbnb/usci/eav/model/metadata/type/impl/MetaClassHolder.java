@@ -7,51 +7,60 @@ import java.util.Set;
 /**
  *
  */
-public class MetaClassHolder extends AbstractMetaType {
-
+public class MetaClassHolder extends AbstractMetaType
+{
     MetaClass meta;
 
-    public MetaClassHolder(long id, MetaClass meta, boolean isKey, boolean isNullable) {
+    public MetaClassHolder(long id, MetaClass meta, boolean isKey, boolean isNullable)
+    {
         super(id, isKey, isNullable);
         this.meta = meta;
     }
 
-    public MetaClassHolder(MetaClass meta, boolean isKey, boolean isNullable) {
+    public MetaClassHolder(MetaClass meta, boolean isKey, boolean isNullable)
+    {
         super(isKey, isNullable);
         this.meta = meta;
     }
 
-    public MetaClassHolder(String className, boolean isKey, boolean isNullable) {
+    public MetaClassHolder(String className, boolean isKey, boolean isNullable)
+    {
         super(isKey, isNullable);
         this.meta = new MetaClass(className);
     }
 
-    public MetaClassHolder(MetaClass meta) {
+    public MetaClassHolder(MetaClass meta)
+    {
         super();
         this.meta = meta;
     }
 
-    public MetaClassHolder(String className) {
+    public MetaClassHolder(String className)
+    {
         super();
         this.meta = new MetaClass(className);
     }
 
     @Override
-    public boolean isArray() {
+    public boolean isArray()
+    {
         return false;
     }
 
     @Override
-    public boolean isComplex() {
+    public boolean isComplex()
+    {
         return true;
     }
 
-    public MetaClass getMeta() {
+    public MetaClass getMeta()
+    {
         return meta;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj)
+    {
         if (obj == this)
             return true;
 
@@ -60,7 +69,8 @@ public class MetaClassHolder extends AbstractMetaType {
 
         if (!(getClass() == obj.getClass()))
             return false;
-        else {
+        else
+        {
             MetaClassHolder tmp = (MetaClassHolder) obj;
 
             if(!(this.getMeta().equals(tmp.getMeta())))
@@ -68,15 +78,14 @@ public class MetaClassHolder extends AbstractMetaType {
 
             return !(tmp.isKey() != this.isKey() ||
                     tmp.isNullable() != this.isNullable());
-
         }
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         int result = super.hashCode();
         result = 31 * result + (meta != null ? meta.hashCode() : 0);
         return result;
     }
-
 }

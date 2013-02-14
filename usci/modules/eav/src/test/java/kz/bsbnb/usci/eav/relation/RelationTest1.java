@@ -6,11 +6,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.batchdata.impl.BatchValue;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.IMetaFactory;
-import kz.bsbnb.usci.eav.model.metadata.impl.BasicMetaClassRepositoryImpl;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -65,40 +61,40 @@ public class RelationTest1
         Batch batch = new Batch(new Timestamp(new Date().getTime()));
         batchDao.save(batch);
 
-        MetaClass metaStreet = new MetaClass("street");
-        metaStreet.setMemberType("lang", new MetaValue(DataTypes.STRING, false, true));
-        metaStreet.setMemberType("value", new MetaValue(DataTypes.STRING, false, true));
+        MetaClassHolder metaStreetHolder = new MetaClassHolder("street");
+        metaStreetHolder.getMeta().setMemberType("lang", new MetaValue(DataTypes.STRING, false, true));
+        metaStreetHolder.getMeta().setMemberType("value", new MetaValue(DataTypes.STRING, false, true));
 
-        MetaClass metaHouse = new MetaClass("house");
-        metaHouse.setMemberType("value", new MetaValueArray(DataTypes.INTEGER, false, true));
+        MetaClassHolder metaHouseHolder = new MetaClassHolder("house");
+        metaHouseHolder.getMeta().setMemberType("value", new MetaValueArray(DataTypes.INTEGER, false, true));
 
-        MetaClass metaAddress = new MetaClass("address");
-        metaAddress.setMemberType("country", new MetaValue(DataTypes.STRING, false, true));
-        metaAddress.setMemberType("city", new MetaValue(DataTypes.STRING, false, true));
-        metaAddress.setMemberType("house", metaHouse);
-        metaAddress.setMemberType("street", metaStreet);
+        MetaClassHolder metaAddressHolder = new MetaClassHolder("address");
+        metaAddressHolder.getMeta().setMemberType("country", new MetaValue(DataTypes.STRING, false, true));
+        metaAddressHolder.getMeta().setMemberType("city", new MetaValue(DataTypes.STRING, false, true));
+        metaAddressHolder.getMeta().setMemberType("house", metaHouseHolder);
+        metaAddressHolder.getMeta().setMemberType("street", metaStreetHolder);
 
-        MetaClass metaDocument = new MetaClass("document");
-        metaDocument.setMemberType("type", new MetaValue(DataTypes.STRING, true, false));
-        metaDocument.setMemberType("no", new MetaValue(DataTypes.STRING, true, false));
+        MetaClassHolder metaDocumentHolder = new MetaClassHolder("document");
+        metaDocumentHolder.getMeta().setMemberType("type", new MetaValue(DataTypes.STRING, true, false));
+        metaDocumentHolder.getMeta().setMemberType("no", new MetaValue(DataTypes.STRING, true, false));
 
-        MetaClass metaDocuments = new MetaClass("documents");
-        metaDocuments.setMemberType("document", new MetaClassArray(metaDocument));
+        MetaClassHolder metaDocumentsHolder = new MetaClassHolder("documents");
+        metaDocumentsHolder.getMeta().setMemberType("document", new MetaClassArray(metaDocumentHolder));
 
-        MetaClass metaName = new MetaClass("name");
-        metaName.setMemberType("firstname", new MetaValue(DataTypes.STRING, true, false));
-        metaName.setMemberType("lastname", new MetaValue(DataTypes.STRING, true, false));
+        MetaClassHolder metaNameHolder = new MetaClassHolder("name");
+        metaNameHolder.getMeta().setMemberType("firstname", new MetaValue(DataTypes.STRING, true, false));
+        metaNameHolder.getMeta().setMemberType("lastname", new MetaValue(DataTypes.STRING, true, false));
 
-        MetaClass metaSubject = new MetaClass("subject");
-        metaSubject.setMemberType("name", metaName);
-        metaSubject.setMemberType("documents", metaDocuments);
-        metaSubject.setMemberType("address", metaAddress);
+        MetaClassHolder metaSubjectHolder = new MetaClassHolder("subject");
+        metaSubjectHolder.getMeta().setMemberType("name", metaNameHolder);
+        metaSubjectHolder.getMeta().setMemberType("documents", metaDocumentsHolder);
+        metaSubjectHolder.getMeta().setMemberType("address", metaAddressHolder);
 
-        MetaClass metaContract = new MetaClass("contract");
-        metaContract.setMemberType("no", new MetaValue(DataTypes.INTEGER, true, false));
-        metaContract.setMemberType("subject", metaSubject);
+        MetaClassHolder metaContractHolder = new MetaClassHolder("contract");
+        metaContractHolder.getMeta().setMemberType("no", new MetaValue(DataTypes.INTEGER, true, false));
+        metaContractHolder.getMeta().setMemberType("subject", metaSubjectHolder);
 
-        metaClassDao.save(metaContract);
+        metaClassDao.save(metaContractHolder.getMeta());
 
         // ----------------------------------------------------------------------
 

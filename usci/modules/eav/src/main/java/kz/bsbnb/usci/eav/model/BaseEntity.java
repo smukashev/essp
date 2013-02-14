@@ -215,9 +215,9 @@ public class BaseEntity extends Persistable
 
         // todo: check
         // there is an error: Cannot convert type(MetaClassArray) to MetaClass
-        if(type.isComplex())
+        /*if(type.isComplex())
             throw new IllegalArgumentException("Type: " + name +
-                    ", is an object of class: " + ((MetaClass)type).getClassName());
+                    ", is an object of class: " + ((MetaClass)type).getClassName());*/
 
         if(!type.isArray())
             throw new IllegalArgumentException("Type: " + name +
