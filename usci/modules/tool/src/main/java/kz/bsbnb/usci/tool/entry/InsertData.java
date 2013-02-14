@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav.stresstest;
+package kz.bsbnb.usci.tool.entry;
 
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 

@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav.stresstest;
+package kz.bsbnb.usci.tool.data;
 
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
@@ -8,7 +8,7 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-class MetaDataGenerator
+public class MetaDataGenerator
 {
     private Random rand = new Random();
 
