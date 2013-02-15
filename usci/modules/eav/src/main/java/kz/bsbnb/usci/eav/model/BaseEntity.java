@@ -36,10 +36,10 @@ public class BaseEntity extends Persistable
     /**
      * Holds attributes values
      */
-    private HashMap<String, IBatchValue> data =
+    private HashMap<String, IBatchValue> values =
             new HashMap<String, IBatchValue>();
 
-    private HashMap<String, ArrayList<IBatchValue>> dataForArray =
+    private HashMap<String, ArrayList<IBatchValue>> arrays =
             new HashMap<String, ArrayList<IBatchValue>>();
 
     /**
@@ -125,7 +125,7 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
-        IBatchValue batchValue = data.get(name);
+        IBatchValue batchValue = values.get(name);
 
         if(batchValue == null)
             return null;
@@ -195,7 +195,7 @@ public class BaseEntity extends Persistable
                         valueClass);
         }
 
-        data.put(name, new BatchValue(batch, index, value));
+        values.put(name, new BatchValue(batch, index, value));
     }
 
     //arrays
@@ -221,12 +221,12 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an array");
 
-        ArrayList<IBatchValue> batchValues = dataForArray.get(name);
+        ArrayList<IBatchValue> batchValues = arrays.get(name);
 
         if(batchValues == null)
         {
             batchValues = new ArrayList<IBatchValue>();
-            dataForArray.put(name, batchValues);
+            arrays.put(name, batchValues);
         }
 
         return batchValues;
@@ -286,7 +286,7 @@ public class BaseEntity extends Persistable
 
     public Set<String> getPresentSimpleAttributeNames(DataTypes dataType)
     {
-        return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), data.keySet());
+        return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), values.keySet());
     }
 
     public Set<String> getPresentDateAttributeNames()
@@ -315,15 +315,15 @@ public class BaseEntity extends Persistable
     }
 
     public Set<String> getPresentComplexAttributeNames() {
-        return SetUtils.intersection(meta.getComplexAttributesNames(), data.keySet());
+        return SetUtils.intersection(meta.getComplexAttributesNames(), values.keySet());
     }
 
     public Set<String> getPresentSimpleArrayAttributeNames(DataTypes dataType) {
-        return SetUtils.intersection(meta.getSimpleArrayAttributesNames(dataType), dataForArray.keySet());
+        return SetUtils.intersection(meta.getSimpleArrayAttributesNames(dataType), arrays.keySet());
     }
 
     public Set<String> getPresentComplexArrayAttributeNames() {
-        return SetUtils.intersection(meta.getComplexArrayAttributesNames(), dataForArray.keySet());
+        return SetUtils.intersection(meta.getComplexArrayAttributesNames(), arrays.keySet());
     }
 
     public Batch getDefaultBatch()
@@ -336,4 +336,86 @@ public class BaseEntity extends Persistable
     {
         return meta.getClassName();
     }
+
+    public Set<String> getAttributeNames() {
+        Set<String> attributeNames = values.keySet();
+        attributeNames.addAll(arrays.keySet());
+        return attributeNames;
+    }
+
+    public int getAttributeCount() {
+        int valuesCount = values.size();
+        int arraysCount = arrays.size();
+
+        return valuesCount + arraysCount;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+
+        if (obj == null)
+            return false;
+
+        if (!(getClass() == obj.getClass()))
+            return false;
+        else
+        {
+            BaseEntity that = (BaseEntity) obj;
+
+            int thisAttributeCount = this.getAttributeCount();
+            int thatAttributeCount = this.getAttributeCount();
+
+            if (thisAttributeCount != thatAttributeCount)
+                return false;
+
+            Iterator<String> valuesIt = values.keySet().iterator();
+            while (valuesIt.hasNext())
+            {
+                String attributeName = valuesIt.next();
+
+                IBatchValue thisBatchValue = this.getBatchValue(attributeName);
+                IBatchValue thatBatchValue = that.getBatchValue(attributeName);
+
+                if (!thisBatchValue.equals(thatBatchValue))
+                    return false;
+            }
+
+            Iterator<String> arraysIt = arrays.keySet().iterator();
+            while (arraysIt.hasNext())
+            {
+                String attributeName = arraysIt.next();
+
+                List<IBatchValue> thisBatchValues = this.getBatchValueArray(attributeName);
+                List<IBatchValue> thatBatchValues = that.getBatchValueArray(attributeName);
+
+                Iterator<IBatchValue> thisBatchValueIt = thisBatchValues.iterator();
+                while (thisBatchValueIt.hasNext())
+                {
+                    IBatchValue thisBatchValue = thisBatchValueIt.next();
+
+                    boolean find = false;
+                    Iterator<IBatchValue> thatBatchValueIt = thatBatchValues.iterator();
+                    while (thatBatchValueIt.hasNext())
+                    {
+                        IBatchValue thatBatchValue = thatBatchValueIt.next();
+                        if (thatBatchValue.equals(thisBatchValue))
+                        {
+                            find = true;
+                            break;
+                        }
+                    }
+
+                    if (!find)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+    }
+
 }
