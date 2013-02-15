@@ -117,8 +117,6 @@ public class XmlBaseEntityGenerator // extends AbstractXmlGenerator
             storage.clear();
         }
 
-
-
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
         DOMSource source = new DOMSource(document);
