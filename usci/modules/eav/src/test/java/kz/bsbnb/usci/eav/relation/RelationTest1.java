@@ -122,8 +122,6 @@ public class RelationTest1
         documentEntity2.set("no", 4, "0987654321");
 
         BaseEntity documentsEntity = metaFactory.getBaseEntity("documents", batch);
-        /*documentsEntity.getBatchValueArray("document").add(new BatchValue(batch, 5, documentEntity1));
-        documentsEntity.getBatchValueArray("document").add(new BatchValue(batch, 5, documentEntity2));*/
 
         documentsEntity.addToArray("document", 5, documentEntity1);
         documentsEntity.addToArray("document", 5, documentEntity2);
