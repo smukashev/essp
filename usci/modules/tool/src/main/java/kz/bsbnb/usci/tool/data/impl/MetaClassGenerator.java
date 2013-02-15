@@ -55,9 +55,8 @@ public class MetaClassGenerator  extends AbstractGenerator
                 //complex attribute
                 MetaClass metaClass = generateMetaClass(rec + 1);
                 metaClass.setComplexKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
-                MetaClassHolder c = new MetaClassHolder(metaClass);
+                type = new MetaClassHolder(metaClass);
 
-                type = c;
                 break;
             case 1:
                 //simple array
@@ -68,6 +67,7 @@ public class MetaClassGenerator  extends AbstractGenerator
 
                 type = a;
                 simpleTypeArrayCount++;
+
                 break;
             case 2:
                 //complex array
@@ -76,6 +76,7 @@ public class MetaClassGenerator  extends AbstractGenerator
 
                 type = ca;
                 complexTypeArrayCount++;
+
                 break;
             default:
                 //simple attribute
@@ -83,6 +84,7 @@ public class MetaClassGenerator  extends AbstractGenerator
                         rand.nextBoolean(), rand.nextBoolean());
 
                 simpleTypeCount++;
+
                 break;
         }
 

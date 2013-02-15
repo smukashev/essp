@@ -261,7 +261,7 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Element of the array can not be equal to null.");
 
         Class<?> valueClass = value.getClass();
-        Class<?> expValueClass = null;
+        Class<?> expValueClass;
 
         if (type.isComplex())
             expValueClass = BaseEntity.class;
