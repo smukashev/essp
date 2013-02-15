@@ -1,10 +1,8 @@
 package kz.bsbnb.usci.batch.parser.impl;
 
-import kz.bsbnb.usci.batch.common.Global;
 import kz.bsbnb.usci.batch.parser.CommonParser;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
@@ -16,7 +14,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.*;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -168,7 +165,7 @@ public class MainParser extends CommonParser
 
                 try
                 {
-                    o = getCastObject(metaValue.getTypeCode(), contents.toString());
+                    o = parserHelper.getCastObject(metaValue.getTypeCode(), contents.toString());
                 }
                 catch (ParseException e)
                 {
@@ -185,7 +182,7 @@ public class MainParser extends CommonParser
 
                 try
                 {
-                    o = getCastObject(metaValueArray.getTypeCode(), contents.toString());
+                    o = parserHelper.getCastObject(metaValueArray.getTypeCode(), contents.toString());
                 }
                 catch (ParseException e)
                 {
@@ -198,25 +195,6 @@ public class MainParser extends CommonParser
             }
 
             currentEntity.set(localName, batch, index, o);
-        }
-    }
-
-    public Object getCastObject(DataTypes typeCode, String value) throws ParseException
-    {
-        switch(typeCode)
-        {
-            case INTEGER:
-                return Integer.parseInt(value);
-            case DATE:
-                return new SimpleDateFormat(Global.DATE_FORMAT).parse(value);
-            case STRING:
-                return value;
-            case BOOLEAN:
-                return Boolean.parseBoolean(value);
-            case DOUBLE:
-                return Double.parseDouble(value);
-            default:
-                throw new IllegalArgumentException("Unknown type. Can not be returned an appropriate class.");
         }
     }
 }
