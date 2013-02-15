@@ -138,35 +138,6 @@ public class MetaClass extends Persistable {
     {
 		this.searchProcedureName = searchProcedureName;
 	}
-	
-	public boolean equals(Object obj)
-    {
-		if (obj == this)
-			return true;
-
-		if (obj == null)
-			return false;
-
-        if (!(getClass() == obj.getClass()))
-			return false;
-		else {
-			MetaClass tmp = (MetaClass) obj;
-
-            Set<String> thisNames = this.members.keySet();
-
-            for (String name : thisNames)
-            {
-                if(!(this.getMemberType(name).equals(tmp.getMemberType(name))))
-                    return false;
-            }
-
-            return !(tmp.isDisabled() != this.isDisabled() ||
-                    !tmp.getBeginDate().equals(this.getBeginDate()) ||
-                    !tmp.getClassName().equals(this.getClassName()) ||
-                    !tmp.complexKeyType.equals(this.complexKeyType));
-
-        }
-	}
 
     public Timestamp getBeginDate() {
         return beginDate;
@@ -311,6 +282,35 @@ public class MetaClass extends Persistable {
             }
         }
         return filteredAttributeNames;
+    }
+
+    public boolean equals(Object obj)
+    {
+        if (obj == this)
+            return true;
+
+        if (obj == null)
+            return false;
+
+        if (!(getClass() == obj.getClass()))
+            return false;
+        else {
+            MetaClass tmp = (MetaClass) obj;
+
+            Set<String> thisNames = this.members.keySet();
+
+            for (String name : thisNames)
+            {
+                if(!(this.getMemberType(name).equals(tmp.getMemberType(name))))
+                    return false;
+            }
+
+            return !(tmp.isDisabled() != this.isDisabled() ||
+                    !tmp.getBeginDate().equals(this.getBeginDate()) ||
+                    !tmp.getClassName().equals(this.getClassName()) ||
+                    !tmp.complexKeyType.equals(this.complexKeyType));
+
+        }
     }
 
 }

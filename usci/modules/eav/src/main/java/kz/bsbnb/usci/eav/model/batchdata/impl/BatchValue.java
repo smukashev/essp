@@ -72,4 +72,27 @@ public class BatchValue implements IBatchValue
     {
         this.value = value;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+
+        if (obj == null)
+            return false;
+
+        if (!(getClass() == obj.getClass()))
+            return false;
+        else
+        {
+            BatchValue that = (BatchValue)obj;
+
+            if (index != that.index) return false;
+            if (!batch.equals(that.batch)) return false;
+            if (value != null ? !value.equals(that.value) : that.value != null) return false;
+
+            return true;
+        }
+    }
+
 }
