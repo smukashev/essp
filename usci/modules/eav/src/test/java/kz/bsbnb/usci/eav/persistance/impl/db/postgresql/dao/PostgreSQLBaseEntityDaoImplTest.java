@@ -191,7 +191,7 @@ public class PostgreSQLBaseEntityDaoImplTest {
             BaseEntity baseEntityForArrayFirst = new BaseEntity(metaClassForArrayElement, batch);
             entityCreate.addToArray("complex_array", 33L, baseEntityForArrayFirst);
             BaseEntity baseEntityForArraySecond = new BaseEntity(metaClassForArrayElement, batch);
-            entityCreate.set("complex_array", 34L, baseEntityForArraySecond);
+            entityCreate.addToArray("complex_array", 34L, baseEntityForArraySecond);
 
             long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
             BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
