@@ -29,6 +29,10 @@ public class MetaClassArray extends GenericMetaArray<MetaClassHolder> {
         super(memberClass);
     }
 
+    public MetaClassArray(long id, MetaClassHolder memberClass) {
+        super(id, memberClass);
+    }
+
 	public MetaClassArray(String className, boolean isKey, boolean isNullable) {
 		super(new MetaClassHolder(new MetaClass(className), isKey, isNullable));
 	}

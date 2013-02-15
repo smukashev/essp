@@ -326,6 +326,10 @@ public class BaseEntity extends Persistable
         return SetUtils.intersection(meta.getSimpleArrayAttributesNames(dataType), dataForArray.keySet());
     }
 
+    public Set<String> getPresentComplexArrayAttributeNames() {
+        return SetUtils.intersection(meta.getComplexArrayAttributesNames(), dataForArray.keySet());
+    }
+
     public Batch getDefaultBatch()
     {
         return defaultBatch;

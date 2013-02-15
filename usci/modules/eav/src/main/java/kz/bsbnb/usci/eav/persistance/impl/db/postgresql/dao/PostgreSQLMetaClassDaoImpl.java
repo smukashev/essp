@@ -420,7 +420,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             MetaClassHolder metaClassHolder = new MetaClassHolder(metaClass, (Boolean)row.get("is_key"),
                     (Boolean) row.get("is_nullable"));
 
-            MetaClassArray metaClassArray = new MetaClassArray(metaClassHolder);
+            MetaClassArray metaClassArray = new MetaClassArray((Integer)row.get("id"), metaClassHolder);
             metaClassArray.setArrayKeyType(ComplexKeyTypes.valueOf((String)row.get("array_key_type")));
 
             meta.setMemberType((String)row.get("name"), metaClassArray);

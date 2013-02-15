@@ -9,6 +9,12 @@ public class GenericMetaArray<T extends AbstractMetaType> extends AbstractMetaAr
         this.memberType = memberType;
     }
 
+    GenericMetaArray(long id, T memberType)
+    {
+        super(id);
+        this.memberType = memberType;
+    }
+
     GenericMetaArray(long id, T memberType, boolean isKey, boolean isNullable)
     {
         super(id);

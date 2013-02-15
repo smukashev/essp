@@ -118,6 +118,9 @@ public class PostgreSQLBaseEntityDaoImplTest {
             // string array values
             metaCreate.setMemberType("string_array", new MetaValueArray(DataTypes.STRING));
 
+            // complex array values
+            metaCreate.setMemberType("complex_array", new MetaClassArray(new MetaClassHolder("meta_class_array")));
+
             long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
             MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
@@ -152,12 +155,12 @@ public class PostgreSQLBaseEntityDaoImplTest {
             entityCreate.set("string_third", 15L, "Test value with a string type for attribute string_third.");
 
             // complex values
-            BaseEntity childBaseEntity1 =
+            BaseEntity baseEntityInnerFirst =
                     new BaseEntity(((MetaClassHolder)metaLoad.getMemberType("complex_first")).getMeta(), batch);
-            entityCreate.set("complex_first", 16L, childBaseEntity1);
-            BaseEntity childBaseEntity2 =
+            entityCreate.set("complex_first", 16L, baseEntityInnerFirst);
+            BaseEntity baseEntityInnerSecond =
                     new BaseEntity(((MetaClassHolder)metaLoad.getMemberType("complex_second")).getMeta(), batch);
-            entityCreate.set("complex_second", 17L, childBaseEntity2);
+            entityCreate.set("complex_second", 17L, baseEntityInnerSecond);
 
             // date array values
             entityCreate.addToArray("date_array", 18L, DateUtils.nowPlus(Calendar.DATE, 3));
@@ -183,6 +186,12 @@ public class PostgreSQLBaseEntityDaoImplTest {
             entityCreate.addToArray("string_array", 30L, "First element of string array.");
             entityCreate.addToArray("string_array", 31L, "Second element of string array.");
             entityCreate.addToArray("string_array", 32L, "Third element of string array.");
+
+            MetaClass metaClassForArrayElement = ((MetaClassArray)metaLoad.getMemberType("complex_array")).getMembersType().getMeta();
+            BaseEntity baseEntityForArrayFirst = new BaseEntity(metaClassForArrayElement, batch);
+            entityCreate.addToArray("complex_array", 33L, baseEntityForArrayFirst);
+            BaseEntity baseEntityForArraySecond = new BaseEntity(metaClassForArrayElement, batch);
+            entityCreate.set("complex_array", 34L, baseEntityForArraySecond);
 
             long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
             BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
