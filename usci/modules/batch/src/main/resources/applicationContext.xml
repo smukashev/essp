@@ -22,11 +22,10 @@
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
-    <!-- helpers -->
-    <bean id="fileHelper" class="kz.bsbnb.usci.batch.helper.impl.FileHelper" />
-
     <context:component-scan base-package="kz.bsbnb.usci.eav.persistance.impl.db.postgresql" />
     <context:component-scan base-package="kz.bsbnb.usci.eav.model.metadata.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.batch.helper.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.batch.parser.impl" />
 
     <bean id="JDBCConfig" class="kz.bsbnb.usci.eav.persistance.impl.db.JDBCConfig"/>
     <bean id="SQLStats" class="kz.bsbnb.usci.eav.stats.SQLQueriesStats"/>

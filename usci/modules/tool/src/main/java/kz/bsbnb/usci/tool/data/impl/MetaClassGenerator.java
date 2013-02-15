@@ -1,17 +1,19 @@
-package kz.bsbnb.usci.eav.stresstest;
+package kz.bsbnb.usci.tool.data.impl;
 
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
+import kz.bsbnb.usci.tool.data.AbstractGenerator;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-class MetaDataGenerator
+/**
+ * @author a.tkachenko
+ */
+public class MetaClassGenerator  extends AbstractGenerator
 {
-    private Random rand = new Random();
-
     private int maxAttributes = 25;
     private int maxRecursion = 2;
     private int classesNumber = 0;
@@ -28,7 +30,7 @@ class MetaDataGenerator
 
     private ArrayList<MetaClass> metaClasses = new ArrayList<MetaClass>();
 
-    public MetaDataGenerator(int maxAttributes, int maxRecursion)
+    public MetaClassGenerator(int maxAttributes, int maxRecursion)
     {
         this.maxAttributes = maxAttributes;
         this.maxRecursion = maxRecursion;
@@ -87,7 +89,8 @@ class MetaDataGenerator
         return type;
     }
 
-    public MetaClassHolder generateMetaClassHolder(int rec) {
+    public MetaClassHolder generateMetaClassHolder(int rec)
+    {
         return new MetaClassHolder(generateMetaClass(rec));
     }
 
@@ -110,6 +113,7 @@ class MetaDataGenerator
 
         complexTypeCount++;
         metaClasses.add(metaClass);
+
         return metaClass;
     }
 

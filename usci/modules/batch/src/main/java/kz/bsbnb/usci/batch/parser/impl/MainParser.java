@@ -1,25 +1,32 @@
 package kz.bsbnb.usci.batch.parser.impl;
 
-import kz.bsbnb.usci.batch.exception.UnknownTagException;
-import kz.bsbnb.usci.batch.parser.AbstractParser;
+import kz.bsbnb.usci.batch.helper.impl.FileHelper;
+import kz.bsbnb.usci.batch.parser.IParser;
+import kz.bsbnb.usci.batch.parser.CommonParser;
 import kz.bsbnb.usci.eav.model.BaseEntity;
+import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.metadata.DataTypes;
+import kz.bsbnb.usci.eav.model.metadata.IMetaFactory;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
+import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.EmptyStackException;
-import java.util.List;
-import java.util.Stack;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author k.tulbassiyev
  */
-public class MainParser extends AbstractParser
+public class MainParser extends CommonParser
 {
     private InputSource inputSource;
 
@@ -27,14 +34,16 @@ public class MainParser extends AbstractParser
 
     private Stack<BaseEntity> stack = new Stack<BaseEntity>();
 
-    private List<BaseEntity> entities = new ArrayList<BaseEntity>();
-
     private BaseEntity currentEntity;
 
     private int level = 0;
 
-    public MainParser(byte[] xmlBytes)
+    private long index = 1;
+
+    public MainParser(byte[] xmlBytes, Batch batch)
     {
+        this.batch = batch;
+
         ByteArrayInputStream bStream = new ByteArrayInputStream(xmlBytes);
         inputSource = new InputSource(bStream);
     }
@@ -77,7 +86,7 @@ public class MainParser extends AbstractParser
             if(currentEntity != null)
                 stack.push(currentEntity);
 
-            currentEntity = new BaseEntity(attributes.getValue("class"));
+            currentEntity = metaFactory.getBaseEntity(attributes.getValue("class"), batch);
             level++;
         }
     }
@@ -109,6 +118,9 @@ public class MainParser extends AbstractParser
                     entity = null;
                 }
 
+                if(entity == null)
+                    throw new NullPointerException("Entity is NULL!");
+
                 BaseEntity parentEntity;
 
                 try
@@ -122,11 +134,12 @@ public class MainParser extends AbstractParser
 
                 if(parentEntity != null)
                 {
-                    parentEntity.set(entity.getMeta().getClassName(), null, 0L, entity);
+                    parentEntity.set(entity.getMeta().getClassName(), batch, index, entity);
                 }
                 else
                 {
-                    entities.add(entity);
+                    baseEntityDao.save(entity);
+                    index++;
                 }
             }
             else
@@ -140,7 +153,10 @@ public class MainParser extends AbstractParser
                     entity = null;
                 }
 
-                entity.set(currentEntity.getMeta().getClassName(), null, 0L, currentEntity);
+                if(entity == null)
+                    throw new NullPointerException("Entity is NULL!");
+
+                entity.set(currentEntity.getMeta().getClassName(), batch, index, currentEntity);
             }
 
             currentEntity = null;
@@ -148,7 +164,7 @@ public class MainParser extends AbstractParser
         }
         else
         {
-            currentEntity.set(localName, null, 0L, contents.toString());
+            currentEntity.set(localName, batch, index, contents.toString());
         }
     }
 }

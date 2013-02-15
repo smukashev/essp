@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.batch.helper.impl;
 
-import kz.bsbnb.usci.batch.helper.AbstractHelper;
+import kz.bsbnb.usci.batch.helper.IHelper;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,12 +11,13 @@ import java.io.IOException;
 /**
  * @author k.tulbassiyev
  */
-public class FileHelper extends AbstractHelper
+@Component
+public class FileHelper implements IHelper
 {
     public byte[] getFileBytes(File file)
     {
-        FileInputStream fii = null;
-        byte bytes[] = null;
+        FileInputStream fii;
+        byte bytes[];
 
         try
         {
@@ -23,7 +25,7 @@ public class FileHelper extends AbstractHelper
         }
         catch (FileNotFoundException e)
         {
-            e.printStackTrace();
+            fii = null;
         }
 
         try
@@ -33,7 +35,7 @@ public class FileHelper extends AbstractHelper
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            bytes = null;
         }
 
         return bytes;

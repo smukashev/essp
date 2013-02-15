@@ -6,7 +6,15 @@ import kz.bsbnb.usci.eav.persistance.Persistable;
 
 public abstract class AbstractMetaArray extends Persistable implements IMetaType
 {
-	/**
+
+    protected AbstractMetaArray(long id) {
+        super(id);
+    }
+
+    protected AbstractMetaArray() {
+    }
+
+    /**
      * When attribute is an array, and is a key attribute - sets key usage strategy.
      * Defaults to <code>ArrayKeyTypes.ALL</code>
      * @see ComplexKeyTypes

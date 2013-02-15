@@ -367,6 +367,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         for (Map<String, Object> row : rows) {
             MetaValueArray attribute = new MetaValueArray(
+                    (Integer)row.get("id"),
                     DataTypes.valueOf((String) row.get("type_code")),
                     (Boolean)row.get("is_key"),
                     (Boolean)row.get("is_nullable"));
