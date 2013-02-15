@@ -31,7 +31,7 @@ public class BaseEntityGenerator  extends AbstractGenerator
                 {
                     MetaClassArray metaClassArray = (MetaClassArray) metaType;
 
-                    for(int i = 0; i < rand.nextInt(10); i++)
+                    for(int i = 0; i < 2 + rand.nextInt(10); i++)
                     {
                         BaseEntity tmpEntity = generateBaseEntity(batch,
                                 metaClassArray.getMembersType().getMeta(), index);
@@ -54,7 +54,8 @@ public class BaseEntityGenerator  extends AbstractGenerator
                 {
                     MetaValueArray metaValueArray = (MetaValueArray) metaType;
 
-                    entity.addToArray(name, index, getCastObject(metaValueArray.getTypeCode(), index));
+                    for(int i = 0; i < 2 + rand.nextInt(20); i++)
+                        entity.addToArray(name, index, getCastObject(metaValueArray.getTypeCode(), index));
                 }
                 else
                 {
@@ -73,15 +74,16 @@ public class BaseEntityGenerator  extends AbstractGenerator
         switch(typeCode)
         {
             case INTEGER:
-                return Integer.valueOf(rand.nextInt());
+                return rand.nextInt(1000);
             case DATE:
-                return new Date();
+                long ms = -946771200000L + (Math.abs(rand.nextLong()) % (70L * 365 * 24 * 60 * 60 * 1000));
+                return new Date(ms);
             case STRING:
-                return "string_" + index;
+                return "string_" + rand.nextInt(1000);
             case BOOLEAN:
                 return rand.nextBoolean();
             case DOUBLE:
-                return rand.nextDouble();
+                return rand.nextDouble()*10000;
             default:
                 throw new IllegalArgumentException("Unknown type. Can not be returned an appropriate class.");
         }
