@@ -479,7 +479,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
             Batch batch = batchRepository.getBatch((Long)row.get("batch_id"));
 
-            baseEntity.add((String) row.get("attribute_name"), batch, (Long) row.get("index"), row.get("value"));
+            baseEntity.addToArray((String) row.get("attribute_name"), batch, (Long) row.get("index"), row.get("value"));
         }
     }
 
