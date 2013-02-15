@@ -172,6 +172,10 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
+        if(type.isArray())
+            throw new IllegalArgumentException("Type: " + name +
+                    ", is an array");
+
         if (value != null)
         {
             Class<?> valueClass = value.getClass();
@@ -181,16 +185,8 @@ public class BaseEntity extends Persistable
                 expValueClass = BaseEntity.class;
             else
             {
-                if (type.isArray())
-                {
-                    MetaValueArray metaClassArray = (MetaValueArray)type;
-                    expValueClass = metaClassArray.getTypeCode().getDataTypeClass();
-                }
-                else
-                {
-                    MetaValue metaValue = (MetaValue)type;
-                    expValueClass = metaValue.getTypeCode().getDataTypeClass();
-                }
+                MetaValue metaValue = (MetaValue)type;
+                expValueClass = metaValue.getTypeCode().getDataTypeClass();
             }
 
             if(expValueClass == null || !expValueClass.isAssignableFrom(valueClass))
@@ -324,6 +320,10 @@ public class BaseEntity extends Persistable
 
     public Set<String> getPresentSimpleArrayAttributeNames(DataTypes dataType) {
         return SetUtils.intersection(meta.getSimpleArrayAttributesNames(dataType), dataForArray.keySet());
+    }
+
+    public Set<String> getPresentComplexArrayAttributeNames() {
+        return SetUtils.intersection(meta.getComplexArrayAttributesNames(), dataForArray.keySet());
     }
 
     public Batch getDefaultBatch()

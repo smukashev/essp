@@ -298,4 +298,19 @@ public class MetaClass extends Persistable {
         return filteredAttributeNames;
     }
 
+    public Set<String> getComplexArrayAttributesNames() {
+        Set<String> allAttributeNames = this.members.keySet();
+        Set<String> filteredAttributeNames = new HashSet<String>();
+
+        Iterator it = allAttributeNames.iterator();
+        while (it.hasNext()) {
+            String attributeName = (String)it.next();
+            IMetaType type = this.getMemberType(attributeName);
+            if (type.isArray() && type.isComplex()) {
+                filteredAttributeNames.add(attributeName);
+            }
+        }
+        return filteredAttributeNames;
+    }
+
 }
