@@ -118,12 +118,15 @@ public class RelationTest1
         documentEntity1.set("no", 4, "1234567890");
 
         BaseEntity documentEntity2 = metaFactory.getBaseEntity("document", batch);
-        documentEntity1.set("type", 4, "PASSPORT");
-        documentEntity1.set("no", 4, "0987654321");
+        documentEntity2.set("type", 4, "PASSPORT");
+        documentEntity2.set("no", 4, "0987654321");
 
         BaseEntity documentsEntity = metaFactory.getBaseEntity("documents", batch);
-        documentsEntity.getBatchValueArray("document").add(new BatchValue(batch, 5, documentEntity1));
-        documentsEntity.getBatchValueArray("document").add(new BatchValue(batch, 5, documentEntity2));
+        /*documentsEntity.getBatchValueArray("document").add(new BatchValue(batch, 5, documentEntity1));
+        documentsEntity.getBatchValueArray("document").add(new BatchValue(batch, 5, documentEntity2));*/
+
+        documentsEntity.addToArray("document", 5, documentEntity1);
+        documentsEntity.addToArray("document", 5, documentEntity2);
 
         BaseEntity nameEntity = metaFactory.getBaseEntity("name", batch);
         nameEntity.set("firstname", 6, "KANAT");
@@ -143,5 +146,9 @@ public class RelationTest1
         BaseEntity contractEntityTest = baseEntityDao.load(id);
 
         Assert.assertEquals(contractEntity, contractEntityTest);
+
+        documentEntity1.set("type", 4, "RNN123");
+
+        Assert.assertTrue(!contractEntity.equals(contractEntityTest));
     }
 }

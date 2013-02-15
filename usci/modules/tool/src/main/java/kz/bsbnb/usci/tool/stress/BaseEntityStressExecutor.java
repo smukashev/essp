@@ -61,7 +61,10 @@ public class BaseEntityStressExecutor
             {
                 MetaClass metaClass = metaClassGenerator.generateMetaClass(0);
 
-                metaClassDao.save(metaClass);
+                long metaClassId = metaClassDao.save(metaClass);
+
+                metaClass = metaClassDao.load(metaClassId);
+
                 data.add(i, metaClass);
 
                 if(i % (dataSize / 10) == 0)
