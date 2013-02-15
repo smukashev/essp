@@ -160,29 +160,29 @@ public class PostgreSQLBaseEntityDaoImplTest {
             entityCreate.set("complex_second", 17L, childBaseEntity2);
 
             // date array values
-            entityCreate.add("date_array", 18L, DateUtils.nowPlus(Calendar.DATE, 3));
-            entityCreate.add("date_array", 19L, DateUtils.nowPlus(Calendar.DATE, 5));
-            entityCreate.add("date_array", 20L, DateUtils.nowPlus(Calendar.DATE, 7));
+            entityCreate.addToArray("date_array", 18L, DateUtils.nowPlus(Calendar.DATE, 3));
+            entityCreate.addToArray("date_array", 19L, DateUtils.nowPlus(Calendar.DATE, 5));
+            entityCreate.addToArray("date_array", 20L, DateUtils.nowPlus(Calendar.DATE, 7));
 
             // double array values
-            entityCreate.add("double_array", 21L, random.nextInt() * random.nextDouble());
-            entityCreate.add("double_array", 22L, random.nextInt() * random.nextDouble());
-            entityCreate.add("double_array", 23L, random.nextInt() * random.nextDouble());
+            entityCreate.addToArray("double_array", 21L, random.nextInt() * random.nextDouble());
+            entityCreate.addToArray("double_array", 22L, random.nextInt() * random.nextDouble());
+            entityCreate.addToArray("double_array", 23L, random.nextInt() * random.nextDouble());
 
             // integer array values
-            entityCreate.add("integer_array", 24L, random.nextInt());
-            entityCreate.add("integer_array", 25L, random.nextInt());
-            entityCreate.add("integer_array", 26L, random.nextInt());
+            entityCreate.addToArray("integer_array", 24L, random.nextInt());
+            entityCreate.addToArray("integer_array", 25L, random.nextInt());
+            entityCreate.addToArray("integer_array", 26L, random.nextInt());
 
             // boolean array values
-            entityCreate.add("boolean_array", 27L, random.nextBoolean());
-            entityCreate.add("boolean_array", 28L, random.nextBoolean());
-            entityCreate.add("boolean_array", 29L, random.nextBoolean());
+            entityCreate.addToArray("boolean_array", 27L, random.nextBoolean());
+            entityCreate.addToArray("boolean_array", 28L, random.nextBoolean());
+            entityCreate.addToArray("boolean_array", 29L, random.nextBoolean());
 
             // string array values
-            entityCreate.add("string_array", 30L, "First element of string array.");
-            entityCreate.add("string_array", 31L, "Second element of string array.");
-            entityCreate.add("string_array", 32L, "Third element of string array.");
+            entityCreate.addToArray("string_array", 30L, "First element of string array.");
+            entityCreate.addToArray("string_array", 31L, "Second element of string array.");
+            entityCreate.addToArray("string_array", 32L, "Third element of string array.");
 
             long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
             BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);

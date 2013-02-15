@@ -427,7 +427,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
     }
 
-    //TODO: add active period to classes
+    //TODO: addToArray active period to classes
 	@Transactional
 	public long save(MetaClass meta) {
         MetaClass dbMeta = new MetaClass(meta);

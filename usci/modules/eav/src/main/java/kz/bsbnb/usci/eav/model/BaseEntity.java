@@ -7,7 +7,6 @@ import kz.bsbnb.usci.eav.model.batchdata.impl.BatchValue;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.Persistable;
@@ -222,12 +221,6 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
-        // todo: check
-        // there is an error: Cannot convert type(MetaClassArray) to MetaClass
-        /*if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is an object of class: " + ((MetaClass)type).getClassName());*/
-
         if(!type.isArray())
             throw new IllegalArgumentException("Type: " + name +
                     ", is not an array");
@@ -243,15 +236,16 @@ public class BaseEntity extends Persistable
         return batchValues;
     }
 
-    public <T> void add(String name, long index, T value)
+    public <T> void addToArray(String name, long index, T value)
     {
         if (defaultBatch == null)
             throw new IllegalStateException("Default Batch is not set.");
 
-        add(name, defaultBatch, index, value);
+        addToArray(name, defaultBatch, index, value);
     }
 
-    public <T> void add(String name, Batch batch, long index, T value) {
+    public <T> void addToArray(String name, Batch batch, long index, T value)
+    {
 
         IMetaType type = meta.getMemberType(name);
 
