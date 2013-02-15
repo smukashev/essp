@@ -2,7 +2,6 @@ package kz.bsbnb.usci.batch;
 
 import kz.bsbnb.usci.batch.parser.IParser;
 import kz.bsbnb.usci.batch.parser.IParserFactory;
-import kz.bsbnb.usci.batch.parser.impl.MainParser;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import org.apache.log4j.Logger;
@@ -36,7 +35,7 @@ public class Main
 
         IParserFactory parserFactory = ctx.getBean(IParserFactory.class);
 
-        IParser parser = parserFactory.getIParser("/opt/xmls/simple.xml", loadedBatch);
+        IParser parser = parserFactory.getIParser("/opt/xmls/simple_with_arrays.xml", loadedBatch);
 
         parser.parse();
     }

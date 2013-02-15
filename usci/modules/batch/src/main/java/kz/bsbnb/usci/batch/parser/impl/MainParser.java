@@ -1,26 +1,19 @@
 package kz.bsbnb.usci.batch.parser.impl;
 
-import kz.bsbnb.usci.batch.helper.impl.FileHelper;
-import kz.bsbnb.usci.batch.parser.IParser;
 import kz.bsbnb.usci.batch.parser.CommonParser;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.metadata.DataTypes;
-import kz.bsbnb.usci.eav.model.metadata.IMetaFactory;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
-import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav.persistance.storage.IStorage;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.*;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -36,9 +29,7 @@ public class MainParser extends CommonParser
 
     private BaseEntity currentEntity;
 
-    private int level = 0;
-
-    private long index = 1;
+    private int level = 0, index = 1;
 
     public MainParser(byte[] xmlBytes, Batch batch)
     {
@@ -164,7 +155,46 @@ public class MainParser extends CommonParser
         }
         else
         {
-            currentEntity.set(localName, batch, index, contents.toString());
+            IMetaType metaType = currentEntity.getMeta().getMemberType(localName);
+
+            Object o = null;
+
+            if(!metaType.isArray())
+            {
+                MetaValue metaValue = (MetaValue) metaType;
+
+                try
+                {
+                    o = parserHelper.getCastObject(metaValue.getTypeCode(), contents.toString());
+                }
+                catch (ParseException e)
+                {
+                    e.printStackTrace();
+                }
+                catch (NumberFormatException n)
+                {
+                    n.printStackTrace();
+                }
+            }
+            else
+            {
+                MetaValueArray metaValueArray = (MetaValueArray) metaType;
+
+                try
+                {
+                    o = parserHelper.getCastObject(metaValueArray.getTypeCode(), contents.toString());
+                }
+                catch (ParseException e)
+                {
+                    e.printStackTrace();
+                }
+                catch (NumberFormatException n)
+                {
+                    n.printStackTrace();
+                }
+            }
+
+            currentEntity.set(localName, batch, index, o);
         }
     }
 }

@@ -5,5 +5,5 @@ package kz.bsbnb.usci.batch.common;
  */
 public class Global
 {
-    public static final String DATE_FORMAT = "yyyy-MM-dd";
+    public static final String DATE_FORMAT = "dd-mm-yyyy";
 }

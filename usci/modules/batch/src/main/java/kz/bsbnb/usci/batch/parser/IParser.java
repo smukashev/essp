@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.batch.parser;
 
 import kz.bsbnb.usci.batch.common.Global;
+import kz.bsbnb.usci.batch.helper.impl.ParserHelper;
 import kz.bsbnb.usci.eav.model.metadata.IMetaFactory;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
@@ -28,4 +29,5 @@ public interface IParser
     public void setMetaClassDao(IMetaClassDao metaClassDao);
     public void setBaseEntityDao(IBaseEntityDao baseEntityDao);
     public void setMetaFactory(IMetaFactory metaFactory);
+    public void setParserHelper(ParserHelper parserHelper);
 }

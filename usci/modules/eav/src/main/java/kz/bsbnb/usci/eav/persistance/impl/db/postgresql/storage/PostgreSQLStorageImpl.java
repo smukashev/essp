@@ -93,7 +93,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
 	@Override
 	public void initialize() {
-        //add unique constraint on name
+        //addToArray unique constraint on name
 	    String query = String.format(CLASSES_TABLE,
                 getConfig().getClassesTableName(), getConfig().getComplexKeyTypeCodeLength(),
                 getConfig().getClassNameLength(), getConfig().getClassesTableName());
