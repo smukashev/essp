@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.tool.data.impl.BaseEntityGenerator;
 import kz.bsbnb.usci.tool.data.impl.MetaClassGenerator;
+import kz.bsbnb.usci.tool.xml.AbstractXmlGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -33,7 +34,7 @@ import java.util.Date;
 /**
  * @author k.tulbassiyev
  */
-public class XmlBaseEntityGenerator // extends AbstractXmlGenerator
+public class XmlBaseEntityGenerator extends AbstractXmlGenerator
 {
     private final static Logger logger = LoggerFactory.getLogger(XmlBaseEntityGenerator.class);
 
@@ -41,8 +42,6 @@ public class XmlBaseEntityGenerator // extends AbstractXmlGenerator
 
     public static void main(String args[]) throws ParserConfigurationException, TransformerException
     {
-        System.out.println("Test started at: " + Calendar.getInstance().getTime());
-
         MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 2);
         BaseEntityGenerator baseEntityGenerator = new BaseEntityGenerator();
 
