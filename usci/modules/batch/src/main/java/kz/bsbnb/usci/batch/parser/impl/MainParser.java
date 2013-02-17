@@ -125,7 +125,16 @@ public class MainParser extends CommonParser
 
                 if(parentEntity != null)
                 {
-                    parentEntity.set(entity.getMeta().getClassName(), batch, index, entity);
+                    IMetaType metaType = parentEntity.getMeta().getMemberType(entity.getMeta().getClassName());
+
+                    if(metaType.isArray())
+                    {
+                        parentEntity.addToArray(entity.getMeta().getClassName(), batch, index, entity);
+                    }
+                    else
+                    {
+                        parentEntity.set(entity.getMeta().getClassName(), batch, index, entity);
+                    }
                 }
                 else
                 {
@@ -147,7 +156,17 @@ public class MainParser extends CommonParser
                 if(entity == null)
                     throw new NullPointerException("Entity is NULL!");
 
-                entity.set(currentEntity.getMeta().getClassName(), batch, index, currentEntity);
+                IMetaType metaType = entity.getMeta().getMemberType(currentEntity.getMeta().getClassName());
+
+                if(metaType.isArray())
+                {
+                    entity.addToArray(currentEntity.getMeta().getClassName(), batch, index, currentEntity);
+                }
+                else
+                {
+                    entity.set(currentEntity.getMeta().getClassName(), batch, index, currentEntity);
+                }
+
             }
 
             currentEntity = null;
@@ -155,6 +174,14 @@ public class MainParser extends CommonParser
         }
         else
         {
+            boolean currentEntityInstalled = false;
+
+            if(currentEntity == null)
+            {
+                currentEntity = stack.peek();
+                currentEntityInstalled = true;
+            }
+
             IMetaType metaType = currentEntity.getMeta().getMemberType(localName);
 
             Object o = null;
@@ -175,6 +202,11 @@ public class MainParser extends CommonParser
                 {
                     n.printStackTrace();
                 }
+
+                currentEntity.set(localName, batch, index, o);
+
+                if(currentEntityInstalled)
+                    currentEntity = null;
             }
             else
             {
@@ -192,9 +224,9 @@ public class MainParser extends CommonParser
                 {
                     n.printStackTrace();
                 }
-            }
 
-            currentEntity.set(localName, batch, index, o);
+                currentEntity.addToArray(localName, batch, index, o);
+            }
         }
     }
 }

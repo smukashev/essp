@@ -55,13 +55,13 @@ public class BaseEntityGenerator  extends AbstractGenerator
                     MetaValueArray metaValueArray = (MetaValueArray) metaType;
 
                     for(int i = 0; i < 2 + rand.nextInt(20); i++)
-                        entity.addToArray(name, index, getCastObject(metaValueArray.getTypeCode(), index));
+                        entity.addToArray(name, index, getCastObject(metaValueArray.getTypeCode()));
                 }
                 else
                 {
                     MetaValue metaValue = (MetaValue) metaType;
 
-                    entity.set(name, index, getCastObject(metaValue.getTypeCode(), index));
+                    entity.set(name, index, getCastObject(metaValue.getTypeCode()));
                 }
             }
         }
@@ -69,15 +69,14 @@ public class BaseEntityGenerator  extends AbstractGenerator
         return entity;
     }
 
-    public Object getCastObject(DataTypes typeCode, long index)
+    public Object getCastObject(DataTypes typeCode)
     {
         switch(typeCode)
         {
             case INTEGER:
                 return rand.nextInt(1000);
             case DATE:
-                long ms = -946771200000L + (Math.abs(rand.nextLong()) % (70L * 365 * 24 * 60 * 60 * 1000));
-                return new Date(ms);
+                return new Date();
             case STRING:
                 return "string_" + rand.nextInt(1000);
             case BOOLEAN:

@@ -25,10 +25,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -38,7 +38,9 @@ public class XmlBaseEntityGenerator extends AbstractXmlGenerator
 {
     private final static Logger logger = LoggerFactory.getLogger(XmlBaseEntityGenerator.class);
 
-    private final static int dataSize = 25;
+    private final static int dataSize = 15;
+
+    private final static String FILE_PATH = "/opt/xmls/test.xml";
 
     public static void main(String args[]) throws ParserConfigurationException, TransformerException
     {
@@ -53,73 +55,65 @@ public class XmlBaseEntityGenerator extends AbstractXmlGenerator
 
         ArrayList<MetaClass> data = new ArrayList<MetaClass>();
 
-        Document document = null;
+        Document document;
 
-        try
+        if(!storage.testConnection())
         {
-            if(!storage.testConnection())
-            {
-                logger.error("Can't connect to storage.");
-                System.exit(1);
-            }
-
-            storage.clear();
-            storage.initialize();
-
-            System.out.println("Generation: ..........");
-            System.out.print(  "Progress  : ");
-
-            for(int i = 0; i < dataSize; i++)
-            {
-                MetaClass metaClass = metaClassGenerator.generateMetaClass(0);
-
-                long metaClassId = metaClassDao.save(metaClass);
-
-                metaClass = metaClassDao.load(metaClassId);
-
-                data.add(i, metaClass);
-
-                if(i % (dataSize / 10) == 0)
-                    System.out.print(".");
-            }
-
-            System.out.println();
-
-            // --------
-
-            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-
-            document = documentBuilder.newDocument();
-
-            Element batchElement = document.createElement("batch");
-            Element entitiesElement = document.createElement("entities");
-
-            document.appendChild(batchElement);
-            // batchElement.appendChild(entitiesElement);
-
-            Batch batch = new Batch(new Timestamp(new Date().getTime()));
-
-            long index = 0L;
-
-            for (MetaClass metaClass : data)
-            {
-                BaseEntity baseEntity = baseEntityGenerator.generateBaseEntity(batch, metaClass, ++index);
-
-                processBaseEntity(document, baseEntity, entitiesElement);
-
-                batchElement.appendChild(entitiesElement);
-            }
+            logger.error("Can't connect to storage.");
+            System.exit(1);
         }
-        finally
+
+        storage.clear();
+        storage.initialize();
+
+        System.out.println("Generation: ..........");
+        System.out.print(  "Progress  : ");
+
+        for(int i = 0; i < dataSize; i++)
         {
-            storage.clear();
+            MetaClass metaClass = metaClassGenerator.generateMetaClass(0);
+
+            long metaClassId = metaClassDao.save(metaClass);
+
+            metaClass = metaClassDao.load(metaClassId);
+
+            data.add(i, metaClass);
+
+            if(i % (dataSize * 0.1) == 0)
+                System.out.print(".");
         }
+
+        System.out.println();
+
+        // --------
+
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+
+        document = documentBuilder.newDocument();
+
+        Element batchElement = document.createElement("batch");
+        Element entitiesElement = document.createElement("entities");
+
+        document.appendChild(batchElement);
+
+        Batch batch = new Batch(new Timestamp(new Date().getTime()));
+
+        long index = 0L;
+
+        for (MetaClass metaClass : data)
+        {
+            BaseEntity baseEntity = baseEntityGenerator.generateBaseEntity(batch, metaClass, ++index);
+
+            processBaseEntity(document, baseEntity, entitiesElement);
+        }
+
+        batchElement.appendChild(entitiesElement);
 
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
         DOMSource source = new DOMSource(document);
-        StreamResult result =  new StreamResult(System.out);
+        StreamResult result =  new StreamResult(new File(FILE_PATH));
         transformer.transform(source, result);
     }
 
@@ -127,32 +121,63 @@ public class XmlBaseEntityGenerator extends AbstractXmlGenerator
     {
         MetaClass meta = entity.getMeta();
 
+        Element element = document.createElement("entity");
+        element.setAttribute("class", entity.getMeta().getClassName());
+
         for (String name : meta.getMemberNames())
         {
             IMetaType metaType = meta.getMemberType(name);
 
-            if(metaType.isComplex())
+            if(metaType.isComplex() && metaType.isArray())
             {
-                if(metaType.isArray())
+                for (IBatchValue batchValue : entity.getBatchValueArray(name))
                 {
+                    BaseEntity memberEntity = (BaseEntity) batchValue.getValue();
 
-                }
-                else
-                {
-
+                    processBaseEntity(document, memberEntity, element);
                 }
             }
-            else
+            else if(metaType.isComplex() && !metaType.isArray())
             {
-                if(metaType.isArray())
-                {
+                BaseEntity memberEntity = (BaseEntity) entity.getBatchValue(name).getValue();
 
-                }
-                else
-                {
+                processBaseEntity(document, memberEntity, element);
+            }
+            else if(!metaType.isComplex() && metaType.isArray())
+            {
+                MetaValueArray metaValueArray = (MetaValueArray) metaType;
 
+                for (IBatchValue batchValue : entity.getBatchValueArray(name))
+                {
+                    Element childElement = document.createElement(name);
+
+                    Object value = batchValue.getValue();
+
+                    childElement.appendChild(document.createTextNode(
+                            metaValueArray.getTypeCode() == DataTypes.DATE ?
+                                    new SimpleDateFormat("yyyy-MM-dd").format(value)
+                                    : value.toString()));
+
+                    element.appendChild(childElement);
                 }
+            }
+            else if(!metaType.isComplex() && !metaType.isArray())
+            {
+                MetaValue metaValue = (MetaValue) metaType;
+
+                Element childElement = document.createElement(name);
+
+                Object value = entity.getBatchValue(name).getValue();
+
+                childElement.appendChild(document.createTextNode(
+                        metaValue.getTypeCode() == DataTypes.DATE ?
+                                new SimpleDateFormat("yyyy-MM-dd").format(value)
+                                : value.toString()));
+
+                element.appendChild(childElement);
             }
         }
+
+        parentElement.appendChild(element);
     }
 }

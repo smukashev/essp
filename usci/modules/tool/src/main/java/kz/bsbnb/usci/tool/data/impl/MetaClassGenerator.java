@@ -104,13 +104,37 @@ public class MetaClassGenerator  extends AbstractGenerator
         metaClass.setDisabled(rand.nextBoolean());
         metaClass.setComplexKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
 
-        for (int j = 5; j < attributesCount; j++)
+        for (int j = 0; j < attributesCount; j++)
         {
-            IMetaType type;
+            IMetaType type = generateMetaType(rec + 1);
 
-            type = generateMetaType(rec + 1);
+            long nanoTime = System.nanoTime();
 
-            metaClass.setMemberType("attribute_" + j, type);
+            if(type instanceof MetaValueArray)
+            {
+                MetaClassHolder metaClassHolder = new MetaClassHolder("simple_array_" + nanoTime);
+                metaClassHolder.getMeta().setMemberType("simple_attribute_" + nanoTime, type);
+
+                metaClass.setMemberType("simple_array_" + nanoTime, metaClassHolder);
+            }
+            else if(type instanceof MetaClassArray)
+            {
+                MetaClassHolder metaClassHolder = new MetaClassHolder("complex_array_" + nanoTime);
+
+                metaClassHolder.getMeta().setMemberType(((MetaClassArray) type).getMembersType()
+                        .getMeta().getClassName(), type);
+
+                metaClass.setMemberType("complex_array_" + nanoTime, metaClassHolder);
+            }
+            else if(type instanceof MetaClassHolder)
+            {
+                MetaClassHolder metaClassHolder = (MetaClassHolder) type;
+                metaClass.setMemberType(metaClassHolder.getMeta().getClassName(), type);
+            }
+            else
+            {
+                metaClass.setMemberType("attribute_" + nanoTime, type);
+            }
         }
 
         complexTypeCount++;
