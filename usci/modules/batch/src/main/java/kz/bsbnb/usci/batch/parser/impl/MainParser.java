@@ -31,6 +31,12 @@ public class MainParser extends CommonParser
 
     private int level = 0, index = 1;
 
+    /* statistic variablees */
+    private Long parseTime1 = 0L, parseTime2 = 0L;
+    private List<Long> parseTimeList = new ArrayList<Long>();
+    private List<Long> saveTimeList = new ArrayList<Long>();
+    private boolean parseInstalled = false;
+
     public MainParser(byte[] xmlBytes, Batch batch)
     {
         this.batch = batch;
@@ -55,6 +61,20 @@ public class MainParser extends CommonParser
     @Override
     public void endDocument() throws SAXException
     {
+        long totalParseTime = 0L, totalSaveTime = 0L;
+
+        for (Long t : parseTimeList)
+            totalParseTime += t;
+
+        for (Long t : saveTimeList)
+            totalSaveTime += t;
+
+        logger.info("---------------------------------------------------");
+        logger.info("[total save time]          :       " + totalSaveTime);
+        logger.info("[total parse time]         :       " + totalParseTime);
+        logger.info("[avg save time]            :       " + (totalSaveTime/saveTimeList.size()));
+        logger.info("[avg parse time]           :       " + (totalParseTime/parseTimeList.size()));
+
         logger.info("finished");
     }
 
@@ -79,6 +99,12 @@ public class MainParser extends CommonParser
 
             currentEntity = metaFactory.getBaseEntity(attributes.getValue("class"), batch);
             level++;
+
+            if(!parseInstalled)
+            {
+                parseTime1 = System.currentTimeMillis();
+                parseInstalled = true;
+            }
         }
     }
 
@@ -138,7 +164,22 @@ public class MainParser extends CommonParser
                 }
                 else
                 {
+                    // parse time
+                    parseTime2 = System.currentTimeMillis();
+                    logger.info("[parse entity]["+index+"]  :  " + (parseTime2 - parseTime1));
+                    parseTimeList.add((parseTime2 - parseTime1));
+                    parseInstalled = false;
+
+                    // save time
+                    long saveTime1 = System.currentTimeMillis();
                     baseEntityDao.save(entity);
+                    long saveTime2 = System.currentTimeMillis();
+
+                    logger.info("[save entity]["+index+"]   :  " + (saveTime2 - saveTime1));
+                    saveTimeList.add((saveTime2 - saveTime1));
+
+                    // do not append save time
+                    parseTime1 = System.currentTimeMillis();
                     index++;
                 }
             }
