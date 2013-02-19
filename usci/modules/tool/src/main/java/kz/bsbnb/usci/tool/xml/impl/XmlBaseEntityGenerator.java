@@ -1,8 +1,9 @@
 package kz.bsbnb.usci.tool.xml.impl;
 
 import kz.bsbnb.usci.eav.model.BaseEntity;
+import kz.bsbnb.usci.eav.model.BaseSet;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.batchdata.IBatchValue;
+import kz.bsbnb.usci.eav.model.batchdata.IBaseValue;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
@@ -26,10 +27,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * @author k.tulbassiyev
@@ -49,6 +52,20 @@ public class XmlBaseEntityGenerator extends AbstractXmlGenerator
 
         ClassPathXmlApplicationContext ctx
                 = new ClassPathXmlApplicationContext("stressApplicationContext.xml");
+
+        File xmlFile = new File(FILE_PATH);
+
+        if(!xmlFile.exists())
+        {
+            try
+            {
+                xmlFile.createNewFile();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
 
         IStorage storage = ctx.getBean(IStorage.class);
         IMetaClassDao metaClassDao = ctx.getBean(IMetaClassDao.class);
@@ -105,7 +122,7 @@ public class XmlBaseEntityGenerator extends AbstractXmlGenerator
         {
             BaseEntity baseEntity = baseEntityGenerator.generateBaseEntity(batch, metaClass, ++index);
 
-            processBaseEntity(document, baseEntity, entitiesElement);
+            processBaseEntity(document, baseEntity, "entity", true, entitiesElement);
         }
 
         batchElement.appendChild(entitiesElement);
@@ -117,12 +134,14 @@ public class XmlBaseEntityGenerator extends AbstractXmlGenerator
         transformer.transform(source, result);
     }
 
-    public static void processBaseEntity(Document document, BaseEntity entity, Element parentElement)
+    public static void processBaseEntity(Document document, BaseEntity entity, String nameInParent, boolean firstTime, Element parentElement)
     {
         MetaClass meta = entity.getMeta();
 
-        Element element = document.createElement("entity");
-        element.setAttribute("class", entity.getMeta().getClassName());
+        Element element = document.createElement(nameInParent);
+
+        if(firstTime)
+            element.setAttribute("class", entity.getMeta().getClassName());
 
         for (String name : meta.getMemberNames())
         {
@@ -130,36 +149,44 @@ public class XmlBaseEntityGenerator extends AbstractXmlGenerator
 
             if(metaType.isComplex() && metaType.isArray())
             {
-                for (IBatchValue batchValue : entity.getBatchValueArray(name))
+                Element arrayContainer = document.createElement(name);
+
+                for (IBaseValue batchValue : (((BaseSet)entity.getBatchValue(name).getValue()).get()))
                 {
                     BaseEntity memberEntity = (BaseEntity) batchValue.getValue();
 
-                    processBaseEntity(document, memberEntity, element);
+                    processBaseEntity(document, memberEntity, "item", false, arrayContainer);
                 }
+
+                element.appendChild(arrayContainer);
             }
             else if(metaType.isComplex() && !metaType.isArray())
             {
                 BaseEntity memberEntity = (BaseEntity) entity.getBatchValue(name).getValue();
 
-                processBaseEntity(document, memberEntity, element);
+                processBaseEntity(document, memberEntity, name, false, element);
             }
             else if(!metaType.isComplex() && metaType.isArray())
             {
-                MetaValueArray metaValueArray = (MetaValueArray) metaType;
+                MetaSet metaSet = (MetaSet) metaType;
 
-                for (IBatchValue batchValue : entity.getBatchValueArray(name))
+                Element arrayContainer = document.createElement(name);
+
+                for (IBaseValue batchValue : (((BaseSet)entity.getBatchValue(name).getValue()).get()))
                 {
-                    Element childElement = document.createElement(name);
+                    Element childElement = document.createElement("item");
 
                     Object value = batchValue.getValue();
 
                     childElement.appendChild(document.createTextNode(
-                            metaValueArray.getTypeCode() == DataTypes.DATE ?
+                            metaSet.getTypeCode() == DataTypes.DATE ?
                                     new SimpleDateFormat("yyyy-MM-dd").format(value)
                                     : value.toString()));
 
-                    element.appendChild(childElement);
+                    arrayContainer.appendChild(childElement);
                 }
+
+                element.appendChild(arrayContainer);
             }
             else if(!metaType.isComplex() && !metaType.isArray())
             {

@@ -2,12 +2,11 @@ package kz.bsbnb.usci.tool.data.impl;
 
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
-import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 import kz.bsbnb.usci.tool.data.AbstractGenerator;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * @author a.tkachenko
@@ -36,9 +35,9 @@ public class MetaClassGenerator  extends AbstractGenerator
         this.maxRecursion = maxRecursion;
     }
 
-    IMetaType generateMetaType(int rec)
+    IMetaAttribute generateMetaAttribute(int rec)
     {
-        IMetaType type;
+        IMetaAttribute attribute;
         int switcher = rand.nextInt(4);
 
         if(switcher == 0 || switcher == 2)
@@ -55,45 +54,39 @@ public class MetaClassGenerator  extends AbstractGenerator
                 //complex attribute
                 MetaClass metaClass = generateMetaClass(rec + 1);
                 metaClass.setComplexKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
-                type = new MetaClassHolder(metaClass);
+                /*type = new MetaClassHolder(metaClass);*/
+                attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), metaClass);
 
                 break;
             case 1:
                 //simple array
-                MetaValueArray a = new MetaValueArray(DataTypes.values()[rand.nextInt(DataTypes.values().length)],
-                        rand.nextBoolean(), rand.nextBoolean());
+                MetaSet a = new MetaSet(new MetaValue(DataTypes.values()[rand.nextInt(DataTypes.values().length)]));
 
                 a.setArrayKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
 
-                type = a;
+                attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), a);
                 simpleTypeArrayCount++;
 
                 break;
             case 2:
                 //complex array
-                MetaClassArray ca = new MetaClassArray(generateMetaClassHolder(rec + 1));
+                MetaSet ca = new MetaSet(generateMetaClass(rec + 1));
                 ca.setArrayKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
 
-                type = ca;
+                attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), ca);
                 complexTypeArrayCount++;
 
                 break;
             default:
                 //simple attribute
-                type = new MetaValue(DataTypes.values()[rand.nextInt(DataTypes.values().length)],
-                        rand.nextBoolean(), rand.nextBoolean());
+                attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), new MetaValue(DataTypes.values()[rand.nextInt(DataTypes.values().length)]));
 
                 simpleTypeCount++;
 
                 break;
         }
 
-        return type;
-    }
-
-    public MetaClassHolder generateMetaClassHolder(int rec)
-    {
-        return new MetaClassHolder(generateMetaClass(rec));
+        return attribute;
     }
 
     public MetaClass generateMetaClass(int rec)
@@ -106,35 +99,9 @@ public class MetaClassGenerator  extends AbstractGenerator
 
         for (int j = 0; j < attributesCount; j++)
         {
-            IMetaType type = generateMetaType(rec + 1);
+            IMetaAttribute type = generateMetaAttribute(rec + 1);
 
-            long nanoTime = System.nanoTime();
-
-            if(type instanceof MetaValueArray)
-            {
-                MetaClassHolder metaClassHolder = new MetaClassHolder("simple_array_" + nanoTime);
-                metaClassHolder.getMeta().setMemberType("simple_attribute_" + nanoTime, type);
-
-                metaClass.setMemberType("simple_array_" + nanoTime, metaClassHolder);
-            }
-            else if(type instanceof MetaClassArray)
-            {
-                MetaClassHolder metaClassHolder = new MetaClassHolder("complex_array_" + nanoTime);
-
-                metaClassHolder.getMeta().setMemberType(((MetaClassArray) type).getMembersType()
-                        .getMeta().getClassName(), type);
-
-                metaClass.setMemberType("complex_array_" + nanoTime, metaClassHolder);
-            }
-            else if(type instanceof MetaClassHolder)
-            {
-                MetaClassHolder metaClassHolder = (MetaClassHolder) type;
-                metaClass.setMemberType(metaClassHolder.getMeta().getClassName(), type);
-            }
-            else
-            {
-                metaClass.setMemberType("attribute_" + nanoTime, type);
-            }
+            metaClass.setMetaAttribute("attribute_" + System.nanoTime(), type);
         }
 
         complexTypeCount++;

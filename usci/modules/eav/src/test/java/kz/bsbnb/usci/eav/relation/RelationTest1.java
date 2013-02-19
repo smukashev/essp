@@ -1,26 +1,16 @@
 package kz.bsbnb.usci.eav.relation;
 
-import junit.framework.Assert;
-import kz.bsbnb.usci.eav.model.BaseEntity;
-import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.batchdata.impl.BatchValue;
-import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.IMetaFactory;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.sql.Timestamp;
-import java.util.Date;
 
 /**
  * @author k.tulbassiyev
@@ -45,7 +35,7 @@ public class RelationTest1
 
     @Autowired
     IMetaFactory metaFactory;
-
+    /*
     @Test
     public void MetaClassBaseEntityRelation()
     {
@@ -103,9 +93,9 @@ public class RelationTest1
         streetEntity.set("value", 1, "ABAY");
 
         BaseEntity houseEntity = metaFactory.getBaseEntity("house", batch);
-        houseEntity.getBatchValueArray("value").add(new BatchValue(batch, 2, 111));
-        houseEntity.getBatchValueArray("value").add(new BatchValue(batch, 2, 222));
-        houseEntity.getBatchValueArray("value").add(new BatchValue(batch, 2, 333));
+        houseEntity.getBatchValueArray("value").add(new BaseValue(batch, 2, 111));
+        houseEntity.getBatchValueArray("value").add(new BaseValue(batch, 2, 222));
+        houseEntity.getBatchValueArray("value").add(new BaseValue(batch, 2, 333));
 
         BaseEntity addressEntity = metaFactory.getBaseEntity("address", batch);
         addressEntity.set("country", 3, "KAZAKHSTAN");
@@ -148,5 +138,5 @@ public class RelationTest1
         documentEntity1.set("type", 4, "RNN123");
 
         Assert.assertTrue(!contractEntity.equals(contractEntityTest));
-    }
+    }    */
 }

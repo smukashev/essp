@@ -2,17 +2,19 @@ package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.batchdata.IBaseValue;
 import kz.bsbnb.usci.eav.model.batchdata.IBatchRepository;
-import kz.bsbnb.usci.eav.model.batchdata.IBatchValue;
+import kz.bsbnb.usci.eav.model.batchdata.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.IMetaClassRepository;
-import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -364,15 +366,15 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             String attributeNameForInsert = it.next();
 
-            IMetaType metaType = meta.getMemberType(attributeNameForInsert);
-            MetaValue metaValue = (MetaValue)metaType;
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(attributeNameForInsert);
 
-            IBatchValue batchValue = baseEntity.getBatchValue(attributeNameForInsert);
+
+            IBaseValue batchValue = baseEntity.getBatchValue(attributeNameForInsert);
 
             Object[] insertArgs = new Object[] {
                     baseEntity.getId(),
                     batchValue.getBatch().getId(),
-                    metaValue.getId(),
+                    metaAttribute.getId(), // todo: check
                     batchValue.getIndex(),
                     batchValue.getValue()
             };
@@ -394,15 +396,14 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             String attributeNameForInsert = it.next();
 
-            IBatchValue batchValue = baseEntity.getBatchValue(attributeNameForInsert);
+            IBaseValue batchValue = baseEntity.getBatchValue(attributeNameForInsert);
 
-            IMetaType metaType = meta.getMemberType(attributeNameForInsert);
-            MetaClassHolder metaClassHolder = (MetaClassHolder)metaType;
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(attributeNameForInsert);
 
             long childBaseEntityId = save((BaseEntity)batchValue.getValue());
 
             Object[] insertArgs = new Object[] {baseEntity.getId(), batchValue.getBatch().getId(),
-                    metaClassHolder.getId(), batchValue.getIndex(), childBaseEntityId};
+                    metaAttribute.getId(), batchValue.getIndex(), childBaseEntityId};          // todo: check
 
             batchArgs.add(insertArgs);
         }
@@ -413,7 +414,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
     private void insertComplexArraysValues(BaseEntity baseEntity, Set<String> attributeNames, String query)
     {
-        MetaClass meta = baseEntity.getMeta();
+        // todo: implement
+        /*MetaClass meta = baseEntity.getMeta();
 
         Iterator<String> it = attributeNames.iterator();
         List<Object[]> batchArgs = new ArrayList<Object[]>();
@@ -421,32 +423,33 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             String attributeNameForInsert = it.next();
 
-            List<IBatchValue> batchValues = baseEntity.getBatchValueArray(attributeNameForInsert);
-            Iterator<IBatchValue> batchValueIt = batchValues.iterator();
+            List<IBaseValue> batchValues = baseEntity.getBatchValueArray(attributeNameForInsert);
+            Iterator<IBaseValue> batchValueIt = batchValues.iterator();
 
             while (batchValueIt.hasNext())
             {
-                IBatchValue batchValue = batchValueIt.next();
+                IBaseValue batchValue = batchValueIt.next();
 
-                IMetaType metaType = meta.getMemberType(attributeNameForInsert);
-                MetaClassArray metaClassArray = (MetaClassArray)metaType;
+                IMetaAttribute metaAttribute = meta.getMetaAttribute(attributeNameForInsert);
+
 
                 long childBaseEntityId = save((BaseEntity)batchValue.getValue());
 
                 Object[] insertArgs = new Object[] {baseEntity.getId(), batchValue.getBatch().getId(),
-                        metaClassArray.getId(), batchValue.getIndex(), childBaseEntityId};
+                        metaAttribute.getId(), batchValue.getIndex(), childBaseEntityId};
 
                 batchArgs.add(insertArgs);
             }
         }
 
         logger.debug(query);
-        batchUpdateWithStats(query, batchArgs);
+        batchUpdateWithStats(query, batchArgs);*/
     }
 
     private void insertSimpleArraysValues(BaseEntity baseEntity, Set<String> attributeNames, String query)
     {
-        MetaClass metaClass = baseEntity.getMeta();
+        // todo: implement
+        /*MetaClass metaClass = baseEntity.getMeta();
 
         int i = 0;
         Iterator<String> it = attributeNames.iterator();
@@ -455,17 +458,16 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             String attributeNameForInsert = it.next();
 
-            IMetaType metaType = metaClass.getMemberType(attributeNameForInsert);
-            MetaValueArray metaValue = (MetaValueArray)metaType;
+            IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attributeNameForInsert);
 
-            List<IBatchValue> batchValues = baseEntity.getBatchValueArray(attributeNameForInsert);
-            Iterator<IBatchValue> valueIt = batchValues.iterator();
+            List<IBaseValue> batchValues = baseEntity.getBatchValueArray(attributeNameForInsert);
+            Iterator<IBaseValue> valueIt = batchValues.iterator();
             while (valueIt.hasNext()) {
-                IBatchValue batchValue = valueIt.next();
+                IBaseValue batchValue = valueIt.next();
                 Object[] insertArgs = new Object[] {
                         baseEntity.getId(),
                         batchValue.getBatch().getId(),
-                        metaValue.getId(),
+                        metaAttribute.getId(),
                         batchValue.getIndex(),
                         batchValue.getValue()
                 };
@@ -476,7 +478,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
 
         logger.debug(query);
-        batchUpdateWithStats(query, batchArgs);
+        batchUpdateWithStats(query, batchArgs);*/
     }
 
     public void loadSimpleValues(BaseEntity baseEntity, String query)
@@ -491,7 +493,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
             Batch batch = batchRepository.getBatch((Long)row.get("batch_id"));
 
-            baseEntity.set((String) row.get("attribute_name"), batch, (Long) row.get("index"), row.get("value"));
+            baseEntity.put((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"), row.get("value")));
         }
     }
 
@@ -507,7 +509,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
             Batch batch = batchRepository.getBatch((Long)row.get("batch_id"));
 
-            baseEntity.addToArray((String) row.get("attribute_name"), batch, (Long) row.get("index"), row.get("value"));
+            baseEntity.addToArray((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"), row.get("value")));
         }
     }
 
@@ -526,7 +528,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             long entityValueId = (Long)row.get("entity_value_id");
             BaseEntity childBaseEntity = load(entityValueId);
 
-            baseEntity.set((String) row.get("attribute_name"), batch, (Long) row.get("index"), childBaseEntity);
+            baseEntity.put((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"), childBaseEntity));
         }
     }
 
@@ -545,7 +547,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             long entityValueId = (Long)row.get("entity_value_id");
             BaseEntity childBaseEntity = load(entityValueId);
 
-            baseEntity.addToArray((String) row.get("attribute_name"), batch, (Long) row.get("index"), childBaseEntity);
+            baseEntity.addToArray((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"), childBaseEntity));
         }
     }
 

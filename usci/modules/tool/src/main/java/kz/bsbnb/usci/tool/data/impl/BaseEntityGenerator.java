@@ -1,15 +1,15 @@
 package kz.bsbnb.usci.tool.data.impl;
 
 import kz.bsbnb.usci.eav.model.BaseEntity;
+import kz.bsbnb.usci.eav.model.BaseSet;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.IBaseContainer;
+import kz.bsbnb.usci.eav.model.batchdata.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 import kz.bsbnb.usci.tool.data.AbstractGenerator;
-import org.apache.log4j.Logger;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -19,7 +19,7 @@ public class BaseEntityGenerator  extends AbstractGenerator
 {
     public BaseEntity generateBaseEntity(Batch batch, MetaClass metaClass, long index)
     {
-        BaseEntity entity = new BaseEntity(metaClass, batch);
+        BaseEntity entity = new BaseEntity(metaClass);
 
         for (String name : metaClass.getMemberNames())
         {
@@ -29,39 +29,47 @@ public class BaseEntityGenerator  extends AbstractGenerator
             {
                 if(metaType.isArray())
                 {
-                    MetaClassArray metaClassArray = (MetaClassArray) metaType;
+                    MetaSet metaSet = (MetaSet) metaType;
+
+                    BaseSet baseSet = new BaseSet(metaSet.getMemberType());
 
                     for(int i = 0; i < 2 + rand.nextInt(10); i++)
                     {
-                        BaseEntity tmpEntity = generateBaseEntity(batch,
-                                metaClassArray.getMembersType().getMeta(), index);
+                        BaseEntity tmpEntity = generateBaseEntity(batch, (MetaClass)metaSet.getMemberType(), index);
 
-                        entity.addToArray(name, index, tmpEntity);
+                        baseSet.put(new BaseValue(batch, index, tmpEntity));
                     }
+
+                    entity.put(name, new BaseValue(batch, index, baseSet));
                 }
                 else
                 {
-                    MetaClassHolder metaClassHolder = (MetaClassHolder) metaType;
+                    MetaClass meta = (MetaClass) metaType;
 
-                    BaseEntity tmpEntity = generateBaseEntity(batch, metaClassHolder.getMeta(), index);
+                    BaseEntity tmpEntity = generateBaseEntity(batch, meta, index);
 
-                    entity.set(name, index, tmpEntity);
+                    entity.put(name, new BaseValue(batch, index, tmpEntity));
                 }
             }
             else
             {
                 if(metaType.isArray())
                 {
-                    MetaValueArray metaValueArray = (MetaValueArray) metaType;
+                    MetaSet metaSet = (MetaSet) metaType;
+
+                    BaseSet baseSet = new BaseSet(metaSet.getMemberType());
 
                     for(int i = 0; i < 2 + rand.nextInt(20); i++)
-                        entity.addToArray(name, index, getCastObject(metaValueArray.getTypeCode()));
+                    {
+                        baseSet.put(new BaseValue(batch, index, getCastObject(metaSet.getTypeCode())));
+                    }
+                    entity.put(name, new BaseValue(batch, index, baseSet));
                 }
                 else
                 {
                     MetaValue metaValue = (MetaValue) metaType;
 
-                    entity.set(name, index, getCastObject(metaValue.getTypeCode()));
+                    entity.put(name, new BaseValue(batch, index, getCastObject(metaValue.getTypeCode())));
                 }
             }
         }

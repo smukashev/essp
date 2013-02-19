@@ -1,12 +1,13 @@
 package kz.bsbnb.usci.eav.model.batchdata.impl;
 
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.batchdata.IBatchValue;
+import kz.bsbnb.usci.eav.model.batchdata.IBaseValue;
+import kz.bsbnb.usci.eav.persistance.Persistable;
 
 /**
  * @author a.motov
  */
-public class BatchValue implements IBatchValue
+public class BaseValue extends Persistable implements IBaseValue
 {
     private long index;
 
@@ -27,15 +28,15 @@ public class BatchValue implements IBatchValue
      * @param value the value. May be is null.
      * @throws IllegalArgumentException if <code>Batch</code> is null or <code>Batch</code> has no id
      */
-    public BatchValue(Batch batch, long index, Object value)
+    public BaseValue(Batch batch, long index, Object value)
     {
         if (batch == null)
             throw new IllegalArgumentException
-                    ("Batch is null. Initialization of the BatchValue ​​is not possible.");
+                    ("Batch is null. Initialization of the BaseValue ​​is not possible.");
 
         if (batch.getId() < 0)
             throw new IllegalArgumentException
-                    ("Batch has no id. Initialization of the BatchValue ​​is not possible.");
+                    ("Batch has no id. Initialization of the BaseValue ​​is not possible.");
 
 
         this.batch = batch;
@@ -85,7 +86,7 @@ public class BatchValue implements IBatchValue
             return false;
         else
         {
-            BatchValue that = (BatchValue)obj;
+            BaseValue that = (BaseValue)obj;
 
             if (index != that.index) return false;
             if (!batch.equals(that.batch)) return false;

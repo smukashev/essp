@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.eav.persistance;
 
-public class Persistable
-{
+public class Persistable implements IPersistable {
 	/**
 	 * id fields value of the persisted object
 	 */
@@ -17,12 +16,14 @@ public class Persistable
         this.id = id;
     }
 
-	public long getId()
+	@Override
+    public long getId()
     {
 		return id;
 	}
 
-	public void setId(long id)
+	@Override
+    public void setId(long id)
     {
 		this.id = id;
 	}
