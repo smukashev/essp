@@ -25,10 +25,12 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
     private final static String ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL,containing_class_id int references %s(id) ON DELETE CASCADE, name character varying(%d) NOT NULL,is_key boolean NOT NULL,is_nullable boolean NOT NULL, CONSTRAINT %s_primary_key_index PRIMARY KEY (id ), UNIQUE (containing_class_id, name) )";
 
     private final static String SIMPLE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (type_code character varying(%d), CONSTRAINT %s_primary_key_index PRIMARY KEY (id), CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
-    private final static String COMPLEX_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_primary_key_index PRIMARY KEY (id), class_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE ) INHERITS (%s)";
-    private final static String ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s (array_key_type character varying(%d), CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    private final static String COMPLEX_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_primary_key_index PRIMARY KEY (id), class_id int references %s (id) ON DELETE CASCADE, CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE ) INHERITS (%s)";
+    private final static String ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s (array_key_type character varying(%d), CONSTRAINT %s_primary_key_index PRIMARY KEY (id), CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
     private final static String SIMPLE_ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_primary_key_index PRIMARY KEY (id), CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s, %s)";
-    private final static String COMPLEX_ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_primary_key_index PRIMARY KEY (id), CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s, %s)";
+    private final static String COMPLEX_ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_primary_key_index PRIMARY KEY (id), CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_class_id_fkey FOREIGN KEY (class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s, %s)";
+
+    private final static String ARRAY_ARRAY_TABLE = "CREATE TABLE IF NOT EXISTS %s (array_id int references %s (id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id), CONSTRAINT %s_containing_class_id_fkey FOREIGN KEY (containing_class_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
 
     private final static String ENTITIES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL,class_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id ))";
     private final static String ARRAY_KEY_FILTER_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL,attribute_id int references %s(id) ON DELETE CASCADE, attribute_name character varying(%d) NOT NULL,CONSTRAINT %s_primary_key_index PRIMARY KEY (id ))";
@@ -130,6 +132,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    jdbcTemplate.execute(query);
 	    //array
 	    query = String.format(ARRAY_TABLE, getConfig().getArrayTableName(), getConfig().getArrayKeyTypeCodeLength(),
+                getConfig().getArrayTableName(),
                 getConfig().getArrayTableName(), getConfig().getClassesTableName(),
                 getConfig().getAttributesTableName());
 	    
@@ -150,12 +153,23 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    //complex array
 	    query = String.format(COMPLEX_ARRAY_TABLE, getConfig().getComplexArrayTableName(),
                 getConfig().getComplexArrayTableName(), getConfig().getComplexArrayTableName(),
+                getConfig().getClassesTableName(), getConfig().getComplexArrayTableName(),
                 getConfig().getClassesTableName(), getConfig().getArrayTableName(),
                 getConfig().getComplexAttributesTableName());
-	    
+
 	    logger.debug(query);
-	    
+
 	    jdbcTemplate.execute(query);
+
+        //array of array
+        query = String.format(ARRAY_ARRAY_TABLE, getConfig().getArrayArrayTableName(),
+                getConfig().getArrayTableName(), getConfig().getArrayArrayTableName(),
+                getConfig().getArrayArrayTableName(), getConfig().getClassesTableName(),
+                getConfig().getArrayTableName());
+
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
 
         //batches
         query = String.format(BATCHES_TABLE, getConfig().getBatchesTableName(),

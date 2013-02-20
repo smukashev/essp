@@ -58,27 +58,59 @@ public class PostgreSQLMetaClassDaoImplTest {
         long time = Calendar.getInstance().getTimeInMillis();
 
         MetaClass metaCreate = new MetaClass("testClass");
+
+        //Header
         metaCreate.setBeginDate(new Timestamp(time));
         metaCreate.setDisabled(false);
 
-        metaCreate.setMetaAttribute("testDate", new MetaAttribute(false, false, new MetaValue(DataTypes.DATE)));
-        metaCreate.setMetaAttribute("testInteger", new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
-        metaCreate.setMetaAttribute("testDouble", new MetaAttribute(false, false, new MetaValue(DataTypes.DOUBLE)));
-        metaCreate.setMetaAttribute("testBoolean", new MetaAttribute(false, false, new MetaValue(DataTypes.BOOLEAN)));
-        metaCreate.setMetaAttribute("testString", new MetaAttribute(false, false, new MetaValue(DataTypes.STRING)));
+        //Simple attributes
+        metaCreate.setMetaAttribute("testDate",
+                new MetaAttribute(false, false, new MetaValue(DataTypes.DATE)));
+        metaCreate.setMetaAttribute("testInteger",
+                new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
+        metaCreate.setMetaAttribute("testDouble",
+                new MetaAttribute(false, false, new MetaValue(DataTypes.DOUBLE)));
+        metaCreate.setMetaAttribute("testBoolean",
+                new MetaAttribute(false, false, new MetaValue(DataTypes.BOOLEAN)));
+        metaCreate.setMetaAttribute("testString",
+                new MetaAttribute(false, false, new MetaValue(DataTypes.STRING)));
 
+        //Simple array
         metaCreate.setMetaAttribute("testArray", new MetaAttribute(false, false,
                 new MetaSet(new MetaValue(DataTypes.DATE))));
+        metaCreate.setMetaAttribute("testArray", new MetaAttribute(false, false,
+                new MetaSet(new MetaValue(DataTypes.INTEGER))));
+        metaCreate.setMetaAttribute("testArray", new MetaAttribute(false, false,
+                new MetaSet(new MetaValue(DataTypes.DOUBLE))));
+        metaCreate.setMetaAttribute("testArray", new MetaAttribute(false, false,
+                new MetaSet(new MetaValue(DataTypes.BOOLEAN))));
+        metaCreate.setMetaAttribute("testArray", new MetaAttribute(false, false,
+                new MetaSet(new MetaValue(DataTypes.STRING))));
 
+        //Complex attribute
         MetaClass metaClass = new MetaClass("innerClass");
-        metaClass.setMetaAttribute("testInteger", new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
-        metaClass.setMetaAttribute("testDouble", new MetaAttribute(false, false, new MetaValue(DataTypes.DOUBLE)));
+        metaClass.setMetaAttribute("testInteger",
+                new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
+        metaClass.setMetaAttribute("testDouble",
+                new MetaAttribute(false, false, new MetaValue(DataTypes.DOUBLE)));
 
-        metaCreate.setMetaAttribute("testInnerClass", new MetaAttribute(false, false, metaClass));
+        MetaClass metaSubClass = new MetaClass("innerClass1");
+        metaSubClass.setMetaAttribute("testInteger",
+                new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
+        metaSubClass.setMetaAttribute("testDouble",
+                new MetaAttribute(false, false, new MetaValue(DataTypes.DOUBLE)));
+        metaClass.setMetaAttribute("testInnerSubClass",
+                new MetaAttribute(false, false, metaSubClass));
 
+        metaCreate.setMetaAttribute("testInnerClass",
+                new MetaAttribute(false, false, metaClass));
+
+        //Complex array
         MetaClass metaClassForArray = new MetaClass("innerClassForArray");
-        metaClassForArray.setMetaAttribute("testInteger", new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
-        metaClassForArray.setMetaAttribute("testDouble", new MetaAttribute(false, false, new MetaValue(DataTypes.DOUBLE)));
+        metaClassForArray.setMetaAttribute("testInteger",
+                new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
+        metaClassForArray.setMetaAttribute("testDouble",
+                new MetaAttribute(false, false, new MetaValue(DataTypes.DOUBLE)));
         metaClassForArray.setComplexKeyType(ComplexKeyTypes.ANY);
         metaCreate.setMetaAttribute("testInnerClassArray",
                 new MetaAttribute(false, false, new MetaSet(metaClassForArray)));
