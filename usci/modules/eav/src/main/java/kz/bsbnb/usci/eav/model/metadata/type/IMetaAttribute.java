@@ -20,4 +20,7 @@ public interface IMetaAttribute extends IPersistable
     public boolean isNullable();
 
     public IMetaType getMetaType();
+
+    public void setKey(boolean isKey);
+    public void setNullable(boolean isNullable);
 }

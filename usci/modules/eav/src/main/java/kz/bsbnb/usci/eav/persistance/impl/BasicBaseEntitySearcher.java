@@ -1,10 +1,8 @@
 package kz.bsbnb.usci.eav.persistance.impl;
 
 import kz.bsbnb.usci.eav.model.BaseEntity;
-import kz.bsbnb.usci.eav.model.batchdata.IBatchValue;
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 
 import java.util.ArrayList;
@@ -33,7 +31,7 @@ public class BasicBaseEntitySearcher implements IBaseEntitySearcher {
     @Override
     public boolean compare(BaseEntity c1, BaseEntity c2) throws IllegalStateException {
 
-        if(c1.getMeta() != c2.getMeta())
+        /*if(c1.getMeta() != c2.getMeta())
             return false;
 
         MetaClass meta = c1.getMeta();
@@ -110,7 +108,7 @@ public class BasicBaseEntitySearcher implements IBaseEntitySearcher {
                     }
                 }
             }
-        }
+        } */
 
         return true;
     }

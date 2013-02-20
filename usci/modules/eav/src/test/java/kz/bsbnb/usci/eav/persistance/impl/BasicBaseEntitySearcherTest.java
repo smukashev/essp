@@ -1,11 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.impl;
 
 import kz.bsbnb.usci.eav.model.BaseEntity;
-import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +25,7 @@ public class BasicBaseEntitySearcherTest {
     {
         MetaClass meta = new MetaClass("testClass");
 
-        meta.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
+        /*meta.setMemberType("testDate", new MetaValue(DataTypes.DATE, false, false));
         meta.setMemberType("testInteger", new MetaValue(DataTypes.INTEGER, false, false));
         meta.setMemberType("testDouble", new MetaValue(DataTypes.DOUBLE, false, false));
         meta.setMemberType("testBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
@@ -47,7 +43,7 @@ public class BasicBaseEntitySearcherTest {
         metaClassForArray.setMemberType("innerBoolean", new MetaValue(DataTypes.BOOLEAN, false, false));
         metaClassForArray.setMemberType("innerDouble", new MetaValue(DataTypes.DOUBLE, false, false));
         MetaClassArray metaClassArray = new MetaClassArray(metaClassForArray);
-        meta.setMemberType("testInnerClassArray", metaClassArray);
+        meta.setMemberType("testInnerClassArray", metaClassArray);     */
 
         BaseEntity b1 = new BaseEntity(meta);
         BaseEntity b2 = new BaseEntity(meta);
