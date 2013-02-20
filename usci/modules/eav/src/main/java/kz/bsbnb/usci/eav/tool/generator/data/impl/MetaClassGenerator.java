@@ -1,25 +1,25 @@
-package kz.bsbnb.usci.tool.data.impl;
+package kz.bsbnb.usci.eav.tool.generator.data.impl;
 
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
-import kz.bsbnb.usci.tool.data.AbstractGenerator;
+import kz.bsbnb.usci.eav.tool.generator.data.AbstractDataGenerator;
 
 import java.util.ArrayList;
 
 /**
  * @author a.tkachenko
  */
-public class MetaClassGenerator  extends AbstractGenerator
+public class MetaClassGenerator extends AbstractDataGenerator
 {
-    private int maxAttributes = 25;
-    private int maxRecursion = 2;
-    private int classesNumber = 0;
+    private int MAX_ATTRIBUTE_NUMBER = 25;
+    private int MAX_RECURSION = 2;
+    private int CLASSES_NUMBER = 0;
 
     String getNextClassName()
     {
-        return "class_" + ++classesNumber;
+        return "class_" + ++CLASSES_NUMBER;
     }
 
     private int simpleTypeCount = 0;
@@ -31,8 +31,8 @@ public class MetaClassGenerator  extends AbstractGenerator
 
     public MetaClassGenerator(int maxAttributes, int maxRecursion)
     {
-        this.maxAttributes = maxAttributes;
-        this.maxRecursion = maxRecursion;
+        this.MAX_ATTRIBUTE_NUMBER = maxAttributes;
+        this.MAX_RECURSION = maxRecursion;
     }
 
     IMetaAttribute generateMetaAttribute(int rec)
@@ -44,7 +44,7 @@ public class MetaClassGenerator  extends AbstractGenerator
             if(rand.nextInt(3) != 2)
                 switcher = 3;
 
-        if(rec > maxRecursion)
+        if(rec > MAX_RECURSION)
             if(switcher == 0 || switcher == 2)
                 switcher = 3;
 
@@ -53,16 +53,20 @@ public class MetaClassGenerator  extends AbstractGenerator
             case 0:
                 //complex attribute
                 MetaClass metaClass = generateMetaClass(rec + 1);
-                metaClass.setComplexKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
-                /*type = new MetaClassHolder(metaClass);*/
+
+                metaClass.setComplexKeyType(ComplexKeyTypes.values()[
+                        rand.nextInt(ComplexKeyTypes.values().length)]);
+
                 attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), metaClass);
 
                 break;
             case 1:
                 //simple array
-                MetaSet a = new MetaSet(new MetaValue(DataTypes.values()[rand.nextInt(DataTypes.values().length)]));
+                MetaSet a = new MetaSet(new MetaValue(DataTypes.values()[
+                        rand.nextInt(DataTypes.values().length)]));
 
-                a.setArrayKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
+                a.setArrayKeyType(ComplexKeyTypes.values()[
+                        rand.nextInt(ComplexKeyTypes.values().length)]);
 
                 attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), a);
                 simpleTypeArrayCount++;
@@ -79,7 +83,8 @@ public class MetaClassGenerator  extends AbstractGenerator
                 break;
             default:
                 //simple attribute
-                attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), new MetaValue(DataTypes.values()[rand.nextInt(DataTypes.values().length)]));
+                attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(),
+                        new MetaValue(DataTypes.values()[rand.nextInt(DataTypes.values().length)]));
 
                 simpleTypeCount++;
 
@@ -92,7 +97,7 @@ public class MetaClassGenerator  extends AbstractGenerator
     public MetaClass generateMetaClass(int rec)
     {
         MetaClass metaClass = new MetaClass(getNextClassName());
-        int attributesCount = rand.nextInt(maxAttributes + 1) + 5;
+        int attributesCount = rand.nextInt(MAX_ATTRIBUTE_NUMBER + 1) + 5;
 
         metaClass.setDisabled(rand.nextBoolean());
         metaClass.setComplexKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);

@@ -1,22 +1,21 @@
-package kz.bsbnb.usci.tool.data.impl;
+package kz.bsbnb.usci.eav.tool.generator.data.impl;
 
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.BaseSet;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.IBaseContainer;
 import kz.bsbnb.usci.eav.model.batchdata.impl.BaseValue;
-import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
-import kz.bsbnb.usci.tool.data.AbstractGenerator;
-
-import java.util.Date;
+import kz.bsbnb.usci.eav.tool.generator.data.AbstractDataGenerator;
 
 /**
  * @author k.tulbassiyev
  */
-public class BaseEntityGenerator  extends AbstractGenerator
+public class BaseEntityGenerator  extends AbstractDataGenerator
 {
+    private final int MAX_ARRAY_ELEMENTS = 20;
+    private final int MIN_ARRAY_ELEMENTS = 5;
+
     public BaseEntity generateBaseEntity(Batch batch, MetaClass metaClass, long index)
     {
         BaseEntity entity = new BaseEntity(metaClass);
@@ -33,9 +32,10 @@ public class BaseEntityGenerator  extends AbstractGenerator
 
                     BaseSet baseSet = new BaseSet(metaSet.getMemberType());
 
-                    for(int i = 0; i < 2 + rand.nextInt(10); i++)
+                    for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++)
                     {
-                        BaseEntity tmpEntity = generateBaseEntity(batch, (MetaClass)metaSet.getMemberType(), index);
+                        BaseEntity tmpEntity = generateBaseEntity(batch,
+                                (MetaClass) metaSet.getMemberType(), index);
 
                         baseSet.put(new BaseValue(batch, index, tmpEntity));
                     }
@@ -44,9 +44,7 @@ public class BaseEntityGenerator  extends AbstractGenerator
                 }
                 else
                 {
-                    MetaClass meta = (MetaClass) metaType;
-
-                    BaseEntity tmpEntity = generateBaseEntity(batch, meta, index);
+                    BaseEntity tmpEntity = generateBaseEntity(batch, ((MetaClass) metaType), index);
 
                     entity.put(name, new BaseValue(batch, index, tmpEntity));
                 }
@@ -59,10 +57,9 @@ public class BaseEntityGenerator  extends AbstractGenerator
 
                     BaseSet baseSet = new BaseSet(metaSet.getMemberType());
 
-                    for(int i = 0; i < 2 + rand.nextInt(20); i++)
-                    {
+                    for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++)
                         baseSet.put(new BaseValue(batch, index, getCastObject(metaSet.getTypeCode())));
-                    }
+
                     entity.put(name, new BaseValue(batch, index, baseSet));
                 }
                 else
@@ -75,24 +72,5 @@ public class BaseEntityGenerator  extends AbstractGenerator
         }
 
         return entity;
-    }
-
-    public Object getCastObject(DataTypes typeCode)
-    {
-        switch(typeCode)
-        {
-            case INTEGER:
-                return rand.nextInt(1000);
-            case DATE:
-                return new Date();
-            case STRING:
-                return "string_" + rand.nextInt(1000);
-            case BOOLEAN:
-                return rand.nextBoolean();
-            case DOUBLE:
-                return rand.nextDouble()*10000;
-            default:
-                throw new IllegalArgumentException("Unknown type. Can not be returned an appropriate class.");
-        }
     }
 }

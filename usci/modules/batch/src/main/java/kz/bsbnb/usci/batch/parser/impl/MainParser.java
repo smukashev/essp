@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.batch.parser.impl;
 
 import kz.bsbnb.usci.batch.parser.CommonParser;
+import kz.bsbnb.usci.batch.parser.listener.IListener;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.IBaseContainer;
@@ -90,17 +91,12 @@ public class MainParser extends CommonParser
             if(metaType.isArray())
             {
                 stack.push(currentContainer);
-
                 currentContainer = metaFactory.getBaseSet(((MetaSet)metaType).getMemberType());
             }
-            else
+            else if(!metaType.isArray() && metaType.isComplex())
             {
-                if(metaType.isComplex())
-                {
-                    stack.push(currentContainer);
-
-                    currentContainer = metaFactory.getBaseEntity((MetaClass)metaType);
-                }
+                stack.push(currentContainer);
+                currentContainer = metaFactory.getBaseEntity((MetaClass)metaType);
             }
 
             level++;
@@ -122,13 +118,7 @@ public class MainParser extends CommonParser
         }
         else if(localName.equalsIgnoreCase("entity"))
         {
-            // save time
-            long saveTime1 = System.currentTimeMillis();
-            //baseEntityDao.save((BaseEntity)currentContainer);
-            long saveTime2 = System.currentTimeMillis();
-
-            logger.info("[save entity][" + index + "]   :  " + (saveTime2 - saveTime1));
-
+            listener.put((BaseEntity)currentContainer);
             currentContainer = null;
             index++;
         }
@@ -137,13 +127,9 @@ public class MainParser extends CommonParser
             IMetaType metaType;
 
             if(level == stack.size())
-            {
                 metaType = stack.peek().getMemberType(localName);
-            }
             else
-            {
                 metaType = currentContainer.getMemberType(localName);
-            }
 
             Object o = null;
 
@@ -170,9 +156,9 @@ public class MainParser extends CommonParser
                 currentContainer = stack.pop();
             }
 
-            level--;
-
             currentContainer.put(localName, new BaseValue(batch, index, o));
+
+            level--;
         }
     }
 }

@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.tool.stress;
+package kz.bsbnb.usci.eav.tool.stress;
 
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.Batch;
@@ -7,10 +7,8 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
-import kz.bsbnb.usci.eav.stats.QueryEntry;
-import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
-import kz.bsbnb.usci.tool.data.impl.BaseEntityGenerator;
-import kz.bsbnb.usci.tool.data.impl.MetaClassGenerator;
+import kz.bsbnb.usci.eav.tool.generator.data.impl.BaseEntityGenerator;
+import kz.bsbnb.usci.eav.tool.generator.data.impl.MetaClassGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

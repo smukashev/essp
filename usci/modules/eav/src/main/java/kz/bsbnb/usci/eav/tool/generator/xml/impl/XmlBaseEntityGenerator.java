@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.tool.xml.impl;
+package kz.bsbnb.usci.eav.tool.generator.xml.impl;
 
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.BaseSet;
@@ -9,9 +9,9 @@ import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
-import kz.bsbnb.usci.tool.data.impl.BaseEntityGenerator;
-import kz.bsbnb.usci.tool.data.impl.MetaClassGenerator;
-import kz.bsbnb.usci.tool.xml.AbstractXmlGenerator;
+import kz.bsbnb.usci.eav.tool.generator.data.impl.BaseEntityGenerator;
+import kz.bsbnb.usci.eav.tool.generator.data.impl.MetaClassGenerator;
+import kz.bsbnb.usci.eav.tool.generator.xml.AbstractXmlGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -32,14 +32,15 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author k.tulbassiyev
  */
+@SuppressWarnings("ALL")
 public class XmlBaseEntityGenerator extends AbstractXmlGenerator
 {
-    private final static Logger logger = LoggerFactory.getLogger(XmlBaseEntityGenerator.class);
+    /*private final static Logger logger = LoggerFactory.getLogger(XmlBaseEntityGenerator.class);
 
     private final static int dataSize = 15;
 
@@ -53,26 +54,10 @@ public class XmlBaseEntityGenerator extends AbstractXmlGenerator
         ClassPathXmlApplicationContext ctx
                 = new ClassPathXmlApplicationContext("stressApplicationContext.xml");
 
-        File xmlFile = new File(FILE_PATH);
-
-        if(!xmlFile.exists())
-        {
-            try
-            {
-                xmlFile.createNewFile();
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-
         IStorage storage = ctx.getBean(IStorage.class);
         IMetaClassDao metaClassDao = ctx.getBean(IMetaClassDao.class);
 
         ArrayList<MetaClass> data = new ArrayList<MetaClass>();
-
-        Document document;
 
         if(!storage.testConnection())
         {
@@ -104,15 +89,13 @@ public class XmlBaseEntityGenerator extends AbstractXmlGenerator
 
         // --------
 
-        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-
-        document = documentBuilder.newDocument();
+        Document document = getDocument();
 
         Element batchElement = document.createElement("batch");
-        Element entitiesElement = document.createElement("entities");
 
         document.appendChild(batchElement);
+
+        Element entitiesElement = document.createElement("entities");
 
         Batch batch = new Batch(new Timestamp(new Date().getTime()));
 
@@ -127,14 +110,28 @@ public class XmlBaseEntityGenerator extends AbstractXmlGenerator
 
         batchElement.appendChild(entitiesElement);
 
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        DOMSource source = new DOMSource(document);
-        StreamResult result =  new StreamResult(new File(FILE_PATH));
-        transformer.transform(source, result);
+        writeToXml(document, FILE_PATH);
+    }*/
+
+    public Document getGeneratedDocument(List<BaseEntity> baseEntities)
+    {
+        Document document = getDocument();
+
+        Element batchElement = document.createElement("batch");
+
+        document.appendChild(batchElement);
+
+        Element entitiesElement = document.createElement("entities");
+
+        for (BaseEntity baseEntity : baseEntities)
+            processBaseEntity(document, baseEntity, "entity", true, entitiesElement);
+
+        return document;
     }
 
-    public static void processBaseEntity(Document document, BaseEntity entity, String nameInParent, boolean firstTime, Element parentElement)
+    @SuppressWarnings("ConstantConditions")
+    private static void processBaseEntity(Document document, BaseEntity entity, String nameInParent,
+                                         boolean firstTime, Element parentElement)
     {
         MetaClass meta = entity.getMeta();
 

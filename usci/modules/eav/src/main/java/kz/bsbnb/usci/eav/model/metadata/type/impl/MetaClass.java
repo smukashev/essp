@@ -68,7 +68,8 @@ public class MetaClass extends Persistable implements IMetaType
         this.beginDate = beginDate;
     }
 
-	public ComplexKeyTypes getComplexKeyType() {
+	public ComplexKeyTypes getComplexKeyType()
+    {
 		return complexKeyType;
 	}
 
@@ -153,19 +154,23 @@ public class MetaClass extends Persistable implements IMetaType
 		this.searchProcedureName = searchProcedureName;
 	}
 
-    public Timestamp getBeginDate() {
+    public Timestamp getBeginDate()
+    {
         return beginDate;
     }
 
-    public void setBeginDate(Timestamp beginDate) {
+    public void setBeginDate(Timestamp beginDate)
+    {
         this.beginDate = beginDate;
     }
 
-    public boolean isDisabled() {
+    public boolean isDisabled()
+    {
         return isDisabled;
     }
 
-    public void setDisabled(boolean disabled) {
+    public void setDisabled(boolean disabled)
+    {
         isDisabled = disabled;
     }
 
@@ -182,19 +187,23 @@ public class MetaClass extends Persistable implements IMetaType
      * @see DataTypes
      * @see MetaValue
      */
-    public Set<String> getSimpleAttributesNames(DataTypes dataType) {
+    public Set<String> getSimpleAttributesNames(DataTypes dataType)
+    {
         Set<String> allAttributeNames = this.members.keySet();
         Set<String> filteredAttributeNames = new HashSet<String>();
 
         Iterator it = allAttributeNames.iterator();
-        while (it.hasNext()) {
+
+        while (it.hasNext())
+        {
             String attributeName = (String)it.next();
             IMetaType type = this.getMemberType(attributeName);
-            if (!type.isArray() && !type.isComplex()) {
+
+            if (!type.isArray() && !type.isComplex())
+            {
                 MetaValue metaValue = (MetaValue)type;
-                if (metaValue.getTypeCode().equals(dataType)) {
+                if (metaValue.getTypeCode().equals(dataType))
                     filteredAttributeNames.add(attributeName);
-                }
             }
         }
         return filteredAttributeNames;
@@ -206,7 +215,8 @@ public class MetaClass extends Persistable implements IMetaType
      * @return list of the attribute names
      * @see MetaValue
      */
-    public Set<String> getBooleanAttributeNames() {
+    public Set<String> getBooleanAttributeNames()
+    {
         return getSimpleAttributesNames(DataTypes.BOOLEAN);
     }
 
@@ -216,7 +226,8 @@ public class MetaClass extends Persistable implements IMetaType
      * @return list of the attribute names
      * @see MetaValue
      */
-    public Set<String> getDateAttributeNames() {
+    public Set<String> getDateAttributeNames()
+    {
         return getSimpleAttributesNames(DataTypes.DATE);
     }
 
@@ -226,7 +237,8 @@ public class MetaClass extends Persistable implements IMetaType
      * @return list of the attribute names
      * @see MetaValue
      */
-    public Set<String> getDoubleAttributeNames() {
+    public Set<String> getDoubleAttributeNames()
+    {
         return getSimpleAttributesNames(DataTypes.DOUBLE);
     }
 
@@ -236,7 +248,8 @@ public class MetaClass extends Persistable implements IMetaType
      * @return list of the attribute names
      * @see MetaValue
      */
-    public Set<String> getIntegerAttributeNames() {
+    public Set<String> getIntegerAttributeNames()
+    {
         return getSimpleAttributesNames(DataTypes.INTEGER);
     }
 
@@ -246,57 +259,71 @@ public class MetaClass extends Persistable implements IMetaType
      * @return list of the attribute names
      * @see MetaValue
      */
-    public Set<String> getStringAttributeNames() {
+    public Set<String> getStringAttributeNames()
+    {
         return getSimpleAttributesNames(DataTypes.STRING);
     }
 
-    public Set<String> getComplexAttributesNames() {
+    public Set<String> getComplexAttributesNames()
+    {
         Set<String> allAttributeNames = this.members.keySet();
         Set<String> filteredAttributeNames = new HashSet<String>();
 
         Iterator it = allAttributeNames.iterator();
-        while (it.hasNext()) {
+
+        while (it.hasNext())
+        {
             String attributeName = (String)it.next();
             IMetaType type = this.getMemberType(attributeName);
-            if (!type.isArray() && type.isComplex()) {
+
+            if (!type.isArray() && type.isComplex())
                 filteredAttributeNames.add(attributeName);
-            }
         }
+
         return filteredAttributeNames;
     }
 
 
-    public Set<String> getSimpleArrayAttributesNames(DataTypes dataType) {
+    public Set<String> getSimpleArrayAttributesNames(DataTypes dataType)
+    {
         Set<String> allAttributeNames = this.members.keySet();
         Set<String> filteredAttributeNames = new HashSet<String>();
 
         Iterator it = allAttributeNames.iterator();
-        while (it.hasNext()) {
+
+        while (it.hasNext())
+        {
             String attributeName = (String)it.next();
             IMetaType type = this.getMemberType(attributeName);
-            if (type.isArray() && !type.isComplex()) {
+
+            if (type.isArray() && !type.isComplex())
+            {
                 MetaSet metaValueArray = (MetaSet)type;
 
-                if (metaValueArray.getTypeCode().equals(dataType)) {
+                if (metaValueArray.getTypeCode().equals(dataType))
                     filteredAttributeNames.add(attributeName);
-                }
             }
         }
+
         return filteredAttributeNames;
     }
 
-    public Set<String> getComplexArrayAttributesNames() {
+    public Set<String> getComplexArrayAttributesNames()
+    {
         Set<String> allAttributeNames = this.members.keySet();
         Set<String> filteredAttributeNames = new HashSet<String>();
 
         Iterator it = allAttributeNames.iterator();
-        while (it.hasNext()) {
+
+        while (it.hasNext())
+        {
             String attributeName = (String)it.next();
             IMetaType type = this.getMemberType(attributeName);
-            if (type.isArray() && type.isComplex()) {
+
+            if (type.isArray() && type.isComplex())
                 filteredAttributeNames.add(attributeName);
-            }
         }
+
         return filteredAttributeNames;
     }
 
@@ -310,7 +337,8 @@ public class MetaClass extends Persistable implements IMetaType
 
         if (!(getClass() == obj.getClass()))
             return false;
-        else {
+        else
+        {
             MetaClass tmp = (MetaClass) obj;
 
             if (tmp.getAttributesCount() != this.getAttributesCount())
@@ -328,17 +356,18 @@ public class MetaClass extends Persistable implements IMetaType
                     !tmp.getBeginDate().equals(this.getBeginDate()) ||
                     !tmp.getClassName().equals(this.getClassName()) ||
                     !tmp.complexKeyType.equals(this.complexKeyType));
-
         }
     }
 
     @Override
-    public boolean isArray() {
+    public boolean isArray()
+    {
         return false;
     }
 
     @Override
-    public boolean isComplex() {
+    public boolean isComplex()
+    {
         return true;
     }
 
@@ -346,6 +375,4 @@ public class MetaClass extends Persistable implements IMetaType
     {
         return members.size();
     }
-
-
 }

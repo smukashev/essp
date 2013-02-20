@@ -2,6 +2,7 @@ package kz.bsbnb.usci.batch;
 
 import kz.bsbnb.usci.batch.parser.IParser;
 import kz.bsbnb.usci.batch.parser.IParserFactory;
+import kz.bsbnb.usci.batch.parser.listener.impl.ListListener;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
@@ -30,7 +31,6 @@ public class Main
 
         IStorage storage = ctx.getBean(IStorage.class);
 
-
         if(!storage.testConnection())
         {
             logger.error("Can't connect to storage.");
@@ -45,12 +45,15 @@ public class Main
 
         Batch loadedBatch = batchDao.load(batchId);
 
+        ListListener listener = new ListListener();
+
         IParserFactory parserFactory = ctx.getBean(IParserFactory.class);
 
-        IParser parser = parserFactory.getIParser(FILE_PATH, loadedBatch);
+        IParser parser = parserFactory.getIParser(FILE_PATH, loadedBatch, listener);
 
         long startTime = System.currentTimeMillis();
         parser.parse();
+
         logger.info("TOTAL TIME : " + (System.currentTimeMillis() - startTime));
     }
 }

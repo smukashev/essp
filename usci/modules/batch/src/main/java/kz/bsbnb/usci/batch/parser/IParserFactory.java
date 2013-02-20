@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.batch.parser;
 
+import kz.bsbnb.usci.batch.parser.listener.IListener;
 import kz.bsbnb.usci.eav.model.Batch;
 
 /**
@@ -7,5 +8,5 @@ import kz.bsbnb.usci.eav.model.Batch;
  */
 public interface IParserFactory
 {
-    public IParser getIParser(String fileName, Batch batch);
+    public IParser getIParser(String fileName, Batch batch, IListener listener);
 }
