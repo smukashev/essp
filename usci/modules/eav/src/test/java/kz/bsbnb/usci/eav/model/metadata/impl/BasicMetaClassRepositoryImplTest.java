@@ -27,7 +27,7 @@ public class BasicMetaClassRepositoryImplTest {
     IStorage storageImpl;
     @Autowired
     IMetaClassDao metaClassDaoImpl;
-
+    /*
     @Test
     public void getMetaClass()
     {
@@ -72,5 +72,5 @@ public class BasicMetaClassRepositoryImplTest {
         {
             storageImpl.clear();
         }
-    }
+    } */
 }

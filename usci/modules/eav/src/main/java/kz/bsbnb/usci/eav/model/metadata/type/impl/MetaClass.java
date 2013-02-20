@@ -8,10 +8,12 @@ import java.util.Set;
 
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 
-public class MetaClass extends Persistable {
+public class MetaClass extends Persistable implements IMetaType
+{
 	/**
 	 * Name of the metadata. Used as a key value for database search if <code>id</code> is 0 
 	 */
@@ -24,7 +26,7 @@ public class MetaClass extends Persistable {
 	/**
 	 * Holds type values. Keys of hash are type names.
 	 */
-    private HashMap<String, IMetaType> members = new HashMap<String, IMetaType>();
+    private HashMap<String, IMetaAttribute> members = new HashMap<String, IMetaAttribute>();
 	
 	/**
      * When attribute is an entity, and is a key attribute - sets key usage strategy.
@@ -109,8 +111,20 @@ public class MetaClass extends Persistable {
 	 */
 	public IMetaType getMemberType(String name)
     {
-		return members.get(name);
+		return members.get(name).getMetaType();
 	}
+
+    /**
+     * Used to get type of the attribute with name <code>name</code>
+     *
+     * @param name name of the attribute
+     * @return type of that attribute
+     * @see MetaValue
+     */
+    public IMetaAttribute getMetaAttribute(String name)
+    {
+        return members.get(name);
+    }
 
 	public void removeMemberType(String name)
     {
@@ -121,12 +135,12 @@ public class MetaClass extends Persistable {
 	 * Used to set attribute type. If there is no such attribute, then creates one.
 	 * 
 	 * @param name attributes name
-	 * @param type type to be set
+	 * @param metaAttribute type to be set
 	 * @see MetaValue
 	 */
-	public void setMemberType(String name, IMetaType type)
+	public void setMetaAttribute(String name, IMetaAttribute metaAttribute)
     {
-		members.put(name, type);
+		members.put(name, metaAttribute);
 	}
 
 	public String getSearchProcedureName()
@@ -137,35 +151,6 @@ public class MetaClass extends Persistable {
 	public void setSearchProcedureName(String searchProcedureName)
     {
 		this.searchProcedureName = searchProcedureName;
-	}
-	
-	public boolean equals(Object obj)
-    {
-		if (obj == this)
-			return true;
-
-		if (obj == null)
-			return false;
-
-        if (!(getClass() == obj.getClass()))
-			return false;
-		else {
-			MetaClass tmp = (MetaClass) obj;
-
-            Set<String> thisNames = this.members.keySet();
-
-            for (String name : thisNames)
-            {
-                if(!(this.getMemberType(name).equals(tmp.getMemberType(name))))
-                    return false;
-            }
-
-            return !(tmp.isDisabled() != this.isDisabled() ||
-                    !tmp.getBeginDate().equals(this.getBeginDate()) ||
-                    !tmp.getClassName().equals(this.getClassName()) ||
-                    !tmp.complexKeyType.equals(this.complexKeyType));
-
-        }
 	}
 
     public Timestamp getBeginDate() {
@@ -280,6 +265,7 @@ public class MetaClass extends Persistable {
         return filteredAttributeNames;
     }
 
+
     public Set<String> getSimpleArrayAttributesNames(DataTypes dataType) {
         Set<String> allAttributeNames = this.members.keySet();
         Set<String> filteredAttributeNames = new HashSet<String>();
@@ -289,7 +275,8 @@ public class MetaClass extends Persistable {
             String attributeName = (String)it.next();
             IMetaType type = this.getMemberType(attributeName);
             if (type.isArray() && !type.isComplex()) {
-                MetaValueArray metaValueArray = (MetaValueArray)type;
+                MetaSet metaValueArray = (MetaSet)type;
+
                 if (metaValueArray.getTypeCode().equals(dataType)) {
                     filteredAttributeNames.add(attributeName);
                 }
@@ -297,5 +284,68 @@ public class MetaClass extends Persistable {
         }
         return filteredAttributeNames;
     }
+
+    public Set<String> getComplexArrayAttributesNames() {
+        Set<String> allAttributeNames = this.members.keySet();
+        Set<String> filteredAttributeNames = new HashSet<String>();
+
+        Iterator it = allAttributeNames.iterator();
+        while (it.hasNext()) {
+            String attributeName = (String)it.next();
+            IMetaType type = this.getMemberType(attributeName);
+            if (type.isArray() && type.isComplex()) {
+                filteredAttributeNames.add(attributeName);
+            }
+        }
+        return filteredAttributeNames;
+    }
+
+    public boolean equals(Object obj)
+    {
+        if (obj == this)
+            return true;
+
+        if (obj == null)
+            return false;
+
+        if (!(getClass() == obj.getClass()))
+            return false;
+        else {
+            MetaClass tmp = (MetaClass) obj;
+
+            if (tmp.getAttributesCount() != this.getAttributesCount())
+                return false;
+
+            Set<String> thisNames = this.members.keySet();
+
+            for (String name : thisNames)
+            {
+                if(!(this.getMemberType(name).equals(tmp.getMemberType(name))))
+                    return false;
+            }
+
+            return !(tmp.isDisabled() != this.isDisabled() ||
+                    !tmp.getBeginDate().equals(this.getBeginDate()) ||
+                    !tmp.getClassName().equals(this.getClassName()) ||
+                    !tmp.complexKeyType.equals(this.complexKeyType));
+
+        }
+    }
+
+    @Override
+    public boolean isArray() {
+        return false;
+    }
+
+    @Override
+    public boolean isComplex() {
+        return true;
+    }
+
+    public int getAttributesCount()
+    {
+        return members.size();
+    }
+
 
 }

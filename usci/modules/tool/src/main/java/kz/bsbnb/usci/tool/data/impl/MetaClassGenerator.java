@@ -2,12 +2,11 @@ package kz.bsbnb.usci.tool.data.impl;
 
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
-import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 import kz.bsbnb.usci.tool.data.AbstractGenerator;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * @author a.tkachenko
@@ -36,9 +35,9 @@ public class MetaClassGenerator  extends AbstractGenerator
         this.maxRecursion = maxRecursion;
     }
 
-    IMetaType generateMetaType(int rec)
+    IMetaAttribute generateMetaAttribute(int rec)
     {
-        IMetaType type;
+        IMetaAttribute attribute;
         int switcher = rand.nextInt(4);
 
         if(switcher == 0 || switcher == 2)
@@ -55,43 +54,39 @@ public class MetaClassGenerator  extends AbstractGenerator
                 //complex attribute
                 MetaClass metaClass = generateMetaClass(rec + 1);
                 metaClass.setComplexKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
-                MetaClassHolder c = new MetaClassHolder(metaClass);
+                /*type = new MetaClassHolder(metaClass);*/
+                attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), metaClass);
 
-                type = c;
                 break;
             case 1:
                 //simple array
-                MetaValueArray a = new MetaValueArray(DataTypes.values()[rand.nextInt(DataTypes.values().length)],
-                        rand.nextBoolean(), rand.nextBoolean());
+                MetaSet a = new MetaSet(new MetaValue(DataTypes.values()[rand.nextInt(DataTypes.values().length)]));
 
                 a.setArrayKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
 
-                type = a;
+                attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), a);
                 simpleTypeArrayCount++;
+
                 break;
             case 2:
                 //complex array
-                MetaClassArray ca = new MetaClassArray(generateMetaClassHolder(rec + 1));
+                MetaSet ca = new MetaSet(generateMetaClass(rec + 1));
                 ca.setArrayKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
 
-                type = ca;
+                attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), ca);
                 complexTypeArrayCount++;
+
                 break;
             default:
                 //simple attribute
-                type = new MetaValue(DataTypes.values()[rand.nextInt(DataTypes.values().length)],
-                        rand.nextBoolean(), rand.nextBoolean());
+                attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), new MetaValue(DataTypes.values()[rand.nextInt(DataTypes.values().length)]));
 
                 simpleTypeCount++;
+
                 break;
         }
 
-        return type;
-    }
-
-    public MetaClassHolder generateMetaClassHolder(int rec)
-    {
-        return new MetaClassHolder(generateMetaClass(rec));
+        return attribute;
     }
 
     public MetaClass generateMetaClass(int rec)
@@ -102,13 +97,11 @@ public class MetaClassGenerator  extends AbstractGenerator
         metaClass.setDisabled(rand.nextBoolean());
         metaClass.setComplexKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
 
-        for (int j = 5; j < attributesCount; j++)
+        for (int j = 0; j < attributesCount; j++)
         {
-            IMetaType type;
+            IMetaAttribute type = generateMetaAttribute(rec + 1);
 
-            type = generateMetaType(rec + 1);
-
-            metaClass.setMemberType("attribute_" + j, type);
+            metaClass.setMetaAttribute("attribute_" + System.nanoTime(), type);
         }
 
         complexTypeCount++;

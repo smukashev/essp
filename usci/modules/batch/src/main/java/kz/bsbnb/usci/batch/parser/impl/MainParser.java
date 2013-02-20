@@ -1,27 +1,27 @@
 package kz.bsbnb.usci.batch.parser.impl;
 
-import kz.bsbnb.usci.batch.helper.impl.FileHelper;
-import kz.bsbnb.usci.batch.parser.IParser;
 import kz.bsbnb.usci.batch.parser.CommonParser;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.metadata.DataTypes;
-import kz.bsbnb.usci.eav.model.metadata.IMetaFactory;
+import kz.bsbnb.usci.eav.model.IBaseContainer;
+import kz.bsbnb.usci.eav.model.batchdata.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
-import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.EmptyStackException;
+import java.util.List;
+import java.util.Stack;
 
 /**
  * @author k.tulbassiyev
@@ -32,13 +32,11 @@ public class MainParser extends CommonParser
 
     private Logger logger = Logger.getLogger(MainParser.class);
 
-    private Stack<BaseEntity> stack = new Stack<BaseEntity>();
+    private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
 
-    private BaseEntity currentEntity;
+    private IBaseContainer currentContainer;
 
-    private int level = 0;
-
-    private long index = 1;
+    private int index = 1, level = 0;
 
     public MainParser(byte[] xmlBytes, Batch batch)
     {
@@ -83,12 +81,31 @@ public class MainParser extends CommonParser
         }
         else if(localName.equalsIgnoreCase("entity"))
         {
-            if(currentEntity != null)
-                stack.push(currentEntity);
+            currentContainer = metaFactory.getBaseEntity(attributes.getValue("class"));
+        }
+        else
+        {
+            IMetaType metaType = currentContainer.getMemberType(localName);
 
-            currentEntity = metaFactory.getBaseEntity(attributes.getValue("class"), batch);
+            if(metaType.isArray())
+            {
+                stack.push(currentContainer);
+
+                currentContainer = metaFactory.getBaseSet(((MetaSet)metaType).getMemberType());
+            }
+            else
+            {
+                if(metaType.isComplex())
+                {
+                    stack.push(currentContainer);
+
+                    currentContainer = metaFactory.getBaseEntity((MetaClass)metaType);
+                }
+            }
+
             level++;
         }
+
     }
 
     @Override
@@ -105,66 +122,57 @@ public class MainParser extends CommonParser
         }
         else if(localName.equalsIgnoreCase("entity"))
         {
-            BaseEntity entity;
+            // save time
+            long saveTime1 = System.currentTimeMillis();
+            //baseEntityDao.save((BaseEntity)currentContainer);
+            long saveTime2 = System.currentTimeMillis();
 
-            if(stack.size() == level)
+            logger.info("[save entity][" + index + "]   :  " + (saveTime2 - saveTime1));
+
+            currentContainer = null;
+            index++;
+        }
+        else
+        {
+            IMetaType metaType;
+
+            if(level == stack.size())
             {
+                metaType = stack.peek().getMemberType(localName);
+            }
+            else
+            {
+                metaType = currentContainer.getMemberType(localName);
+            }
+
+            Object o = null;
+
+            if(!metaType.isComplex() && !metaType.isArray())
+            {
+                MetaValue metaValue = (MetaValue) metaType;
+
                 try
                 {
-                    entity = stack.pop();
+                    o = parserHelper.getCastObject(metaValue.getTypeCode(), contents.toString());
                 }
-                catch(EmptyStackException ex)
+                catch (ParseException e)
                 {
-                    entity = null;
+                    e.printStackTrace();
                 }
-
-                if(entity == null)
-                    throw new NullPointerException("Entity is NULL!");
-
-                BaseEntity parentEntity;
-
-                try
+                catch (NumberFormatException n)
                 {
-                    parentEntity = stack.peek();
-                }
-                catch (EmptyStackException ex)
-                {
-                    parentEntity = null;
-                }
-
-                if(parentEntity != null)
-                {
-                    parentEntity.set(entity.getMeta().getClassName(), batch, index, entity);
-                }
-                else
-                {
-                    baseEntityDao.save(entity);
-                    index++;
+                    n.printStackTrace();
                 }
             }
             else
             {
-                try
-                {
-                    entity = stack.peek();
-                }
-                catch(EmptyStackException ex)
-                {
-                    entity = null;
-                }
-
-                if(entity == null)
-                    throw new NullPointerException("Entity is NULL!");
-
-                entity.set(currentEntity.getMeta().getClassName(), batch, index, currentEntity);
+                o = currentContainer;
+                currentContainer = stack.pop();
             }
 
-            currentEntity = null;
             level--;
-        }
-        else
-        {
-            currentEntity.set(localName, batch, index, contents.toString());
+
+            currentContainer.put(localName, new BaseValue(batch, index, o));
         }
     }
 }

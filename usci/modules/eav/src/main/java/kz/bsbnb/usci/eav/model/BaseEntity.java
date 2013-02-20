@@ -2,16 +2,15 @@ package kz.bsbnb.usci.eav.model;
 
 import java.util.*;
 
-import kz.bsbnb.usci.eav.model.batchdata.IBatchValue;
-import kz.bsbnb.usci.eav.model.batchdata.impl.BatchValue;
+import kz.bsbnb.usci.eav.model.batchdata.IBaseValue;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClassArray;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValueArray;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 import kz.bsbnb.usci.eav.util.SetUtils;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Implements EAV entity object. 
@@ -21,27 +20,19 @@ import kz.bsbnb.usci.eav.util.SetUtils;
  * @see MetaClass
  * @see DataTypes
  */
-public class BaseEntity extends Persistable
+public class BaseEntity extends Persistable implements IBaseContainer
 {
     /**
      * Holds data about entity structure
      * @see MetaClass
      */
     private MetaClass meta;
-
-    /**
-     * <code>Batch</code> that is used by default when adding values.
-     */
-    private Batch defaultBatch = null;
     
     /**
      * Holds attributes values
      */
-    private HashMap<String, IBatchValue> data =
-            new HashMap<String, IBatchValue>();
-
-    private HashMap<String, ArrayList<IBatchValue>> dataForArray =
-            new HashMap<String, ArrayList<IBatchValue>>();
+    private HashMap<String, IBaseValue> values =
+            new HashMap<String, IBaseValue>();
 
     /**
      * Initializes entity.
@@ -49,16 +40,6 @@ public class BaseEntity extends Persistable
     public BaseEntity()
     {
 
-    }
-
-    /**
-     * Initializes entity with a class name.
-     * 
-     * @param className the class name.
-     */
-    public BaseEntity(String className)
-    {
-        meta = new MetaClass(className);
     }
 
     /**
@@ -72,24 +53,6 @@ public class BaseEntity extends Persistable
     }
 
     /**
-     * Initializes entity with a class name and batch information.
-     *
-     * @param className the class name.
-     * @param defaultBatch information about batch
-     */
-    public BaseEntity(String className, Batch defaultBatch)
-    {
-        this(className);
-        this.defaultBatch = defaultBatch;
-    }
-
-    public BaseEntity(MetaClass meta, Batch defaultBatch)
-    {
-        this.meta = meta;
-        this.defaultBatch = defaultBatch;
-    }
-
-    /**
      * Used to retrieve object structure description. Can be used to modify metadata.
      * 
      * @return Object structure
@@ -100,16 +63,6 @@ public class BaseEntity extends Persistable
     }
 
     /**
-     * Used to set object structure description.
-     *
-     * @param meta Object structure
-     */
-    public void setMeta(MetaClass meta)
-    {
-        this.meta = meta;
-    }
-
-    /**
      * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>
      *
      * @param name attribute name. Must exist in entity metadata
@@ -118,7 +71,7 @@ public class BaseEntity extends Persistable
      * 	                                or attribute has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public IBatchValue getBatchValue(String name)
+    public IBaseValue getBatchValue(String name)
     {
         IMetaType type = meta.getMemberType(name);
 
@@ -126,7 +79,7 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
-        IBatchValue batchValue = data.get(name);
+        IBaseValue batchValue = values.get(name);
 
         if(batchValue == null)
             return null;
@@ -136,36 +89,15 @@ public class BaseEntity extends Persistable
 
     /**
      * Retrieves attribute titled <code>name</code>.
-     * Uses default <code>Batch</code>.
      *
      * @param name name attribute name. Must exist in entity metadata
-     * @param index the index of value
-     * @param value new value of the attribute
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
-     * @throws IllegalStateException if default <code>Batch</code> is not set
-     * @see DataTypes
-     */
-    public <T> void set(String name, long index, T value)
-    {
-        if (defaultBatch == null)
-            throw new IllegalStateException("Default Batch is not set.");
-
-        set(name, defaultBatch, index, value);
-    }
-
-    /**
-     * Retrieves attribute titled <code>name</code>.
-     *
-     * @param name name attribute name. Must exist in entity metadata
-     * @param batch information about the origin of this value
-     * @param index the index of value
      * @param value new value of the attribute
      * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
      * 	                                or attribute has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public <T> void set(String name, Batch batch, long index, T value)
+    @Override
+    public void put(String name, IBaseValue value)
     {
         IMetaType type = meta.getMemberType(name);
 
@@ -173,25 +105,39 @@ public class BaseEntity extends Persistable
             throw new IllegalArgumentException("Type: " + name +
                     ", not found in class: " + meta.getClassName());
 
-        if (value != null)
+        if (value == null)
+            throw new IllegalArgumentException("Value not be equal to null.");
+
+        if (value.getValue() != null)
         {
-            Class<?> valueClass = value.getClass();
+            Class<?> valueClass = value.getValue().getClass();
             Class<?> expValueClass = null;
 
             if (type.isComplex())
-                expValueClass = BaseEntity.class;
+                if(type.isArray())
+                {
+                    expValueClass = BaseSet.class;
+                }
+                else
+                {
+                    expValueClass = BaseEntity.class;
+                }
             else
             {
-                if (type.isArray())
+                if(type.isArray())
                 {
-                    MetaValueArray metaClassArray = (MetaValueArray)type;
-                    expValueClass = metaClassArray.getTypeCode().getDataTypeClass();
+                    MetaSet metaValue = (MetaSet)type;
+                    expValueClass = metaValue.getTypeCode().getDataTypeClass();
+
+                    valueClass = ((MetaValue)(((BaseSet)value.getValue()).getMemberType())).getTypeCode().
+                            getDataTypeClass();
                 }
                 else
                 {
                     MetaValue metaValue = (MetaValue)type;
                     expValueClass = metaValue.getTypeCode().getDataTypeClass();
                 }
+
             }
 
             if(expValueClass == null || !expValueClass.isAssignableFrom(valueClass))
@@ -200,59 +146,13 @@ public class BaseEntity extends Persistable
                         valueClass);
         }
 
-        data.put(name, new BatchValue(batch, index, value));
+        values.put(name, value);
     }
 
     //arrays
 
-    /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>
-     *
-     * @param name attribute name. Must exist in entity metadata
-     * @return attribute value, null if value is not set
-     * @throws IllegalArgumentException if attribute name does not exist in entity metadata,
-     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
-     * @see DataTypes
-     */
-    public ArrayList<IBatchValue> getBatchValueArray(String name)
+    public <T> void addToArray(String name, IBaseValue value)
     {
-        IMetaType type = meta.getMemberType(name);
-
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name +
-                    ", not found in class: " + meta.getClassName());
-
-        // todo: check
-        // there is an error: Cannot convert type(MetaClassArray) to MetaClass
-        /*if(type.isComplex())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is an object of class: " + ((MetaClass)type).getClassName());*/
-
-        if(!type.isArray())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is not an array");
-
-        ArrayList<IBatchValue> batchValues = dataForArray.get(name);
-
-        if(batchValues == null)
-        {
-            batchValues = new ArrayList<IBatchValue>();
-            dataForArray.put(name, batchValues);
-        }
-
-        return batchValues;
-    }
-
-    public <T> void add(String name, long index, T value)
-    {
-        if (defaultBatch == null)
-            throw new IllegalStateException("Default Batch is not set.");
-
-        add(name, defaultBatch, index, value);
-    }
-
-    public <T> void add(String name, Batch batch, long index, T value) {
-
         IMetaType type = meta.getMemberType(name);
 
         if(type == null)
@@ -266,8 +166,11 @@ public class BaseEntity extends Persistable
         if (value == null)
             throw new IllegalArgumentException("Element of the array can not be equal to null.");
 
+        if (value.getValue() == null)
+            throw new IllegalArgumentException("Element of the array can not be equal to null.");
+
         Class<?> valueClass = value.getClass();
-        Class<?> expValueClass = null;
+        Class<?> expValueClass;
 
         if (type.isComplex())
             expValueClass = BaseEntity.class;
@@ -275,7 +178,7 @@ public class BaseEntity extends Persistable
         {
             if (type.isArray())
             {
-                MetaValueArray metaClassArray = (MetaValueArray)type;
+                MetaSet metaClassArray = (MetaSet)type;
                 expValueClass = metaClassArray.getTypeCode().getDataTypeClass();
             }
             else
@@ -290,13 +193,12 @@ public class BaseEntity extends Persistable
                     meta.getClassName() + ". Needed " + expValueClass + ", got: " +
                     valueClass);
 
-
-        this.getBatchValueArray(name).add(new BatchValue(batch, index, value));
+        ((Set<IBaseValue>)values.get(name).getValue()).add(value);
     }
 
     public Set<String> getPresentSimpleAttributeNames(DataTypes dataType)
     {
-        return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), data.keySet());
+        return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), values.keySet());
     }
 
     public Set<String> getPresentDateAttributeNames()
@@ -325,21 +227,116 @@ public class BaseEntity extends Persistable
     }
 
     public Set<String> getPresentComplexAttributeNames() {
-        return SetUtils.intersection(meta.getComplexAttributesNames(), data.keySet());
+        return SetUtils.intersection(meta.getComplexAttributesNames(), values.keySet());
     }
 
     public Set<String> getPresentSimpleArrayAttributeNames(DataTypes dataType) {
-        return SetUtils.intersection(meta.getSimpleArrayAttributesNames(dataType), dataForArray.keySet());
+        // todo: complete
+        // return SetUtils.intersection(meta.getSimpleArrayAttributesNames(dataType), values.keySet());
+        throw new NotImplementedException();
     }
 
-    public Batch getDefaultBatch()
-    {
-        return defaultBatch;
+    public Set<String> getPresentComplexArrayAttributeNames() {
+        // todo: complete
+        //return SetUtils.intersection(meta.getComplexArrayAttributesNames(), arrays.keySet());
+        throw new NotImplementedException();
     }
+
 
     @Override
     public String toString()
     {
         return meta.getClassName();
+    }
+
+    public Set<String> getAttributeNames() {
+        Set<String> attributeNames = values.keySet();
+        return attributeNames;
+    }
+
+    public int getAttributeCount() {
+        int valuesCount = values.size();
+
+        return valuesCount;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+
+        if (obj == null)
+            return false;
+
+        if (!(getClass() == obj.getClass()))
+            return false;
+        else
+        {
+            BaseEntity that = (BaseEntity) obj;
+
+            int thisAttributeCount = this.getAttributeCount();
+            int thatAttributeCount = this.getAttributeCount();
+
+            if (thisAttributeCount != thatAttributeCount)
+                return false;
+
+            // todo: implement and complete
+
+            Iterator<String> valuesIt = values.keySet().iterator();
+            while (valuesIt.hasNext())
+            {
+                String attributeName = valuesIt.next();
+
+                IBaseValue thisBatchValue = this.getBatchValue(attributeName);
+                IBaseValue thatBatchValue = that.getBatchValue(attributeName);
+
+                if (!thisBatchValue.equals(thatBatchValue))
+                    return false;
+            }
+
+            /*Iterator<String> arraysIt = arrays.keySet().iterator();
+            while (arraysIt.hasNext())
+            {
+                String attributeName = arraysIt.next();
+
+                List<IBaseValue> thisBatchValues = this.getBatchValueArray(attributeName);
+                List<IBaseValue> thatBatchValues = that.getBatchValueArray(attributeName);
+
+                Iterator<IBaseValue> thisBatchValueIt = thisBatchValues.iterator();
+                while (thisBatchValueIt.hasNext())
+                {
+                    IBaseValue thisBatchValue = thisBatchValueIt.next();
+
+                    boolean find = false;
+                    Iterator<IBaseValue> thatBatchValueIt = thatBatchValues.iterator();
+                    while (thatBatchValueIt.hasNext())
+                    {
+                        IBaseValue thatBatchValue = thatBatchValueIt.next();
+                        if (thatBatchValue.equals(thisBatchValue))
+                        {
+                            find = true;
+                            break;
+                        }
+                    }
+
+                    if (!find)
+                    {
+                        return false;
+                    }
+                }
+            }*/
+
+            return true;
+        }
+    }
+
+    @Override
+    public Set<IBaseValue> get() {
+        return (Set<IBaseValue>) values.values();
+    }
+
+    @Override
+    public IMetaType getMemberType(String name) {
+        return meta.getMemberType(name);
     }
 }

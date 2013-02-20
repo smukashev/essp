@@ -5,7 +5,7 @@ import java.util.Random;
 /**
  * @author k.tulbassiyev
  */
-public class AbstractGenerator
+public abstract class AbstractGenerator
 {
-    protected Random rand = new Random();
+    protected Random rand = new Random(10000);
 }

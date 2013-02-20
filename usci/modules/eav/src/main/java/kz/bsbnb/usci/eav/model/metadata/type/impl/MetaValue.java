@@ -1,6 +1,8 @@
 package kz.bsbnb.usci.eav.model.metadata.type.impl;
 
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 
 /**
  * Represents EAV entity attribute's type metadata 
@@ -8,7 +10,7 @@ import kz.bsbnb.usci.eav.model.metadata.DataTypes;
  * @author a.tkachenko
  * @version 1.1, 17.01.2013
  */
-public class MetaValue extends AbstractMetaType
+public class MetaValue implements IMetaType
 {
 	/**
 	 * Attributes type's code
@@ -22,26 +24,10 @@ public class MetaValue extends AbstractMetaType
     
     /**
      * 
-     * @param typeCode code of the attribute's type 
-     * @param isKey <code>true</code> when attribute is a key for search 
-     * @param isNullable <code>true</code> when attribute can have <code>null</code> value
-     */
-    public MetaValue(DataTypes typeCode, boolean isKey, boolean isNullable)
-    {
-    	super(isKey, isNullable);
-        this.typeCode = typeCode;
-    }
-
-    /**
-     *
-     * @param id identifier
      * @param typeCode code of the attribute's type
-     * @param isKey <code>true</code> when attribute is a key for search
-     * @param isNullable <code>true</code> when attribute can have <code>null</code> value
      */
-    public MetaValue(long id, DataTypes typeCode, boolean isKey, boolean isNullable)
+    public MetaValue(DataTypes typeCode)
     {
-        super(id, isKey, isNullable);
         this.typeCode = typeCode;
     }
     
@@ -69,12 +55,10 @@ public class MetaValue extends AbstractMetaType
 
 		if (!(getClass() == obj.getClass()))
 			return false;
-		else {
+		else
+        {
 			MetaValue tmp = (MetaValue) obj;
-            return !(tmp.getTypeCode() != this.getTypeCode() ||
-                    tmp.isKey() != this.isKey() ||
-                    tmp.isNullable() != this.isNullable());
-
+            return !(tmp.getTypeCode() != this.getTypeCode());
         }
 	}
 
