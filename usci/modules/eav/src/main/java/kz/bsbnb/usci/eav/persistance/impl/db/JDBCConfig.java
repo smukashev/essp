@@ -20,6 +20,7 @@ public class JDBCConfig {
     private String complexAttributesTableName;
     private String arrayTableName;
     private String complexArrayTableName;
+    private String arrayArrayTableName;
     private String simpleArrayTableName;
     private String entitiesTableName;
     private String batchesTableName;
@@ -57,6 +58,7 @@ public class JDBCConfig {
         complexAttributesTableName = tablePrefix + "complex_attributes";
         arrayTableName = tablePrefix + "array";
         complexArrayTableName = tablePrefix + "complex_array";
+        arrayArrayTableName = tablePrefix + "array_array";
         simpleArrayTableName = tablePrefix + "simple_array";
         batchesTableName = tablePrefix + "batches";
         valuesTableName = tablePrefix + "values";
@@ -198,4 +200,7 @@ public class JDBCConfig {
         return stringValueLength;
     }
 
+    public String getArrayArrayTableName() {
+        return arrayArrayTableName;
+    }
 }
