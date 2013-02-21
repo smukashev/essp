@@ -105,6 +105,10 @@ public class PostgreSQLMetaClassDaoImplTest {
         metaCreate.setMetaAttribute("testInnerClass",
                 new MetaAttribute(false, false, metaClass));
 
+        //Simple array of array of dates
+        metaCreate.setMetaAttribute("testArrayArray",
+                new MetaAttribute(false, false, new MetaSet(new MetaSet(new MetaValue(DataTypes.DATE)))));
+
         //Complex array
         MetaClass metaClassForArray = new MetaClass("innerClassForArray");
         metaClassForArray.setMetaAttribute("testInteger",
@@ -192,6 +196,13 @@ public class PostgreSQLMetaClassDaoImplTest {
 
         postgreSQLMetaClassDaoImpl.remove(metaCreate);
 
+        MetaClass innerClass = postgreSQLMetaClassDaoImpl.load("innerClass");
+        postgreSQLMetaClassDaoImpl.remove(innerClass);
+        MetaClass innerClass1 = postgreSQLMetaClassDaoImpl.load("innerClass1");
+        postgreSQLMetaClassDaoImpl.remove(innerClass1);
+        MetaClass innerClassForArray = postgreSQLMetaClassDaoImpl.load("innerClassForArray");
+        postgreSQLMetaClassDaoImpl.remove(innerClassForArray);
+
         try
         {
             postgreSQLMetaClassDaoImpl.load(metaCreate.getId());
@@ -199,6 +210,11 @@ public class PostgreSQLMetaClassDaoImplTest {
         }
         catch(IllegalArgumentException e)
         {
+        }
+
+        if(!postgreSQLStorageImpl.isClean())
+        {
+            fail("DB after deletion is not clean!");
         }
     }
 
