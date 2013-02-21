@@ -7,6 +7,7 @@ import kz.bsbnb.usci.batch.parser.listener.impl.ListListener;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.metadata.IMetaFactory;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -60,8 +61,8 @@ public class ParserTest
 
     private final Logger logger = LoggerFactory.getLogger(ParserTest.class);
 
-    private final int DATA_SIZE = 5;
-    private final String FILE_PATH = "/opt/xmls/test1.xml";
+    private final int DATA_SIZE = 100;
+    private final String FILE_PATH = "/opt/xmls/test.xml";
 
     @Before
     public void init()
@@ -135,6 +136,13 @@ public class ParserTest
         {
             BaseEntity entity = baseEntityList.get(i);
             BaseEntity pEntity = pBaseEntityList.get(i);
+            MetaClass metaClass = metaClassList.get(i);
+
+            if(!metaClass.equals(entity.getMeta()))
+                fail("MetaClass is different");
+
+            if(!metaClass.equals(pEntity.getMeta()))
+                fail("MetaClass is different");
 
             if(!entity.equals(pEntity))
                 fail("Entities are not equal");

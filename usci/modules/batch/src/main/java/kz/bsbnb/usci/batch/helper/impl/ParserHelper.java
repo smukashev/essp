@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author k.tulbassiyev
@@ -14,14 +15,26 @@ import java.text.SimpleDateFormat;
 @Component
 public class ParserHelper implements IHelper
 {
-    public Object getCastObject(DataTypes typeCode, String value) throws ParseException
+    public Object getCastObject(DataTypes typeCode, String value)
     {
         switch(typeCode)
         {
             case INTEGER:
                 return Integer.parseInt(value);
             case DATE:
-                return new SimpleDateFormat(Global.DATE_FORMAT).parse(value);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Global.DATE_FORMAT);
+                Date date = null;
+
+                try
+                {
+                    date = simpleDateFormat.parse(value);
+                }
+                catch (ParseException e)
+                {
+                    e.printStackTrace();
+                }
+
+                return date;
             case STRING:
                 return value;
             case BOOLEAN:

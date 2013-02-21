@@ -141,10 +141,6 @@ public class MainParser extends CommonParser
                 {
                     o = parserHelper.getCastObject(metaValue.getTypeCode(), contents.toString());
                 }
-                catch (ParseException e)
-                {
-                    e.printStackTrace();
-                }
                 catch (NumberFormatException n)
                 {
                     n.printStackTrace();

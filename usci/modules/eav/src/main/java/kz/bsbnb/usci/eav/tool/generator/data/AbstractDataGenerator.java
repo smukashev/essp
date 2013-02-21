@@ -43,7 +43,6 @@ public abstract class AbstractDataGenerator
                     ex.printStackTrace();
                 }
 
-                System.out.println(date);
                 return date;
             case STRING:
                 return "string_" + rand.nextInt(1000);
