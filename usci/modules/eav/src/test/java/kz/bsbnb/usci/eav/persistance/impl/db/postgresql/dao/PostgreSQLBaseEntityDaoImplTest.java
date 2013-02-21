@@ -192,10 +192,10 @@ public class PostgreSQLBaseEntityDaoImplTest {
 
                 for (String attributeName: attributeNamesCreate)
                 {
-                    IBaseValue batchValueLoad = entityLoad.getBatchValue(attributeName);
+                    IBaseValue batchValueLoad = entityLoad.getBaseValue(attributeName);
                     if (batchValueLoad != null)
                     {
-                        IBaseValue batchValueCreate = entityCreate.getBatchValue(attributeName);
+                        IBaseValue batchValueCreate = entityCreate.getBaseValue(attributeName);
                         assertEquals(
                                 String.format(
                                         "Not properly saved or loaded an index field of one of the values with type %s.",

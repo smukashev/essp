@@ -40,9 +40,4 @@
     <bean id="SQLStats" class="kz.bsbnb.usci.eav.stats.SQLQueriesStats"/>
     <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav.model.batchdata.impl.BatchRepository"/>
 
-    <bean id="helloService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
-        <property name="serviceUrl" value="rmi://127.0.0.1:1099/HelloService"/>
-        <property name="serviceInterface" value="kz.bsbnb.usci.core.BaseEntityService"/>
-    </bean>
-
 </beans>

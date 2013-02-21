@@ -1,5 +1,9 @@
 package kz.bsbnb.usci.batch.test.parser;
 
+import junit.framework.Assert;
+import kz.bsbnb.usci.batch.parser.IParser;
+import kz.bsbnb.usci.batch.parser.IParserFactory;
+import kz.bsbnb.usci.batch.parser.listener.impl.ListListener;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.metadata.IMetaFactory;
@@ -9,7 +13,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.tool.generator.data.impl.BaseEntityGenerator;
 import kz.bsbnb.usci.eav.tool.generator.data.impl.MetaClassGenerator;
-import kz.bsbnb.usci.eav.tool.generator.xml.impl.XmlBaseEntityGenerator;
+import kz.bsbnb.usci.eav.tool.generator.xml.impl.BaseEntityXmlGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,16 +23,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author k.tulbassiyev
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:applicationContext.xml"})
+@ContextConfiguration(locations = {"classpath:applicationContextTest.xml"})
 public class ParserTest
 {
     @Autowired
@@ -41,6 +50,9 @@ public class ParserTest
     IBatchDao batchDao;
 
     @Autowired
+    IParserFactory parserFactory;
+
+    @Autowired
     IMetaFactory metaFactory;
 
     MetaClassGenerator metaClassGenerator;
@@ -48,7 +60,8 @@ public class ParserTest
 
     private final Logger logger = LoggerFactory.getLogger(ParserTest.class);
 
-    private final int DATA_SIZE = 15;
+    private final int DATA_SIZE = 5;
+    private final String FILE_PATH = "/opt/xmls/test.xml";
 
     @Before
     public void init()
@@ -69,11 +82,8 @@ public class ParserTest
     @Test
     public void parseTest()
     {
-        ArrayList<MetaClass> metaClassList = new ArrayList<MetaClass>();
-        ArrayList<BaseEntity> baseEntityList = new ArrayList<BaseEntity>();
-
-        System.out.println("Generation: ..........");
-        System.out.print(  "Progress  : ");
+        List<MetaClass> metaClassList = new ArrayList<MetaClass>();
+        List<BaseEntity> baseEntityList = new ArrayList<BaseEntity>();
 
         for(int i = 0; i < DATA_SIZE; i++)
         {
@@ -84,14 +94,7 @@ public class ParserTest
             metaClass = metaClassDao.load(metaClassId);
 
             metaClassList.add(metaClass);
-
-            if(i % (DATA_SIZE * 0.1) == 0)
-                System.out.print(".");
         }
-
-        System.out.println();
-
-        // --------
 
         Batch batch = new Batch(new Timestamp(new Date().getTime()));
 
@@ -100,10 +103,41 @@ public class ParserTest
         for (MetaClass metaClass : metaClassList)
             baseEntityList.add(baseEntityGenerator.generateBaseEntity(batch, metaClass, ++index));
 
-        XmlBaseEntityGenerator xmlBaseEntityGenerator = new XmlBaseEntityGenerator();
+        BaseEntityXmlGenerator baseEntityXmlGenerator = new BaseEntityXmlGenerator();
 
-        Document document = xmlBaseEntityGenerator.getGeneratedDocument(baseEntityList);
+        Document document = baseEntityXmlGenerator.getGeneratedDocument(baseEntityList);
 
-        xmlBaseEntityGenerator.writeToXml(document, "/opt/xmls/test.xml");
+        baseEntityXmlGenerator.writeToXml(document, "/opt/xmls/test.xml");
+
+        ListListener listener = new ListListener();
+
+        IParser parser = parserFactory.getIParser(FILE_PATH, batch, listener);
+
+        try
+        {
+            parser.parse();
+        }
+        catch (SAXException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        List<BaseEntity> pBaseEntityList = listener.getData();
+
+        if(baseEntityList.size() != pBaseEntityList.size())
+            fail("Lists are not equal");
+
+        for(int i = 0; i < baseEntityList.size(); i++)
+        {
+            BaseEntity entity = baseEntityList.get(i);
+            BaseEntity pEntity = pBaseEntityList.get(i);
+
+            if(!entity.equals(pEntity))
+                fail("Entities are not equal");
+        }
     }
 }

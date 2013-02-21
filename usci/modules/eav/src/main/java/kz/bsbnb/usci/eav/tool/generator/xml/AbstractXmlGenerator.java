@@ -19,10 +19,9 @@ import java.io.IOException;
  */
 public abstract class AbstractXmlGenerator
 {
-    protected static Document getDocument()
+    public Document getDocument()
     {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-
         DocumentBuilder documentBuilder = null;
 
         try
@@ -39,7 +38,6 @@ public abstract class AbstractXmlGenerator
 
     public void writeToXml(Document document, String filePath)
     {
-
         File xmlFile = new File(filePath);
 
         if(!xmlFile.exists())
