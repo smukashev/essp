@@ -9,9 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-
 
 /**
  *
@@ -38,10 +35,15 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
     private final static String STRING_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value character varying(%d), CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
     private final static String COMPLEX_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (entity_value_id bigint references %s(id), CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
 
-    private final static String BASE_ARRAYS_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, entity_id int references %s(id) ON DELETE CASCADE, batch_id bigint references %s(id) ON DELETE CASCADE, attribute_id int references %s(id) ON DELETE CASCADE, index bigint, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
-    private final static String BASE_SIMPLE_ARRAYS_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id)) INHERITS (%s)";
-    private final static String BASE_ARRAY_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, array_id bigint references %s(id) ON DELETE CASCADE, batch_id bigint references %s(id) ON DELETE CASCADE, index bigint, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
-    private final static String BASE_DATE_ARRAY_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value DATE, CONSTRAINT %s_array_id_fkey FOREIGN KEY (array_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    private final static String BASE_SETS_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, entity_id int references %s(id) ON DELETE CASCADE, batch_id bigint references %s(id) ON DELETE CASCADE, attribute_id int references %s(id) ON DELETE CASCADE, index bigint, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
+    private final static String BASE_SIMPLE_SETS_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id)) INHERITS (%s)";
+    private final static String BASE_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, set_id bigint references %s(id) ON DELETE CASCADE, batch_id bigint references %s(id) ON DELETE CASCADE, index bigint, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
+    private final static String BASE_DATE_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value DATE, CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    private final static String BASE_INTEGER_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value integer, CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    private final static String BASE_BOOLEAN_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value boolean, CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    private final static String BASE_STRING_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value character varying(%d), CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+    private final static String BASE_DOUBLE_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value double precision, CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+
 
 //    private void createIndexes()
 //    {
@@ -275,33 +277,34 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
         jdbcTemplate.execute(query);
 
-        //base arrays
-        query = String.format(BASE_ARRAYS_TABLE, getConfig().getBaseSetsTableName(),
+        //base sets
+        query = String.format(BASE_SETS_TABLE, getConfig().getBaseSetsTableName(),
                 getConfig().getEntitiesTableName(), getConfig().getBatchesTableName(),
                 getConfig().getArrayTableName(), getConfig().getBaseSetsTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
-        //base simple arrays
-        query = String.format(BASE_SIMPLE_ARRAYS_TABLE, getConfig().getBaseSimpleSetsTableName(),
+        //base simple sets
+        query = String.format(BASE_SIMPLE_SETS_TABLE, getConfig().getBaseSimpleSetsTableName(),
                 getConfig().getBaseSimpleSetsTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseSimpleSetsTableName(), getConfig().getBatchesTableName(),
                 getConfig().getBaseSimpleSetsTableName(), getConfig().getSimpleArrayTableName(),
                 getConfig().getBaseSimpleSetsTableName(), getConfig().getBaseSetsTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
-        //base array values
-        query = String.format(BASE_ARRAY_VALUES_TABLE, getConfig().getBaseSetValuesTableName(),
+        //base array sets
+        query = String.format(BASE_SET_VALUES_TABLE, getConfig().getBaseSetValuesTableName(),
                 getConfig().getBaseSetsTableName(), getConfig().getBatchesTableName(),
                 getConfig().getBaseSetValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
-        //base date array values
-        query = String.format(BASE_DATE_ARRAY_VALUES_TABLE, getConfig().getBaseDateSetValuesTableName(),
+        //base date set values
+        query = String.format(BASE_DATE_SET_VALUES_TABLE, getConfig().getBaseDateSetValuesTableName(),
                 getConfig().getBaseDateSetValuesTableName(), getConfig().getBaseSimpleSetsTableName(),
                 getConfig().getBaseDateSetValuesTableName(), getConfig().getBatchesTableName(),
                 getConfig().getBaseSetValuesTableName());
@@ -310,47 +313,43 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         jdbcTemplate.execute(query);
 
         //base double array values
-        query = String.format(DOUBLE_VALUES_TABLE, getConfig().getBaseDoubleSetValuesTableName(),
-                getConfig().getBaseDoubleSetValuesTableName(), getConfig().getEntitiesTableName(),
+        query = String.format(BASE_DOUBLE_SET_VALUES_TABLE, getConfig().getBaseDoubleSetValuesTableName(),
+                getConfig().getBaseDoubleSetValuesTableName(), getConfig().getBaseSimpleSetsTableName(),
                 getConfig().getBaseDoubleSetValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseDoubleSetValuesTableName(), getConfig().getSimpleArrayTableName(),
-                getConfig().getBaseValuesTableName());
+                getConfig().getBaseSetValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
-        //integer array values
-        query = String.format(INTEGER_VALUES_TABLE, getConfig().getBaseIntegerSetValuesTableName(),
-                getConfig().getBaseIntegerSetValuesTableName(), getConfig().getEntitiesTableName(),
+        //base integer set values
+        query = String.format(BASE_INTEGER_SET_VALUES_TABLE, getConfig().getBaseIntegerSetValuesTableName(),
+                getConfig().getBaseIntegerSetValuesTableName(), getConfig().getBaseSimpleSetsTableName(),
                 getConfig().getBaseIntegerSetValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseIntegerSetValuesTableName(), getConfig().getSimpleArrayTableName(),
-                getConfig().getBaseValuesTableName());
+                getConfig().getBaseSetValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
-        //boolean array values
-        query = String.format(BOOLEAN_VALUES_TABLE, getConfig().getBaseBooleanSetValuesTableName(),
-                getConfig().getBaseBooleanSetValuesTableName(), getConfig().getEntitiesTableName(),
+        //base boolean set values
+        query = String.format(BASE_BOOLEAN_SET_VALUES_TABLE, getConfig().getBaseBooleanSetValuesTableName(),
+                getConfig().getBaseBooleanSetValuesTableName(), getConfig().getBaseSimpleSetsTableName(),
                 getConfig().getBaseBooleanSetValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseBooleanSetValuesTableName(), getConfig().getSimpleArrayTableName(),
-                getConfig().getBaseValuesTableName());
+                getConfig().getBaseSetValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
-        //string values
-        query = String.format(STRING_VALUES_TABLE, getConfig().getBaseStringSetValuesTableName(),
+        //base string set values
+        query = String.format(BASE_STRING_SET_VALUES_TABLE, getConfig().getBaseStringSetValuesTableName(),
                 getConfig().getStringValueLength(),
-                getConfig().getBaseStringSetValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseStringSetValuesTableName(), getConfig().getBaseSimpleSetsTableName(),
                 getConfig().getBaseStringSetValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseStringSetValuesTableName(), getConfig().getSimpleArrayTableName(),
-                getConfig().getBaseValuesTableName());
+                getConfig().getBaseSetValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
-        //complex array values
+        //complex set values
         query = String.format(COMPLEX_VALUES_TABLE, getConfig().getBaseComplexSetValuesTableName(),
                 getConfig().getEntitiesTableName(),
                 getConfig().getBaseComplexSetValuesTableName(), getConfig().getEntitiesTableName(),

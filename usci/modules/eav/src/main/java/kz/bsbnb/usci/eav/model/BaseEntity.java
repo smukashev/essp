@@ -157,8 +157,8 @@ public class BaseEntity extends Persistable implements IBaseContainer
         return SetUtils.intersection(meta.getComplexAttributesNames(), values.keySet());
     }
 
-    public Set<String> getPresentSimpleArrayAttributeNames(DataTypes dataType) {
-        return SetUtils.intersection(meta.getSimpleArrayAttributesNames(dataType), values.keySet());
+    public Set<String> getPresentSimpleSetAttributeNames(DataTypes dataType) {
+        return SetUtils.intersection(meta.getSimpleSetAttributesNames(dataType), values.keySet());
     }
 
     public Set<String> getPresentComplexArrayAttributeNames() {
@@ -172,8 +172,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
     }
 
     public Set<String> getAttributeNames() {
-        Set<String> attributeNames = values.keySet();
-        return attributeNames;
+        return values.keySet();
     }
 
     public int getAttributeCount() {

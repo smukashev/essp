@@ -179,6 +179,10 @@ public class MetaClass extends Persistable implements IMetaType
         members.clear();
     }
 
+    public Set<String> getAttributeNames() {
+        return members.keySet();
+    }
+
     /**
      * Used to get list of the attribute names with type <code>dataType</code>
      *
@@ -227,8 +231,7 @@ public class MetaClass extends Persistable implements IMetaType
         return filteredAttributeNames;
     }
 
-
-    public Set<String> getSimpleArrayAttributesNames(DataTypes dataType)
+    public Set<String> getSimpleSetAttributesNames(DataTypes dataType)
     {
         Set<String> allAttributeNames = this.members.keySet();
         Set<String> filteredAttributeNames = new HashSet<String>();
