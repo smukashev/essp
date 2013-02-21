@@ -1,13 +1,11 @@
 package kz.bsbnb.usci.batch.test.parser;
 
-import junit.framework.Assert;
 import kz.bsbnb.usci.batch.parser.IParser;
-import kz.bsbnb.usci.batch.parser.IParserFactory;
+import kz.bsbnb.usci.batch.parser.factory.IParserFactory;
 import kz.bsbnb.usci.batch.parser.listener.impl.ListListener;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.metadata.IMetaFactory;
-import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;

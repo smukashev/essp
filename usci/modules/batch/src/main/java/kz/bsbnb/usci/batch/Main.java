@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.batch;
 
 import kz.bsbnb.usci.batch.parser.IParser;
-import kz.bsbnb.usci.batch.parser.IParserFactory;
+import kz.bsbnb.usci.batch.parser.factory.IParserFactory;
 import kz.bsbnb.usci.batch.parser.listener.impl.DatabaseListener;
 import kz.bsbnb.usci.batch.parser.listener.impl.ListListener;
 import kz.bsbnb.usci.eav.model.Batch;
@@ -11,14 +11,11 @@ import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.core.env.SystemEnvironmentPropertySource;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  *
@@ -50,9 +47,8 @@ public class Main
 
         Batch loadedBatch = batchDao.load(batchId);
 
-        /*DatabaseListener listener = new DatabaseListener();*/
-        /*listener.setBaseEntityDao(ctx.getBean(IBaseEntityDao.class));*/
-        ListListener listener = new ListListener();
+        DatabaseListener listener = new DatabaseListener();
+        listener.setBaseEntityDao(ctx.getBean(IBaseEntityDao.class));
 
         IParserFactory parserFactory = ctx.getBean(IParserFactory.class);
 

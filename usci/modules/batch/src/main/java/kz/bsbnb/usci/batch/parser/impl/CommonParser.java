@@ -1,7 +1,8 @@
-package kz.bsbnb.usci.batch.parser;
+package kz.bsbnb.usci.batch.parser.impl;
 
 import kz.bsbnb.usci.batch.common.Global;
 import kz.bsbnb.usci.batch.helper.impl.ParserHelper;
+import kz.bsbnb.usci.batch.parser.IParser;
 import kz.bsbnb.usci.batch.parser.listener.IListener;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.metadata.IMetaFactory;

@@ -1,7 +1,5 @@
 package kz.bsbnb.usci.batch.parser.impl;
 
-import kz.bsbnb.usci.batch.parser.CommonParser;
-import kz.bsbnb.usci.batch.parser.listener.IListener;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.IBaseContainer;
@@ -18,10 +16,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.EmptyStackException;
-import java.util.List;
 import java.util.Stack;
 
 /**
