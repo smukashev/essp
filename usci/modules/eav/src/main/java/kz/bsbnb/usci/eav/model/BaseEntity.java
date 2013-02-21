@@ -257,7 +257,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
+       if (obj == this)
             return true;
 
         if (obj == null)
@@ -289,7 +289,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
                     return false;
             }
 
-            /*Iterator<String> arraysIt = arrays.keySet().iterator();
+           /*Iterator<String> arraysIt = arrays.keySet().iterator();
             while (arraysIt.hasNext())
             {
                 String attributeName = arraysIt.next();

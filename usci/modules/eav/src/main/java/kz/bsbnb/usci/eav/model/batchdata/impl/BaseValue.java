@@ -89,10 +89,11 @@ public class BaseValue extends Persistable implements IBaseValue
         {
             BaseValue that = (BaseValue)obj;
 
-            if (index != that.index) return false;
-            if (!batch.equals(that.batch)) return false;
-            if (value != null ? !value.equals(that.value) : that.value != null)
+            if (index != that.index)
                 return false;
+            if (!batch.equals(that.batch))
+                return false;
+            if (value != null ? !value.equals(that.value) : that.value != null) return false;
 
             return true;
         }

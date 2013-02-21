@@ -61,7 +61,7 @@ public class ParserTest
     private final Logger logger = LoggerFactory.getLogger(ParserTest.class);
 
     private final int DATA_SIZE = 5;
-    private final String FILE_PATH = "/opt/xmls/test.xml";
+    private final String FILE_PATH = "/opt/xmls/test1.xml";
 
     @Before
     public void init()
@@ -101,13 +101,13 @@ public class ParserTest
         int index = 1;
 
         for (MetaClass metaClass : metaClassList)
-            baseEntityList.add(baseEntityGenerator.generateBaseEntity(batch, metaClass, ++index));
+            baseEntityList.add(baseEntityGenerator.generateBaseEntity(batch, metaClass, index++));
 
         BaseEntityXmlGenerator baseEntityXmlGenerator = new BaseEntityXmlGenerator();
 
         Document document = baseEntityXmlGenerator.getGeneratedDocument(baseEntityList);
 
-        baseEntityXmlGenerator.writeToXml(document, "/opt/xmls/test.xml");
+        baseEntityXmlGenerator.writeToXml(document, FILE_PATH);
 
         ListListener listener = new ListListener();
 

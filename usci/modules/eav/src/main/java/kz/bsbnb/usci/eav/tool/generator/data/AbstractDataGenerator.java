@@ -1,7 +1,11 @@
 package kz.bsbnb.usci.eav.tool.generator.data;
 
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
+import org.aspectj.weaver.patterns.ParserException;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
@@ -12,6 +16,9 @@ public abstract class AbstractDataGenerator
 {
     protected Random rand = new Random(10000);
 
+    protected final String date_format = "yyyy-MM-dd";
+    protected final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(date_format);
+
     protected Object getCastObject(DataTypes typeCode)
     {
         switch(typeCode)
@@ -19,7 +26,25 @@ public abstract class AbstractDataGenerator
             case INTEGER:
                 return rand.nextInt(1000);
             case DATE:
-                return new Date();
+                long offset = Timestamp.valueOf("2000-01-01 00:00:00").getTime();
+                long end = Timestamp.valueOf("2013-01-01 00:00:00").getTime();
+                long diff = end - offset + 1;
+
+                Timestamp timestamp = new Timestamp(offset + (long)(Math.random() * diff));
+
+                Date date = null;
+
+                try
+                {
+                    date = simpleDateFormat.parse(simpleDateFormat.format(new Date(timestamp.getTime())));
+                }
+                catch (ParseException ex)
+                {
+                    ex.printStackTrace();
+                }
+
+                System.out.println(date);
+                return date;
             case STRING:
                 return "string_" + rand.nextInt(1000);
             case BOOLEAN:

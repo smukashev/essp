@@ -16,7 +16,9 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -48,8 +50,8 @@ public class Main
 
         Batch loadedBatch = batchDao.load(batchId);
 
-        /*DatabaseListener listener = new DatabaseListener();
-        listener.setBaseEntityDao(ctx.getBean(IBaseEntityDao.class));*/
+        /*DatabaseListener listener = new DatabaseListener();*/
+        /*listener.setBaseEntityDao(ctx.getBean(IBaseEntityDao.class));*/
         ListListener listener = new ListListener();
 
         IParserFactory parserFactory = ctx.getBean(IParserFactory.class);

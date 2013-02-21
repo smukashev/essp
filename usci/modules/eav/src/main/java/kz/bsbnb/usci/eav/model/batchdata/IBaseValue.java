@@ -36,4 +36,7 @@ public interface IBaseValue
 
     public void setValue(Object value);
 
+    @Override
+    public boolean equals(Object obj);
+
 }
