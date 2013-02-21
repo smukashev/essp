@@ -47,5 +47,4 @@ public class ParserHelperTest
 
         Assert.assertFalse(simpleDateFormat.parse(date1).equals(date2));
     }
-
 }
