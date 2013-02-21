@@ -209,63 +209,7 @@ public class MetaClass extends Persistable implements IMetaType
         return filteredAttributeNames;
     }
 
-    /**
-     * Used to get list of the attribute names with type <code>DataTypes.BOOLEAN</code>.
-     *
-     * @return list of the attribute names
-     * @see MetaValue
-     */
-    public Set<String> getBooleanAttributeNames()
-    {
-        return getSimpleAttributesNames(DataTypes.BOOLEAN);
-    }
-
-    /**
-     * Used to get list of the attribute names with type <code>DataTypes.DATE</code>.
-     *
-     * @return list of the attribute names
-     * @see MetaValue
-     */
-    public Set<String> getDateAttributeNames()
-    {
-        return getSimpleAttributesNames(DataTypes.DATE);
-    }
-
-    /**
-     * Used to get list of the attribute names with type <code>DataTypes.DOUBLE</code>.
-     *
-     * @return list of the attribute names
-     * @see MetaValue
-     */
-    public Set<String> getDoubleAttributeNames()
-    {
-        return getSimpleAttributesNames(DataTypes.DOUBLE);
-    }
-
-    /**
-     * Used to get list of the attribute names with type <code>DataTypes.DOUBLE</code>.
-     *
-     * @return list of the attribute names
-     * @see MetaValue
-     */
-    public Set<String> getIntegerAttributeNames()
-    {
-        return getSimpleAttributesNames(DataTypes.INTEGER);
-    }
-
-    /**
-     * Used to get list of the attribute names with type <code>DataTypes.STRING</code>.
-     *
-     * @return list of the attribute names
-     * @see MetaValue
-     */
-    public Set<String> getStringAttributeNames()
-    {
-        return getSimpleAttributesNames(DataTypes.STRING);
-    }
-
-    public Set<String> getComplexAttributesNames()
-    {
+    public Set<String> getComplexAttributesNames() {
         Set<String> allAttributeNames = this.members.keySet();
         Set<String> filteredAttributeNames = new HashSet<String>();
 

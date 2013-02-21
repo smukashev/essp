@@ -23,20 +23,27 @@ public class JDBCConfig {
     private String arrayArrayTableName;
     private String simpleArrayTableName;
     private String entitiesTableName;
+
     private String batchesTableName;
-    private String valuesTableName;
-    private String dateValuesTableName;
-    private String dateArrayValuesTableName;
-    private String doubleValuesTableName;
-    private String doubleArrayValuesTableName;
-    private String integerValuesTableName;
-    private String integerArrayValuesTableName;
-    private String booleanValuesTableName;
-    private String booleanArrayValuesTableName;
-    private String stringValuesTableName;
-    private String stringArrayValuesTableName;
-    private String complexValuesTableName;
-    private String complexArrayValuesTableName;
+
+    private String baseValuesTableName;
+    private String baseDateValuesTableName;
+    private String baseDoubleValuesTableName;
+    private String baseIntegerValuesTableName;
+    private String baseBooleanValuesTableName;
+    private String baseStringValuesTableName;
+    private String baseComplexValuesTableName;
+    
+    private String baseSetsTableName;
+    private String baseSimpleSetsTableName;
+    private String baseComplexSetsTableName;
+    private String baseSetValuesTableName;
+    private String baseIntegerSetValuesTableName;
+    private String baseDoubleSetValuesTableName;
+    private String baseDateSetValuesTableName;
+    private String baseBooleanSetValuesTableName;
+    private String baseStringSetValuesTableName;
+    private String baseComplexSetValuesTableName;
 
     private final int classNameLength = 64;
     private final int attributeNameLength = 64;
@@ -61,19 +68,25 @@ public class JDBCConfig {
         arrayArrayTableName = tablePrefix + "array_array";
         simpleArrayTableName = tablePrefix + "simple_array";
         batchesTableName = tablePrefix + "batches";
-        valuesTableName = tablePrefix + "values";
-        dateValuesTableName = tablePrefix + "date_values";
-        doubleValuesTableName = tablePrefix + "double_values";
-        integerValuesTableName = tablePrefix + "integer_values";
-        booleanValuesTableName  = tablePrefix + "boolean_values";
-        stringValuesTableName = tablePrefix + "string_values";
-        complexValuesTableName = tablePrefix + "complex_values";
-        dateArrayValuesTableName = tablePrefix + "date_array_values";
-        doubleArrayValuesTableName = tablePrefix + "double_array_values";
-        integerArrayValuesTableName = tablePrefix + "integer_array_values";
-        booleanArrayValuesTableName  = tablePrefix + "boolean_array_values";
-        stringArrayValuesTableName = tablePrefix + "string_array_values";
-        complexArrayValuesTableName = tablePrefix + "complex_array_values";
+
+        baseValuesTableName = tablePrefix + "b_values";
+        baseDateValuesTableName = tablePrefix + "b_date_values";
+        baseDoubleValuesTableName = tablePrefix + "b_double_values";
+        baseIntegerValuesTableName = tablePrefix + "b_integer_values";
+        baseBooleanValuesTableName = tablePrefix + "b_boolean_values";
+        baseStringValuesTableName = tablePrefix + "b_string_values";
+        baseComplexValuesTableName = tablePrefix + "b_complex_values";
+
+        baseSetsTableName = tablePrefix + "b_sets";
+        baseSimpleSetsTableName = tablePrefix + "b_simple_sets";
+        baseComplexSetsTableName = tablePrefix + "b_complex_sets";
+        baseSetValuesTableName = tablePrefix + "b_set_values";
+        baseDateSetValuesTableName = tablePrefix + "b_date_set_values";
+        baseDoubleSetValuesTableName = tablePrefix + "b_double_set_values";
+        baseIntegerSetValuesTableName = tablePrefix + "b_integer_set_values";
+        baseBooleanSetValuesTableName = tablePrefix + "b_boolean_set_values";
+        baseStringSetValuesTableName = tablePrefix + "b_string_set_values";
+        baseComplexSetValuesTableName = tablePrefix + "b_complex_set_values";
     }
 
     public String getClassesTableName() {
@@ -120,56 +133,68 @@ public class JDBCConfig {
         return batchesTableName;
     }
 
-    public String getValuesTableName() {
-        return valuesTableName;
+    public String getBaseValuesTableName() {
+        return baseValuesTableName;
     }
 
-    public String getDateValuesTableName() {
-        return dateValuesTableName;
+    public String getBaseDateValuesTableName() {
+        return baseDateValuesTableName;
     }
 
-    public String getDoubleValuesTableName() {
-        return doubleValuesTableName;
+    public String getBaseDoubleValuesTableName() {
+        return baseDoubleValuesTableName;
     }
 
-    public String getIntegerValuesTableName() {
-        return integerValuesTableName;
+    public String getBaseIntegerValuesTableName() {
+        return baseIntegerValuesTableName;
     }
 
-    public String getBooleanValuesTableName() {
-        return booleanValuesTableName;
+    public String getBaseBooleanValuesTableName() {
+        return baseBooleanValuesTableName;
     }
 
-    public String getStringValuesTableName() {
-        return stringValuesTableName;
+    public String getBaseStringValuesTableName() {
+        return baseStringValuesTableName;
     }
 
-    public String getComplexValuesTableName() {
-        return complexValuesTableName;
+    public String getBaseComplexValuesTableName() {
+        return baseComplexValuesTableName;
     }
 
-    public String getDateArrayValuesTableName() {
-        return dateArrayValuesTableName;
+    public String getBaseSetsTableName() {
+        return baseSetsTableName;
     }
 
-    public String getDoubleArrayValuesTableName() {
-        return doubleArrayValuesTableName;
+    public String getBaseSimpleSetsTableName() {
+        return baseSimpleSetsTableName;
     }
 
-    public String getIntegerArrayValuesTableName() {
-        return integerArrayValuesTableName;
+    public String getBaseSetValuesTableName() {
+        return baseSetValuesTableName;
     }
 
-    public String getBooleanArrayValuesTableName() {
-        return booleanArrayValuesTableName;
+    public String getBaseDateSetValuesTableName() {
+        return baseDateSetValuesTableName;
     }
 
-    public String getStringArrayValuesTableName() {
-        return stringArrayValuesTableName;
+    public String getBaseDoubleSetValuesTableName() {
+        return baseDoubleSetValuesTableName;
     }
 
-    public String getComplexArrayValuesTableName() {
-        return complexArrayValuesTableName;
+    public String getBaseIntegerSetValuesTableName() {
+        return baseIntegerSetValuesTableName;
+    }
+
+    public String getBaseBooleanSetValuesTableName() {
+        return baseBooleanSetValuesTableName;
+    }
+
+    public String getBaseStringSetValuesTableName() {
+        return baseStringSetValuesTableName;
+    }
+
+    public String getBaseComplexSetValuesTableName() {
+        return baseComplexSetValuesTableName;
     }
 
     public int getClassNameLength() {
