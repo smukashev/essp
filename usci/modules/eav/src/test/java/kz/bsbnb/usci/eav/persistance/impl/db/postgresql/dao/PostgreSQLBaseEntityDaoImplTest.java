@@ -4,19 +4,40 @@
  */
 package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
+import kz.bsbnb.usci.eav.model.BaseEntity;
+import kz.bsbnb.usci.eav.model.BaseSet;
+import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.batchdata.IBaseValue;
 import kz.bsbnb.usci.eav.model.batchdata.IBatchRepository;
+import kz.bsbnb.usci.eav.model.batchdata.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.metadata.DataTypes;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaAttribute;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaSet;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
+import kz.bsbnb.usci.eav.util.DateUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Random;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -51,7 +72,7 @@ public class PostgreSQLBaseEntityDaoImplTest {
     public void finalization() throws Exception {
 
     }
-    /*
+
     @Test
     public void saveBaseEntity() throws Exception {
         try {
@@ -60,40 +81,58 @@ public class PostgreSQLBaseEntityDaoImplTest {
             MetaClass metaCreate = new MetaClass("testMetaClass");
 
             // date values
-            metaCreate.setMemberType("date_first", new MetaValue(DataTypes.DATE, false, true));
-            metaCreate.setMemberType("date_second", new MetaValue(DataTypes.DATE, false, true));
-            metaCreate.setMemberType("date_third", new MetaValue(DataTypes.DATE, false, true));
+            metaCreate.setMetaAttribute("date_first",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.DATE)));
+            metaCreate.setMetaAttribute("date_second",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.DATE)));
+            metaCreate.setMetaAttribute("date_third",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.DATE)));
 
             //  double values
-            metaCreate.setMemberType("double_first", new MetaValue(DataTypes.DOUBLE, false, true));
-            metaCreate.setMemberType("double_second", new MetaValue(DataTypes.DOUBLE, false, true));
-            metaCreate.setMemberType("double_third", new MetaValue(DataTypes.DOUBLE, false, true));
+            metaCreate.setMetaAttribute("double_first",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.DOUBLE)));
+            metaCreate.setMetaAttribute("double_second",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.DOUBLE)));
+            metaCreate.setMetaAttribute("double_third",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.DOUBLE)));
 
             // integer values
-            metaCreate.setMemberType("integer_first", new MetaValue(DataTypes.INTEGER, false, true));
-            metaCreate.setMemberType("integer_second", new MetaValue(DataTypes.INTEGER, false, true));
-            metaCreate.setMemberType("integer_third", new MetaValue(DataTypes.INTEGER, false, true));
+            metaCreate.setMetaAttribute("integer_first",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.INTEGER)));
+            metaCreate.setMetaAttribute("integer_second",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.INTEGER)));
+            metaCreate.setMetaAttribute("integer_third",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.INTEGER)));
 
             // boolean values
-            metaCreate.setMemberType("boolean_first", new MetaValue(DataTypes.BOOLEAN, false, true));
-            metaCreate.setMemberType("boolean_second", new MetaValue(DataTypes.BOOLEAN, false, true));
-            metaCreate.setMemberType("boolean_third", new MetaValue(DataTypes.BOOLEAN, false, true));
+            metaCreate.setMetaAttribute("boolean_first",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.BOOLEAN)));
+            metaCreate.setMetaAttribute("boolean_second",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.BOOLEAN)));
+            metaCreate.setMetaAttribute("boolean_third",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.BOOLEAN)));
 
             // string values
-            metaCreate.setMemberType("string_first", new MetaValue(DataTypes.STRING, false, true));
-            metaCreate.setMemberType("string_second", new MetaValue(DataTypes.STRING, false, true));
-            metaCreate.setMemberType("string_third", new MetaValue(DataTypes.STRING, false, true));
+            metaCreate.setMetaAttribute("string_first",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.STRING)));
+            metaCreate.setMetaAttribute("string_second",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.STRING)));
+            metaCreate.setMetaAttribute("string_third",
+                    new MetaAttribute(false, true, new MetaValue(DataTypes.STRING)));
 
             // complex values
-            metaCreate.setMemberType("complex_first", new MetaClassHolder("inner_meta_class_first"));
-            metaCreate.setMemberType("complex_second", new MetaClassHolder("inner_meta_class_second"));
-            metaCreate.setMemberType("complex_third", new MetaClassHolder("inner_meta_class_third"));
+            metaCreate.setMetaAttribute("complex_first",
+                    new MetaAttribute(false, true, new MetaClass("inner_meta_class_first")));
+            metaCreate.setMetaAttribute("complex_second",
+                    new MetaAttribute(false, true, new MetaClass("inner_meta_class_second")));
+            metaCreate.setMetaAttribute("complex_third",
+                    new MetaAttribute(false, true, new MetaClass("inner_meta_class_third")));
 
             // date array values
-            metaCreate.setMemberType("date_array", new MetaValueArray(DataTypes.DATE));
+            metaCreate.setMetaAttribute("date_array", new MetaAttribute(false, true, new MetaSet(new MetaValue(DataTypes.DATE))));
 
             // double array values
-            metaCreate.setMemberType("double_array", new MetaValueArray(DataTypes.DOUBLE));
+            /*metaCreate.setMemberType("double_array", new MetaValueArray(DataTypes.DOUBLE));
 
             // integer array values
             metaCreate.setMemberType("integer_array", new MetaValueArray(DataTypes.INTEGER));
@@ -105,56 +144,72 @@ public class PostgreSQLBaseEntityDaoImplTest {
             metaCreate.setMemberType("string_array", new MetaValueArray(DataTypes.STRING));
 
             // complex array values
-            metaCreate.setMemberType("complex_array", new MetaClassArray(new MetaClassHolder("meta_class_array")));
+            metaCreate.setMemberType("complex_array", new MetaClassArray(new MetaClassHolder("meta_class_array")));*/
 
             long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
             MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
 
             Batch batch = batchRepository.addBatch(new Batch());
-            BaseEntity entityCreate = new BaseEntity(metaLoad, batch);
+            BaseEntity entityCreate = new BaseEntity(metaLoad);
             Random random = new Random();
 
             // date values
-            entityCreate.set("date_first", 1L, DateUtils.nowPlus(Calendar.DATE, 1));
-            entityCreate.set("date_second", 2L, DateUtils.nowPlus(Calendar.DATE, 2));
-            entityCreate.set("date_third", 3L, null);
+            entityCreate.put("date_first",
+                    new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 1)));
+            entityCreate.put("date_second",
+                    new BaseValue(batch, 2L, DateUtils.nowPlus(Calendar.DATE, 2)));
+            entityCreate.put("date_third",
+                    new BaseValue(batch, 3L, null));
 
             // double values
-            entityCreate.set("double_first", 4L, random.nextInt() * random.nextDouble());
-            entityCreate.set("double_second", 5L, null);
-            entityCreate.set("double_third", 6L, random.nextInt() * random.nextDouble());
+            entityCreate.put("double_first",
+                    new BaseValue(batch, 4L, random.nextInt() * random.nextDouble()));
+            entityCreate.put("double_second",
+                    new BaseValue(batch, 5L, null));
+            entityCreate.put("double_third",
+                    new BaseValue(batch, 6L, random.nextInt() * random.nextDouble()));
 
             // integer values
-            entityCreate.set("integer_first", 7L, null);
-            entityCreate.set("integer_second", 8L, random.nextInt());
-            entityCreate.set("integer_third", 9L, random.nextInt());
+            entityCreate.put("integer_first",
+                    new BaseValue(batch, 7L, null));
+            entityCreate.put("integer_second",
+                    new BaseValue(batch, 8L, random.nextInt()));
+            entityCreate.put("integer_third",
+                    new BaseValue(batch, 9L, random.nextInt()));
 
             // boolean values
-            entityCreate.set("boolean_first", 10L, false);
-            entityCreate.set("boolean_second", 11L, true);
-            entityCreate.set("boolean_third", 12L, null);
+            entityCreate.put("boolean_first",
+                    new BaseValue(batch, 10L, false));
+            entityCreate.put("boolean_second",
+                    new BaseValue(batch, 11L, true));
+            entityCreate.put("boolean_third",
+                    new BaseValue(batch, 12L, null));
 
             // string values
-            entityCreate.set("string_first", 13L, "Test value with a string type for attribute string_first.");
-            entityCreate.set("string_second", 14L, null);
-            entityCreate.set("string_third", 15L, "Test value with a string type for attribute string_third.");
+            entityCreate.put("string_first",
+                    new BaseValue(batch, 13L, "Test value with a string type for attribute string_first."));
+            entityCreate.put("string_second",
+                    new BaseValue(batch, 14L, null));
+            entityCreate.put("string_third",
+                    new BaseValue(batch, 15L, "Test value with a string type for attribute string_third."));
 
             // complex values
-            BaseEntity baseEntityInnerFirst =
-                    new BaseEntity(((MetaClassHolder)metaLoad.getMemberType("complex_first")).getMeta(), batch);
-            entityCreate.set("complex_first", 16L, baseEntityInnerFirst);
-            BaseEntity baseEntityInnerSecond =
-                    new BaseEntity(((MetaClassHolder)metaLoad.getMemberType("complex_second")).getMeta(), batch);
-            entityCreate.set("complex_second", 17L, baseEntityInnerSecond);
+            BaseEntity baseEntityInnerFirst = new BaseEntity((MetaClass)metaLoad.getMemberType("complex_first"));
+            entityCreate.put("complex_first", new BaseValue(batch, 16L, baseEntityInnerFirst));
+            BaseEntity baseEntityInnerSecond = new BaseEntity((MetaClass)metaLoad.getMemberType("complex_second"));
+            entityCreate.put("complex_second", new BaseValue(batch, 17L, baseEntityInnerSecond));
 
             // date array values
-            entityCreate.addToArray("date_array", 18L, DateUtils.nowPlus(Calendar.DATE, 3));
-            entityCreate.addToArray("date_array", 19L, DateUtils.nowPlus(Calendar.DATE, 5));
-            entityCreate.addToArray("date_array", 20L, DateUtils.nowPlus(Calendar.DATE, 7));
+            BaseSet baseSet = new BaseSet(((MetaSet)metaLoad.getMemberType("date_array")).getMemberType());
+            baseSet.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 3)));
+            baseSet.put(new BaseValue(batch, 2L, DateUtils.nowPlus(Calendar.DATE, 5)));
+            baseSet.put(new BaseValue(batch, 3L, DateUtils.nowPlus(Calendar.DATE, 7)));
+
+            entityCreate.put("date_array", new BaseValue(batch, 18L, baseSet));
 
             // double array values
-            entityCreate.addToArray("double_array", 21L, random.nextInt() * random.nextDouble());
+            /*entityCreate.addToArray("double_array", 21L, random.nextInt() * random.nextDouble());
             entityCreate.addToArray("double_array", 22L, random.nextInt() * random.nextDouble());
             entityCreate.addToArray("double_array", 23L, random.nextInt() * random.nextDouble());
 
@@ -177,13 +232,14 @@ public class PostgreSQLBaseEntityDaoImplTest {
             BaseEntity baseEntityForArrayFirst = new BaseEntity(metaClassForArrayElement, batch);
             entityCreate.addToArray("complex_array", 33L, baseEntityForArrayFirst);
             BaseEntity baseEntityForArraySecond = new BaseEntity(metaClassForArrayElement, batch);
-            entityCreate.addToArray("complex_array", 34L, baseEntityForArraySecond);
+            entityCreate.addToArray("complex_array", 34L, baseEntityForArraySecond);*/
 
             long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
             BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
 
             // simple values
-            for (DataTypes dataType: DataTypes.values()) {
+            for (DataTypes dataType: DataTypes.values())
+            {
                 Set<String> attributeNamesCreate = entityCreate.getPresentSimpleAttributeNames(dataType);
                 Set<String> attributeNamesLoad = entityLoad.getPresentSimpleAttributeNames(dataType);
                 assertEquals(
@@ -192,18 +248,18 @@ public class PostgreSQLBaseEntityDaoImplTest {
 
                 for (String attributeName: attributeNamesCreate)
                 {
-                    IBaseValue batchValueLoad = entityLoad.getBaseValue(attributeName);
-                    if (batchValueLoad != null)
+                    IBaseValue baseValueLoad = entityLoad.getBaseValue(attributeName);
+                    if (baseValueLoad != null)
                     {
-                        IBaseValue batchValueCreate = entityCreate.getBaseValue(attributeName);
+                        IBaseValue baseValueCreate = entityCreate.getBaseValue(attributeName);
                         assertEquals(
                                 String.format(
                                         "Not properly saved or loaded an index field of one of the values with type %s.",
                                         dataType),
-                                batchValueCreate.getIndex(), batchValueLoad.getIndex());
+                                baseValueCreate.getIndex(), baseValueLoad.getIndex());
 
-                        Batch batchCreate = batchValueCreate.getBatch();
-                        Batch batchLoad = batchValueLoad.getBatch();
+                        Batch batchCreate = baseValueCreate.getBatch();
+                        Batch batchLoad = baseValueLoad.getBatch();
 
                         assertNotNull(
                                 String.format(
@@ -222,10 +278,10 @@ public class PostgreSQLBaseEntityDaoImplTest {
                                 String.format(
                                         "Not properly saved or loaded an index field of one of the values with type %s.",
                                         dataType),
-                                batchValueCreate.getIndex(), batchValueLoad.getIndex());
+                                baseValueCreate.getIndex(), baseValueLoad.getIndex());
 
-                        Object valueCreate = batchValueCreate.getValue();
-                        Object valueLoad = batchValueLoad.getValue();
+                        Object valueCreate = baseValueCreate.getValue();
+                        Object valueLoad = baseValueLoad.getValue();
 
                         if (dataType.equals(DataTypes.DATE)) {
                             assertTrue(
@@ -242,6 +298,12 @@ public class PostgreSQLBaseEntityDaoImplTest {
                     }
                 }
             }
+
+            Set<String> attributeNamesCreate = entityCreate.getPresentComplexAttributeNames();
+            Set<String> attributeNamesLoad = entityLoad.getPresentComplexAttributeNames();
+            assertEquals(
+                    "One of the complex values are not saved or loaded.",
+                    attributeNamesCreate.size(), attributeNamesLoad.size());
         }
         finally
         {
@@ -253,5 +315,5 @@ public class PostgreSQLBaseEntityDaoImplTest {
     public void multipleBatchSave() throws Exception {
 
     }
-    */
+
 }

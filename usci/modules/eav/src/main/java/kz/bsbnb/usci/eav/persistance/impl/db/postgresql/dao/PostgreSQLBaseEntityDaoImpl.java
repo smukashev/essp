@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
 import kz.bsbnb.usci.eav.model.BaseEntity;
+import kz.bsbnb.usci.eav.model.BaseSet;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.batchdata.IBaseValue;
 import kz.bsbnb.usci.eav.model.batchdata.IBatchRepository;
@@ -8,6 +9,7 @@ import kz.bsbnb.usci.eav.model.batchdata.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.IMetaClassRepository;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
@@ -39,7 +41,10 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     private String DELETE_ENTITY_BY_ID_SQL;
     private String INSERT_SIMPLE_VALUE_SQL;
     private String INSERT_COMPLEX_VALUE_SQL;
+    private String INSERT_SET_SQL;
+    private String SELECT_SETS_BY_ENTITY_ID_SQL;
     private String SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL;
+    private String SELECT_SIMPLE_SET_VALUES_BY_SET_ID_SQL;
     private String SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL;
 
     @Autowired
@@ -65,6 +70,18 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         INSERT_SIMPLE_VALUE_SQL = "INSERT INTO %s (entity_id, batch_id, attribute_id, index, value) VALUES ( ?, ?, ?, ?, ? )";
         INSERT_COMPLEX_VALUE_SQL = "INSERT INTO %s (entity_id, batch_id, attribute_id, index, entity_value_id) VALUES ( ?, ?, ?, ?, ? )";
+        INSERT_SET_SQL = String.format("INSERT INTO %s (entity_id, batch_id, attribute_id, index) VALUES ( ?, ?, ?, ? )",
+                getConfig().getBaseSimpleSetsTableName());
+
+        SELECT_SETS_BY_ENTITY_ID_SQL = String.format(
+                "SELECT ss.batch_id, " +
+                       "sa.name as attribute_name, " +
+                       "ss.index " +
+                  "FROM %s ss, " +
+                       "%s sa " +
+                 "WHERE ss.entity_id = ? " +
+                   "AND ss.attribute_id = sa.id",
+                getConfig().getBaseSimpleSetsTableName(), getConfig().getSimpleArrayTableName());
 
         SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL =
                 "SELECT v.batch_id, " +
@@ -76,6 +93,13 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                        "%s sa " +
                  "WHERE v.entity_id = ? " +
                    "AND v.attribute_id = sa.id";
+
+        SELECT_SIMPLE_SET_VALUES_BY_SET_ID_SQL =
+                "SELECT sav.batch_id, " +
+                       "sav.index, " +
+                       "sav.value " +
+                  "FROM %s sav " +
+                 "WHERE sav.set_id in (?) ";
 
         SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL =
                 "SELECT cv.batch_id, " +
@@ -143,60 +167,51 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         // simple attribute values
         for (DataTypes dataType: DataTypes.values()) {
-            String queryForSimpleValues;
-            String queryForSimpleArraysValues;
+            String query;
 
             switch(dataType)
             {
                 case INTEGER: {
-                    queryForSimpleValues = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getIntegerValuesTableName(), getConfig().getSimpleAttributesTableName());
-                    queryForSimpleArraysValues = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getIntegerArrayValuesTableName(), getConfig().getSimpleArrayTableName());
+                    query = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
+                            getConfig().getBaseIntegerValuesTableName(), getConfig().getSimpleAttributesTableName());
                     break;
                 }
                 case DATE: {
-                    queryForSimpleValues = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getDateValuesTableName(), getConfig().getSimpleAttributesTableName());
-                    queryForSimpleArraysValues = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getDateArrayValuesTableName(), getConfig().getSimpleArrayTableName());
+                    query = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
+                            getConfig().getBaseDateValuesTableName(), getConfig().getSimpleAttributesTableName());
                     break;
                 }
                 case STRING: {
-                    queryForSimpleValues = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getStringValuesTableName(), getConfig().getSimpleAttributesTableName());
-                    queryForSimpleArraysValues = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getStringArrayValuesTableName(), getConfig().getSimpleArrayTableName());
+                    query = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
+                            getConfig().getBaseStringValuesTableName(), getConfig().getSimpleAttributesTableName());
                     break;
                 }
                 case BOOLEAN: {
-                    queryForSimpleValues = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getBooleanValuesTableName(), getConfig().getSimpleAttributesTableName());
-                    queryForSimpleArraysValues = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getBooleanArrayValuesTableName(), getConfig().getSimpleArrayTableName());
+                    query = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
+                            getConfig().getBaseBooleanValuesTableName(), getConfig().getSimpleAttributesTableName());
                     break;
                 }
                 case DOUBLE: {
-                    queryForSimpleValues = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getDoubleValuesTableName(), getConfig().getSimpleAttributesTableName());
-                    queryForSimpleArraysValues = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getDoubleArrayValuesTableName(), getConfig().getSimpleArrayTableName());
+                    query = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
+                            getConfig().getBaseDoubleValuesTableName(), getConfig().getSimpleAttributesTableName());
                     break;
                 }
                 default:
                     throw new IllegalArgumentException("Unknown type.");
             }
-            loadSimpleValues(baseEntity, queryForSimpleValues);
-            //loadSimpleArraysValues(baseEntity, queryForSimpleArraysValues);
+            loadSimpleValues(baseEntity, query);
         }
+
+        // simple sets values
+        loadSimpleArraysValues(baseEntity);
 
         // complex attribute values
         loadComplexValues(baseEntity, String.format(SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL,
-                getConfig().getComplexValuesTableName(), getConfig().getComplexAttributesTableName()));
+                getConfig().getBaseComplexValuesTableName(), getConfig().getComplexAttributesTableName()));
 
         // complex arrays values
         /*loadComplexArraysValues(baseEntity, String.format(SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL,
-                getConfig().getComplexArrayValuesTableName(), getConfig().getComplexArrayTableName()));*/
+                getConfig().getBaseComplexSetValuesTableName(), getConfig().getComplexArrayTableName()));*/
 
         return baseEntity;
     }
@@ -229,27 +244,27 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 {
                     case INTEGER: {
                         query = String.format(INSERT_SIMPLE_VALUE_SQL,
-                                getConfig().getIntegerValuesTableName());
+                                getConfig().getBaseIntegerValuesTableName());
                         break;
                     }
                     case DATE: {
                         query = String.format(INSERT_SIMPLE_VALUE_SQL,
-                                getConfig().getDateValuesTableName());
+                                getConfig().getBaseDateValuesTableName());
                         break;
                     }
                     case STRING: {
                         query = String.format(INSERT_SIMPLE_VALUE_SQL,
-                                getConfig().getStringValuesTableName());
+                                getConfig().getBaseStringValuesTableName());
                         break;
                     }
                     case BOOLEAN: {
                         query = String.format(INSERT_SIMPLE_VALUE_SQL,
-                                getConfig().getBooleanValuesTableName());
+                                getConfig().getBaseBooleanValuesTableName());
                         break;
                     }
                     case DOUBLE: {
                         query = String.format(INSERT_SIMPLE_VALUE_SQL,
-                                getConfig().getDoubleValuesTableName());
+                                getConfig().getBaseDoubleValuesTableName());
                         break;
                     }
                     default:
@@ -267,33 +282,34 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 {
                     case INTEGER: {
                         query = String.format(INSERT_SIMPLE_VALUE_SQL,
-                                getConfig().getIntegerArrayValuesTableName());
+                                getConfig().getBaseIntegerSetValuesTableName());
                         break;
                     }
                     case DATE: {
                         query = String.format(INSERT_SIMPLE_VALUE_SQL,
-                                getConfig().getDateArrayValuesTableName());
+                                getConfig().getBaseDateSetValuesTableName());
                         break;
                     }
                     case STRING: {
                         query = String.format(INSERT_SIMPLE_VALUE_SQL,
-                                getConfig().getStringArrayValuesTableName());
+                                getConfig().getBaseStringSetValuesTableName());
                         break;
                     }
                     case BOOLEAN: {
                         query = String.format(INSERT_SIMPLE_VALUE_SQL,
-                                getConfig().getBooleanArrayValuesTableName());
+                                getConfig().getBaseBooleanSetValuesTableName());
                         break;
                     }
                     case DOUBLE: {
                         query = String.format(INSERT_SIMPLE_VALUE_SQL,
-                                getConfig().getDoubleArrayValuesTableName());
+                                getConfig().getBaseDoubleSetValuesTableName());
                         break;
                     }
                     default:
                         throw new IllegalArgumentException("Unknown type.");
                 }
-                /*insertSimpleArraysValues(baseEntity, attributeNames, query);*/
+                //insertSimpleSetsValues(baseEntity, attributeNames, query);
+
             }
         }
 
@@ -304,15 +320,16 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         if (!attributeNames.isEmpty())
         {
             insertComplexValues(baseEntity, attributeNames, String.format(INSERT_COMPLEX_VALUE_SQL,
-                    getConfig().getComplexValuesTableName()));
+                    getConfig().getBaseComplexValuesTableName()));
         }
 
         /*attributeNames = baseEntity.getPresentComplexArrayAttributeNames();
         if (!attributeNames.isEmpty())
         {
             insertComplexArraysValues(baseEntity, attributeNames, String.format(INSERT_COMPLEX_VALUE_SQL,
-                    getConfig().getComplexArrayValuesTableName()));
-        } */
+                    getConfig().getBaseComplexSetValuesTableName()));
+        }*/
+
 
         return baseEntityId;
     }
@@ -422,16 +439,14 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             String attributeNameForInsert = it.next();
 
-            List<IBaseValue> batchValues = baseEntity.getBatchValueArray(attributeNameForInsert);
-            Iterator<IBaseValue> batchValueIt = batchValues.iterator();
+            BaseSet baseSet = (BaseSet)baseEntity.getBatchValue(attributeNameForInsert);
+            Set<IBaseValue> baseValues = baseSet.get();
+            Iterator<IBaseValue> batchValueIt = baseValues.iterator();
 
             while (batchValueIt.hasNext())
             {
                 IBaseValue batchValue = batchValueIt.next();
-
                 IMetaAttribute metaAttribute = meta.getMetaAttribute(attributeNameForInsert);
-
-
                 long childBaseEntityId = save((BaseEntity)batchValue.getValue());
 
                 Object[] insertArgs = new Object[] {baseEntity.getId(), batchValue.getBatch().getId(),
@@ -445,7 +460,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         batchUpdateWithStats(query, batchArgs);*/
     }
 
-    private void insertSimpleArraysValues(BaseEntity baseEntity, Set<String> attributeNames, String query)
+    private void insertSimpleSetsValues(BaseEntity baseEntity, Set<String> attributeNames, String query)
     {
         // todo: implement
         /*MetaClass metaClass = baseEntity.getMeta();
@@ -496,19 +511,86 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    public void loadSimpleArraysValues(BaseEntity baseEntity, String query)
+    public void loadSimpleArraysValues(BaseEntity baseEntity)
     {
-        logger.debug(query);
-        List<Map<String, Object>> rows = queryForListWithStats(query, baseEntity.getId());
+        MetaClass metaClass = baseEntity.getMeta();
 
-        Iterator<Map<String, Object>> it = rows.iterator();
-        while (it.hasNext())
+        logger.debug(SELECT_SETS_BY_ENTITY_ID_SQL);
+        List<Map<String, Object>> rowsSet = queryForListWithStats(SELECT_SETS_BY_ENTITY_ID_SQL, baseEntity.getId());
+
+        Iterator<Map<String, Object>> itSet = rowsSet.iterator();
+        while (itSet.hasNext())
         {
-            Map<String, Object> row = it.next();
+            Map<String, Object> rowSet = itSet.next();
 
-            Batch batch = batchRepository.getBatch((Long)row.get("batch_id"));
+            long setId = (Long)rowSet.get("set_id");
+            String attributeName = (String)rowSet.get("attribute_name");
 
-            baseEntity.addToArray((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"), row.get("value")));
+            IMetaType metaTypeSet = metaClass.getMemberType(attributeName);
+
+            if (!metaTypeSet.isArray() && metaTypeSet.isComplex()) {
+                throw new RuntimeException("Create an array of simple values ​​impossible. " +
+                        "Query returned no valid data.");
+            }
+
+            MetaSet metaSet = (MetaSet)metaTypeSet;
+            IMetaType metaTypeValue = metaSet.getMemberType();
+
+            if (metaTypeValue.isArray() || metaTypeValue.isComplex()) {
+                throw new RuntimeException("Create an array of simple values ​​impossible. " +
+                        "Query returned no valid data.");
+            }
+
+            MetaValue metaValue = (MetaValue)metaTypeValue;
+            DataTypes dataType = metaValue.getTypeCode();
+
+            String query;
+            switch(dataType)
+            {
+                case INTEGER: {
+                    query = String.format(SELECT_SIMPLE_SET_VALUES_BY_SET_ID_SQL,
+                            getConfig().getBaseIntegerSetValuesTableName());
+                    break;
+                }
+                case DATE: {
+                    query = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
+                            getConfig().getBaseDateSetValuesTableName());
+                    break;
+                }
+                case STRING: {
+                    query = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
+                            getConfig().getBaseStringSetValuesTableName());
+                    break;
+                }
+                case BOOLEAN: {
+                    query = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
+                            getConfig().getBaseBooleanSetValuesTableName());
+                    break;
+                }
+                case DOUBLE: {
+                    query = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
+                            getConfig().getBaseDoubleSetValuesTableName());
+                    break;
+                }
+                default:
+                    throw new IllegalArgumentException("Unknown type.");
+            }
+
+            BaseSet baseSet = new BaseSet(metaTypeValue);
+
+            List<Map<String, Object>> rowsValue = queryForListWithStats(query, setId);
+            Iterator<Map<String, Object>> itValue = rowsValue.iterator();
+            while (itValue.hasNext())
+            {
+                Map<String, Object> rowValue = itSet.next();
+
+                Batch batch = batchRepository.getBatch((Long)rowValue.get("batch_id"));
+                baseSet.put(new BaseValue(batch, (Long)rowValue.get("index"), rowValue.get("value")));
+            }
+
+            Batch batch = batchRepository.getBatch((Long)rowSet.get("batch_id"));
+            baseEntity.put(attributeName, new BaseValue(batch, (Long)rowSet.get("index"), baseSet));
+
         }
     }
 
@@ -533,7 +615,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
     private void loadComplexArraysValues(BaseEntity baseEntity, String query)
     {
-        logger.debug(query);
+        /*logger.debug(query);
         List<Map<String, Object>> rows =
                 queryForListWithStats(query, baseEntity.getId());
 
@@ -547,7 +629,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             BaseEntity childBaseEntity = load(entityValueId);
 
             baseEntity.addToArray((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"), childBaseEntity));
-        }
+        }*/
     }
 
 }

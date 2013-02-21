@@ -148,81 +148,9 @@ public class BaseEntity extends Persistable implements IBaseContainer
         values.put(name, value);
     }
 
-    //arrays
-
-    public <T> void addToArray(String name, IBaseValue value)
-    {
-        IMetaType type = meta.getMemberType(name);
-
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name +
-                    ", not found in class: " + meta.getClassName());
-
-        if(!type.isArray())
-            throw new IllegalArgumentException("Type: " + name +
-                    ", is not an array");
-
-        if (value == null)
-            throw new IllegalArgumentException("Element of the array can not be equal to null.");
-
-        if (value.getValue() == null)
-            throw new IllegalArgumentException("Element of the array can not be equal to null.");
-
-        Class<?> valueClass = value.getClass();
-        Class<?> expValueClass;
-
-        if (type.isComplex())
-            expValueClass = BaseEntity.class;
-        else
-        {
-            if (type.isArray())
-            {
-                MetaSet metaClassArray = (MetaSet)type;
-                expValueClass = metaClassArray.getTypeCode().getDataTypeClass();
-            }
-            else
-            {
-                MetaValue metaValue = (MetaValue)type;
-                expValueClass = metaValue.getTypeCode().getDataTypeClass();
-            }
-        }
-
-        if(expValueClass == null || !expValueClass.isAssignableFrom(valueClass))
-            throw new IllegalArgumentException("Type mismatch in class: " +
-                    meta.getClassName() + ". Needed " + expValueClass + ", got: " +
-                    valueClass);
-
-        ((Set<IBaseValue>)values.get(name).getValue()).add(value);
-    }
-
     public Set<String> getPresentSimpleAttributeNames(DataTypes dataType)
     {
         return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), values.keySet());
-    }
-
-    public Set<String> getPresentDateAttributeNames()
-    {
-        return getPresentSimpleAttributeNames(DataTypes.DATE);
-    }
-
-    public Set<String> getPresentDoubleAttributeNames()
-    {
-        return getPresentSimpleAttributeNames(DataTypes.DOUBLE);
-    }
-
-    public Set<String> getPresentIntegerAttributeNames()
-    {
-        return getPresentSimpleAttributeNames(DataTypes.INTEGER);
-    }
-
-    public Set<String> getPresentBooleanAttributeNames()
-    {
-        return getPresentSimpleAttributeNames(DataTypes.BOOLEAN);
-    }
-
-    public Set<String> getPresentStringAttributeNames()
-    {
-        return getPresentSimpleAttributeNames(DataTypes.STRING);
     }
 
     public Set<String> getPresentComplexAttributeNames() {
@@ -236,7 +164,6 @@ public class BaseEntity extends Persistable implements IBaseContainer
     public Set<String> getPresentComplexArrayAttributeNames() {
         return SetUtils.intersection(meta.getComplexArrayAttributesNames(), values.keySet());
     }
-
 
     @Override
     public String toString()

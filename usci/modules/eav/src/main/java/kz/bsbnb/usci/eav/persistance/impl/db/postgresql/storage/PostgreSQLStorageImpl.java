@@ -36,8 +36,12 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
     private final static String INTEGER_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value integer, CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
     private final static String BOOLEAN_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value boolean, CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
     private final static String STRING_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value character varying(%d), CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
-
     private final static String COMPLEX_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (entity_value_id bigint references %s(id), CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+
+    private final static String BASE_ARRAYS_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, entity_id int references %s(id) ON DELETE CASCADE, batch_id bigint references %s(id) ON DELETE CASCADE, attribute_id int references %s(id) ON DELETE CASCADE, index bigint, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
+    private final static String BASE_SIMPLE_ARRAYS_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id)) INHERITS (%s)";
+    private final static String BASE_ARRAY_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, array_id bigint references %s(id) ON DELETE CASCADE, batch_id bigint references %s(id) ON DELETE CASCADE, index bigint, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
+    private final static String BASE_DATE_ARRAY_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value DATE, CONSTRAINT %s_array_id_fkey FOREIGN KEY (array_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
 
 //    private void createIndexes()
 //    {
@@ -202,133 +206,157 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         jdbcTemplate.execute(query);
 
         //values
-        query = String.format(VALUES_TABLE, getConfig().getValuesTableName(),
+        query = String.format(VALUES_TABLE, getConfig().getBaseValuesTableName(),
                 getConfig().getEntitiesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getAttributesTableName(), getConfig().getValuesTableName());
+                getConfig().getAttributesTableName(), getConfig().getBaseValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
         //date values
-        query = String.format(DATE_VALUES_TABLE, getConfig().getDateValuesTableName(),
-                getConfig().getDateValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getDateValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getDateValuesTableName(), getConfig().getSimpleAttributesTableName(),
-                getConfig().getValuesTableName());
+        query = String.format(DATE_VALUES_TABLE, getConfig().getBaseDateValuesTableName(),
+                getConfig().getBaseDateValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseDateValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBaseDateValuesTableName(), getConfig().getSimpleAttributesTableName(),
+                getConfig().getBaseValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
         //double values
-        query = String.format(DOUBLE_VALUES_TABLE, getConfig().getDoubleValuesTableName(),
-                getConfig().getDoubleValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getDoubleValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getDoubleValuesTableName(), getConfig().getSimpleAttributesTableName(),
-                getConfig().getValuesTableName());
+        query = String.format(DOUBLE_VALUES_TABLE, getConfig().getBaseDoubleValuesTableName(),
+                getConfig().getBaseDoubleValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseDoubleValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBaseDoubleValuesTableName(), getConfig().getSimpleAttributesTableName(),
+                getConfig().getBaseValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
         //integer values
-        query = String.format(INTEGER_VALUES_TABLE, getConfig().getIntegerValuesTableName(),
-                getConfig().getIntegerValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getIntegerValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getIntegerValuesTableName(), getConfig().getSimpleAttributesTableName(),
-                getConfig().getValuesTableName());
+        query = String.format(INTEGER_VALUES_TABLE, getConfig().getBaseIntegerValuesTableName(),
+                getConfig().getBaseIntegerValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseIntegerValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBaseIntegerValuesTableName(), getConfig().getSimpleAttributesTableName(),
+                getConfig().getBaseValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
         //boolean values
-        query = String.format(BOOLEAN_VALUES_TABLE, getConfig().getBooleanValuesTableName(),
-                getConfig().getBooleanValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getBooleanValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBooleanValuesTableName(), getConfig().getSimpleAttributesTableName(),
-                getConfig().getValuesTableName());
+        query = String.format(BOOLEAN_VALUES_TABLE, getConfig().getBaseBooleanValuesTableName(),
+                getConfig().getBaseBooleanValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseBooleanValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBaseBooleanValuesTableName(), getConfig().getSimpleAttributesTableName(),
+                getConfig().getBaseValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
         //string values
-        query = String.format(STRING_VALUES_TABLE, getConfig().getStringValuesTableName(),
+        query = String.format(STRING_VALUES_TABLE, getConfig().getBaseStringValuesTableName(),
                 getConfig().getStringValueLength(),
-                getConfig().getStringValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getStringValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getStringValuesTableName(), getConfig().getSimpleAttributesTableName(),
-                getConfig().getValuesTableName());
+                getConfig().getBaseStringValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseStringValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBaseStringValuesTableName(), getConfig().getSimpleAttributesTableName(),
+                getConfig().getBaseValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
         //complex values
-        query = String.format(COMPLEX_VALUES_TABLE, getConfig().getComplexValuesTableName(),
+        query = String.format(COMPLEX_VALUES_TABLE, getConfig().getBaseComplexValuesTableName(),
                 getConfig().getEntitiesTableName(),
-                getConfig().getComplexValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getComplexValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getComplexValuesTableName(), getConfig().getComplexAttributesTableName(),
-                getConfig().getValuesTableName());
+                getConfig().getBaseComplexValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseComplexValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBaseComplexValuesTableName(), getConfig().getComplexAttributesTableName(),
+                getConfig().getBaseValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
-        //date array values
-        query = String.format(DATE_VALUES_TABLE, getConfig().getDateArrayValuesTableName(),
-                getConfig().getDateArrayValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getDateArrayValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getDateArrayValuesTableName(), getConfig().getSimpleArrayTableName(),
-                getConfig().getValuesTableName());
+        //base arrays
+        query = String.format(BASE_ARRAYS_TABLE, getConfig().getBaseSetsTableName(),
+                getConfig().getEntitiesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getArrayTableName(), getConfig().getBaseSetsTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
-        //double array values
-        query = String.format(DOUBLE_VALUES_TABLE, getConfig().getDoubleArrayValuesTableName(),
-                getConfig().getDoubleArrayValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getDoubleArrayValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getDoubleArrayValuesTableName(), getConfig().getSimpleArrayTableName(),
-                getConfig().getValuesTableName());
+        //base simple arrays
+        query = String.format(BASE_SIMPLE_ARRAYS_TABLE, getConfig().getBaseSimpleSetsTableName(),
+                getConfig().getBaseSimpleSetsTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseSimpleSetsTableName(), getConfig().getSimpleArrayTableName(),
+                getConfig().getBaseSimpleSetsTableName(), getConfig().getBaseSetsTableName());
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
+
+        //base array values
+        query = String.format(BASE_ARRAY_VALUES_TABLE, getConfig().getBaseSetValuesTableName(),
+                getConfig().getBaseSetsTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBaseSetValuesTableName());
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
+
+        //base date array values
+        query = String.format(BASE_DATE_ARRAY_VALUES_TABLE, getConfig().getBaseDateSetValuesTableName(),
+                getConfig().getBaseDateSetValuesTableName(), getConfig().getBaseSimpleSetsTableName(),
+                getConfig().getBaseDateSetValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBaseSetValuesTableName());
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
+
+        //base double array values
+        query = String.format(DOUBLE_VALUES_TABLE, getConfig().getBaseDoubleSetValuesTableName(),
+                getConfig().getBaseDoubleSetValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseDoubleSetValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBaseDoubleSetValuesTableName(), getConfig().getSimpleArrayTableName(),
+                getConfig().getBaseValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
         //integer array values
-        query = String.format(INTEGER_VALUES_TABLE, getConfig().getIntegerArrayValuesTableName(),
-                getConfig().getIntegerArrayValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getIntegerArrayValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getIntegerArrayValuesTableName(), getConfig().getSimpleArrayTableName(),
-                getConfig().getValuesTableName());
+        query = String.format(INTEGER_VALUES_TABLE, getConfig().getBaseIntegerSetValuesTableName(),
+                getConfig().getBaseIntegerSetValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseIntegerSetValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBaseIntegerSetValuesTableName(), getConfig().getSimpleArrayTableName(),
+                getConfig().getBaseValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
         //boolean array values
-        query = String.format(BOOLEAN_VALUES_TABLE, getConfig().getBooleanArrayValuesTableName(),
-                getConfig().getBooleanArrayValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getBooleanArrayValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBooleanArrayValuesTableName(), getConfig().getSimpleArrayTableName(),
-                getConfig().getValuesTableName());
+        query = String.format(BOOLEAN_VALUES_TABLE, getConfig().getBaseBooleanSetValuesTableName(),
+                getConfig().getBaseBooleanSetValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseBooleanSetValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBaseBooleanSetValuesTableName(), getConfig().getSimpleArrayTableName(),
+                getConfig().getBaseValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
         //string values
-        query = String.format(STRING_VALUES_TABLE, getConfig().getStringArrayValuesTableName(),
+        query = String.format(STRING_VALUES_TABLE, getConfig().getBaseStringSetValuesTableName(),
                 getConfig().getStringValueLength(),
-                getConfig().getStringArrayValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getStringArrayValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getStringArrayValuesTableName(), getConfig().getSimpleArrayTableName(),
-                getConfig().getValuesTableName());
+                getConfig().getBaseStringSetValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseStringSetValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBaseStringSetValuesTableName(), getConfig().getSimpleArrayTableName(),
+                getConfig().getBaseValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
 
         //complex array values
-        query = String.format(COMPLEX_VALUES_TABLE, getConfig().getComplexArrayValuesTableName(),
+        query = String.format(COMPLEX_VALUES_TABLE, getConfig().getBaseComplexSetValuesTableName(),
                 getConfig().getEntitiesTableName(),
-                getConfig().getComplexArrayValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getComplexArrayValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getComplexArrayValuesTableName(), getConfig().getComplexArrayTableName(),
-                getConfig().getValuesTableName());
+                getConfig().getBaseComplexSetValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseComplexSetValuesTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBaseComplexSetValuesTableName(), getConfig().getComplexArrayTableName(),
+                getConfig().getBaseValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);
@@ -381,7 +409,13 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    query = String.format(DROP_TABLE, getConfig().getArrayKeyFilterTableName());
 	    logger.debug(query);
 	    jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE_CASCADE, getConfig().getValuesTableName());
+        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseValuesTableName());
+        logger.debug(query);
+        jdbcTemplate.execute(query);
+        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseSetValuesTableName());
+        logger.debug(query);
+        jdbcTemplate.execute(query);
+        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseSetsTableName());
         logger.debug(query);
         jdbcTemplate.execute(query);
         query = String.format(DROP_TABLE, getConfig().getEntitiesTableName());
@@ -463,11 +497,11 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         }
 
         //values
-        query = String.format(COUNT_TABLE, getConfig().getValuesTableName());
+        query = String.format(COUNT_TABLE, getConfig().getBaseValuesTableName());
         logger.debug(query);
         if(jdbcTemplate.queryForInt(query) > 0)
         {
-            logger.debug("Table " + getConfig().getValuesTableName() + " is not clean.");
+            logger.debug("Table " + getConfig().getBaseValuesTableName() + " is not clean.");
             return false;
         }
 
