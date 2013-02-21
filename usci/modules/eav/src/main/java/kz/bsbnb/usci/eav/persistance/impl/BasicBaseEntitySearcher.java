@@ -49,8 +49,8 @@ public class BasicBaseEntitySearcher implements IBaseEntitySearcher {
             {
                 if(!meta.getMemberType(name).isArray())
                 {
-                    IBatchValue value1 = c1.getBatchValue(name);
-                    IBatchValue value2 = c2.getBatchValue(name);
+                    IBatchValue value1 = c1.getBaseValue(name);
+                    IBatchValue value2 = c2.getBaseValue(name);
 
                     if(value1 == null || value2 == null)
                     {

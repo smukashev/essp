@@ -14,7 +14,6 @@ import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -188,7 +187,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     throw new IllegalArgumentException("Unknown type.");
             }
             loadSimpleValues(baseEntity, queryForSimpleValues);
-            loadSimpleArraysValues(baseEntity, queryForSimpleArraysValues);
+            //loadSimpleArraysValues(baseEntity, queryForSimpleArraysValues);
         }
 
         // complex attribute values
@@ -196,8 +195,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 getConfig().getComplexValuesTableName(), getConfig().getComplexAttributesTableName()));
 
         // complex arrays values
-        loadComplexArraysValues(baseEntity, String.format(SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL,
-                getConfig().getComplexArrayValuesTableName(), getConfig().getComplexArrayTableName()));
+        /*loadComplexArraysValues(baseEntity, String.format(SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL,
+                getConfig().getComplexArrayValuesTableName(), getConfig().getComplexArrayTableName()));*/
 
         return baseEntity;
     }
@@ -294,7 +293,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     default:
                         throw new IllegalArgumentException("Unknown type.");
                 }
-                insertSimpleArraysValues(baseEntity, attributeNames, query);
+                /*insertSimpleArraysValues(baseEntity, attributeNames, query);*/
             }
         }
 
@@ -308,12 +307,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     getConfig().getComplexValuesTableName()));
         }
 
-        attributeNames = baseEntity.getPresentComplexArrayAttributeNames();
+        /*attributeNames = baseEntity.getPresentComplexArrayAttributeNames();
         if (!attributeNames.isEmpty())
         {
             insertComplexArraysValues(baseEntity, attributeNames, String.format(INSERT_COMPLEX_VALUE_SQL,
                     getConfig().getComplexArrayValuesTableName()));
-        }
+        } */
 
         return baseEntityId;
     }
@@ -369,7 +368,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             IMetaAttribute metaAttribute = meta.getMetaAttribute(attributeNameForInsert);
 
 
-            IBaseValue batchValue = baseEntity.getBatchValue(attributeNameForInsert);
+            IBaseValue batchValue = baseEntity.getBaseValue(attributeNameForInsert);
 
             Object[] insertArgs = new Object[] {
                     baseEntity.getId(),
@@ -396,7 +395,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             String attributeNameForInsert = it.next();
 
-            IBaseValue batchValue = baseEntity.getBatchValue(attributeNameForInsert);
+            IBaseValue batchValue = baseEntity.getBaseValue(attributeNameForInsert);
 
             IMetaAttribute metaAttribute = meta.getMetaAttribute(attributeNameForInsert);
 

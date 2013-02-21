@@ -2,6 +2,7 @@ package kz.bsbnb.usci.batch.parser;
 
 import kz.bsbnb.usci.batch.common.Global;
 import kz.bsbnb.usci.batch.helper.impl.ParserHelper;
+import kz.bsbnb.usci.batch.parser.listener.IListener;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.metadata.IMetaFactory;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
@@ -31,6 +32,8 @@ public abstract class CommonParser extends DefaultHandler implements IParser
     protected IBatchDao batchDao;
     protected IBaseEntityDao baseEntityDao;
     protected IMetaFactory metaFactory;
+
+    protected IListener listener;
 
     protected ParserHelper parserHelper;
 
@@ -84,5 +87,11 @@ public abstract class CommonParser extends DefaultHandler implements IParser
     public void setParserHelper(ParserHelper parserHelper)
     {
         this.parserHelper = parserHelper;
+    }
+
+    @Override
+    public void setListener(IListener listener)
+    {
+        this.listener = listener;
     }
 }

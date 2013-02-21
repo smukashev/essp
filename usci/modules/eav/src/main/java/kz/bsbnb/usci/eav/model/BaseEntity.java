@@ -10,7 +10,6 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 import kz.bsbnb.usci.eav.util.SetUtils;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Implements EAV entity object. 
@@ -71,7 +70,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
      * 	                                or attribute has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public IBaseValue getBatchValue(String name)
+    public IBaseValue getBaseValue(String name)
     {
         IMetaType type = meta.getMemberType(name);
 
@@ -231,15 +230,11 @@ public class BaseEntity extends Persistable implements IBaseContainer
     }
 
     public Set<String> getPresentSimpleArrayAttributeNames(DataTypes dataType) {
-        // todo: complete
-        // return SetUtils.intersection(meta.getSimpleArrayAttributesNames(dataType), values.keySet());
-        throw new NotImplementedException();
+        return SetUtils.intersection(meta.getSimpleArrayAttributesNames(dataType), values.keySet());
     }
 
     public Set<String> getPresentComplexArrayAttributeNames() {
-        // todo: complete
-        //return SetUtils.intersection(meta.getComplexArrayAttributesNames(), arrays.keySet());
-        throw new NotImplementedException();
+        return SetUtils.intersection(meta.getComplexArrayAttributesNames(), values.keySet());
     }
 
 
@@ -287,10 +282,10 @@ public class BaseEntity extends Persistable implements IBaseContainer
             {
                 String attributeName = valuesIt.next();
 
-                IBaseValue thisBatchValue = this.getBatchValue(attributeName);
-                IBaseValue thatBatchValue = that.getBatchValue(attributeName);
+                IBaseValue thisBaseValue = this.getBaseValue(attributeName);
+                IBaseValue thatBaseValue = that.getBaseValue(attributeName);
 
-                if (!thisBatchValue.equals(thatBatchValue))
+                if (!thisBaseValue.equals(thatBaseValue))
                     return false;
             }
 

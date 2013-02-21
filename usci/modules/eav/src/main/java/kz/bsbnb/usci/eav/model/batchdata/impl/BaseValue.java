@@ -75,7 +75,8 @@ public class BaseValue extends Persistable implements IBaseValue
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj)
+    {
         if (obj == this)
             return true;
 
@@ -90,7 +91,8 @@ public class BaseValue extends Persistable implements IBaseValue
 
             if (index != that.index) return false;
             if (!batch.equals(that.batch)) return false;
-            if (value != null ? !value.equals(that.value) : that.value != null) return false;
+            if (value != null ? !value.equals(that.value) : that.value != null)
+                return false;
 
             return true;
         }

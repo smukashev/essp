@@ -4,6 +4,7 @@ import kz.bsbnb.usci.batch.helper.impl.FileHelper;
 import kz.bsbnb.usci.batch.helper.impl.ParserHelper;
 import kz.bsbnb.usci.batch.parser.IParser;
 import kz.bsbnb.usci.batch.parser.IParserFactory;
+import kz.bsbnb.usci.batch.parser.listener.IListener;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.metadata.IMetaFactory;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
@@ -42,7 +43,7 @@ public class MainParserFactory implements IParserFactory
     @Autowired
     ParserHelper parserHelper;
 
-    public IParser getIParser(String fileName, Batch batch)
+    public IParser getIParser(String fileName, Batch batch, IListener listener)
     {
         IParser parser = new MainParser(fileHelper.getFileBytes(new File(fileName)), batch);
 
@@ -52,6 +53,7 @@ public class MainParserFactory implements IParserFactory
         parser.setMetaFactory(metaFactory);
         parser.setStorage(storage);
         parser.setParserHelper(parserHelper);
+        parser.setListener(listener);
 
         return parser;
     }
