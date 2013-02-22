@@ -3,14 +3,11 @@ package kz.bsbnb.usci.batch;
 import kz.bsbnb.usci.batch.parser.IParser;
 import kz.bsbnb.usci.batch.parser.factory.IParserFactory;
 import kz.bsbnb.usci.batch.parser.listener.impl.RmiListener;
-import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.sync.service.IDataService;
 import org.apache.log4j.Logger;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -56,8 +53,6 @@ public class Main
         IDataService service = (IDataService)rmiProxyFactoryBean.getObject();
 
         RmiListener listener = new RmiListener(service);
-
-        // JobListener listener = new JobListener(ctx.getBean(JobLauncher.class), ctx.getBean(Job.class));
 
         IParserFactory parserFactory = ctx.getBean(IParserFactory.class);
 
