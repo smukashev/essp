@@ -58,9 +58,10 @@ public class Main
 
         IParser parser = parserFactory.getIParser(FILE_PATH, loadedBatch, listener);
 
-        long startTime = System.currentTimeMillis();
+        long t1 = System.currentTimeMillis();
         parser.parse();
+        long t2 = System.currentTimeMillis() - t1;
 
-        logger.info("TOTAL TIME : " + (System.currentTimeMillis() - startTime));
+        logger.info("TOTAL TIME : " + t2);
     }
 }
