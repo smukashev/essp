@@ -2,7 +2,6 @@ package kz.bsbnb.usci.batch;
 
 import kz.bsbnb.usci.batch.parser.IParser;
 import kz.bsbnb.usci.batch.parser.factory.IParserFactory;
-import kz.bsbnb.usci.batch.parser.listener.impl.JobListener;
 import kz.bsbnb.usci.batch.parser.listener.impl.RmiListener;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.Batch;
