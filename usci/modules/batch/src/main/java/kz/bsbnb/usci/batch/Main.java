@@ -2,15 +2,19 @@ package kz.bsbnb.usci.batch;
 
 import kz.bsbnb.usci.batch.parser.IParser;
 import kz.bsbnb.usci.batch.parser.factory.IParserFactory;
-import kz.bsbnb.usci.batch.parser.listener.impl.DatabaseListener;
-import kz.bsbnb.usci.batch.parser.listener.impl.ListListener;
+import kz.bsbnb.usci.batch.parser.listener.impl.JobListener;
+import kz.bsbnb.usci.batch.parser.listener.impl.RmiListener;
+import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
+import kz.bsbnb.usci.sync.service.IDataService;
 import org.apache.log4j.Logger;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -29,7 +33,7 @@ public class Main
 
     public static void main(String args[]) throws IOException, SAXException
     {
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextTest.xml");
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 
         IStorage storage = ctx.getBean(IStorage.class);
 
@@ -47,8 +51,14 @@ public class Main
 
         Batch loadedBatch = batchDao.load(batchId);
 
-        DatabaseListener listener = new DatabaseListener();
-        listener.setBaseEntityDao(ctx.getBean(IBaseEntityDao.class));
+        RmiProxyFactoryBean rmiProxyFactoryBean =
+                ctx.getBean(org.springframework.remoting.rmi.RmiProxyFactoryBean.class);
+
+        IDataService service = (IDataService)rmiProxyFactoryBean.getObject();
+
+        RmiListener listener = new RmiListener(service);
+
+        // JobListener listener = new JobListener(ctx.getBean(JobLauncher.class), ctx.getBean(Job.class));
 
         IParserFactory parserFactory = ctx.getBean(IParserFactory.class);
 

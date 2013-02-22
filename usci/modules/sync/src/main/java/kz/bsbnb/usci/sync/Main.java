@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.core;
+package kz.bsbnb.usci.sync;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
