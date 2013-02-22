@@ -3,6 +3,7 @@ package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaContainer;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
@@ -45,14 +46,13 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     private String SELECT_COMPLEX_ATTRIBUTE;
     private String SELECT_ARRAY_ARRAY;
     private String INSERT_ARRAY_ARRAY;
-    private String DELETE_ALL_ARRAYS;
 
     @PostConstruct
     public void init()
     {
         INSERT_CLASS_SQL = String.format("INSERT INTO %s (name, complex_key_type, begin_date, is_disabled) VALUES ( ?, ?, ?, ? )", getConfig().getClassesTableName());
         // SELECT_CLASS_BY_NAME = String.format("SELECT * FROM %s WHERE name = ? and begin_date <= ? and is_disabled = FALSE ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
-        SELECT_CLASS_BY_NAME = String.format("SELECT * FROM %s WHERE name = ? and begin_date <= ? ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
+        SELECT_CLASS_BY_NAME = String.format("SELECT * FROM %s WHERE name = ? and begin_date <= ? and is_disabled = FALSE ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
         SELECT_CLASS_BY_NAME_STRICT = String.format("SELECT * FROM %s WHERE name = ? and begin_date = ? ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
         SELECT_CLASS_BY_ID = String.format("SELECT * FROM %s WHERE id = ?", getConfig().getClassesTableName());
         UPDATE_CLASS_BY_ID = String.format("UPDATE %s SET  name = ?,  complex_key_type = ?, begin_date = ?,  is_disabled = ?  WHERE id = ?", getConfig().getClassesTableName());
@@ -233,13 +233,14 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             }
 
             id = insertWithId(query, args);
+            metaSet.setId(id);
 
             if(sqlStats != null)
             {
                 sqlStats.put(query, System.currentTimeMillis() - t);
             }
 
-            saveSet((MetaSet)metaSet.getMemberType(), id, new MetaAttribute(false, false, null), "item");
+            saveSet(metaSet.getMemberType(), id, new MetaAttribute(false, false, null), "item");
         }
         else
         {
@@ -270,6 +271,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             }
 
             id = insertWithId(query, args);
+            metaSet.setId(id);
 
             if(sqlStats != null)
             {
@@ -375,14 +377,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
     }
 
-    void loadAttributes(MetaClass meta) {
-        if(meta.getId() < 1)
-            return;
-
-        long id = meta.getId();
-        meta.removeMembers();
-
-        //load simple attributes
+    void loadSimpleAttributes(IMetaContainer meta)
+    {
         String query = SELECT_SIMPLE_ATTRIBUTES;
 
         logger.debug(query);
@@ -392,7 +388,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             t = System.currentTimeMillis();
         }
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, id);
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, meta.getId());
         if(sqlStats != null)
         {
             sqlStats.put(query, System.currentTimeMillis() - t);
@@ -408,9 +404,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             meta.setMetaAttribute((String) row.get("name"), metaAttirubute);
         }
+    }
 
-        //load simple attributes arrays
-        query = SELECT_SIMPLE_ARRAY;
+    void loadSimpleArrays(IMetaContainer meta)
+    {
+        String query = SELECT_SIMPLE_ARRAY;
+        long t = 0;
 
         logger.debug(query);
 
@@ -418,7 +417,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             t = System.currentTimeMillis();
         }
-        rows = jdbcTemplate.queryForList(query, id);
+        List<Map<String, Object>>  rows = jdbcTemplate.queryForList(query, meta.getId());
         if(sqlStats != null)
         {
             sqlStats.put(query, System.currentTimeMillis() - t);
@@ -433,6 +432,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
 
             MetaSet metaSet = new MetaSet(new MetaValue(DataTypes.valueOf((String) row.get("type_code"))));
+            metaSet.setId(((Integer)row.get("id")).longValue());
 
             metaSet.setArrayKeyType(ComplexKeyTypes.valueOf((String) row.get("array_key_type")));
 
@@ -442,9 +442,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
 
         }
+    }
 
-        //load complex attributes
-        query = SELECT_COMPLEX_ATTRIBUTE;
+    void loadComplexAttributes(IMetaContainer meta)
+    {
+        String query = SELECT_COMPLEX_ATTRIBUTE;
+        long t = 0;
 
         logger.debug(query);
 
@@ -452,7 +455,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             t = System.currentTimeMillis();
         }
-        rows = jdbcTemplate.queryForList(query, id);
+
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, meta.getId());
         if(sqlStats != null)
         {
             sqlStats.put(query, System.currentTimeMillis() - t);
@@ -470,9 +474,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             meta.setMetaAttribute((String) row.get("name"), metaAttribute);
         }
+    }
 
-        //load complex attributes array
-        query = SELECT_COMPLEX_ARRAY;
+    void loadComplexArrays(IMetaContainer meta)
+    {
+        String query = SELECT_COMPLEX_ARRAY;
+        long t = 0;
 
         logger.debug(query);
 
@@ -480,7 +487,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             t = System.currentTimeMillis();
         }
-        rows = jdbcTemplate.queryForList(query, id);
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, meta.getId());
         if(sqlStats != null)
         {
             sqlStats.put(query, System.currentTimeMillis() - t);
@@ -495,6 +502,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     (Boolean)row.get("is_nullable"));
 
             MetaSet metaSet = new MetaSet(metaClass);
+            metaSet.setId(((Integer)row.get("id")).longValue());
             metaSet.setArrayKeyType(ComplexKeyTypes.valueOf((String) row.get("array_key_type")));
 
             metaAttribute.setMetaType(metaSet);
@@ -503,7 +511,63 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
     }
 
-    //TODO: addToArray active period to classes
+    void loadArrayArrays(IMetaContainer meta)
+    {
+        String query = SELECT_ARRAY_ARRAY;
+        long t = 0;
+
+        logger.debug(query);
+
+        if(sqlStats != null)
+        {
+            t = System.currentTimeMillis();
+        }
+        List<Map<String, Object>>  rows = jdbcTemplate.queryForList(query, meta.getId());
+        if(sqlStats != null)
+        {
+            sqlStats.put(query, System.currentTimeMillis() - t);
+        }
+
+        for (Map<String, Object> row : rows) {
+
+            MetaAttribute metaAttribute = new MetaAttribute(
+                    ((Integer)row.get("id")).longValue(),
+                    (Boolean)row.get("is_key"),
+                    (Boolean)row.get("is_nullable"));
+
+
+
+            MetaSet metaSet = new MetaSet();
+
+            metaSet.setId(((Integer)row.get("id")).longValue());
+            metaSet.setArrayKeyType(ComplexKeyTypes.valueOf((String) row.get("array_key_type")));
+
+            loadSimpleArrays(metaSet);
+            loadComplexArrays(metaSet);
+
+            metaAttribute.setMetaType(metaSet);
+
+            meta.setMetaAttribute((String) row.get("name"), metaAttribute);
+
+
+        }
+    }
+
+    void loadAttributes(MetaClass meta) {
+        if(meta.getId() < 1)
+        {
+            throw new IllegalStateException("Can't load atributes of metaclass without id!");
+        }
+
+        meta.removeMembers();
+
+        loadSimpleAttributes(meta);
+        loadSimpleArrays(meta);
+        loadComplexAttributes(meta);
+        loadComplexArrays(meta);
+        loadArrayArrays(meta);
+    }
+
 	@Transactional
 	public long save(MetaClass meta) {
         MetaClass dbMeta = new MetaClass(meta);
@@ -585,9 +649,22 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         return meta;
 	}
 
-    private void deleteClass(MetaClass metaClass)
+    private void removeAllAttributes(long id)
     {
+        String query = DELETE_ALL_ATTRIBUTES;
 
+        logger.debug(query);
+
+        long t = 0;
+        if(sqlStats != null)
+        {
+            t = System.currentTimeMillis();
+        }
+        jdbcTemplate.update(query, id);
+        if(sqlStats != null)
+        {
+            sqlStats.put(query, System.currentTimeMillis() - t);
+        }
     }
 
 	@Override
@@ -599,22 +676,15 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
 
         String query;
+        long t = 0;
+
+        for (String arrayName : metaClass.getArrayArrayAttributesNames())
+        {
+            removeAllAttributes(((MetaSet)metaClass.getMemberType(arrayName)).getId());
+        }
 
         //delete all class attributes
-        query = DELETE_ALL_ATTRIBUTES;
-
-        logger.debug(query);
-
-        long t = 0;
-        if(sqlStats != null)
-        {
-            t = System.currentTimeMillis();
-        }
-        jdbcTemplate.update(query, metaClass.getId());
-        if(sqlStats != null)
-        {
-            sqlStats.put(query, System.currentTimeMillis() - t);
-        }
+        removeAllAttributes(metaClass.getId());
 
         //delete class
         query = DELETE_CLASS_BY_ID;
