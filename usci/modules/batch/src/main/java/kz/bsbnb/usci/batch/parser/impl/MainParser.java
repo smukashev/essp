@@ -112,7 +112,12 @@ public class MainParser extends CommonParser
         }
         else if(localName.equalsIgnoreCase("entity"))
         {
+            long t1 = System.currentTimeMillis();
             listener.put((BaseEntity)currentContainer);
+            long t2 = System.currentTimeMillis() - t1;
+            logger.info("[parse entity]           :       " + t2);
+
+
             currentContainer = null;
             index++;
         }
