@@ -9,10 +9,11 @@ import java.util.Set;
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaContainer;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 
-public class MetaClass extends Persistable implements IMetaType
+public class MetaClass extends Persistable implements IMetaType, IMetaContainer
 {
 	/**
 	 * Name of the metadata. Used as a key value for database search if <code>id</code> is 0 
@@ -268,6 +269,25 @@ public class MetaClass extends Persistable implements IMetaType
             IMetaType type = this.getMemberType(attributeName);
 
             if (type.isArray() && type.isComplex())
+                filteredAttributeNames.add(attributeName);
+        }
+
+        return filteredAttributeNames;
+    }
+
+    public Set<String> getArrayArrayAttributesNames()
+    {
+        Set<String> allAttributeNames = this.members.keySet();
+        Set<String> filteredAttributeNames = new HashSet<String>();
+
+        Iterator it = allAttributeNames.iterator();
+
+        while (it.hasNext())
+        {
+            String attributeName = (String)it.next();
+            IMetaType type = this.getMemberType(attributeName);
+
+            if (type.isArray() && ((MetaSet)type).getMemberType().isArray())
                 filteredAttributeNames.add(attributeName);
         }
 

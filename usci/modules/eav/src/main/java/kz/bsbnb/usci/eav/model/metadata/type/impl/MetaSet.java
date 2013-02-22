@@ -2,11 +2,18 @@ package kz.bsbnb.usci.eav.model.metadata.type.impl;
 
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaContainer;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
+import kz.bsbnb.usci.eav.persistance.Persistable;
 
-public class MetaSet implements IMetaType
+public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
 {
     IMetaType metaType;
+
+    public MetaSet()
+    {
+    }
 
     public MetaSet(IMetaType metaType)
     {
@@ -82,5 +89,8 @@ public class MetaSet implements IMetaType
         return result;
     }
 
-
+    @Override
+    public void setMetaAttribute(String name, IMetaAttribute metaAttribute) {
+        setMetaType(metaAttribute.getMetaType());
+    }
 }

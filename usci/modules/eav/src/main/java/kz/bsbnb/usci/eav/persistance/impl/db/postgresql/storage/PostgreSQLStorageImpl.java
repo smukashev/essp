@@ -59,22 +59,36 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
 	@Override
 	public void initialize() {
-        //addToArray unique constraint on name
-	    String query = String.format(
+        String query = String.format(
                 "CREATE TABLE IF NOT EXISTS %s " +
                         "(" +
                         "id serial NOT NULL, " +
+                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id ) " +
+                        ")",
+                getConfig().getMetaObjectTableName(),
+                getConfig().getMetaObjectTableName());
+
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
+        //----------------------------------------------
+        //addToArray unique constraint on name
+	    query = String.format(
+                "CREATE TABLE IF NOT EXISTS %s " +
+                        "(" +
                         "complex_key_type character varying(%d), " +
                         "begin_date TIMESTAMP WITH TIME ZONE NOT NULL, " +
                         "is_disabled BOOLEAN NOT NULL, " +
                         "name character varying(%d) NOT NULL, " +
                         "CONSTRAINT %s_primary_key_index PRIMARY KEY (id ), " +
                         "UNIQUE (name, begin_date) " +
-                        ")",
+                        ") " +
+                        "INHERITS (%s)",
                 getConfig().getClassesTableName(),
                 getConfig().getComplexKeyTypeCodeLength(),
                 getConfig().getClassNameLength(),
-                getConfig().getClassesTableName());
+                getConfig().getClassesTableName(),
+                getConfig().getMetaObjectTableName());
 	    
 	    logger.debug(query);
 	    
@@ -84,17 +98,18 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 	    query = String.format(
                 "CREATE TABLE IF NOT EXISTS %s " +
                         "(" +
-                        "id serial NOT NULL, " +
                         "containing_id int, " +
                         "name character varying(%d) NOT NULL, " +
                         "is_key boolean NOT NULL, " +
                         "is_nullable boolean NOT NULL, " +
                         "CONSTRAINT %s_primary_key_index PRIMARY KEY (id ), " +
                         "UNIQUE (containing_id, name) " +
-                        ")",
+                        ") " +
+                        "INHERITS (%s)",
                 getConfig().getAttributesTableName(),
                 getConfig().getAttributeNameLength(),
-                getConfig().getAttributesTableName());
+                getConfig().getAttributesTableName(),
+                getConfig().getMetaObjectTableName());
 	    
 	    logger.debug(query);
 	    

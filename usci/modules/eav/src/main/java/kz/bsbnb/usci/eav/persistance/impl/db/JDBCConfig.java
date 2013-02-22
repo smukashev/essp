@@ -24,6 +24,8 @@ public class JDBCConfig {
     private String simpleArrayTableName;
     private String entitiesTableName;
 
+    private String metaObjectTableName;
+
     private String batchesTableName;
 
     private String baseValuesTableName;
@@ -56,6 +58,7 @@ public class JDBCConfig {
     @PostConstruct
     public void init()
     {
+        metaObjectTableName = tablePrefix + "meta_object";
         classesTableName = tablePrefix + "classes";
         attributesTableName = tablePrefix + "attributes";
         simpleAttributesTableName = tablePrefix + "simple_attributes";
@@ -227,5 +230,9 @@ public class JDBCConfig {
 
     public String getArrayArrayTableName() {
         return arrayArrayTableName;
+    }
+
+    public String getMetaObjectTableName() {
+        return metaObjectTableName;
     }
 }
