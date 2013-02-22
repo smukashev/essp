@@ -1,6 +1,8 @@
 package kz.bsbnb.usci.eav.model.metadata.type;
 
-public interface IMetaType
+import java.io.Serializable;
+
+public interface IMetaType extends Serializable
 {
 	public boolean isArray();
 

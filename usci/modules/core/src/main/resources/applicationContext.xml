@@ -9,7 +9,7 @@
 
     <context:component-scan base-package="kz.bsbnb.usci.eav.persistance.impl.db.postgresql" />
     <context:component-scan base-package="kz.bsbnb.usci.eav.model.metadata.impl" />
-    <context:component-scan base-package="kz.bsbnb.usci.core.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.core.service.impl" />
 
     <context:annotation-config/>
     <!-- Add this tag to enable annotations transactions -->
@@ -52,10 +52,10 @@
     <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav.model.batchdata.impl.BatchRepository"/>
 
     <bean id="rmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
-        <property name="serviceName" value="HelloService"/>
-        <property name="service" ref="baseEntityServiceImpl"/>
-        <property name="serviceInterface" value="kz.bsbnb.usci.core.BaseEntityService"/>
-        <!-- defaults to 1099 -->
+        <property name="serviceName" value="EntityService"/>
+        <property name="service" ref="entityServiceImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IEntityService"/>
         <property name="registryPort" value="1099"/>
     </bean>
+
 </beans>
