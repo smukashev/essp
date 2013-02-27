@@ -53,7 +53,7 @@ public class PostgreSQLMetaClassDaoImplTest {
         postgreSQLStorageImpl.clear();
     }
 
-    private MetaClass generateFullMetaClass()
+    static public MetaClass generateFullMetaClass()
     {
         long time = Calendar.getInstance().getTimeInMillis();
 

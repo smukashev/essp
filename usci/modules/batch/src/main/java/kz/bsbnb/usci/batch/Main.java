@@ -54,15 +54,14 @@ public class Main
 
         RmiListener listener = new RmiListener(service);
 
-        // JobListener listener = new JobListener(ctx.getBean(JobLauncher.class), ctx.getBean(Job.class));
-
         IParserFactory parserFactory = ctx.getBean(IParserFactory.class);
 
         IParser parser = parserFactory.getIParser(FILE_PATH, loadedBatch, listener);
 
-        long startTime = System.currentTimeMillis();
+        long t1 = System.currentTimeMillis();
         parser.parse();
+        long t2 = System.currentTimeMillis() - t1;
 
-        logger.info("TOTAL TIME : " + (System.currentTimeMillis() - startTime));
+        logger.info("TOTAL TIME : " + t2);
     }
 }

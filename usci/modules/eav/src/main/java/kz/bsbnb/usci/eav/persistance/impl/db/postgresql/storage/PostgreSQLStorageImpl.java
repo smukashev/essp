@@ -9,6 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
+
 
 /**
  *
@@ -44,18 +47,85 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
     private final static String BASE_STRING_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value character varying(%d), CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
     private final static String BASE_DOUBLE_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value double precision, CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
 
+    private final static String INDEXES_QUERY = "select pg_index.indexrelid::regclass, 'create index ' || relname || '_' ||\n" +
+            " array_to_string(column_name_list, '_') || '_idx on ' || conrelid ||\n" +
+            " ' (' || array_to_string(column_name_list, ',') || ')' as query\n" +
+            "from (select distinct\n" +
+            " conrelid,\n" +
+            " array_agg(attname) column_name_list,\n" +
+            " array_agg(attnum) as column_list\n" +
+            " from pg_attribute\n" +
+            " join (select conrelid::regclass,\n" +
+            " conname,\n" +
+            " unnest(conkey) as column_index\n" +
+            " from (select distinct\n" +
+            " conrelid, conname, conkey\n" +
+            " from pg_constraint\n" +
+            " join pg_class on pg_class.oid = pg_constraint.conrelid\n" +
+            " join pg_namespace on pg_namespace.oid = pg_class.relnamespace\n" +
+            " where nspname !~ '^pg_' and nspname <> 'information_schema'\n" +
+            " ) fkey\n" +
+            " ) fkey\n" +
+            " on fkey.conrelid = pg_attribute.attrelid\n" +
+            " and fkey.column_index = pg_attribute.attnum\n" +
+            " group by conrelid, conname\n" +
+            " ) candidate_index\n" +
+            "join pg_class on pg_class.oid = candidate_index.conrelid\n" +
+            "left join pg_index on pg_index.indrelid = conrelid\n" +
+            " and indkey::text = array_to_string(column_list, ' ')\n" +
+            "where indexrelid is null";
 
-//    private void createIndexes()
-//    {
-//        List<Map<String, Object>> rows = jdbcTemplate.queryForList(INDEXES_QUERY);
-//
-//        for (Map<String, Object> row : rows)
-//        {
-//            String query = (String)row.get("query");
-//            logger.debug(query);
-//            jdbcTemplate.update(query);
-//        }
-//    }
+    private final String CONTAINING_ID_INDEX = "CREATE INDEX %s_containing_id_idx ON %s (containing_id)";
+
+    private final String CLASS_ID_INDEX = "CREATE INDEX %s_class_id_idx ON %s (class_id)";
+
+    private void createIndexes()
+    {
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(INDEXES_QUERY);
+
+        for (Map<String, Object> row : rows)
+        {
+            String query = (String)row.get("query");
+            logger.debug(query);
+            jdbcTemplate.update(query);
+        }
+
+        String query = String.format(CONTAINING_ID_INDEX,
+                getConfig().getAttributesTableName(),
+                getConfig().getAttributesTableName());
+        logger.debug(query);
+        jdbcTemplate.update(query);
+
+        query = String.format(CONTAINING_ID_INDEX,
+                getConfig().getSimpleAttributesTableName(),
+                getConfig().getSimpleAttributesTableName());
+        logger.debug(query);
+        jdbcTemplate.update(query);
+
+        query = String.format(CONTAINING_ID_INDEX,
+                getConfig().getSimpleArrayTableName(),
+                getConfig().getSimpleArrayTableName());
+        logger.debug(query);
+        jdbcTemplate.update(query);
+
+        query = String.format(CONTAINING_ID_INDEX,
+                getConfig().getComplexArrayTableName(),
+                getConfig().getComplexArrayTableName());
+        logger.debug(query);
+        jdbcTemplate.update(query);
+
+        query = String.format(CONTAINING_ID_INDEX,
+                getConfig().getComplexAttributesTableName(),
+                getConfig().getComplexAttributesTableName());
+        logger.debug(query);
+        jdbcTemplate.update(query);
+
+        query = String.format(CLASS_ID_INDEX,
+                getConfig().getComplexAttributesTableName(),
+                getConfig().getComplexAttributesTableName());
+        logger.debug(query);
+        jdbcTemplate.update(query);
+    }
 
 	@Override
 	public void initialize() {
@@ -411,8 +481,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 		
 		jdbcTemplate.execute(query);
 
-        //todo: add again
-        //createIndexes();
+        createIndexes();
 	}
 
 	@Override

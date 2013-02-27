@@ -17,7 +17,7 @@ public class MetaClassStressExecutor
 {
     private final static Logger logger = LoggerFactory.getLogger(MetaClassStressExecutor.class);
 
-    private final static int dataSize = 100;
+    private final static int dataSize = 10000;
 
     public static void main(String[] args)
     {
