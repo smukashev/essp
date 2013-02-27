@@ -40,12 +40,17 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
     private final static String BASE_SETS_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, entity_id int references %s(id) ON DELETE CASCADE, batch_id bigint references %s(id) ON DELETE CASCADE, attribute_id int references %s(id) ON DELETE CASCADE, index bigint, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
     private final static String BASE_SIMPLE_SETS_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id)) INHERITS (%s)";
+    private final static String BASE_COMPLEX_SETS_TABLE = "CREATE TABLE IF NOT EXISTS %s (CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id)) INHERITS (%s)";
+
     private final static String BASE_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, set_id bigint references %s(id) ON DELETE CASCADE, batch_id bigint references %s(id) ON DELETE CASCADE, index bigint, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
+
     private final static String BASE_DATE_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value DATE, CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
     private final static String BASE_INTEGER_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value integer, CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
     private final static String BASE_BOOLEAN_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value boolean, CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
     private final static String BASE_STRING_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value character varying(%d), CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
     private final static String BASE_DOUBLE_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (value double precision, CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
+
+    private final static String BASE_COMPLEX_SET_VALUES_TABLE = "CREATE TABLE IF NOT EXISTS %s (entity_value_id bigint references %s(id), CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE) INHERITS (%s)";
 
     private final static String INDEXES_QUERY = "select pg_index.indexrelid::regclass, 'create index ' || relname || '_' ||\n" +
             " array_to_string(column_name_list, '_') || '_idx on ' || conrelid ||\n" +
@@ -380,6 +385,16 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
         jdbcTemplate.execute(query);
 
+        //base complex sets
+        query = String.format(BASE_COMPLEX_SETS_TABLE, getConfig().getBaseComplexSetsTableName(),
+                getConfig().getBaseComplexSetsTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseComplexSetsTableName(), getConfig().getBatchesTableName(),
+                getConfig().getBaseComplexSetsTableName(), getConfig().getComplexArrayTableName(),
+                getConfig().getBaseComplexSetsTableName(), getConfig().getBaseSetsTableName());
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
+
         //base array sets
         query = String.format(BASE_SET_VALUES_TABLE, getConfig().getBaseSetValuesTableName(),
                 getConfig().getBaseSetsTableName(), getConfig().getBatchesTableName(),
@@ -434,13 +449,12 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
         jdbcTemplate.execute(query);
 
-        //complex set values
-        query = String.format(COMPLEX_VALUES_TABLE, getConfig().getBaseComplexSetValuesTableName(),
+        //base complex set values
+        query = String.format(BASE_COMPLEX_SET_VALUES_TABLE, getConfig().getBaseComplexSetValuesTableName(),
                 getConfig().getEntitiesTableName(),
-                getConfig().getBaseComplexSetValuesTableName(), getConfig().getEntitiesTableName(),
+                getConfig().getBaseComplexSetValuesTableName(), getConfig().getBaseComplexSetsTableName(),
                 getConfig().getBaseComplexSetValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseComplexSetValuesTableName(), getConfig().getComplexArrayTableName(),
-                getConfig().getBaseValuesTableName());
+                getConfig().getBaseSetValuesTableName());
         logger.debug(query);
 
         jdbcTemplate.execute(query);

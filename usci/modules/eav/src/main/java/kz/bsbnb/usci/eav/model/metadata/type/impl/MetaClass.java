@@ -113,7 +113,12 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
 	 */
 	public IMetaType getMemberType(String name)
     {
-		return members.get(name).getMetaType();
+        IMetaAttribute metaAttribute = members.get(name);
+        if (metaAttribute == null) {
+            throw new IllegalArgumentException("Type: " + name +
+                    ", not found in class: " + this.getClassName());
+        }
+        return metaAttribute.getMetaType();
 	}
 
     /**

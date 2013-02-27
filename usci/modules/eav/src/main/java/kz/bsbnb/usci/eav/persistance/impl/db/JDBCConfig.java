@@ -172,6 +172,10 @@ public class JDBCConfig {
         return baseSimpleSetsTableName;
     }
 
+    public String getBaseComplexSetsTableName() {
+        return baseComplexSetsTableName;
+    }
+
     public String getBaseSetValuesTableName() {
         return baseSetValuesTableName;
     }
