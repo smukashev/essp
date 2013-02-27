@@ -95,7 +95,6 @@ public class MainParser extends CommonParser
 
             level++;
         }
-
     }
 
     @Override
@@ -115,8 +114,8 @@ public class MainParser extends CommonParser
             long t1 = System.currentTimeMillis();
             listener.put((BaseEntity)currentContainer);
             long t2 = System.currentTimeMillis() - t1;
-            logger.info("[parse entity]           :       " + t2);
 
+            logger.info("[parse entity]           :       " + t2);
 
             currentContainer = null;
             index++;
