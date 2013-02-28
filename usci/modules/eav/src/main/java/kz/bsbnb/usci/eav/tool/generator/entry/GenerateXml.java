@@ -27,7 +27,7 @@ public class GenerateXml
     private final static Logger logger
             = LoggerFactory.getLogger(GenerateXml.class);
 
-    private final static int DATA_SIZE = 5;
+    private final static int DATA_SIZE = 10;
     private final static String FILE_PATH = "/opt/xmls/test.xml";
 
     public static void main(String args[])

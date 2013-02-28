@@ -2,12 +2,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:batch="http://www.springframework.org/schema/batch"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context.xsd
-       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
 
     <context:annotation-config/>
     <context:component-scan base-package="kz.bsbnb.usci.batch"/>
@@ -33,8 +33,9 @@
 
     <context:component-scan base-package="kz.bsbnb.usci.eav.persistance.impl.db.postgresql" />
     <context:component-scan base-package="kz.bsbnb.usci.eav.model.metadata.impl" />
-    <context:component-scan base-package="kz.bsbnb.usci.batch.helper.impl" />
-    <context:component-scan base-package="kz.bsbnb.usci.batch.parser.impl" />
+    <!--<context:component-scan base-package="kz.bsbnb.usci.batch.helper.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.batch.parser.impl" />-->
+    <context:component-scan base-package="kz.bsbnb.usci.batch" />
 
     <bean id="JDBCConfig" class="kz.bsbnb.usci.eav.persistance.impl.db.JDBCConfig"/>
     <bean id="SQLStats" class="kz.bsbnb.usci.eav.stats.SQLQueriesStats"/>
@@ -44,5 +45,23 @@
         <property name="serviceUrl" value="rmi://127.0.0.1:1098/DataService"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IDataService"/>
     </bean>
+
+    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+        <property name="transactionManager" ref="transactionManager" />
+    </bean>
+
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+        <property name="jobRepository" ref="jobRepository" />
+    </bean>
+
+    <batch:job id="job">
+        <batch:step id="workflow">
+            <batch:tasklet>
+                <batch:chunk reader="staxEventEntityReader" writer="rmiEventEntityWriter" processor="entityProcessor"
+                             commit-interval="1"/>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+
 
 </beans>

@@ -1,19 +1,17 @@
 package kz.bsbnb.usci.batch;
 
-import kz.bsbnb.usci.batch.parser.IParser;
-import kz.bsbnb.usci.batch.parser.factory.IParserFactory;
-import kz.bsbnb.usci.batch.parser.listener.impl.RmiListener;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
-import kz.bsbnb.usci.sync.service.IDataService;
 import org.apache.log4j.Logger;
+import org.springframework.batch.core.*;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.remoting.rmi.RmiProxyFactoryBean;
-import org.xml.sax.SAXException;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -25,9 +23,7 @@ public class Main
 {
     static Logger logger = Logger.getLogger(Main.class);
 
-    private final static String FILE_PATH = "/opt/xmls/test.xml";
-
-    public static void main(String args[]) throws IOException, SAXException
+    public static void main(String args[])
     {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 
@@ -45,23 +41,34 @@ public class Main
 
         long batchId = batchDao.save(batch);
 
-        Batch loadedBatch = batchDao.load(batchId);
+        JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
 
-        RmiProxyFactoryBean rmiProxyFactoryBean =
-                ctx.getBean(org.springframework.remoting.rmi.RmiProxyFactoryBean.class);
+        Job job = ctx.getBean(Job.class);
 
-        IDataService service = (IDataService)rmiProxyFactoryBean.getObject();
+        try
+        {
+            JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+            jobParametersBuilder.addParameter("fileName", new JobParameter("/opt/xmls/test.xml"));
+            jobParametersBuilder.addParameter("batchId", new JobParameter(batchId));
 
-        RmiListener listener = new RmiListener(service);
+            jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+        }
+        catch (JobExecutionAlreadyRunningException e)
+        {
+            e.printStackTrace();
+        }
+        catch (JobRestartException e)
+        {
+            e.printStackTrace();
+        }
+        catch (JobInstanceAlreadyCompleteException e)
+        {
+            e.printStackTrace();
+        }
+        catch (JobParametersInvalidException e)
+        {
+            e.printStackTrace();
+        }
 
-        IParserFactory parserFactory = ctx.getBean(IParserFactory.class);
-
-        IParser parser = parserFactory.getIParser(FILE_PATH, loadedBatch, listener);
-
-        long t1 = System.currentTimeMillis();
-        parser.parse();
-        long t2 = System.currentTimeMillis() - t1;
-
-        logger.info("TOTAL TIME : " + t2);
     }
 }
