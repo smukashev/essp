@@ -110,7 +110,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
         if (value.getValue() != null)
         {
             Class<?> valueClass = value.getValue().getClass();
-            Class<?> expValueClass = null;
+            Class<?> expValueClass;
 
             if (type.isComplex())
                 if(type.isArray())
@@ -148,19 +148,41 @@ public class BaseEntity extends Persistable implements IBaseContainer
         values.put(name, value);
     }
 
+    /**
+     * Set of simple attribute names that are actually set in entity
+     *
+     * @param dataType - attributes are filtered by this type
+     * @return
+     */
     public Set<String> getPresentSimpleAttributeNames(DataTypes dataType)
     {
         return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), values.keySet());
     }
 
+    /**
+     * Set of complex attribute names that are actually set in entity
+     *
+     * @return
+     */
     public Set<String> getPresentComplexAttributeNames() {
         return SetUtils.intersection(meta.getComplexAttributesNames(), values.keySet());
     }
 
+    /**
+     * Set of simpleSet attribute names that are actually set in entity
+     *
+     * @param dataType - attributes are filtered by this type
+     * @return
+     */
     public Set<String> getPresentSimpleSetAttributeNames(DataTypes dataType) {
         return SetUtils.intersection(meta.getSimpleSetAttributesNames(dataType), values.keySet());
     }
 
+    /**
+     * Set of complexSet attribute names that are actually set in entity
+     *
+     * @return
+     */
     public Set<String> getPresentComplexArrayAttributeNames() {
         return SetUtils.intersection(meta.getComplexArrayAttributesNames(), values.keySet());
     }
@@ -171,6 +193,10 @@ public class BaseEntity extends Persistable implements IBaseContainer
         return meta.getClassName();
     }
 
+    /**
+     * Names of all attributes that are actually set in entity
+     * @return
+     */
     public Set<String> getAttributeNames() {
         return values.keySet();
     }
@@ -215,6 +241,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
                     return false;
             }
 
+            //todo: implement
            /*Iterator<String> arraysIt = arrays.keySet().iterator();
             while (arraysIt.hasNext())
             {

@@ -3,6 +3,10 @@ package kz.bsbnb.usci.eav.model.batchdata;
 import kz.bsbnb.usci.eav.model.Batch;
 
 /**
+ * Actual value placeholder used in BaseEntity.
+ *
+ * @see kz.bsbnb.usci.eav.model.BaseEntity
+ *
  * @author a.motov
  */
 public interface IBaseValue

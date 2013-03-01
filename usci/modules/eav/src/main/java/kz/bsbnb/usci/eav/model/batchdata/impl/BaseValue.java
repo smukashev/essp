@@ -5,19 +5,27 @@ import kz.bsbnb.usci.eav.model.batchdata.IBaseValue;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 
 /**
+ * Attributes value place holder for BaseEntity. Contains information about batch and record number of the value's
+ * origin and reference to the actual value as an instance of Object.
+ *
+ * @see kz.bsbnb.usci.eav.model.BaseEntity
+ *
  * @author a.motov
  */
 public class BaseValue extends Persistable implements IBaseValue
 {
+    /**
+     * Information about the sequential number of record in the batch
+     */
     private long index;
 
     /**
-     * Contains information about the origin of this value.
+     * Information about the origin of this value.
      */
     private Batch batch;
 
     /**
-     * The value can be a simple type, an array or a complex type.
+     * Can be a simple type, an array or a complex type.
      */
     private Object value;
 
@@ -89,13 +97,8 @@ public class BaseValue extends Persistable implements IBaseValue
         {
             BaseValue that = (BaseValue)obj;
 
-            if (index != that.index)
-                return false;
-            if (!batch.equals(that.batch))
-                return false;
-            if (value != null ? !value.equals(that.value) : that.value != null) return false;
+            return index == that.index && batch.equals(that.batch) && !(value != null ? !value.equals(that.value) : that.value != null);
 
-            return true;
         }
     }
 

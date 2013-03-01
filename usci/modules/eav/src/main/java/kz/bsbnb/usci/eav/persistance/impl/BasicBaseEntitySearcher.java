@@ -8,6 +8,9 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import java.util.ArrayList;
 import java.util.Set;
 
+/**
+ * Used to compare BaseEntity in memory, and to retrieve BaseEntities from storage by example.
+ */
 public class BasicBaseEntitySearcher implements IBaseEntitySearcher {
     @Override
     public String getClassName() {
@@ -30,7 +33,7 @@ public class BasicBaseEntitySearcher implements IBaseEntitySearcher {
 
     @Override
     public boolean compare(BaseEntity c1, BaseEntity c2) throws IllegalStateException {
-
+        //todo: implement
         /*if(c1.getMeta() != c2.getMeta())
             return false;
 
