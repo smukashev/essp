@@ -10,6 +10,9 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 import kz.bsbnb.usci.eav.util.SetUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.impl.Log4jLoggerAdapter;
 
 /**
  * Implements EAV entity object. 
@@ -21,6 +24,7 @@ import kz.bsbnb.usci.eav.util.SetUtils;
  */
 public class BaseEntity extends Persistable implements IBaseContainer
 {
+    Logger logger = LoggerFactory.getLogger(BaseEntity.class);
     /**
      * Holds data about entity structure
      * @see MetaClass
@@ -110,7 +114,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
         if (value.getValue() != null)
         {
             Class<?> valueClass = value.getValue().getClass();
-            Class<?> expValueClass = null;
+            Class<?> expValueClass;
 
             if (type.isComplex())
                 if(type.isArray())
@@ -148,19 +152,41 @@ public class BaseEntity extends Persistable implements IBaseContainer
         values.put(name, value);
     }
 
+    /**
+     * Set of simple attribute names that are actually set in entity
+     *
+     * @param dataType - attributes are filtered by this type
+     * @return
+     */
     public Set<String> getPresentSimpleAttributeNames(DataTypes dataType)
     {
         return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), values.keySet());
     }
 
+    /**
+     * Set of complex attribute names that are actually set in entity
+     *
+     * @return
+     */
     public Set<String> getPresentComplexAttributeNames() {
         return SetUtils.intersection(meta.getComplexAttributesNames(), values.keySet());
     }
 
+    /**
+     * Set of simpleSet attribute names that are actually set in entity
+     *
+     * @param dataType - attributes are filtered by this type
+     * @return
+     */
     public Set<String> getPresentSimpleSetAttributeNames(DataTypes dataType) {
         return SetUtils.intersection(meta.getSimpleSetAttributesNames(dataType), values.keySet());
     }
 
+    /**
+     * Set of complexSet attribute names that are actually set in entity
+     *
+     * @return
+     */
     public Set<String> getPresentComplexArrayAttributeNames() {
         return SetUtils.intersection(meta.getComplexArrayAttributesNames(), values.keySet());
     }
@@ -171,6 +197,10 @@ public class BaseEntity extends Persistable implements IBaseContainer
         return meta.getClassName();
     }
 
+    /**
+     * Names of all attributes that are actually set in entity
+     * @return
+     */
     public Set<String> getAttributeNames() {
         return values.keySet();
     }
@@ -207,45 +237,34 @@ public class BaseEntity extends Persistable implements IBaseContainer
             while (valuesIt.hasNext())
             {
                 String attributeName = valuesIt.next();
+                IBaseValue thisValue = this.getBaseValue(attributeName);
+                IBaseValue thatValue = that.getBaseValue(attributeName);
 
-                IBaseValue thisBaseValue = this.getBaseValue(attributeName);
-                IBaseValue thatBaseValue = that.getBaseValue(attributeName);
-
-                if (!thisBaseValue.equals(thatBaseValue))
+                if(thisValue == null || thatValue == null)
                     return false;
-            }
 
-           /*Iterator<String> arraysIt = arrays.keySet().iterator();
-            while (arraysIt.hasNext())
-            {
-                String attributeName = arraysIt.next();
+                logger.debug("Attribute: " + attributeName);
 
-                List<IBaseValue> thisBatchValues = this.getBatchValueArray(attributeName);
-                List<IBaseValue> thatBatchValues = that.getBatchValueArray(attributeName);
-
-                Iterator<IBaseValue> thisBatchValueIt = thisBatchValues.iterator();
-                while (thisBatchValueIt.hasNext())
+                if (this.getMeta().getMemberType(attributeName).isArray())
                 {
-                    IBaseValue thisBatchValue = thisBatchValueIt.next();
+                    BaseSet thisSet = (BaseSet)(thisValue.getValue());
+                    BaseSet thatSet = (BaseSet)(thatValue.getValue());
 
-                    boolean find = false;
-                    Iterator<IBaseValue> thatBatchValueIt = thatBatchValues.iterator();
-                    while (thatBatchValueIt.hasNext())
-                    {
-                        IBaseValue thatBatchValue = thatBatchValueIt.next();
-                        if (thatBatchValue.equals(thisBatchValue))
-                        {
-                            find = true;
-                            break;
-                        }
-                    }
+                    Set<IBaseValue> thisBatchValues = thisSet.get();
+                    Set<IBaseValue> thatBatchValues = thatSet.get();
 
-                    if (!find)
-                    {
+                    if(!thisBatchValues.equals(thatBatchValues))
                         return false;
-                    }
                 }
-            }*/
+                else
+                {
+                    IBaseValue thisBaseValue = this.getBaseValue(attributeName);
+                    IBaseValue thatBaseValue = that.getBaseValue(attributeName);
+
+                    if (!thisBaseValue.equals(thatBaseValue))
+                        return false;
+                }
+            }
 
             return true;
         }

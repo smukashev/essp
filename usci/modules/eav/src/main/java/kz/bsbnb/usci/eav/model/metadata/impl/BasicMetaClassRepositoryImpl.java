@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 
+/**
+ * Caches crud operations with MetaClass objects.
+ */
 @Repository
 public class BasicMetaClassRepositoryImpl implements IMetaClassRepository
 {

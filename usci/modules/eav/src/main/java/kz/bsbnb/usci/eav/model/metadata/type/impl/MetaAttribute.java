@@ -37,6 +37,13 @@ public class MetaAttribute extends Persistable implements IMetaAttribute
         this.metaType = metaType;
     }
 
+    public MetaAttribute(IMetaType metaType)
+    {
+        this.isKey = false;
+        this.isNullable = true;
+        this.metaType = metaType;
+    }
+
     public MetaAttribute(long id, boolean isKey, boolean isNullable)
     {
         super(id);

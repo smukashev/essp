@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 
 /**
+ * Caches crud operations with Batch objects. Uses permanent cache.
+ *
  * @author a.motov
  */
 @Component
@@ -22,6 +24,12 @@ public class BatchRepository implements IBatchRepository
 
     private HashMap<Long, Batch> cache = new HashMap<Long, Batch>();
 
+    /**
+     * Retrieves Batch from Dao.
+     *
+     * @param batchId - id of Batch in Storage
+     * @return
+     */
     @Override
     public Batch getBatch(long batchId)
     {
@@ -36,6 +44,12 @@ public class BatchRepository implements IBatchRepository
         }
     }
 
+    /**
+     * Persists Batch using Dao. Always cache write through.
+     *
+     * @param batch - id of Batch in Storage
+     * @return
+     */
     @Override
     public Batch addBatch(Batch batch)
     {

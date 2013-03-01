@@ -16,6 +16,18 @@ public enum DataTypes
     BOOLEAN,
     DOUBLE;
 
+    /**
+     * Returns appropriate class for given DataTypes enum value
+     *
+     * INTEGER - Integer
+     * DATE - java.util.Date
+     * STRING - String
+     * BOOLEAN - Boolean
+     * DOUBLE - Double
+     *
+     * @param dataType
+     * @return
+     */
     public static Class<?> getDataTypeClass(DataTypes dataType) {
         switch(dataType) {
             case INTEGER:
@@ -33,6 +45,11 @@ public enum DataTypes
         }
     }
 
+    /**
+     * Same as getDataTypeClass for current instance
+     *
+     * @return
+     */
     public Class<?> getDataTypeClass() {
         return getDataTypeClass(this);
     }
