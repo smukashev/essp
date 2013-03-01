@@ -20,8 +20,6 @@ public class DataServiceImpl implements IDataService
 {
     private List<BaseEntity> data = new ArrayList<BaseEntity>();
 
-    private Logger logger = Logger.getLogger(DataServiceImpl.class);
-
     IEntityService entityService;
 
     @Autowired
@@ -30,29 +28,31 @@ public class DataServiceImpl implements IDataService
     @PostConstruct
     public void init()
     {
-        entityService = (IEntityService)rmiProxyFactoryBean.getObject();
+        entityService = (IEntityService) rmiProxyFactoryBean.getObject();
     }
 
     @Override
-    public boolean add(BaseEntity baseEntity)
+    public void process(List<BaseEntity> entities)
     {
-        // todo: implement
-        if(!isEntityExist(baseEntity))
+        for (BaseEntity entity : entities)
         {
-            data.add(baseEntity);
+            if(!isEntityExist(entity))
+            {
+                entityService.save(entity);
+            }
+            else
+            {
 
-            long t1 = System.currentTimeMillis();
-            entityService.save(baseEntity);
-            long t2 = System.currentTimeMillis() - t1;
-            logger.info("[save entity]          :       " + t2);
+            }
         }
-
-        return false;
     }
 
     public boolean isEntityExist(BaseEntity baseEntity)
     {
-        // todo: implement
-        return false;
+        for (BaseEntity entity : data)
+            if(entity.equals(baseEntity))
+                return true;
+
+        return true;
     }
 }
