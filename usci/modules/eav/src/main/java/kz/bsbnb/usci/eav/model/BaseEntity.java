@@ -10,6 +10,9 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 import kz.bsbnb.usci.eav.util.SetUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.impl.Log4jLoggerAdapter;
 
 /**
  * Implements EAV entity object. 
@@ -21,6 +24,7 @@ import kz.bsbnb.usci.eav.util.SetUtils;
  */
 public class BaseEntity extends Persistable implements IBaseContainer
 {
+    Logger logger = LoggerFactory.getLogger(BaseEntity.class);
     /**
      * Holds data about entity structure
      * @see MetaClass
@@ -233,46 +237,34 @@ public class BaseEntity extends Persistable implements IBaseContainer
             while (valuesIt.hasNext())
             {
                 String attributeName = valuesIt.next();
+                IBaseValue thisValue = this.getBaseValue(attributeName);
+                IBaseValue thatValue = that.getBaseValue(attributeName);
 
-                IBaseValue thisBaseValue = this.getBaseValue(attributeName);
-                IBaseValue thatBaseValue = that.getBaseValue(attributeName);
-
-                if (!thisBaseValue.equals(thatBaseValue))
+                if(thisValue == null || thatValue == null)
                     return false;
-            }
 
-            //todo: implement
-           /*Iterator<String> arraysIt = arrays.keySet().iterator();
-            while (arraysIt.hasNext())
-            {
-                String attributeName = arraysIt.next();
+                logger.debug("Attribute: " + attributeName);
 
-                List<IBaseValue> thisBatchValues = this.getBatchValueArray(attributeName);
-                List<IBaseValue> thatBatchValues = that.getBatchValueArray(attributeName);
-
-                Iterator<IBaseValue> thisBatchValueIt = thisBatchValues.iterator();
-                while (thisBatchValueIt.hasNext())
+                if (this.getMeta().getMemberType(attributeName).isArray())
                 {
-                    IBaseValue thisBatchValue = thisBatchValueIt.next();
+                    BaseSet thisSet = (BaseSet)(thisValue.getValue());
+                    BaseSet thatSet = (BaseSet)(thatValue.getValue());
 
-                    boolean find = false;
-                    Iterator<IBaseValue> thatBatchValueIt = thatBatchValues.iterator();
-                    while (thatBatchValueIt.hasNext())
-                    {
-                        IBaseValue thatBatchValue = thatBatchValueIt.next();
-                        if (thatBatchValue.equals(thisBatchValue))
-                        {
-                            find = true;
-                            break;
-                        }
-                    }
+                    Set<IBaseValue> thisBatchValues = thisSet.get();
+                    Set<IBaseValue> thatBatchValues = thatSet.get();
 
-                    if (!find)
-                    {
+                    if(!thisBatchValues.equals(thatBatchValues))
                         return false;
-                    }
                 }
-            }*/
+                else
+                {
+                    IBaseValue thisBaseValue = this.getBaseValue(attributeName);
+                    IBaseValue thatBaseValue = that.getBaseValue(attributeName);
+
+                    if (!thisBaseValue.equals(thatBaseValue))
+                        return false;
+                }
+            }
 
             return true;
         }
