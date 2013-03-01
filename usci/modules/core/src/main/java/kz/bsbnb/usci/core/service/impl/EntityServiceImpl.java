@@ -21,10 +21,6 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Autowired
     IBaseEntityDao baseEntityDao;
 
-    List<Long> tSaveList = new ArrayList<Long>();
-
-    private final Logger logger = Logger.getLogger(EntityServiceImpl.class);
-
     public EntityServiceImpl() throws RemoteException
     {
         super();
@@ -33,39 +29,6 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Override
     public void save(BaseEntity baseEntity)
     {
-        long t1 = System.currentTimeMillis();
         baseEntityDao.save(baseEntity);
-        long t2 = System.currentTimeMillis() - t1;
-        tSaveList.add(t2);
-        logger.info("[save entity]          :       " + t2);
-        System.out.println("[save entity]          :       " + t2);
-    }
-
-    public void setBaseEntityDao(IBaseEntityDao baseEntityDao)
-    {
-        this.baseEntityDao = baseEntityDao;
-    }
-
-    public Long getAvgSaveTime()
-    {
-        if(tSaveList.size() == 0)
-            return 0L;
-
-        return (getTotalSaveTime() / tSaveList.size());
-    }
-
-    public Long getTotalSaveTime()
-    {
-        Long t = 0L;
-
-        for (Long time : tSaveList)
-            t += time;
-
-        return t;
-    }
-
-    public void resetSaveTime()
-    {
-        tSaveList.clear();
     }
 }
