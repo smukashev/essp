@@ -610,7 +610,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    public void loadSimpleSetsValues(BaseEntity baseEntity)
+    private void loadSimpleSetsValues(BaseEntity baseEntity)
     {
         MetaClass metaClass = baseEntity.getMeta();
 

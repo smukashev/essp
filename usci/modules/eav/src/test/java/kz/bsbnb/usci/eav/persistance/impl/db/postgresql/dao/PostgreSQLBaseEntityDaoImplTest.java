@@ -75,7 +75,7 @@ public class PostgreSQLBaseEntityDaoImplTest {
 
     @Test
     public void saveBaseEntity() throws Exception {
-        try {
+        /*try {
             postgreSQLStorageImpl.initialize();
 
             MetaClass metaCreate = new MetaClass("testMetaClass");
@@ -130,7 +130,7 @@ public class PostgreSQLBaseEntityDaoImplTest {
 
             // date array values
             metaCreate.setMetaAttribute("date_set",
-                    new MetaAttribute(false, true, new MetaSet(new MetaValue(DataTypes.DATE))));
+                    new MetaAttribute(false, true, new MetaSet(new MetaValue(DataTypes.DATE)))); */
 
             // double array values
             /*metaCreate.setMemberType("double_array", new MetaValueArray(DataTypes.DOUBLE));
@@ -145,8 +145,11 @@ public class PostgreSQLBaseEntityDaoImplTest {
             metaCreate.setMemberType("string_array", new MetaValueArray(DataTypes.STRING));*/
 
             // complex array values
-            metaCreate.setMetaAttribute("complex_set",
+            /*metaCreate.setMetaAttribute("complex_set",
                     new MetaAttribute(false, true, new MetaSet(new MetaClass("meta_class_set"))));
+
+            metaCreate.setMetaAttribute("set_of_date_sets",
+                    new MetaAttribute(false, true, new MetaSet(new MetaSet(new MetaValue(DataTypes.DATE)))));
 
             long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
             MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
@@ -230,7 +233,7 @@ public class PostgreSQLBaseEntityDaoImplTest {
             entityCreate.addToArray("string_array", 31L, "Second element of string array.");
             entityCreate.addToArray("string_array", 32L, "Third element of string array."); */
 
-            BaseSet baseSetForComplex = new BaseSet(((MetaSet)metaLoad.getMemberType("complex_set")).getMemberType());
+            /*BaseSet baseSetForComplex = new BaseSet(((MetaSet)metaLoad.getMemberType("complex_set")).getMemberType());
 
             MetaClass metaClassForArrayElement = (MetaClass)((MetaSet)metaLoad.getMemberType("complex_set")).getMemberType();
             BaseEntity baseEntityForArrayFirst = new BaseEntity(metaClassForArrayElement);
@@ -315,12 +318,40 @@ public class PostgreSQLBaseEntityDaoImplTest {
         finally
         {
             postgreSQLStorageImpl.clear();
-        }
+        }*/
     }
 
     @Test
     public void multipleBatchSave() throws Exception {
+        try {
+            postgreSQLStorageImpl.initialize();
 
+            MetaClass metaCreate = new MetaClass("testMetaClass");
+
+            metaCreate.setMetaAttribute("set_of_date_sets",
+                    new MetaAttribute(false, true, new MetaSet(new MetaSet(new MetaValue(DataTypes.DATE)))));
+
+            long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
+            MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
+
+            Batch batch = batchRepository.addBatch(new Batch());
+            BaseEntity entityCreate = new BaseEntity(metaLoad);
+
+            MetaSet metaSetParent = (MetaSet)metaLoad.getMemberType("set_of_date_sets");
+            MetaSet metaSetChild = (MetaSet)metaSetParent.getMemberType();
+            BaseSet baseSetParent = new BaseSet(metaSetParent);
+            BaseSet baseSetChild = new BaseSet(metaSetChild);
+            baseSetParent.put(new BaseValue(batch, 1L, baseSetChild));
+
+            entityCreate.put("set_of_date_sets", new BaseValue(batch, 1L, baseSetParent));
+
+            long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
+            BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
+        }
+        finally
+        {
+            postgreSQLStorageImpl.clear();
+        }
     }
 
 }
