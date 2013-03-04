@@ -130,10 +130,21 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 if(type.isArray())
                 {
                     MetaSet metaValue = (MetaSet)type;
-                    expValueClass = metaValue.getTypeCode().getDataTypeClass();
 
-                    valueClass = ((MetaValue)(((BaseSet)value.getValue()).getMemberType())).getTypeCode().
-                            getDataTypeClass();
+                    IMetaType metaValueChild = metaValue.getMemberType();
+                    if (type.isArray())
+                    {
+                        expValueClass = BaseSet.class;
+                        valueClass = value.getValue().getClass();
+                    }
+                    else
+                    {
+                        expValueClass = metaValue.getTypeCode().getDataTypeClass();
+                        valueClass = ((MetaValue)(((BaseSet)value.getValue()).getMemberType())).getTypeCode().
+                                getDataTypeClass();
+                    }
+
+
                 }
                 else
                 {
