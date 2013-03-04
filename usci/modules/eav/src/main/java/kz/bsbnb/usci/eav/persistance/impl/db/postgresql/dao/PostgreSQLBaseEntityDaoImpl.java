@@ -185,7 +185,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         // complex arrays values
         /*loadComplexArraysValues(baseEntity, String.format(SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL,
-                getConfig().getBaseComplexSetValuesTableName(), getConfig().getComplexArrayTableName()));*/
+                getConfig().getBaseComplexSetValuesTableName(), getConfig().getComplexSetTableName()));*/
 
         return baseEntity;
     }
@@ -615,7 +615,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         MetaClass metaClass = baseEntity.getMeta();
 
         String query = String.format(SELECT_SETS_BY_ENTITY_ID_SQL,
-                getConfig().getBaseSimpleSetsTableName(), getConfig().getSimpleArrayTableName());
+                getConfig().getBaseSimpleSetsTableName(), getConfig().getSimpleSetTableName());
 
         logger.debug(query);
         List<Map<String, Object>> rowsSet = queryForListWithStats(query, baseEntity.getId());

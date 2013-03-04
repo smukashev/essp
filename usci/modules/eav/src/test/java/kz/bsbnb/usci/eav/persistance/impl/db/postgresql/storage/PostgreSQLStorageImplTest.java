@@ -44,12 +44,17 @@ public class PostgreSQLStorageImplTest {
     
     @Test
     public void createDropStructure() {
-        if(postgreSQLStorageImpl == null)
-        	fail("postgreSQLAdapterDaoImpl is null");
+        try
+        {
+            if(postgreSQLStorageImpl == null)
+                fail("postgreSQLAdapterDaoImpl is null");
 
-        logger.debug("DB created");
-        postgreSQLStorageImpl.initialize();
-        logger.debug("DB cleared");
-        postgreSQLStorageImpl.clear();
+            logger.debug("DB created");
+            postgreSQLStorageImpl.initialize();
+            logger.debug("DB cleared");
+        }
+        finally {
+            postgreSQLStorageImpl.clear();
+        }
     }
 }
