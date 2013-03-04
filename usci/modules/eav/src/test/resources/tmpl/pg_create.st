@@ -239,7 +239,7 @@ CREATE TABLE IF NOT EXISTS $be_entity_simple_sets$
 (
     CONSTRAINT $be_entity_simple_sets$_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES $be_entities$ (id)
         ON DELETE CASCADE,
-    CONSTRAINT $be_entity_simple_sets$_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES $simple_sets$ (id)
+    CONSTRAINT $be_entity_simple_sets$_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES $sets$ (id)
         ON DELETE CASCADE,
     CONSTRAINT $be_entity_simple_sets$_set_id_fkey FOREIGN KEY (set_id) REFERENCES $be_sets$ (id)
             ON DELETE CASCADE,
@@ -254,7 +254,7 @@ CREATE TABLE IF NOT EXISTS $be_entity_complex_sets$
 (
     CONSTRAINT $be_entity_complex_sets$_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES $be_entities$ (id)
         ON DELETE CASCADE,
-    CONSTRAINT $be_entity_complex_sets$_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES $complex_sets$ (id)
+    CONSTRAINT $be_entity_complex_sets$_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES $sets$ (id)
         ON DELETE CASCADE,
     CONSTRAINT $be_entity_complex_sets$_set_id_fkey FOREIGN KEY (set_id) REFERENCES $be_sets$ (id)
         ON DELETE CASCADE,
@@ -268,7 +268,6 @@ INHERITS
 CREATE TABLE IF NOT EXISTS $be_set_of_sets$
 (
     id serial NOT NULL,
-    attribute_id int references $sets$ (id) ON DELETE CASCADE,
     parent_set_id int references $be_sets$ (id) ON DELETE CASCADE,
     child_set_id int references $be_sets$ (id) ON DELETE CASCADE,
     CONSTRAINT $be_set_of_sets$_primary_key_index PRIMARY KEY (id)
@@ -276,8 +275,6 @@ CREATE TABLE IF NOT EXISTS $be_set_of_sets$
 
 CREATE TABLE IF NOT EXISTS $be_set_of_simple_sets$
 (
-    CONSTRAINT $be_set_of_simple_sets$_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES $simple_sets$ (id)
-        ON DELETE CASCADE,
     CONSTRAINT $be_set_of_simple_sets$_parent_set_id_fkey FOREIGN KEY (parent_set_id) REFERENCES $be_sets$ (id)
         ON DELETE CASCADE,
     CONSTRAINT $be_set_of_simple_sets$_child_set_id_fkey FOREIGN KEY (child_set_id) REFERENCES $be_sets$ (id)
@@ -291,8 +288,6 @@ INHERITS
 
 CREATE TABLE IF NOT EXISTS $be_set_of_complex_sets$
 (
-    CONSTRAINT $be_set_of_complex_sets$_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES $complex_sets$ (id)
-            ON DELETE CASCADE,
     CONSTRAINT $be_set_of_complex_sets$_parent_set_id_fkey FOREIGN KEY (parent_set_id) REFERENCES $be_sets$ (id)
         ON DELETE CASCADE,
     CONSTRAINT $be_set_of_complex_sets$_child_set_id_fkey FOREIGN KEY (child_set_id) REFERENCES $be_sets$ (id)

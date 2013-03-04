@@ -322,7 +322,7 @@ public class PostgreSQLBaseEntityDaoImplTest {
     }
 
     @Test
-    public void multipleBatchSave() throws Exception {
+    public void saveBaseValueWithSetOfDateSets() throws Exception {
         try {
             postgreSQLStorageImpl.initialize();
 
@@ -339,8 +339,13 @@ public class PostgreSQLBaseEntityDaoImplTest {
 
             MetaSet metaSetParent = (MetaSet)metaLoad.getMemberType("set_of_date_sets");
             MetaSet metaSetChild = (MetaSet)metaSetParent.getMemberType();
-            BaseSet baseSetParent = new BaseSet(metaSetParent);
+
             BaseSet baseSetChild = new BaseSet(metaSetChild);
+            baseSetChild.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 10)));
+            baseSetChild.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 20)));
+            baseSetChild.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 30)));
+
+            BaseSet baseSetParent = new BaseSet(metaSetParent);
             baseSetParent.put(new BaseValue(batch, 1L, baseSetChild));
 
             entityCreate.put("set_of_date_sets", new BaseValue(batch, 1L, baseSetParent));
