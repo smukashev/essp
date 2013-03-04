@@ -378,7 +378,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             if (metaTypeValue.isComplex())
             {
-                long setId = insertWithId(String.format(INSERT_SET_SQL, getConfig().getBaseComplexSetsTableName()),
+                long setId = insertWithId(String.format(INSERT_SET_SQL, getConfig().getBaseEntityComplexSetsTableName()),
                         new Object[]{baseEntity.getId(), baseValue.getBatch().getId(),
                                 metaAttribute.getId(), baseValue.getIndex()});
 
@@ -405,7 +405,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             }
             else
             {
-                long setId = insertWithId(String.format(INSERT_SET_SQL, getConfig().getBaseSimpleSetsTableName()),
+                long setId = insertWithId(String.format(INSERT_SET_SQL, getConfig().getBaseEntitySimpleSetsTableName()),
                         new Object[]{baseEntity.getId(), baseValue.getBatch().getId(),
                                 metaAttribute.getId(), baseValue.getIndex()});
 
@@ -615,7 +615,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         MetaClass metaClass = baseEntity.getMeta();
 
         String query = String.format(SELECT_SETS_BY_ENTITY_ID_SQL,
-                getConfig().getBaseSimpleSetsTableName(), getConfig().getSimpleSetTableName());
+                getConfig().getBaseEntitySimpleSetsTableName(), getConfig().getSimpleSetTableName());
 
         logger.debug(query);
         List<Map<String, Object>> rowsSet = queryForListWithStats(query, baseEntity.getId());

@@ -129,24 +129,30 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         st.add("sets_key_filter_values", getConfig().getArrayKeyFilterValuesTableName());
 
         st.add("batches", getConfig().getBatchesTableName());
-        st.add("entities", getConfig().getEntitiesTableName());
-        st.add("base_values", getConfig().getBaseValuesTableName());
-        st.add("date_base_values", getConfig().getBaseDateValuesTableName());
-        st.add("double_base_values", getConfig().getBaseDoubleValuesTableName());
-        st.add("integer_base_values", getConfig().getBaseIntegerValuesTableName());
-        st.add("boolean_base_values", getConfig().getBaseBooleanValuesTableName());
-        st.add("string_base_values", getConfig().getBaseStringValuesTableName());
-        st.add("complex_base_values", getConfig().getBaseComplexValuesTableName());
-        st.add("base_sets", getConfig().getBaseSetsTableName());
-        st.add("base_simple_sets", getConfig().getBaseSimpleSetsTableName());
-        st.add("base_complex_sets", getConfig().getBaseComplexSetsTableName());
-        st.add("base_sets_values", getConfig().getBaseSetValuesTableName());
-        st.add("base_sets_dates_values", getConfig().getBaseDateSetValuesTableName());
-        st.add("base_sets_double_values", getConfig().getBaseDoubleSetValuesTableName());
-        st.add("base_sets_integer_values", getConfig().getBaseIntegerSetValuesTableName());
-        st.add("base_sets_boolean_values", getConfig().getBaseBooleanSetValuesTableName());
-        st.add("base_sets_string_values", getConfig().getBaseStringSetValuesTableName());
-        st.add("base_sets_complex_values", getConfig().getBaseComplexSetValuesTableName());
+        st.add("be_entities", getConfig().getEntitiesTableName());
+        st.add("be_values", getConfig().getBaseValuesTableName());
+        st.add("be_date_values", getConfig().getBaseDateValuesTableName());
+        st.add("be_double_values", getConfig().getBaseDoubleValuesTableName());
+        st.add("be_integer_values", getConfig().getBaseIntegerValuesTableName());
+        st.add("be_boolean_values", getConfig().getBaseBooleanValuesTableName());
+        st.add("be_string_values", getConfig().getBaseStringValuesTableName());
+        st.add("be_complex_values", getConfig().getBaseComplexValuesTableName());
+
+        st.add("be_sets", getConfig().getBaseSetsTableName());
+        st.add("be_entity_sets", getConfig().getBaseEntitySetsTableName());
+        st.add("be_entity_simple_sets", getConfig().getBaseEntitySimpleSetsTableName());
+        st.add("be_entity_complex_sets", getConfig().getBaseEntityComplexSetsTableName());
+        st.add("be_set_of_sets", getConfig().getBaseSetOfSetsTableName());
+        st.add("be_set_of_simple_sets", getConfig().getBaseSetOfSimpleSetsTableName());
+        st.add("be_set_of_complex_sets", getConfig().getBaseSetOfComplexSetsTableName());
+
+        st.add("be_set_values", getConfig().getBaseSetValuesTableName());
+        st.add("be_set_dates_values", getConfig().getBaseDateSetValuesTableName());
+        st.add("be_set_double_values", getConfig().getBaseDoubleSetValuesTableName());
+        st.add("be_set_integer_values", getConfig().getBaseIntegerSetValuesTableName());
+        st.add("be_set_boolean_values", getConfig().getBaseBooleanSetValuesTableName());
+        st.add("be_set_string_values", getConfig().getBaseStringSetValuesTableName());
+        st.add("be_set_complex_values", getConfig().getBaseComplexSetValuesTableName());
 
         st.add("complex_key_length", getConfig().getComplexKeyTypeCodeLength());
         st.add("class_name_length", getConfig().getClassNameLength());
@@ -179,7 +185,13 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseSetValuesTableName());
         logger.debug(query);
         jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseSetsTableName());
+        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseSetOfSetsTableName());
+        logger.debug(query);
+        jdbcTemplate.execute(query);
+        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseEntitySetsTableName());
+        logger.debug(query);
+        jdbcTemplate.execute(query);
+        query = String.format(DROP_TABLE, getConfig().getBaseSetsTableName());
         logger.debug(query);
         jdbcTemplate.execute(query);
         query = String.format(DROP_TABLE, getConfig().getEntitiesTableName());
