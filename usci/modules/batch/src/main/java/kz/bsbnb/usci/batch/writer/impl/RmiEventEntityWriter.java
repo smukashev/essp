@@ -23,8 +23,6 @@ public class RmiEventEntityWriter<T> implements AbstractWriter<T>
     @Autowired
     RmiProxyFactoryBean rmiProxyFactoryBean;
 
-
-
     private Logger logger = Logger.getLogger(RmiEventEntityWriter.class);
 
     @PostConstruct
