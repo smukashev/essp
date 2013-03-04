@@ -18,10 +18,10 @@ public class JDBCConfig {
     private String attributesTableName;
     private String simpleAttributesTableName;
     private String complexAttributesTableName;
-    private String arrayTableName;
-    private String complexArrayTableName;
-    private String arrayArrayTableName;
-    private String simpleArrayTableName;
+    private String setTableName;
+    private String complexSetTableName;
+    private String setOfSetsTableName;
+    private String simpleSetTableName;
     private String entitiesTableName;
 
     private String metaObjectTableName;
@@ -66,10 +66,10 @@ public class JDBCConfig {
         arrayKeyFilterTableName = tablePrefix + "array_key_filter";
         arrayKeyFilterValuesTableName = tablePrefix + "array_key_filter_values";
         complexAttributesTableName = tablePrefix + "complex_attributes";
-        arrayTableName = tablePrefix + "array";
-        complexArrayTableName = tablePrefix + "complex_array";
-        arrayArrayTableName = tablePrefix + "array_array";
-        simpleArrayTableName = tablePrefix + "simple_array";
+        setTableName = tablePrefix + "set";
+        complexSetTableName = tablePrefix + "complex_set";
+        setOfSetsTableName = tablePrefix + "set_of_sets";
+        simpleSetTableName = tablePrefix + "simple_set";
         batchesTableName = tablePrefix + "batches";
 
         baseValuesTableName = tablePrefix + "b_values";
@@ -116,16 +116,16 @@ public class JDBCConfig {
         return complexAttributesTableName;
     }
 
-    public String getArrayTableName() {
-        return arrayTableName;
+    public String getSetTableName() {
+        return setTableName;
     }
 
-    public String getComplexArrayTableName() {
-        return complexArrayTableName;
+    public String getComplexSetTableName() {
+        return complexSetTableName;
     }
 
-    public String getSimpleArrayTableName() {
-        return simpleArrayTableName;
+    public String getSimpleSetTableName() {
+        return simpleSetTableName;
     }
 
     public String getEntitiesTableName() {
@@ -232,11 +232,21 @@ public class JDBCConfig {
         return stringValueLength;
     }
 
-    public String getArrayArrayTableName() {
-        return arrayArrayTableName;
+    public String getSetOfSetsTableName() {
+        return setOfSetsTableName;
     }
 
     public String getMetaObjectTableName() {
         return metaObjectTableName;
+    }
+
+    public String getTablePrefix()
+    {
+        return tablePrefix;
+    }
+
+    public void setTablePrefix(String tablePrefix)
+    {
+        this.tablePrefix = tablePrefix;
     }
 }
