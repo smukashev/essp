@@ -63,6 +63,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         st.add("be_entity_sets", getConfig().getBaseEntitySetsTableName());
         st.add("be_entity_simple_sets", getConfig().getBaseEntitySimpleSetsTableName());
         st.add("be_entity_complex_sets", getConfig().getBaseEntityComplexSetsTableName());
+        st.add("be_entity_set_of_sets", getConfig().getBaseEntitySetOfSetsTableName());
         st.add("be_set_of_sets", getConfig().getBaseSetOfSetsTableName());
         st.add("be_set_of_simple_sets", getConfig().getBaseSetOfSimpleSetsTableName());
         st.add("be_set_of_complex_sets", getConfig().getBaseSetOfComplexSetsTableName());

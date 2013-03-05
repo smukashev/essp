@@ -32,6 +32,12 @@ public class BaseSet extends Persistable implements IBaseContainer
         this.meta = meta;
     }
 
+    public BaseSet(long id, IMetaType meta)
+    {
+        super(id);
+        this.meta = meta;
+    }
+
     @Override
     public IMetaType getMemberType(String name)
     {
