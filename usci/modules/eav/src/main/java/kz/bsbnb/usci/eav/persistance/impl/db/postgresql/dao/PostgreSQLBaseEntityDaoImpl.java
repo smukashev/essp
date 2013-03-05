@@ -244,8 +244,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             {
                 if (metaType.isComplex())
                 {
-                    MetaClass metaClass = (MetaClass)metaType;
-
+                    complexAttributeNames.add(attributeName);
                 }
                 else
                 {
@@ -309,7 +308,10 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             }
         }
 
-        insertComplexValues(baseEntity, complexAttributeNames);
+        if (!complexAttributeNames.isEmpty())
+        {
+            insertComplexValues(baseEntity, complexAttributeNames);
+        }
 
         return baseEntity.getId();
     }
