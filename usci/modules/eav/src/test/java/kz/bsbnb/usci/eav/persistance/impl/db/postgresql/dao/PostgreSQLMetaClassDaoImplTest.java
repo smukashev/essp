@@ -257,8 +257,8 @@ public class PostgreSQLMetaClassDaoImplTest {
 
         assertTrue(metaCreateNext.equals(loadedMetaCreateNext));
 
-        MetaClass loadedMetaCreate = postgreSQLMetaClassDaoImpl.load(metaCreateNextDisabled.getClassName(),
-                metaCreateNextDisabled.getBeginDate());
+        MetaClass loadedMetaCreate = postgreSQLMetaClassDaoImpl.load(metaCreate.getClassName(),
+                metaCreate.getBeginDate());
 
         assertTrue(metaCreate.equals(loadedMetaCreate));
     }
