@@ -25,12 +25,14 @@ public class BatchTest {
         Batch batch = new Batch(tt);
         Batch batch2 = new Batch(tt);
 
-        Assert.assertEquals(true,batch.equals(batch));
-        Assert.assertEquals(true,batch.equals(batch2));
+        Assert.assertTrue(batch.equals(batch));
+        Assert.assertTrue(batch.equals(batch2));
+
+        Thread.sleep(50);
 
         Batch batch3 = new Batch();
 
-        Assert.assertEquals(false,batch.equals(batch3));
+        Assert.assertFalse(batch.equals(batch3));
 
     }
 }
