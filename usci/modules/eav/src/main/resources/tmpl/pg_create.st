@@ -427,7 +427,7 @@ END;
 
 SELECT createIndexesOnFK();
 
-CREATE INDEX $attributes$_containing_id_idx ON $attributes$ (containing_id);
+-- CREATE INDEX $attributes$_containing_id_idx ON $attributes$ (containing_id);
 CREATE INDEX $simple_attributes$_containing_id_idx ON $simple_attributes$ (containing_id);
 CREATE INDEX $complex_attributes$_containing_id_idx ON $complex_attributes$ (containing_id);
 CREATE INDEX $simple_sets$_containing_id_idx ON $simple_sets$ (containing_id);
