@@ -22,7 +22,11 @@ public class ProcessJob extends AbstractJob
     @Override
     public void run()
     {
+        long t1 = System.currentTimeMillis();
         entityService.save(baseEntity);
+        long t2 = System.currentTimeMillis() - t1;
+
+        System.out.println("[sync][save]                :               " + t2);
     }
 
     public BaseEntity getBaseEntity()
