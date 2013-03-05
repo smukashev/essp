@@ -427,15 +427,76 @@ END;
 
 SELECT createIndexesOnFK();
 
-CREATE INDEX $attributes$_containing_id_idx ON $attributes$ (containing_id);
-CREATE INDEX $simple_attributes$_containing_id_idx ON $simple_attributes$ (containing_id);
-CREATE INDEX $complex_attributes$_containing_id_idx ON $complex_attributes$ (containing_id);
-CREATE INDEX $simple_sets$_containing_id_idx ON $simple_sets$ (containing_id);
-CREATE INDEX $complex_sets$_containing_id_idx ON $complex_sets$ (containing_id);
+DO '
+BEGIN
 
-CREATE INDEX $complex_attributes$_class_id_idx ON $complex_attributes$ (class_id);
+IF NOT EXISTS (
+    SELECT 1
+    FROM   pg_class c
+    JOIN   pg_namespace n ON n.oid = c.relnamespace
+    WHERE  c.relname = ''$attributes$_containing_id_idx''
+    AND    n.nspname = ''public''
+    ) THEN
 
+    CREATE INDEX $attributes$_containing_id_idx ON $attributes$ (containing_id);
+END IF;
 
+IF NOT EXISTS (
+    SELECT 1
+    FROM   pg_class c
+    JOIN   pg_namespace n ON n.oid = c.relnamespace
+    WHERE  c.relname = ''$simple_attributes$_containing_id_idx''
+    AND    n.nspname = ''public''
+    ) THEN
+
+    CREATE INDEX $simple_attributes$_containing_id_idx ON $simple_attributes$ (containing_id);
+END IF;
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM   pg_class c
+    JOIN   pg_namespace n ON n.oid = c.relnamespace
+    WHERE  c.relname = ''$complex_attributes$_containing_id_idx''
+    AND    n.nspname = ''public''
+    ) THEN
+
+    CREATE INDEX $complex_attributes$_containing_id_idx ON $complex_attributes$ (containing_id);
+END IF;
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM   pg_class c
+    JOIN   pg_namespace n ON n.oid = c.relnamespace
+    WHERE  c.relname = ''$simple_sets$_containing_id_idx''
+    AND    n.nspname = ''public''
+    ) THEN
+
+    CREATE INDEX $simple_sets$_containing_id_idx ON $simple_sets$ (containing_id);
+END IF;
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM   pg_class c
+    JOIN   pg_namespace n ON n.oid = c.relnamespace
+    WHERE  c.relname = ''$complex_sets$_containing_id_idx''
+    AND    n.nspname = ''public''
+    ) THEN
+
+    CREATE INDEX $complex_sets$_containing_id_idx ON $complex_sets$ (containing_id);
+END IF;
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM   pg_class c
+    JOIN   pg_namespace n ON n.oid = c.relnamespace
+    WHERE  c.relname = ''$complex_attributes$_class_id_idx''
+    AND    n.nspname = ''public''
+    ) THEN
+
+    CREATE INDEX $complex_attributes$_class_id_idx ON $complex_attributes$ (class_id);
+END IF;
+
+END';
 
 
 
