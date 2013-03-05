@@ -42,7 +42,7 @@ public class BaseValue extends Persistable implements IBaseValue
             throw new IllegalArgumentException
                     ("Batch is null. Initialization of the BaseValue ​​is not possible.");
 
-        if (batch.getId() < 0)
+        if (batch.getId() < 1)
             throw new IllegalArgumentException
                     ("Batch has no id. Initialization of the BaseValue ​​is not possible.");
 

@@ -6,7 +6,6 @@ import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 
