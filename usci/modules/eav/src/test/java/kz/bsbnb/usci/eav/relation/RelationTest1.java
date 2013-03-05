@@ -184,11 +184,6 @@ public class RelationTest1
         BaseEntity contractEntityTest = baseEntityDao.load(id);
 
         Assert.assertEquals(contractEntity, contractEntityTest);
-
-        //TODO: return back
-        //documentEntity1.put("type", new BaseValue(batch, 4, "RNN123"));
-
-        //Assert.assertTrue(!contractEntity.equals(contractEntityTest));
     }
 
     @Test
@@ -212,6 +207,14 @@ public class RelationTest1
         BaseEntity contractEntity1 = generateBaseEntity(batch);
 
         Assert.assertEquals(contractEntity, contractEntity1);
+
+        BaseEntity subject = (BaseEntity)contractEntity1.getBaseValue("subject").getValue();
+
+        BaseEntity nameEntity = (BaseEntity)subject.getBaseValue("name").getValue();
+
+        nameEntity.put("firstname", new BaseValue(batch, 6, "KANAT_some_fix"));
+
+        Assert.assertFalse(contractEntity.equals(contractEntity1));
     }
 
     @Test

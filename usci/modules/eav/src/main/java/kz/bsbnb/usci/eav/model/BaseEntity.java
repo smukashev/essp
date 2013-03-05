@@ -236,7 +236,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
             BaseEntity that = (BaseEntity) obj;
 
             int thisAttributeCount = this.getAttributeCount();
-            int thatAttributeCount = this.getAttributeCount();
+            int thatAttributeCount = that.getAttributeCount();
 
             if (thisAttributeCount != thatAttributeCount)
                 return false;
@@ -251,6 +251,9 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 logger.debug("Attribute: " + attributeName);
                 logger.debug("This: " + thisValue);
                 logger.debug("That: " + thatValue);
+
+                if(thisValue == null && thatValue == null)
+                    continue;
 
                 if(thisValue == null || thatValue == null)
                     return false;
