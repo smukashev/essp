@@ -2,8 +2,6 @@ package kz.bsbnb.usci.eav.model;
 
 import kz.bsbnb.usci.eav.model.batchdata.IBaseValue;
 import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaSet;
 import kz.bsbnb.usci.eav.persistance.Persistable;
 
 import java.util.HashSet;
