@@ -17,7 +17,7 @@
         <property name="staticMethod" value="org.springframework.util.Log4jConfigurer.initLogging"/>
         <property name="arguments">
             <list>
-                <value>classpath:properties/log4j.properties</value>
+                <value>classpath:log4j.properties</value>
             </list>
         </property>
     </bean>
@@ -33,9 +33,10 @@
 
     <context:component-scan base-package="kz.bsbnb.usci.eav.persistance.impl.db.postgresql" />
     <context:component-scan base-package="kz.bsbnb.usci.eav.model.metadata.impl" />
-    <!--<context:component-scan base-package="kz.bsbnb.usci.batch.helper.impl" />
-    <context:component-scan base-package="kz.bsbnb.usci.batch.parser.impl" />-->
-    <context:component-scan base-package="kz.bsbnb.usci.batch" />
+    <context:component-scan base-package="kz.bsbnb.usci.batch.helper.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.batch.reader.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.batch.writer.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.batch.processor.impl" />
 
     <bean id="JDBCConfig" class="kz.bsbnb.usci.eav.persistance.impl.db.JDBCConfig"/>
     <bean id="SQLStats" class="kz.bsbnb.usci.eav.stats.SQLQueriesStats"/>
