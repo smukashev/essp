@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -28,94 +29,14 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
     private final static String DROP_TABLE_CASCADE = "DROP TABLE IF EXISTS %s CASCADE";
     private final static String COUNT_TABLE = "SELECT count(*) FROM %s";
 
-    private final static String BATCH_FILES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, file_data BYTEA NOT NULL, file_size double precision NOT NULL, file_name character varying(%d), batch_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
+    @Autowired
+    STRawGroupDir stRawGroupDir;
 
-    private final static String INDEXES_QUERY = "select pg_index.indexrelid::regclass, 'create index ' || relname || '_' ||\n" +
-            " array_to_string(column_name_list, '_') || '_idx on ' || conrelid ||\n" +
-            " ' (' || array_to_string(column_name_list, ',') || ')' as query\n" +
-            "from (select distinct\n" +
-            " conrelid,\n" +
-            " array_agg(attname) column_name_list,\n" +
-            " array_agg(attnum) as column_list\n" +
-            " from pg_attribute\n" +
-            " join (select conrelid::regclass,\n" +
-            " conname,\n" +
-            " unnest(conkey) as column_index\n" +
-            " from (select distinct\n" +
-            " conrelid, conname, conkey\n" +
-            " from pg_constraint\n" +
-            " join pg_class on pg_class.oid = pg_constraint.conrelid\n" +
-            " join pg_namespace on pg_namespace.oid = pg_class.relnamespace\n" +
-            " where nspname !~ '^pg_' and nspname <> 'information_schema'\n" +
-            " ) fkey\n" +
-            " ) fkey\n" +
-            " on fkey.conrelid = pg_attribute.attrelid\n" +
-            " and fkey.column_index = pg_attribute.attnum\n" +
-            " group by conrelid, conname\n" +
-            " ) candidate_index\n" +
-            "join pg_class on pg_class.oid = candidate_index.conrelid\n" +
-            "left join pg_index on pg_index.indrelid = conrelid\n" +
-            " and indkey::text = array_to_string(column_list, ' ')\n" +
-            "where indexrelid is null";
+    //TODO: Remove?
+    //private final static String BATCH_FILES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, file_data BYTEA NOT NULL, file_size double precision NOT NULL, file_name character varying(%d), batch_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
 
-    private final String CONTAINING_ID_INDEX = "CREATE INDEX %s_containing_id_idx ON %s (containing_id)";
-
-    private final String CLASS_ID_INDEX = "CREATE INDEX %s_class_id_idx ON %s (class_id)";
-
-    private void createIndexes()
+    private void setTableNames(ST st)
     {
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(INDEXES_QUERY);
-
-        for (Map<String, Object> row : rows)
-        {
-            String query = (String)row.get("query");
-            logger.debug(query);
-            jdbcTemplate.update(query);
-        }
-
-        String query = String.format(CONTAINING_ID_INDEX,
-                getConfig().getAttributesTableName(),
-                getConfig().getAttributesTableName());
-        logger.debug(query);
-        jdbcTemplate.update(query);
-
-        query = String.format(CONTAINING_ID_INDEX,
-                getConfig().getSimpleAttributesTableName(),
-                getConfig().getSimpleAttributesTableName());
-        logger.debug(query);
-        jdbcTemplate.update(query);
-
-        query = String.format(CONTAINING_ID_INDEX,
-                getConfig().getSimpleSetTableName(),
-                getConfig().getSimpleSetTableName());
-        logger.debug(query);
-        jdbcTemplate.update(query);
-
-        query = String.format(CONTAINING_ID_INDEX,
-                getConfig().getComplexSetTableName(),
-                getConfig().getComplexSetTableName());
-        logger.debug(query);
-        jdbcTemplate.update(query);
-
-        query = String.format(CONTAINING_ID_INDEX,
-                getConfig().getComplexAttributesTableName(),
-                getConfig().getComplexAttributesTableName());
-        logger.debug(query);
-        jdbcTemplate.update(query);
-
-        query = String.format(CLASS_ID_INDEX,
-                getConfig().getComplexAttributesTableName(),
-                getConfig().getComplexAttributesTableName());
-        logger.debug(query);
-        jdbcTemplate.update(query);
-    }
-
-	@Override
-	public void initialize() {
-        //todo: refactor hard code
-        STGroup group = new STRawGroupDir("tmpl", '$', '$');
-        ST st = group.getInstanceOf("pg_create");
-
         st.add("meta_objects", getConfig().getMetaObjectTableName());
         st.add("classes", getConfig().getClassesTableName());
         st.add("attributes", getConfig().getAttributesTableName());
@@ -161,55 +82,34 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         st.add("array_key_length", getConfig().getArrayKeyTypeCodeLength());
         st.add("string_value_length", getConfig().getStringValueLength());
         st.add("array_key_filter_length", getConfig().getArrayKeyFilterValueLength());
+    }
+
+    @Override
+	public void initialize() {
+        ST st = stRawGroupDir.getInstanceOf("pg_create");
+
+        setTableNames(st);
 
         String query = st.render();
 
         logger.debug(query);
 
         jdbcTemplate.execute(query);
-
-        createIndexes();
 	}
 
 	@Override
 	public void clear() {
-		String query = String.format(DROP_TABLE, getConfig().getArrayKeyFilterValuesTableName());
-	    logger.debug(query);
-	    jdbcTemplate.execute(query);
-	    query = String.format(DROP_TABLE, getConfig().getArrayKeyFilterTableName());
-	    logger.debug(query);
-	    jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseValuesTableName());
+
+        ST st = stRawGroupDir.getInstanceOf("pg_drop");
+
+        setTableNames(st);
+
+        String query = st.render();
+
         logger.debug(query);
+
         jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseSetValuesTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseSetOfSetsTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseEntitySetsTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE, getConfig().getBaseSetsTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE, getConfig().getEntitiesTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-		query = String.format(DROP_TABLE_CASCADE, getConfig().getAttributesTableName());
-	    logger.debug(query);
-	    jdbcTemplate.execute(query);
-	    query = String.format(DROP_TABLE, getConfig().getEntitiesTableName());
-	    logger.debug(query);
-	    jdbcTemplate.execute(query);
-	    query = String.format(DROP_TABLE, getConfig().getClassesTableName());
-	    logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE, getConfig().getBatchesTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-	}
+    }
 
 	@Override
 	public void empty() {
@@ -282,5 +182,15 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         }
 
         return true;
+    }
+
+    public STRawGroupDir getStRawGroupDir()
+    {
+        return stRawGroupDir;
+    }
+
+    public void setStRawGroupDir(STRawGroupDir stRawGroupDir)
+    {
+        this.stRawGroupDir = stRawGroupDir;
     }
 }
