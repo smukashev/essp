@@ -355,7 +355,7 @@ public class PostgreSQLBaseEntityDaoImplTest {
         }
         finally
         {
-            postgreSQLStorageImpl.clear();
+            //postgreSQLStorageImpl.clear();
         }
     }
 

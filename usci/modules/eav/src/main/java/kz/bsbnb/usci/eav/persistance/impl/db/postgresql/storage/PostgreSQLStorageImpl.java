@@ -35,10 +35,8 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
     //TODO: Remove?
     //private final static String BATCH_FILES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, file_data BYTEA NOT NULL, file_size double precision NOT NULL, file_name character varying(%d), batch_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
 
-    @Override
-	public void initialize() {
-        ST st = stRawGroupDir.getInstanceOf("pg_create");
-
+    private void setTableNames(ST st)
+    {
         st.add("meta_objects", getConfig().getMetaObjectTableName());
         st.add("classes", getConfig().getClassesTableName());
         st.add("attributes", getConfig().getAttributesTableName());
@@ -84,6 +82,13 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         st.add("array_key_length", getConfig().getArrayKeyTypeCodeLength());
         st.add("string_value_length", getConfig().getStringValueLength());
         st.add("array_key_filter_length", getConfig().getArrayKeyFilterValueLength());
+    }
+
+    @Override
+	public void initialize() {
+        ST st = stRawGroupDir.getInstanceOf("pg_create");
+
+        setTableNames(st);
 
         String query = st.render();
 
@@ -94,44 +99,15 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
 	@Override
 	public void clear() {
-        String query = String.format(DROP_TABLE, getConfig().getArrayKeyFilterValuesTableName());
-	    logger.debug(query);
-	    jdbcTemplate.execute(query);
-	    query = String.format(DROP_TABLE, getConfig().getArrayKeyFilterTableName());
-	    logger.debug(query);
-	    jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseValuesTableName());
+
+        ST st = stRawGroupDir.getInstanceOf("pg_drop");
+
+        setTableNames(st);
+
+        String query = st.render();
+
         logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseSetValuesTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseSetOfSetsTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseEntitySetsTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE, getConfig().getBaseSetsTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE, getConfig().getEntitiesTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-		query = String.format(DROP_TABLE_CASCADE, getConfig().getAttributesTableName());
-	    logger.debug(query);
-	    jdbcTemplate.execute(query);
-	    query = String.format(DROP_TABLE, getConfig().getEntitiesTableName());
-	    logger.debug(query);
-	    jdbcTemplate.execute(query);
-	    query = String.format(DROP_TABLE, getConfig().getClassesTableName());
-	    logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE, getConfig().getBatchesTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE, getConfig().getMetaObjectTableName());
-        logger.debug(query);
+
         jdbcTemplate.execute(query);
     }
 
