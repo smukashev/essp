@@ -4,6 +4,7 @@
  */
 package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
+import kz.bsbnb.usci.eav.GenericTestCase;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.BaseSet;
 import kz.bsbnb.usci.eav.model.Batch;
@@ -42,12 +43,11 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-public class PostgreSQLBaseEntityDaoImplTest {
+public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
+{
 
     @Autowired
     IBatchRepository batchRepository;
-    @Autowired
-    IStorage postgreSQLStorageImpl;
     @Autowired
     IMetaClassDao postgreSQLMetaClassDaoImpl;
     @Autowired
@@ -320,122 +320,98 @@ public class PostgreSQLBaseEntityDaoImplTest {
 
     @Test
     public void saveBaseValueWithSetOfDateSets() throws Exception {
-        try {
-            postgreSQLStorageImpl.initialize();
+        MetaClass metaCreate = new MetaClass("testMetaClass");
 
-            MetaClass metaCreate = new MetaClass("testMetaClass");
+        metaCreate.setMetaAttribute("set_of_date_sets",
+                new MetaAttribute(false, true, new MetaSet(new MetaSet(new MetaValue(DataTypes.DATE)))));
 
-            metaCreate.setMetaAttribute("set_of_date_sets",
-                    new MetaAttribute(false, true, new MetaSet(new MetaSet(new MetaValue(DataTypes.DATE)))));
+        long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
+        MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
-            long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
-            MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
+        Batch batch = batchRepository.addBatch(new Batch());
+        BaseEntity entityCreate = new BaseEntity(metaLoad);
 
-            Batch batch = batchRepository.addBatch(new Batch());
-            BaseEntity entityCreate = new BaseEntity(metaLoad);
+        MetaSet metaSetParent = (MetaSet)metaLoad.getMemberType("set_of_date_sets");
+        MetaSet metaSetChild = (MetaSet)metaSetParent.getMemberType();
 
-            MetaSet metaSetParent = (MetaSet)metaLoad.getMemberType("set_of_date_sets");
-            MetaSet metaSetChild = (MetaSet)metaSetParent.getMemberType();
+        BaseSet baseSetChildCreate = new BaseSet(metaSetChild);
+        baseSetChildCreate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 10)));
+        baseSetChildCreate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 20)));
+        baseSetChildCreate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 30)));
 
-            BaseSet baseSetChildCreate = new BaseSet(metaSetChild);
-            baseSetChildCreate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 10)));
-            baseSetChildCreate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 20)));
-            baseSetChildCreate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 30)));
+        BaseSet baseSetParentCreate = new BaseSet(metaSetParent);
+        baseSetParentCreate.put(new BaseValue(batch, 1L, baseSetChildCreate));
 
-            BaseSet baseSetParentCreate = new BaseSet(metaSetParent);
-            baseSetParentCreate.put(new BaseValue(batch, 1L, baseSetChildCreate));
+        entityCreate.put("set_of_date_sets", new BaseValue(batch, 1L, baseSetParentCreate));
 
-            entityCreate.put("set_of_date_sets", new BaseValue(batch, 1L, baseSetParentCreate));
+        long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
+        BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
 
-            long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
-            BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
-
-            long countCreate = entityCreate.getAttributeCount();
-            long countLoad = entityLoad.getAttributeCount();
-            assertEquals(countCreate, countLoad);
-        }
-        finally
-        {
-            postgreSQLStorageImpl.clear();
-        }
+        long countCreate = entityCreate.getAttributeCount();
+        long countLoad = entityLoad.getAttributeCount();
+        assertEquals(countCreate, countLoad);
     }
 
     @Test
     public void saveBaseValueWithDateSet() throws Exception {
-        try {
-            postgreSQLStorageImpl.initialize();
+        MetaClass metaCreate = new MetaClass("testMetaClass");
+        metaCreate.setMetaAttribute("date_set",
+                new MetaAttribute(false, true, new MetaSet(new MetaValue(DataTypes.DATE))));
 
-            MetaClass metaCreate = new MetaClass("testMetaClass");
-            metaCreate.setMetaAttribute("date_set",
-                    new MetaAttribute(false, true, new MetaSet(new MetaValue(DataTypes.DATE))));
+        long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
+        MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
-            long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
-            MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
+        Batch batch = batchRepository.addBatch(new Batch());
+        BaseEntity entityCreate = new BaseEntity(metaLoad);
 
-            Batch batch = batchRepository.addBatch(new Batch());
-            BaseEntity entityCreate = new BaseEntity(metaLoad);
+        Random random = new Random();
 
-            Random random = new Random();
+        BaseSet baseSetForDate = new BaseSet(((MetaSet)metaLoad.getMemberType("date_set")).getMemberType());
+        baseSetForDate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 3)));
+        baseSetForDate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 5)));
+        baseSetForDate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 7)));
 
-            BaseSet baseSetForDate = new BaseSet(((MetaSet)metaLoad.getMemberType("date_set")).getMemberType());
-            baseSetForDate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 3)));
-            baseSetForDate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 5)));
-            baseSetForDate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 7)));
+        entityCreate.put("date_set", new BaseValue(batch, 1L, baseSetForDate));
 
-            entityCreate.put("date_set", new BaseValue(batch, 1L, baseSetForDate));
+        long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
+        BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
 
-            long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
-            BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
-
-            long countCreate = entityCreate.getAttributeCount();
-            long countLoad = entityLoad.getAttributeCount();
-            assertEquals(countCreate, countLoad);
-        }
-        finally
-        {
-            postgreSQLStorageImpl.clear();
-        }
+        long countCreate = entityCreate.getAttributeCount();
+        long countLoad = entityLoad.getAttributeCount();
+        assertEquals(countCreate, countLoad);
     }
 
     @Test
     public void saveBaseValueWithComplexSet() throws Exception {
-        try {
-            postgreSQLStorageImpl.initialize();
+        MetaClass metaCreate = new MetaClass("testMetaClass");
+        metaCreate.setMetaAttribute("complex_set",
+                new MetaAttribute(false, true, new MetaSet(new MetaClass("meta_class_set"))));
 
-            MetaClass metaCreate = new MetaClass("testMetaClass");
-            metaCreate.setMetaAttribute("complex_set",
-                    new MetaAttribute(false, true, new MetaSet(new MetaClass("meta_class_set"))));
+        long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
+        MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
-            long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
-            MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
+        Batch batch = batchRepository.addBatch(new Batch());
+        BaseEntity entityCreate = new BaseEntity(metaLoad);
 
-            Batch batch = batchRepository.addBatch(new Batch());
-            BaseEntity entityCreate = new BaseEntity(metaLoad);
+        Random random = new Random();
 
-            Random random = new Random();
+        BaseSet baseSetForComplex = new BaseSet(((MetaSet)metaLoad.getMemberType("complex_set")).getMemberType());
 
-            BaseSet baseSetForComplex = new BaseSet(((MetaSet)metaLoad.getMemberType("complex_set")).getMemberType());
+        MetaClass metaClassForArrayElement = (MetaClass)((MetaSet)metaLoad.getMemberType("complex_set")).getMemberType();
+        BaseEntity baseEntityForArrayFirst = new BaseEntity(metaClassForArrayElement);
+        BaseEntity baseEntityForArraySecond = new BaseEntity(metaClassForArrayElement);
 
-            MetaClass metaClassForArrayElement = (MetaClass)((MetaSet)metaLoad.getMemberType("complex_set")).getMemberType();
-            BaseEntity baseEntityForArrayFirst = new BaseEntity(metaClassForArrayElement);
-            BaseEntity baseEntityForArraySecond = new BaseEntity(metaClassForArrayElement);
+        baseSetForComplex.put(new BaseValue(batch, 1L, baseEntityForArrayFirst));
+        baseSetForComplex.put(new BaseValue(batch, 1L, baseEntityForArraySecond));
 
-            baseSetForComplex.put(new BaseValue(batch, 1L, baseEntityForArrayFirst));
-            baseSetForComplex.put(new BaseValue(batch, 1L, baseEntityForArraySecond));
+        entityCreate.put("complex_set", new BaseValue(batch, 1L, baseSetForComplex));
 
-            entityCreate.put("complex_set", new BaseValue(batch, 1L, baseSetForComplex));
+        long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
+        BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
 
-            long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
-            BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
-
-            long countCreate = entityCreate.getAttributeCount();
-            long countLoad = entityLoad.getAttributeCount();
-            assertEquals(countCreate, countLoad);
-        }
-        finally
-        {
-            //postgreSQLStorageImpl.clear();
-        }
+        long countCreate = entityCreate.getAttributeCount();
+        long countLoad = entityLoad.getAttributeCount();
+        assertEquals(countCreate, countLoad);
     }
 
 }

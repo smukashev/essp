@@ -114,12 +114,20 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
 	@Override
 	public void empty() {
-		// TODO Auto-generated method stub
-		
-	}
+        ST st = stRawGroupDir.getInstanceOf("pg_clear");
+
+        setTableNames(st);
+
+        String query = st.render();
+
+        logger.debug(query);
+
+        jdbcTemplate.execute(query);
+    }
 
     @Override
     public boolean isClean() {
+        //TODO: add base entity tables
         String query = String.format(COUNT_TABLE, getConfig().getArrayKeyFilterValuesTableName());
         logger.debug(query);
         if(jdbcTemplate.queryForInt(query) > 0)

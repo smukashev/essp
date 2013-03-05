@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
+import kz.bsbnb.usci.eav.GenericTestCase;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -21,10 +22,9 @@ import static org.junit.Assert.fail;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-public class PostgreSQLBatchDaoImplTest {
+public class PostgreSQLBatchDaoImplTest  extends GenericTestCase
+{
 
-	@Autowired
-    IStorage postgreSQLStorageImpl;
     @Autowired
     IBatchDao postgreSQLBatchDaoImpl;
 
@@ -35,69 +35,52 @@ public class PostgreSQLBatchDaoImplTest {
 
     @Test
     public void saveAndLoadBatch() throws Exception {
-        try {
-            postgreSQLStorageImpl.initialize();
+        logger.debug("Create and load batch test");
 
-            logger.debug("Create and load batch test");
+        Batch batchCreate = new Batch();
+        Batch loadBatchNotExists;
 
-            Batch batchCreate = new Batch();
-            Batch loadBatchNotExists;
-
-            try
-            {
-                loadBatchNotExists = postgreSQLBatchDaoImpl.load(1000);
-            }
-            catch (IllegalArgumentException e)
-            {
-                logger.debug("Can't load not existing batch, and that's ok");
-                loadBatchNotExists = null;
-            }
-            assertTrue(loadBatchNotExists == null);
-
-            long batchId = postgreSQLBatchDaoImpl.save(batchCreate);
-            Batch batchLoadedById = postgreSQLBatchDaoImpl.load(batchId);
-            assertTrue(batchCreate.equals(batchLoadedById));
-        }
-        finally
+        try
         {
-            postgreSQLStorageImpl.clear();
+            loadBatchNotExists = postgreSQLBatchDaoImpl.load(1000);
         }
+        catch (IllegalArgumentException e)
+        {
+            logger.debug("Can't load not existing batch, and that's ok");
+            loadBatchNotExists = null;
+        }
+        assertTrue(loadBatchNotExists == null);
+
+        long batchId = postgreSQLBatchDaoImpl.save(batchCreate);
+        Batch batchLoadedById = postgreSQLBatchDaoImpl.load(batchId);
+        assertTrue(batchCreate.equals(batchLoadedById));
     }
     
     @Test
     public void deleteBatch() throws Exception {
-        try {
-            postgreSQLStorageImpl.initialize();
+        logger.debug("Delete batch test.");
 
-            logger.debug("Delete batch test.");
+        Batch batchCreate = new Batch();
+        postgreSQLBatchDaoImpl.save(batchCreate);
 
-            Batch batchCreate = new Batch();
-            postgreSQLBatchDaoImpl.save(batchCreate);
-
-            try
-            {
-                Batch dbBatch = postgreSQLBatchDaoImpl.load(batchCreate.getId());
-            }
-            catch(IllegalArgumentException e)
-            {
-                fail(String.format("Can't load Batch: %s", e.getMessage()));
-            }
-
-            postgreSQLBatchDaoImpl.remove(batchCreate);
-
-            try
-            {
-                postgreSQLBatchDaoImpl.load(batchCreate.getId());
-                fail("Loaded removed batch");
-            }
-            catch(IllegalArgumentException e)
-            {
-            }
-
-        }
-        finally
+        try
         {
-            postgreSQLStorageImpl.clear();
+            Batch dbBatch = postgreSQLBatchDaoImpl.load(batchCreate.getId());
+        }
+        catch(IllegalArgumentException e)
+        {
+            fail(String.format("Can't load Batch: %s", e.getMessage()));
+        }
+
+        postgreSQLBatchDaoImpl.remove(batchCreate);
+
+        try
+        {
+            postgreSQLBatchDaoImpl.load(batchCreate.getId());
+            fail("Loaded removed batch");
+        }
+        catch(IllegalArgumentException e)
+        {
         }
     }
 

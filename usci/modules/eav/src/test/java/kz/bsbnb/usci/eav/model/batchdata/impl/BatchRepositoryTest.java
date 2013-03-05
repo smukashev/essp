@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.model.batchdata.impl;
 
 import junit.framework.Assert;
+import kz.bsbnb.usci.eav.GenericTestCase;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.batchdata.IBatchRepository;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
@@ -23,7 +24,8 @@ import static org.junit.Assert.fail;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-public class BatchRepositoryTest {
+public class BatchRepositoryTest  extends GenericTestCase
+{
 
     private final Logger logger = LoggerFactory.getLogger(BatchRepositoryTest.class);
 
@@ -31,23 +33,10 @@ public class BatchRepositoryTest {
     private IBatchDao batchDao;
 
     @Autowired
-    IStorage storage;
-
-    @Autowired
     IBatchRepository batchRepository;
 
     @Test
     public void testAddBatch() throws Exception {
-
-        if(!storage.testConnection())
-        {
-            logger.error("Can't connect to storage.");
-            System.exit(1);
-        }
-
-        storage.clear();
-        storage.initialize();
-
 
         Batch batchStored = new Batch(new Timestamp(new Date().getTime()));
 

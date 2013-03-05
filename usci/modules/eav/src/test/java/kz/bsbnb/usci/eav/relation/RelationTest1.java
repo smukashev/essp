@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.relation;
 
 import junit.framework.Assert;
+import kz.bsbnb.usci.eav.GenericTestCase;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.BaseSet;
 import kz.bsbnb.usci.eav.model.Batch;
@@ -34,12 +35,9 @@ import static junit.framework.Assert.fail;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-public class RelationTest1
+public class RelationTest1  extends GenericTestCase
 {
     private final Logger logger = LoggerFactory.getLogger(RelationTest1.class);
-
-    @Autowired
-    IStorage storage;
 
     @Autowired
     IMetaClassDao metaClassDao;
@@ -163,15 +161,6 @@ public class RelationTest1
     @Test
     public void MetaClassBaseEntityRelation()
     {
-        if(!storage.testConnection())
-        {
-            logger.error("Can't connect to storage.");
-            System.exit(1);
-        }
-
-        storage.clear();
-        storage.initialize();
-
         Batch batch = new Batch(new Timestamp(new Date().getTime()));
         batchDao.save(batch);
 
@@ -189,15 +178,6 @@ public class RelationTest1
     @Test
     public void equalsTest()
     {
-        if(!storage.testConnection())
-        {
-            logger.error("Can't connect to storage.");
-            System.exit(1);
-        }
-
-        storage.clear();
-        storage.initialize();
-
         Batch batch = new Batch(new Timestamp(new Date().getTime()));
         batchDao.save(batch);
 
@@ -220,20 +200,10 @@ public class RelationTest1
     @Test
     public void compareTest()
     {
-        if(!storage.testConnection())
-        {
-            logger.error("Can't connect to storage.");
-            System.exit(1);
-        }
-
         if (baseEntitySearcher == null)
         {
             fail("No base entity searcher found in spring config!");
         }
-
-        storage.clear();
-        storage.initialize();
-
         Batch batch = new Batch(new Timestamp(new Date().getTime()));
         batchDao.save(batch);
 

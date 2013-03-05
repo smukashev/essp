@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.model;
 
 import junit.framework.Assert;
+import kz.bsbnb.usci.eav.GenericTestCase;
 import org.junit.Test;
 
 import java.sql.Timestamp;
@@ -9,7 +10,8 @@ import java.util.Date;
 /**
  *  @author abukabayev
  */
-public class BatchTest {
+public class BatchTest  extends GenericTestCase
+{
     @Test
     public void testGetReceipt() throws Exception {
         Timestamp tt = new Timestamp(new Date().getTime());

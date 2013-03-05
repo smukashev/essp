@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.impl;
 
+import kz.bsbnb.usci.eav.GenericTestCase;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
@@ -16,7 +17,8 @@ import static junit.framework.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-public class BasicBaseEntitySearcherTest {
+public class BasicBaseEntitySearcherTest  extends GenericTestCase
+{
     @Autowired
     private IBaseEntitySearcher basicBaseEntitySearcher;
 

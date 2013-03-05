@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.model.metadata.impl;
 
+import kz.bsbnb.usci.eav.GenericTestCase;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -18,15 +19,14 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-public class BasicMetaClassRepositoryImplTest {
+public class BasicMetaClassRepositoryImplTest  extends GenericTestCase
+{
 
     private final Logger logger = LoggerFactory.getLogger(BasicMetaClassRepositoryImplTest.class);
 
     @Autowired
     BasicMetaClassRepositoryImpl basicMetaClassRepositoryImpl;
 
-    @Autowired
-    IStorage storageImpl;
     @Autowired
     IMetaClassDao metaClassDaoImpl;
 
@@ -35,22 +35,14 @@ public class BasicMetaClassRepositoryImplTest {
     {
         logger.debug("getMetaClass test started");
 
-        try {
-            storageImpl.initialize();
+        logger.debug("Create metadata test");
 
-            logger.debug("Create metadata test");
+        MetaClass metaCreate = PostgreSQLMetaClassDaoImplTest.generateFullMetaClass();
 
-            MetaClass metaCreate = PostgreSQLMetaClassDaoImplTest.generateFullMetaClass();
+        long id = metaClassDaoImpl.save(metaCreate);
 
-            long id = metaClassDaoImpl.save(metaCreate);
+        MetaClass loadedByNameMetaCreate = basicMetaClassRepositoryImpl.getMetaClass("testClass");
 
-            MetaClass loadedByNameMetaCreate = basicMetaClassRepositoryImpl.getMetaClass("testClass");
-
-            assertTrue(metaCreate.equals(loadedByNameMetaCreate));
-        }
-        finally
-        {
-            storageImpl.clear();
-        }
+        assertTrue(metaCreate.equals(loadedByNameMetaCreate));
     }
 }

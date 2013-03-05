@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.model.batchdata.impl;
 
 import junit.framework.Assert;
+import kz.bsbnb.usci.eav.GenericTestCase;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
@@ -21,15 +22,13 @@ import static junit.framework.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-public class BaseValueTest {
+public class BaseValueTest  extends GenericTestCase
+{
 
     private final Logger logger = LoggerFactory.getLogger(BatchRepositoryTest.class);
 
     @Autowired
     private IBatchDao batchDao;
-
-    @Autowired
-    IStorage storage;
 
     @Test
     public void testBatchIsNull() {
@@ -64,15 +63,6 @@ public class BaseValueTest {
     @Test
     public void testGetBatch(){
 
-        if(!storage.testConnection())
-        {
-            logger.error("Can't connect to storage.");
-            System.exit(1);
-        }
-
-        storage.clear();
-        storage.initialize();
-
         Batch batch = new Batch();
         Long batchId = batchDao.save(batch);
         BaseValue bv = new BaseValue(batch,1L,null);
@@ -82,17 +72,6 @@ public class BaseValueTest {
 
     @Test
     public void testEquals(){
-
-        if(!storage.testConnection())
-        {
-            logger.error("Can't connect to storage.");
-            System.exit(1);
-        }
-
-        storage.clear();
-        storage.initialize();
-
-
 
         Batch batch = new Batch();
         Long batchId = batchDao.save(batch);

@@ -4,6 +4,7 @@
  */
 package kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao;
 
+import kz.bsbnb.usci.eav.GenericTestCase;
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.metadata.DataTypes;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.*;
@@ -31,26 +32,15 @@ import static org.junit.Assert.fail;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-public class PostgreSQLMetaClassDaoImplTest {
+public class PostgreSQLMetaClassDaoImplTest extends GenericTestCase
+{
 	
-	@Autowired
-    IStorage postgreSQLStorageImpl;
 	@Autowired
     IMetaClassDao postgreSQLMetaClassDaoImpl;
 	
 	private final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
 	
 	public PostgreSQLMetaClassDaoImplTest() {
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        postgreSQLStorageImpl.initialize();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        postgreSQLStorageImpl.clear();
     }
 
     static public MetaClass generateFullMetaClass()
