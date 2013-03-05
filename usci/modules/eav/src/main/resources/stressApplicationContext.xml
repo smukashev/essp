@@ -26,7 +26,7 @@
         <property name="staticMethod" value="org.springframework.util.Log4jConfigurer.initLogging"/>
         <property name="arguments">
             <list>
-                <value>classpath:log4j.properties</value>
+                <value>classpath:properties/log4j.properties</value>
             </list>
         </property>
     </bean>
@@ -49,4 +49,11 @@
     <bean id="JDBCConfig" class="kz.bsbnb.usci.eav.persistance.impl.db.JDBCConfig"/>
     <bean id="SQLStats" class="kz.bsbnb.usci.eav.stats.SQLQueriesStats"/>
     <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav.model.batchdata.impl.BatchRepository"/>
+
+    <bean id="stRawGroupDir" class="org.stringtemplate.v4.STRawGroupDir">
+        <constructor-arg index="0" value="${ds.templates_dir}"/>
+        <constructor-arg index="1" value="$"/>
+        <constructor-arg index="2" value="$"/>
+    </bean>
+
 </beans>

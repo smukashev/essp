@@ -11,7 +11,14 @@
 
     <context:annotation-config/>
     <context:component-scan base-package="kz.bsbnb.usci.batch"/>
-    <context:property-placeholder location="classpath:properties/jdbc.properties"/>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:properties/dataSource.properties</value>
+            </list>
+        </property>
+    </bean>
 
     <bean id="log4jInitializer" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="staticMethod" value="org.springframework.util.Log4jConfigurer.initLogging"/>
@@ -33,9 +40,10 @@
 
     <context:component-scan base-package="kz.bsbnb.usci.eav.persistance.impl.db.postgresql" />
     <context:component-scan base-package="kz.bsbnb.usci.eav.model.metadata.impl" />
-    <!--<context:component-scan base-package="kz.bsbnb.usci.batch.helper.impl" />
-    <context:component-scan base-package="kz.bsbnb.usci.batch.parser.impl" />-->
-    <context:component-scan base-package="kz.bsbnb.usci.batch" />
+    <context:component-scan base-package="kz.bsbnb.usci.batch.helper.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.batch.reader.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.batch.writer.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.batch.processor.impl" />
 
     <bean id="JDBCConfig" class="kz.bsbnb.usci.eav.persistance.impl.db.JDBCConfig"/>
     <bean id="SQLStats" class="kz.bsbnb.usci.eav.stats.SQLQueriesStats"/>
@@ -63,5 +71,11 @@
         </batch:step>
     </batch:job>
 
+
+    <bean id="stRawGroupDir" class="org.stringtemplate.v4.STRawGroupDir">
+        <constructor-arg index="0" value="${ds.templates_dir}"/>
+        <constructor-arg index="1" value="$"/>
+        <constructor-arg index="2" value="$"/>
+    </bean>
 
 </beans>

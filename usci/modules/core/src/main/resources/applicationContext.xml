@@ -32,6 +32,12 @@
         </property>
     </bean>
 
+    <bean id="stRawGroupDir" class="org.stringtemplate.v4.STRawGroupDir">
+        <constructor-arg index="0" value="${ds.templates_dir}"/>
+        <constructor-arg index="1" value="$"/>
+        <constructor-arg index="2" value="$"/>
+    </bean>
+
     <!-- spring transaction manager -->
     <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
@@ -56,12 +62,6 @@
         <property name="service" ref="entityServiceImpl"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IEntityService"/>
         <property name="registryPort" value="1099"/>
-    </bean>
-
-    <bean id="stRawGroupDir" class="org.stringtemplate.v4.STRawGroupDir">
-        <constructor-arg index="0" value="${ds.templates_dir}"/>
-        <constructor-arg index="1" value="$"/>
-        <constructor-arg index="2" value="$"/>
     </bean>
 
 </beans>

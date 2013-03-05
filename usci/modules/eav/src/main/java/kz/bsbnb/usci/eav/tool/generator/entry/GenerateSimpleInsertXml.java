@@ -3,6 +3,7 @@ package kz.bsbnb.usci.eav.tool.generator.entry;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
+import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.tool.generator.data.impl.BaseEntityGenerator;
@@ -22,10 +23,10 @@ import java.util.Date;
 /**
  * @author k.tulbassiyev
  */
-public class GenerateXml
+public class GenerateSimpleInsertXml
 {
     private final static Logger logger
-            = LoggerFactory.getLogger(GenerateXml.class);
+            = LoggerFactory.getLogger(GenerateSimpleInsertXml.class);
 
     private final static int DATA_SIZE = 100;
     private final static String FILE_PATH = "/opt/xmls/test.xml";
@@ -43,6 +44,7 @@ public class GenerateXml
 
         IStorage storage = ctx.getBean(IStorage.class);
         IMetaClassDao metaClassDao = ctx.getBean(IMetaClassDao.class);
+        IBatchDao batchDao = ctx.getBean(IBatchDao.class);
 
         ArrayList<MetaClass> data = new ArrayList<MetaClass>();
         ArrayList<BaseEntity> entities = new ArrayList<BaseEntity>();
@@ -72,6 +74,10 @@ public class GenerateXml
         logger.info("Data has been generated.");
 
         Batch batch = new Batch(new Timestamp(new Date().getTime()));
+
+        long batchId = batchDao.save(batch);
+
+        batch = batchDao.load(batchId);
 
         long index = 0L;
 
