@@ -3,6 +3,7 @@ package kz.bsbnb.usci.sync.job.impl;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.sync.job.AbstractJob;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
@@ -16,39 +17,34 @@ import java.util.List;
 /**
  * @author k.tulbassiyev
  */
-@Component
 public class DataJob extends AbstractJob
 {
-    private List<BaseEntity> entities = Collections.synchronizedList(new ArrayList<BaseEntity>());
-    private List<BaseEntity> entitiesInProcess = Collections.synchronizedList(new ArrayList<BaseEntity>());
-
-    private List<ProcessJob> processJobs = new ArrayList<ProcessJob>();
-    private List<ProcessJob> waitingJobs = new ArrayList<ProcessJob>();
-
-    private final int SLEEP_TIME_NORMAL = 1000;
-    private final int SLEEP_TIME_LONG = 5000;
-    private final int SKIP_TIME_MAX = 10;
-
-    private final int MAX_THREAD = 30;
-
-    private int skip_count = 0;
-
     @Autowired
     RmiProxyFactoryBean rmiProxyFactoryBean;
 
     IEntityService entityService;
 
-    @PostConstruct
-    public void init()
-    {
-        entityService = (IEntityService) rmiProxyFactoryBean.getObject();
+    private final List<BaseEntity> entities = Collections.synchronizedList(new ArrayList<BaseEntity>());
+    private final List<BaseEntity> entitiesInProcess = Collections.synchronizedList(new ArrayList<BaseEntity>());
+    private final List<ProcessJob> processJobs = new ArrayList<ProcessJob>();
+    private final List<ProcessJob> waitingJobs = new ArrayList<ProcessJob>();
 
-        run();
-    }
+    private final int SLEEP_TIME_NORMAL = 1000;
+    private final int SLEEP_TIME_LONG = 5000;
+    private final int SKIP_TIME_MAX = 10;
+    private final int MAX_THREAD = 30;
+
+    private int skip_count = 0;
+
+    private final Logger logger = Logger.getLogger(DataJob.class);
 
     @Override
     public void run()
     {
+        logger.info("DataJob has been executed");
+
+        entityService = (IEntityService) rmiProxyFactoryBean.getObject();
+
         while(true)
         {
             try
@@ -68,17 +64,15 @@ public class DataJob extends AbstractJob
                         if(processJobs.size() < MAX_THREAD)
                         {
                             processJobs.add(processJob);
-
                             processJob.start();
                         }
                         else
-                        {
                             waitingJobs.add(processJob);
-                        }
-
                     }
                     else
+                    {
                         Thread.sleep(SLEEP_TIME_NORMAL);
+                    }
                 }
                 else
                 {
@@ -92,16 +86,57 @@ public class DataJob extends AbstractJob
 
                 if(waitingJobs.size() > 0 && processJobs.size() < MAX_THREAD)
                 {
-                    for (ProcessJob waitingJob : waitingJobs)
+                    Iterator<ProcessJob> iterator = waitingJobs.iterator();
+
+                    while(iterator.hasNext())
                     {
-                        if(isClear(waitingJob.getBaseEntity()))
+                        ProcessJob waitingJob = iterator.next();
+
+                        if(processJobs.size() < MAX_THREAD && isClear(waitingJob.getBaseEntity()))
                         {
+                            iterator.remove();
                             processJobs.add(waitingJob);
                             entitiesInProcess.add(waitingJob.getBaseEntity());
                             waitingJob.start();
                         }
                     }
+                }
 
+                //
+
+                if(processJobs.size() > 0)
+                {
+                    Iterator<ProcessJob> processJobIterator = processJobs.iterator();
+
+                    while(processJobIterator.hasNext())
+                    {
+                        ProcessJob processJob = processJobIterator.next();
+
+                        boolean entityProcessRemoved = false;
+
+                        if(!processJob.isAlive())
+                        {
+                            BaseEntity entity = processJob.getBaseEntity();
+
+                            Iterator<BaseEntity> entityProcessIterator = entitiesInProcess.iterator();
+
+                            while(entityProcessIterator.hasNext())
+                            {
+                                if(entity.equals(entityProcessIterator.next()))
+                                {
+                                    entityProcessIterator.remove();
+                                    entityProcessRemoved = true;
+                                    break;
+                                }
+                            }
+
+                            processJobIterator.remove();
+
+                            // for debug; in production will be deleted
+                            if(!entityProcessRemoved)
+                                throw new IllegalStateException("CRITICAL: Entity has not been removed.");
+                         }
+                    }
                 }
 
                 // for debug; in production will be deleted
@@ -139,16 +174,16 @@ public class DataJob extends AbstractJob
     {
         for (BaseEntity entity : entitiesInProcess)
             if(hasCrossLine(baseEntity, entity))
-                return true;
+                return false;
 
-        return false;
+        return true;
     }
 
     public boolean hasCrossLine(BaseEntity entity1, BaseEntity entity2)
     {
         // todo: implement
-        if(entity1.equals(entity2))
-            return true;
+        /*if(entity1.equals(entity2))
+            return true;*/
 
         return false;
     }
