@@ -12,6 +12,6 @@ public class EntityProcessor<T, O> implements AbstractProcessor<T, O>
     @Override
     public O process(T item) throws Exception
     {
-        return (O)item;
+        return (O) item;
     }
 }

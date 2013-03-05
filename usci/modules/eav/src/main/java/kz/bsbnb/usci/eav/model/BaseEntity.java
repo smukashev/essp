@@ -223,7 +223,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
 
     @Override
     public boolean equals(Object obj) {
-       if (obj == this)
+        if (obj == this)
             return true;
 
         if (obj == null)
@@ -241,8 +241,6 @@ public class BaseEntity extends Persistable implements IBaseContainer
             if (thisAttributeCount != thatAttributeCount)
                 return false;
 
-            // todo: implement and complete
-
             Iterator<String> valuesIt = values.keySet().iterator();
             while (valuesIt.hasNext())
             {
@@ -250,10 +248,12 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 IBaseValue thisValue = this.getBaseValue(attributeName);
                 IBaseValue thatValue = that.getBaseValue(attributeName);
 
+                logger.debug("Attribute: " + attributeName);
+                logger.debug("This: " + thisValue);
+                logger.debug("That: " + thatValue);
+
                 if(thisValue == null || thatValue == null)
                     return false;
-
-                logger.debug("Attribute: " + attributeName);
 
                 if (this.getMeta().getMemberType(attributeName).isArray())
                 {

@@ -45,4 +45,6 @@
         <property name="registryPort" value="1098"/>
     </bean>
 
+    <bean class="kz.bsbnb.usci.sync.job.impl.DataJob" id="dataJob" init-method="start" />
+
 </beans>

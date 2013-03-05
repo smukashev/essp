@@ -12,6 +12,7 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
@@ -25,6 +26,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Timestamp;
 import java.util.Date;
+
+import static junit.framework.Assert.fail;
 
 /**
  * @author k.tulbassiyev
@@ -50,21 +53,11 @@ public class RelationTest1
     @Autowired
     IMetaFactory metaFactory;
 
-    @Test
-    public void MetaClassBaseEntityRelation()
+    @Autowired
+    IBaseEntitySearcher baseEntitySearcher;
+
+    private MetaClass generateMetaClass()
     {
-        if(!storage.testConnection())
-        {
-            logger.error("Can't connect to storage.");
-            System.exit(1);
-        }
-
-        storage.clear();
-        storage.initialize();
-
-        Batch batch = new Batch(new Timestamp(new Date().getTime()));
-        batchDao.save(batch);
-
         MetaClass metaStreetHolder = new MetaClass("street");
         metaStreetHolder.setMetaAttribute("lang",
                 new MetaAttribute(false, false, new MetaValue(DataTypes.STRING)));
@@ -103,7 +96,7 @@ public class RelationTest1
 
         MetaClass metaSubjectHolder = new MetaClass("subject");
         metaSubjectHolder.setMetaAttribute("name",
-                new MetaAttribute(metaNameHolder));
+                new MetaAttribute(true, false, metaNameHolder));
         metaSubjectHolder.setMetaAttribute("documents",
                 new MetaAttribute(metaDocumentsHolder));
         metaSubjectHolder.setMetaAttribute("address",
@@ -113,12 +106,13 @@ public class RelationTest1
         metaContractHolder.setMetaAttribute("no",
                 new MetaAttribute(true, false, new MetaValue(DataTypes.INTEGER)));
         metaContractHolder.setMetaAttribute("subject",
-                new MetaAttribute(metaSubjectHolder));
+                new MetaAttribute(true, false, metaSubjectHolder));
 
-        metaClassDao.save(metaContractHolder);
+        return metaContractHolder;
+    }
 
-        // ----------------------------------------------------------------------
-
+    private BaseEntity generateBaseEntity(Batch batch)
+    {
         BaseEntity streetEntity = metaFactory.getBaseEntity("street");
         streetEntity.put("lang", new BaseValue(batch, 1, "KAZ"));
         streetEntity.put("value", new BaseValue(batch, 1, "ABAY"));
@@ -163,14 +157,98 @@ public class RelationTest1
         contractEntity.put("no", new BaseValue(batch, 8, 12345));
         contractEntity.put("subject", new BaseValue(batch, 8, subjectEntity));
 
+        return contractEntity;
+    }
+
+    @Test
+    public void MetaClassBaseEntityRelation()
+    {
+        if(!storage.testConnection())
+        {
+            logger.error("Can't connect to storage.");
+            System.exit(1);
+        }
+
+        storage.clear();
+        storage.initialize();
+
+        Batch batch = new Batch(new Timestamp(new Date().getTime()));
+        batchDao.save(batch);
+
+        metaClassDao.save(generateMetaClass());
+
+        BaseEntity contractEntity = generateBaseEntity(batch);
+
         long id = baseEntityDao.save(contractEntity);
 
         BaseEntity contractEntityTest = baseEntityDao.load(id);
 
         Assert.assertEquals(contractEntity, contractEntityTest);
 
-        documentEntity1.put("type", new BaseValue(batch, 4, "RNN123"));
+        //TODO: return back
+        //documentEntity1.put("type", new BaseValue(batch, 4, "RNN123"));
 
-        Assert.assertTrue(!contractEntity.equals(contractEntityTest));
+        //Assert.assertTrue(!contractEntity.equals(contractEntityTest));
+    }
+
+    @Test
+    public void equalsTest()
+    {
+        if(!storage.testConnection())
+        {
+            logger.error("Can't connect to storage.");
+            System.exit(1);
+        }
+
+        storage.clear();
+        storage.initialize();
+
+        Batch batch = new Batch(new Timestamp(new Date().getTime()));
+        batchDao.save(batch);
+
+        metaClassDao.save(generateMetaClass());
+
+        BaseEntity contractEntity = generateBaseEntity(batch);
+        BaseEntity contractEntity1 = generateBaseEntity(batch);
+
+        Assert.assertEquals(contractEntity, contractEntity1);
+    }
+
+    @Test
+    public void compareTest()
+    {
+        if(!storage.testConnection())
+        {
+            logger.error("Can't connect to storage.");
+            System.exit(1);
+        }
+
+        if (baseEntitySearcher == null)
+        {
+            fail("No base entity searcher found in spring config!");
+        }
+
+        storage.clear();
+        storage.initialize();
+
+        Batch batch = new Batch(new Timestamp(new Date().getTime()));
+        batchDao.save(batch);
+
+        metaClassDao.save(generateMetaClass());
+
+        BaseEntity contractEntity = generateBaseEntity(batch);
+        BaseEntity contractEntity1 = generateBaseEntity(batch);
+
+        logger.debug("Trying same objects");
+        Assert.assertTrue(baseEntitySearcher.compare(contractEntity, contractEntity1));
+
+        BaseEntity subject = (BaseEntity)contractEntity1.getBaseValue("subject").getValue();
+
+        BaseEntity nameEntity = (BaseEntity)subject.getBaseValue("name").getValue();
+
+        nameEntity.put("firstname", new BaseValue(batch, 6, "KANAT_some_fix"));
+
+        logger.debug("Trying changed first name objects");
+        Assert.assertFalse(baseEntitySearcher.compare(contractEntity, contractEntity1));
     }
 }

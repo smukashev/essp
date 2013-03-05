@@ -7,7 +7,11 @@ import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STRawGroupDir;
 
 import java.util.List;
 import java.util.Map;
@@ -25,640 +29,87 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
     private final static String DROP_TABLE_CASCADE = "DROP TABLE IF EXISTS %s CASCADE";
     private final static String COUNT_TABLE = "SELECT count(*) FROM %s";
 
-    private final static String BATCH_FILES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, file_data BYTEA NOT NULL, file_size double precision NOT NULL, file_name character varying(%d), batch_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
+    @Autowired
+    STRawGroupDir stRawGroupDir;
 
-    private final static String INDEXES_QUERY = "select pg_index.indexrelid::regclass, 'create index ' || relname || '_' ||\n" +
-            " array_to_string(column_name_list, '_') || '_idx on ' || conrelid ||\n" +
-            " ' (' || array_to_string(column_name_list, ',') || ')' as query\n" +
-            "from (select distinct\n" +
-            " conrelid,\n" +
-            " array_agg(attname) column_name_list,\n" +
-            " array_agg(attnum) as column_list\n" +
-            " from pg_attribute\n" +
-            " join (select conrelid::regclass,\n" +
-            " conname,\n" +
-            " unnest(conkey) as column_index\n" +
-            " from (select distinct\n" +
-            " conrelid, conname, conkey\n" +
-            " from pg_constraint\n" +
-            " join pg_class on pg_class.oid = pg_constraint.conrelid\n" +
-            " join pg_namespace on pg_namespace.oid = pg_class.relnamespace\n" +
-            " where nspname !~ '^pg_' and nspname <> 'information_schema'\n" +
-            " ) fkey\n" +
-            " ) fkey\n" +
-            " on fkey.conrelid = pg_attribute.attrelid\n" +
-            " and fkey.column_index = pg_attribute.attnum\n" +
-            " group by conrelid, conname\n" +
-            " ) candidate_index\n" +
-            "join pg_class on pg_class.oid = candidate_index.conrelid\n" +
-            "left join pg_index on pg_index.indrelid = conrelid\n" +
-            " and indkey::text = array_to_string(column_list, ' ')\n" +
-            "where indexrelid is null";
+    //TODO: Remove?
+    //private final static String BATCH_FILES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, file_data BYTEA NOT NULL, file_size double precision NOT NULL, file_name character varying(%d), batch_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
 
-    private final String CONTAINING_ID_INDEX = "CREATE INDEX %s_containing_id_idx ON %s (containing_id)";
-
-    private final String CLASS_ID_INDEX = "CREATE INDEX %s_class_id_idx ON %s (class_id)";
-
-    private void createIndexes()
+    private void setTableNames(ST st)
     {
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(INDEXES_QUERY);
+        st.add("meta_objects", getConfig().getMetaObjectTableName());
+        st.add("classes", getConfig().getClassesTableName());
+        st.add("attributes", getConfig().getAttributesTableName());
+        st.add("simple_attributes", getConfig().getSimpleAttributesTableName());
+        st.add("complex_attributes", getConfig().getComplexAttributesTableName());
+        st.add("sets", getConfig().getSetTableName());
+        st.add("simple_sets", getConfig().getSimpleSetTableName());
+        st.add("complex_sets", getConfig().getComplexSetTableName());
+        st.add("set_of_sets", getConfig().getSetOfSetsTableName());
+        st.add("sets_key_filter", getConfig().getArrayKeyFilterTableName());
+        st.add("sets_key_filter_values", getConfig().getArrayKeyFilterValuesTableName());
 
-        for (Map<String, Object> row : rows)
-        {
-            String query = (String)row.get("query");
-            logger.debug(query);
-            jdbcTemplate.update(query);
-        }
+        st.add("batches", getConfig().getBatchesTableName());
+        st.add("be_entities", getConfig().getEntitiesTableName());
+        st.add("be_values", getConfig().getBaseValuesTableName());
+        st.add("be_date_values", getConfig().getBaseDateValuesTableName());
+        st.add("be_double_values", getConfig().getBaseDoubleValuesTableName());
+        st.add("be_integer_values", getConfig().getBaseIntegerValuesTableName());
+        st.add("be_boolean_values", getConfig().getBaseBooleanValuesTableName());
+        st.add("be_string_values", getConfig().getBaseStringValuesTableName());
+        st.add("be_complex_values", getConfig().getBaseComplexValuesTableName());
 
-        String query = String.format(CONTAINING_ID_INDEX,
-                getConfig().getAttributesTableName(),
-                getConfig().getAttributesTableName());
-        logger.debug(query);
-        jdbcTemplate.update(query);
+        st.add("be_sets", getConfig().getBaseSetsTableName());
+        st.add("be_entity_sets", getConfig().getBaseEntitySetsTableName());
+        st.add("be_entity_simple_sets", getConfig().getBaseEntitySimpleSetsTableName());
+        st.add("be_entity_complex_sets", getConfig().getBaseEntityComplexSetsTableName());
+        st.add("be_set_of_sets", getConfig().getBaseSetOfSetsTableName());
+        st.add("be_set_of_simple_sets", getConfig().getBaseSetOfSimpleSetsTableName());
+        st.add("be_set_of_complex_sets", getConfig().getBaseSetOfComplexSetsTableName());
 
-        query = String.format(CONTAINING_ID_INDEX,
-                getConfig().getSimpleAttributesTableName(),
-                getConfig().getSimpleAttributesTableName());
-        logger.debug(query);
-        jdbcTemplate.update(query);
+        st.add("be_set_values", getConfig().getBaseSetValuesTableName());
+        st.add("be_set_dates_values", getConfig().getBaseDateSetValuesTableName());
+        st.add("be_set_double_values", getConfig().getBaseDoubleSetValuesTableName());
+        st.add("be_set_integer_values", getConfig().getBaseIntegerSetValuesTableName());
+        st.add("be_set_boolean_values", getConfig().getBaseBooleanSetValuesTableName());
+        st.add("be_set_string_values", getConfig().getBaseStringSetValuesTableName());
+        st.add("be_set_complex_values", getConfig().getBaseComplexSetValuesTableName());
 
-        query = String.format(CONTAINING_ID_INDEX,
-                getConfig().getSimpleArrayTableName(),
-                getConfig().getSimpleArrayTableName());
-        logger.debug(query);
-        jdbcTemplate.update(query);
-
-        query = String.format(CONTAINING_ID_INDEX,
-                getConfig().getComplexArrayTableName(),
-                getConfig().getComplexArrayTableName());
-        logger.debug(query);
-        jdbcTemplate.update(query);
-
-        query = String.format(CONTAINING_ID_INDEX,
-                getConfig().getComplexAttributesTableName(),
-                getConfig().getComplexAttributesTableName());
-        logger.debug(query);
-        jdbcTemplate.update(query);
-
-        query = String.format(CLASS_ID_INDEX,
-                getConfig().getComplexAttributesTableName(),
-                getConfig().getComplexAttributesTableName());
-        logger.debug(query);
-        jdbcTemplate.update(query);
+        st.add("complex_key_length", getConfig().getComplexKeyTypeCodeLength());
+        st.add("class_name_length", getConfig().getClassNameLength());
+        st.add("attribute_name_length", getConfig().getAttributeNameLength());
+        st.add("type_code_length", getConfig().getTypeCodeLength());
+        st.add("array_key_length", getConfig().getArrayKeyTypeCodeLength());
+        st.add("string_value_length", getConfig().getStringValueLength());
+        st.add("array_key_filter_length", getConfig().getArrayKeyFilterValueLength());
     }
 
-	@Override
+    @Override
 	public void initialize() {
-        String query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "id serial NOT NULL, " +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id ) " +
-                        ")",
-                getConfig().getMetaObjectTableName(),
-                getConfig().getMetaObjectTableName());
+        ST st = stRawGroupDir.getInstanceOf("pg_create");
+
+        setTableNames(st);
+
+        String query = st.render();
 
         logger.debug(query);
 
         jdbcTemplate.execute(query);
-        //----------------------------------------------
-        //addToArray unique constraint on name
-	    query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "complex_key_type character varying(%d), " +
-                        "begin_date TIMESTAMP WITH TIME ZONE NOT NULL, " +
-                        "is_disabled BOOLEAN NOT NULL, " +
-                        "name character varying(%d) NOT NULL, " +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id ), " +
-                        "UNIQUE (name, begin_date) " +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getClassesTableName(),
-                getConfig().getComplexKeyTypeCodeLength(),
-                getConfig().getClassNameLength(),
-                getConfig().getClassesTableName(),
-                getConfig().getMetaObjectTableName());
-	    
-	    logger.debug(query);
-	    
-	    jdbcTemplate.execute(query);
-	    //----------------------------------------------
-	    //basic attribute
-	    query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "containing_id int, " +
-                        "name character varying(%d) NOT NULL, " +
-                        "is_key boolean NOT NULL, " +
-                        "is_nullable boolean NOT NULL, " +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id ), " +
-                        "UNIQUE (containing_id, name) " +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getAttributesTableName(),
-                getConfig().getAttributeNameLength(),
-                getConfig().getAttributesTableName(),
-                getConfig().getMetaObjectTableName());
-	    
-	    logger.debug(query);
-	    
-	    jdbcTemplate.execute(query);
-	    //simple attributes
-	    query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "type_code character varying(%d), " +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id) " +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getSimpleAttributesTableName(),
-                getConfig().getTypeCodeLength(),
-                getConfig().getSimpleAttributesTableName(),
-                getConfig().getAttributesTableName());
-	    
-	    logger.debug(query);
-	    
-	    jdbcTemplate.execute(query);
-	    
-	    //complex attributes
-	    query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "class_id int, " +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id) " +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getComplexAttributesTableName(),
-                getConfig().getComplexAttributesTableName(),
-                getConfig().getAttributesTableName());
-	    
-	    logger.debug(query);
-	    
-	    jdbcTemplate.execute(query);
-	    //array
-	    query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "array_key_type character varying(%d), " +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id) " +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getArrayTableName(),
-                getConfig().getArrayKeyTypeCodeLength(),
-                getConfig().getArrayTableName(),
-                getConfig().getAttributesTableName());
-	    
-	    logger.debug(query);
-	    
-	    jdbcTemplate.execute(query);
-	    
-	    //simple array
-	    query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id) " +
-                        ") " +
-                        "INHERITS (%s, %s)",
-                getConfig().getSimpleArrayTableName(),
-                getConfig().getSimpleArrayTableName(),
-                getConfig().getArrayTableName(), getConfig().getSimpleAttributesTableName());
-	    
-	    logger.debug(query);
-	    
-	    jdbcTemplate.execute(query);
-
-	    //complex array
-	    query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id)" +
-                        ") " +
-                        "INHERITS (%s, %s)",
-                getConfig().getComplexArrayTableName(),
-                getConfig().getComplexArrayTableName(),
-                getConfig().getArrayTableName(), getConfig().getComplexAttributesTableName());
-
-	    logger.debug(query);
-
-	    jdbcTemplate.execute(query);
-
-        //array of array
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id) " +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getArrayArrayTableName(),
-                getConfig().getArrayArrayTableName(),
-                getConfig().getArrayTableName());
-
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //batches
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "id serial NOT NULL, " +
-                        "receipt_date TIMESTAMP WITH TIME ZONE NOT NULL, " +
-                        "begin_date TIMESTAMP WITH TIME ZONE, " +
-                        "end_date TIMESTAMP WITH TIME ZONE, " +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id)" +
-                        ")",
-                getConfig().getBatchesTableName(), getConfig().getBatchesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //entities
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "id serial NOT NULL, " +
-                        "class_id int references %s(id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id )" +
-                        ")",
-                getConfig().getEntitiesTableName(), getConfig().getClassesTableName(),
-                getConfig().getEntitiesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //values
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "id serial NOT NULL, " +
-                        "entity_id int references %s(id) ON DELETE CASCADE, " +
-                        "batch_id bigint references %s(id) ON DELETE CASCADE, " +
-                        "attribute_id int references %s(id) ON DELETE CASCADE, " +
-                        "index bigint, " +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id)" +
-                        ")",
-                getConfig().getBaseValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getBatchesTableName(), getConfig().getAttributesTableName(),
-                getConfig().getBaseValuesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //date values
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "value DATE, " +
-                        "CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE" +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getBaseDateValuesTableName(),
-                getConfig().getBaseDateValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getBaseDateValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseDateValuesTableName(), getConfig().getSimpleAttributesTableName(),
-                getConfig().getBaseValuesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //double values
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "value double precision, " +
-                        "CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE" +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getBaseDoubleValuesTableName(),
-                getConfig().getBaseDoubleValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getBaseDoubleValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseDoubleValuesTableName(), getConfig().getSimpleAttributesTableName(),
-                getConfig().getBaseValuesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //integer values
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "value integer, " +
-                        "CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE" +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getBaseIntegerValuesTableName(),
-                getConfig().getBaseIntegerValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getBaseIntegerValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseIntegerValuesTableName(), getConfig().getSimpleAttributesTableName(),
-                getConfig().getBaseValuesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //boolean values
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "value boolean, " +
-                        "CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE" +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getBaseBooleanValuesTableName(),
-                getConfig().getBaseBooleanValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getBaseBooleanValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseBooleanValuesTableName(), getConfig().getSimpleAttributesTableName(),
-                getConfig().getBaseValuesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //string values
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "value character varying(%d), " +
-                        "CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE" +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getBaseStringValuesTableName(), getConfig().getStringValueLength(),
-                getConfig().getBaseStringValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getBaseStringValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseStringValuesTableName(), getConfig().getSimpleAttributesTableName(),
-                getConfig().getBaseValuesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //complex values
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "entity_value_id bigint references %s(id), " +
-                        "CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE" +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getBaseComplexValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getBaseComplexValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getBaseComplexValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseComplexValuesTableName(), getConfig().getComplexAttributesTableName(),
-                getConfig().getBaseValuesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //base sets
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "id serial NOT NULL, " +
-                        "entity_id int references %s(id) ON DELETE CASCADE, " +
-                        "batch_id bigint references %s(id) ON DELETE CASCADE, " +
-                        "attribute_id int references %s(id) ON DELETE CASCADE, " +
-                        "index bigint, " +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id)" +
-                        ")",
-                getConfig().getBaseSetsTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getBatchesTableName(), getConfig().getArrayTableName(),
-                getConfig().getBaseSetsTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //base simple sets
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id)" +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getBaseSimpleSetsTableName(),
-                getConfig().getBaseSimpleSetsTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getBaseSimpleSetsTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseSimpleSetsTableName(), getConfig().getSimpleArrayTableName(),
-                getConfig().getBaseSimpleSetsTableName(), getConfig().getBaseSetsTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //base complex sets
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "CONSTRAINT %s_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id)" +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getBaseComplexSetsTableName(),
-                getConfig().getBaseComplexSetsTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getBaseComplexSetsTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseComplexSetsTableName(), getConfig().getComplexArrayTableName(),
-                getConfig().getBaseComplexSetsTableName(), getConfig().getBaseSetsTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //base array sets
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "id serial NOT NULL, " +
-                        "set_id bigint references %s(id) ON DELETE CASCADE, " +
-                        "batch_id bigint references %s(id) ON DELETE CASCADE, " +
-                        "index bigint, CONSTRAINT %s_primary_key_index PRIMARY KEY (id)" +
-                        ")",
-                getConfig().getBaseSetValuesTableName(), getConfig().getBaseSetsTableName(),
-                getConfig().getBatchesTableName(), getConfig().getBaseSetValuesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //base date set values
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "value DATE, " +
-                        "CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE" +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getBaseDateSetValuesTableName(),
-                getConfig().getBaseDateSetValuesTableName(), getConfig().getBaseSimpleSetsTableName(),
-                getConfig().getBaseDateSetValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseSetValuesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //base double array values
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "value double precision, " +
-                        "CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE" +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getBaseDoubleSetValuesTableName(),
-                getConfig().getBaseDoubleSetValuesTableName(), getConfig().getBaseSimpleSetsTableName(),
-                getConfig().getBaseDoubleSetValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseSetValuesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //base integer set values
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "value integer, " +
-                        "CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE" +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getBaseIntegerSetValuesTableName(),
-                getConfig().getBaseIntegerSetValuesTableName(), getConfig().getBaseSimpleSetsTableName(),
-                getConfig().getBaseIntegerSetValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseSetValuesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //base boolean set values
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "value boolean, " +
-                        "CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE" +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getBaseBooleanSetValuesTableName(),
-                getConfig().getBaseBooleanSetValuesTableName(), getConfig().getBaseSimpleSetsTableName(),
-                getConfig().getBaseBooleanSetValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseSetValuesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //base string set values
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "value character varying(%d), " +
-                        "CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE" +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getBaseStringSetValuesTableName(), getConfig().getStringValueLength(),
-                getConfig().getBaseStringSetValuesTableName(), getConfig().getBaseSimpleSetsTableName(),
-                getConfig().getBaseStringSetValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseSetValuesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-
-        //base complex set values
-        query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "entity_value_id bigint references %s(id), " +
-                        "CONSTRAINT %s_set_id_fkey FOREIGN KEY (set_id) REFERENCES %s (id) ON DELETE CASCADE, " +
-                        "CONSTRAINT %s_batch_id_fkey FOREIGN KEY (batch_id) REFERENCES %s (id) ON DELETE CASCADE" +
-                        ") " +
-                        "INHERITS (%s)",
-                getConfig().getBaseComplexSetValuesTableName(), getConfig().getEntitiesTableName(),
-                getConfig().getBaseComplexSetValuesTableName(), getConfig().getBaseComplexSetsTableName(),
-                getConfig().getBaseComplexSetValuesTableName(), getConfig().getBatchesTableName(),
-                getConfig().getBaseSetValuesTableName());
-        logger.debug(query);
-
-        jdbcTemplate.execute(query);
-	    //------------------------------------------------
-	    
-	    query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "id serial NOT NULL, " +
-                        "attribute_id int, " +
-                        "attribute_name character varying(%d) NOT NULL, " +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id ))",
-                getConfig().getArrayKeyFilterTableName(),
-                getConfig().getAttributeNameLength(),
-                getConfig().getArrayKeyFilterTableName());
-
-		logger.debug(query);
-		
-		jdbcTemplate.execute(query);
-		
-		query = String.format(
-                "CREATE TABLE IF NOT EXISTS %s " +
-                        "(" +
-                        "id serial NOT NULL, " +
-                        "filter_id int, " +
-                        "value character varying(%d) NOT NULL, " +
-                        "CONSTRAINT %s_primary_key_index PRIMARY KEY (id ))",
-                getConfig().getArrayKeyFilterValuesTableName(),
-                getConfig().getArrayKeyFilterValueLength(),
-                getConfig().getArrayKeyFilterValuesTableName());
-
-		logger.debug(query);
-		
-		jdbcTemplate.execute(query);
-
-        createIndexes();
 	}
 
 	@Override
 	public void clear() {
-		String query = String.format(DROP_TABLE, getConfig().getArrayKeyFilterValuesTableName());
-	    logger.debug(query);
-	    jdbcTemplate.execute(query);
-	    query = String.format(DROP_TABLE, getConfig().getArrayKeyFilterTableName());
-	    logger.debug(query);
-	    jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseValuesTableName());
+
+        ST st = stRawGroupDir.getInstanceOf("pg_drop");
+
+        setTableNames(st);
+
+        String query = st.render();
+
         logger.debug(query);
+
         jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseSetValuesTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE_CASCADE, getConfig().getBaseSetsTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE, getConfig().getEntitiesTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-		query = String.format(DROP_TABLE_CASCADE, getConfig().getAttributesTableName());
-	    logger.debug(query);
-	    jdbcTemplate.execute(query);
-	    query = String.format(DROP_TABLE, getConfig().getEntitiesTableName());
-	    logger.debug(query);
-	    jdbcTemplate.execute(query);
-	    query = String.format(DROP_TABLE, getConfig().getClassesTableName());
-	    logger.debug(query);
-        jdbcTemplate.execute(query);
-        query = String.format(DROP_TABLE, getConfig().getBatchesTableName());
-        logger.debug(query);
-        jdbcTemplate.execute(query);
-	}
+    }
 
 	@Override
 	public void empty() {
@@ -731,5 +182,15 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         }
 
         return true;
+    }
+
+    public STRawGroupDir getStRawGroupDir()
+    {
+        return stRawGroupDir;
+    }
+
+    public void setStRawGroupDir(STRawGroupDir stRawGroupDir)
+    {
+        this.stRawGroupDir = stRawGroupDir;
     }
 }

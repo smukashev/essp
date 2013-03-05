@@ -18,10 +18,10 @@ public class JDBCConfig {
     private String attributesTableName;
     private String simpleAttributesTableName;
     private String complexAttributesTableName;
-    private String arrayTableName;
-    private String complexArrayTableName;
-    private String arrayArrayTableName;
-    private String simpleArrayTableName;
+    private String setTableName;
+    private String complexSetTableName;
+    private String setOfSetsTableName;
+    private String simpleSetTableName;
     private String entitiesTableName;
 
     private String metaObjectTableName;
@@ -35,10 +35,15 @@ public class JDBCConfig {
     private String baseBooleanValuesTableName;
     private String baseStringValuesTableName;
     private String baseComplexValuesTableName;
-    
+
     private String baseSetsTableName;
-    private String baseSimpleSetsTableName;
-    private String baseComplexSetsTableName;
+    private String baseEntitySetsTableName;
+    private String baseEntitySimpleSetsTableName;
+    private String baseEntityComplexSetsTableName;
+    private String baseSetOfSetsTableName;
+    private String baseSetOfSimpleSetsTableName;
+    private String baseSetOfComplexSetsTableName;
+
     private String baseSetValuesTableName;
     private String baseIntegerSetValuesTableName;
     private String baseDoubleSetValuesTableName;
@@ -66,30 +71,35 @@ public class JDBCConfig {
         arrayKeyFilterTableName = tablePrefix + "array_key_filter";
         arrayKeyFilterValuesTableName = tablePrefix + "array_key_filter_values";
         complexAttributesTableName = tablePrefix + "complex_attributes";
-        arrayTableName = tablePrefix + "array";
-        complexArrayTableName = tablePrefix + "complex_array";
-        arrayArrayTableName = tablePrefix + "array_array";
-        simpleArrayTableName = tablePrefix + "simple_array";
+        setTableName = tablePrefix + "set";
+        complexSetTableName = tablePrefix + "complex_set";
+        setOfSetsTableName = tablePrefix + "set_of_sets";
+        simpleSetTableName = tablePrefix + "simple_set";
         batchesTableName = tablePrefix + "batches";
 
-        baseValuesTableName = tablePrefix + "b_values";
-        baseDateValuesTableName = tablePrefix + "b_date_values";
-        baseDoubleValuesTableName = tablePrefix + "b_double_values";
-        baseIntegerValuesTableName = tablePrefix + "b_integer_values";
-        baseBooleanValuesTableName = tablePrefix + "b_boolean_values";
-        baseStringValuesTableName = tablePrefix + "b_string_values";
-        baseComplexValuesTableName = tablePrefix + "b_complex_values";
+        baseValuesTableName = tablePrefix + "be_values";
+        baseDateValuesTableName = tablePrefix + "be_date_values";
+        baseDoubleValuesTableName = tablePrefix + "be_double_values";
+        baseIntegerValuesTableName = tablePrefix + "be_integer_values";
+        baseBooleanValuesTableName = tablePrefix + "be_boolean_values";
+        baseStringValuesTableName = tablePrefix + "be_string_values";
+        baseComplexValuesTableName = tablePrefix + "be_complex_values";
 
-        baseSetsTableName = tablePrefix + "b_sets";
-        baseSimpleSetsTableName = tablePrefix + "b_simple_sets";
-        baseComplexSetsTableName = tablePrefix + "b_complex_sets";
-        baseSetValuesTableName = tablePrefix + "b_set_values";
-        baseDateSetValuesTableName = tablePrefix + "b_date_set_values";
-        baseDoubleSetValuesTableName = tablePrefix + "b_double_set_values";
-        baseIntegerSetValuesTableName = tablePrefix + "b_integer_set_values";
-        baseBooleanSetValuesTableName = tablePrefix + "b_boolean_set_values";
-        baseStringSetValuesTableName = tablePrefix + "b_string_set_values";
-        baseComplexSetValuesTableName = tablePrefix + "b_complex_set_values";
+        baseSetsTableName = tablePrefix + "be_sets";
+        baseEntitySetsTableName = tablePrefix + "be_entity_sets";
+        baseEntitySimpleSetsTableName = tablePrefix + "be_entity_simple_sets";
+        baseEntityComplexSetsTableName = tablePrefix + "be_entity_complex_sets";
+        baseSetOfSetsTableName = tablePrefix + "be_set_of_sets";
+        baseSetOfSimpleSetsTableName = tablePrefix + "be_set_of_simple_sets";
+        baseSetOfComplexSetsTableName = tablePrefix + "be_set_of_complex_sets";
+
+        baseSetValuesTableName = tablePrefix + "be_set_values";
+        baseDateSetValuesTableName = tablePrefix + "be_date_set_values";
+        baseDoubleSetValuesTableName = tablePrefix + "be_double_set_values";
+        baseIntegerSetValuesTableName = tablePrefix + "be_integer_set_values";
+        baseBooleanSetValuesTableName = tablePrefix + "be_boolean_set_values";
+        baseStringSetValuesTableName = tablePrefix + "be_string_set_values";
+        baseComplexSetValuesTableName = tablePrefix + "be_complex_set_values";
     }
 
     public String getClassesTableName() {
@@ -116,16 +126,16 @@ public class JDBCConfig {
         return complexAttributesTableName;
     }
 
-    public String getArrayTableName() {
-        return arrayTableName;
+    public String getSetTableName() {
+        return setTableName;
     }
 
-    public String getComplexArrayTableName() {
-        return complexArrayTableName;
+    public String getComplexSetTableName() {
+        return complexSetTableName;
     }
 
-    public String getSimpleArrayTableName() {
-        return simpleArrayTableName;
+    public String getSimpleSetTableName() {
+        return simpleSetTableName;
     }
 
     public String getEntitiesTableName() {
@@ -168,12 +178,28 @@ public class JDBCConfig {
         return baseSetsTableName;
     }
 
-    public String getBaseSimpleSetsTableName() {
-        return baseSimpleSetsTableName;
+    public String getBaseEntitySetsTableName() {
+        return baseEntitySetsTableName;
     }
 
-    public String getBaseComplexSetsTableName() {
-        return baseComplexSetsTableName;
+    public String getBaseEntitySimpleSetsTableName() {
+        return baseEntitySimpleSetsTableName;
+    }
+
+    public String getBaseEntityComplexSetsTableName() {
+        return baseEntityComplexSetsTableName;
+    }
+
+    public String getBaseSetOfSetsTableName() {
+        return baseSetOfSetsTableName;
+    }
+
+    public String getBaseSetOfSimpleSetsTableName() {
+        return baseSetOfSimpleSetsTableName;
+    }
+
+    public String getBaseSetOfComplexSetsTableName() {
+        return baseSetOfComplexSetsTableName;
     }
 
     public String getBaseSetValuesTableName() {
@@ -232,11 +258,21 @@ public class JDBCConfig {
         return stringValueLength;
     }
 
-    public String getArrayArrayTableName() {
-        return arrayArrayTableName;
+    public String getSetOfSetsTableName() {
+        return setOfSetsTableName;
     }
 
     public String getMetaObjectTableName() {
         return metaObjectTableName;
+    }
+
+    public String getTablePrefix()
+    {
+        return tablePrefix;
+    }
+
+    public void setTablePrefix(String tablePrefix)
+    {
+        this.tablePrefix = tablePrefix;
     }
 }
