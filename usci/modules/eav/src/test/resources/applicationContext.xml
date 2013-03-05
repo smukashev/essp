@@ -51,4 +51,11 @@
     <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav.model.batchdata.impl.BatchRepository"/>
     <bean id="BasicBaseEntitySearcher" class="kz.bsbnb.usci.eav.persistance.impl.BasicBaseEntitySearcher"/>
 
+    <bean id="stRawGroupDir" class="org.stringtemplate.v4.STRawGroupDir">
+
+        <constructor-arg index="0" value="${ds.templates_dir}"/>
+        <constructor-arg index="1" value="$"/>
+        <constructor-arg index="2" value="$"/>
+    </bean>
+
 </beans>
