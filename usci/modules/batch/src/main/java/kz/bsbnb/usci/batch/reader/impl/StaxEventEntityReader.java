@@ -79,56 +79,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
 
-                if(localName.equals("batch"))
-                {
-                    logger.info("batch");
-                }
-                else if(localName.equals("entities"))
-                {
-                    logger.info("entities");
-                }
-                else if(localName.equals("entity"))
-                {
-                    currentContainer = metaFactory.getBaseEntity(
-                            startElement.getAttributeByName(new QName("class")).getValue());
-                }
-                else
-                {
-                    IMetaType metaType = currentContainer.getMemberType(localName);
-
-                    if(metaType.isArray())
-                    {
-                        stack.push(currentContainer);
-                        currentContainer = metaFactory.getBaseSet(((MetaSet)metaType).getMemberType());
-                        level++;
-                    }
-                    else if(metaType.isComplex() && !metaType.isArray())
-                    {
-                        stack.push(currentContainer);
-                        currentContainer = metaFactory.getBaseEntity((MetaClass)metaType);
-                        level++;
-                    }
-                    else if(!metaType.isComplex() && !metaType.isArray())
-                    {
-                        Object o = null;
-                        MetaValue metaValue = (MetaValue) metaType;
-
-                        try
-                        {
-                            event = (XMLEvent) xmlEventReader.next();
-                            o = parserHelper.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
-                            xmlEventReader.next();
-                        }
-                        catch (NumberFormatException n)
-                        {
-                            n.printStackTrace();
-                        }
-
-                        currentContainer.put(localName, new BaseValue(batch, index, o));
-                    }
-                }
+                startElement(event, startElement, localName);
             }
-
             else if(event.isEndElement())
             {
                 EndElement endElement = event.asEndElement();
@@ -181,5 +133,57 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
         }
 
         return null;
+    }
+
+    public void startElement(XMLEvent event, StartElement startElement, String localName)
+    {
+        if(localName.equals("batch"))
+        {
+            logger.info("batch");
+        }
+        else if(localName.equals("entities"))
+        {
+            logger.info("entities");
+        }
+        else if(localName.equals("entity"))
+        {
+            currentContainer = metaFactory.getBaseEntity(
+                    startElement.getAttributeByName(new QName("class")).getValue());
+        }
+        else
+        {
+            IMetaType metaType = currentContainer.getMemberType(localName);
+
+            if(metaType.isArray())
+            {
+                stack.push(currentContainer);
+                currentContainer = metaFactory.getBaseSet(((MetaSet)metaType).getMemberType());
+                level++;
+            }
+            else if(metaType.isComplex() && !metaType.isArray())
+            {
+                stack.push(currentContainer);
+                currentContainer = metaFactory.getBaseEntity((MetaClass)metaType);
+                level++;
+            }
+            else if(!metaType.isComplex() && !metaType.isArray())
+            {
+                Object o = null;
+                MetaValue metaValue = (MetaValue) metaType;
+
+                try
+                {
+                    event = (XMLEvent) xmlEventReader.next();
+                    o = parserHelper.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
+                    xmlEventReader.next();
+                }
+                catch (NumberFormatException n)
+                {
+                    n.printStackTrace();
+                }
+
+                currentContainer.put(localName, new BaseValue(batch, index, o));
+            }
+        }
     }
 }
