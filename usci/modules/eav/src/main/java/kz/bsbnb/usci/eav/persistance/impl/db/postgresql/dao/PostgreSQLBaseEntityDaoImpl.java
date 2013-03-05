@@ -46,8 +46,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     private String SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL;
 
     private String INSERT_SET_SQL;
-    private String SELECT_SETS_BY_ENTITY_ID_SQL;
-    private String SELECT_SETS_BY_PARENT_SET_ID_SQL;
+    private String SELECT_ENTITY_SETS_BY_ENTITY_ID_SQL;
+    private String SELECT_SETS_OF_SETS_BY_PARENT_SET_ID_SQL;
 
     private String INSERT_ENTITY_SET;
     private String INSERT_SET_OF_SETS;
@@ -105,25 +105,36 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 getConfig().getBaseComplexValuesTableName(), getConfig().getComplexAttributesTableName());
 
         INSERT_SET_SQL = "INSERT INTO %s (batch_id, index) VALUES ( ?, ? )";
-        SELECT_SETS_BY_ENTITY_ID_SQL =
+
+        INSERT_ENTITY_SET = "INSERT INTO %s (entity_id, attribute_id, set_id) VALUES ( ?, ?, ? )";
+        SELECT_ENTITY_SETS_BY_ENTITY_ID_SQL =
                 "SELECT s.id, " +
                        "s.batch_id, " +
                        "a.name as attribute_name, " +
                        "s.index " +
-                  "FROM %s s, " +
-                       "%s a " +
-                 "WHERE s.entity_id = ? " +
-                   "AND s.attribute_id = a.id";
+                  "FROM %s a, " +
+                       "%s es, " +
+                       "%s s " +
+                 "WHERE es.entity_id = ? " +
+                   "AND es.attribute_id = a.id " +
+                   "AND es.set_id = s.id";
 
-        INSERT_ENTITY_SET = "INSERT INTO %s (entity_id, attribute_id, set_id) VALUES ( ?, ?, ? )";
         INSERT_SET_OF_SETS = "INSERT INTO %s (parent_set_id, child_set_id) VALUES ( ?, ? )";
+        SELECT_SETS_OF_SETS_BY_PARENT_SET_ID_SQL =
+                "SELECT s.id, " +
+                       "s.batch_id, " +
+                       "s.index " +
+                  "FROM %s ss, " +
+                       "%s s " +
+                 "WHERE ss.parent_set_id = ? " +
+                   "AND ss.child_set_id = s.id";
 
         INSERT_SIMPLE_SET_VALUE_SQL = "INSERT INTO %s (set_id, batch_id, index, value) VALUES ( ?, ?, ?, ? )";
         SELECT_SIMPLE_SET_VALUES_BY_SET_ID_SQL = "SELECT sav.batch_id, sav.index, sav.value FROM %s sav WHERE sav.set_id in (?) ";
 
         INSERT_COMPLEX_SET_VALUE_SQL = String.format("INSERT INTO %s (set_id, batch_id, index, entity_value_id) VALUES ( ?, ?, ?, ? )",
                 getConfig().getBaseComplexSetValuesTableName());
-        SELECT_COMPLEX_SET_VALUES_BY_SET_ID_SQL = String.format("SELECT cav.batch_id, cav.index, cav.value FROM %s cav WHERE cav.set_id in (?) ",
+        SELECT_COMPLEX_SET_VALUES_BY_SET_ID_SQL = String.format("SELECT cav.batch_id, cav.index, cav.entity_value_id FROM %s cav WHERE cav.set_id in (?) ",
                 getConfig().getBaseComplexSetValuesTableName());
 
     }
@@ -184,15 +195,11 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         // simple values
         loadSimpleValues(baseEntity);
 
-        // simple sets values
-        //loadSimpleSetsValues(baseEntity);
-
-        // complex attribute values
+        // complex values
         loadComplexValues(baseEntity);
 
-        // complex arrays values
-        /*loadComplexArraysValues(baseEntity, String.format(SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL,
-                getConfig().getBaseComplexSetValuesTableName(), getConfig().getComplexSetTableName()));*/
+        // entity sets
+        loadEntitySets(baseEntity);
 
         return baseEntity;
     }
@@ -419,19 +426,32 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaType metaTypeValue = baseSet.getMemberType();
 
         long setId;
-        String query;
         if (metaTypeValue.isComplex())
         {
-            query = String.format(INSERT_ENTITY_SET, getConfig().getBaseEntityComplexSetsTableName());
             setId = insertComplexSet(baseValue, metaSet);
         }
         else
         {
-            query = String.format(INSERT_ENTITY_SET, getConfig().getBaseEntitySimpleSetsTableName());
             setId = insertSimpleSet(baseValue, metaSet);
         }
-        //TODO: ATTENTION! Table eav_set is the parent table and the foreign key to it is not working.
-        //insertWithId(query, new Object[] {baseEntity.getId(), metaAttribute.getId(), setId});
+
+        String query;
+        if (metaTypeValue.isArray())
+        {
+            query = String.format(INSERT_ENTITY_SET, getConfig().getBaseEntitySetOfSetsTableName());
+        }
+        else
+        {
+            if (metaTypeValue.isComplex())
+            {
+                query = String.format(INSERT_ENTITY_SET, getConfig().getBaseEntityComplexSetsTableName());
+            }
+            else
+            {
+                query = String.format(INSERT_ENTITY_SET, getConfig().getBaseEntitySimpleSetsTableName());
+            }
+        }
+        insertWithId(query, new Object[] {baseEntity.getId(), metaAttribute.getId(), setId});
     }
 
     private long insertSimpleSet(IBaseValue baseValue, MetaSet metaSet)
@@ -645,12 +665,52 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadSimpleSetsValues(BaseEntity baseEntity)
+    private void loadComplexValues(BaseEntity baseEntity)
     {
-        MetaClass metaClass = baseEntity.getMeta();
+        logger.debug(SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL);
+        List<Map<String, Object>> rows =
+                queryForListWithStats(SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL, baseEntity.getId());
 
-        String query = String.format(SELECT_SETS_BY_ENTITY_ID_SQL,
-                getConfig().getBaseEntitySimpleSetsTableName(), getConfig().getSimpleSetTableName());
+        Iterator<Map<String, Object>> it = rows.iterator();
+        while (it.hasNext())
+        {
+            Map<String, Object> row = it.next();
+
+            Batch batch = batchRepository.getBatch((Long)row.get("batch_id"));
+            long entityValueId = (Long)row.get("entity_value_id");
+            BaseEntity childBaseEntity = load(entityValueId);
+
+            baseEntity.put((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"), childBaseEntity));
+        }
+    }
+
+    private void loadEntitySets(BaseEntity baseEntity) {
+        String query;
+
+        // entity simple sets
+        query = String.format(SELECT_ENTITY_SETS_BY_ENTITY_ID_SQL,
+                getConfig().getSimpleSetTableName(),
+                getConfig().getBaseEntitySimpleSetsTableName(),
+                getConfig().getBaseSetsTableName());
+        loadEntitySets(baseEntity, query);
+
+        // entity complex sets
+        query = String.format(SELECT_ENTITY_SETS_BY_ENTITY_ID_SQL,
+                getConfig().getComplexSetTableName(),
+                getConfig().getBaseEntityComplexSetsTableName(),
+                getConfig().getBaseSetsTableName());
+        loadEntitySets(baseEntity, query);
+
+        // entity set of sets
+        query = String.format(SELECT_ENTITY_SETS_BY_ENTITY_ID_SQL,
+                getConfig().getSetOfSetsTableName(),
+                getConfig().getBaseEntitySetOfSetsTableName(),
+                getConfig().getBaseSetsTableName());
+        loadEntitySets(baseEntity, query);
+    }
+
+    private void loadEntitySets(BaseEntity baseEntity, String query) {
+        MetaClass metaClass = baseEntity.getMeta();
 
         logger.debug(query);
         List<Map<String, Object>> rowsSet = queryForListWithStats(query, baseEntity.getId());
@@ -660,29 +720,75 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             Map<String, Object> rowSet = itSet.next();
 
-            long setId = (Integer)rowSet.get("id");
             String attributeName = (String)rowSet.get("attribute_name");
+            IMetaType metaType = metaClass.getMemberType(attributeName);
 
-            IMetaType metaTypeSet = metaClass.getMemberType(attributeName);
+            BaseSet baseSet = new BaseSet((Integer)rowSet.get("id"), ((MetaSet)metaType).getMemberType());
 
-            if (!metaTypeSet.isArray() && metaTypeSet.isComplex())
+            // load child values
+            if (metaType.isComplex())
             {
-                throw new RuntimeException("Create an set of simple values ​​impossible. " +
-                        "Query returned no valid data.");
+                loadComplexSetValues(baseSet);
+            }
+            else
+            {
+                loadSimpleSetValues(baseSet);
             }
 
-            MetaSet metaSet = (MetaSet)metaTypeSet;
-            IMetaType metaTypeValue = metaSet.getMemberType();
+            Batch batch = batchRepository.getBatch((Long)rowSet.get("batch_id"));
+            baseEntity.put(attributeName, new BaseValue(batch, (Long)rowSet.get("index"), baseSet));
+        }
+    }
 
-            if (metaTypeValue.isArray() || metaTypeValue.isComplex())
+    private void loadSetOfSets(BaseSet baseSet, String query) {
+        logger.debug(query);
+        List<Map<String, Object>> rowsSet = queryForListWithStats(query, baseSet.getId());
+
+        Iterator<Map<String, Object>> itSet = rowsSet.iterator();
+        while (itSet.hasNext())
+        {
+            Map<String, Object> rowSet = itSet.next();
+
+            String attributeName = (String)rowSet.get("attribute_name");
+            IMetaType metaType = baseSet.getMemberType();
+
+            BaseSet baseSetChild = new BaseSet((Integer)rowSet.get("id"), ((MetaSet)metaType).getMemberType());
+
+            if (metaType.isComplex())
             {
-                throw new RuntimeException("Create an set of simple values ​​impossible. " +
-                        "Query returned no valid data.");
+                loadComplexSetValues(baseSetChild);
+            }
+            else
+            {
+                loadSimpleSetValues(baseSetChild);
             }
 
-            MetaValue metaValue = (MetaValue)metaTypeValue;
+
+            Batch batch = batchRepository.getBatch((Long)rowSet.get("batch_id"));
+            baseSet.put(attributeName, new BaseValue(batch, (Long)rowSet.get("index"), baseSetChild));
+        }
+    }
+
+    private void loadSimpleSetValues(BaseSet baseSet)
+    {
+        IMetaType metaType = baseSet.getMemberType();
+        if (metaType.isComplex())
+            throw new RuntimeException("Load the simple set values is not possible. " +
+                    "Simple values ​​can not be added to an set of complex values.");
+
+        if (metaType.isArray())
+        {
+            String query = String.format(SELECT_SETS_OF_SETS_BY_PARENT_SET_ID_SQL,
+                    getConfig().getBaseSetOfSimpleSetsTableName(),
+                    getConfig().getBaseSetsTableName());
+            loadSetOfSets(baseSet, query);
+        }
+        else
+        {
+            MetaValue metaValue = (MetaValue)metaType;
             DataTypes dataType = metaValue.getTypeCode();
 
+            String query;
             switch(dataType)
             {
                 case INTEGER:
@@ -719,9 +825,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     throw new IllegalArgumentException("Unknown type.");
             }
 
-            BaseSet baseSet = new BaseSet(metaTypeValue);
-
-            List<Map<String, Object>> rowsValue = queryForListWithStats(query, setId);
+            List<Map<String, Object>> rowsValue = queryForListWithStats(query, baseSet.getId());
             Iterator<Map<String, Object>> itValue = rowsValue.iterator();
             while (itValue.hasNext())
             {
@@ -730,29 +834,35 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 Batch batch = batchRepository.getBatch((Long)rowValue.get("batch_id"));
                 baseSet.put(new BaseValue(batch, (Long)rowValue.get("index"), rowValue.get("value")));
             }
-
-            Batch batch = batchRepository.getBatch((Long)rowSet.get("batch_id"));
-            baseEntity.put(attributeName, new BaseValue(batch, (Long)rowSet.get("index"), baseSet));
-
         }
     }
 
-    private void loadComplexValues(BaseEntity baseEntity)
+    private void loadComplexSetValues(BaseSet baseSet)
     {
-        logger.debug(SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL);
-        List<Map<String, Object>> rows =
-                queryForListWithStats(SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL, baseEntity.getId());
+        IMetaType metaType = baseSet.getMemberType();
+        if (!metaType.isComplex())
+            throw new RuntimeException("Load the complex set values is not possible. " +
+                    "Complex values ​​can not be added to an set of simple values.");
 
-        Iterator<Map<String, Object>> it = rows.iterator();
-        while (it.hasNext())
+        if (metaType.isArray())
         {
-            Map<String, Object> row = it.next();
+            String query = String.format(SELECT_SETS_OF_SETS_BY_PARENT_SET_ID_SQL,
+                    getConfig().getBaseSetOfComplexSetsTableName(),
+                    getConfig().getBaseSetsTableName());
+            loadSetOfSets(baseSet, query);
+        }
+        else
+        {
+            List<Map<String, Object>> rowsValue = queryForListWithStats(SELECT_COMPLEX_SET_VALUES_BY_SET_ID_SQL, baseSet.getId());
+            Iterator<Map<String, Object>> itValue = rowsValue.iterator();
+            while (itValue.hasNext())
+            {
+                Map<String, Object> rowValue = itValue.next();
 
-            Batch batch = batchRepository.getBatch((Long)row.get("batch_id"));
-            long entityValueId = (Long)row.get("entity_value_id");
-            BaseEntity childBaseEntity = load(entityValueId);
-
-            baseEntity.put((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"), childBaseEntity));
+                Batch batch = batchRepository.getBatch((Long)rowValue.get("batch_id"));
+                BaseEntity baseEntity = load((Long)rowValue.get("entity_value_id"));
+                baseSet.put(new BaseValue(batch, (Long)rowValue.get("index"), baseEntity));
+            }
         }
     }
 

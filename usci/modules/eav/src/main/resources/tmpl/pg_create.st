@@ -239,7 +239,7 @@ CREATE TABLE IF NOT EXISTS $be_entity_simple_sets$
 (
     CONSTRAINT $be_entity_simple_sets$_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES $be_entities$ (id)
         ON DELETE CASCADE,
-    CONSTRAINT $be_entity_simple_sets$_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES $sets$ (id)
+    CONSTRAINT $be_entity_simple_sets$_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES $simple_sets$ (id)
         ON DELETE CASCADE,
     CONSTRAINT $be_entity_simple_sets$_set_id_fkey FOREIGN KEY (set_id) REFERENCES $be_sets$ (id)
             ON DELETE CASCADE,
@@ -254,11 +254,26 @@ CREATE TABLE IF NOT EXISTS $be_entity_complex_sets$
 (
     CONSTRAINT $be_entity_complex_sets$_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES $be_entities$ (id)
         ON DELETE CASCADE,
-    CONSTRAINT $be_entity_complex_sets$_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES $sets$ (id)
+    CONSTRAINT $be_entity_complex_sets$_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES $complex_sets$ (id)
         ON DELETE CASCADE,
     CONSTRAINT $be_entity_complex_sets$_set_id_fkey FOREIGN KEY (set_id) REFERENCES $be_sets$ (id)
         ON DELETE CASCADE,
     CONSTRAINT $be_entity_complex_sets$_primary_key_index PRIMARY KEY (id)
+)
+INHERITS
+(
+    $be_entity_sets$
+);
+
+CREATE TABLE IF NOT EXISTS $be_entity_set_of_sets$
+(
+    CONSTRAINT $be_entity_set_of_sets$_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES $be_entities$ (id)
+        ON DELETE CASCADE,
+    CONSTRAINT $be_entity_set_of_sets$_attribute_id_fkey FOREIGN KEY (attribute_id) REFERENCES $set_of_sets$ (id)
+        ON DELETE CASCADE,
+    CONSTRAINT $be_entity_set_of_sets$_set_id_fkey FOREIGN KEY (set_id) REFERENCES $be_sets$ (id)
+        ON DELETE CASCADE,
+    CONSTRAINT $be_entity_set_of_sets$_primary_key_index PRIMARY KEY (id)
 )
 INHERITS
 (

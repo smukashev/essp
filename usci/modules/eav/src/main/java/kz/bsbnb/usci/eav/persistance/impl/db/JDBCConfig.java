@@ -40,6 +40,7 @@ public class JDBCConfig {
     private String baseEntitySetsTableName;
     private String baseEntitySimpleSetsTableName;
     private String baseEntityComplexSetsTableName;
+    private String baseEntitySetOfSetsTableName;
     private String baseSetOfSetsTableName;
     private String baseSetOfSimpleSetsTableName;
     private String baseSetOfComplexSetsTableName;
@@ -89,6 +90,7 @@ public class JDBCConfig {
         baseEntitySetsTableName = tablePrefix + "be_entity_sets";
         baseEntitySimpleSetsTableName = tablePrefix + "be_entity_simple_sets";
         baseEntityComplexSetsTableName = tablePrefix + "be_entity_complex_sets";
+        baseEntitySetOfSetsTableName = tablePrefix + "be_entity_set_of_sets";
         baseSetOfSetsTableName = tablePrefix + "be_set_of_sets";
         baseSetOfSimpleSetsTableName = tablePrefix + "be_set_of_simple_sets";
         baseSetOfComplexSetsTableName = tablePrefix + "be_set_of_complex_sets";
@@ -188,6 +190,10 @@ public class JDBCConfig {
 
     public String getBaseEntityComplexSetsTableName() {
         return baseEntityComplexSetsTableName;
+    }
+
+    public String getBaseEntitySetOfSetsTableName() {
+        return baseEntitySetOfSetsTableName;
     }
 
     public String getBaseSetOfSetsTableName() {
