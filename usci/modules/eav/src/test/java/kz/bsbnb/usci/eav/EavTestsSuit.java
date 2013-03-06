@@ -4,7 +4,6 @@ import kz.bsbnb.usci.eav.model.BatchTest;
 import kz.bsbnb.usci.eav.model.batchdata.impl.BaseValueTest;
 import kz.bsbnb.usci.eav.model.batchdata.impl.BatchRepositoryTest;
 import kz.bsbnb.usci.eav.model.metadata.impl.BasicMetaClassRepositoryImplTest;
-import kz.bsbnb.usci.eav.persistance.impl.BasicBaseEntitySearcherTest;
 import kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao.PostgreSQLBaseEntityDaoImplTest;
 import kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao.PostgreSQLBatchDaoImplTest;
 import kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao.PostgreSQLMetaClassDaoImplTest;
@@ -29,7 +28,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
         PostgreSQLBaseEntityDaoImplTest.class,
         PostgreSQLBatchDaoImplTest.class,
         PostgreSQLMetaClassDaoImplTest.class,
-        BasicBaseEntitySearcherTest.class,
         RelationTest1.class})
 public class EavTestsSuit
 {
