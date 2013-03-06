@@ -4,9 +4,9 @@ import kz.bsbnb.usci.eav.model.BaseEntity;
 
 import java.util.ArrayList;
 
-public interface IBaseEntitySearcher {
+public interface IBaseEntitySearcher
+{
     public String getClassName();
     public BaseEntity findSingle(BaseEntity meta);
     public ArrayList<BaseEntity> findAll(BaseEntity meta);
-    public boolean compare(BaseEntity c1, BaseEntity c2) throws IllegalStateException;
 }
