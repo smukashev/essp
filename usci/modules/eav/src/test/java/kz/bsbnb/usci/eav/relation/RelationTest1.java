@@ -12,10 +12,7 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
-import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
-import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,7 +49,7 @@ public class RelationTest1  extends GenericTestCase
     IMetaFactory metaFactory;
 
     @Autowired
-    IBaseEntitySearcher baseEntitySearcher;
+    IBaseEntitySearcherPool baseEntitySearcherPool;
 
     private MetaClass generateMetaClass()
     {
@@ -200,7 +197,7 @@ public class RelationTest1  extends GenericTestCase
     @Test
     public void compareTest()
     {
-        if (baseEntitySearcher == null)
+        if (baseEntitySearcherPool == null)
         {
             fail("No base entity searcher found in spring config!");
         }
@@ -211,6 +208,9 @@ public class RelationTest1  extends GenericTestCase
 
         BaseEntity contractEntity = generateBaseEntity(batch);
         BaseEntity contractEntity1 = generateBaseEntity(batch);
+
+        IBaseEntitySearcher baseEntitySearcher = baseEntitySearcherPool.
+                getSearcher(contractEntity.getMeta().getClassName());
 
         logger.debug("Trying same objects");
         Assert.assertTrue(baseEntitySearcher.compare(contractEntity, contractEntity1));

@@ -245,8 +245,27 @@ public class BaseEntity extends Persistable implements IBaseContainer
             while (valuesIt.hasNext())
             {
                 String attributeName = valuesIt.next();
-                IBaseValue thisValue = this.getBaseValue(attributeName);
-                IBaseValue thatValue = that.getBaseValue(attributeName);
+
+                IBaseValue thisValue;
+                IBaseValue thatValue;
+
+                try
+                {
+                    thisValue = this.getBaseValue(attributeName);
+                }
+                catch(IllegalArgumentException e)
+                {
+                    thisValue = null;
+                }
+
+                try
+                {
+                    thatValue = that.getBaseValue(attributeName);
+                }
+                catch(IllegalArgumentException e)
+                {
+                    thatValue = null;
+                }
 
                 logger.debug("Attribute: " + attributeName);
                 logger.debug("This: " + thisValue);
