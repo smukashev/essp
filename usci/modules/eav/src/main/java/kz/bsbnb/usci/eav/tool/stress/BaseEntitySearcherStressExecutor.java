@@ -33,7 +33,7 @@ public class BaseEntitySearcherStressExecutor
 
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
 
-        MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 2);
+        MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 2, 2);
         BaseEntityGenerator baseEntityGenerator = new BaseEntityGenerator();
 
         ClassPathXmlApplicationContext ctx
@@ -62,7 +62,7 @@ public class BaseEntitySearcherStressExecutor
 
             for(int i = 0; i < dataSize; i++)
             {
-                MetaClass metaClass = metaClassGenerator.generateMetaClass(0);
+                MetaClass metaClass = metaClassGenerator.generateMetaClass();
 
                 long metaClassId = metaClassDao.save(metaClass);
 
