@@ -28,6 +28,11 @@
             <artifactId>ST4</artifactId>
             <version>4.0.7</version>
         </dependency>
+        <dependency>
+            <groupId>kz.bsbnb.usci</groupId>
+            <artifactId>eav_ext</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <parent>

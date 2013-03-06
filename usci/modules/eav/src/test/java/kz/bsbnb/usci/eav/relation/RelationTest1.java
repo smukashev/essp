@@ -13,6 +13,7 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import kz.bsbnb.usci.eav.persistance.dao.*;
+import kz.bsbnb.usci.eav.persistance.impl.comparator.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -212,8 +213,10 @@ public class RelationTest1  extends GenericTestCase
         IBaseEntitySearcher baseEntitySearcher = baseEntitySearcherPool.
                 getSearcher(contractEntity.getMeta().getClassName());
 
+        IBaseEntityComparator baseEntityComparator = new BasicBaseEntityComparator();
+
         logger.debug("Trying same objects");
-        Assert.assertTrue(baseEntitySearcher.compare(contractEntity, contractEntity1));
+        Assert.assertTrue(baseEntityComparator.compare(contractEntity, contractEntity1));
 
         BaseEntity subject = (BaseEntity)contractEntity1.getBaseValue("subject").getValue();
 
@@ -222,6 +225,6 @@ public class RelationTest1  extends GenericTestCase
         nameEntity.put("firstname", new BaseValue(batch, 6, "KANAT_some_fix"));
 
         logger.debug("Trying changed first name objects");
-        Assert.assertFalse(baseEntitySearcher.compare(contractEntity, contractEntity1));
+        Assert.assertFalse(baseEntityComparator.compare(contractEntity, contractEntity1));
     }
 }

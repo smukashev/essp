@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav.persistance.impl.comparator.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.tool.generator.data.impl.BaseEntityGenerator;
@@ -28,6 +29,8 @@ public class BaseEntitySearcherStressExecutor
     public static void main(String[] args)
     {
         BasicBaseEntitySearcher bes = new BasicBaseEntitySearcher();
+        BasicBaseEntityComparator bec = new BasicBaseEntityComparator();
+
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
 
         MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 2, 2);
@@ -87,7 +90,7 @@ public class BaseEntitySearcherStressExecutor
             {
                 BaseEntity baseEntity = baseEntityGenerator.generateBaseEntity(batch, metaClass, ++index);
 
-                if (!bes.compare(baseEntity, baseEntity))
+                if (!bec.compare(baseEntity, baseEntity))
                 {
                     logger.error("Same objects rejected by searcher");
                 }
