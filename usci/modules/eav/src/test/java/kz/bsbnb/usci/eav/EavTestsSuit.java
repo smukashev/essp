@@ -1,9 +1,11 @@
 package kz.bsbnb.usci.eav;
 
+import kz.bsbnb.usci.eav.model.BaseEntityTest;
 import kz.bsbnb.usci.eav.model.BatchTest;
 import kz.bsbnb.usci.eav.model.batchdata.impl.BaseValueTest;
 import kz.bsbnb.usci.eav.model.batchdata.impl.BatchRepositoryTest;
 import kz.bsbnb.usci.eav.model.metadata.impl.BasicMetaClassRepositoryImplTest;
+//import kz.bsbnb.usci.eav.persistance.impl.BasicBaseEntitySearcherTest;
 import kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao.PostgreSQLBaseEntityDaoImplTest;
 import kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao.PostgreSQLBatchDaoImplTest;
 import kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao.PostgreSQLMetaClassDaoImplTest;
@@ -23,12 +25,14 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
         BaseValueTest.class,
         BatchRepositoryTest.class,
         BasicMetaClassRepositoryImplTest.class,
-        //BaseEntityTest.class, TODO: implement and uncomment
+        BaseEntityTest.class, //
         BatchTest.class,
         PostgreSQLBaseEntityDaoImplTest.class,
         PostgreSQLBatchDaoImplTest.class,
         PostgreSQLMetaClassDaoImplTest.class,
-        RelationTest1.class})
+       // BasicBaseEntitySearcherTest.class,
+        RelationTest1.class
+            })
 public class EavTestsSuit
 {
     static Logger logger = LoggerFactory.getLogger(EavTestsSuit.class);
