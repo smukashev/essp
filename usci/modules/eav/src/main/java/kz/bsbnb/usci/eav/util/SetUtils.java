@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.eav.util;
 
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class SetUtils {
 	private static <T> Set<T> union(Set<T> setA, Set<T> setB) {
@@ -40,4 +39,9 @@ public class SetUtils {
 	public static <T> boolean isSuperset(Set<T> setA, Set<T> setB) {
 		return setA.containsAll(setB);
 	}
+
+    public static <T> T getRandomElement(Collection<T> collection, Random random) {
+        return new ArrayList<T>(collection).get(random.nextInt(collection.size()));
+    }
+
 }

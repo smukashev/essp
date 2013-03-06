@@ -23,7 +23,7 @@ public class MetaClassStressExecutor
     {
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
 
-        MetaClassGenerator gen = new MetaClassGenerator(25, 2);
+        MetaClassGenerator gen = new MetaClassGenerator(25, 2, 2);
 
         ClassPathXmlApplicationContext ctx
                 = new ClassPathXmlApplicationContext("stressApplicationContext.xml");
@@ -49,7 +49,7 @@ public class MetaClassStressExecutor
 
             for(int i = 0; i < dataSize; i++)
             {
-                MetaClass metaClass = gen.generateMetaClass(0);
+                MetaClass metaClass = gen.generateMetaClass();
 
                 dao.save(metaClass);
                 data.add(i, metaClass);
