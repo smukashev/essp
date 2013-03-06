@@ -4,6 +4,8 @@ import kz.bsbnb.usci.eav.model.BaseEntity;
 import kz.bsbnb.usci.eav.model.BaseSet;
 import kz.bsbnb.usci.eav.model.batchdata.IBaseValue;
 import kz.bsbnb.usci.eav.model.metadata.ComplexKeyTypes;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.metadata.type.IMetaType;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaSet;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
@@ -38,7 +40,108 @@ public class BasicBaseEntitySearcher implements IBaseEntitySearcher {
         return null;
     }
 
-    //TODO: method stub refactoring needed
+    private IBaseValue safeGetValue(BaseEntity entity, String name)
+    {
+        try
+        {
+            return entity.getBaseValue(name);
+        }
+        catch(Exception e)
+        {
+            return null;
+        }
+    }
+
+    private boolean compareValue(IMetaType type, IBaseValue value1, IBaseValue value2)
+    {
+        boolean res;
+
+        if(!type.isComplex())
+        {
+            res = (value1.getValue().equals(value2.
+                    getValue()));
+        }
+        else
+        {
+            res = compare((BaseEntity)value1.getValue(),
+                    (BaseEntity)value2.getValue());
+        }
+
+        if (res)
+        {
+            logger.debug("Same: " + value1.getValue() + ", " + value2.getValue());
+        }
+        else
+        {
+            logger.debug("Different: " + value1.getValue() + ", " + value2.getValue());
+        }
+
+        return res;
+    }
+
+    private boolean compareSet(IMetaType type, IBaseValue value1, IBaseValue value2)
+    {
+        BaseSet set1 = (BaseSet)value1.getValue();
+        BaseSet set2 = (BaseSet)value2.getValue();
+
+        Set<IBaseValue> ar1 = set1.get();
+        Set<IBaseValue> ar2 = set2.get();
+
+        if(ar1.size() != ar2.size())
+            return false;
+
+        boolean res = (((MetaSet)type).getArrayKeyType() ==
+                ComplexKeyTypes.ALL);
+
+        for(IBaseValue v1 : ar1)
+        {
+            if(!type.isComplex())
+            {
+                if(((MetaSet)type).getArrayKeyType() == ComplexKeyTypes.ALL)
+                {
+                    res = res && ar2.contains(v1);
+                }
+                else
+                {
+                    res = res || ar2.contains(v1);
+                }
+            }
+            else
+            {
+                boolean found = false;
+
+                for(IBaseValue v2 : ar2)
+                {
+                    if (compare((BaseEntity)v1.getValue(), (BaseEntity)v2.getValue()))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if(((MetaSet)type).getArrayKeyType() == ComplexKeyTypes.ALL)
+                {
+                    res = res && found;
+                }
+                else
+                {
+                    res = res || found;
+                }
+            }
+        }
+
+        if (res)
+        {
+            logger.debug("Same: " + value1.getValue() + ", " + value2.getValue());
+        }
+        else
+        {
+            logger.debug("Different: " + value1.getValue() + ", " + value2.getValue());
+        }
+
+        return res;
+    }
+
     @Override
     public boolean compare(BaseEntity c1, BaseEntity c2) throws IllegalStateException {
         if(!c1.getMeta().equals(c2.getMeta()))
@@ -55,8 +158,11 @@ public class BasicBaseEntitySearcher implements IBaseEntitySearcher {
 
         for(String name : names)
         {
+            IMetaAttribute attribute = meta.getMetaAttribute(name);
+            IMetaType type = meta.getMemberType(name);
+
             logger.debug("Testing attribute: " + name);
-            if(!meta.getMetaAttribute(name).isKey())
+            if(!attribute.isKey())
             {
                 logger.debug("It's not a key! So skipped.");
                 continue;
@@ -64,26 +170,8 @@ public class BasicBaseEntitySearcher implements IBaseEntitySearcher {
 
             logger.debug("It's a key!");
 
-            IBaseValue value1;
-            IBaseValue value2;
-
-            try
-            {
-                value1 = c1.getBaseValue(name);
-            }
-            catch(IllegalArgumentException e)
-            {
-                value1 = null;
-            }
-
-            try
-            {
-                value2 = c2.getBaseValue(name);
-            }
-            catch(IllegalArgumentException e)
-            {
-                value2 = null;
-            }
+            IBaseValue value1 = safeGetValue(c1, name);
+            IBaseValue value2 = safeGetValue(c2, name);
 
             if(value1 == null || value2 == null)
             {
@@ -93,82 +181,24 @@ public class BasicBaseEntitySearcher implements IBaseEntitySearcher {
             //todo: add other complex key type
             if(meta.getComplexKeyType() == ComplexKeyTypes.ALL)
             {
-                if(!meta.getMemberType(name).isArray())
+                if(!type.isArray())
                 {
-                    if(!meta.getMemberType(name).isComplex())
-                    {
-                        boolean tmp = (value1.getValue().equals(value2.
-                                getValue()));
-
-                        if (tmp)
-                        {
-                            logger.debug("Same: " + value1.getValue() + ", " + value2.getValue());
-                        }
-                        else
-                        {
-                            logger.debug("Different: " + value1.getValue() + ", " + value2.getValue());
-                        }
-
-                        result = result && tmp;
-                    }
-                    else
-                    {
-                        result = result && compare((BaseEntity)value1.getValue(),
-                                (BaseEntity)value2.getValue());
-                    }
+                    result = result && compareValue(type, value1, value2);
                 }
                 else
                 {
-                    BaseSet set1 = (BaseSet)value1.getValue();
-                    BaseSet set2 = (BaseSet)value2.getValue();
-
-                    Set<IBaseValue> ar1 = set1.get();
-                    Set<IBaseValue> ar2 = set2.get();
-
-                    if(ar1.size() != ar2.size())
-                        result = false;
-
-                    boolean arrayResult = (((MetaSet)meta.getMemberType(name)).getArrayKeyType() ==
-                            ComplexKeyTypes.ALL);
-
-                    for(IBaseValue v1 : ar1)
-                    {
-                        if(!meta.getMemberType(name).isComplex())
-                        {
-                            if(((MetaSet)meta.getMemberType(name)).getArrayKeyType() == ComplexKeyTypes.ALL)
-                            {
-                                arrayResult = arrayResult && ar2.contains(v1);
-                            }
-                            else
-                            {
-                                arrayResult = arrayResult || ar2.contains(v1);
-                            }
-                        }
-                        else
-                        {
-                            boolean found = false;
-
-                            for(IBaseValue v2 : ar2)
-                            {
-                                if (compare((BaseEntity)v1.getValue(), (BaseEntity)v2.getValue()))
-                                {
-                                    found = true;
-                                    break;
-                                }
-                            }
-
-                            if(((MetaSet)meta.getMemberType(name)).getArrayKeyType() == ComplexKeyTypes.ALL)
-                            {
-                                arrayResult = arrayResult && found;
-                            }
-                            else
-                            {
-                                arrayResult = arrayResult || found;
-                            }
-                        }
-                    }
-
-                    result = result && arrayResult;
+                    result = result && compareSet(type, value1, value2);
+                }
+            }
+            else
+            {
+                if(!type.isArray())
+                {
+                    result = result || compareValue(type, value1, value2);
+                }
+                else
+                {
+                    result = result || compareSet(type, value1, value2);
                 }
             }
         }
