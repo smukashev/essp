@@ -2,39 +2,22 @@ package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.BaseEntity;
-import kz.bsbnb.usci.sync.job.AbstractJob;
+import kz.bsbnb.usci.sync.job.AbstractDataJob;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author k.tulbassiyev
  */
-public class DataJob extends AbstractJob
+public class DataJob extends AbstractDataJob
 {
     @Autowired
     RmiProxyFactoryBean rmiProxyFactoryBean;
 
     IEntityService entityService;
-
-    private final List<BaseEntity> entities = Collections.synchronizedList(new ArrayList<BaseEntity>());
-    private final List<BaseEntity> entitiesInProcess = Collections.synchronizedList(new ArrayList<BaseEntity>());
-    private final List<ProcessJob> processJobs = new ArrayList<ProcessJob>();
-    private final List<ProcessJob> waitingJobs = new ArrayList<ProcessJob>();
-
-    private final int SLEEP_TIME_NORMAL = 1000;
-    private final int SLEEP_TIME_LONG = 5000;
-    private final int SKIP_TIME_MAX = 10;
-    private final int MAX_THREAD = 30;
-
-    private int skip_count = 0;
 
     private final Logger logger = Logger.getLogger(DataJob.class);
 
@@ -49,31 +32,8 @@ public class DataJob extends AbstractJob
         {
             try
             {
-                //
-
-                if(entities.size() > 0)
-                {
-                    BaseEntity entity = getClearEntity();
-
-                    if(entity != null)
-                    {
-                        entitiesInProcess.add(entity);
-
-                        ProcessJob processJob = new ProcessJob(entityService, entity);
-
-                        if(processJobs.size() < MAX_THREAD)
-                        {
-                            processJobs.add(processJob);
-                            processJob.start();
-                        }
-                        else
-                            waitingJobs.add(processJob);
-                    }
-                    else
-                    {
-                        Thread.sleep(SLEEP_TIME_NORMAL);
-                    }
-                }
+                if(entities.size() > 0 && entitiesInProcess.size() < MAX_THREAD)
+                    processNewEntities();
                 else
                 {
                     if(++skip_count > SKIP_TIME_MAX)
@@ -82,114 +42,93 @@ public class DataJob extends AbstractJob
                     Thread.sleep(SLEEP_TIME_NORMAL);
                 }
 
-                //
-
                 if(waitingJobs.size() > 0 && processJobs.size() < MAX_THREAD)
-                {
-                    Iterator<ProcessJob> iterator = waitingJobs.iterator();
-
-                    while(iterator.hasNext())
-                    {
-                        ProcessJob waitingJob = iterator.next();
-
-                        if(processJobs.size() < MAX_THREAD && isClear(waitingJob.getBaseEntity()))
-                        {
-                            iterator.remove();
-                            processJobs.add(waitingJob);
-                            entitiesInProcess.add(waitingJob.getBaseEntity());
-                            waitingJob.start();
-                        }
-                    }
-                }
-
-                //
+                    processWaitingJobs();
 
                 if(processJobs.size() > 0)
-                {
-                    Iterator<ProcessJob> processJobIterator = processJobs.iterator();
-
-                    while(processJobIterator.hasNext())
-                    {
-                        ProcessJob processJob = processJobIterator.next();
-
-                        boolean entityProcessRemoved = false;
-
-                        if(!processJob.isAlive())
-                        {
-                            BaseEntity entity = processJob.getBaseEntity();
-
-                            Iterator<BaseEntity> entityProcessIterator = entitiesInProcess.iterator();
-
-                            while(entityProcessIterator.hasNext())
-                            {
-                                if(entity.equals(entityProcessIterator.next()))
-                                {
-                                    entityProcessIterator.remove();
-                                    entityProcessRemoved = true;
-                                    break;
-                                }
-                            }
-
-                            processJobIterator.remove();
-
-                            // for debug; in production will be deleted
-                            if(!entityProcessRemoved)
-                                throw new IllegalStateException("CRITICAL: Entity has not been removed.");
-                         }
-                    }
-                }
-
-                // for debug; in production will be deleted
-                if(entitiesInProcess.size() != processJobs.size())
-                    throw new IllegalStateException("CRITICAL: Sizes are not equal");
+                    removeDeadJobs();
 
             }
             catch(Exception e)
             {
                 e.printStackTrace();
             }
-
         }
     }
 
-    public BaseEntity getClearEntity()
+    public void processNewEntities() throws InterruptedException
     {
-        Iterator<BaseEntity> iterator = entities.iterator();
+        final BaseEntity entity = getClearEntity();
+
+        if(entity != null)
+        {
+            entitiesInProcess.add(entity);
+
+            final ProcessJob processJob = new ProcessJob(entityService, entity);
+
+            if(processJobs.size() < MAX_THREAD)
+            {
+                processJobs.add(processJob);
+                processJob.start();
+            }
+            else
+                waitingJobs.add(processJob);
+        }
+        else
+            Thread.sleep(SLEEP_TIME_NORMAL);
+    }
+
+    private void processWaitingJobs()
+    {
+        Iterator<ProcessJob> iterator = waitingJobs.iterator();
 
         while(iterator.hasNext())
         {
-            BaseEntity entity = iterator.next();
+            final ProcessJob waitingJob = iterator.next();
 
-            if(isClear(entity))
+            if(processJobs.size() < MAX_THREAD && isClear(waitingJob.getBaseEntity()))
             {
                 iterator.remove();
-                return entity;
+
+                processJobs.add(waitingJob);
+                entitiesInProcess.add(waitingJob.getBaseEntity());
+
+                waitingJob.start();
             }
         }
-
-        return null;
     }
 
-    public boolean isClear(BaseEntity baseEntity)
+    private void removeDeadJobs()
     {
-        for (BaseEntity entity : entitiesInProcess)
-            if(hasCrossLine(baseEntity, entity))
-                return false;
+        Iterator<ProcessJob> processJobIterator = processJobs.iterator();
 
-        return true;
-    }
+        while(processJobIterator.hasNext())
+        {
+            ProcessJob processJob = processJobIterator.next();
 
-    public boolean hasCrossLine(BaseEntity entity1, BaseEntity entity2)
-    {
-        // todo: implement
-        /*if(entity1.equals(entity2))
-            return true;*/
+            if(!processJob.isAlive())
+            {
+                BaseEntity entity = processJob.getBaseEntity();
 
-        return false;
-    }
+                Iterator<BaseEntity> entityProcessIterator = entitiesInProcess.iterator();
 
-    public void addAll(List<BaseEntity> entities)
-    {
-        this.entities.addAll(entities);
+                boolean found = false;
+
+                while(entityProcessIterator.hasNext())
+                {
+                    if(entity.hashCode() == entityProcessIterator.next().hashCode())
+                    {
+                        entityProcessIterator.remove();
+                        found = true;
+                        break;
+                    }
+                }
+
+                if(!found)
+                    throw new IllegalStateException("CRITICAL: Entity not found.");
+
+                processJobIterator.remove();
+            }
+        }
     }
 }
