@@ -64,19 +64,37 @@ public class BasicBaseEntitySearcher implements IBaseEntitySearcher {
 
             logger.debug("It's a key!");
 
+            IBaseValue value1;
+            IBaseValue value2;
+
+            try
+            {
+                value1 = c1.getBaseValue(name);
+            }
+            catch(IllegalArgumentException e)
+            {
+                value1 = null;
+            }
+
+            try
+            {
+                value2 = c2.getBaseValue(name);
+            }
+            catch(IllegalArgumentException e)
+            {
+                value2 = null;
+            }
+
+            if(value1 == null || value2 == null)
+            {
+                throw new IllegalArgumentException("Key attribute " + name + " couldn't be null");
+            }
+
             //todo: add other complex key type
             if(meta.getComplexKeyType() == ComplexKeyTypes.ALL)
             {
                 if(!meta.getMemberType(name).isArray())
                 {
-                    IBaseValue value1 = c1.getBaseValue(name);
-                    IBaseValue value2 = c2.getBaseValue(name);
-
-                    if(value1 == null || value2 == null)
-                    {
-                        throw new IllegalArgumentException("Key attribute " + name + " couldn't be null");
-                    }
-
                     if(!meta.getMemberType(name).isComplex())
                     {
                         boolean tmp = (value1.getValue().equals(value2.
@@ -101,8 +119,8 @@ public class BasicBaseEntitySearcher implements IBaseEntitySearcher {
                 }
                 else
                 {
-                    BaseSet set1 = (BaseSet)c1.getBaseValue(name).getValue();
-                    BaseSet set2 = (BaseSet)c2.getBaseValue(name).getValue();
+                    BaseSet set1 = (BaseSet)value1.getValue();
+                    BaseSet set2 = (BaseSet)value2.getValue();
 
                     Set<IBaseValue> ar1 = set1.get();
                     Set<IBaseValue> ar2 = set2.get();
