@@ -76,6 +76,8 @@ public class DataJob extends AbstractDataJob
         }
         else
             Thread.sleep(SLEEP_TIME_NORMAL);
+
+        skip_count = 0;
     }
 
     private void processWaitingJobs()
@@ -96,6 +98,8 @@ public class DataJob extends AbstractDataJob
                 waitingJob.start();
             }
         }
+
+        skip_count = 0;
     }
 
     private void removeDeadJobs()
