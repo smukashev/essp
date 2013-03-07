@@ -103,17 +103,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
 
         logger.debug(query);
-
-        long t = 0;
-        if(sqlStats != null)
-        {
-            t = System.currentTimeMillis();
-        }
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, args);
-        if(sqlStats != null)
-        {
-            sqlStats.put(query, System.currentTimeMillis() - t);
-        }
+        List<Map<String, Object>> rows = queryForListWithStats(query, args);
 
         if (rows.size() > 1)
         {

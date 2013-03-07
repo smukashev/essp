@@ -103,29 +103,40 @@ public class JDBCSupport {
 
     protected int[] batchUpdateWithStats(String sql, List<Object[]> batchArgs)
     {
-        long t = 0;
+        double t1 = 0;
         if(sqlStats != null)
-            t = System.currentTimeMillis();
+            t1 = System.nanoTime();
 
         int[] counts = jdbcTemplate.batchUpdate(sql, batchArgs);
 
+        double t2 = System.nanoTime() - t1;
+        double t3 = (t2 % batchArgs.size()) / 1000000;
+
         if(sqlStats != null)
-            //TODO: Может нужно делить время на количество операций
-            sqlStats.put(sql, System.currentTimeMillis() - t);
+        {
+            for (int i = 0; i < batchArgs.size(); i++)
+                sqlStats.put(sql, t3);
+        }
 
         return counts;
     }
 
     protected List<Map<String, Object>> queryForListWithStats(String sql, Object... args)
     {
-        long t = 0;
+        double t1 = 0;
         if(sqlStats != null)
-            t = System.currentTimeMillis();
+            t1 = System.nanoTime();
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, args);
 
+        double t2 = System.nanoTime() - t1;
+        double t3 = (t2 % rows.size()) / 1000000;
+
         if(sqlStats != null)
-            sqlStats.put(sql, System.currentTimeMillis() - t);
+        {
+            for (int i = 0; i < rows.size(); i++)
+                sqlStats.put(sql, t3);
+        }
 
         return rows;
     }
