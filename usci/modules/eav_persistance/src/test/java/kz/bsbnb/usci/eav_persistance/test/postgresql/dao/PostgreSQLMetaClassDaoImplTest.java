@@ -98,7 +98,7 @@ public class PostgreSQLMetaClassDaoImplTest extends GenericTestCase
 
         //Simple array of array of dates
         metaCreate.setMetaAttribute("testArrayArray",
-                new MetaAttribute(false, false, new MetaSet(new MetaSet(new MetaValue(DataTypes.DATE)))));
+                new MetaAttribute(false, false, new MetaSet(new MetaSet(new MetaSet(new MetaValue(DataTypes.DATE))))));
 
         //Complex array
         MetaClass metaClassForArray = new MetaClass("innerClassForArray");

@@ -544,6 +544,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             loadSimpleArrays(metaSet);
             loadComplexArrays(metaSet);
+            loadArrayArrays(metaSet);
 
             metaAttribute.setMetaType(metaSet);
 

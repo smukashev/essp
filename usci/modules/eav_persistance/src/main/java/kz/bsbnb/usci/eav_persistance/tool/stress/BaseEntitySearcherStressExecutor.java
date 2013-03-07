@@ -1,16 +1,16 @@
-package kz.bsbnb.usci.eav_persistance.tool.stress;
+package kz.bsbnb.usci.eav.tool.stress;
 
-import kz.bsbnb.usci.eav_model.comparator.impl.BasicBaseEntityComparator;
-import kz.bsbnb.usci.eav_model.model.Batch;
-import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav_persistance.persistance.dao.IBaseEntityDao;
-import kz.bsbnb.usci.eav_persistance.persistance.dao.IBatchDao;
-import kz.bsbnb.usci.eav_persistance.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav_persistance.persistance.impl.searcher.BasicBaseEntitySearcher;
-import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
-import kz.bsbnb.usci.eav_persistance.tool.generator.data.impl.BaseEntityGenerator;
-import kz.bsbnb.usci.eav_persistance.tool.generator.data.impl.MetaClassGenerator;
+import kz.bsbnb.usci.eav.model.BaseEntity;
+import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
+import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav.persistance.impl.comparator.BasicBaseEntityComparator;
+import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcher;
+import kz.bsbnb.usci.eav.persistance.storage.IStorage;
+import kz.bsbnb.usci.eav.tool.generator.data.impl.BaseEntityGenerator;
+import kz.bsbnb.usci.eav.tool.generator.data.impl.MetaClassGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -33,8 +33,7 @@ public class BaseEntitySearcherStressExecutor
 
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
 
-        // todo: check constructor of MetaClassGenerator
-        MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 2, 3);
+        MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 2, 2);
         BaseEntityGenerator baseEntityGenerator = new BaseEntityGenerator();
 
         ClassPathXmlApplicationContext ctx
@@ -63,7 +62,6 @@ public class BaseEntitySearcherStressExecutor
 
             for(int i = 0; i < dataSize; i++)
             {
-                // todo: check generateMetaClass()
                 MetaClass metaClass = metaClassGenerator.generateMetaClass();
 
                 long metaClassId = metaClassDao.save(metaClass);
