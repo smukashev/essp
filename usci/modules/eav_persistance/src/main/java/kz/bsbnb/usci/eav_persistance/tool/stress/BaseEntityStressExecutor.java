@@ -24,13 +24,13 @@ public class BaseEntityStressExecutor
 {
     private final static Logger logger = LoggerFactory.getLogger(BaseEntityStressExecutor.class);
 
-    private final static int dataSize = 1;
+    private final static int dataSize = 10;
 
     public static void main(String[] args)
     {
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
 
-        MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 2, 2);
+        MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 20, 2, 4);
         BaseEntityGenerator baseEntityGenerator = new BaseEntityGenerator();
 
         ClassPathXmlApplicationContext ctx
@@ -54,8 +54,8 @@ public class BaseEntityStressExecutor
             storage.clear();
             storage.initialize();
 
-            System.out.println("Generation: ..........");
-            System.out.print(  "Progress  : ");
+            System.out.println("Generation MetaClasses : ..........");
+            System.out.print(  "Progress               : ");
 
             for(int i = 0; i < dataSize; i++)
             {
@@ -83,40 +83,47 @@ public class BaseEntityStressExecutor
 
             long index = 0L;
 
+            System.out.println("Generation BaseEntities: ..........");
+            System.out.print(  "Progress               : ");
+
+            int i = 0;
             for (MetaClass metaClass : data)
             {
                 BaseEntity baseEntity = baseEntityGenerator.generateBaseEntity(batch, metaClass, ++index);
                 baseEntityDao.save(baseEntity);
+
+                i++;
+                if(i % (dataSize / 10) == 0)
+                    System.out.print(".");
             }
         }
         finally
         {
             metaClassGenerator.printStats();
 
-            System.out.println("-------------------------------------");
-
             SQLQueriesStats sqlStats = ctx.getBean(SQLQueriesStats.class);
             storage.clear();
 
             if(sqlStats != null)
             {
-                System.out.println("+---------+-----+-----------+");
-                System.out.println("|  count  | avg |   total   |");
-                System.out.println("+---------+-----+-----------+");
+                System.out.println();
+                System.out.println("+---------+------------+------------------+");
+                System.out.println("|  count  |    avg     |      total       |");
+                System.out.println("+---------+------------+------------------+");
 
                 for (String query : sqlStats.getStats().keySet())
                 {
                     QueryEntry qe = sqlStats.getStats().get(query);
 
-                    System.out.printf("| %7d | %3d | %9d | %s%n", qe.count,
+                    System.out.printf("| %7d | %10.6f | %16.6f | %s%n", qe.count,
                             qe.totalTime / qe.count, qe.totalTime, query);
                 }
 
-                System.out.println("+---------+-----+-----------+");
+                System.out.println("+---------+------------+------------------+");
             }
             else
             {
-                System.out.println("SQL stats off");
+                System.out.println("SQL stats off.");
             }
 
             storage.clear();

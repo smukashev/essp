@@ -33,7 +33,7 @@ public class BaseEntitySearcherStressExecutor
 
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
 
-        MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 2, 2);
+        MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 20, 2, 4);
         BaseEntityGenerator baseEntityGenerator = new BaseEntityGenerator();
 
         ClassPathXmlApplicationContext ctx

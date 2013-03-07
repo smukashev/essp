@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class SQLQueriesStats {
     private HashMap<String, QueryEntry> stats = new HashMap<String, QueryEntry>();
 
-    public void put(String query, long time)
+    public void put(String query, double time)
     {
         QueryEntry qe = stats.get(query);
 
@@ -38,5 +38,10 @@ public class SQLQueriesStats {
     public HashMap<String, QueryEntry> getStats()
     {
         return stats;
+    }
+
+    public void clear()
+    {
+        stats.clear();
     }
 }

@@ -20,6 +20,7 @@ public class MetaClassGenerator extends AbstractDataGenerator
     private int MAX_META_CLASS_RECURSION = 2;
     private int MAX_META_SET_RECURSION = 4;
     private int CLASSES_NUMBER = 0;
+    private boolean META_CLASS_REPEAT = false;
 
     String getNextClassName()
     {
@@ -36,9 +37,10 @@ public class MetaClassGenerator extends AbstractDataGenerator
     private Map<String, MetaClass> metaClasses = new HashMap<String, MetaClass>();
     private Map<String, Integer> recCounts = new HashMap<String, Integer>();
 
-    public MetaClassGenerator(int maxAttributes, int maxMetaClassRecursion, int maxMetaSetRecursion)
+    public MetaClassGenerator(int maxAttributes, int maxGeneralRecursion, int maxMetaClassRecursion, int maxMetaSetRecursion)
     {
         this.MAX_ATTRIBUTE_NUMBER = maxAttributes;
+        this.MAX_GENERAL_RECURSION = maxGeneralRecursion;
         this.MAX_META_CLASS_RECURSION = maxMetaClassRecursion;
         this.MAX_META_SET_RECURSION = maxMetaSetRecursion;
     }
@@ -122,7 +124,7 @@ public class MetaClassGenerator extends AbstractDataGenerator
 
         Set<String> availableClassNames = SetUtils.difference(metaClasses.keySet(), classNames);
 
-        if (random.nextBoolean() || availableClassNames.isEmpty())
+        if (!META_CLASS_REPEAT || random.nextBoolean() || availableClassNames.isEmpty())
         {
             MetaClass metaClass = new MetaClass(getNextClassName());
             int attributesCount = rand.nextInt(MAX_ATTRIBUTE_NUMBER + 1) + 5;
@@ -205,6 +207,7 @@ public class MetaClassGenerator extends AbstractDataGenerator
 
     public void printStats()
     {
+        System.out.println();
         System.out.println("Simple  types           : " + simpleTypeCount);
         System.out.println("Complex types           : " + complexTypeCount);
         System.out.println("Simple  type sets       : " + simpleTypeSetCount);

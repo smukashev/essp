@@ -23,7 +23,7 @@ public class MetaClassStressExecutor
     {
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
 
-        MetaClassGenerator gen = new MetaClassGenerator(25, 2, 2);
+        MetaClassGenerator gen = new MetaClassGenerator(25, 20, 2, 4);
 
         ClassPathXmlApplicationContext ctx
                 = new ClassPathXmlApplicationContext("stressApplicationContext.xml");
@@ -141,19 +141,19 @@ public class MetaClassStressExecutor
 
         if(sqlStats != null)
         {
-            System.out.println("+---------+-----+-----------+");
-            System.out.println("|  count  | avg |   total   |");
-            System.out.println("+---------+-----+-----------+");
+            System.out.println("+---------+------------+------------------+");
+            System.out.println("|  count  |    avg     |      total       |");
+            System.out.println("+---------+------------+------------------+");
 
             for (String query : sqlStats.getStats().keySet())
             {
                 QueryEntry qe = sqlStats.getStats().get(query);
 
-                System.out.printf("| %7d | %3d | %9d | %s%n", qe.count,
+                System.out.printf("| %7d | %10.6f | %16.6f | %s%n", qe.count,
                         qe.totalTime / qe.count, qe.totalTime, query);
             }
 
-            System.out.println("+---------+-----+-----------+");
+            System.out.println("+---------+------------+------------------+");
         }
         else
         {
