@@ -1,16 +1,15 @@
-package kz.bsbnb.usci.eav;
+package kz.bsbnb.usci.eav_persistance.test;
 
-import kz.bsbnb.usci.eav.model.BaseEntityTest;
-import kz.bsbnb.usci.eav.model.BatchTest;
-import kz.bsbnb.usci.eav.model.batchdata.impl.BaseValueTest;
-import kz.bsbnb.usci.eav.model.batchdata.impl.BatchRepositoryTest;
-import kz.bsbnb.usci.eav.model.metadata.impl.BasicMetaClassRepositoryImplTest;
-//import kz.bsbnb.usci.eav.persistance.impl.BasicBaseEntitySearcherTest;
-import kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao.PostgreSQLBaseEntityDaoImplTest;
-import kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao.PostgreSQLBatchDaoImplTest;
-import kz.bsbnb.usci.eav.persistance.impl.db.postgresql.dao.PostgreSQLMetaClassDaoImplTest;
-import kz.bsbnb.usci.eav.persistance.storage.IStorage;
-import kz.bsbnb.usci.eav.relation.RelationTest1;
+import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
+import kz.bsbnb.usci.eav_persistance.test.model.BaseEntityTest;
+import kz.bsbnb.usci.eav_persistance.test.model.BatchTest;
+import kz.bsbnb.usci.eav_persistance.test.model.batchdata.impl.BaseValueTest;
+import kz.bsbnb.usci.eav_persistance.test.model.batchdata.impl.BatchRepositoryTest;
+import kz.bsbnb.usci.eav_persistance.test.model.metadata.impl.BasicMetaClassRepositoryImplTest;
+import kz.bsbnb.usci.eav_persistance.test.postgresql.dao.PostgreSQLBaseEntityDaoImplTest;
+import kz.bsbnb.usci.eav_persistance.test.postgresql.dao.PostgreSQLBatchDaoImplTest;
+import kz.bsbnb.usci.eav_persistance.test.postgresql.dao.PostgreSQLMetaClassDaoImplTest;
+import kz.bsbnb.usci.eav_persistance.test.relation.RelationTest1;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package kz.bsbnb.usci.eav.model;
+package kz.bsbnb.usci.eav_persistance.test.model;
 
 import static org.junit.Assert.*;
 
@@ -11,21 +11,24 @@ import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
-import kz.bsbnb.usci.eav.GenericTestCase;
-import kz.bsbnb.usci.eav.model.batchdata.impl.BaseValue;
-import kz.bsbnb.usci.eav.model.metadata.IMetaFactory;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaAttribute;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaSet;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
-import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav_model.model.Batch;
+import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav_model.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav_model.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav_model.model.meta.impl.MetaAttribute;
+import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav_model.model.meta.impl.MetaSet;
+import kz.bsbnb.usci.eav_model.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav_model.model.type.DataTypes;
+import kz.bsbnb.usci.eav_persistance.factory.IMetaFactory;
+import kz.bsbnb.usci.eav_persistance.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav_persistance.persistance.dao.IBatchDao;
+import kz.bsbnb.usci.eav_persistance.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav_persistance.test.GenericTestCase;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import kz.bsbnb.usci.eav.model.metadata.DataTypes;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.metadata.type.impl.MetaValue;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +43,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-public class BaseEntityTest extends GenericTestCase{
+public class BaseEntityTest extends GenericTestCase {
     private final Logger logger = LoggerFactory.getLogger(BaseEntityTest.class);
 
     @Autowired

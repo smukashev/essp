@@ -2,7 +2,7 @@ package kz.bsbnb.usci.batch.helper.impl;
 
 import kz.bsbnb.usci.batch.common.Global;
 import kz.bsbnb.usci.batch.helper.IHelper;
-import kz.bsbnb.usci.eav.model.metadata.DataTypes;
+import kz.bsbnb.usci.eav_model.model.type.DataTypes;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;

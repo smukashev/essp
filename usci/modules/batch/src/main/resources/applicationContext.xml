@@ -39,15 +39,11 @@
     </bean>
 
     <context:component-scan base-package="kz.bsbnb.usci.eav.persistance.impl.db.postgresql" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav.model.metadata.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.eav_model.model.meta.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.helper.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.reader.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.writer.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.processor.impl" />
-
-    <bean id="JDBCConfig" class="kz.bsbnb.usci.eav.persistance.impl.db.JDBCConfig"/>
-    <bean id="SQLStats" class="kz.bsbnb.usci.eav.stats.SQLQueriesStats"/>
-    <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav.model.batchdata.impl.BatchRepository"/>
 
     <bean id="dataService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1098/DataService"/>

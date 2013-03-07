@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.batch.writer;
 
-import kz.bsbnb.usci.eav.model.BaseEntity;
 import org.springframework.batch.item.ItemWriter;
 
 /**

@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
-import kz.bsbnb.usci.eav.model.BaseEntity;
+import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.sync.job.AbstractJob;
 
 /**

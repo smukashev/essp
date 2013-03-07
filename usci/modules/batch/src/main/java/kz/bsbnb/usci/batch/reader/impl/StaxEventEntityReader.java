@@ -1,9 +1,9 @@
 package kz.bsbnb.usci.batch.reader.impl;
 
-import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.IBaseContainer;
-import kz.bsbnb.usci.eav.model.batchdata.impl.BaseValue;
-import kz.bsbnb.usci.eav_model.IMetaType;
+import kz.bsbnb.usci.eav_model.model.Batch;
+import kz.bsbnb.usci.eav_model.model.base.IBaseContainer;
+import kz.bsbnb.usci.eav_model.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav_model.model.meta.IMetaType;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaValue;

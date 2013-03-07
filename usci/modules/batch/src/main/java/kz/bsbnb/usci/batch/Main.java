@@ -1,8 +1,8 @@
 package kz.bsbnb.usci.batch;
 
-import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
-import kz.bsbnb.usci.eav.persistance.storage.IStorage;
+import kz.bsbnb.usci.eav_model.model.Batch;
+import kz.bsbnb.usci.eav_persistance.persistance.dao.IBatchDao;
+import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
 import org.apache.log4j.Logger;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;

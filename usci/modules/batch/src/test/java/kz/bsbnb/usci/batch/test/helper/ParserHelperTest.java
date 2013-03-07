@@ -3,7 +3,7 @@ package kz.bsbnb.usci.batch.test.helper;
 import junit.framework.Assert;
 import kz.bsbnb.usci.batch.common.Global;
 import kz.bsbnb.usci.batch.helper.impl.ParserHelper;
-import kz.bsbnb.usci.eav.model.metadata.DataTypes;
+import kz.bsbnb.usci.eav_model.model.type.DataTypes;
 import org.junit.Test;
 
 import java.text.ParseException;
