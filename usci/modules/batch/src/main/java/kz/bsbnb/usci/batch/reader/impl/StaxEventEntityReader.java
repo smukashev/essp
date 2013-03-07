@@ -31,13 +31,9 @@ import java.util.Stack;
 public class StaxEventEntityReader<T> extends CommonReader<T>
 {
     private Logger logger = Logger.getLogger(StaxEventEntityReader.class);
-
     private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
-
     private IBaseContainer currentContainer;
-
     private Batch batch;
-
     private int index = 1, level = 0;
 
     @PostConstruct
@@ -52,7 +48,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
 
         try
         {
-             xmlEventReader = inputFactory.createXMLEventReader(inputStream);
+            xmlEventReader = inputFactory.createXMLEventReader(inputStream);
         }
         catch (XMLStreamException e)
         {
@@ -113,7 +109,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
 
                     if(metaType.isComplex() || metaType.isArray())
                     {
-
                         Object o = currentContainer;
                         currentContainer = stack.pop();
 
