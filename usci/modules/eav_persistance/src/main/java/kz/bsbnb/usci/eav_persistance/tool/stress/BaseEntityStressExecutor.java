@@ -7,6 +7,8 @@ import kz.bsbnb.usci.eav_persistance.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
+import kz.bsbnb.usci.eav_persistance.stats.QueryEntry;
+import kz.bsbnb.usci.eav_persistance.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav_persistance.tool.generator.data.impl.BaseEntityGenerator;
 import kz.bsbnb.usci.eav_persistance.tool.generator.data.impl.MetaClassGenerator;
 import org.slf4j.Logger;
@@ -22,7 +24,7 @@ public class BaseEntityStressExecutor
 {
     private final static Logger logger = LoggerFactory.getLogger(BaseEntityStressExecutor.class);
 
-    private final static int dataSize = 100;
+    private final static int dataSize = 1;
 
     public static void main(String[] args)
     {
@@ -89,6 +91,34 @@ public class BaseEntityStressExecutor
         }
         finally
         {
+            metaClassGenerator.printStats();
+
+            System.out.println("-------------------------------------");
+
+            SQLQueriesStats sqlStats = ctx.getBean(SQLQueriesStats.class);
+            storage.clear();
+
+            if(sqlStats != null)
+            {
+                System.out.println("+---------+-----+-----------+");
+                System.out.println("|  count  | avg |   total   |");
+                System.out.println("+---------+-----+-----------+");
+
+                for (String query : sqlStats.getStats().keySet())
+                {
+                    QueryEntry qe = sqlStats.getStats().get(query);
+
+                    System.out.printf("| %7d | %3d | %9d | %s%n", qe.count,
+                            qe.totalTime / qe.count, qe.totalTime, query);
+                }
+
+                System.out.println("+---------+-----+-----------+");
+            }
+            else
+            {
+                System.out.println("SQL stats off");
+            }
+
             storage.clear();
         }
     }

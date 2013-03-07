@@ -17,6 +17,10 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
 
     public MetaSet(IMetaType metaType)
     {
+        if (metaType == null)
+        {
+            throw new IllegalArgumentException("MetaType can not be null.");
+        }
         this.metaType = metaType;
     }
 
@@ -26,21 +30,21 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
      * @see ComplexKeyTypes
      */
     ComplexKeyTypes arrayKeyType = ComplexKeyTypes.ALL;
-    
+
     public ComplexKeyTypes getArrayKeyType()
     {
-		return arrayKeyType;
-	}
+        return arrayKeyType;
+    }
 
-	public void setArrayKeyType(ComplexKeyTypes arrayKeyType)
+    public void setArrayKeyType(ComplexKeyTypes arrayKeyType)
     {
-		this.arrayKeyType = arrayKeyType;
-	}
-	
-	public boolean isArray()
+        this.arrayKeyType = arrayKeyType;
+    }
+
+    public boolean isArray()
     {
-		return true;
-	}
+        return true;
+    }
 
     @Override
     public boolean isComplex()
@@ -50,6 +54,10 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
 
     public void setMetaType(IMetaType metaType)
     {
+        if (metaType == null)
+        {
+            throw new IllegalArgumentException("MetaType can not be null.");
+        }
         this.metaType = metaType;
     }
 
@@ -70,7 +78,8 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
         if (this == o) return true;
         if (!(o instanceof MetaSet)) return false;
 
@@ -83,14 +92,20 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         int result = metaType.hashCode();
         result = 31 * result + (arrayKeyType != null ? arrayKeyType.hashCode() : 0);
         return result;
     }
 
     @Override
-    public void setMetaAttribute(String name, IMetaAttribute metaAttribute) {
+    public void setMetaAttribute(String name, IMetaAttribute metaAttribute)
+    {
+        if (metaAttribute.getMetaType() == null)
+        {
+            throw new IllegalArgumentException("MetaType can not be null.");
+        }
         setMetaType(metaAttribute.getMetaType());
     }
 }

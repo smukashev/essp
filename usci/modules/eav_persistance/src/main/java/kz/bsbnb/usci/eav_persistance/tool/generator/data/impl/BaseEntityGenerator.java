@@ -7,14 +7,17 @@ import kz.bsbnb.usci.eav_model.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaType;
 import kz.bsbnb.usci.eav_model.model.meta.impl.*;
 import kz.bsbnb.usci.eav_persistance.tool.generator.data.AbstractDataGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author k.tulbassiyev
  */
 public class BaseEntityGenerator  extends AbstractDataGenerator
 {
+    private final Logger logger = LoggerFactory.getLogger(BaseEntityGenerator.class);
     private final int MAX_ARRAY_ELEMENTS = 20;
-    private final int MIN_ARRAY_ELEMENTS = 5;
+    private final int MIN_ARRAY_ELEMENTS = 3;
 
     public BaseEntity generateBaseEntity(Batch batch, MetaClass metaClass, long index)
     {
@@ -28,18 +31,7 @@ public class BaseEntityGenerator  extends AbstractDataGenerator
             {
                 if(metaType.isArray())
                 {
-                    MetaSet metaSet = (MetaSet) metaType;
-
-                    BaseSet baseSet = new BaseSet(metaSet.getMemberType());
-
-                    for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++)
-                    {
-                        BaseEntity tmpEntity = generateBaseEntity(batch,
-                                (MetaClass) metaSet.getMemberType(), index);
-
-                        baseSet.put(new BaseValue(batch, index, tmpEntity));
-                    }
-
+                    BaseSet baseSet = generateBaseSet(batch, (MetaSet)metaType, index);
                     entity.put(name, new BaseValue(batch, index, baseSet));
                 }
                 else
@@ -53,24 +45,64 @@ public class BaseEntityGenerator  extends AbstractDataGenerator
             {
                 if(metaType.isArray())
                 {
-                    MetaSet metaSet = (MetaSet) metaType;
-
-                    BaseSet baseSet = new BaseSet(metaSet.getMemberType());
-
-                    for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++)
-                        baseSet.put(new BaseValue(batch, index, getCastObject(metaSet.getTypeCode())));
-
+                    BaseSet baseSet = generateBaseSet(batch, (MetaSet)metaType, index);
                     entity.put(name, new BaseValue(batch, index, baseSet));
                 }
                 else
                 {
                     MetaValue metaValue = (MetaValue) metaType;
-
                     entity.put(name, new BaseValue(batch, index, getCastObject(metaValue.getTypeCode())));
                 }
             }
         }
 
         return entity;
+    }
+
+    private BaseSet generateBaseSet(Batch batch, MetaSet metaSet, long index) {
+        IMetaType metaTypeChild = metaSet.getMemberType();
+        BaseSet baseSet = new BaseSet(metaSet.getMemberType());
+
+        if (metaTypeChild.isArray())
+        {
+            logger.debug("Generating values set of the sets.");
+            if (metaTypeChild.isComplex())
+            {
+                MetaSet metaSetChild = (MetaSet)metaTypeChild;
+                for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++)
+                {
+                    BaseSet baseSetChild = generateBaseSet(batch, metaSetChild, index);
+                    baseSet.put(new BaseValue(batch, index, baseSetChild));
+                }
+            }
+            else
+            {
+                MetaSet metaSetChild = (MetaSet)metaTypeChild;
+                for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++)
+                {
+                    BaseSet baseSetChild = generateBaseSet(batch, metaSetChild, index);
+                    baseSet.put(new BaseValue(batch, index, baseSetChild));
+                }
+            }
+        }
+        else
+        {
+            if (metaSet.isComplex())
+            {
+                logger.debug("Generating values for complex set.");
+                for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++)
+                {
+                    BaseEntity baseEntity = generateBaseEntity(batch, (MetaClass) metaTypeChild, index);
+                    baseSet.put(new BaseValue(batch, index, baseEntity));
+                }
+            }
+            else
+            {
+                logger.debug("Generating values for simple set.");
+                for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++)
+                    baseSet.put(new BaseValue(batch, index, getCastObject(metaSet.getTypeCode())));
+            }
+        }
+        return baseSet;
     }
 }

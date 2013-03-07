@@ -16,8 +16,9 @@ import java.util.*;
 public class MetaClassGenerator extends AbstractDataGenerator
 {
     private int MAX_ATTRIBUTE_NUMBER = 25;
+    private int MAX_GENERAL_RECURSION = 20;
     private int MAX_META_CLASS_RECURSION = 2;
-    private int MAX_META_SET_RECURSION = 2;
+    private int MAX_META_SET_RECURSION = 4;
     private int CLASSES_NUMBER = 0;
 
     String getNextClassName()
@@ -33,6 +34,7 @@ public class MetaClassGenerator extends AbstractDataGenerator
     private int setOfComplexSetsCount = 0;
 
     private Map<String, MetaClass> metaClasses = new HashMap<String, MetaClass>();
+    private Map<String, Integer> recCounts = new HashMap<String, Integer>();
 
     public MetaClassGenerator(int maxAttributes, int maxMetaClassRecursion, int maxMetaSetRecursion)
     {
@@ -41,16 +43,16 @@ public class MetaClassGenerator extends AbstractDataGenerator
         this.MAX_META_SET_RECURSION = maxMetaSetRecursion;
     }
 
-    private IMetaAttribute generateMetaAttribute(int rec, Set<String> classNames)
+    private IMetaAttribute generateMetaAttribute(int recPrivate, int recGeneral, Set<String> classNames)
     {
         IMetaAttribute attribute;
         int switcher = rand.nextInt(5);
 
-        if(switcher == 0 || switcher == 2 || switcher == 4)
+        if(switcher == 0 || switcher == 2)
             if(rand.nextInt(3) != 2)
                 switcher = 5;
 
-        if(rec > MAX_META_CLASS_RECURSION)
+        if(recPrivate > MAX_META_CLASS_RECURSION || recGeneral > MAX_GENERAL_RECURSION)
             if(switcher == 0 || switcher == 2 || switcher == 4)
                 switcher = 5;
 
@@ -58,7 +60,7 @@ public class MetaClassGenerator extends AbstractDataGenerator
         {
             case 0:
                 //complex attribute
-                MetaClass metaClass = generateMetaClass(rec + 1, classNames);
+                MetaClass metaClass = generateMetaClass(recPrivate + 1, recGeneral + 1, classNames);
 
                 metaClass.setComplexKeyType(ComplexKeyTypes.values()[
                         rand.nextInt(ComplexKeyTypes.values().length)]);
@@ -80,7 +82,7 @@ public class MetaClassGenerator extends AbstractDataGenerator
                 break;
             case 2:
                 //complex set
-                MetaSet cs = new MetaSet(generateMetaClass(rec + 1, classNames));
+                MetaSet cs = new MetaSet(generateMetaClass(recPrivate + 1, recGeneral + 1, classNames));
                 cs.setArrayKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
 
                 attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), cs);
@@ -89,14 +91,14 @@ public class MetaClassGenerator extends AbstractDataGenerator
                 break;
             case 3:
                 //set of simple set
-                MetaSet soss = generateMetaSetOfSimpleTypes(0);
+                MetaSet soss = generateMetaSetOfSimpleTypes(0, recGeneral);
                 attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), soss);
                 setOfSimpleSetsCount++;
 
                 break;
             case 4:
                 //set of complex set
-                MetaSet socs = generateMetaSetOfComplexTypes(0, classNames);
+                MetaSet socs = generateMetaSetOfComplexTypes(0, recGeneral, classNames);
                 attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), socs);
                 setOfComplexSetsCount++;
 
@@ -114,7 +116,7 @@ public class MetaClassGenerator extends AbstractDataGenerator
         return attribute;
     }
 
-    private MetaClass generateMetaClass(int rec, Set<String> classNames)
+    private MetaClass generateMetaClass(int recPrivate, int recGeneral, Set<String> classNames)
     {
         Random random = new Random();
 
@@ -132,7 +134,7 @@ public class MetaClassGenerator extends AbstractDataGenerator
 
             for (int j = 0; j < attributesCount; j++)
             {
-                IMetaAttribute type = generateMetaAttribute(rec + 1, classNames);
+                IMetaAttribute type = generateMetaAttribute(recPrivate + 1, recGeneral + 1, classNames);
 
                 metaClass.setMetaAttribute("attribute_" + System.nanoTime(), type);
             }
@@ -150,18 +152,25 @@ public class MetaClassGenerator extends AbstractDataGenerator
     }
 
     public MetaClass generateMetaClass() {
-        return generateMetaClass(0, new HashSet<String>());
+        return generateMetaClass(0, 0, new HashSet<String>());
     }
 
-    private MetaSet generateMetaSetOfComplexTypes(int rec, Set<String> classNames) {
+    private MetaSet generateMetaSetOfComplexTypes(int recPrivate, int recGeneral, Set<String> classNames) {
+        int recGeneralAvailable = MAX_GENERAL_RECURSION - recGeneral;
+        int recPrivateAvailable = MAX_META_SET_RECURSION - recPrivate;
+
+        boolean last = false;
+        if (recGeneralAvailable == recPrivateAvailable || recGeneralAvailable == 1 || recPrivateAvailable == 0)
+            last = true;
+
         IMetaType metaType;
-        if (rec <= (MAX_META_SET_RECURSION - 1))
+        if (last)
         {
-            metaType = generateMetaSetOfComplexTypes(rec + 1, classNames);
+            metaType = generateMetaClass(MAX_META_CLASS_RECURSION + 1, recGeneral + 1, classNames);
         }
         else
         {
-            metaType = generateMetaClass(MAX_META_CLASS_RECURSION + 1, classNames);
+            metaType = generateMetaSetOfComplexTypes(recPrivate + 1, recGeneral + 1, classNames);
         }
 
         MetaSet metaSet = new MetaSet(metaType);
@@ -170,11 +179,18 @@ public class MetaClassGenerator extends AbstractDataGenerator
         return metaSet;
     }
 
-    private MetaSet generateMetaSetOfSimpleTypes(int rec) {
+    private MetaSet generateMetaSetOfSimpleTypes(int recPrivate, int recGeneral) {
+        int recGeneralAvailable = MAX_GENERAL_RECURSION - recGeneral;
+        int recPrivateAvailable = MAX_META_SET_RECURSION - recPrivate;
+
+        boolean last = false;
+        if (recGeneralAvailable == recPrivateAvailable || recGeneralAvailable == 1 || recPrivateAvailable == 0)
+            last = true;
+
         IMetaType metaType;
-        if (rec <= (MAX_META_SET_RECURSION - 1))
+        if (last)
         {
-            metaType = generateMetaSetOfSimpleTypes(rec + 1);
+            metaType = generateMetaSetOfSimpleTypes(recPrivate + 1, recGeneral + 1);
         }
         else
         {
@@ -201,4 +217,5 @@ public class MetaClassGenerator extends AbstractDataGenerator
     {
         return metaClasses.values();
     }
+
 }

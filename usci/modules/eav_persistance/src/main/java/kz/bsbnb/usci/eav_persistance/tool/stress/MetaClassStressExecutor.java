@@ -137,7 +137,7 @@ public class MetaClassStressExecutor
         System.out.println("-------------------------------------");
 
         SQLQueriesStats sqlStats = ctx.getBean(SQLQueriesStats.class);
-            storage.clear();
+        storage.clear();
 
         if(sqlStats != null)
         {
