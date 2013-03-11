@@ -658,6 +658,22 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
     }
 
+    private void removeSet(MetaSet set)
+    {
+        if (set.getMemberType().isArray())
+        {
+            removeSet((MetaSet)set.getMemberType());
+            removeAllAttributes(set.getId());
+        }
+        else
+        {
+            if (set.getMemberType().isComplex())
+            {
+                remove((MetaClass)set.getMemberType());
+            }
+        }
+    }
+
 	@Override
     @Transactional
 	public void remove(MetaClass metaClass) {
@@ -671,7 +687,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         for (String arrayName : metaClass.getArrayArrayAttributesNames())
         {
-            removeAllAttributes(((MetaSet)metaClass.getMemberType(arrayName)).getId());
+            removeSet(((MetaSet)metaClass.getMemberType(arrayName)));
         }
 
         //delete all class attributes
