@@ -204,10 +204,10 @@ public class PostgreSQLMetaClassDaoImplTest extends GenericTestCase
         }
 
         // todo: check and fix
-        /*if(!postgreSQLStorageImpl.isClean())
+        if(!postgreSQLStorageImpl.isClean())
         {
             fail("DB after deletion is not clean!");
-        }*/
+        }
     }
 
     @Test
