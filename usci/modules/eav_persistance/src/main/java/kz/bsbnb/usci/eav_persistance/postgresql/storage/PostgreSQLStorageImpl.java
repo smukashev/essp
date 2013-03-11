@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav_persistance.postgresql.storage;
 
+import kz.bsbnb.usci.eav_persistance.persistance.impl.db.JDBCConfig;
 import kz.bsbnb.usci.eav_persistance.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
 
@@ -9,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STRawGroupDir;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 
 /**
  *
@@ -123,7 +128,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         //TODO: add base entity tables
         String query = String.format(COUNT_TABLE, getConfig().getArrayKeyFilterValuesTableName());
         logger.debug(query);
-        if(jdbcTemplate.queryForInt(query) > 0)
+        if(jdbcTemplate.queryForLong(query) > 0)
         {
             logger.debug("Table " + getConfig().getArrayKeyFilterValuesTableName() + " is not clean.");
             return false;
@@ -132,7 +137,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         //array key filter
         query = String.format(COUNT_TABLE, getConfig().getArrayKeyFilterTableName());
         logger.debug(query);
-        if(jdbcTemplate.queryForInt(query) > 0)
+        if(jdbcTemplate.queryForLong(query) > 0)
         {
             logger.debug("Table " + getConfig().getArrayKeyFilterTableName() + " is not clean.");
             return false;
@@ -141,7 +146,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         //attributes
         query = String.format(COUNT_TABLE, getConfig().getAttributesTableName());
         logger.debug(query);
-        if(jdbcTemplate.queryForInt(query) > 0)
+        if(jdbcTemplate.queryForLong(query) > 0)
         {
             logger.debug("Table " + getConfig().getAttributesTableName() + " is not clean.");
             return false;
@@ -150,7 +155,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         //entities
         query = String.format(COUNT_TABLE, getConfig().getEntitiesTableName());
         logger.debug(query);
-        if(jdbcTemplate.queryForInt(query) > 0)
+        if(jdbcTemplate.queryForLong(query) > 0)
         {
             logger.debug("Table " + getConfig().getEntitiesTableName() + " is not clean.");
             return false;
@@ -159,7 +164,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         //classes
         query = String.format(COUNT_TABLE, getConfig().getClassesTableName());
         logger.debug(query);
-        if(jdbcTemplate.queryForInt(query) > 0)
+        if(jdbcTemplate.queryForLong(query) > 0)
         {
             logger.debug("Table " + getConfig().getClassesTableName() + " is not clean.");
             return false;
@@ -168,7 +173,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         //batches
         query = String.format(COUNT_TABLE, getConfig().getBatchesTableName());
         logger.debug(query);
-        if(jdbcTemplate.queryForInt(query) > 0)
+        if(jdbcTemplate.queryForLong(query) > 0)
         {
             logger.debug("Table " + getConfig().getBatchesTableName() + " is not clean.");
             return false;
@@ -177,13 +182,44 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         //values
         query = String.format(COUNT_TABLE, getConfig().getBaseValuesTableName());
         logger.debug(query);
-        if(jdbcTemplate.queryForInt(query) > 0)
+        if(jdbcTemplate.queryForLong(query) > 0)
         {
             logger.debug("Table " + getConfig().getBaseValuesTableName() + " is not clean.");
             return false;
         }
 
         return true;
+    }
+
+    @Override
+    public HashMap<String, Long> tableCounts() {
+        //Obtain the Class instance
+        Class jdbcConfig = JDBCConfig.class;
+
+        HashMap<String, Long> res = new HashMap<String, Long>();
+
+        //Get the methods
+        Method[] methods = jdbcConfig.getDeclaredMethods();
+
+        //Loop through the methods and print out their names
+        for (Method method : methods) {
+            try
+            {
+                if(method.getName().endsWith("TableName"))
+                {
+                    String tableName = (String)method.invoke(getConfig());
+                    String query = String.format(COUNT_TABLE, tableName);
+                    long count = jdbcTemplate.queryForLong(query);
+                    logger.debug("Table " + tableName + ": " + count);
+
+                    res.put(tableName, count);
+                }
+            } catch (Exception e) {
+                logger.error("Can't call method " + method.getName() + " with error: " + e.getMessage());
+            }
+        }
+
+        return res;
     }
 
     public STRawGroupDir getStRawGroupDir()

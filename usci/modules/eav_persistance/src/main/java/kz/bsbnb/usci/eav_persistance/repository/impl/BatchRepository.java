@@ -56,8 +56,8 @@ public class BatchRepository implements IBatchRepository
 
         if (batch.getId() < 1)
             batchId = postgreSQLBatchDaoImpl.save(batch);
+        //else TODO: Add batch update here
 
-        //TODO: Здесь можно сразу же обновить или создать новый метод только для обновления
         return getBatch(batchId);
     }
 }

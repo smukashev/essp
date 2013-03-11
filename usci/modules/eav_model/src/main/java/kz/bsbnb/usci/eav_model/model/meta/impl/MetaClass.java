@@ -280,6 +280,25 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
         return filteredAttributeNames;
     }
 
+    public Set<String> getArrayAttributesNames()
+    {
+        Set<String> allAttributeNames = this.members.keySet();
+        Set<String> filteredAttributeNames = new HashSet<String>();
+
+        Iterator it = allAttributeNames.iterator();
+
+        while (it.hasNext())
+        {
+            String attributeName = (String)it.next();
+            IMetaType type = this.getMemberType(attributeName);
+
+            if (type.isArray())
+                filteredAttributeNames.add(attributeName);
+        }
+
+        return filteredAttributeNames;
+    }
+
     public Set<String> getArrayArrayAttributesNames()
     {
         Set<String> allAttributeNames = this.members.keySet();

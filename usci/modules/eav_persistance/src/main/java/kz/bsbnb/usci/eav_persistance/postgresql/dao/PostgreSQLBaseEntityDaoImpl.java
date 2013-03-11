@@ -70,38 +70,38 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         INSERT_ENTITY_SQL = String.format("INSERT INTO %s (class_id) VALUES ( ? )", getConfig().getEntitiesTableName());
         SELECT_ENTITY_BY_ID_SQL = String.format(
                 "SELECT e.id, " +
-                        "e.class_id, " +
-                        "c.name as class_name " +
-                        "FROM %s e, " +
-                        "%s c " +
-                        "WHERE e.id = ? " +
-                        "AND e.class_id = c.id",
+                       "e.class_id, " +
+                       "c.name as class_name " +
+                  "FROM %s e, " +
+                       "%s c " +
+                 "WHERE e.id = ? " +
+                   "AND e.class_id = c.id",
                 getConfig().getEntitiesTableName(), getConfig().getClassesTableName());
         DELETE_ENTITY_BY_ID_SQL = String.format("DELETE FROM %s WHERE id = ?", getConfig().getEntitiesTableName());
 
         INSERT_SIMPLE_VALUE_SQL = "INSERT INTO %s (entity_id, batch_id, attribute_id, index, value) VALUES ( ?, ?, ?, ?, ? )";
         SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL =
                 "SELECT v.batch_id, " +
-                        "v.attribute_id, " +
-                        "sa.name as attribute_name, " +
-                        "v.index, " +
-                        "v.value " +
-                        "FROM %s v, " +
-                        "%s sa " +
-                        "WHERE v.entity_id = ? " +
-                        "AND v.attribute_id = sa.id";
+                       "v.attribute_id, " +
+                       "sa.name as attribute_name, " +
+                       "v.index, " +
+                       "v.value " +
+                  "FROM %s v, " +
+                       "%s sa " +
+                 "WHERE v.entity_id = ? " +
+                   "AND v.attribute_id = sa.id";
 
         INSERT_COMPLEX_VALUE_SQL = String.format("INSERT INTO %s (entity_id, batch_id, attribute_id, index, entity_value_id) VALUES ( ?, ?, ?, ?, ? )",
                 getConfig().getBaseComplexValuesTableName());
         SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL = String.format(
                 "SELECT cv.batch_id, " +
-                        "ca.name as attribute_name, " +
-                        "cv.index, " +
-                        "cv.entity_value_id " +
-                        "FROM %s cv, " +
-                        "%s ca " +
-                        "WHERE cv.entity_id = ? " +
-                        "AND cv.attribute_id = ca.id ",
+                       "ca.name as attribute_name, " +
+                       "cv.index, " +
+                       "cv.entity_value_id " +
+                  "FROM %s cv, " +
+                       "%s ca " +
+                 "WHERE cv.entity_id = ? " +
+                   "AND cv.attribute_id = ca.id ",
                 getConfig().getBaseComplexValuesTableName(), getConfig().getComplexAttributesTableName());
 
         INSERT_SET_SQL = "INSERT INTO %s (batch_id, index) VALUES ( ?, ? )";
@@ -109,25 +109,25 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         INSERT_ENTITY_SET = "INSERT INTO %s (entity_id, attribute_id, set_id) VALUES ( ?, ?, ? )";
         SELECT_ENTITY_SETS_BY_ENTITY_ID_SQL =
                 "SELECT s.id, " +
-                        "s.batch_id, " +
-                        "a.name as attribute_name, " +
-                        "s.index " +
-                        "FROM %s a, " +
-                        "%s es, " +
-                        "%s s " +
-                        "WHERE es.entity_id = ? " +
-                        "AND es.attribute_id = a.id " +
-                        "AND es.set_id = s.id";
+                       "s.batch_id, " +
+                       "a.name as attribute_name, " +
+                       "s.index " +
+                  "FROM %s a, " +
+                       "%s es, " +
+                       "%s s " +
+                 "WHERE es.entity_id = ? " +
+                   "AND es.attribute_id = a.id " +
+                   "AND es.set_id = s.id";
 
         INSERT_SET_OF_SETS = "INSERT INTO %s (parent_set_id, child_set_id) VALUES ( ?, ? )";
         SELECT_SETS_OF_SETS_BY_PARENT_SET_ID_SQL =
                 "SELECT s.id, " +
-                        "s.batch_id, " +
-                        "s.index " +
-                        "FROM %s ss, " +
-                        "%s s " +
-                        "WHERE ss.parent_set_id = ? " +
-                        "AND ss.child_set_id = s.id";
+                       "s.batch_id, " +
+                       "s.index " +
+                  "FROM %s ss, " +
+                       "%s s " +
+                 "WHERE ss.parent_set_id = ? " +
+                   "AND ss.child_set_id = s.id";
 
         INSERT_SIMPLE_SET_VALUE_SQL = "INSERT INTO %s (set_id, batch_id, index, value) VALUES ( ?, ?, ?, ? )";
         SELECT_SIMPLE_SET_VALUES_BY_SET_ID_SQL = "SELECT sav.batch_id, sav.index, sav.value FROM %s sav WHERE sav.set_id in (?) ";
