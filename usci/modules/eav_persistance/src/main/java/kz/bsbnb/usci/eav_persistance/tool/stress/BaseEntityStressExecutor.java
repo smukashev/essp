@@ -163,7 +163,7 @@ public class BaseEntityStressExecutor
             {
                 System.out.println();
                 System.out.println("+---------+------------------+------------------------+");
-                System.out.println("|  count  |        avg       |          total         |");
+                System.out.println("|  count  |     avg (ms)     |       total (ms)       |");
                 System.out.println("+---------+------------------+------------------------+");
 
                 List<String> queries = SetUtils.asSortedList(sqlStats.getStats().keySet());
