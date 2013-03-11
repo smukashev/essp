@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav_persistance.persistance.storage;
 
+import java.util.HashMap;
+
 public interface IStorage
 {
 	public void initialize();
@@ -7,4 +9,5 @@ public interface IStorage
 	public void empty();
     public boolean isClean();
     public boolean testConnection();
+    public HashMap<String, Long> tableCounts();
 }

@@ -18,10 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class BaseEntityStressExecutor
 {
@@ -33,7 +30,11 @@ public class BaseEntityStressExecutor
     {
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
 
+        //big entities
         MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 20, 2, 4);
+
+        //moderate entities
+        //MetaClassGenerator metaClassGenerator = new MetaClassGenerator(15, 10, 2, 2);
         BaseEntityGenerator baseEntityGenerator = new BaseEntityGenerator();
 
         ClassPathXmlApplicationContext ctx
@@ -139,6 +140,23 @@ public class BaseEntityStressExecutor
             metaClassGenerator.printStats();
 
             SQLQueriesStats sqlStats = ctx.getBean(SQLQueriesStats.class);
+
+            HashMap<String, Long> tableCounts = storage.tableCounts();
+
+            System.out.println();
+            System.out.println("+---------+");
+            System.out.println("|  count  |");
+            System.out.println("+---------+");
+            List<String> tables = SetUtils.asSortedList(tableCounts.keySet());
+            for (String table : tables)
+            {
+                long count = tableCounts.get(table);
+
+                System.out.printf("| %7d | %s%n", count, table);
+            }
+            System.out.println("+---------+");
+
+
             storage.clear();
 
             if(sqlStats != null)
@@ -163,8 +181,6 @@ public class BaseEntityStressExecutor
             {
                 System.out.println("SQL stats off.");
             }
-
-            storage.clear();
         }
     }
 }
