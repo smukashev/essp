@@ -91,12 +91,12 @@ public class JDBCSupport {
         long t = 0;
 
         if(sqlStats != null)
-            t = System.currentTimeMillis();
+            t = System.nanoTime();
 
         int count = jdbcTemplate.update(sql, args);
 
         if(sqlStats != null)
-            sqlStats.put(sql, System.currentTimeMillis() - t);
+            sqlStats.put(sql, (System.nanoTime() - t) / 1000000);
 
         return count;
     }
