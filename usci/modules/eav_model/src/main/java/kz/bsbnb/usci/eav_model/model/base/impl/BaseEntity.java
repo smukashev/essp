@@ -12,9 +12,7 @@ import kz.bsbnb.usci.eav_model.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implements EAV entity object. 
@@ -307,7 +305,8 @@ public class BaseEntity extends Persistable implements IBaseContainer
 
     @Override
     public Set<IBaseValue> get() {
-        return (Set<IBaseValue>) values.values();
+        List<IBaseValue> list = new ArrayList<IBaseValue>(values.values());
+        return (new HashSet<IBaseValue>(list));
     }
 
     @Override

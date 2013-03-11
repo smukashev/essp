@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import kz.bsbnb.usci.eav_model.model.Batch;
+import kz.bsbnb.usci.eav_model.model.base.IBaseValue;
 import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav_model.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav_model.model.base.impl.BaseValue;
@@ -43,7 +44,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-public class BaseEntityTest extends GenericTestCase {
+public class BaseEntityTest extends GenericTestCase{
     private final Logger logger = LoggerFactory.getLogger(BaseEntityTest.class);
 
     @Autowired
@@ -171,22 +172,6 @@ public class BaseEntityTest extends GenericTestCase {
         assertEquals(baseSet,((BaseValue)instance.getBaseValue("testArrayInteger")).getValue());
 
 
-
-        boolean pass = false;
-        try {
-            // instance.getDate("unknownName");
-            instance.getBaseValue("unknownName");
-        }
-        catch(IllegalArgumentException e)
-        {
-            pass = true;
-        }
-
-        if(!pass) {
-            fail("Gives value with unknown name");
-        }
-
-
     }
 
     @Test
@@ -217,10 +202,50 @@ public class BaseEntityTest extends GenericTestCase {
         assertEquals(set,instance.getAttributeNames());
         assertEquals(2,instance.getAttributeCount());
 
+        set.remove("testInteger");
+        assertEquals(set,instance.getPresentSimpleAttributeNames(DataTypes.DATE));
+
+        MetaClass meta2 = new MetaClass("testClass2");
+        Long meta2Id = metaClassDao.save(meta2);
+        BaseEntity expEntity = metaFactory.getBaseEntity("testClass2");
+        instance.getMeta().setMetaAttribute("testComplex",new MetaAttribute(meta2));
+        instance.put("testComplex",new BaseValue(batch,1,expEntity));
+
+        set.clear();
+        set.add("testComplex");
+        assertEquals(set, instance.getPresentComplexAttributeNames());
+
+        instance.getMeta().setMetaAttribute("testArrayInteger", new MetaAttribute(false, true, new MetaSet(new MetaValue(DataTypes.INTEGER))));
+        BaseSet baseSet = new BaseSet(((MetaSet)instance.getMemberType("testArrayInteger")).getMemberType());
+        baseSet.put(new BaseValue(batch,1,11));
+        baseSet.put(new BaseValue(batch,1,22));
+        baseSet.put(new BaseValue(batch,1,33));
+        instance.put("testArrayInteger",new BaseValue(batch,1,baseSet));
+        set.clear();
+        set.add("testArrayInteger");
+
+        assertEquals(set,instance.getPresentSimpleSetAttributeNames(DataTypes.INTEGER));
+
+        MetaClass meta3 = new MetaClass("testClass3");
+        Long meta3Id = metaClassDao.save(meta3);
+        instance.getMeta().setMetaAttribute("testArrayString", new MetaAttribute(false, true, new MetaSet(meta3)));
+        BaseSet baseSet2 = new BaseSet(((MetaSet)instance.getMemberType("testArrayString")).getMemberType());
+        baseSet2.put(new BaseValue(batch,1,"str1"));
+        baseSet2.put(new BaseValue(batch,1,"str2"));
+        baseSet2.put(new BaseValue(batch,1,"str3"));
+        instance.put("testArrayString",new BaseValue(batch,1,baseSet2));
+
+        set.clear();
+        set.add("testArrayString");
+        assertEquals(set,instance.getPresentComplexArrayAttributeNames());
+
+
+        //Set<IBaseValue> setBase = new TreeSet<IBaseValue>();
+        assertEquals(4,((Set<IBaseValue>)instance.get()).size());
     }
 
     @Test
-    public void testEqual() throws Exception {
+    public void testEqual(){
         String name = "testClass";
 
         Batch batch = new Batch();
@@ -260,18 +285,18 @@ public class BaseEntityTest extends GenericTestCase {
         instance2.put("testArrayInteger",new BaseValue(batch,1,baseSet));
         assertTrue(instance.equals(instance2));
 
+        instance.getMeta().setMetaAttribute("testInteger3", new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
+        instance.put("testInteger3", new BaseValue(batch, 1, null));
+        instance2.getMeta().setMetaAttribute("testInteger3", new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
+        instance2.put("testInteger3", new BaseValue(batch, 1, null));
+        assertTrue(instance.equals(instance2));
+
         instance2.getMeta().setMetaAttribute("testInteger2", new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
         instance2.put("testInteger2", new BaseValue(batch, 1, intResult));
         assertFalse(instance.equals(instance2));
 
         instance.getMeta().setMetaAttribute("testInteger2", new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
         instance.put("testInteger2", new BaseValue(batch, 1, null));
-        assertFalse(instance.equals(instance2));
-
-        instance.getMeta().setMetaAttribute("testInteger3", new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
-        instance.put("testInteger3", new BaseValue(batch, 1, null));
-        instance2.getMeta().setMetaAttribute("testInteger3", new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
-        instance2.put("testInteger3", new BaseValue(batch, 1, null));
         assertFalse(instance.equals(instance2));
 
 
