@@ -32,6 +32,7 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository
 
     @Override
     public MetaClass getMetaClass(long id) {
+
         MetaClass metaClass = storage.load(id);
         cache.put(metaClass.getClassName(),metaClass);
 

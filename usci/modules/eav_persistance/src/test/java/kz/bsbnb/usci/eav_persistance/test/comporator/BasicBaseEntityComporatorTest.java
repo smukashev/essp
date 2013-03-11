@@ -74,6 +74,7 @@ public class BasicBaseEntityComporatorTest {
 //
 //        if (!q)
 //            fail("Accepts null key attribute");
+//              fail("Accepts null key attribute");
     }
 
     @Test
