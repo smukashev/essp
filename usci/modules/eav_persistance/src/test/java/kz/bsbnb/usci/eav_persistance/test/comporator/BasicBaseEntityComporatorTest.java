@@ -4,10 +4,12 @@ import junit.framework.Assert;
 import kz.bsbnb.usci.eav_model.comparator.IBaseEntityComparator;
 import kz.bsbnb.usci.eav_model.model.Batch;
 import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav_model.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav_model.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav_model.comparator.impl.BasicBaseEntityComparator;
+import kz.bsbnb.usci.eav_model.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav_model.model.type.DataTypes;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IBatchDao;
@@ -16,8 +18,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assert.fail;
 
 /**
  * @author abukabayev
@@ -36,7 +36,8 @@ public class BasicBaseEntityComporatorTest {
         MetaClass meta1 = new MetaClass("testClass1");
         MetaClass meta2 = new MetaClass("testClass2");
         BaseEntity entity1 = new BaseEntity(meta1);
-        BaseEntity entity2 = new BaseEntity(meta2);
+        BaseEntity entity2 = new BaseEntity(meta1);
+        BaseEntity entity3 = new BaseEntity(meta2);
 
         IBaseEntityComparator instance = new BasicBaseEntityComparator();
 
@@ -45,13 +46,24 @@ public class BasicBaseEntityComporatorTest {
         entity1.put("attr1",new BaseValue(batch,1,"str1"));
         entity2.put("attr1",new BaseValue(batch,1,"str1"));
 
-        Assert.assertFalse(instance.compare(entity1, entity2));
-        Assert.assertTrue(instance.compare(entity1, entity1));
+        Assert.assertTrue(instance.compare(entity1, entity2));
 
-        entity1.getMeta().setMetaAttribute("attr2",new MetaAttribute(true,false,new MetaValue(DataTypes.STRING)));
-        entity2.getMeta().setMetaAttribute("attr2",new MetaAttribute(false,false,new MetaValue(DataTypes.STRING)));
-        entity2.put("attr2",new BaseValue(batch,1,"str2"));
+        entity2.put("attr1", new BaseValue(batch, 1, "str2"));
+
         Assert.assertFalse(instance.compare(entity1, entity2));
+
+        Assert.assertFalse(instance.compare(entity1, entity3));
+       // Assert.assertTrue(instance.compare(entity1, entity1));
+
+        entity1.getMeta().setMetaAttribute("attr2", new MetaAttribute(true, false, new MetaValue(DataTypes.STRING)));
+        entity2.getMeta().setMetaAttribute("attr2", new MetaAttribute(false, false, new MetaValue(DataTypes.STRING)));
+        entity2.put("attr2",new BaseValue(batch,1,"str2"));
+
+        Assert.assertFalse(instance.compare(entity1, entity2));
+
+
+
+
 //        boolean q=false;
 //        try{
 //            Assert.assertTrue(instance.compare(entity1, entity2));
@@ -62,5 +74,53 @@ public class BasicBaseEntityComporatorTest {
 //
 //        if (!q)
 //            fail("Accepts null key attribute");
+//              fail("Accepts null key attribute");
+    }
+
+    @Test
+    public void testCompareSet() throws Exception {
+        Batch batch = new Batch();
+        batchDao.save(batch);
+        MetaClass meta1 = new MetaClass("testClass1");
+//        MetaClass meta2 = new MetaClass("testClass2");
+        BaseEntity entity1 = new BaseEntity(meta1);
+        BaseEntity entity2 = new BaseEntity(meta1);
+
+        IBaseEntityComparator instance = new BasicBaseEntityComparator();
+
+        entity1.getMeta().setMetaAttribute("testArrayInteger", new MetaAttribute(true, false, new MetaSet(new MetaValue(DataTypes.INTEGER))));
+        entity2.getMeta().setMetaAttribute("testArrayInteger", new MetaAttribute(true, false, new MetaSet(new MetaValue(DataTypes.INTEGER))));
+        BaseSet baseSet = new BaseSet(((MetaSet)entity1.getMemberType("testArrayInteger")).getMemberType());
+        baseSet.put(new BaseValue(batch,1,11));
+        baseSet.put(new BaseValue(batch,1,22));
+        baseSet.put(new BaseValue(batch,1,33));
+        entity1.put("testArrayInteger", new BaseValue(batch, 1, baseSet));
+        entity2.put("testArrayInteger",new BaseValue(batch,1,baseSet));
+
+        Assert.assertTrue(instance.compare(entity1, entity2));
+        //Assert.assertFalse(instance.compare(entity1, entity2));
+
+        MetaClass meta3 = new MetaClass("testClass3");
+        BaseEntity expEntity = new BaseEntity(meta3);
+
+        expEntity.getMeta().setMetaAttribute("testString",new MetaAttribute(true,false,new MetaValue(DataTypes.STRING)));
+        expEntity.getMeta().setMetaAttribute("testArrayInteger", new MetaAttribute(true, false, new MetaSet(new MetaValue(DataTypes.INTEGER))));
+
+        BaseSet baseSet2 = new BaseSet(((MetaSet)entity1.getMemberType("testArrayInteger")).getMemberType());
+        baseSet2.put(new BaseValue(batch,1,11));
+        baseSet2.put(new BaseValue(batch,1,22));
+        baseSet2.put(new BaseValue(batch,1,33));
+        expEntity.put("testArrayInteger",new BaseValue(batch,1,baseSet2));
+        expEntity.put("testString",new BaseValue(batch,1,"str"));
+
+
+        entity1.getMeta().setMetaAttribute("testComplex", new MetaAttribute(meta3));
+        entity1.put("testComplex",new BaseValue(batch,1,expEntity));
+
+        entity2.getMeta().setMetaAttribute("testComplex", new MetaAttribute(meta3));
+        entity2.put("testComplex",new BaseValue(batch,1,expEntity));
+
+        Assert.assertTrue(instance.compare(entity1, entity2));
+
     }
 }
