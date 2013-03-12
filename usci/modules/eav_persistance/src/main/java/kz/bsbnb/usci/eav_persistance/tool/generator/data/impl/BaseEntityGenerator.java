@@ -29,7 +29,7 @@ public class BaseEntityGenerator  extends AbstractDataGenerator
 
             if(metaType.isComplex())
             {
-                if(metaType.isArray())
+                if(metaType.isSet())
                 {
                     BaseSet baseSet = generateBaseSet(batch, (MetaSet)metaType, index);
                     entity.put(name, new BaseValue(batch, index, baseSet));
@@ -43,7 +43,7 @@ public class BaseEntityGenerator  extends AbstractDataGenerator
             }
             else
             {
-                if(metaType.isArray())
+                if(metaType.isSet())
                 {
                     BaseSet baseSet = generateBaseSet(batch, (MetaSet)metaType, index);
                     entity.put(name, new BaseValue(batch, index, baseSet));
@@ -63,7 +63,7 @@ public class BaseEntityGenerator  extends AbstractDataGenerator
         IMetaType metaTypeChild = metaSet.getMemberType();
         BaseSet baseSet = new BaseSet(metaSet.getMemberType());
 
-        if (metaTypeChild.isArray())
+        if (metaTypeChild.isSet())
         {
             logger.debug("Generating values set of the sets.");
             if (metaTypeChild.isComplex())

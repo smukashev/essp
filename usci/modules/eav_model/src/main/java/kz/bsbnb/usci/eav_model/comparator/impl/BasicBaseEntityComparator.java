@@ -145,14 +145,14 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
 
             if(meta.getComplexKeyType() == ComplexKeyTypes.ALL)
             {
-                if(!type.isArray())
+                if(!type.isSet())
                     result = result && compareValue(type, value1, value2);
                 else
                     result = result && compareSet(type, value1, value2);
             }
             else
             {
-                if(!type.isArray())
+                if(!type.isSet())
                     result = result || compareValue(type, value1, value2);
                 else
                     result = result || compareSet(type, value1, value2);

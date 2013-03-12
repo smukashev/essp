@@ -236,7 +236,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             String attributeName = it.next();
 
             IMetaType metaType = meta.getMemberType(attributeName);
-            if (metaType.isArray())
+            if (metaType.isSet())
             {
                 insertEntitySet(baseEntity, attributeName);
             }
@@ -438,7 +438,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
 
         String query;
-        if (metaTypeValue.isArray())
+        if (metaTypeValue.isSet())
         {
             query = String.format(INSERT_ENTITY_SET, getConfig().getBaseEntitySetOfSetsTableName());
         }
@@ -466,7 +466,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 new Object[]{baseValue.getBatch().getId(), baseValue.getIndex()});
 
         String query;
-        if (metaType.isArray())
+        if (metaType.isSet())
         {
             List<Object[]> batchArgs = new ArrayList<Object[]>();
 
@@ -560,7 +560,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 new Object[]{baseValue.getBatch().getId(), baseValue.getIndex()});
 
         String query;
-        if (metaType.isArray())
+        if (metaType.isSet())
         {
             List<Object[]> batchArgs = new ArrayList<Object[]>();
 
@@ -777,7 +777,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             throw new RuntimeException("Load the simple set values is not possible. " +
                     "Simple values ​​can not be added to an set of complex values.");
 
-        if (metaType.isArray())
+        if (metaType.isSet())
         {
             String query = String.format(SELECT_SETS_OF_SETS_BY_PARENT_SET_ID_SQL,
                     getConfig().getBaseSetOfSimpleSetsTableName(),
@@ -845,7 +845,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             throw new RuntimeException("Load the complex set values is not possible. " +
                     "Complex values ​​can not be added to an set of simple values.");
 
-        if (metaType.isArray())
+        if (metaType.isSet())
         {
             String query = String.format(SELECT_SETS_OF_SETS_BY_PARENT_SET_ID_SQL,
                     getConfig().getBaseSetOfComplexSetsTableName(),

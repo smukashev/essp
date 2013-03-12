@@ -28,13 +28,15 @@ public class GenerateSimpleInsertXml
     private final static Logger logger
             = LoggerFactory.getLogger(GenerateSimpleInsertXml.class);
 
-    private final static int DATA_SIZE = 100;
-    private final static String FILE_PATH = "/opt/xmls/test.xml";
+    private final static int DATA_SIZE = 1;
+    private static String OS = System.getProperty("os.name").toLowerCase();
+    private final static String FILE_PATH_UNIX = "/opt/xmls/test.xml";
+    private final static String FILE_PATH_WINDOWS = "D:/DevTemp/test.xml";
 
     public static void main(String args[])
             throws ParserConfigurationException, TransformerException
     {
-        MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 20, 2, 4);
+        MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 20, 2, 3);
         BaseEntityGenerator baseEntityGenerator = new BaseEntityGenerator();
 
         BaseEntityXmlGenerator baseEntityXmlGenerator = new BaseEntityXmlGenerator();
@@ -88,9 +90,39 @@ public class GenerateSimpleInsertXml
 
         Document document = baseEntityXmlGenerator.getGeneratedDocument(entities);
 
-        baseEntityXmlGenerator.writeToXml(document, FILE_PATH);
+        String filePath;
+        if (isWindows()) {
+            filePath = FILE_PATH_WINDOWS;
+        } else if (isMac()) {
+            throw new RuntimeException("OS is not support.");
+        } else if (isUnix()) {
+            filePath = FILE_PATH_UNIX;
+        } else if (isSolaris()) {
+            throw new RuntimeException("OS is not support.");
+        } else {
+            throw new RuntimeException("OS is not support.");
+        }
+
+        baseEntityXmlGenerator.writeToXml(document, filePath);
 
         logger.info("Xml has been generated.");
-        logger.info("File " + FILE_PATH + " is ready to use.");
+        logger.info("File " + filePath + " is ready to use.");
     }
+
+    public static boolean isWindows() {
+        return (OS.indexOf("win") >= 0);
+    }
+
+    public static boolean isMac() {
+        return (OS.indexOf("mac") >= 0);
+    }
+
+    public static boolean isUnix() {
+        return (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0 );
+    }
+
+    public static boolean isSolaris() {
+        return (OS.indexOf("sunos") >= 0);
+    }
+
 }

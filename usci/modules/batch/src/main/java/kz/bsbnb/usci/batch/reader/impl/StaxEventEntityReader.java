@@ -81,19 +81,19 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
         {
             IMetaType metaType = currentContainer.getMemberType(localName);
 
-            if(metaType.isArray())
+            if(metaType.isSet())
             {
                 stack.push(currentContainer);
                 currentContainer = metaFactory.getBaseSet(((MetaSet)metaType).getMemberType());
                 level++;
             }
-            else if(metaType.isComplex() && !metaType.isArray())
+            else if(metaType.isComplex() && !metaType.isSet())
             {
                 stack.push(currentContainer);
                 currentContainer = metaFactory.getBaseEntity((MetaClass)metaType);
                 level++;
             }
-            else if(!metaType.isComplex() && !metaType.isArray())
+            else if(!metaType.isComplex() && !metaType.isSet())
             {
                 Object o = null;
                 MetaValue metaValue = (MetaValue) metaType;
@@ -163,7 +163,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
                     else
                         metaType = currentContainer.getMemberType(localName);
 
-                    if(metaType.isComplex() || metaType.isArray())
+                    if(metaType.isComplex() || metaType.isSet())
                     {
 
                         Object o = currentContainer;

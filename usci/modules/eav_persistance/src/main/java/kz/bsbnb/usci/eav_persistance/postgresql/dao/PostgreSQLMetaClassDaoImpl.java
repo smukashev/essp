@@ -199,14 +199,14 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         Object[] args;
         long id;
 
-        if(!type.isArray())
+        if(!type.isSet())
         {
             throw new IllegalStateException(attributeName + " is not an array.");
         }
 
         MetaSet metaSet = (MetaSet)type;
 
-        if(metaSet.getMemberType().isArray())
+        if(metaSet.getMemberType().isSet())
         {
             query = INSERT_ARRAY_ARRAY;
 
@@ -277,7 +277,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         String query;
         Object[] args;
 
-        if(type.isArray())
+        if(type.isSet())
         {
             throw new IllegalStateException(attributeName + " is an array, single value expected.");
         }
@@ -329,7 +329,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             IMetaAttribute metaAttribute = meta.getMetaAttribute(typeName);
             IMetaType metaType = metaAttribute.getMetaType();
 
-            if(metaType.isArray())
+            if(metaType.isSet())
             {
                 saveSet(metaType, meta.getId(), metaAttribute, typeName);
             }
@@ -660,7 +660,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
     private void removeSet(MetaSet set)
     {
-        if (set.getMemberType().isArray())
+        if (set.getMemberType().isSet())
         {
             removeSet((MetaSet)set.getMemberType());
             removeAllAttributes(set.getId());

@@ -117,7 +117,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
             Class<?> expValueClass;
 
             if (type.isComplex())
-                if(type.isArray())
+                if(type.isSet())
                 {
                     expValueClass = BaseSet.class;
                 }
@@ -127,12 +127,12 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 }
             else
             {
-                if(type.isArray())
+                if(type.isSet())
                 {
                     MetaSet metaValue = (MetaSet)type;
 
                     IMetaType metaValueChild = metaValue.getMemberType();
-                    if (type.isArray())
+                    if (type.isSet())
                     {
                         expValueClass = BaseSet.class;
                         valueClass = value.getValue().getClass();
@@ -278,7 +278,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 if(thisValue == null || thatValue == null)
                     return false;
 
-                if (this.getMeta().getMemberType(attributeName).isArray())
+                if (this.getMeta().getMemberType(attributeName).isSet())
                 {
                     BaseSet thisSet = (BaseSet)(thisValue.getValue());
                     BaseSet thatSet = (BaseSet)(thatValue.getValue());

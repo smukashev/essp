@@ -41,7 +41,7 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
         this.arrayKeyType = arrayKeyType;
     }
 
-    public boolean isArray()
+    public boolean isSet()
     {
         return true;
     }
@@ -50,6 +50,11 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
     public boolean isComplex()
     {
         return metaType.isComplex();
+    }
+
+    @Override
+    public boolean isSetOfSets() {
+        return metaType.isSet();
     }
 
     public void setMetaType(IMetaType metaType)
@@ -66,7 +71,7 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
         if(isComplex())
             throw new IllegalStateException();
 
-        if(metaType.isArray())
+        if(metaType.isSet())
             throw new IllegalStateException();
 
         return ((MetaValue) metaType).getTypeCode();

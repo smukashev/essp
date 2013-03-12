@@ -209,7 +209,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
             String attributeName = (String)it.next();
             IMetaType type = this.getMemberType(attributeName);
 
-            if (!type.isArray() && !type.isComplex())
+            if (!type.isSet() && !type.isComplex())
             {
                 MetaValue metaValue = (MetaValue)type;
                 if (metaValue.getTypeCode().equals(dataType))
@@ -230,7 +230,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
             String attributeName = (String)it.next();
             IMetaType type = this.getMemberType(attributeName);
 
-            if (!type.isArray() && type.isComplex())
+            if (!type.isSet() && type.isComplex())
                 filteredAttributeNames.add(attributeName);
         }
 
@@ -249,7 +249,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
             String attributeName = (String)it.next();
             IMetaType type = this.getMemberType(attributeName);
 
-            if (type.isArray() && !type.isComplex())
+            if (type.isSet() && !type.isComplex())
             {
                 MetaSet metaValueArray = (MetaSet)type;
 
@@ -273,7 +273,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
             String attributeName = (String)it.next();
             IMetaType type = this.getMemberType(attributeName);
 
-            if (type.isArray() && type.isComplex())
+            if (type.isSet() && type.isComplex())
                 filteredAttributeNames.add(attributeName);
         }
 
@@ -292,7 +292,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
             String attributeName = (String)it.next();
             IMetaType type = this.getMemberType(attributeName);
 
-            if (type.isArray())
+            if (type.isSet())
                 filteredAttributeNames.add(attributeName);
         }
 
@@ -311,7 +311,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
             String attributeName = (String)it.next();
             IMetaType type = this.getMemberType(attributeName);
 
-            if (type.isArray() && ((MetaSet)type).getMemberType().isArray())
+            if (type.isSet() && ((MetaSet)type).getMemberType().isSet())
                 filteredAttributeNames.add(attributeName);
         }
 
@@ -351,7 +351,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
     }
 
     @Override
-    public boolean isArray()
+    public boolean isSet()
     {
         return false;
     }
@@ -360,6 +360,11 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
     public boolean isComplex()
     {
         return true;
+    }
+
+    @Override
+    public boolean isSetOfSets() {
+        return false;
     }
 
     public int getAttributesCount()
