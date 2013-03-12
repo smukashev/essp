@@ -72,7 +72,7 @@ public class BaseEntityTest extends GenericTestCase{
     public void testSimple() {
         String name = "testClass";
 
-        Batch batch = new Batch();
+        Batch batch = new Batch(new java.sql.Date(System.currentTimeMillis()));
         batchDao.save(batch);
 
         MetaClass meta = new MetaClass(name);
@@ -135,7 +135,7 @@ public class BaseEntityTest extends GenericTestCase{
     public void testComplex() {
         String name = "testClass";
 
-        Batch batch = new Batch();
+        Batch batch = new Batch(new java.sql.Date(System.currentTimeMillis()));
         batchDao.save(batch);
 
         MetaClass meta = new MetaClass(name);
@@ -178,7 +178,7 @@ public class BaseEntityTest extends GenericTestCase{
     public void testSets() throws Exception {
         String name = "testClass";
 
-        Batch batch = new Batch();
+        Batch batch = new Batch(new java.sql.Date(System.currentTimeMillis()));
         batchDao.save(batch);
 
         MetaClass meta = new MetaClass(name);
@@ -248,7 +248,7 @@ public class BaseEntityTest extends GenericTestCase{
     public void testEqual(){
         String name = "testClass";
 
-        Batch batch = new Batch();
+        Batch batch = new Batch(new java.sql.Date(System.currentTimeMillis()));
         batchDao.save(batch);
 
         MetaClass meta = new MetaClass(name);

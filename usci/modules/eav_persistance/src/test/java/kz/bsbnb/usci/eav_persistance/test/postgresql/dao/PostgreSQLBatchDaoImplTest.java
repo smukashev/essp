@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.sql.Date;
+
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -36,7 +38,7 @@ public class PostgreSQLBatchDaoImplTest  extends GenericTestCase
     public void saveAndLoadBatch() throws Exception {
         logger.debug("Create and load batch test");
 
-        Batch batchCreate = new Batch();
+        Batch batchCreate = new Batch(new Date(System.currentTimeMillis()));
         Batch loadBatchNotExists;
 
         try
@@ -59,7 +61,7 @@ public class PostgreSQLBatchDaoImplTest  extends GenericTestCase
     public void deleteBatch() throws Exception {
         logger.debug("Delete batch test.");
 
-        Batch batchCreate = new Batch();
+        Batch batchCreate = new Batch(new Date(System.currentTimeMillis()));
         postgreSQLBatchDaoImpl.save(batchCreate);
 
         try

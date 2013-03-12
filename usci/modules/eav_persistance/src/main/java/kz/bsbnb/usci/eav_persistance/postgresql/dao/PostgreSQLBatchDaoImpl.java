@@ -12,10 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +31,7 @@ public class PostgreSQLBatchDaoImpl extends JDBCSupport implements IBatchDao
     @PostConstruct
     public void init()
     {
-        INSERT_BATCH_SQL = String.format("INSERT INTO %s (receipt_date) VALUES ( ? )", getConfig().getBatchesTableName());
+        INSERT_BATCH_SQL = String.format("INSERT INTO %s (receipt_date, rep_date) VALUES ( ?, ? )", getConfig().getBatchesTableName());
         DELETE_BATCH_BY_ID_SQL = String.format("DELETE FROM %s WHERE id = ?", getConfig().getBatchesTableName());
         SELECT_BATCH_BY_ID_SQL = String.format("SELECT * FROM %s WHERE id = ?", getConfig().getBatchesTableName());
     }
@@ -51,6 +48,7 @@ public class PostgreSQLBatchDaoImpl extends JDBCSupport implements IBatchDao
             PreparedStatement ps = con.prepareStatement(
                     INSERT_BATCH_SQL, new String[] {"id"});
             ps.setTimestamp(1, batch.getReceiptDate());
+            ps.setDate(2, batch.getRepDate());
 
             logger.debug(ps.toString());
 
@@ -64,7 +62,7 @@ public class PostgreSQLBatchDaoImpl extends JDBCSupport implements IBatchDao
             return null;
         }
 
-        Batch batch = new Batch();
+        Batch batch = new Batch(new Date(System.currentTimeMillis()));
         batch.setId(id);
 
         loadBatch(batch);
@@ -131,6 +129,8 @@ public class PostgreSQLBatchDaoImpl extends JDBCSupport implements IBatchDao
             batch.setId((Integer)row.get("id"));
             logger.debug("CLASS: " + row.get("receipt_date").getClass());
             batch.setReceiptDate((Timestamp)row.get("receipt_date"));
+            logger.debug("CLASS: " + row.get("rep_date").getClass());
+            batch.setRepDate((Date) row.get("rep_date"));
         }
         else
         {

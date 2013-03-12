@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
@@ -79,24 +80,26 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 getConfig().getEntitiesTableName(), getConfig().getClassesTableName());
         DELETE_ENTITY_BY_ID_SQL = String.format("DELETE FROM %s WHERE id = ?", getConfig().getEntitiesTableName());
 
-        INSERT_SIMPLE_VALUE_SQL = "INSERT INTO %s (entity_id, batch_id, attribute_id, index, value) VALUES ( ?, ?, ?, ?, ? )";
+        INSERT_SIMPLE_VALUE_SQL = "INSERT INTO %s (entity_id, batch_id, attribute_id, index, rep_date, value) VALUES ( ?, ?, ?, ?, ?, ? )";
         SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL =
                 "SELECT v.batch_id, " +
                        "v.attribute_id, " +
                        "sa.name as attribute_name, " +
                        "v.index, " +
+                       "v.rep_date, " +
                        "v.value " +
                   "FROM %s v, " +
                        "%s sa " +
                  "WHERE v.entity_id = ? " +
                    "AND v.attribute_id = sa.id";
 
-        INSERT_COMPLEX_VALUE_SQL = String.format("INSERT INTO %s (entity_id, batch_id, attribute_id, index, entity_value_id) VALUES ( ?, ?, ?, ?, ? )",
+        INSERT_COMPLEX_VALUE_SQL = String.format("INSERT INTO %s (entity_id, batch_id, attribute_id, index, rep_date, entity_value_id) VALUES ( ?, ?, ?, ?, ?, ? )",
                 getConfig().getBaseComplexValuesTableName());
         SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL = String.format(
                 "SELECT cv.batch_id, " +
                        "ca.name as attribute_name, " +
                        "cv.index, " +
+                       "cv.rep_date, " +
                        "cv.entity_value_id " +
                   "FROM %s cv, " +
                        "%s ca " +
@@ -104,14 +107,15 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                    "AND cv.attribute_id = ca.id ",
                 getConfig().getBaseComplexValuesTableName(), getConfig().getComplexAttributesTableName());
 
-        INSERT_SET_SQL = "INSERT INTO %s (batch_id, index) VALUES ( ?, ? )";
+        INSERT_SET_SQL = "INSERT INTO %s (batch_id, index, rep_date) VALUES ( ?, ?, ? )";
 
         INSERT_ENTITY_SET = "INSERT INTO %s (entity_id, attribute_id, set_id) VALUES ( ?, ?, ? )";
         SELECT_ENTITY_SETS_BY_ENTITY_ID_SQL =
                 "SELECT s.id, " +
                        "s.batch_id, " +
                        "a.name as attribute_name, " +
-                       "s.index " +
+                       "s.index, " +
+                       "s.rep_date " +
                   "FROM %s a, " +
                        "%s es, " +
                        "%s s " +
@@ -123,18 +127,19 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         SELECT_SETS_OF_SETS_BY_PARENT_SET_ID_SQL =
                 "SELECT s.id, " +
                        "s.batch_id, " +
-                       "s.index " +
+                       "s.index, " +
+                       "s.rep_date " +
                   "FROM %s ss, " +
                        "%s s " +
                  "WHERE ss.parent_set_id = ? " +
                    "AND ss.child_set_id = s.id";
 
-        INSERT_SIMPLE_SET_VALUE_SQL = "INSERT INTO %s (set_id, batch_id, index, value) VALUES ( ?, ?, ?, ? )";
-        SELECT_SIMPLE_SET_VALUES_BY_SET_ID_SQL = "SELECT sav.batch_id, sav.index, sav.value FROM %s sav WHERE sav.set_id in (?) ";
+        INSERT_SIMPLE_SET_VALUE_SQL = "INSERT INTO %s (set_id, batch_id, index, rep_date, value) VALUES ( ?, ?, ?, ?, ? )";
+        SELECT_SIMPLE_SET_VALUES_BY_SET_ID_SQL = "SELECT sav.batch_id, sav.index, sav.value, sav.rep_date FROM %s sav WHERE sav.set_id in (?) ";
 
-        INSERT_COMPLEX_SET_VALUE_SQL = String.format("INSERT INTO %s (set_id, batch_id, index, entity_value_id) VALUES ( ?, ?, ?, ? )",
+        INSERT_COMPLEX_SET_VALUE_SQL = String.format("INSERT INTO %s (set_id, batch_id, index, rep_date, entity_value_id) VALUES ( ?, ?, ?, ?, ? )",
                 getConfig().getBaseComplexSetValuesTableName());
-        SELECT_COMPLEX_SET_VALUES_BY_SET_ID_SQL = String.format("SELECT cav.batch_id, cav.index, cav.entity_value_id FROM %s cav WHERE cav.set_id in (?) ",
+        SELECT_COMPLEX_SET_VALUES_BY_SET_ID_SQL = String.format("SELECT cav.batch_id, cav.index, cav.rep_date, cav.entity_value_id FROM %s cav WHERE cav.set_id in (?) ",
                 getConfig().getBaseComplexSetValuesTableName());
 
     }
@@ -146,7 +151,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             this.baseEntity = baseEntity;
         }
 
-        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+        public PreparedStatement createPreparedStatement(Connection con) throws SQLException
+        {
             PreparedStatement ps = con.prepareStatement(
                     INSERT_ENTITY_SQL, new String[] {"id"});
             ps.setLong(1, baseEntity.getMeta().getId());
@@ -374,6 +380,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     batchValue.getBatch().getId(),
                     metaAttribute.getId(),
                     batchValue.getIndex(),
+                    batchValue.getRepDate(),
                     batchValue.getValue()
             };
 
@@ -401,7 +408,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             long childBaseEntityId = save((BaseEntity) batchValue.getValue());
 
             Object[] insertArgs = new Object[] {baseEntity.getId(), batchValue.getBatch().getId(),
-                    metaAttribute.getId(), batchValue.getIndex(), childBaseEntityId};          // todo: check
+                    metaAttribute.getId(), batchValue.getIndex(), batchValue.getRepDate(), childBaseEntityId};          // todo: check
 
             batchArgs.add(insertArgs);
         }
@@ -463,7 +470,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaType metaType = metaSet.getMemberType();
 
         long setId = insertWithId(String.format(INSERT_SET_SQL, getConfig().getBaseSetsTableName()),
-                new Object[]{baseValue.getBatch().getId(), baseValue.getIndex()});
+                new Object[]{baseValue.getBatch().getId(), baseValue.getIndex(), baseValue.getRepDate()});
 
         String query;
         if (metaType.isSet())
@@ -540,6 +547,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         setId,
                         batchValueChild.getBatch().getId(),
                         batchValueChild.getIndex(),
+                        batchValueChild.getRepDate(),
                         batchValueChild.getValue()
                 };
                 batchArgs.add(insertArgs);
@@ -557,7 +565,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaType metaType = metaSet.getMemberType();
 
         long setId = insertWithId(String.format(INSERT_SET_SQL, getConfig().getBaseSetsTableName()),
-                new Object[]{baseValue.getBatch().getId(), baseValue.getIndex()});
+                new Object[]{baseValue.getBatch().getId(), baseValue.getIndex(), baseValue.getRepDate()});
 
         String query;
         if (metaType.isSet())
@@ -600,6 +608,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         setId,
                         baseValueChild.getBatch().getId(),
                         baseValueChild.getIndex(),
+                        baseValue.getRepDate(),
                         baseEntityChildId
                 };
                 batchArgs.add(insertArgs);
@@ -662,7 +671,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
             Batch batch = batchRepository.getBatch((Long)row.get("batch_id"));
 
-            baseEntity.put((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"), row.get("value")));
+            baseEntity.put((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"),
+                    (Date) row.get("rep_date"), row.get("value")));
         }
     }
 
@@ -681,7 +691,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             long entityValueId = (Long)row.get("entity_value_id");
             BaseEntity childBaseEntity = load(entityValueId);
 
-            baseEntity.put((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"), childBaseEntity));
+            baseEntity.put((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"),
+                    (Date) row.get("rep_date"), childBaseEntity));
         }
     }
 
@@ -737,7 +748,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             }
 
             Batch batch = batchRepository.getBatch((Long)rowSet.get("batch_id"));
-            baseEntity.put(attributeName, new BaseValue(batch, (Long)rowSet.get("index"), baseSet));
+            baseEntity.put(attributeName, new BaseValue(batch, (Long)rowSet.get("index"),
+                    (Date) rowSet.get("rep_date"), baseSet));
         }
     }
 
@@ -766,7 +778,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
 
             Batch batch = batchRepository.getBatch((Long)rowSet.get("batch_id"));
-            baseSet.put(attributeName, new BaseValue(batch, (Long)rowSet.get("index"), baseSetChild));
+            baseSet.put(attributeName, new BaseValue(batch, (Long)rowSet.get("index"),
+                    (Date) rowSet.get("rep_date"), baseSetChild));
         }
     }
 
@@ -833,7 +846,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 Map<String, Object> rowValue = itValue.next();
 
                 Batch batch = batchRepository.getBatch((Long)rowValue.get("batch_id"));
-                baseSet.put(new BaseValue(batch, (Long)rowValue.get("index"), rowValue.get("value")));
+                baseSet.put(new BaseValue(batch, (Long)rowValue.get("index"),
+                        (Date) rowValue.get("rep_date"), rowValue.get("value")));
             }
         }
     }
@@ -862,7 +876,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
                 Batch batch = batchRepository.getBatch((Long)rowValue.get("batch_id"));
                 BaseEntity baseEntity = load((Long)rowValue.get("entity_value_id"));
-                baseSet.put(new BaseValue(batch, (Long)rowValue.get("index"), baseEntity));
+                baseSet.put(new BaseValue(batch, (Long)rowValue.get("index"),
+                        (Date) rowValue.get("rep_date"), baseEntity));
             }
         }
     }

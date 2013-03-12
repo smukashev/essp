@@ -14,6 +14,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
+import java.sql.Date;
+
 import static junit.framework.Assert.fail;
 
 /**
@@ -47,7 +50,7 @@ public class BaseValueTest  extends GenericTestCase
 
     @Test
     public void testBatchNoId() throws Exception {
-         Batch batch = new Batch();
+         Batch batch = new Batch(new Date(System.currentTimeMillis()));
         boolean b = false;
         try{
             BaseValue bv = new BaseValue(batch,1L,null);
@@ -63,7 +66,7 @@ public class BaseValueTest  extends GenericTestCase
     @Test
     public void testGetBatch(){
 
-        Batch batch = new Batch();
+        Batch batch = new Batch(new Date(System.currentTimeMillis()));
         Long batchId = batchDao.save(batch);
         BaseValue bv = new BaseValue(batch,1L,null);
 
@@ -73,7 +76,7 @@ public class BaseValueTest  extends GenericTestCase
     @Test
     public void testEquals(){
 
-        Batch batch = new Batch();
+        Batch batch = new Batch(new Date(System.currentTimeMillis()));
         Long batchId = batchDao.save(batch);
         BaseValue bv = new BaseValue(batch,1L,null);
 

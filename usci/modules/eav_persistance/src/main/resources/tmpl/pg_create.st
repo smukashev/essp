@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS $batches$
     receipt_date TIMESTAMP WITH TIME ZONE NOT NULL,
     begin_date TIMESTAMP WITH TIME ZONE,
     end_date TIMESTAMP WITH TIME ZONE,
+    rep_date DATE NOT NULL,
     CONSTRAINT $batches$_primary_key_index PRIMARY KEY (id)
 );
 
@@ -134,6 +135,7 @@ CREATE TABLE IF NOT EXISTS $be_values$
     batch_id bigint references $batches$ (id) ON DELETE CASCADE,
     attribute_id int references $attributes$ (id) ON DELETE CASCADE,
     index bigint,
+    rep_date DATE NOT NULL,
     CONSTRAINT $be_values$_primary_key_index PRIMARY KEY (id)
 );
 
@@ -223,6 +225,7 @@ CREATE TABLE IF NOT EXISTS $be_sets$
     id serial NOT NULL,
     batch_id bigint references $batches$ (id) ON DELETE CASCADE,
     index bigint,
+    rep_date DATE NOT NULL,
     CONSTRAINT $be_sets$_primary_key_index PRIMARY KEY (id)
 );
 
@@ -319,7 +322,9 @@ CREATE TABLE IF NOT EXISTS $be_set_values$
     id serial NOT NULL,
     set_id bigint references $be_sets$(id) ON DELETE CASCADE,
     batch_id bigint references $batches$(id) ON DELETE CASCADE,
-    index bigint, CONSTRAINT $be_set_values$_primary_key_index PRIMARY KEY (id)
+    index bigint,
+    rep_date DATE NOT NULL,
+    CONSTRAINT $be_set_values$_primary_key_index PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS $be_set_dates_values$

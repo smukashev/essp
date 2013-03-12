@@ -16,7 +16,7 @@ public class BatchTest  extends GenericTestCase
     @Test
     public void testGetReceipt() throws Exception {
         Timestamp tt = new Timestamp(new Date().getTime());
-         Batch batch = new Batch(tt);
+         Batch batch = new Batch(tt, new java.sql.Date(new Date().getTime()));
 
 
         Assert.assertEquals(tt,batch.getReceiptDate());
@@ -25,15 +25,15 @@ public class BatchTest  extends GenericTestCase
     @Test
     public void testEquals() throws Exception {
         Timestamp tt = new Timestamp(new Date().getTime());
-        Batch batch = new Batch(tt);
-        Batch batch2 = new Batch(tt);
+        Batch batch = new Batch(tt, new java.sql.Date(new Date().getTime()));
+        Batch batch2 = new Batch(tt, new java.sql.Date(new Date().getTime()));
 
         Assert.assertTrue(batch.equals(batch));
         Assert.assertTrue(batch.equals(batch2));
 
         Thread.sleep(50);
 
-        Batch batch3 = new Batch();
+        Batch batch3 = new Batch(new java.sql.Date(System.currentTimeMillis()));
 
         Assert.assertFalse(batch.equals(batch3));
 

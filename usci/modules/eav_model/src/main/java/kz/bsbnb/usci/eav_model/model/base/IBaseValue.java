@@ -3,6 +3,8 @@ package kz.bsbnb.usci.eav_model.model.base;
 
 import kz.bsbnb.usci.eav_model.model.Batch;
 
+import java.sql.Date;
+
 /**
  * Actual value placeholder used in BaseEntity.
  *
@@ -44,4 +46,5 @@ public interface IBaseValue
     @Override
     public boolean equals(Object obj);
 
+    public Date getRepDate();
 }

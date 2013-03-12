@@ -17,8 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 public class BaseEntityStressExecutor
 {
@@ -95,7 +96,7 @@ public class BaseEntityStressExecutor
 
             // --------
 
-            Batch batch = new Batch(new Timestamp(new Date().getTime()));
+            Batch batch = new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime()));
 
             long batchId = batchDao.save(batch);
 

@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.sql.Date;
+
 /**
  * @author abukabayev
  */
@@ -31,7 +33,7 @@ public class BasicBaseEntityComporatorTest {
 
     @Test
     public void testCompare() {
-        Batch batch = new Batch();
+        Batch batch = new Batch(new Date(System.currentTimeMillis()));
         batchDao.save(batch);
         MetaClass meta1 = new MetaClass("testClass1");
         MetaClass meta2 = new MetaClass("testClass2");
@@ -79,7 +81,7 @@ public class BasicBaseEntityComporatorTest {
 
     @Test
     public void testCompareSet() throws Exception {
-        Batch batch = new Batch();
+        Batch batch = new Batch(new Date(System.currentTimeMillis()));
         batchDao.save(batch);
         MetaClass meta1 = new MetaClass("testClass1");
 //        MetaClass meta2 = new MetaClass("testClass2");
@@ -92,10 +94,10 @@ public class BasicBaseEntityComporatorTest {
         entity2.getMeta().setMetaAttribute("testArrayInteger", new MetaAttribute(true, false, new MetaSet(new MetaValue(DataTypes.INTEGER))));
         BaseSet baseSet = new BaseSet(((MetaSet)entity1.getMemberType("testArrayInteger")).getMemberType());
         baseSet.put(new BaseValue(batch,1,11));
-        baseSet.put(new BaseValue(batch,1,22));
-        baseSet.put(new BaseValue(batch,1,33));
+        baseSet.put(new BaseValue(batch, 1, 22));
+        baseSet.put(new BaseValue(batch, 1, 33));
         entity1.put("testArrayInteger", new BaseValue(batch, 1, baseSet));
-        entity2.put("testArrayInteger",new BaseValue(batch,1,baseSet));
+        entity2.put("testArrayInteger", new BaseValue(batch, 1, baseSet));
 
         Assert.assertTrue(instance.compare(entity1, entity2));
         //Assert.assertFalse(instance.compare(entity1, entity2));
