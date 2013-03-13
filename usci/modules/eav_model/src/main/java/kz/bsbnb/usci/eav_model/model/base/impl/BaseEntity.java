@@ -286,6 +286,9 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 if(thisValue == null || thatValue == null)
                     return false;
 
+                if(!thisValue.getRepDate().equals(thatValue.getRepDate()))
+                    return false;
+
                 if (this.getMeta().getMemberType(attributeName).isSet())
                 {
                     BaseSet thisSet = (BaseSet)(thisValue.getValue());
