@@ -42,8 +42,10 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     private String DELETE_ENTITY_BY_ID_SQL;
 
     private String INSERT_SIMPLE_VALUE_SQL;
-    private String INSERT_COMPLEX_VALUE_SQL;
+    private String UPDATE_SIMPLE_VALUE_SQL;
     private String SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL;
+
+    private String INSERT_COMPLEX_VALUE_SQL;
     private String SELECT_COMPLEX_VALUES_BY_ENTITY_ID_SQL;
 
     private String INSERT_SET_SQL;
@@ -81,6 +83,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         DELETE_ENTITY_BY_ID_SQL = String.format("DELETE FROM %s WHERE id = ?", getConfig().getEntitiesTableName());
 
         INSERT_SIMPLE_VALUE_SQL = "INSERT INTO %s (entity_id, batch_id, attribute_id, index, rep_date, value) VALUES ( ?, ?, ?, ?, ?, ? )";
+        UPDATE_SIMPLE_VALUE_SQL = "UPDATE %s sv SET sv.batch_id = ?, sv.index = ?, value = ? WHERE sv.id = ?";
         SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL =
                 "SELECT v.batch_id, " +
                        "v.attribute_id, " +
@@ -212,6 +215,17 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
     @Override
     @Transactional
+    public void update(BaseEntity baseEntity) {
+        if (baseEntity.getId() < 1)
+        {
+            throw new IllegalArgumentException("BaseEntity must contain the id.");
+        }
+
+
+    }
+
+    @Override
+    @Transactional
     public long save(BaseEntity baseEntity)
     {
         if(baseEntity.getMeta() == null)
@@ -274,10 +288,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         for (DataTypes dataType: DataTypes.values())
         {
-
             // simple values
-            Set<String> attributeNames = baseEntity.getPresentSimpleAttributeNames(dataType);
-            if (!attributeNames.isEmpty())
+            if (simpleAttributeNames.containsKey(dataType))
             {
                 String query;
                 switch(dataType)
@@ -310,7 +322,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     default:
                         throw new IllegalArgumentException("Unknown type.");
                 }
-                insertSimpleValues(baseEntity, attributeNames, query);
+                insertSimpleValues(baseEntity, simpleAttributeNames.get(dataType), query);
             }
         }
 
@@ -331,12 +343,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
 
         updateWithStats(DELETE_ENTITY_BY_ID_SQL, baseEntity.getId());
-    }
-
-    @Override
-    public BaseEntity load(BaseEntity baseEntity, boolean eager)
-    {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private long insertBaseEntity(BaseEntity baseEntity)
@@ -389,6 +395,10 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         logger.debug(query);
         batchUpdateWithStats(query, batchArgs);
+    }
+
+    private void updateSimpleValues(BaseEntity baseEntity, Set<String> attributeNames, String query) {
+
     }
 
     private void insertComplexValues(BaseEntity baseEntity, Set<String> attributeNames)
