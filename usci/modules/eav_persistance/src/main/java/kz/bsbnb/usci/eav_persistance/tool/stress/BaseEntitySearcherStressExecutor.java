@@ -37,7 +37,7 @@ public class BaseEntitySearcherStressExecutor
         BaseEntityGenerator baseEntityGenerator = new BaseEntityGenerator();
 
         ClassPathXmlApplicationContext ctx
-                = new ClassPathXmlApplicationContext("stressApplicationContext.xml");
+                = new ClassPathXmlApplicationContext("applicationContext.xml");
 
         IStorage storage = ctx.getBean(IStorage.class);
         IMetaClassDao metaClassDao = ctx.getBean(IMetaClassDao.class);

@@ -62,4 +62,8 @@
         <constructor-arg index="2" value="$"/>
     </bean>
 
+    <bean id="sqlGenerator" class="org.jooq.impl.Executor">
+        <constructor-arg index="0" value="POSTGRES"/>
+    </bean>
+
 </beans>

@@ -26,7 +26,7 @@ public class MetaClassStressExecutor
         MetaClassGenerator gen = new MetaClassGenerator(25, 20, 2, 4);
 
         ClassPathXmlApplicationContext ctx
-                = new ClassPathXmlApplicationContext("stressApplicationContext.xml");
+                = new ClassPathXmlApplicationContext("applicationContext.xml");
 
         IStorage storage = ctx.getBean(IStorage.class);
         IMetaClassDao dao = ctx.getBean(IMetaClassDao.class);

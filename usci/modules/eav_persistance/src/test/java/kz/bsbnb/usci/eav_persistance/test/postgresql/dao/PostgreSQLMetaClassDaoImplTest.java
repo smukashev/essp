@@ -250,7 +250,7 @@ public class PostgreSQLMetaClassDaoImplTest extends GenericTestCase
         assertTrue(metaCreateNext.equals(loadedMetaCreateNext));
 
         MetaClass loadedMetaCreate = postgreSQLMetaClassDaoImpl.load(metaCreate.getClassName(),
-                metaCreate.getBeginDate());
+                metaCreateNextDisabled.getBeginDate());
 
         assertTrue(metaCreate.equals(loadedMetaCreate));
     }

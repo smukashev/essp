@@ -4,6 +4,7 @@ import kz.bsbnb.usci.eav_persistance.persistance.impl.db.JDBCConfig;
 import kz.bsbnb.usci.eav_persistance.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
 
+import kz.bsbnb.usci.eav_persistance.tool.db.DDLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,11 +90,14 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
         setTableNames(st);
 
-        String query = st.render();
+        //String query = st.render();
+        DDLHelper.changeDatabase(jdbcTemplate.getDataSource(),
+                DDLHelper.readDatabaseFromXML("./usci/modules/eav_persistance/src/main/resources/tmpl/create_db.ddl"),
+                true);
 
-        logger.debug(query);
+        //logger.debug(query);
 
-        jdbcTemplate.execute(query);
+        //jdbcTemplate.execute(query);
 	}
 
 	@Override
@@ -103,16 +107,18 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
         setTableNames(st);
 
-        String query = st.render();
+        //String query = st.render();
+        DDLHelper.dropDatabase(jdbcTemplate.getDataSource(),
+                DDLHelper.readDatabaseFromXML("./usci/modules/eav_persistance/src/main/resources/tmpl/create_db.ddl"));
 
-        logger.debug(query);
+        //logger.debug(query);
 
-        jdbcTemplate.execute(query);
+        //jdbcTemplate.execute(query);
     }
 
 	@Override
 	public void empty() {
-        ST st = stRawGroupDir.getInstanceOf("pg_clear");
+        /*ST st = stRawGroupDir.getInstanceOf("pg_clear");
 
         setTableNames(st);
 
@@ -120,7 +126,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
         logger.debug(query);
 
-        jdbcTemplate.execute(query);
+        jdbcTemplate.execute(query);*/
     }
 
     @Override

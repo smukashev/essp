@@ -6,12 +6,14 @@ import static org.jooq.impl.Factory.tableByName;
 import org.jooq.Query;
 import org.jooq.SQLDialect;
 import org.jooq.impl.Executor;
+import org.junit.Test;
 
 /**
  *
  */
 public class JooqTest {
 
+    @Test
    public void generateSQLTest() throws Exception
    {
        Query query;

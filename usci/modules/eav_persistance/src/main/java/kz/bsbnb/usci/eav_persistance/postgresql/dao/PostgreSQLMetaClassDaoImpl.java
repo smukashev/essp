@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav_persistance.postgresql.dao;
 
+import static kz.bsbnb.eav.persistance.generated.Tables.*;
+import kz.bsbnb.eav.persistance.generated.tables.EavClasses;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaType;
@@ -12,8 +14,11 @@ import kz.bsbnb.usci.eav_model.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav_model.util.SetUtils;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav_persistance.persistance.impl.db.JDBCSupport;
+import org.jooq.SQLDialect;
+import org.jooq.impl.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +28,10 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.jooq.impl.Factory.fieldByName;
+import static org.jooq.impl.Factory.inline;
+import static org.jooq.impl.Factory.tableByName;
 
 @Repository
 public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
@@ -47,12 +56,40 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     private String SELECT_ARRAY_ARRAY;
     private String INSERT_ARRAY_ARRAY;
 
+    @Autowired
+    private Executor sqlGenerator;
+
     @PostConstruct
     public void init()
     {
-        INSERT_CLASS_SQL = String.format("INSERT INTO %s (name, complex_key_type, begin_date, is_disabled) VALUES ( ?, ?, ?, ? )", getConfig().getClassesTableName());
-        // SELECT_CLASS_BY_NAME = String.format("SELECT * FROM %s WHERE name = ? and begin_date <= ? and is_disabled = FALSE ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
-        SELECT_CLASS_BY_NAME = String.format("SELECT * FROM %s WHERE name = ? and begin_date <= ? ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
+        //INSERT_CLASS_SQL = String.format("INSERT INTO %s (name, complex_key_type, begin_date, is_disabled) VALUES ( ?, ?, ?, ? )", getConfig().getClassesTableName());
+        INSERT_CLASS_SQL = sqlGenerator.insertInto(
+                EAV_CLASSES,
+                EAV_CLASSES.NAME,
+                EAV_CLASSES.COMPLEX_KEY_TYPE,
+                EAV_CLASSES.BEGIN_DATE,
+                EAV_CLASSES.IS_DISABLED
+            ).values("", "", new Timestamp(System.currentTimeMillis()), true).getSQL();
+
+
+        //SELECT_CLASS_BY_NAME = String.format("SELECT * FROM %s WHERE name = ? and begin_date <= ? and is_disabled = FALSE ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
+        //SELECT_CLASS_BY_NAME = String.format("SELECT * FROM %s WHERE name = ? and begin_date <= ? ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
+        SELECT_CLASS_BY_NAME = sqlGenerator.select(
+                fieldByName("is_disabled"),
+                fieldByName("begin_date"),
+                fieldByName("id"),
+                fieldByName("name"),
+                fieldByName("complex_key_type")
+            ).from(tableByName(getConfig().getClassesTableName())).
+            where(
+                    fieldByName("name").equal("?")
+            ).and(
+                fieldByName("begin_date").le("?")
+        ).and(
+                fieldByName("is_disabled").equal(inline(false))
+            ).orderBy(fieldByName("begin_date").desc()).limit(inline(1)).offset(inline(0)).
+                getSQL();
+
         SELECT_CLASS_BY_NAME_STRICT = String.format("SELECT * FROM %s WHERE name = ? and begin_date = ? ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
         SELECT_CLASS_BY_ID = String.format("SELECT * FROM %s WHERE id = ?", getConfig().getClassesTableName());
         UPDATE_CLASS_BY_ID = String.format("UPDATE %s SET  name = ?,  complex_key_type = ?, begin_date = ?,  is_disabled = ?  WHERE id = ?", getConfig().getClassesTableName());
@@ -687,7 +724,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         for (String arrayName : metaClass.getArrayArrayAttributesNames())
         {
-            removeSet(((MetaSet)metaClass.getMemberType(arrayName)));
+            removeSet(((MetaSet) metaClass.getMemberType(arrayName)));
         }
 
         //delete all class attributes
@@ -708,4 +745,14 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             sqlStats.put(query, (System.nanoTime() - t) / 1000000);
         }
 	}
+
+    public Executor getSqlGenerator()
+    {
+        return sqlGenerator;
+    }
+
+    public void setSqlGenerator(Executor sqlGenerator)
+    {
+        this.sqlGenerator = sqlGenerator;
+    }
 }

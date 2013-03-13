@@ -14,7 +14,7 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>classpath:properties/stressDataSource.properties</value>
+                <value>classpath:properties/dataSource.properties</value>
             </list>
         </property>
     </bean>
@@ -53,4 +53,7 @@
         <constructor-arg index="2" value="$"/>
     </bean>
 
+    <bean id="sqlGenerator" class="org.jooq.impl.Executor">
+        <constructor-arg index="0" value="POSTGRES"/>
+    </bean>
 </beans>

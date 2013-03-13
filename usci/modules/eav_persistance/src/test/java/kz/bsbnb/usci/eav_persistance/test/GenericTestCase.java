@@ -12,14 +12,11 @@ public class GenericTestCase
 
     @Before
     public void setUp() throws Exception {
-        if(postgreSQLStorageImpl != null)
-        {
-            postgreSQLStorageImpl.initialize();
-            postgreSQLStorageImpl.empty();
-        }
+        postgreSQLStorageImpl.initialize();
     }
 
     @After
     public void tearDown() throws Exception {
+        postgreSQLStorageImpl.clear();
     }
 }

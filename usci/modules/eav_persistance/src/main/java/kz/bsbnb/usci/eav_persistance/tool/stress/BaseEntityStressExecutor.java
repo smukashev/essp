@@ -7,7 +7,6 @@ import kz.bsbnb.usci.eav_model.util.SetUtils;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav_persistance.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav_persistance.stats.QueryEntry;
 import kz.bsbnb.usci.eav_persistance.stats.SQLQueriesStats;
@@ -39,7 +38,7 @@ public class BaseEntityStressExecutor
         BaseEntityGenerator baseEntityGenerator = new BaseEntityGenerator();
 
         ClassPathXmlApplicationContext ctx
-                = new ClassPathXmlApplicationContext("stressApplicationContext.xml");
+                = new ClassPathXmlApplicationContext("applicationContext.xml");
 
         IStorage storage = ctx.getBean(IStorage.class);
         IMetaClassDao metaClassDao = ctx.getBean(IMetaClassDao.class);
