@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav_model.model;
 
 import kz.bsbnb.usci.eav_model.model.persistable.impl.Persistable;
+import kz.bsbnb.usci.eav_model.util.DateUtils;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -39,7 +40,7 @@ public class Batch extends Persistable
     public Batch(Timestamp receiptDate, Date repDate)
     {
         this.receiptDate = receiptDate;
-        this.repDate = repDate;
+        this.repDate = new Date(DateUtils.cutOffTime(repDate));
     }
 
     public void setReceiptDate(Timestamp receiptDate)
