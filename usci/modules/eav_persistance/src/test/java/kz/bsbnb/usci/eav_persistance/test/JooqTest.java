@@ -6,16 +6,23 @@ import static org.jooq.impl.Factory.tableByName;
 import org.jooq.Query;
 import org.jooq.SQLDialect;
 import org.jooq.impl.Executor;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath:applicationContext.xml"})
 public class JooqTest {
 
-   public void generateSQLTest() throws Exception
+    @Test
+    public void generateSQLTest() throws Exception
    {
        Query query;
-       Executor create = new Executor(SQLDialect.ORACLE);
+       Executor create = new Executor(SQLDialect.POSTGRES);
 
        query = create.select(fieldByName("BOOK","TITLE"), fieldByName("AUTHOR","FIRST_NAME"), fieldByName("AUTHOR","LAST_NAME"))
                .from(tableByName("BOOK"))
