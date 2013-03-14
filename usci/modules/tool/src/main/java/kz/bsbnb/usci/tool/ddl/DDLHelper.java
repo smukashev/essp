@@ -1,11 +1,5 @@
-package kz.bsbnb.usci.eav_persistance.tool.db;
+package kz.bsbnb.usci.tool.ddl;
 
-import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav_persistance.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
-import kz.bsbnb.usci.eav_persistance.stats.QueryEntry;
-import kz.bsbnb.usci.eav_persistance.stats.SQLQueriesStats;
-import kz.bsbnb.usci.eav_persistance.tool.generator.data.impl.MetaClassGenerator;
 import org.apache.ddlutils.Platform;
 import org.apache.ddlutils.PlatformFactory;
 import org.apache.ddlutils.io.DatabaseIO;
@@ -15,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.Calendar;
 
 public class DDLHelper
 {
@@ -67,16 +59,35 @@ public class DDLHelper
     {
         logger.info("DBHelper started");
 
+        if(args.length < 2)
+        {
+            System.out.println("Usage: <command> <filename>");
+            System.out.println("Commands: gen, apply");
+            return;
+        }
+
         ClassPathXmlApplicationContext ctx
-                = new ClassPathXmlApplicationContext("applicationContext.xml");
+                = new ClassPathXmlApplicationContext("applicationContextDDL.xml");
 
         DataSource source = ctx.getBean(DataSource.class);
 
-        Database db = readDatabase(source);
+        if(args[0].equals("gen"))
+        {
+            Database db = readDatabase(source);
 
-        String workingDir = System.getProperty("user.dir");
-        System.out.println("Current working directory : " + workingDir);
+            String workingDir = System.getProperty("user.dir");
+            System.out.println("Current working directory : " + workingDir);
 
-        writeDatabaseToXML(db, "./usci/modules/eav_persistance/target/create_db.ddl");
+            writeDatabaseToXML(db, args[1]);
+        }
+        else if(args[0].equals("apply"))
+        {
+            DDLHelper.dropDatabase(source,
+                    DDLHelper.readDatabaseFromXML(args[1]));
+
+            DDLHelper.changeDatabase(source,
+                    DDLHelper.readDatabaseFromXML(args[1]),
+                    true);
+        }
     }
 }

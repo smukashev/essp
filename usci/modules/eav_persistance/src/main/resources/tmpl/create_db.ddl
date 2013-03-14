@@ -19,7 +19,8 @@
     </table>
     <table name="eav_attributes">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
-      <column name="containing_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
+      <column name="containing_id" primaryKey="false" required="true" type="INTEGER" size="10" autoIncrement="false"/>
+      <column name="container_type" required="true" type="INTEGER" size="1"/>
       <column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
       <column name="is_key" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <column name="is_nullable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
@@ -37,6 +38,9 @@
         <index-column name="name"/>
         <index-column name="containing_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_batches">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
@@ -49,7 +53,7 @@
       </unique>
     </table>
     <table name="eav_be_boolean_set_values">
-      <column name="id" primaryKey="false" required="true" type="INTEGER" size="10" autoIncrement="true"/>
+      <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
@@ -67,9 +71,12 @@
       <index>
         <index-column name="set_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_boolean_values">
-      <column name="id" primaryKey="false" required="true" type="INTEGER" size="10" autoIncrement="true"/>
+      <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="entity_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
@@ -94,9 +101,12 @@
       <index>
         <index-column name="entity_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_complex_set_values">
-      <column name="id" primaryKey="false" required="true" type="INTEGER" size="10" autoIncrement="true"/>
+      <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
@@ -120,9 +130,12 @@
       <index>
         <index-column name="set_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_complex_values">
-      <column name="id" primaryKey="false" required="true" type="INTEGER" size="10" autoIncrement="true"/>
+      <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="entity_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
@@ -153,9 +166,12 @@
       <index>
         <index-column name="entity_value_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_date_set_values">
-      <column name="id" primaryKey="false" required="true" type="INTEGER" size="10" autoIncrement="true"/>
+      <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
@@ -173,9 +189,12 @@
       <index>
         <index-column name="set_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_date_values">
-      <column name="id" primaryKey="false" required="true" type="INTEGER" size="10" autoIncrement="true"/>
+      <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="entity_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
@@ -200,9 +219,12 @@
       <index>
         <index-column name="entity_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_double_set_values">
-      <column name="id" primaryKey="false" required="true" type="INTEGER" size="10" autoIncrement="true"/>
+      <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
@@ -220,9 +242,12 @@
       <index>
         <index-column name="set_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_double_values">
-      <column name="id" primaryKey="false" required="true" type="INTEGER" size="10" autoIncrement="true"/>
+      <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="entity_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
@@ -247,6 +272,9 @@
       <index>
         <index-column name="entity_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_entity_complex_sets">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
@@ -357,7 +385,7 @@
       </index>
     </table>
     <table name="eav_be_integer_set_values">
-      <column name="id" primaryKey="false" required="true" type="INTEGER" size="10" autoIncrement="true"/>
+      <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
@@ -377,7 +405,7 @@
       </index>
     </table>
     <table name="eav_be_integer_values">
-      <column name="id" primaryKey="false" required="true" type="INTEGER" size="10" autoIncrement="true"/>
+      <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="entity_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
@@ -402,6 +430,9 @@
       <index>
         <index-column name="entity_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_set_of_complex_sets">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
@@ -422,6 +453,9 @@
       <index>
         <index-column name="parent_set_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_set_of_sets">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
@@ -442,6 +476,9 @@
       <index>
         <index-column name="parent_set_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_set_of_simple_sets">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
@@ -462,6 +499,9 @@
       <index>
         <index-column name="parent_set_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_set_values">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
@@ -484,6 +524,9 @@
       <index>
         <index-column name="set_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_sets">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
@@ -501,7 +544,7 @@
       </index>
     </table>
     <table name="eav_be_string_set_values">
-      <column name="id" primaryKey="false" required="true" type="INTEGER" size="10" autoIncrement="true"/>
+      <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
@@ -519,9 +562,12 @@
       <index>
         <index-column name="set_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_string_values">
-      <column name="id" primaryKey="false" required="true" type="INTEGER" size="10" autoIncrement="true"/>
+      <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="entity_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
@@ -546,6 +592,9 @@
       <index>
         <index-column name="entity_id"/>
       </index>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
     </table>
     <table name="eav_be_values">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
@@ -597,6 +646,7 @@
     <table name="eav_complex_attributes">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="containing_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
+      <column name="container_type" required="true" type="INTEGER" size="1"/>
       <column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
       <column name="is_key" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <column name="is_nullable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
@@ -614,6 +664,7 @@
     <table name="eav_complex_set">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="containing_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
+      <column name="container_type" required="true" type="INTEGER" size="1"/>
       <column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
       <column name="is_key" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <column name="is_nullable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
@@ -648,6 +699,7 @@
     <table name="eav_set">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="containing_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
+      <column name="container_type" required="true" type="INTEGER" size="1"/>
       <column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
       <column name="is_key" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <column name="is_nullable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
@@ -659,6 +711,7 @@
     <table name="eav_set_of_sets">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="containing_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
+      <column name="container_type" required="true" type="INTEGER" size="1"/>
       <column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
       <column name="is_key" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <column name="is_nullable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
@@ -670,6 +723,7 @@
     <table name="eav_simple_attributes">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="containing_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
+      <column name="container_type" required="true" type="INTEGER" size="1"/>
       <column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
       <column name="is_key" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <column name="is_nullable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
@@ -684,6 +738,7 @@
     <table name="eav_simple_set">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="containing_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
+      <column name="container_type" required="true" type="INTEGER" size="1"/>
       <column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
       <column name="is_key" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <column name="is_nullable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>

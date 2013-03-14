@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav_model.model.meta.impl;
 
+import kz.bsbnb.usci.eav_model.model.base.ContainerTypes;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaType;
@@ -112,5 +113,11 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
             throw new IllegalArgumentException("MetaType can not be null.");
         }
         setMetaType(metaAttribute.getMetaType());
+    }
+
+    @Override
+    public int getType()
+    {
+        return ContainerTypes.SET;
     }
 }

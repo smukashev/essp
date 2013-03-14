@@ -4,7 +4,7 @@ import kz.bsbnb.usci.eav_persistance.persistance.impl.db.JDBCConfig;
 import kz.bsbnb.usci.eav_persistance.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
 
-import kz.bsbnb.usci.eav_persistance.tool.db.DDLHelper;
+import kz.bsbnb.usci.tool.ddl.DDLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STRawGroupDir;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 

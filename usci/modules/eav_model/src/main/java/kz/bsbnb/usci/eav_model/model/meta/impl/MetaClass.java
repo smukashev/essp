@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import kz.bsbnb.usci.eav_model.model.base.ContainerTypes;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaType;
@@ -150,7 +151,13 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
 		members.put(name, metaAttribute);
 	}
 
-	public String getSearchProcedureName()
+    @Override
+    public int getType()
+    {
+        return ContainerTypes.CLASS;
+    }
+
+    public String getSearchProcedureName()
     {
 		return searchProcedureName;
 	}

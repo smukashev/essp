@@ -1,7 +1,8 @@
 package kz.bsbnb.usci.eav_persistance.postgresql.dao;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
-import kz.bsbnb.eav.persistance.generated.tables.EavClasses;
+
+import kz.bsbnb.usci.eav_model.model.base.ContainerTypes;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaType;
@@ -14,7 +15,6 @@ import kz.bsbnb.usci.eav_model.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav_model.util.SetUtils;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav_persistance.persistance.impl.db.JDBCSupport;
-import org.jooq.SQLDialect;
 import org.jooq.impl.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,8 +47,10 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     private String INSERT_COMPLEX_ATTRIBUTE;
     private String INSERT_SIMPLE_ARRAY;
     private String INSERT_SIMPLE_ATTRIBUTE;
-    private String DELETE_ATTRIBUTE;
-    private String DELETE_ALL_ATTRIBUTES;
+    private String DELETE_SIMPLE_ATTRIBUTE;
+    private String DELETE_COMPLEX_ATTRIBUTE;
+    private String DELETE_ALL_SIMPLE_ATTRIBUTES;
+    private String DELETE_ALL_COMPLEX_ATTRIBUTES;
     private String SELECT_SIMPLE_ATTRIBUTES;
     private String SELECT_SIMPLE_ARRAY;
     private String SELECT_COMPLEX_ARRAY;
@@ -94,21 +96,24 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         SELECT_CLASS_BY_ID = String.format("SELECT * FROM %s WHERE id = ?", getConfig().getClassesTableName());
         UPDATE_CLASS_BY_ID = String.format("UPDATE %s SET  name = ?,  complex_key_type = ?, begin_date = ?,  is_disabled = ?  WHERE id = ?", getConfig().getClassesTableName());
         DELETE_CLASS_BY_ID = String.format("DELETE FROM %s WHERE id = ?", getConfig().getClassesTableName());
-        INSERT_COMPLEX_ARRAY = String.format("INSERT INTO %s (containing_id, name, is_key, is_nullable, class_id, array_key_type) VALUES  ( ?, ?, ?, ?, ?, ?) ", getConfig().getComplexSetTableName());
-        INSERT_COMPLEX_ATTRIBUTE = String.format("INSERT INTO %s (containing_id, name, is_key, is_nullable, class_id) VALUES  ( ?, ?, ?, ?, ? ) ", getConfig().getComplexAttributesTableName());
-        INSERT_SIMPLE_ARRAY = String.format("INSERT INTO %s (containing_id, name, type_code, is_key, is_nullable, array_key_type) VALUES  ( ?, ?, ?, ?, ?, ?) ", getConfig().getSimpleSetTableName());
-        INSERT_SIMPLE_ATTRIBUTE = String.format("INSERT INTO %s (containing_id, name, type_code, is_key, is_nullable) VALUES  ( ?, ?, ?, ?, ?) ", getConfig().getSimpleAttributesTableName());
+        INSERT_COMPLEX_ARRAY = String.format("INSERT INTO %s (containing_id, container_type, name, is_key, is_nullable, class_id, array_key_type) VALUES  ( ?, ?, ?, ?, ?, ?, ?) ", getConfig().getComplexSetTableName());
+        INSERT_COMPLEX_ATTRIBUTE = String.format("INSERT INTO %s (containing_id, container_type, name, is_key, is_nullable, class_id) VALUES  ( ?, ?, ?, ?, ?, ? ) ", getConfig().getComplexAttributesTableName());
+        INSERT_SIMPLE_ARRAY = String.format("INSERT INTO %s (containing_id, container_type, name, type_code, is_key, is_nullable, array_key_type) VALUES  ( ?, ?, ?, ?, ?, ?, ?) ", getConfig().getSimpleSetTableName());
+        INSERT_SIMPLE_ATTRIBUTE = String.format("INSERT INTO %s (containing_id, container_type, name, type_code, is_key, is_nullable) VALUES  ( ?, ?, ?, ?, ?, ?) ", getConfig().getSimpleAttributesTableName());
 
-        DELETE_ATTRIBUTE = String.format("DELETE FROM %s WHERE containing_id = ? AND name = ? ", getConfig().getAttributesTableName());
-        DELETE_ALL_ATTRIBUTES = String.format("DELETE FROM %s WHERE containing_id = ? ", getConfig().getAttributesTableName());
+        DELETE_SIMPLE_ATTRIBUTE = String.format("DELETE FROM %s WHERE containing_id = ? AND container_type = ? AND name = ? ", getConfig().getSimpleAttributesTableName());
+        DELETE_COMPLEX_ATTRIBUTE = String.format("DELETE FROM %s WHERE containing_id = ? AND container_type = ? AND name = ? ", getConfig().getComplexAttributesTableName());
 
-        SELECT_SIMPLE_ATTRIBUTES = String.format("SELECT * FROM ONLY %s WHERE containing_id = ?", getConfig().getSimpleAttributesTableName());
-        SELECT_SIMPLE_ARRAY = String.format("SELECT * FROM %s WHERE containing_id = ?", getConfig().getSimpleSetTableName());
-        SELECT_ARRAY_ARRAY = String.format("SELECT * FROM %s WHERE containing_id = ?", getConfig().getSetOfSetsTableName());
-        SELECT_COMPLEX_ARRAY = String.format("SELECT ca.*, c.name cname FROM %s ca LEFT JOIN %s c ON ca.class_id = c.id  WHERE containing_id = ?", getConfig().getComplexSetTableName(), getConfig().getClassesTableName());
-        SELECT_COMPLEX_ATTRIBUTE = String.format("SELECT ca.*, c.name cname FROM ONLY %s ca LEFT JOIN %s c ON ca.class_id = c.id  WHERE containing_id = ?", getConfig().getComplexAttributesTableName(), getConfig().getClassesTableName());
+        DELETE_ALL_SIMPLE_ATTRIBUTES = String.format("DELETE FROM %s WHERE containing_id = ? AND container_type = ? ", getConfig().getSimpleAttributesTableName());
+        DELETE_ALL_COMPLEX_ATTRIBUTES = String.format("DELETE FROM %s WHERE containing_id = ? AND container_type = ? ", getConfig().getComplexAttributesTableName());
 
-        INSERT_ARRAY_ARRAY = String.format("INSERT INTO %s (containing_id, name, is_key, is_nullable, array_key_type) VALUES  ( ?, ?, ?, ?, ?) ", getConfig().getSetOfSetsTableName());
+        SELECT_SIMPLE_ATTRIBUTES = String.format("SELECT * FROM ONLY %s WHERE containing_id = ? AND container_type = ? ", getConfig().getSimpleAttributesTableName());
+        SELECT_SIMPLE_ARRAY = String.format("SELECT * FROM %s WHERE containing_id = ? AND container_type = ? ", getConfig().getSimpleSetTableName());
+        SELECT_ARRAY_ARRAY = String.format("SELECT * FROM %s WHERE containing_id = ? AND container_type = ? ", getConfig().getSetOfSetsTableName());
+        SELECT_COMPLEX_ARRAY = String.format("SELECT ca.*, c.name cname FROM %s ca LEFT JOIN %s c ON ca.class_id = c.id  WHERE containing_id = ? AND container_type = ? ", getConfig().getComplexSetTableName(), getConfig().getClassesTableName());
+        SELECT_COMPLEX_ATTRIBUTE = String.format("SELECT ca.*, c.name cname FROM ONLY %s ca LEFT JOIN %s c ON ca.class_id = c.id  WHERE containing_id = ? AND container_type = ? ", getConfig().getComplexAttributesTableName(), getConfig().getClassesTableName());
+
+        INSERT_ARRAY_ARRAY = String.format("INSERT INTO %s (containing_id, container_type, name, is_key, is_nullable, array_key_type) VALUES  ( ?, ?, ?, ?, ?, ?) ", getConfig().getSetOfSetsTableName());
     }
 	
     private void loadClass(MetaClass metaClass, boolean beginDateStrict)
@@ -230,7 +235,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
     }
 
-    private long saveSet(IMetaType type, long parentId, IMetaAttribute metaAttribute, String attributeName)
+    private long saveSet(IMetaType type, long parentId, int parentType, IMetaAttribute metaAttribute, String attributeName)
     {
         String query;
         Object[] args;
@@ -247,7 +252,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             query = INSERT_ARRAY_ARRAY;
 
-            args = new Object[] {parentId, attributeName,
+            args = new Object[] {parentId, parentType, attributeName,
                     metaAttribute.isKey(), metaAttribute.isNullable(),
                     metaSet.getArrayKeyType().toString()};
 
@@ -267,7 +272,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 sqlStats.put(query, (System.nanoTime() - t) / 1000000);
             }
 
-            saveSet(metaSet.getMemberType(), id, new MetaAttribute(false, false, null), "item");
+            saveSet(metaSet.getMemberType(), id, ContainerTypes.SET, new MetaAttribute(false, false, null), "item");
         }
         else
         {
@@ -277,14 +282,14 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
                 query = INSERT_COMPLEX_ARRAY;
 
-                args = new Object[] {parentId, attributeName, metaAttribute.isKey(), metaAttribute.isNullable(),
+                args = new Object[] {parentId, parentType, attributeName, metaAttribute.isKey(), metaAttribute.isNullable(),
                         innerId, metaSet.getArrayKeyType().toString()};
             }
             else
             {
                 query = INSERT_SIMPLE_ARRAY;
 
-                args = new Object[] {parentId, attributeName, metaSet.getTypeCode().toString(),
+                args = new Object[] {parentId, parentType, attributeName, metaSet.getTypeCode().toString(),
                         metaAttribute.isKey(), metaAttribute.isNullable(),
                         metaSet.getArrayKeyType().toString()};
             }
@@ -309,7 +314,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         return id;
     }
 
-    private long saveAttribute(IMetaType type, long parentId, IMetaAttribute metaAttribute, String attributeName)
+    private long saveAttribute(IMetaType type, long parentId, int parentType, IMetaAttribute metaAttribute, String attributeName)
     {
         String query;
         Object[] args;
@@ -325,14 +330,14 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             query = INSERT_COMPLEX_ATTRIBUTE;
 
-            args = new Object[] {parentId, attributeName, metaAttribute.isKey(), metaAttribute.isNullable(),
+            args = new Object[] {parentId, parentType, attributeName, metaAttribute.isKey(), metaAttribute.isNullable(),
                     innerId};
         }
         else
         {
             query = INSERT_SIMPLE_ATTRIBUTE;
 
-            args = new Object[] {parentId, attributeName, ((MetaValue)type).getTypeCode().toString(),
+            args = new Object[] {parentId, parentType, attributeName, ((MetaValue)type).getTypeCode().toString(),
                     metaAttribute.isKey(), metaAttribute.isNullable()};
         }
 
@@ -368,11 +373,11 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             if(metaType.isSet())
             {
-                saveSet(metaType, meta.getId(), metaAttribute, typeName);
+                saveSet(metaType, meta.getId(), ContainerTypes.CLASS, metaAttribute, typeName);
             }
             else
             {
-                saveAttribute(metaType, meta.getId(), metaAttribute, typeName);
+                saveAttribute(metaType, meta.getId(), ContainerTypes.CLASS, metaAttribute, typeName);
             }
         }
     }
@@ -387,7 +392,14 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         for(String typeName : deleteNames)
         {
-            query = DELETE_ATTRIBUTE;
+            if(meta.getMemberType(typeName).isComplex())
+            {
+                query = DELETE_COMPLEX_ATTRIBUTE;
+            }
+            else
+            {
+                query = DELETE_SIMPLE_ATTRIBUTE;
+            }
 
             logger.debug(query);
 
@@ -396,7 +408,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             {
                 t = System.nanoTime();
             }
-            jdbcTemplate.update(query, meta.getId(), typeName);
+            jdbcTemplate.update(query, meta.getId(), ContainerTypes.CLASS, typeName);
             if(sqlStats != null)
             {
                 sqlStats.put(query, (System.nanoTime() - t) / 1000000);
@@ -415,7 +427,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             t = System.nanoTime();
         }
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, meta.getId());
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, meta.getId(), meta.getType());
         if(sqlStats != null)
         {
             sqlStats.put(query, (System.nanoTime() - t) / 1000000);
@@ -444,7 +456,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             t = System.nanoTime();
         }
-        List<Map<String, Object>>  rows = jdbcTemplate.queryForList(query, meta.getId());
+        List<Map<String, Object>>  rows = jdbcTemplate.queryForList(query, meta.getId(), meta.getType());
         if(sqlStats != null)
         {
             sqlStats.put(query, (System.nanoTime() - t) / 1000000);
@@ -483,7 +495,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             t = System.nanoTime();
         }
 
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, meta.getId());
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, meta.getId(), meta.getType());
         if(sqlStats != null)
         {
             sqlStats.put(query, (System.nanoTime() - t) / 1000000);
@@ -514,7 +526,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             t = System.nanoTime();
         }
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, meta.getId());
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, meta.getId(), meta.getType());
         if(sqlStats != null)
         {
             sqlStats.put(query, (System.nanoTime() - t) / 1000000);
@@ -549,7 +561,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             t = System.nanoTime();
         }
-        List<Map<String, Object>>  rows = jdbcTemplate.queryForList(query, meta.getId());
+        List<Map<String, Object>>  rows = jdbcTemplate.queryForList(query, meta.getId(), meta.getType());
         if(sqlStats != null)
         {
             sqlStats.put(query, (System.nanoTime() - t) / 1000000);
@@ -677,9 +689,9 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         return meta;
 	}
 
-    private void removeAllAttributes(long id)
+    private void removeAllAttributes(long id, int type)
     {
-        String query = DELETE_ALL_ATTRIBUTES;
+        String query = DELETE_ALL_SIMPLE_ATTRIBUTES;
 
         logger.debug(query);
 
@@ -688,7 +700,22 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             t = System.nanoTime();
         }
-        jdbcTemplate.update(query, id);
+        jdbcTemplate.update(query, id, type);
+        if(sqlStats != null)
+        {
+            sqlStats.put(query, (System.nanoTime() - t) / 1000000);
+        }
+
+        query = DELETE_ALL_COMPLEX_ATTRIBUTES;
+
+        logger.debug(query);
+
+        t = 0;
+        if(sqlStats != null)
+        {
+            t = System.nanoTime();
+        }
+        jdbcTemplate.update(query, id, type);
         if(sqlStats != null)
         {
             sqlStats.put(query, (System.nanoTime() - t) / 1000000);
@@ -700,7 +727,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         if (set.getMemberType().isSet())
         {
             removeSet((MetaSet)set.getMemberType());
-            removeAllAttributes(set.getId());
+            removeAllAttributes(set.getId(), ContainerTypes.SET);
         }
         else
         {
@@ -728,7 +755,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
 
         //delete all class attributes
-        removeAllAttributes(metaClass.getId());
+        removeAllAttributes(metaClass.getId(), ContainerTypes.CLASS);
 
         //delete class
         query = DELETE_CLASS_BY_ID;

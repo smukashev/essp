@@ -18,6 +18,7 @@
       <module>modules/batch</module>
       <module>modules/sync</module>
       <module>modules/parent</module>
+      <module>modules/tool</module>
   </modules>
 
 </project>
