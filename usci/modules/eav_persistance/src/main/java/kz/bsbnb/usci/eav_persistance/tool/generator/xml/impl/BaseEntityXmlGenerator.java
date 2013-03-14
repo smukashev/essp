@@ -67,7 +67,6 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
                                 Element parentElement, String name)
     {
         Element arrayContainer = document.createElement(name);
-
         for (IBaseValue batchValue : (((BaseSet)entity.getBaseValue(name).getValue()).get()))
         {
             BaseEntity memberEntity = (BaseEntity) batchValue.getValue();

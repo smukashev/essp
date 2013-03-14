@@ -36,7 +36,7 @@ public class GenerateSimpleInsertXml
     public static void main(String args[])
             throws ParserConfigurationException, TransformerException
     {
-        MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 20, 2, 3);
+        MetaClassGenerator metaClassGenerator = new MetaClassGenerator(5, 5, 2, 3);
         BaseEntityGenerator baseEntityGenerator = new BaseEntityGenerator();
 
         BaseEntityXmlGenerator baseEntityXmlGenerator = new BaseEntityXmlGenerator();
