@@ -4,6 +4,7 @@ package kz.bsbnb.usci.eav_model.model.base.impl;
 import kz.bsbnb.usci.eav_model.model.Batch;
 import kz.bsbnb.usci.eav_model.model.base.IBaseValue;
 import kz.bsbnb.usci.eav_model.model.persistable.impl.Persistable;
+import kz.bsbnb.usci.eav_model.util.DateUtils;
 
 import java.sql.Date;
 
@@ -59,7 +60,7 @@ public class BaseValue extends Persistable implements IBaseValue
         this.batch = batch;
         this.index = index;
         this.value = value;
-        this.repDate = repDate;
+        this.repDate = new Date(DateUtils.cutOffTime(repDate));
     }
 
     public BaseValue(Batch batch, long index, Object value)
@@ -124,7 +125,9 @@ public class BaseValue extends Persistable implements IBaseValue
         {
             BaseValue that = (BaseValue)obj;
 
-            return index == that.index && batch.equals(that.batch) && !(value != null ? !value.equals(that.value) : that.value != null);
+            return index == that.index && batch.equals(that.batch) &&
+                    !(value != null ? !value.equals(that.value) : that.value != null) &&
+                    repDate.equals(that.repDate);
 
         }
     }

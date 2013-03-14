@@ -163,6 +163,17 @@ public class BaseEntity extends Persistable implements IBaseContainer
         values.put(name, value);
     }
 
+    @Override
+    public Set<IBaseValue> get() {
+        List<IBaseValue> list = new ArrayList<IBaseValue>(values.values());
+        return (new HashSet<IBaseValue>(list));
+    }
+
+    @Override
+    public IMetaType getMemberType(String name) {
+        return meta.getMemberType(name);
+    }
+
     /**
      * Set of simple attribute names that are actually set in entity
      *
@@ -179,7 +190,8 @@ public class BaseEntity extends Persistable implements IBaseContainer
      *
      * @return
      */
-    public Set<String> getPresentComplexAttributeNames() {
+    public Set<String> getPresentComplexAttributeNames()
+    {
         return SetUtils.intersection(meta.getComplexAttributesNames(), values.keySet());
     }
 
@@ -189,7 +201,8 @@ public class BaseEntity extends Persistable implements IBaseContainer
      * @param dataType - attributes are filtered by this type
      * @return
      */
-    public Set<String> getPresentSimpleSetAttributeNames(DataTypes dataType) {
+    public Set<String> getPresentSimpleSetAttributeNames(DataTypes dataType)
+    {
         return SetUtils.intersection(meta.getSimpleSetAttributesNames(dataType), values.keySet());
     }
 
@@ -198,14 +211,9 @@ public class BaseEntity extends Persistable implements IBaseContainer
      *
      * @return
      */
-    public Set<String> getPresentComplexArrayAttributeNames() {
-        return SetUtils.intersection(meta.getComplexArrayAttributesNames(), values.keySet());
-    }
-
-    @Override
-    public String toString()
+    public Set<String> getPresentComplexArrayAttributeNames()
     {
-        return meta.getClassName();
+        return SetUtils.intersection(meta.getComplexArrayAttributesNames(), values.keySet());
     }
 
     /**
@@ -278,6 +286,9 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 if(thisValue == null || thatValue == null)
                     return false;
 
+                if(!thisValue.getRepDate().equals(thatValue.getRepDate()))
+                    return false;
+
                 if (this.getMeta().getMemberType(attributeName).isSet())
                 {
                     BaseSet thisSet = (BaseSet)(thisValue.getValue());
@@ -304,13 +315,9 @@ public class BaseEntity extends Persistable implements IBaseContainer
     }
 
     @Override
-    public Set<IBaseValue> get() {
-        List<IBaseValue> list = new ArrayList<IBaseValue>(values.values());
-        return (new HashSet<IBaseValue>(list));
+    public String toString()
+    {
+        return meta.getClassName();
     }
 
-    @Override
-    public IMetaType getMemberType(String name) {
-        return meta.getMemberType(name);
-    }
 }
