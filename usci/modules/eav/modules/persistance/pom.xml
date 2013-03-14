@@ -13,6 +13,13 @@
         <runSuite>**/EavTestsSuit.class</runSuite>
     </properties>
 
+    <parent>
+        <groupId>kz.bsbnb.usci.eav</groupId>
+        <artifactId>eav_parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../eav_parent</relativePath>
+    </parent>
+
     <dependencies>
         <dependency>
             <groupId>postgresql</groupId>
@@ -141,7 +148,7 @@
                         </database>
                         <target>
                             <packageName>kz.bsbnb.eav.persistance.generated</packageName>
-                            <directory>target/generated-sources/jooq</directory>
+                            <directory>${basedir}/target/generated-sources/jooq</directory>
                         </target>
                     </generator>
                 </configuration>

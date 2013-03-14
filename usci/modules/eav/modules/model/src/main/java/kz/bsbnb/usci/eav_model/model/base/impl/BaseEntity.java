@@ -233,13 +233,23 @@ public class BaseEntity extends Persistable implements IBaseContainer
     @Override
     public boolean equals(Object obj) {
         if (obj == this)
+        {
+            logger.debug("Same object");
             return true;
+        }
+
 
         if (obj == null)
+        {
+            logger.debug("Object is null");
             return false;
+        }
 
         if (!(getClass() == obj.getClass()))
+        {
+            logger.debug("Different classes");
             return false;
+        }
         else
         {
             BaseEntity that = (BaseEntity) obj;
@@ -248,7 +258,10 @@ public class BaseEntity extends Persistable implements IBaseContainer
             int thatAttributeCount = that.getAttributeCount();
 
             if (thisAttributeCount != thatAttributeCount)
+            {
+                logger.debug("Different attributes count");
                 return false;
+            }
 
             Iterator<String> valuesIt = values.keySet().iterator();
             while (valuesIt.hasNext())
@@ -281,16 +294,26 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 logger.debug("That: " + thatValue);
 
                 if(thisValue == null && thatValue == null)
+                {
+                    logger.debug("Both null skiped");
                     continue;
+                }
 
                 if(thisValue == null || thatValue == null)
+                {
+                    logger.debug("Null met");
                     return false;
+                }
 
                 if(!thisValue.getRepDate().equals(thatValue.getRepDate()))
+                {
+                    logger.debug("Different repDates");
                     return false;
+                }
 
                 if (this.getMeta().getMemberType(attributeName).isSet())
                 {
+                    logger.debug("It is an array");
                     BaseSet thisSet = (BaseSet)(thisValue.getValue());
                     BaseSet thatSet = (BaseSet)(thatValue.getValue());
 
@@ -302,6 +325,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 }
                 else
                 {
+                    logger.debug("It is a single value");
                     IBaseValue thisBaseValue = this.getBaseValue(attributeName);
                     IBaseValue thatBaseValue = that.getBaseValue(attributeName);
 

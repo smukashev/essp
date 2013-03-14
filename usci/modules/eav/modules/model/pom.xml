@@ -9,4 +9,10 @@
     <version>1.0-SNAPSHOT</version>
     <name>EAV model</name>
 
+    <parent>
+        <groupId>kz.bsbnb.usci.eav</groupId>
+        <artifactId>eav_parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../eav_parent</relativePath>
+    </parent>
 </project>

@@ -90,8 +90,10 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         setTableNames(st);
 
         //String query = st.render();
+
         DDLHelper.changeDatabase(jdbcTemplate.getDataSource(),
-                DDLHelper.readDatabaseFromXML("./usci/modules/eav_persistance/src/main/resources/tmpl/create_db.ddl"),
+                DDLHelper.readDatabaseFromXML(this.getClass().getClassLoader().getResource(getConfig().getSchema()).
+                        getFile()),
                 true);
 
         //logger.debug(query);
@@ -108,7 +110,8 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
         //String query = st.render();
         DDLHelper.dropDatabase(jdbcTemplate.getDataSource(),
-                DDLHelper.readDatabaseFromXML("./usci/modules/eav_persistance/src/main/resources/tmpl/create_db.ddl"));
+                DDLHelper.readDatabaseFromXML(this.getClass().getClassLoader().getResource(getConfig().getSchema()).
+                        getFile()));
 
         //logger.debug(query);
 

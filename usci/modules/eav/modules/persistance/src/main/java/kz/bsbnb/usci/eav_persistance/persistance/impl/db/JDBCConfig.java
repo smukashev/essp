@@ -12,6 +12,9 @@ public class JDBCConfig {
     @Value("${ds.table.prefix}")
     protected String tablePrefix = "eav_";
 
+    @Value("${ds.schema}")
+    protected String schema;
+
     private String classesTableName;
     private String arrayKeyFilterTableName;
     private String arrayKeyFilterValuesTableName;
@@ -280,5 +283,15 @@ public class JDBCConfig {
     public void setTablePrefix(String tablePrefix)
     {
         this.tablePrefix = tablePrefix;
+    }
+
+    public String getSchema()
+    {
+        return schema;
+    }
+
+    public void setSchema(String schema)
+    {
+        this.schema = schema;
     }
 }
