@@ -13,8 +13,10 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.SetUtils;
+import org.jooq.DeleteConditionStep;
 import org.jooq.InsertOnDuplicateStep;
 import org.jooq.SelectForUpdateStep;
+import org.jooq.UpdateConditionStep;
 import org.jooq.impl.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -31,34 +32,16 @@ import java.util.Set;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
+//TODO: refactor all id casts!
+
 @Repository
 public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 	private final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
-
-    private String UPDATE_CLASS_BY_ID;
-    private String DELETE_CLASS_BY_ID;
-    private String DELETE_SIMPLE_ATTRIBUTE;
-    private String DELETE_COMPLEX_ATTRIBUTE;
-    private String DELETE_ALL_SIMPLE_ATTRIBUTES;
-    private String DELETE_ALL_COMPLEX_ATTRIBUTES;
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private Executor sqlGenerator;
 
-    @PostConstruct
-    public void init()
-    {
-        UPDATE_CLASS_BY_ID = String.format("UPDATE %s SET  name = ?,  complex_key_type = ?, begin_date = ?,  is_disabled = ?  WHERE id = ?", getConfig().getClassesTableName());
-        DELETE_CLASS_BY_ID = String.format("DELETE FROM %s WHERE id = ?", getConfig().getClassesTableName());
-
-        DELETE_SIMPLE_ATTRIBUTE = String.format("DELETE FROM %s WHERE containing_id = ? AND container_type = ? AND name = ? ", getConfig().getSimpleAttributesTableName());
-        DELETE_COMPLEX_ATTRIBUTE = String.format("DELETE FROM %s WHERE containing_id = ? AND container_type = ? AND name = ? ", getConfig().getComplexAttributesTableName());
-
-        DELETE_ALL_SIMPLE_ATTRIBUTES = String.format("DELETE FROM %s WHERE containing_id = ? AND container_type = ? ", getConfig().getSimpleAttributesTableName());
-        DELETE_ALL_COMPLEX_ATTRIBUTES = String.format("DELETE FROM %s WHERE containing_id = ? AND container_type = ? ", getConfig().getComplexAttributesTableName());
-    }
-	
     private void loadClass(MetaClass metaClass, boolean beginDateStrict)
     {
         SelectForUpdateStep select;
@@ -78,7 +61,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                         EAV_CLASSES.COMPLEX_KEY_TYPE
                     ).from(EAV_CLASSES).
                     where(
-                        EAV_CLASSES.NAME.equal(metaClass.getClassName())
+                            EAV_CLASSES.NAME.equal(metaClass.getClassName())
                     ).and(
                         EAV_CLASSES.BEGIN_DATE.eq(metaClass.getBeginDate())
                     ).and(
@@ -106,7 +89,6 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
         else
         {
-            //todo: refactor cast
             select = sqlGenerator.select(
                     EAV_CLASSES.IS_DISABLED,
                     EAV_CLASSES.BEGIN_DATE,
@@ -190,29 +172,24 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             throw new IllegalArgumentException("MetaClass must have id to be updated");
         }
 
-        String query;
+        UpdateConditionStep update = sqlGenerator.update(EAV_CLASSES
+            ).set(EAV_CLASSES.NAME, metaClass.getClassName()
+            ).set(EAV_CLASSES.COMPLEX_KEY_TYPE, metaClass.getComplexKeyType().toString()
+            ).set(EAV_CLASSES.BEGIN_DATE, metaClass.getBeginDate()
+            ).set(EAV_CLASSES.IS_DISABLED, metaClass.isDisabled()
+            ).where(EAV_CLASSES.ID.eq((int)metaClass.getId()));
 
-        query = UPDATE_CLASS_BY_ID;
-
-        Object[] args = {
-                metaClass.getClassName(),
-                metaClass.getComplexKeyType().toString(),
-                metaClass.getBeginDate(),
-                metaClass.isDisabled(),
-                metaClass.getId()
-        };
-
-        logger.debug(query);
+        logger.debug(update.toString());
 
         long t = 0;
         if(sqlStats != null)
         {
             t = System.nanoTime();
         }
-        jdbcTemplate.update(query, args);
+        jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
         if(sqlStats != null)
         {
-            sqlStats.put(query, (System.nanoTime() - t) / 1000000);
+            sqlStats.put(update.getSQL(), (System.nanoTime() - t) / 1000000);
         }
     }
 
@@ -266,7 +243,6 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             {
                 long innerId = save((MetaClass)metaSet.getMemberType());
 
-                //todo: refactor cast
                 insert = sqlGenerator.insertInto(
                         EAV_COMPLEX_SET,
                         EAV_COMPLEX_SET.CONTAINING_ID,
@@ -281,7 +257,6 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             }
             else
             {
-                //todo: refactor cast
                 insert = sqlGenerator.insertInto(
                         EAV_SIMPLE_SET,
                         EAV_SIMPLE_SET.CONTAINING_ID,
@@ -331,7 +306,6 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             long innerId = save((MetaClass)type);
 
-            //todo: refactor cast
             insert = sqlGenerator.insertInto(
                     EAV_COMPLEX_ATTRIBUTES,
                     EAV_COMPLEX_ATTRIBUTES.CONTAINING_ID,
@@ -345,7 +319,6 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
         else
         {
-            //todo: refactor cast
             insert = sqlGenerator.insertInto(
                     EAV_SIMPLE_ATTRIBUTES,
                     EAV_SIMPLE_ATTRIBUTES.CONTAINING_ID,
@@ -401,7 +374,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
     private void deleteAttributes(Set<String> deleteNames, MetaClass meta)
     {
-        String query;
+        DeleteConditionStep delete;
+
         if(meta.getId() < 1)
         {
             throw new IllegalArgumentException("MetaClass must have an id filled before attributes deletion to DB");
@@ -411,24 +385,30 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             if(meta.getMemberType(typeName).isComplex())
             {
-                query = DELETE_COMPLEX_ATTRIBUTE;
+                delete = sqlGenerator.delete(EAV_COMPLEX_ATTRIBUTES
+                    ).where(EAV_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq((int)meta.getId())
+                    ).and(EAV_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
             }
             else
             {
-                query = DELETE_SIMPLE_ATTRIBUTE;
+                delete = sqlGenerator.delete(EAV_SIMPLE_ATTRIBUTES
+                    ).where(EAV_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq((int)meta.getId())
+                    ).and(EAV_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
             }
 
-            logger.debug(query);
+            logger.debug(delete.toString());
 
             long t = 0;
             if(sqlStats != null)
             {
                 t = System.nanoTime();
             }
-            jdbcTemplate.update(query, meta.getId(), ContainerTypes.CLASS, typeName);
+            jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
             if(sqlStats != null)
             {
-                sqlStats.put(query, (System.nanoTime() - t) / 1000000);
+                sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
             }
         }
     }
@@ -444,11 +424,11 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 EAV_SIMPLE_ATTRIBUTES.IS_KEY,
                 EAV_SIMPLE_ATTRIBUTES.IS_NULLABLE
             ).from(EAV_SIMPLE_ATTRIBUTES
-            ).where(
-                EAV_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq((int)meta.getId())
-            ).and(
+        ).where(
+                EAV_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq((int) meta.getId())
+        ).and(
                 EAV_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(meta.getType())
-            );
+        );
 
         logger.debug(select.toString());
 
@@ -487,8 +467,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 EAV_SIMPLE_SET.TYPE_CODE,
                 EAV_SIMPLE_SET.ARRAY_KEY_TYPE
             ).from(EAV_SIMPLE_SET
-            ).where(EAV_SIMPLE_SET.CONTAINING_ID.eq((int)meta.getId())
-            ).and(EAV_SIMPLE_SET.CONTAINER_TYPE.eq(meta.getType()));
+        ).where(EAV_SIMPLE_SET.CONTAINING_ID.eq((int) meta.getId())
+        ).and(EAV_SIMPLE_SET.CONTAINER_TYPE.eq(meta.getType()));
 
         long t = 0;
 
@@ -537,9 +517,9 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 EAV_COMPLEX_ATTRIBUTES.CLASS_ID,
                 EAV_CLASSES.NAME.as("cname")
             ).from(EAV_COMPLEX_ATTRIBUTES).leftOuterJoin(EAV_CLASSES
-            ).on(EAV_COMPLEX_ATTRIBUTES.CLASS_ID.eq(EAV_CLASSES.ID)
-            ).where(EAV_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq((int)meta.getId())
-            ).and(EAV_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(meta.getType()));
+        ).on(EAV_COMPLEX_ATTRIBUTES.CLASS_ID.eq(EAV_CLASSES.ID)
+        ).where(EAV_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq((int) meta.getId())
+        ).and(EAV_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(meta.getType()));
 
         long t = 0;
 
@@ -583,9 +563,9 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 EAV_COMPLEX_SET.CONTAINING_ID,
                 EAV_CLASSES.NAME.as("cname")
             ).from(EAV_COMPLEX_SET
-            ).leftOuterJoin(EAV_CLASSES).on(EAV_COMPLEX_SET.CLASS_ID.eq(EAV_CLASSES.ID)
-            ).where(EAV_COMPLEX_SET.CONTAINING_ID.eq((int)meta.getId())
-            ).and(EAV_COMPLEX_SET.CONTAINER_TYPE.eq(meta.getType()));
+        ).leftOuterJoin(EAV_CLASSES).on(EAV_COMPLEX_SET.CLASS_ID.eq(EAV_CLASSES.ID)
+        ).where(EAV_COMPLEX_SET.CONTAINING_ID.eq((int) meta.getId())
+        ).and(EAV_COMPLEX_SET.CONTAINER_TYPE.eq(meta.getType()));
         long t = 0;
 
         logger.debug(select.toString());
@@ -629,8 +609,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 EAV_SET_OF_SETS.CONTAINING_ID,
                 EAV_SET_OF_SETS.ARRAY_KEY_TYPE
             ).from(EAV_SET_OF_SETS
-            ).where(EAV_SET_OF_SETS.CONTAINING_ID.eq((int)meta.getId())
-            ).and(EAV_SET_OF_SETS.CONTAINER_TYPE.eq(meta.getType()));
+        ).where(EAV_SET_OF_SETS.CONTAINING_ID.eq((int) meta.getId())
+        ).and(EAV_SET_OF_SETS.CONTAINER_TYPE.eq(meta.getType()));
         long t = 0;
 
         logger.debug(select.toString());
@@ -769,34 +749,38 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
     private void removeAllAttributes(long id, int type)
     {
-        String query = DELETE_ALL_SIMPLE_ATTRIBUTES;
+        DeleteConditionStep delete = sqlGenerator.delete(EAV_SIMPLE_ATTRIBUTES
+            ).where(EAV_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq((int) id)
+        ).and(EAV_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(type));
 
-        logger.debug(query);
+        logger.debug(delete.toString());
 
         long t = 0;
         if(sqlStats != null)
         {
             t = System.nanoTime();
         }
-        jdbcTemplate.update(query, id, type);
+        jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
         if(sqlStats != null)
         {
-            sqlStats.put(query, (System.nanoTime() - t) / 1000000);
+            sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
         }
 
-        query = DELETE_ALL_COMPLEX_ATTRIBUTES;
+        delete = sqlGenerator.delete(EAV_COMPLEX_ATTRIBUTES
+            ).where(EAV_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq((int)id)
+            ).and(EAV_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(type));
 
-        logger.debug(query);
+        logger.debug(delete.toString());
 
         t = 0;
         if(sqlStats != null)
         {
             t = System.nanoTime();
         }
-        jdbcTemplate.update(query, id, type);
+        jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
         if(sqlStats != null)
         {
-            sqlStats.put(query, (System.nanoTime() - t) / 1000000);
+            sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
         }
     }
 
@@ -824,7 +808,6 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             throw new IllegalArgumentException("Can't remove MetaClass without id");
         }
 
-        String query;
         long t = 0;
 
         for (String arrayName : metaClass.getArrayArrayAttributesNames())
@@ -836,18 +819,18 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         removeAllAttributes(metaClass.getId(), ContainerTypes.CLASS);
 
         //delete class
-        query = DELETE_CLASS_BY_ID;
+        DeleteConditionStep delete = sqlGenerator.delete(EAV_CLASSES).where(EAV_CLASSES.ID.eq((int)metaClass.getId()));
 
-        logger.debug(query);
+        logger.debug(delete.toString());
 
         if(sqlStats != null)
         {
             t = System.nanoTime();
         }
-        jdbcTemplate.update(query, metaClass.getId());
+        jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
         if(sqlStats != null)
         {
-            sqlStats.put(query, (System.nanoTime() - t) / 1000000);
+            sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
         }
 	}
 
