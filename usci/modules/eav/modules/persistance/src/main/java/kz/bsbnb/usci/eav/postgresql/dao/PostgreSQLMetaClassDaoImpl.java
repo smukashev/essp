@@ -1,20 +1,20 @@
 package kz.bsbnb.usci.eav.postgresql.dao;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.*;
-
 import kz.bsbnb.usci.eav.model.base.ContainerTypes;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
-import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
-import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
-import kz.bsbnb.usci.eav.util.SetUtils;
+import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
+import kz.bsbnb.usci.eav.util.SetUtils;
+import org.jooq.InsertOnDuplicateStep;
+import org.jooq.SelectForUpdateStep;
 import org.jooq.impl.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,18 +29,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.jooq.impl.Factory.fieldByName;
-import static org.jooq.impl.Factory.inline;
-import static org.jooq.impl.Factory.tableByName;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_CLASSES;
 
 @Repository
 public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 	private final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
 
-    private String INSERT_CLASS_SQL;
-    private String SELECT_CLASS_BY_NAME;
-    private String SELECT_CLASS_BY_NAME_STRICT;
-    private String SELECT_CLASS_BY_ID;
     private String UPDATE_CLASS_BY_ID;
     private String DELETE_CLASS_BY_ID;
     private String INSERT_COMPLEX_ARRAY;
@@ -64,36 +58,6 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     @PostConstruct
     public void init()
     {
-        //INSERT_CLASS_SQL = String.format("INSERT INTO %s (name, complex_key_type, begin_date, is_disabled) VALUES ( ?, ?, ?, ? )", getConfig().getClassesTableName());
-        INSERT_CLASS_SQL = sqlGenerator.insertInto(
-                EAV_CLASSES,
-                EAV_CLASSES.NAME,
-                EAV_CLASSES.COMPLEX_KEY_TYPE,
-                EAV_CLASSES.BEGIN_DATE,
-                EAV_CLASSES.IS_DISABLED
-            ).values("", "", new Timestamp(System.currentTimeMillis()), true).getSQL();
-
-
-        //SELECT_CLASS_BY_NAME = String.format("SELECT * FROM %s WHERE name = ? and begin_date <= ? and is_disabled = FALSE ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
-        //SELECT_CLASS_BY_NAME = String.format("SELECT * FROM %s WHERE name = ? and begin_date <= ? ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
-        SELECT_CLASS_BY_NAME = sqlGenerator.select(
-                fieldByName("is_disabled"),
-                fieldByName("begin_date"),
-                fieldByName("id"),
-                fieldByName("name"),
-                fieldByName("complex_key_type")
-            ).from(tableByName(getConfig().getClassesTableName())).
-            where(
-                    fieldByName("name").equal("?")
-            ).and(
-                fieldByName("begin_date").le("?")
-        ).and(
-                fieldByName("is_disabled").equal(inline(false))
-            ).orderBy(fieldByName("begin_date").desc()).limit(inline(1)).offset(inline(0)).
-                getSQL();
-
-        SELECT_CLASS_BY_NAME_STRICT = String.format("SELECT * FROM %s WHERE name = ? and begin_date = ? ORDER BY begin_date DESC LIMIT 1", getConfig().getClassesTableName());
-        SELECT_CLASS_BY_ID = String.format("SELECT * FROM %s WHERE id = ?", getConfig().getClassesTableName());
         UPDATE_CLASS_BY_ID = String.format("UPDATE %s SET  name = ?,  complex_key_type = ?, begin_date = ?,  is_disabled = ?  WHERE id = ?", getConfig().getClassesTableName());
         DELETE_CLASS_BY_ID = String.format("DELETE FROM %s WHERE id = ?", getConfig().getClassesTableName());
         INSERT_COMPLEX_ARRAY = String.format("INSERT INTO %s (containing_id, container_type, name, is_key, is_nullable, class_id, array_key_type) VALUES  ( ?, ?, ?, ?, ?, ?, ?) ", getConfig().getComplexSetTableName());
@@ -118,8 +82,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	
     private void loadClass(MetaClass metaClass, boolean beginDateStrict)
     {
-        String query;
-        Object[] args;
+        //String query;
+        SelectForUpdateStep select;
 
         if(metaClass.getId() < 1)
         {
@@ -128,24 +92,57 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             if(beginDateStrict)
             {
-                query = SELECT_CLASS_BY_NAME_STRICT;
+                select = sqlGenerator.select(
+                        EAV_CLASSES.IS_DISABLED,
+                        EAV_CLASSES.BEGIN_DATE,
+                        EAV_CLASSES.ID,
+                        EAV_CLASSES.NAME,
+                        EAV_CLASSES.COMPLEX_KEY_TYPE
+                ).from(EAV_CLASSES).
+                where(
+                    EAV_CLASSES.NAME.equal(metaClass.getClassName())
+                ).and(
+                    EAV_CLASSES.BEGIN_DATE.eq(metaClass.getBeginDate())
+                ).and(
+                    EAV_CLASSES.IS_DISABLED.equal(false)
+                ).orderBy(EAV_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
             }
             else
             {
-                query = SELECT_CLASS_BY_NAME;
+                select = sqlGenerator.select(
+                        EAV_CLASSES.IS_DISABLED,
+                        EAV_CLASSES.BEGIN_DATE,
+                        EAV_CLASSES.ID,
+                        EAV_CLASSES.NAME,
+                        EAV_CLASSES.COMPLEX_KEY_TYPE
+                    ).from(EAV_CLASSES).
+                    where(
+                        EAV_CLASSES.NAME.equal(metaClass.getClassName())
+                    ).and(
+                        EAV_CLASSES.BEGIN_DATE.le(metaClass.getBeginDate())
+                    ).and(
+                        EAV_CLASSES.IS_DISABLED.equal(false)
+                    ).orderBy(EAV_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
             }
 
-            args = new Object[] { metaClass.getClassName(), metaClass.getBeginDate() };
         }
         else
         {
-            query = SELECT_CLASS_BY_ID;
-
-            args = new Object[] { metaClass.getId() };
+            //todo: refactor cast
+            select = sqlGenerator.select(
+                    EAV_CLASSES.IS_DISABLED,
+                    EAV_CLASSES.BEGIN_DATE,
+                    EAV_CLASSES.ID,
+                    EAV_CLASSES.NAME,
+                    EAV_CLASSES.COMPLEX_KEY_TYPE
+                ).from(EAV_CLASSES).
+                where(
+                    EAV_CLASSES.ID.equal((int) metaClass.getId())
+                ).limit(1).offset(0);
         }
 
-        logger.debug(query);
-        List<Map<String, Object>> rows = queryForListWithStats(query, args);
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
         {
@@ -177,13 +174,19 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     {
         try
         {
-            long metaId = insertWithId(INSERT_CLASS_SQL,
-                    new Object[] {
-                            metaClass.getClassName(),
-                            metaClass.getComplexKeyType().toString(),
-                            metaClass.getBeginDate(),
-                            metaClass.isDisabled()
-                    });
+            InsertOnDuplicateStep insert = sqlGenerator.insertInto(
+                    EAV_CLASSES,
+                    EAV_CLASSES.NAME,
+                    EAV_CLASSES.COMPLEX_KEY_TYPE,
+                    EAV_CLASSES.BEGIN_DATE,
+                    EAV_CLASSES.IS_DISABLED
+            ).values(metaClass.getClassName(),
+                    metaClass.getComplexKeyType().toString(),
+                    metaClass.getBeginDate(),
+                    metaClass.isDisabled());
+
+            logger.debug(insert.toString());
+            long metaId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
             if(metaId < 1)
             {

@@ -58,8 +58,6 @@ public class JDBCSupport {
                 ps.setObject(i++, obj);
             }
 
-            logger.debug(ps.toString());
-
             return ps;
         }
     }
