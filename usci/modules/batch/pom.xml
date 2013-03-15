@@ -40,8 +40,8 @@
             <version>${spring.batch.version}</version>
         </dependency>
         <dependency>
-            <groupId>kz.bsbnb.usci</groupId>
-            <artifactId>eav_model</artifactId>
+            <groupId>kz.bsbnb.usci.eav</groupId>
+            <artifactId>model</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
