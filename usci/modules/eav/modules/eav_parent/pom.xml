@@ -6,7 +6,7 @@
 	<groupId>kz.bsbnb.usci.eav</groupId>
 	<artifactId>parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>USCI parent</name>
+	<name>EAV parent</name>
 
 	<properties>
 		<releaseCandidate>1</releaseCandidate>

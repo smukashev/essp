@@ -1,12 +1,12 @@
 package kz.bsbnb.usci.batch.reader.impl;
 
-import kz.bsbnb.usci.eav_model.model.Batch;
-import kz.bsbnb.usci.eav_model.model.base.IBaseContainer;
-import kz.bsbnb.usci.eav_model.model.base.impl.BaseValue;
-import kz.bsbnb.usci.eav_model.model.meta.IMetaType;
-import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav_model.model.meta.impl.MetaSet;
-import kz.bsbnb.usci.eav_model.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.base.IBaseContainer;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;

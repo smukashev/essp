@@ -44,23 +44,16 @@
         <property name="maxActive" value="${ds.pool.maxActive}"/>
     </bean>
 
-    <!--<context:component-scan base-package="kz.bsbnb.usci.eav_model.model.meta.impl" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav_persistance.repository.impl" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav_persistance.persistance.impl.db" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav_persistance.persistance.impl.searcher" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav_persistance.stats" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav_persistance.postgresql.storage" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav_persistance.persistance.dao" />-->
+    <!--<context:component-scan base-package="kz.bsbnb.usci.eav.meta.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.eavimpl" />
+    <context:component-scan base-package="kz.bsbnb.usci.eav.impl.db" />
+    <context:component-scan base-package="kz.bsbnb.usci.eav.impl.searcher" />
+    <context:component-scan base-package="kz.bsbnb.usci.eav   <context:component-scan base-package="kz.bsbnb.usci.eavstorage" />
+    <context:component-scan base-package="kz.bsbnb.usci.eav.dao" />-->
 
-    <context:component-scan base-package="kz.bsbnb.usci.eav_persistance" />
+    <context:component-scan base-package="kz.bsbnb.usci.eav" />
 
-    <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav_persistance.repository.impl.BatchRepository"/>
-
-    <bean id="stRawGroupDir" class="org.stringtemplate.v4.STRawGroupDir">
-        <constructor-arg index="0" value="${ds.templates_dir}"/>
-        <constructor-arg index="1" value="$"/>
-        <constructor-arg index="2" value="$"/>
-    </bean>
+    <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav.repository.impl.BatchRepository"/>
 
     <bean id="sqlGenerator" class="org.jooq.impl.Executor">
         <constructor-arg index="0" value="POSTGRES"/>

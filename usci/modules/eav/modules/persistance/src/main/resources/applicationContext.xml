@@ -43,15 +43,9 @@
         <property name="maxActive" value="${ds.pool.maxActive}"/>
     </bean>
 
-    <context:component-scan base-package="kz.bsbnb.usci.eav_persistance" />
+    <context:component-scan base-package="kz.bsbnb.usci.eav" />
 
-    <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav_persistance.repository.impl.BatchRepository"/>
-
-    <bean id="stRawGroupDir" class="org.stringtemplate.v4.STRawGroupDir">
-        <constructor-arg index="0" value="${ds.templates_dir}"/>
-        <constructor-arg index="1" value="$"/>
-        <constructor-arg index="2" value="$"/>
-    </bean>
+    <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav.repository.impl.BatchRepository"/>
 
     <bean id="sqlGenerator" class="org.jooq.impl.Executor">
         <constructor-arg index="0" value="POSTGRES"/>

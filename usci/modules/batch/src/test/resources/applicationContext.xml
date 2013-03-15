@@ -39,9 +39,9 @@
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
-    <!--<context:component-scan base-package="kz.bsbnb.usci.eav_persistance.impl.db.postgresql" />-->
-    <context:component-scan base-package="kz.bsbnb.usci.eav_persistance" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav_model.model.meta.impl" />
+    <!--<context:component-scan base-package="kz.bsbnb.usci.eavtgresql" />-->
+    <context:component-scan base-package="kz.bsbnb.usci.eav" />
+    <context:component-scan base-package="kz.bsbnb.usci.eav.model.meta.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.helper.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.reader.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.writer.impl" />

@@ -1,8 +1,8 @@
 package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
-import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav_persistance.persistance.impl.searcher.BasicBaseEntitySearcherPool;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcherPool;
 import kz.bsbnb.usci.sync.job.AbstractDataJob;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

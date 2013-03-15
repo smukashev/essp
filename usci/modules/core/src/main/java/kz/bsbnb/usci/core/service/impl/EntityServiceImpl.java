@@ -1,8 +1,8 @@
 package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
-import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav_persistance.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
