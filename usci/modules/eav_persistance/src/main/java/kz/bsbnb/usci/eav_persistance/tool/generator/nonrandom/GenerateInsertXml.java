@@ -1,16 +1,17 @@
-package kz.bsbnb.usci.eav_persistance.tool.generator2;
+package kz.bsbnb.usci.eav_persistance.tool.generator.nonrandom;
 
 import kz.bsbnb.usci.eav_model.model.Batch;
 import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav_persistance.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
-import kz.bsbnb.usci.eav_persistance.tool.generator2.data.AttributeTree;
-import kz.bsbnb.usci.eav_persistance.tool.generator2.data.BaseEntityGenerator;
-import kz.bsbnb.usci.eav_persistance.tool.generator2.data.MetaClassGenerator;
-import kz.bsbnb.usci.eav_persistance.tool.generator2.xml.impl.BaseEntityXmlGenerator;
-import kz.bsbnb.usci.eav_persistance.tool.generator2.helper.TreeGenerator;
+import kz.bsbnb.usci.eav_persistance.tool.generator.nonrandom.data.AttributeTree;
+import kz.bsbnb.usci.eav_persistance.tool.generator.nonrandom.data.BaseEntityGenerator;
+import kz.bsbnb.usci.eav_persistance.tool.generator.nonrandom.data.MetaClassGenerator;
+import kz.bsbnb.usci.eav_persistance.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
+import kz.bsbnb.usci.eav_persistance.tool.generator.nonrandom.helper.TreeGenerator;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.w3c.dom.Document;
 
@@ -24,7 +25,7 @@ import java.util.Date;
  */
 public class GenerateInsertXml {
 
-    private static final int DATA_SIZE=1;
+    private static final int DATA_SIZE=1;   // Number of entities to generate
     private static String OS = System.getProperty("os.name").toLowerCase();
     private final static String FILE_PATH_UNIX = "/opt/xmls/test.xml";
     private final static String FILE_PATH_WINDOWS = "D:/DevTemp/test.xml";
@@ -44,6 +45,7 @@ public class GenerateInsertXml {
 
         IStorage storage = ctx.getBean(IStorage.class);
         IMetaClassDao metaClassDao = ctx.getBean(IMetaClassDao.class);
+        IBaseEntityDao baseEntityDao = ctx.getBean(IBaseEntityDao.class);
         IBatchDao batchDao = ctx.getBean(IBatchDao.class);
 
         AttributeTree tree = new AttributeTree("packages",null);
@@ -62,20 +64,35 @@ public class GenerateInsertXml {
 
             tree = helper.generateTree(tree);
             tree = tree.getChildren().get(0);
-            for (int i=1;i<=DATA_SIZE;i++){
-                MetaClass metaClass = metaClassGenerator.generateMetaClass(tree,i);
-                data.add(metaClass);
 
+            for (int i=1; i<=DATA_SIZE; i++){
+
+                MetaClass metaClass = metaClassGenerator.generateMetaClass(tree,i);
+
+                Long id = metaClassDao.save(metaClass);
+                data.add(metaClassDao.load(id));
+//                Set<String> ss = metaClass.getAttributeNames();
+//                for (String s:ss){
+//                    System.out.print(s+" ");
+//                }
+
+//               System.out.println(metaClass.equals(metaClassDao.load(id)));
+            }
+
+            for (MetaClass m:metaClassGenerator.getMetaClasses()){
+                   metaClassDao.save(m);
             }
 
             Batch batch = new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime()));
             long batchId = batchDao.save(batch);
 
             batch = batchDao.load(batchId);
-
+            int index=0;
             for (MetaClass aData : data) {
-                BaseEntity baseEntity = baseEntityGenerator.generateBaseEntity(batch, aData, 1);
+                BaseEntity baseEntity = baseEntityGenerator.generateBaseEntity(batch, aData, ++index);
                 entities.add(baseEntity);
+               Long id = baseEntityDao.save(baseEntity);
+               BaseEntity bb = baseEntityDao.load(id);
             }
 
             Document document = baseEntityXmlGenerator.getGeneratedDocument(entities);

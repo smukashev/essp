@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav_persistance.tool.generator.data;
+package kz.bsbnb.usci.eav_persistance.tool.generator.random.data;
 
 import kz.bsbnb.usci.eav_model.model.type.DataTypes;
 

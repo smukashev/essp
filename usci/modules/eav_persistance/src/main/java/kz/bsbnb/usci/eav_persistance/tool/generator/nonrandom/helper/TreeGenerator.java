@@ -1,7 +1,6 @@
-package kz.bsbnb.usci.eav_persistance.tool.generator2.helper;
+package kz.bsbnb.usci.eav_persistance.tool.generator.nonrandom.helper;
 
-import kz.bsbnb.usci.eav_persistance.tool.generator2.data.AttributeTree;
-import org.aspectj.apache.bcel.util.ClassPath;
+import kz.bsbnb.usci.eav_persistance.tool.generator.nonrandom.data.AttributeTree;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav_persistance.tool.generator.data.impl;
+package kz.bsbnb.usci.eav_persistance.tool.generator.random.data.impl;
 
 import kz.bsbnb.usci.eav_model.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaType;
@@ -6,7 +6,7 @@ import kz.bsbnb.usci.eav_model.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav_model.model.type.DataTypes;
 import kz.bsbnb.usci.eav_model.model.meta.impl.*;
 import kz.bsbnb.usci.eav_model.util.SetUtils;
-import kz.bsbnb.usci.eav_persistance.tool.generator.data.AbstractDataGenerator;
+import kz.bsbnb.usci.eav_persistance.tool.generator.random.data.AbstractDataGenerator;
 
 import java.util.*;
 

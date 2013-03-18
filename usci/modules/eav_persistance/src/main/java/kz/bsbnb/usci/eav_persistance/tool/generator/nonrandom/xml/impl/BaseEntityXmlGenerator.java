@@ -1,11 +1,11 @@
-package kz.bsbnb.usci.eav_persistance.tool.generator2.xml.impl;
+package kz.bsbnb.usci.eav_persistance.tool.generator.nonrandom.xml.impl;
 
 import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaType;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav_model.model.type.DataTypes;
-import kz.bsbnb.usci.eav_persistance.tool.generator2.xml.AbstractXmlGenerator;
+import kz.bsbnb.usci.eav_persistance.tool.generator.nonrandom.xml.AbstractXmlGenerator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

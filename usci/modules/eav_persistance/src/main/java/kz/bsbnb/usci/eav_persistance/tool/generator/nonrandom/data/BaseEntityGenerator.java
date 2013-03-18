@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav_persistance.tool.generator2.data;
+package kz.bsbnb.usci.eav_persistance.tool.generator.nonrandom.data;
 
 import kz.bsbnb.usci.eav_model.model.Batch;
 import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
@@ -6,7 +6,7 @@ import kz.bsbnb.usci.eav_model.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav_model.model.meta.IMetaType;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaValue;
-import kz.bsbnb.usci.eav_persistance.tool.generator.data.AbstractDataGenerator;
+import kz.bsbnb.usci.eav_persistance.tool.generator.random.data.AbstractDataGenerator;
 
 /**
  * @author abukabayev

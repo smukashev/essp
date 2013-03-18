@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav_persistance.tool.generator.entry;
+package kz.bsbnb.usci.eav_persistance.tool.generator.random.entry;
 
 import kz.bsbnb.usci.eav_model.model.Batch;
 import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
@@ -6,9 +6,9 @@ import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
-import kz.bsbnb.usci.eav_persistance.tool.generator.data.impl.BaseEntityGenerator;
-import kz.bsbnb.usci.eav_persistance.tool.generator.data.impl.MetaClassGenerator;
-import kz.bsbnb.usci.eav_persistance.tool.generator.xml.impl.BaseEntityXmlGenerator;
+import kz.bsbnb.usci.eav_persistance.tool.generator.random.data.impl.BaseEntityGenerator;
+import kz.bsbnb.usci.eav_persistance.tool.generator.random.data.impl.MetaClassGenerator;
+import kz.bsbnb.usci.eav_persistance.tool.generator.random.xml.impl.BaseEntityXmlGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

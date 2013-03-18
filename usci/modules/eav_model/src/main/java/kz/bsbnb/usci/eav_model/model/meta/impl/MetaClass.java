@@ -322,27 +322,22 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
     {
         if (obj == this)
             return true;
-
         if (obj == null)
             return false;
-
         if (!(getClass() == obj.getClass()))
             return false;
         else
         {
             MetaClass tmp = (MetaClass) obj;
-
             if (tmp.getAttributesCount() != this.getAttributesCount())
                 return false;
 
             Set<String> thisNames = this.members.keySet();
-
             for (String name : thisNames)
             {
                 if(!(this.getMemberType(name).equals(tmp.getMemberType(name))))
                     return false;
             }
-
             return !(tmp.isDisabled() != this.isDisabled() ||
                     !tmp.getBeginDate().equals(this.getBeginDate()) ||
                     !tmp.getClassName().equals(this.getClassName()) ||

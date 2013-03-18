@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav_persistance.tool.generator2.data;
+package kz.bsbnb.usci.eav_persistance.tool.generator.nonrandom.data;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -31,9 +31,7 @@ public class AttributeTree {
     }
 
     public Boolean hasChildren(){
-        if (this.getChildren().isEmpty())
-            return false;
-        return true;
+        return !this.getChildren().isEmpty();
     }
 
 }

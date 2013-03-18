@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav_persistance.tool.generator2.data;
+package kz.bsbnb.usci.eav_persistance.tool.generator.nonrandom.data;
 
 import kz.bsbnb.usci.eav_model.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaAttribute;
@@ -6,22 +6,36 @@ import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav_model.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav_model.model.type.DataTypes;
-import kz.bsbnb.usci.eav_persistance.tool.generator.data.AbstractDataGenerator;
+import kz.bsbnb.usci.eav_persistance.tool.generator.random.data.AbstractDataGenerator;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author abukabayev
  */
 public class MetaClassGenerator extends AbstractDataGenerator{
 
-    private String className;
+    private static int index,index2;
+    private Map<String, MetaClass> metaClasses = new HashMap<String, MetaClass>();
 
-    public void setClassName(String className) {
-        this.className = className;
+    public void setIndex(int index) {
+        MetaClassGenerator.index = index;
     }
 
-    public String getClassName() {
+    public void setIndex2(int index) {
+        MetaClassGenerator.index2 = index;
+    }
 
-        return className;
+    public int getIndex() {
+
+        return ++index;
+    }
+
+    public int getIndex2() {
+
+        return index2;
     }
 
     public MetaClassGenerator() {
@@ -51,7 +65,7 @@ public class MetaClassGenerator extends AbstractDataGenerator{
     }
 
     private MetaClass generateMetaClass(AttributeTree tree){
-        MetaClass meta = new MetaClass(tree.getName()+"_"+getClassName());
+        MetaClass meta = new MetaClass(tree.getName()+"_"+getIndex2()+"_"+getIndex());
 
         meta.setDisabled(rand.nextBoolean());
         meta.setComplexKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
@@ -60,11 +74,17 @@ public class MetaClassGenerator extends AbstractDataGenerator{
             IMetaAttribute type = generateMetaAttribute(child);
             meta.setMetaAttribute(child.getName(),type);
         }
+        metaClasses.put(meta.getClassName(),meta);
         return meta;
     }
 
     public MetaClass generateMetaClass(AttributeTree tree,int index){
-        setClassName(String.valueOf(index));
+        setIndex(1);
+        setIndex2(index);
         return generateMetaClass(tree);
+    }
+
+    public Collection<MetaClass> getMetaClasses(){
+        return metaClasses.values();
     }
 }

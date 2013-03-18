@@ -5,7 +5,7 @@ import kz.bsbnb.usci.eav_persistance.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav_persistance.stats.QueryEntry;
 import kz.bsbnb.usci.eav_persistance.stats.SQLQueriesStats;
-import kz.bsbnb.usci.eav_persistance.tool.generator.data.impl.MetaClassGenerator;
+import kz.bsbnb.usci.eav_persistance.tool.generator.random.data.impl.MetaClassGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -13,9 +13,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class MetaClassStressExecutor
+public class RandMetaClassStressExecutor
 {
-    private final static Logger logger = LoggerFactory.getLogger(MetaClassStressExecutor.class);
+    private final static Logger logger = LoggerFactory.getLogger(RandMetaClassStressExecutor.class);
 
     private final static int dataSize = 100;
 
