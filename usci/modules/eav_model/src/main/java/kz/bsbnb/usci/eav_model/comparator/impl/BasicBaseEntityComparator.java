@@ -143,17 +143,16 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
                 throw new IllegalArgumentException("Key attribute " + name + " couldn't be null");
             }
 
-            //todo: add other complex key type
             if(meta.getComplexKeyType() == ComplexKeyTypes.ALL)
             {
-                if(!type.isArray())
+                if(!type.isSet())
                     result = result && compareValue(type, value1, value2);
                 else
                     result = result && compareSet(type, value1, value2);
             }
             else
             {
-                if(!type.isArray())
+                if(!type.isSet())
                     result = result || compareValue(type, value1, value2);
                 else
                     result = result || compareSet(type, value1, value2);

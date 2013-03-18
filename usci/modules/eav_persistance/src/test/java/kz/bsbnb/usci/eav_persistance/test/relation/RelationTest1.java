@@ -159,7 +159,7 @@ public class RelationTest1  extends GenericTestCase
     @Test
     public void MetaClassBaseEntityRelation()
     {
-        Batch batch = new Batch(new Timestamp(new Date().getTime()));
+        Batch batch = new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime()));
         batchDao.save(batch);
 
         metaClassDao.save(generateMetaClass());
@@ -176,7 +176,7 @@ public class RelationTest1  extends GenericTestCase
     @Test
     public void equalsTest()
     {
-        Batch batch = new Batch(new Timestamp(new Date().getTime()));
+        Batch batch = new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime()));
         batchDao.save(batch);
 
         metaClassDao.save(generateMetaClass());
@@ -202,7 +202,7 @@ public class RelationTest1  extends GenericTestCase
         {
             fail("No base entity searcher found in spring config!");
         }
-        Batch batch = new Batch(new Timestamp(new Date().getTime()));
+        Batch batch = new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime()));
         batchDao.save(batch);
 
         metaClassDao.save(generateMetaClass());

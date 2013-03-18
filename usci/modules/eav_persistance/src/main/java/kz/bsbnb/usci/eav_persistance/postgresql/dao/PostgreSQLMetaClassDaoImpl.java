@@ -184,12 +184,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         long t = 0;
         if(sqlStats != null)
         {
-            t = System.currentTimeMillis();
+            t = System.nanoTime();
         }
         jdbcTemplate.update(query, args);
         if(sqlStats != null)
         {
-            sqlStats.put(query, System.currentTimeMillis() - t);
+            sqlStats.put(query, (System.nanoTime() - t) / 1000000);
         }
     }
 
@@ -199,14 +199,14 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         Object[] args;
         long id;
 
-        if(!type.isArray())
+        if(!type.isSet())
         {
             throw new IllegalStateException(attributeName + " is not an array.");
         }
 
         MetaSet metaSet = (MetaSet)type;
 
-        if(metaSet.getMemberType().isArray())
+        if(metaSet.getMemberType().isSet())
         {
             query = INSERT_ARRAY_ARRAY;
 
@@ -219,7 +219,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             long t = 0;
             if(sqlStats != null)
             {
-                t = System.currentTimeMillis();
+                t = System.nanoTime();
             }
 
             id = insertWithId(query, args);
@@ -227,7 +227,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             if(sqlStats != null)
             {
-                sqlStats.put(query, System.currentTimeMillis() - t);
+                sqlStats.put(query, (System.nanoTime() - t) / 1000000);
             }
 
             saveSet(metaSet.getMemberType(), id, new MetaAttribute(false, false, null), "item");
@@ -257,7 +257,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             long t = 0;
             if(sqlStats != null)
             {
-                t = System.currentTimeMillis();
+                t = System.nanoTime();
             }
 
             id = insertWithId(query, args);
@@ -265,7 +265,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             if(sqlStats != null)
             {
-                sqlStats.put(query, System.currentTimeMillis() - t);
+                sqlStats.put(query, (System.nanoTime() - t) / 1000000);
             }
         }
 
@@ -277,7 +277,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         String query;
         Object[] args;
 
-        if(type.isArray())
+        if(type.isSet())
         {
             throw new IllegalStateException(attributeName + " is an array, single value expected.");
         }
@@ -304,14 +304,14 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         long t = 0;
         if(sqlStats != null)
         {
-            t = System.currentTimeMillis();
+            t = System.nanoTime();
         }
 
         long id = insertWithId(query, args);
 
         if(sqlStats != null)
         {
-            sqlStats.put(query, System.currentTimeMillis() - t);
+            sqlStats.put(query, (System.nanoTime() - t) / 1000000);
         }
 
         return id;
@@ -329,7 +329,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             IMetaAttribute metaAttribute = meta.getMetaAttribute(typeName);
             IMetaType metaType = metaAttribute.getMetaType();
 
-            if(metaType.isArray())
+            if(metaType.isSet())
             {
                 saveSet(metaType, meta.getId(), metaAttribute, typeName);
             }
@@ -357,12 +357,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             long t = 0;
             if(sqlStats != null)
             {
-                t = System.currentTimeMillis();
+                t = System.nanoTime();
             }
             jdbcTemplate.update(query, meta.getId(), typeName);
             if(sqlStats != null)
             {
-                sqlStats.put(query, System.currentTimeMillis() - t);
+                sqlStats.put(query, (System.nanoTime() - t) / 1000000);
             }
         }
     }
@@ -376,12 +376,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         long t = 0;
         if(sqlStats != null)
         {
-            t = System.currentTimeMillis();
+            t = System.nanoTime();
         }
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, meta.getId());
         if(sqlStats != null)
         {
-            sqlStats.put(query, System.currentTimeMillis() - t);
+            sqlStats.put(query, (System.nanoTime() - t) / 1000000);
         }
 
         for (Map<String, Object> row : rows) {
@@ -405,12 +405,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         if(sqlStats != null)
         {
-            t = System.currentTimeMillis();
+            t = System.nanoTime();
         }
         List<Map<String, Object>>  rows = jdbcTemplate.queryForList(query, meta.getId());
         if(sqlStats != null)
         {
-            sqlStats.put(query, System.currentTimeMillis() - t);
+            sqlStats.put(query, (System.nanoTime() - t) / 1000000);
         }
 
         for (Map<String, Object> row : rows) {
@@ -443,13 +443,13 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         if(sqlStats != null)
         {
-            t = System.currentTimeMillis();
+            t = System.nanoTime();
         }
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, meta.getId());
         if(sqlStats != null)
         {
-            sqlStats.put(query, System.currentTimeMillis() - t);
+            sqlStats.put(query, (System.nanoTime() - t) / 1000000);
         }
 
         for (Map<String, Object> row : rows) {
@@ -475,12 +475,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         if(sqlStats != null)
         {
-            t = System.currentTimeMillis();
+            t = System.nanoTime();
         }
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, meta.getId());
         if(sqlStats != null)
         {
-            sqlStats.put(query, System.currentTimeMillis() - t);
+            sqlStats.put(query, (System.nanoTime() - t) / 1000000);
         }
 
         for (Map<String, Object> row : rows) {
@@ -510,12 +510,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         if(sqlStats != null)
         {
-            t = System.currentTimeMillis();
+            t = System.nanoTime();
         }
         List<Map<String, Object>>  rows = jdbcTemplate.queryForList(query, meta.getId());
         if(sqlStats != null)
         {
-            sqlStats.put(query, System.currentTimeMillis() - t);
+            sqlStats.put(query, (System.nanoTime() - t) / 1000000);
         }
 
         for (Map<String, Object> row : rows) {
@@ -649,12 +649,28 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         long t = 0;
         if(sqlStats != null)
         {
-            t = System.currentTimeMillis();
+            t = System.nanoTime();
         }
         jdbcTemplate.update(query, id);
         if(sqlStats != null)
         {
-            sqlStats.put(query, System.currentTimeMillis() - t);
+            sqlStats.put(query, (System.nanoTime() - t) / 1000000);
+        }
+    }
+
+    private void removeSet(MetaSet set)
+    {
+        if (set.getMemberType().isSet())
+        {
+            removeSet((MetaSet)set.getMemberType());
+            removeAllAttributes(set.getId());
+        }
+        else
+        {
+            if (set.getMemberType().isComplex())
+            {
+                remove((MetaClass)set.getMemberType());
+            }
         }
     }
 
@@ -671,7 +687,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         for (String arrayName : metaClass.getArrayArrayAttributesNames())
         {
-            removeAllAttributes(((MetaSet)metaClass.getMemberType(arrayName)).getId());
+            removeSet(((MetaSet)metaClass.getMemberType(arrayName)));
         }
 
         //delete all class attributes
@@ -684,12 +700,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         if(sqlStats != null)
         {
-            t = System.currentTimeMillis();
+            t = System.nanoTime();
         }
         jdbcTemplate.update(query, metaClass.getId());
         if(sqlStats != null)
         {
-            sqlStats.put(query, System.currentTimeMillis() - t);
+            sqlStats.put(query, (System.nanoTime() - t) / 1000000);
         }
 	}
 }

@@ -4,6 +4,9 @@ package kz.bsbnb.usci.eav_model.model.base.impl;
 import kz.bsbnb.usci.eav_model.model.Batch;
 import kz.bsbnb.usci.eav_model.model.base.IBaseValue;
 import kz.bsbnb.usci.eav_model.model.persistable.impl.Persistable;
+import kz.bsbnb.usci.eav_model.util.DateUtils;
+
+import java.sql.Date;
 
 /**
  * Attributes value place holder for BaseEntity. Contains information about batch and record number of the value's
@@ -30,6 +33,8 @@ public class BaseValue extends Persistable implements IBaseValue
      */
     private Object value;
 
+    private Date repDate;
+
     /**
      * Initializes batch value with a batch information, index and value.
      * @param batch information about the origin of this value.
@@ -37,6 +42,27 @@ public class BaseValue extends Persistable implements IBaseValue
      * @param value the value. May be is null.
      * @throws IllegalArgumentException if <code>Batch</code> is null or <code>Batch</code> has no id
      */
+    public BaseValue(Batch batch, long index, Date repDate, Object value)
+    {
+        if (repDate == null)
+            throw new IllegalArgumentException
+                    ("repDate is null. Initialization of the BaseValue ​​is not possible.");
+
+        if (batch == null)
+            throw new IllegalArgumentException
+                    ("Batch is null. Initialization of the BaseValue ​​is not possible.");
+
+        if (batch.getId() < 1)
+            throw new IllegalArgumentException
+                    ("Batch has no id. Initialization of the BaseValue ​​is not possible.");
+
+
+        this.batch = batch;
+        this.index = index;
+        this.value = value;
+        this.repDate = new Date(DateUtils.cutOffTime(repDate));
+    }
+
     public BaseValue(Batch batch, long index, Object value)
     {
         if (batch == null)
@@ -51,6 +77,7 @@ public class BaseValue extends Persistable implements IBaseValue
         this.batch = batch;
         this.index = index;
         this.value = value;
+        this.repDate = batch.getRepDate();
     }
 
     @Override
@@ -98,9 +125,20 @@ public class BaseValue extends Persistable implements IBaseValue
         {
             BaseValue that = (BaseValue)obj;
 
-            return index == that.index && batch.equals(that.batch) && !(value != null ? !value.equals(that.value) : that.value != null);
+            return index == that.index && batch.equals(that.batch) &&
+                    !(value != null ? !value.equals(that.value) : that.value != null) &&
+                    repDate.equals(that.repDate);
 
         }
     }
 
+    public Date getRepDate()
+    {
+        return repDate;
+    }
+
+    public void setRepDate(Date repDate)
+    {
+        this.repDate = repDate;
+    }
 }

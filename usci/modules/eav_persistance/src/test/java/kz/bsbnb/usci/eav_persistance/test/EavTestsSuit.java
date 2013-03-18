@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav_persistance.test;
 
 import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
+import kz.bsbnb.usci.eav_persistance.test.comporator.BasicBaseEntityComporatorTest;
 import kz.bsbnb.usci.eav_persistance.test.model.BaseEntityTest;
 import kz.bsbnb.usci.eav_persistance.test.model.BatchTest;
 import kz.bsbnb.usci.eav_persistance.test.model.batchdata.impl.BaseValueTest;
@@ -30,7 +31,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
         PostgreSQLBatchDaoImplTest.class,
         PostgreSQLMetaClassDaoImplTest.class,
        // BasicBaseEntitySearcherTest.class,
+        BasicBaseEntityComporatorTest.class,
         RelationTest1.class
+
             })
 public class EavTestsSuit
 {

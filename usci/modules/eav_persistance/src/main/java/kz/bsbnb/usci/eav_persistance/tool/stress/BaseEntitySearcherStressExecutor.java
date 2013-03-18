@@ -78,7 +78,7 @@ public class BaseEntitySearcherStressExecutor
 
             // --------
 
-            Batch batch = new Batch(new Timestamp(new Date().getTime()));
+            Batch batch = new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime()));
 
             long batchId = batchDao.save(batch);
 

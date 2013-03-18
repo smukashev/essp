@@ -62,7 +62,7 @@ public class MetaValue implements IMetaType
 	}
 
 	@Override
-	public boolean isArray()
+	public boolean isSet()
     {
 		return false;
 	}
@@ -72,4 +72,9 @@ public class MetaValue implements IMetaType
     {
 		return false;
 	}
+
+    @Override
+    public boolean isSetOfSets() {
+        return false;
+    }
 }

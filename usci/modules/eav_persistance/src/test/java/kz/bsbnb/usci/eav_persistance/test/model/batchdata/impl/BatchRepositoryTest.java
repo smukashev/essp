@@ -37,7 +37,7 @@ public class BatchRepositoryTest  extends GenericTestCase
     @Test
     public void testAddBatch() throws Exception {
 
-        Batch batchStored = new Batch(new Timestamp(new Date().getTime()));
+        Batch batchStored = new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime()));
 
         Long batchId = batchDao.save(batchStored);
 
@@ -48,7 +48,7 @@ public class BatchRepositoryTest  extends GenericTestCase
         Assert.assertEquals(batchRepo, batchGet);
 
         try{
-            Batch batchNotStored = batchRepository.addBatch(new Batch());
+            Batch batchNotStored = batchRepository.addBatch(new Batch(new java.sql.Date(System.currentTimeMillis())));
         }catch (Exception e){
             fail("Batch with no Id is not added");
         }

@@ -3,9 +3,11 @@ package kz.bsbnb.usci.eav_persistance.tool.stress;
 import kz.bsbnb.usci.eav_model.model.Batch;
 import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav_model.util.SetUtils;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav_persistance.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav_persistance.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav_persistance.stats.QueryEntry;
 import kz.bsbnb.usci.eav_persistance.stats.SQLQueriesStats;
@@ -15,9 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.sql.*;
+import java.util.*;
 import java.util.Date;
 
 public class BaseEntityStressExecutor
@@ -30,7 +31,11 @@ public class BaseEntityStressExecutor
     {
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
 
+        //big entities
         MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 20, 2, 4);
+
+        //moderate entities
+        //MetaClassGenerator metaClassGenerator = new MetaClassGenerator(15, 10, 2, 2);
         BaseEntityGenerator baseEntityGenerator = new BaseEntityGenerator();
 
         ClassPathXmlApplicationContext ctx
@@ -40,6 +45,7 @@ public class BaseEntityStressExecutor
         IMetaClassDao metaClassDao = ctx.getBean(IMetaClassDao.class);
         IBaseEntityDao baseEntityDao = ctx.getBean(IBaseEntityDao.class);
         IBatchDao batchDao = ctx.getBean(IBatchDao.class);
+        SQLQueriesStats stats = ctx.getBean(SQLQueriesStats.class);
 
         ArrayList<MetaClass> data = new ArrayList<MetaClass>();
 
@@ -59,15 +65,30 @@ public class BaseEntityStressExecutor
 
             for(int i = 0; i < dataSize; i++)
             {
+                double t1;
+                double t2;
+
+                t1 = System.nanoTime();
                 MetaClass metaClass = metaClassGenerator.generateMetaClass();
+                t2 = (System.nanoTime() - t1) / 1000000;
 
+                stats.put("_META_CLASS_GENERATION", t2);
+
+                t1 = System.nanoTime();
                 long metaClassId = metaClassDao.save(metaClass);
+                t2 = (System.nanoTime() - t1) / 1000000;
 
+                stats.put("_META_CLASS_SAVE", t2);
+
+                t1 = System.nanoTime();
                 metaClass = metaClassDao.load(metaClassId);
+                t2 = (System.nanoTime() - t1) / 1000000;
+
+                stats.put("_META_CLASS_LOAD", t2);
 
                 data.add(i, metaClass);
 
-                if(i % (dataSize / 10) == 0)
+                //if(i % (dataSize / 10) == 0)
                     System.out.print(".");
             }
 
@@ -75,7 +96,7 @@ public class BaseEntityStressExecutor
 
             // --------
 
-            Batch batch = new Batch(new Timestamp(new Date().getTime()));
+            Batch batch = new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime()));
 
             long batchId = batchDao.save(batch);
 
@@ -89,11 +110,29 @@ public class BaseEntityStressExecutor
             int i = 0;
             for (MetaClass metaClass : data)
             {
-                BaseEntity baseEntity = baseEntityGenerator.generateBaseEntity(batch, metaClass, ++index);
-                baseEntityDao.save(baseEntity);
+                double t1;
+                double t2;
+
+                t1 = System.nanoTime();
+                BaseEntity baseEntityCreate = baseEntityGenerator.generateBaseEntity(batch, metaClass, ++index);
+                t2 = (System.nanoTime() - t1) / 1000000;
+
+                stats.put("_BASE_ENTITY_GENERATION", t2);
+
+                t1 = System.nanoTime();
+                long baseEntityId = baseEntityDao.save(baseEntityCreate);
+                t2 = (System.nanoTime() - t1) / 1000000;
+
+                stats.put("_BASE_ENTITY_SAVE", t2);
+
+                t1 = System.nanoTime();
+                BaseEntity baseEntityLoad = baseEntityDao.load(baseEntityId);
+                t2 = (System.nanoTime() - t1) / 1000000;
+
+                stats.put("_BASE_ENTITY_LOAD", t2);
 
                 i++;
-                if(i % (dataSize / 10) == 0)
+                //if(i % (dataSize / 10) == 0)
                     System.out.print(".");
             }
         }
@@ -102,31 +141,47 @@ public class BaseEntityStressExecutor
             metaClassGenerator.printStats();
 
             SQLQueriesStats sqlStats = ctx.getBean(SQLQueriesStats.class);
+
+            HashMap<String, Long> tableCounts = storage.tableCounts();
+
+            System.out.println();
+            System.out.println("+---------+");
+            System.out.println("|  count  |");
+            System.out.println("+---------+");
+            List<String> tables = SetUtils.asSortedList(tableCounts.keySet());
+            for (String table : tables)
+            {
+                long count = tableCounts.get(table);
+
+                System.out.printf("| %7d | %s%n", count, table);
+            }
+            System.out.println("+---------+");
+
+
             storage.clear();
 
             if(sqlStats != null)
             {
                 System.out.println();
-                System.out.println("+---------+------------+------------------+");
-                System.out.println("|  count  |    avg     |      total       |");
-                System.out.println("+---------+------------+------------------+");
+                System.out.println("+---------+------------------+------------------------+");
+                System.out.println("|  count  |     avg (ms)     |       total (ms)       |");
+                System.out.println("+---------+------------------+------------------------+");
 
-                for (String query : sqlStats.getStats().keySet())
+                List<String> queries = SetUtils.asSortedList(sqlStats.getStats().keySet());
+                for (String query : queries)
                 {
                     QueryEntry qe = sqlStats.getStats().get(query);
 
-                    System.out.printf("| %7d | %10.6f | %16.6f | %s%n", qe.count,
+                    System.out.printf("| %7d | %16.6f | %22.6f | %s%n", qe.count,
                             qe.totalTime / qe.count, qe.totalTime, query);
                 }
 
-                System.out.println("+---------+------------+------------------+");
+                System.out.println("+---------+------------------+------------------------+");
             }
             else
             {
                 System.out.println("SQL stats off.");
             }
-
-            storage.clear();
         }
     }
 }

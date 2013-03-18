@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.sql.Date;
 import java.util.Calendar;
 import java.util.Random;
 
@@ -327,7 +328,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
         MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
-        Batch batch = batchRepository.addBatch(new Batch());
+        Batch batch = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
         BaseEntity entityCreate = new BaseEntity(metaLoad);
 
         MetaSet metaSetParent = (MetaSet)metaLoad.getMemberType("set_of_date_sets");
@@ -360,7 +361,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
         MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
-        Batch batch = batchRepository.addBatch(new Batch());
+        Batch batch = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
         BaseEntity entityCreate = new BaseEntity(metaLoad);
 
         Random random = new Random();
@@ -389,7 +390,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
         MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
-        Batch batch = batchRepository.addBatch(new Batch());
+        Batch batch = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
         BaseEntity entityCreate = new BaseEntity(metaLoad);
 
         Random random = new Random();

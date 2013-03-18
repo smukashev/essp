@@ -12,9 +12,7 @@ import kz.bsbnb.usci.eav_model.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implements EAV entity object. 
@@ -119,7 +117,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
             Class<?> expValueClass;
 
             if (type.isComplex())
-                if(type.isArray())
+                if(type.isSet())
                 {
                     expValueClass = BaseSet.class;
                 }
@@ -129,12 +127,12 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 }
             else
             {
-                if(type.isArray())
+                if(type.isSet())
                 {
                     MetaSet metaValue = (MetaSet)type;
 
                     IMetaType metaValueChild = metaValue.getMemberType();
-                    if (type.isArray())
+                    if (type.isSet())
                     {
                         expValueClass = BaseSet.class;
                         valueClass = value.getValue().getClass();
@@ -165,6 +163,17 @@ public class BaseEntity extends Persistable implements IBaseContainer
         values.put(name, value);
     }
 
+    @Override
+    public Set<IBaseValue> get() {
+        List<IBaseValue> list = new ArrayList<IBaseValue>(values.values());
+        return (new HashSet<IBaseValue>(list));
+    }
+
+    @Override
+    public IMetaType getMemberType(String name) {
+        return meta.getMemberType(name);
+    }
+
     /**
      * Set of simple attribute names that are actually set in entity
      *
@@ -181,7 +190,8 @@ public class BaseEntity extends Persistable implements IBaseContainer
      *
      * @return
      */
-    public Set<String> getPresentComplexAttributeNames() {
+    public Set<String> getPresentComplexAttributeNames()
+    {
         return SetUtils.intersection(meta.getComplexAttributesNames(), values.keySet());
     }
 
@@ -191,7 +201,8 @@ public class BaseEntity extends Persistable implements IBaseContainer
      * @param dataType - attributes are filtered by this type
      * @return
      */
-    public Set<String> getPresentSimpleSetAttributeNames(DataTypes dataType) {
+    public Set<String> getPresentSimpleSetAttributeNames(DataTypes dataType)
+    {
         return SetUtils.intersection(meta.getSimpleSetAttributesNames(dataType), values.keySet());
     }
 
@@ -200,14 +211,9 @@ public class BaseEntity extends Persistable implements IBaseContainer
      *
      * @return
      */
-    public Set<String> getPresentComplexArrayAttributeNames() {
-        return SetUtils.intersection(meta.getComplexArrayAttributesNames(), values.keySet());
-    }
-
-    @Override
-    public String toString()
+    public Set<String> getPresentComplexArrayAttributeNames()
     {
-        return meta.getClassName();
+        return SetUtils.intersection(meta.getComplexArrayAttributesNames(), values.keySet());
     }
 
     /**
@@ -280,7 +286,10 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 if(thisValue == null || thatValue == null)
                     return false;
 
-                if (this.getMeta().getMemberType(attributeName).isArray())
+                if(!thisValue.getRepDate().equals(thatValue.getRepDate()))
+                    return false;
+
+                if (this.getMeta().getMemberType(attributeName).isSet())
                 {
                     BaseSet thisSet = (BaseSet)(thisValue.getValue());
                     BaseSet thatSet = (BaseSet)(thatValue.getValue());
@@ -306,12 +315,9 @@ public class BaseEntity extends Persistable implements IBaseContainer
     }
 
     @Override
-    public Set<IBaseValue> get() {
-        return (Set<IBaseValue>) values.values();
+    public String toString()
+    {
+        return meta.getClassName();
     }
 
-    @Override
-    public IMetaType getMemberType(String name) {
-        return meta.getMemberType(name);
-    }
 }

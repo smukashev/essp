@@ -4,7 +4,10 @@ import java.io.Serializable;
 
 public interface IMetaType extends Serializable
 {
-	public boolean isArray();
+	public boolean isSet();
 
 	public boolean isComplex();
+
+    public boolean isSetOfSets();
+
 }

@@ -1,7 +1,9 @@
 package kz.bsbnb.usci.eav_model.model;
 
 import kz.bsbnb.usci.eav_model.model.persistable.impl.Persistable;
+import kz.bsbnb.usci.eav_model.util.DateUtils;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 
 /**
@@ -18,12 +20,16 @@ public class Batch extends Persistable
      */
     private Timestamp receiptDate = new Timestamp(java.util.Calendar.getInstance().getTimeInMillis());
 
+    private Date repDate;
+
     /**
      * Initializes batch with the default values.
      */
-    public Batch()
+    public Batch(Date repDate)
     {
         super();
+
+        this.repDate = repDate;
     }
 
     /**
@@ -31,9 +37,10 @@ public class Batch extends Persistable
      *
      * @param receiptDate the date and time of receipt of the batch.
      */
-    public Batch(Timestamp receiptDate)
+    public Batch(Timestamp receiptDate, Date repDate)
     {
         this.receiptDate = receiptDate;
+        this.repDate = new Date(DateUtils.cutOffTime(repDate));
     }
 
     public void setReceiptDate(Timestamp receiptDate)
@@ -66,5 +73,15 @@ public class Batch extends Persistable
         int result = super.hashCode();
         result = 31 * result + receiptDate.hashCode();
         return result;
+    }
+
+    public Date getRepDate()
+    {
+        return repDate;
+    }
+
+    public void setRepDate(Date repDate)
+    {
+        this.repDate = repDate;
     }
 }
