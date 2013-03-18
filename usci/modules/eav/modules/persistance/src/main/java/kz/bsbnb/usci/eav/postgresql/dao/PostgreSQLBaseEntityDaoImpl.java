@@ -13,6 +13,9 @@ import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.model.meta.impl.*;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
+import kz.bsbnb.usci.eav.util.DateUtils;
+import org.jooq.SelectForUpdateStep;
+import org.jooq.impl.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
+import static kz.bsbnb.eav.persistance.generated.Tables.*;
+
 /**
  * @author a.motov
  */
@@ -38,7 +43,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     private final Logger logger = LoggerFactory.getLogger(PostgreSQLBaseEntityDaoImpl.class);
 
     private String INSERT_ENTITY_SQL;
-    private String SELECT_ENTITY_BY_ID_SQL;
+    //private String SELECT_ENTITY_BY_ID_SQL;
     private String DELETE_ENTITY_BY_ID_SQL;
 
     private String INSERT_SIMPLE_VALUE_SQL;
@@ -67,19 +72,14 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     @Autowired
     IMetaClassRepository metaClassRepository;
 
+    @SuppressWarnings("SpringJavaAutowiringInspection")
+    @Autowired
+    private Executor sqlGenerator;
+
     @PostConstruct
     public void init()
     {
         INSERT_ENTITY_SQL = String.format("INSERT INTO %s (class_id) VALUES ( ? )", getConfig().getEntitiesTableName());
-        SELECT_ENTITY_BY_ID_SQL = String.format(
-                "SELECT e.id, " +
-                       "e.class_id, " +
-                       "c.name as class_name " +
-                  "FROM %s e, " +
-                       "%s c " +
-                 "WHERE e.id = ? " +
-                   "AND e.class_id = c.id",
-                getConfig().getEntitiesTableName(), getConfig().getClassesTableName());
         DELETE_ENTITY_BY_ID_SQL = String.format("DELETE FROM %s WHERE id = ?", getConfig().getEntitiesTableName());
 
         INSERT_SIMPLE_VALUE_SQL = "INSERT INTO %s (entity_id, batch_id, attribute_id, index, rep_date, value) VALUES ( ?, ?, ?, ?, ?, ? )";
@@ -174,7 +174,11 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             throw new IllegalArgumentException("Does not have id. Can't load.");
         }
 
-        List<Map<String, Object>> rows = queryForListWithStats(SELECT_ENTITY_BY_ID_SQL, id);
+        SelectForUpdateStep select = sqlGenerator
+                .select(EAV_ENTITIES.ID, EAV_ENTITIES.CLASS_ID)
+                .from(EAV_ENTITIES)
+                .where(EAV_ENTITIES.ID.equal((int)id));
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
         {
@@ -191,10 +195,10 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         if(row != null)
         {
-            MetaClass meta = metaClassRepository.getMetaClass((String) row.get("class_name"));
+            MetaClass meta = metaClassRepository.getMetaClass((Integer)row.get(EAV_ENTITIES.CLASS_ID.getName()));
 
             baseEntity = new BaseEntity(meta);
-            baseEntity.setId((Integer)row.get("id"));
+            baseEntity.setId((Integer)row.get(EAV_ENTITIES.ID.getName()));
         }
         else
         {
@@ -202,7 +206,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
 
         // simple values
-        loadSimpleValues(baseEntity);
+        loadIntegerValues(baseEntity);
+        loadDateValues(baseEntity);
 
         // complex values
         loadComplexValues(baseEntity);
@@ -630,61 +635,166 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         return setId;
     }
 
-    private void loadSimpleValues(BaseEntity baseEntity)
+    /*private void loadSimpleValues(BaseEntity baseEntity)
     {
-        for (DataTypes dataType: DataTypes.values()) {
-            String query;
 
-            switch(dataType)
-            {
-                case INTEGER: {
-                    query = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getBaseIntegerValuesTableName(), getConfig().getSimpleAttributesTableName());
-                    break;
-                }
-                case DATE: {
-                    query = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getBaseDateValuesTableName(), getConfig().getSimpleAttributesTableName());
-                    break;
-                }
-                case STRING: {
-                    query = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getBaseStringValuesTableName(), getConfig().getSimpleAttributesTableName());
-                    break;
-                }
-                case BOOLEAN: {
-                    query = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getBaseBooleanValuesTableName(), getConfig().getSimpleAttributesTableName());
-                    break;
-                }
-                case DOUBLE: {
-                    query = String.format(SELECT_SIMPLE_VALUES_BY_ENTITY_ID_SQL,
-                            getConfig().getBaseDoubleValuesTableName(), getConfig().getSimpleAttributesTableName());
-                    break;
-                }
-                default:
-                    throw new IllegalArgumentException("Unknown type.");
-            }
-            loadSimpleValues(baseEntity, query);
-        }
-    }
+    }*/
 
-    private void loadSimpleValues(BaseEntity baseEntity, String query)
-    {
-        logger.debug(query);
-        List<Map<String, Object>> rows = queryForListWithStats(query, baseEntity.getId());
+    private void loadIntegerValues(BaseEntity baseEntity) {
+        SelectForUpdateStep select = sqlGenerator
+                .select(EAV_BE_INTEGER_VALUES.BATCH_ID,
+                        EAV_SIMPLE_ATTRIBUTES.NAME,
+                        EAV_BE_INTEGER_VALUES.INDEX,
+                        EAV_BE_INTEGER_VALUES.REP_DATE,
+                        EAV_BE_INTEGER_VALUES.VALUE)
+                .from(EAV_BE_INTEGER_VALUES)
+                .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
+                .where(EAV_BE_INTEGER_VALUES.ENTITY_ID.equal((int)baseEntity.getId()));
 
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
         Iterator<Map<String, Object>> it = rows.iterator();
         while (it.hasNext())
         {
             Map<String, Object> row = it.next();
 
-            Batch batch = batchRepository.getBatch((Long)row.get("batch_id"));
-
-            baseEntity.put((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"),
-                    (Date) row.get("rep_date"), row.get("value")));
+            Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_INTEGER_VALUES.BATCH_ID.getName()));
+            baseEntity.put(
+                    (String) row.get(EAV_SIMPLE_ATTRIBUTES.NAME.getName()),
+                    new BaseValue(
+                            batch,
+                            (Long) row.get(EAV_BE_INTEGER_VALUES.INDEX.getName()),
+                            (java.sql.Date) row.get(EAV_BE_INTEGER_VALUES.REP_DATE.getName()),
+                            row.get(EAV_BE_INTEGER_VALUES.VALUE.getName())));
         }
     }
+
+    private void loadDateValues(BaseEntity baseEntity) {
+        SelectForUpdateStep select = sqlGenerator
+                .select(EAV_BE_DATE_VALUES.BATCH_ID,
+                        EAV_SIMPLE_ATTRIBUTES.NAME,
+                        EAV_BE_DATE_VALUES.INDEX,
+                        EAV_BE_DATE_VALUES.REP_DATE,
+                        EAV_BE_DATE_VALUES.VALUE)
+                .from(EAV_BE_DATE_VALUES)
+                .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
+                .where(EAV_BE_DATE_VALUES.ENTITY_ID.equal((int)baseEntity.getId()));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+        Iterator<Map<String, Object>> it = rows.iterator();
+        while (it.hasNext())
+        {
+            Map<String, Object> row = it.next();
+
+            Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_DATE_VALUES.BATCH_ID.getName()));
+            baseEntity.put(
+                    (String) row.get(EAV_SIMPLE_ATTRIBUTES.NAME.getName()),
+                    new BaseValue(
+                            batch,
+                            (Long) row.get(EAV_BE_DATE_VALUES.INDEX.getName()),
+                            (java.sql.Date) row.get(EAV_BE_DATE_VALUES.REP_DATE.getName()),
+                            DateUtils.convert((java.sql.Date) row.get(EAV_BE_DATE_VALUES.VALUE.getName()))));
+        }
+    }
+
+
+    /*private void loadSimpleValues(BaseEntity baseEntity, String query)
+    {
+        for (DataTypes dataType: DataTypes.values()) {
+            SelectForUpdateStep select;
+
+            switch(dataType)
+            {
+                case INTEGER: {
+                    select = sqlGenerator
+                            .select(EAV_BE_INTEGER_VALUES.BATCH_ID,
+                                    EAV_SIMPLE_ATTRIBUTES.NAME,
+                                    EAV_BE_INTEGER_VALUES.INDEX,
+                                    EAV_BE_INTEGER_VALUES.REP_DATE,
+                                    EAV_BE_INTEGER_VALUES.VALUE)
+                            .from(EAV_BE_INTEGER_VALUES)
+                            .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
+                            .where(EAV_BE_INTEGER_VALUES.ID.equal((int)baseEntity.getId()));
+
+                    List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+                    Iterator<Map<String, Object>> it = rows.iterator();
+                    while (it.hasNext())
+                    {
+                        Map<String, Object> row = it.next();
+
+                        Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_INTEGER_VALUES.BATCH_ID.getName()));
+
+                        baseEntity.put((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"),
+                                (Date) row.get("rep_date"), row.get("value")));
+                    }
+                    break;
+                }
+                case DATE: {
+                    select = sqlGenerator
+                            .select(EAV_BE_DATE_VALUES.BATCH_ID,
+                                    EAV_SIMPLE_ATTRIBUTES.NAME,
+                                    EAV_BE_DATE_VALUES.INDEX,
+                                    EAV_BE_DATE_VALUES.REP_DATE,
+                                    EAV_BE_DATE_VALUES.VALUE)
+                            .from(EAV_BE_DATE_VALUES)
+                            .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
+                            .where(EAV_BE_DATE_VALUES.ID.equal((int)baseEntity.getId()));
+                    break;
+                }
+                case STRING: {
+                    select = sqlGenerator
+                            .select(EAV_BE_STRING_VALUES.BATCH_ID,
+                                    EAV_SIMPLE_ATTRIBUTES.NAME,
+                                    EAV_BE_STRING_VALUES.INDEX,
+                                    EAV_BE_STRING_VALUES.REP_DATE,
+                                    EAV_BE_STRING_VALUES.VALUE)
+                            .from(EAV_BE_STRING_VALUES)
+                            .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
+                            .where(EAV_BE_STRING_VALUES.ID.equal((int)baseEntity.getId()));
+                    break;
+                }
+                case BOOLEAN: {
+                    select = sqlGenerator
+                            .select(EAV_BE_BOOLEAN_VALUES.BATCH_ID,
+                                    EAV_SIMPLE_ATTRIBUTES.NAME,
+                                    EAV_BE_BOOLEAN_VALUES.INDEX,
+                                    EAV_BE_BOOLEAN_VALUES.REP_DATE,
+                                    EAV_BE_BOOLEAN_VALUES.VALUE)
+                            .from(EAV_BE_BOOLEAN_VALUES)
+                            .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
+                            .where(EAV_BE_BOOLEAN_VALUES.ID.equal((int)baseEntity.getId()));
+                    break;
+                }
+                case DOUBLE: {
+                    select = sqlGenerator
+                            .select(EAV_BE_DOUBLE_VALUES.BATCH_ID,
+                                    EAV_SIMPLE_ATTRIBUTES.NAME,
+                                    EAV_BE_DOUBLE_VALUES.INDEX,
+                                    EAV_BE_DOUBLE_VALUES.REP_DATE,
+                                    EAV_BE_DOUBLE_VALUES.VALUE)
+                            .from(EAV_BE_DOUBLE_VALUES)
+                            .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
+                            .where(EAV_BE_DOUBLE_VALUES.ID.equal((int)baseEntity.getId()));
+                    break;
+                }
+                default:
+                    throw new IllegalArgumentException("Unknown type.");
+            }
+
+            logger.debug(query);
+            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+            Iterator<Map<String, Object>> it = rows.iterator();
+            while (it.hasNext())
+            {
+                Map<String, Object> row = it.next();
+
+                Batch batch = batchRepository.getBatch((Long)row.get("batch_id"));
+
+                baseEntity.put((String) row.get("attribute_name"), new BaseValue(batch, (Long) row.get("index"),
+                        (Date) row.get("rep_date"), row.get("value")));
+            }
+        }
+    }*/
 
     private void loadComplexValues(BaseEntity baseEntity)
     {
