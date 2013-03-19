@@ -24,4 +24,6 @@ public interface IBatchRepository
      * @return
      */
     public Batch addBatch(Batch batch);
+
+    public void clearCache();
 }

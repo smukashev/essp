@@ -5,6 +5,8 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.util.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Date;
 
@@ -18,6 +20,7 @@ import java.sql.Date;
  */
 public class BaseValue extends Persistable implements IBaseValue
 {
+    Logger logger = LoggerFactory.getLogger(BaseValue.class);
     /**
      * Information about the sequential number of record in the batch
      */
@@ -125,9 +128,19 @@ public class BaseValue extends Persistable implements IBaseValue
         {
             BaseValue that = (BaseValue)obj;
 
-            return index == that.index && batch.equals(that.batch) &&
+            boolean res = index == that.index && batch.equals(that.batch) &&
                     !(value != null ? !value.equals(that.value) : that.value != null) &&
                     repDate.equals(that.repDate);
+
+            logger.debug("Values: " + this.value + ", " + that.value);
+            logger.debug("BaseValue Equals main expression: " + res);
+            logger.debug("index == that.index: " + (index == that.index));
+            logger.debug("batch.equals(that.batch): " + (batch.equals(that.batch)));
+            logger.debug("!(value != null ? !value.equals(that.value) : that.value != null): " +
+                    !(value != null ? !value.equals(that.value) : that.value != null));
+            logger.debug("repDate.equals(that.repDate): " + (repDate.equals(that.repDate)));
+
+            return res;
 
         }
     }

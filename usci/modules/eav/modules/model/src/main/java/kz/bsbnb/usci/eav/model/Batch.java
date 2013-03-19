@@ -2,6 +2,8 @@ package kz.bsbnb.usci.eav.model;
 
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.util.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -15,6 +17,7 @@ import java.sql.Timestamp;
  */
 public class Batch extends Persistable
 {
+    Logger logger = LoggerFactory.getLogger(Batch.class);
     /**
      * Date and time of receipt of the batch.
      */
@@ -62,9 +65,8 @@ public class Batch extends Persistable
 
         Batch batch = (Batch) o;
 
-        if (!receiptDate.equals(batch.receiptDate)) return false;
-
-        return true;
+        logger.debug("Batch receipt date: " + receiptDate + ", " + batch.receiptDate);
+        return receiptDate.equals(batch.receiptDate);
     }
 
     @Override

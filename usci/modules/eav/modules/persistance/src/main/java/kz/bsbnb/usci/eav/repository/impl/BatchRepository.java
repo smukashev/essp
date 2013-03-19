@@ -30,7 +30,7 @@ public class BatchRepository implements IBatchRepository
      * @return
      */
     @Override
-    public Batch getBatch(long batchId)
+    public synchronized Batch getBatch(long batchId)
     {
         if (cache.containsKey(batchId))
             return cache.get(batchId);
@@ -50,7 +50,7 @@ public class BatchRepository implements IBatchRepository
      * @return
      */
     @Override
-    public Batch addBatch(Batch batch)
+    public synchronized Batch addBatch(Batch batch)
     {
         long batchId = batch.getId();
 
@@ -59,5 +59,11 @@ public class BatchRepository implements IBatchRepository
         //else TODO: Add batch update here
 
         return getBatch(batchId);
+    }
+
+    @Override
+    public synchronized void clearCache()
+    {
+        cache.clear();
     }
 }
