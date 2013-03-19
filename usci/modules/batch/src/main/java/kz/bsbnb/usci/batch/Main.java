@@ -12,9 +12,6 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.sql.Timestamp;
-import java.util.Date;
-
 /**
  *
  * @author k.tulbassiyev
@@ -37,7 +34,7 @@ public class Main
 
         IBatchDao batchDao = ctx.getBean(IBatchDao.class);
 
-        Batch batch = new Batch(new Timestamp(new Date().getTime()));
+        Batch batch = new Batch(new java.sql.Date(new java.util.Date().getTime()));
 
         long batchId = batchDao.save(batch);
 
