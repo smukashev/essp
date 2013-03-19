@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
+import com.sun.org.apache.bcel.internal.generic.ACONST_NULL;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -313,16 +314,41 @@ public class BaseEntity extends Persistable implements IBaseContainer
                     Set<IBaseValue> thisBatchValues = thisSet.get();
                     Set<IBaseValue> thatBatchValues = thatSet.get();
 
-                    if (!thisBatchValues.equals(thatBatchValues))
+                    logger.debug("Arrays sizes: " + thisBatchValues.size() + " " + thatBatchValues.size());
+                    if(thisBatchValues.size() != thatBatchValues.size())
+                    {
+                        logger.debug("Sizes are different");
                         return false;
+                    }
+
+                    if (!thisBatchValues.containsAll(thatBatchValues))
+                    {
+                        logger.debug("Arrays are different");
+                        return false;
+                    }
                 } else
                 {
                     logger.debug("It is a single value");
-                    IBaseValue thisBaseValue = this.getBaseValue(attributeName);
-                    IBaseValue thatBaseValue = that.getBaseValue(attributeName);
+                    Object thisActualValue = thisValue.getValue();
+                    Object thatActualValue = thatValue.getValue();
 
-                    if (!thisBaseValue.equals(thatBaseValue))
+                    if(thisActualValue == null && thatActualValue == null)
+                    {
+                        logger.debug("Both null so skipped.");
+                        continue;
+                    }
+
+                    if(thisActualValue == null || thatActualValue == null)
+                    {
+                        logger.debug("One is null");
                         return false;
+                    }
+
+                    if (!thisActualValue.equals(thatActualValue))
+                    {
+                        logger.debug("Single values are different.");
+                        return false;
+                    }
                 }
             }
 
