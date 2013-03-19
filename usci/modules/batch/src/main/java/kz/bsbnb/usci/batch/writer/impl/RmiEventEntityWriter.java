@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.batch.writer.impl;
 
 import kz.bsbnb.usci.batch.writer.AbstractWriter;
-import kz.bsbnb.usci.sync.service.IDataService;
+import kz.bsbnb.usci.sync.service.IEntityService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -18,7 +18,7 @@ import java.util.List;
 @Scope("step")
 public class RmiEventEntityWriter<T> implements AbstractWriter<T>
 {
-    IDataService dataService;
+    IEntityService dataService;
 
     @Autowired
     RmiProxyFactoryBean rmiProxyFactoryBean;
@@ -28,7 +28,7 @@ public class RmiEventEntityWriter<T> implements AbstractWriter<T>
     @PostConstruct
     public void init()
     {
-        dataService = (IDataService) rmiProxyFactoryBean.getObject();
+        dataService = (IEntityService) rmiProxyFactoryBean.getObject();
     }
 
     @Override

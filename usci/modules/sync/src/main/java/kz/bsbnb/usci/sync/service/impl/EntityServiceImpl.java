@@ -2,7 +2,7 @@ package kz.bsbnb.usci.sync.service.impl;
 
 import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.sync.job.impl.DataJob;
-import kz.bsbnb.usci.sync.service.IDataService;
+import kz.bsbnb.usci.sync.service.IEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * @author k.tulbassiyev
  */
 @Service
-public class DataServiceImpl implements IDataService
+public class EntityServiceImpl implements IEntityService
 {
     @Autowired
     private DataJob dataJob;

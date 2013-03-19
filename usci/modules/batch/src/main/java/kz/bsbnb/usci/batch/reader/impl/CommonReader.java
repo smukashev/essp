@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat;
  */
 public abstract class CommonReader<T> implements AbstractReader<T>
 {
-    @Autowired
+   /* @Autowired
     protected IStorage storage;
 
     @Autowired
@@ -37,7 +37,7 @@ public abstract class CommonReader<T> implements AbstractReader<T>
     protected IBaseEntityDao baseEntityDao;
 
     @Autowired
-    protected IMetaFactory metaFactory;
+    protected IMetaFactory metaFactory;*/
 
     @Autowired
     protected ParserHelper parserHelper;

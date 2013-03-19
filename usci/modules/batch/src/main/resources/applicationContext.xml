@@ -43,10 +43,11 @@
     <context:component-scan base-package="kz.bsbnb.usci.batch.reader.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.writer.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.processor.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.batch.factory.impl" />
 
     <bean id="dataService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1098/DataService"/>
-        <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IDataService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IEntityService"/>
     </bean>
 
     <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">

@@ -18,8 +18,8 @@ public class DataJob extends AbstractDataJob
     @Autowired
     RmiProxyFactoryBean rmiProxyFactoryBean;
 
-    @Autowired
-    BasicBaseEntitySearcherPool basicBaseEntitySearcherPool;
+   /* @Autowired
+    BasicBaseEntitySearcherPool basicBaseEntitySearcherPool;*/
 
     IEntityService entityService;
 
@@ -51,7 +51,6 @@ public class DataJob extends AbstractDataJob
 
                 if(processJobs.size() > 0)
                     removeDeadJobs();
-
             }
             catch(Exception e)
             {

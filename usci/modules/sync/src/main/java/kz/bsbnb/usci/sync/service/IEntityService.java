@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author k.tulbassiyev
  */
-public interface IDataService
+public interface IEntityService
 {
     public void process(List<BaseEntity> entities);
 }
