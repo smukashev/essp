@@ -53,4 +53,13 @@ public class DateUtils
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTimeInMillis();
     }
+
+    public static java.util.Date convert(java.sql.Date date) {
+        return date == null ? null : new java.util.Date(date.getTime());
+    }
+
+    public static java.sql.Date convert(java.util.Date date) {
+        return date == null ? null : new java.sql.Date(date.getTime());
+    }
+
 }
