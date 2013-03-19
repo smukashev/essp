@@ -148,10 +148,10 @@
       <foreign-key foreignTable="eav_complex_attributes">
         <reference local="attribute_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_entities">
+      <foreign-key foreignTable="eav_entities" name="cv_e_fk1">
         <reference local="entity_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_entities">
+      <foreign-key foreignTable="eav_entities" name="cv_e_fk2">
         <reference local="entity_value_id" foreign="id"/>
       </foreign-key>
       <index>
@@ -438,10 +438,10 @@
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="parent_set_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
       <column name="child_set_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
-      <foreign-key foreignTable="eav_be_sets">
+      <foreign-key foreignTable="eav_be_sets" name="socs_s_fk1">
         <reference local="child_set_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_be_sets">
+      <foreign-key foreignTable="eav_be_sets" name="socs_s_fk2">
         <reference local="parent_set_id" foreign="id"/>
       </foreign-key>
       <unique>
@@ -461,10 +461,10 @@
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="parent_set_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
       <column name="child_set_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
-      <foreign-key foreignTable="eav_be_sets">
+      <foreign-key foreignTable="eav_be_sets" name="sos_s_fk1">
         <reference local="child_set_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_be_sets">
+      <foreign-key foreignTable="eav_be_sets" name="sos_s_fk2">
         <reference local="parent_set_id" foreign="id"/>
       </foreign-key>
       <unique>
@@ -484,10 +484,10 @@
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
       <column name="parent_set_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
       <column name="child_set_id" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
-      <foreign-key foreignTable="eav_be_sets">
+      <foreign-key foreignTable="eav_be_sets" name="soss_s_fk1">
         <reference local="child_set_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_be_sets">
+      <foreign-key foreignTable="eav_be_sets" name="soss_s_fk2">
         <reference local="parent_set_id" foreign="id"/>
       </foreign-key>
       <unique>

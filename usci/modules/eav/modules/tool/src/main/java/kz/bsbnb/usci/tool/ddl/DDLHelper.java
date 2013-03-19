@@ -39,11 +39,11 @@ public class DDLHelper
 
         if (alterDb)
         {
-            platform.alterTables(targetModel, true);
+            platform.alterTables(targetModel, false);
         }
         else
         {
-            platform.createTables(targetModel, true, true);
+            platform.createTables(targetModel, true, false);
         }
     }
 
