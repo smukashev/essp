@@ -7,6 +7,9 @@ import kz.bsbnb.usci.eav_model.model.meta.IMetaType;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav_model.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.sync.service.IBatchService;
+import kz.bsbnb.usci.sync.service.IEntityService;
+import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -36,9 +39,17 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
     private Batch batch;
     private int index = 1, level = 0;
 
+    private IEntityService entityService;
+    private IBatchService batchService;
+    private IMetaFactoryService metaFactoryService;
+
     @PostConstruct
     public void init()
     {
+        entityService = (IEntityService) entityRmiService.getObject();
+        batchService = (IBatchService) batchRmiService.getObject();
+        metaFactoryService = (IMetaFactoryService) metaFactoryRmiService.getObject();
+
         File file = new File(fileName);
 
         byte[] byteArray = fileHelper.getFileBytes(file);
@@ -55,7 +66,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
             e.printStackTrace();
         }
 
-        batch = batchDao.load(batchId);
+        // batch = batchDao.load(batchId);
+        batch = batchService.load(batchId);
     }
 
     public void startElement(XMLEvent event, StartElement startElement, String localName)
@@ -70,7 +82,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
         }
         else if(localName.equals("entity"))
         {
-            currentContainer = metaFactory.getBaseEntity(
+            currentContainer = metaFactoryService.getBaseEntity(
                     startElement.getAttributeByName(new QName("class")).getValue());
         }
         else
@@ -80,13 +92,13 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
             if(metaType.isSet())
             {
                 stack.push(currentContainer);
-                currentContainer = metaFactory.getBaseSet(((MetaSet)metaType).getMemberType());
+                currentContainer = metaFactoryService.getBaseSet(((MetaSet)metaType).getMemberType());
                 level++;
             }
             else if(metaType.isComplex() && !metaType.isSet())
             {
                 stack.push(currentContainer);
-                currentContainer = metaFactory.getBaseEntity((MetaClass)metaType);
+                currentContainer = metaFactoryService.getBaseEntity((MetaClass)metaType);
                 level++;
             }
             else if(!metaType.isComplex() && !metaType.isSet())

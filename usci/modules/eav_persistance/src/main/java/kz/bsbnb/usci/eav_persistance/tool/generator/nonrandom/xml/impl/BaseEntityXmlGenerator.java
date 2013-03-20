@@ -25,10 +25,10 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
 
         document.appendChild(batchElement);
 
-        Element entitiesElement = document.createElement("packages");
+        Element entitiesElement = document.createElement("entities");
 
         for (BaseEntity baseEntity : baseEntities)
-            processBaseEntity(document, baseEntity, "package", true, entitiesElement);
+            processBaseEntity(document, baseEntity, "entity", true, entitiesElement);
 
         batchElement.appendChild(entitiesElement);
 

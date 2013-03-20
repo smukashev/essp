@@ -2,10 +2,10 @@ package kz.bsbnb.usci.batch;
 
 import com.couchbase.client.CouchbaseClient;
 import kz.bsbnb.usci.batch.factory.ICouchbaseClientFactory;
+import kz.bsbnb.usci.batch.factory.IServiceFactory;
 import kz.bsbnb.usci.batch.helper.impl.FileHelper;
 import kz.bsbnb.usci.eav_model.model.Batch;
-import kz.bsbnb.usci.eav_persistance.persistance.dao.IBatchDao;
-import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
+import kz.bsbnb.usci.sync.service.IBatchService;
 import org.apache.log4j.Logger;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -16,8 +16,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
-import java.net.URI;
-import java.util.ArrayList;
 
 /**
  *
@@ -32,29 +30,21 @@ public class Main
     {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 
-        IStorage storage = ctx.getBean(IStorage.class);
-
-        if(!storage.testConnection())
-        {
-            logger.error("Can't connect to storage.");
-            System.exit(1);
-        }
+        IServiceFactory serviceFactory = ctx.getBean(IServiceFactory.class);
+        IBatchService batchService = serviceFactory.getBatchService();
 
         ICouchbaseClientFactory couchbaseClientFactory = ctx.getBean(ICouchbaseClientFactory.class);
-
         CouchbaseClient client = couchbaseClientFactory.getCouchbaseClient();
 
         FileHelper fileHelper = ctx.getBean(FileHelper.class);
         File file  = new File(FILE_PATH);
         byte bytes[] = fileHelper.getFileBytes(file);
 
-        IBatchDao batchDao = ctx.getBean(IBatchDao.class);
-
         Batch batch = new Batch(new java.sql.Date(new java.util.Date().getTime()));
 
-        long batchId = batchDao.save(batch);
+        long batchId = batchService.save(batch);
 
-        client.set(""+batchId, 0, bytes);
+        client.set("batch:"+batchId, 0, bytes);
 
         JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
 

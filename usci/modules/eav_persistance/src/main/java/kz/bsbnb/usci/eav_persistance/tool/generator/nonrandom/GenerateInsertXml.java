@@ -23,15 +23,15 @@ import java.util.Date;
 /**
  * @author abukabayev
  */
-public class GenerateInsertXml {
-
-    private static final int DATA_SIZE=1;   // Number of entities to generate
+public class GenerateInsertXml
+{
+    private static final int DATA_SIZE = 1;   // Number of entities to generate
     private static String OS = System.getProperty("os.name").toLowerCase();
     private final static String FILE_PATH_UNIX = "/opt/xmls/test.xml";
     private final static String FILE_PATH_WINDOWS = "D:/DevTemp/test.xml";
 
-    public static void main(String args[]){
-
+    public static void main(String args[])
+    {
         BaseEntityXmlGenerator baseEntityXmlGenerator = new BaseEntityXmlGenerator();
 
         MetaClassGenerator metaClassGenerator = new MetaClassGenerator();
@@ -48,7 +48,7 @@ public class GenerateInsertXml {
         IBaseEntityDao baseEntityDao = ctx.getBean(IBaseEntityDao.class);
         IBatchDao batchDao = ctx.getBean(IBatchDao.class);
 
-        AttributeTree tree = new AttributeTree("packages",null);
+        AttributeTree tree = new AttributeTree("entities",null);
         TreeGenerator helper = new TreeGenerator();
 
         if(!storage.testConnection())
@@ -71,12 +71,7 @@ public class GenerateInsertXml {
 
                 Long id = metaClassDao.save(metaClass);
                 data.add(metaClassDao.load(id));
-//                Set<String> ss = metaClass.getAttributeNames();
-//                for (String s:ss){
-//                    System.out.print(s+" ");
-//                }
 
-//               System.out.println(metaClass.equals(metaClassDao.load(id)));
             }
 
             for (MetaClass m:metaClassGenerator.getMetaClasses()){

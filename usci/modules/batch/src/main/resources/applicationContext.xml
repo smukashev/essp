@@ -45,11 +45,6 @@
     <context:component-scan base-package="kz.bsbnb.usci.batch.processor.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.factory.impl" />
 
-    <bean id="dataService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
-        <property name="serviceUrl" value="rmi://127.0.0.1:1098/DataService"/>
-        <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IEntityService"/>
-    </bean>
-
     <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
         <property name="transactionManager" ref="transactionManager" />
     </bean>
@@ -67,11 +62,26 @@
         </batch:step>
     </batch:job>
 
-
     <bean id="stRawGroupDir" class="org.stringtemplate.v4.STRawGroupDir">
         <constructor-arg index="0" value="${ds.templates_dir}"/>
         <constructor-arg index="1" value="$"/>
         <constructor-arg index="2" value="$"/>
+    </bean>
+
+    <!-- remote services -->
+    <bean id="remoteEntityService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1098/entityService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IEntityService"/>
+    </bean>
+
+    <bean id="remoteBatchService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1098/batchService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IBatchService"/>
+    </bean>
+
+    <bean id="remoteMetaFactoryService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1098/metaFactoryService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IMetaFactoryService"/>
     </bean>
 
 </beans>

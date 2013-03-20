@@ -4,6 +4,7 @@ import kz.bsbnb.usci.batch.writer.AbstractWriter;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
@@ -18,24 +19,24 @@ import java.util.List;
 @Scope("step")
 public class RmiEventEntityWriter<T> implements AbstractWriter<T>
 {
-    IEntityService dataService;
-
     @Autowired
-    RmiProxyFactoryBean rmiProxyFactoryBean;
+    @Qualifier(value = "remoteEntityService")
+    private RmiProxyFactoryBean rmiProxyFactoryBean;
 
+    private IEntityService entityService;
     private Logger logger = Logger.getLogger(RmiEventEntityWriter.class);
 
     @PostConstruct
     public void init()
     {
-        dataService = (IEntityService) rmiProxyFactoryBean.getObject();
+        entityService = (IEntityService) rmiProxyFactoryBean.getObject();
     }
 
     @Override
     public void write(List items) throws Exception
     {
         long t1 = System.currentTimeMillis();
-        dataService.process(items);
+        entityService.process(items);
         long t2 = System.currentTimeMillis() - t1;
 
         logger.info("[batch][service][data]               :               " + t2);

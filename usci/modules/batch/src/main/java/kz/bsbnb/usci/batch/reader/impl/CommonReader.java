@@ -4,16 +4,13 @@ import kz.bsbnb.usci.batch.common.Global;
 import kz.bsbnb.usci.batch.helper.impl.FileHelper;
 import kz.bsbnb.usci.batch.helper.impl.ParserHelper;
 import kz.bsbnb.usci.batch.reader.AbstractReader;
-import kz.bsbnb.usci.eav_persistance.factory.IMetaFactory;
-import kz.bsbnb.usci.eav_persistance.persistance.dao.IBaseEntityDao;
-import kz.bsbnb.usci.eav_persistance.persistance.dao.IBatchDao;
-import kz.bsbnb.usci.eav_persistance.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.xml.stream.XMLEventReader;
 import java.text.DateFormat;
@@ -24,20 +21,17 @@ import java.text.SimpleDateFormat;
  */
 public abstract class CommonReader<T> implements AbstractReader<T>
 {
-   /* @Autowired
-    protected IStorage storage;
+    @Autowired
+    @Qualifier(value = "remoteMetaFactoryService")
+    protected RmiProxyFactoryBean metaFactoryRmiService;
 
     @Autowired
-    protected IMetaClassDao metaClassDao;
+    @Qualifier(value = "remoteBatchService")
+    protected RmiProxyFactoryBean batchRmiService;
 
     @Autowired
-    protected IBatchDao batchDao;
-
-    @Autowired
-    protected IBaseEntityDao baseEntityDao;
-
-    @Autowired
-    protected IMetaFactory metaFactory;*/
+    @Qualifier(value = "remoteEntityService")
+    protected RmiProxyFactoryBean entityRmiService;
 
     @Autowired
     protected ParserHelper parserHelper;

@@ -20,4 +20,10 @@ public class BatchServiceImpl implements IBatchService
     {
         return batchDao.save(batch);
     }
+
+    @Override
+    public Batch load(long batchId)
+    {
+        return batchDao.load(batchId);
+    }
 }

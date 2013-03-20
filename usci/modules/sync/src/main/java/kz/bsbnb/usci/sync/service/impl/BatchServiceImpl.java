@@ -34,4 +34,10 @@ public class BatchServiceImpl implements IBatchService
     {
         return remoteBatchService.save(batch);
     }
+
+    @Override
+    public Batch load(long batchId)
+    {
+        return remoteBatchService.load(batchId);
+    }
 }

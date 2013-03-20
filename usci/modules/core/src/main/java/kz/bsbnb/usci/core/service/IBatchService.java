@@ -8,4 +8,5 @@ import kz.bsbnb.usci.eav_model.model.Batch;
 public interface IBatchService
 {
     public long save(Batch batch);
+    public Batch load(long batchId);
 }

@@ -50,7 +50,11 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
         {
             IMetaType metaType = meta.getMemberType(name);
 
-            if(metaType.isComplex() && metaType.isSet())
+            if(metaType.isSetOfSets() && metaType.isComplex())
+                doComplexSetOfSets(entity, metaType, document, element, name);
+            else if(metaType.isSetOfSets() && metaType.isSet())
+                doSimpleSetOfSets(entity, metaType, document, element, name);
+            else if(metaType.isComplex() && metaType.isSet())
                 doComplexArray(entity, metaType, document, element, name);
             else if(metaType.isComplex() && !metaType.isSet())
                 doComplexValue(entity, metaType, document, element, name);
@@ -63,10 +67,24 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
         parentElement.appendChild(element);
     }
 
+    public void doComplexSetOfSets(BaseEntity entity, IMetaType metaType,
+                           Document document, Element parentElement, String name)
+    {
+        BaseSet memberSet = (BaseSet) entity.getBaseValue(name).getValue();
+        // todo: implement
+    }
+
+    public void doSimpleSetOfSets(BaseEntity entity, IMetaType metaType,
+                                   Document document, Element parentElement, String name)
+    {
+        // todo: implement
+    }
+
     public void doComplexArray(BaseEntity entity, IMetaType metaType, Document document,
                                 Element parentElement, String name)
     {
         Element arrayContainer = document.createElement(name);
+
         for (IBaseValue batchValue : (((BaseSet)entity.getBaseValue(name).getValue()).get()))
         {
             BaseEntity memberEntity = (BaseEntity) batchValue.getValue();
