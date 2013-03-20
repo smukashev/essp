@@ -4,6 +4,7 @@ import kz.bsbnb.usci.batch.common.Global;
 import kz.bsbnb.usci.batch.helper.impl.FileHelper;
 import kz.bsbnb.usci.batch.helper.impl.ParserHelper;
 import kz.bsbnb.usci.batch.reader.AbstractReader;
+import kz.bsbnb.usci.batch.repository.IServiceRepository;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
@@ -22,16 +23,7 @@ import java.text.SimpleDateFormat;
 public abstract class CommonReader<T> implements AbstractReader<T>
 {
     @Autowired
-    @Qualifier(value = "remoteMetaFactoryService")
-    protected RmiProxyFactoryBean metaFactoryRmiService;
-
-    @Autowired
-    @Qualifier(value = "remoteBatchService")
-    protected RmiProxyFactoryBean batchRmiService;
-
-    @Autowired
-    @Qualifier(value = "remoteEntityService")
-    protected RmiProxyFactoryBean entityRmiService;
+    protected IServiceRepository serviceRepository;
 
     @Autowired
     protected ParserHelper parserHelper;

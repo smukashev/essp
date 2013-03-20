@@ -2,7 +2,7 @@ package kz.bsbnb.usci.batch;
 
 import com.couchbase.client.CouchbaseClient;
 import kz.bsbnb.usci.batch.factory.ICouchbaseClientFactory;
-import kz.bsbnb.usci.batch.factory.IServiceFactory;
+import kz.bsbnb.usci.batch.repository.IServiceRepository;
 import kz.bsbnb.usci.batch.helper.impl.FileHelper;
 import kz.bsbnb.usci.eav_model.model.Batch;
 import kz.bsbnb.usci.sync.service.IBatchService;
@@ -30,7 +30,7 @@ public class Main
     {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 
-        IServiceFactory serviceFactory = ctx.getBean(IServiceFactory.class);
+        IServiceRepository serviceFactory = ctx.getBean(IServiceRepository.class);
         IBatchService batchService = serviceFactory.getBatchService();
 
         ICouchbaseClientFactory couchbaseClientFactory = ctx.getBean(ICouchbaseClientFactory.class);
@@ -41,13 +41,11 @@ public class Main
         byte bytes[] = fileHelper.getFileBytes(file);
 
         Batch batch = new Batch(new java.sql.Date(new java.util.Date().getTime()));
-
         long batchId = batchService.save(batch);
 
         client.set("batch:"+batchId, 0, bytes);
 
         JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
-
         Job job = ctx.getBean(Job.class);
 
         try

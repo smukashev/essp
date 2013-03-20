@@ -39,16 +39,14 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
     private Batch batch;
     private int index = 1, level = 0;
 
-    private IEntityService entityService;
     private IBatchService batchService;
     private IMetaFactoryService metaFactoryService;
 
     @PostConstruct
     public void init()
     {
-        entityService = (IEntityService) entityRmiService.getObject();
-        batchService = (IBatchService) batchRmiService.getObject();
-        metaFactoryService = (IMetaFactoryService) metaFactoryRmiService.getObject();
+        batchService = serviceRepository.getBatchService();
+        metaFactoryService = serviceRepository.getMetaFactoryService();
 
         File file = new File(fileName);
 
@@ -66,7 +64,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
             e.printStackTrace();
         }
 
-        // batch = batchDao.load(batchId);
         batch = batchService.load(batchId);
     }
 

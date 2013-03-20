@@ -1,6 +1,6 @@
-package kz.bsbnb.usci.batch.factory.impl;
+package kz.bsbnb.usci.batch.repository.impl;
 
-import kz.bsbnb.usci.batch.factory.IServiceFactory;
+import kz.bsbnb.usci.batch.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
@@ -15,7 +15,7 @@ import javax.annotation.PostConstruct;
  * @author k.tulbassiyev
  */
 @Repository
-public class ServiceFactoryImpl implements IServiceFactory
+public class ServiceRepositoryImpl implements IServiceRepository
 {
     @Autowired
     @Qualifier(value = "remoteMetaFactoryService")
