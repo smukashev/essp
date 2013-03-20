@@ -94,7 +94,7 @@ public class JDBCSupport {
         int count = jdbcTemplate.update(sql, args);
 
         if(sqlStats != null)
-            sqlStats.put(sql, (System.nanoTime() - t) / 1000000);
+            sqlStats.put(sql, (System.nanoTime() - t) / 1000);
 
         return count;
     }
@@ -108,12 +108,12 @@ public class JDBCSupport {
         int[] counts = jdbcTemplate.batchUpdate(sql, batchArgs);
 
         double t2 = System.nanoTime() - t1;
-        //double t3 = (t2 % batchArgs.size()) / 1000000;
+        //double t3 = (t2 % batchArgs.size()) / 1000;
 
         if(sqlStats != null)
         {
             //for (int i = 0; i < batchArgs.size(); i++)
-                sqlStats.put(sql, t2 / 1000000);
+                sqlStats.put(sql, t2 / 1000);
         }
 
         return counts;
@@ -128,7 +128,7 @@ public class JDBCSupport {
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, args);
 
         double t2 = System.nanoTime() - t1;
-        //double t3 = (t2 % rows.size()) / 1000000;
+        //double t3 = (t2 % rows.size()) / 1000;
 
         if(sqlStats != null)
         {

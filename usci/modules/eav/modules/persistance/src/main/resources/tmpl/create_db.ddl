@@ -33,10 +33,12 @@
       </unique>
       <index>
         <index-column name="containing_id"/>
+        <index-column name="container_type"/>
       </index>
       <index>
         <index-column name="name"/>
         <index-column name="containing_id"/>
+        <index-column name="container_type"/>
       </index>
       <unique>
         <unique-column name="id"/>
@@ -641,6 +643,7 @@
       <index>
         <index-column name="begin_date"/>
         <index-column name="name"/>
+        <index-column name="is_disabled"/>
       </index>
     </table>
     <table name="eav_complex_attributes">
@@ -659,6 +662,7 @@
       </index>
       <index>
         <index-column name="containing_id"/>
+        <index-column name="container_type"/>
       </index>
     </table>
     <table name="eav_complex_set">
@@ -675,6 +679,7 @@
       </unique>
       <index>
         <index-column name="containing_id"/>
+        <index-column name="container_type"/>
       </index>
     </table>
     <table name="eav_entities">
@@ -707,6 +712,10 @@
       <unique>
         <unique-column name="id"/>
       </unique>
+      <index>
+        <index-column name="containing_id"/>
+        <index-column name="container_type"/>
+      </index>
     </table>
     <table name="eav_set_of_sets">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
@@ -719,6 +728,10 @@
       <unique>
         <unique-column name="id"/>
       </unique>
+      <index>
+        <index-column name="containing_id"/>
+        <index-column name="container_type"/>
+      </index>
     </table>
     <table name="eav_simple_attributes">
       <column name="id" primaryKey="true" required="true" type="INTEGER" size="10" autoIncrement="true"/>
@@ -733,6 +746,7 @@
       </unique>
       <index>
         <index-column name="containing_id"/>
+        <index-column name="container_type"/>
       </index>
     </table>
     <table name="eav_simple_set">
@@ -749,6 +763,7 @@
       </unique>
       <index>
         <index-column name="containing_id"/>
+        <index-column name="container_type"/>
       </index>
     </table>
   </database>

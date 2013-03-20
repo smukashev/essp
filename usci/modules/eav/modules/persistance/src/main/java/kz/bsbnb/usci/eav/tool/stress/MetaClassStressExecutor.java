@@ -6,18 +6,21 @@ import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.tool.generator.data.impl.MetaClassGenerator;
+import kz.bsbnb.usci.eav.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
 
 public class MetaClassStressExecutor
 {
     private final static Logger logger = LoggerFactory.getLogger(MetaClassStressExecutor.class);
 
-    private final static int dataSize = 100;
+    private final static int dataSize = 1000;
 
     public static void main(String[] args)
     {
@@ -28,8 +31,11 @@ public class MetaClassStressExecutor
         ClassPathXmlApplicationContext ctx
                 = new ClassPathXmlApplicationContext("applicationContext.xml");
 
+        long t = 0;
+
         IStorage storage = ctx.getBean(IStorage.class);
         IMetaClassDao dao = ctx.getBean(IMetaClassDao.class);
+        SQLQueriesStats sqlStats = ctx.getBean(SQLQueriesStats.class);
 
         ArrayList<MetaClass> data = new ArrayList<MetaClass>();
 
@@ -49,9 +55,13 @@ public class MetaClassStressExecutor
 
             for(int i = 0; i < dataSize; i++)
             {
+                t = System.nanoTime();
                 MetaClass metaClass = gen.generateMetaClass();
+                sqlStats.put("GENERATE_METACLASS", (double)(System.nanoTime() - t) / 1000000);
 
+                t = System.nanoTime();
                 dao.save(metaClass);
+                sqlStats.put("SAVE_METACLASS", (double)(System.nanoTime() - t) / 1000000);
                 data.add(i, metaClass);
 
                 if(i % (dataSize / 10) == 0)
@@ -77,7 +87,9 @@ public class MetaClassStressExecutor
 
                 try
                 {
+                    t = System.nanoTime();
                     MetaClass loadedMetaClassByName = dao.load(mc.getClassName());
+                    sqlStats.put("LOAD_METACLASS", (double)(System.nanoTime() - t) / 1000000);
 
                     if(!mc.equals(loadedMetaClassByName))
                         logger.error("Mismatch with loaded by Name");
@@ -136,7 +148,21 @@ public class MetaClassStressExecutor
 
         System.out.println("-------------------------------------");
 
-        SQLQueriesStats sqlStats = ctx.getBean(SQLQueriesStats.class);
+        HashMap<String, Long> tableCounts = storage.tableCounts();
+
+        System.out.println();
+        System.out.println("+---------+");
+        System.out.println("|  count  |");
+        System.out.println("+---------+");
+        List<String> tables = SetUtils.asSortedList(tableCounts.keySet());
+        for (String table : tables)
+        {
+            long count = tableCounts.get(table);
+
+            System.out.printf("| %7d | %s%n", count, table);
+        }
+        System.out.println("+---------+");
+
         storage.clear();
 
         if(sqlStats != null)

@@ -69,19 +69,19 @@ public class BaseEntityStressExecutor
 
                 t1 = System.nanoTime();
                 MetaClass metaClass = metaClassGenerator.generateMetaClass();
-                t2 = (System.nanoTime() - t1) / 1000000;
+                t2 = (System.nanoTime() - t1) / 1000;
 
                 stats.put("_META_CLASS_GENERATION", t2);
 
                 t1 = System.nanoTime();
                 long metaClassId = metaClassDao.save(metaClass);
-                t2 = (System.nanoTime() - t1) / 1000000;
+                t2 = (System.nanoTime() - t1) / 1000;
 
                 stats.put("_META_CLASS_SAVE", t2);
 
                 t1 = System.nanoTime();
                 metaClass = metaClassDao.load(metaClassId);
-                t2 = (System.nanoTime() - t1) / 1000000;
+                t2 = (System.nanoTime() - t1) / 1000;
 
                 stats.put("_META_CLASS_LOAD", t2);
 
@@ -114,19 +114,19 @@ public class BaseEntityStressExecutor
 
                 t1 = System.nanoTime();
                 BaseEntity baseEntityCreate = baseEntityGenerator.generateBaseEntity(batch, metaClass, ++index);
-                t2 = (System.nanoTime() - t1) / 1000000;
+                t2 = (System.nanoTime() - t1) / 1000;
 
                 stats.put("_BASE_ENTITY_GENERATION", t2);
 
                 t1 = System.nanoTime();
                 long baseEntityId = baseEntityDao.save(baseEntityCreate);
-                t2 = (System.nanoTime() - t1) / 1000000;
+                t2 = (System.nanoTime() - t1) / 1000;
 
                 stats.put("_BASE_ENTITY_SAVE", t2);
 
                 t1 = System.nanoTime();
                 BaseEntity baseEntityLoad = baseEntityDao.load(baseEntityId);
-                t2 = (System.nanoTime() - t1) / 1000000;
+                t2 = (System.nanoTime() - t1) / 1000;
 
                 stats.put("_BASE_ENTITY_LOAD", t2);
 
