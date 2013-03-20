@@ -2,12 +2,13 @@ package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav_persistance.persistance.impl.searcher.BasicBaseEntitySearcherPool;
 import kz.bsbnb.usci.sync.job.AbstractDataJob;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
+import javax.annotation.Resource;
 import java.util.Iterator;
 
 /**
@@ -16,6 +17,7 @@ import java.util.Iterator;
 public class DataJob extends AbstractDataJob
 {
     @Autowired
+    @Qualifier(value = "entityService")
     RmiProxyFactoryBean rmiProxyFactoryBean;
 
    /* @Autowired

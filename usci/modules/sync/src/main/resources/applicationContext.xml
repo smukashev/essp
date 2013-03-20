@@ -33,15 +33,41 @@
 
     <context:component-scan base-package="kz.bsbnb.usci.sync.service.impl" />
 
-    <bean id="baseEntityService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
-        <property name="serviceUrl" value="rmi://127.0.0.1:1099/EntityService"/>
+    <!-- remote services -->
+    <bean id="entityService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1099/entityService"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IEntityService"/>
     </bean>
 
-    <bean id="rmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
-        <property name="serviceName" value="DataService"/>
+    <bean id="batchService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1099/batchService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IBatchService"/>
+    </bean>
+
+    <bean id="metaFactoryService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1099/metaFactoryService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IMetaFactoryService"/>
+    </bean>
+
+    <!-- available services -->
+    <bean id="entityRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="entityService"/>
         <property name="service" ref="entityServiceImpl"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IEntityService"/>
+        <property name="registryPort" value="1098"/>
+    </bean>
+
+    <bean id="batchRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="batchService"/>
+        <property name="service" ref="batchServiceImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IBatchService"/>
+        <property name="registryPort" value="1098"/>
+    </bean>
+
+    <bean id="metaFactoryRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="metaFactoryService"/>
+        <property name="service" ref="metaFactoryServiceImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IMetaFactoryService"/>
         <property name="registryPort" value="1098"/>
     </bean>
 

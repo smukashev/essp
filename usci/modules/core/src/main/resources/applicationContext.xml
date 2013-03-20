@@ -11,6 +11,7 @@
     <context:component-scan base-package="kz.bsbnb.usci.core.service.impl" />
 
     <context:annotation-config/>
+
     <!-- Add this tag to enable annotations transactions -->
     <tx:annotation-driven transaction-manager="txManager"/>
 
@@ -54,10 +55,25 @@
 
     <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav_persistance.repository.impl.BatchRepository"/>
 
-    <bean id="rmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
-        <property name="serviceName" value="EntityService"/>
+    <!-- services -->
+    <bean id="entityRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="entityService"/>
         <property name="service" ref="entityServiceImpl"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IEntityService"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
+    <bean id="batchRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="batchService"/>
+        <property name="service" ref="batchServiceImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IBatchService"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
+    <bean id="metaFactoryRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="metaFactoryService"/>
+        <property name="service" ref="metaFactoryServiceImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IMetaFactoryService"/>
         <property name="registryPort" value="1099"/>
     </bean>
 
