@@ -1,18 +1,3 @@
-<<<<<<< HEAD:usci/modules/eav_persistance/src/main/java/kz/bsbnb/usci/eav_persistance/tool/stress/BaseEntitySearcherStressExecutor.java
-package kz.bsbnb.usci.eav_persistance.tool.stress;
-
-import kz.bsbnb.usci.eav_model.comparator.impl.BasicBaseEntityComparator;
-import kz.bsbnb.usci.eav_model.model.Batch;
-import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav_persistance.persistance.dao.IBaseEntityDao;
-import kz.bsbnb.usci.eav_persistance.persistance.dao.IBatchDao;
-import kz.bsbnb.usci.eav_persistance.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav_persistance.persistance.impl.searcher.BasicBaseEntitySearcher;
-import kz.bsbnb.usci.eav_persistance.persistance.storage.IStorage;
-import kz.bsbnb.usci.eav_persistance.tool.generator.random.data.impl.BaseEntityGenerator;
-import kz.bsbnb.usci.eav_persistance.tool.generator.random.data.impl.MetaClassGenerator;
-=======
 package kz.bsbnb.usci.eav.tool.stress;
 
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
@@ -26,7 +11,6 @@ import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.tool.generator.data.impl.BaseEntityGenerator;
 import kz.bsbnb.usci.eav.tool.generator.data.impl.MetaClassGenerator;
->>>>>>> jooq:usci/modules/eav/modules/persistance/src/main/java/kz/bsbnb/usci/eav/tool/stress/BaseEntitySearcherStressExecutor.java
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

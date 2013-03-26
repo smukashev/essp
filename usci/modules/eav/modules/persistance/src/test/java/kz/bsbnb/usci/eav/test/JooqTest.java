@@ -7,12 +7,9 @@ import org.jooq.Query;
 import org.jooq.SQLDialect;
 import org.jooq.impl.Executor;
 import org.junit.Test;
-<<<<<<< HEAD:usci/modules/eav_persistance/src/test/java/kz/bsbnb/usci/eav_persistance/test/JooqTest.java
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-=======
->>>>>>> jooq:usci/modules/eav/modules/persistance/src/test/java/kz/bsbnb/usci/eav/test/JooqTest.java
 
 /**
  *
@@ -20,13 +17,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
 public class JooqTest {
-
-    @Test
-<<<<<<< HEAD:usci/modules/eav_persistance/src/test/java/kz/bsbnb/usci/eav_persistance/test/JooqTest.java
-    public void generateSQLTest() throws Exception
-=======
+   @Test
    public void generateSQLTest() throws Exception
->>>>>>> jooq:usci/modules/eav/modules/persistance/src/test/java/kz/bsbnb/usci/eav/test/JooqTest.java
    {
        Query query;
        Executor create = new Executor(SQLDialect.POSTGRES);
@@ -45,5 +37,4 @@ public class JooqTest {
        System.out.println("UPDATE_SQL: " + query.getSQL());
        System.out.println("UPDATE_SQL_BINDS: " + query.getBindValues());
    }
-
 }
