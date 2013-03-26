@@ -22,7 +22,7 @@
       <module>modules/model</module>
       <module>modules/persistance</module>
       <module>modules/tool</module>
-      <module>modules/eav_parent</module>
+      <module>modules/parent</module>
   </modules>
 
 </project>
