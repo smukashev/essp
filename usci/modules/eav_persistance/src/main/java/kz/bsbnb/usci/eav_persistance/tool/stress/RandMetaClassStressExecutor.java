@@ -17,7 +17,7 @@ public class RandMetaClassStressExecutor
 {
     private final static Logger logger = LoggerFactory.getLogger(RandMetaClassStressExecutor.class);
 
-    private final static int dataSize = 100;
+    private final static int dataSize = 1000;
 
     public static void main(String[] args)
     {
@@ -30,6 +30,7 @@ public class RandMetaClassStressExecutor
 
         IStorage storage = ctx.getBean(IStorage.class);
         IMetaClassDao dao = ctx.getBean(IMetaClassDao.class);
+        SQLQueriesStats sqlStats = ctx.getBean(SQLQueriesStats.class);
 
         ArrayList<MetaClass> data = new ArrayList<MetaClass>();
 
@@ -57,6 +58,8 @@ public class RandMetaClassStressExecutor
                 if(i % (dataSize / 10) == 0)
                     System.out.print(".");
             }
+
+            sqlStats.put("HEAP", (double)(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576);
 
             System.out.println();
 
@@ -89,6 +92,8 @@ public class RandMetaClassStressExecutor
                     else
                         logger.error("Can't load class: " + e.getMessage());
                 }
+
+                sqlStats.put("HEAP", (double)(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576);
 
                 i++;
 
@@ -136,7 +141,6 @@ public class RandMetaClassStressExecutor
 
         System.out.println("-------------------------------------");
 
-        SQLQueriesStats sqlStats = ctx.getBean(SQLQueriesStats.class);
         storage.clear();
 
         if(sqlStats != null)
