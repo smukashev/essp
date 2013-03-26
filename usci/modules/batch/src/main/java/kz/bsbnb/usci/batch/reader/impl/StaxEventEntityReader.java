@@ -30,8 +30,7 @@ import java.util.Stack;
  */
 @Component
 @Scope("step")
-public class StaxEventEntityReader<T> extends CommonReader<T>
-{
+public class StaxEventEntityReader<T> extends CommonReader<T> {
     private Logger logger = Logger.getLogger(StaxEventEntityReader.class);
     private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
     private IBaseContainer currentContainer;
@@ -42,8 +41,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
     private IMetaFactoryService metaFactoryService;
 
     @PostConstruct
-    public void init()
-    {
+    public void init() {
         batchService = serviceRepository.getBatchService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
 
@@ -54,62 +52,43 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
         ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray);
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 
-        try
-        {
+        try {
             xmlEventReader = inputFactory.createXMLEventReader(inputStream);
-        }
-        catch (XMLStreamException e)
-        {
+        } catch (XMLStreamException e) {
             e.printStackTrace();
         }
 
         batch = batchService.load(batchId);
     }
 
-    public void startElement(XMLEvent event, StartElement startElement, String localName)
-    {
-        if(localName.equals("batch"))
-        {
+    public void startElement(XMLEvent event, StartElement startElement, String localName) {
+        if(localName.equals("batch")) {
             logger.info("batch");
-        }
-        else if(localName.equals("entities"))
-        {
+        } else if(localName.equals("entities")) {
             logger.info("entities");
-        }
-        else if(localName.equals("entity"))
-        {
+        } else if(localName.equals("entity")) {
             currentContainer = metaFactoryService.getBaseEntity(
                     startElement.getAttributeByName(new QName("class")).getValue());
-        }
-        else
-        {
+        } else {
             IMetaType metaType = currentContainer.getMemberType(localName);
 
-            if(metaType.isSet())
-            {
+            if(metaType.isSet()) {
                 stack.push(currentContainer);
                 currentContainer = metaFactoryService.getBaseSet(((MetaSet)metaType).getMemberType());
                 level++;
-            }
-            else if(metaType.isComplex() && !metaType.isSet())
-            {
+            } else if(metaType.isComplex() && !metaType.isSet()) {
                 stack.push(currentContainer);
                 currentContainer = metaFactoryService.getBaseEntity((MetaClass)metaType);
                 level++;
-            }
-            else if(!metaType.isComplex() && !metaType.isSet())
-            {
+            } else if(!metaType.isComplex() && !metaType.isSet()) {
                 Object o = null;
                 MetaValue metaValue = (MetaValue) metaType;
 
-                try
-                {
+                try {
                     event = (XMLEvent) xmlEventReader.next();
                     o = parserHelper.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
                     xmlEventReader.next();
-                }
-                catch (NumberFormatException n)
-                {
+                } catch (NumberFormatException n) {
                     n.printStackTrace();
                 }
 
@@ -119,47 +98,32 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
     }
 
     @Override
-    public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException
-    {
-
-        while(xmlEventReader.hasNext())
-        {
+    public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException {
+        while(xmlEventReader.hasNext()) {
             XMLEvent event = (XMLEvent) xmlEventReader.next();
 
-            if(event.isStartDocument())
-            {
+            if(event.isStartDocument()) {
                 logger.info("start document");
-            }
-            else if(event.isStartElement())
-            {
+            } else if(event.isStartElement()) {
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
 
                 startElement(event, startElement, localName);
-            }
-            else if(event.isEndElement())
-            {
+            } else if(event.isEndElement()) {
                 EndElement endElement = event.asEndElement();
                 String localName = endElement.getName().getLocalPart();
 
-                if(localName.equals("batch"))
-                {
+                if(localName.equals("batch")) {
                     logger.info("batch");
-                }
-                else if(localName.equals("entities"))
-                {
+                } else if(localName.equals("entities")) {
                     logger.info("entities");
-                }
-                else if(localName.equals("entity"))
-                {
+                } else if(localName.equals("entity")) {
                     T entity = (T) currentContainer;
                     currentContainer = null;
                     index++;
 
                     return entity;
-                }
-                else
-                {
+                } else {
                     IMetaType metaType;
 
                     if(level == stack.size())
@@ -167,8 +131,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
                     else
                         metaType = currentContainer.getMemberType(localName);
 
-                    if(metaType.isComplex() || metaType.isSet())
-                    {
+                    if(metaType.isComplex() || metaType.isSet()) {
                         Object o = currentContainer;
                         currentContainer = stack.pop();
 
@@ -176,13 +139,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T>
                         level--;
                     }
                 }
-            }
-            else if(event.isEndDocument())
-            {
+            } else if(event.isEndDocument()) {
                 logger.info("end document");
-            }
-            else
-            {
+            } else {
                 logger.info(event);
             }
         }

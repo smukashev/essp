@@ -12,29 +12,21 @@ import java.io.IOException;
  * @author k.tulbassiyev
  */
 @Component
-public class FileHelper implements IHelper
-{
-    public byte[] getFileBytes(File file)
-    {
+public class FileHelper implements IHelper {
+    public byte[] getFileBytes(File file) {
         FileInputStream fii;
         byte bytes[];
 
-        try
-        {
+        try {
             fii = new FileInputStream(file);
-        }
-        catch (FileNotFoundException e)
-        {
+        } catch (FileNotFoundException e) {
             fii = null;
         }
 
-        try
-        {
+        try {
             bytes = new byte[fii.available()];
             fii.read(bytes);
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             bytes = null;
         }
 

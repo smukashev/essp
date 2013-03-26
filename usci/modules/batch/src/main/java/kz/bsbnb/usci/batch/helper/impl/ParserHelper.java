@@ -13,24 +13,18 @@ import java.util.Date;
  * @author k.tulbassiyev
  */
 @Component
-public class ParserHelper implements IHelper
-{
-    public Object getCastObject(DataTypes typeCode, String value)
-    {
-        switch(typeCode)
-        {
+public class ParserHelper implements IHelper {
+    public Object getCastObject(DataTypes typeCode, String value) {
+        switch(typeCode) {
             case INTEGER:
                 return Integer.parseInt(value);
             case DATE:
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Global.DATE_FORMAT);
                 Date date = null;
 
-                try
-                {
+                try {
                     date = simpleDateFormat.parse(value);
-                }
-                catch (ParseException e)
-                {
+                } catch (ParseException e) {
                     e.printStackTrace();
                 }
 

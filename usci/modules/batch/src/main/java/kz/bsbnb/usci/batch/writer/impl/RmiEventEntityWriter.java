@@ -17,8 +17,7 @@ import java.util.List;
  */
 @Component
 @Scope("step")
-public class RmiEventEntityWriter<T> implements AbstractWriter<T>
-{
+public class RmiEventEntityWriter<T> implements AbstractWriter<T> {
     @Autowired
     @Qualifier(value = "remoteEntityService")
     private RmiProxyFactoryBean rmiProxyFactoryBean;
@@ -27,14 +26,12 @@ public class RmiEventEntityWriter<T> implements AbstractWriter<T>
     private Logger logger = Logger.getLogger(RmiEventEntityWriter.class);
 
     @PostConstruct
-    public void init()
-    {
+    public void init() {
         entityService = (IEntityService) rmiProxyFactoryBean.getObject();
     }
 
     @Override
-    public void write(List items) throws Exception
-    {
+    public void write(List items) throws Exception {
         long t1 = System.currentTimeMillis();
         entityService.process(items);
         long t2 = System.currentTimeMillis() - t1;

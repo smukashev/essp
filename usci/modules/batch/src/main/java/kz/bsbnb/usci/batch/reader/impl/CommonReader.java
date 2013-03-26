@@ -18,8 +18,7 @@ import java.text.SimpleDateFormat;
 /**
  * @author k.tulbassiyev
  */
-public abstract class CommonReader<T> implements AbstractReader<T>
-{
+public abstract class CommonReader<T> implements AbstractReader<T> {
     @Autowired
     protected IServiceRepository serviceRepository;
 

@@ -13,31 +13,25 @@ import java.util.ArrayList;
  * @author k.tulbassiyev
  */
 @Repository
-public class CouchbaseClientFactoryImpl implements ICouchbaseClientFactory
-{
+public class CouchbaseClientFactoryImpl implements ICouchbaseClientFactory {
     private CouchbaseClient couchbaseClient;
     private Logger logger = Logger.getLogger(CouchbaseClientFactoryImpl.class);
 
     @PostConstruct
-    public void init()
-    {
+    public void init() {
         ArrayList<URI> nodes = new ArrayList<URI>();
         nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
-        try
-        {
+        try {
             couchbaseClient = new CouchbaseClient(nodes, "default", "");
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.info("Error connecting to Couchbase: " + e.getMessage());
             System.exit(1);
         }
     }
 
     @Override
-    public CouchbaseClient getCouchbaseClient()
-    {
+    public CouchbaseClient getCouchbaseClient() {
         return couchbaseClient;
     }
 }

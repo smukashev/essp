@@ -5,10 +5,8 @@ import org.xml.sax.SAXException;
 /**
  * @author k.tulbassiyev
  */
-public class UnknownTagException extends SAXException
-{
-    public UnknownTagException(String tagName)
-    {
+public class UnknownTagException extends SAXException {
+    public UnknownTagException(String tagName) {
         super("Unknown tag: " + tagName);
     }
 }
