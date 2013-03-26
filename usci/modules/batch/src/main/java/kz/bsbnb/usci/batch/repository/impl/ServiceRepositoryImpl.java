@@ -18,16 +18,16 @@ import javax.annotation.PostConstruct;
 public class ServiceRepositoryImpl implements IServiceRepository
 {
     @Autowired
-    @Qualifier(value = "remoteMetaFactoryService")
-    private RmiProxyFactoryBean metaFactoryRmiService;
+    @Qualifier(value = "remoteEntityService")
+    private RmiProxyFactoryBean entityRmiService;
 
     @Autowired
     @Qualifier(value = "remoteBatchService")
     private RmiProxyFactoryBean batchRmiService;
 
     @Autowired
-    @Qualifier(value = "remoteEntityService")
-    private RmiProxyFactoryBean entityRmiService;
+    @Qualifier(value = "remoteMetaFactoryService")
+    private RmiProxyFactoryBean metaFactoryRmiService;
 
     private IEntityService entityService;
     private IBatchService batchService;
