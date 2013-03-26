@@ -20,14 +20,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class BaseEntitySearcherStressExecutor
-{
+public class BaseEntitySearcherStressExecutor {
     private final static Logger logger = LoggerFactory.getLogger(BaseEntitySearcherStressExecutor.class);
-
     private final static int dataSize = 100;
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         BasicBaseEntitySearcher bes = new BasicBaseEntitySearcher();
         BasicBaseEntityComparator bec = new BasicBaseEntityComparator();
 
@@ -46,10 +43,8 @@ public class BaseEntitySearcherStressExecutor
 
         ArrayList<MetaClass> data = new ArrayList<MetaClass>();
 
-        try
-        {
-            if(!storage.testConnection())
-            {
+        try {
+            if(!storage.testConnection()) {
                 logger.error("Can't connect to storage.");
                 System.exit(1);
             }
@@ -60,10 +55,8 @@ public class BaseEntitySearcherStressExecutor
             System.out.println("Generation: ..........");
             System.out.print(  "Progress  : ");
 
-            for(int i = 0; i < dataSize; i++)
-            {
+            for(int i = 0; i < dataSize; i++) {
                 MetaClass metaClass = metaClassGenerator.generateMetaClass();
-
                 long metaClassId = metaClassDao.save(metaClass);
 
                 metaClass = metaClassDao.load(metaClassId);
@@ -81,23 +74,17 @@ public class BaseEntitySearcherStressExecutor
             Batch batch = new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime()));
 
             long batchId = batchDao.save(batch);
-
             batch = batchDao.load(batchId);
 
             long index = 0L;
 
-            for (MetaClass metaClass : data)
-            {
+            for (MetaClass metaClass : data) {
                 BaseEntity baseEntity = baseEntityGenerator.generateBaseEntity(batch, metaClass, ++index);
 
                 if (!bec.compare(baseEntity, baseEntity))
-                {
                     logger.error("Same objects rejected by searcher");
-                }
             }
-        }
-        finally
-        {
+        } finally {
             storage.clear();
         }
     }

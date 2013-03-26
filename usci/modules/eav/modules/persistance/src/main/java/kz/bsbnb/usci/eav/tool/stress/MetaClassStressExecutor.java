@@ -16,14 +16,12 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-public class MetaClassStressExecutor
-{
+public class MetaClassStressExecutor {
     private final static Logger logger = LoggerFactory.getLogger(MetaClassStressExecutor.class);
 
     private final static int dataSize = 1000;
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
 
         MetaClassGenerator gen = new MetaClassGenerator(25, 20, 2, 4);
@@ -39,8 +37,7 @@ public class MetaClassStressExecutor
 
         ArrayList<MetaClass> data = new ArrayList<MetaClass>();
 
-        if(!storage.testConnection())
-        {
+        if(!storage.testConnection()){
             logger.error("Can't connect to storage.");
             System.exit(1);
         }
@@ -51,8 +48,7 @@ public class MetaClassStressExecutor
         System.out.println("Generation: ..........");
         System.out.print(  "Progress  : ");
 
-        for(int i = 0; i < dataSize; i++)
-        {
+        for(int i = 0; i < dataSize; i++) {
             t = System.nanoTime();
             MetaClass metaClass = gen.generateMetaClass();
             sqlStats.put("GENERATE_METACLASS", (double)(System.nanoTime() - t) / 1000000);
@@ -62,7 +58,8 @@ public class MetaClassStressExecutor
             sqlStats.put("SAVE_METACLASS", (double)(System.nanoTime() - t) / 1000000);
             data.add(i, metaClass);
 
-            sqlStats.put("HEAP", (double)(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576);
+            sqlStats.put("HEAP",
+                    (double)(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576);
 
             if(i % (dataSize / 10) == 0)
                 System.out.print(".");
@@ -78,36 +75,32 @@ public class MetaClassStressExecutor
         int delta = data.size() / 10;
         int i = 0;
 
-        for(MetaClass mc : data)
-        {
+        for(MetaClass mc : data) {
             MetaClass loadedMetaClassById = dao.load(mc.getId());
 
             if(!mc.equals(loadedMetaClassById))
                 logger.error("Mismatch with loaded by Id");
 
-            try
-            {
+            try {
                 t = System.nanoTime();
                 MetaClass loadedMetaClassByName = dao.load(mc.getClassName());
                 sqlStats.put("LOAD_METACLASS", (double)(System.nanoTime() - t) / 1000000);
 
                 if(!mc.equals(loadedMetaClassByName))
                     logger.error("Mismatch with loaded by Name");
-            }
-            catch(IllegalArgumentException e)
-            {
+            } catch(IllegalArgumentException e) {
                 if(mc.isDisabled())
                     logger.debug("Disabled class skipped");
                 else
                     logger.error("Can't load class: " + e.getMessage());
             }
 
-            sqlStats.put("HEAP", (double)(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576);
+            sqlStats.put("HEAP",
+                    (double)(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576);
 
             i++;
 
-            if(i > delta)
-            {
+            if(i > delta) {
                 i = 0;
                 System.out.print(".");
             }
@@ -122,14 +115,11 @@ public class MetaClassStressExecutor
 
         i = 0;
 
-        for(MetaClass mc : gen.getMetaClasses())
-        {
+        for(MetaClass mc : gen.getMetaClasses()) {
             dao.remove(mc);
-
             i++;
 
-            if(i > delta)
-            {
+            if(i > delta) {
                 i = 0;
                 System.out.print(".");
             }
@@ -153,24 +143,23 @@ public class MetaClassStressExecutor
         System.out.println("|  count  |");
         System.out.println("+---------+");
         List<String> tables = SetUtils.asSortedList(tableCounts.keySet());
-        for (String table : tables)
-        {
+
+        for (String table : tables) {
             long count = tableCounts.get(table);
 
             System.out.printf("| %7d | %s%n", count, table);
         }
+
         System.out.println("+---------+");
 
         storage.clear();
 
-        if(sqlStats != null)
-        {
+        if(sqlStats != null) {
             System.out.println("+---------+------------+------------------+");
             System.out.println("|  count  |    avg     |      total       |");
             System.out.println("+---------+------------+------------------+");
 
-            for (String query : sqlStats.getStats().keySet())
-            {
+            for (String query : sqlStats.getStats().keySet()) {
                 QueryEntry qe = sqlStats.getStats().get(query);
 
                 System.out.printf("| %7d | %10.6f | %16.6f | %s%n", qe.count,
@@ -178,9 +167,7 @@ public class MetaClassStressExecutor
             }
 
             System.out.println("+---------+------------+------------------+");
-        }
-        else
-        {
+        } else {
             System.out.println("SQL stats off");
         }
     }

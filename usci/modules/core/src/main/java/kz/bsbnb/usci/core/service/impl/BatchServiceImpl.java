@@ -10,20 +10,17 @@ import org.springframework.stereotype.Service;
  * @author k.tulbassiyev
  */
 @Service
-public class BatchServiceImpl implements IBatchService
-{
+public class BatchServiceImpl implements IBatchService {
     @Autowired
     private IBatchDao batchDao;
 
     @Override
-    public long save(Batch batch)
-    {
+    public long save(Batch batch) {
         return batchDao.save(batch);
     }
 
     @Override
-    public Batch load(long batchId)
-    {
+    public Batch load(long batchId) {
         return batchDao.load(batchId);
     }
 }

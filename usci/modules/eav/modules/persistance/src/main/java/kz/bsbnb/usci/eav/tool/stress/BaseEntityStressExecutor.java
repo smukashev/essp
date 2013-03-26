@@ -20,14 +20,12 @@ import java.sql.*;
 import java.util.*;
 import java.util.Date;
 
-public class BaseEntityStressExecutor
-{
-    private final static Logger logger = LoggerFactory.getLogger(BaseEntityStressExecutor.class);
 
+public class BaseEntityStressExecutor {
+    private final static Logger logger = LoggerFactory.getLogger(BaseEntityStressExecutor.class);
     private final static int dataSize = 10;
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
 
         //big entities
@@ -48,10 +46,8 @@ public class BaseEntityStressExecutor
 
         ArrayList<MetaClass> data = new ArrayList<MetaClass>();
 
-        try
-        {
-            if(!storage.testConnection())
-            {
+        try {
+            if(!storage.testConnection()) {
                 logger.error("Can't connect to storage.");
                 System.exit(1);
             }
@@ -62,8 +58,7 @@ public class BaseEntityStressExecutor
             System.out.println("Generation MetaClasses : ..........");
             System.out.print(  "Progress               : ");
 
-            for(int i = 0; i < dataSize; i++)
-            {
+            for(int i = 0; i < dataSize; i++) {
                 double t1;
                 double t2;
 
@@ -107,8 +102,7 @@ public class BaseEntityStressExecutor
             System.out.print(  "Progress               : ");
 
             int i = 0;
-            for (MetaClass metaClass : data)
-            {
+            for (MetaClass metaClass : data) {
                 double t1;
                 double t2;
 
@@ -134,9 +128,7 @@ public class BaseEntityStressExecutor
                 //if(i % (dataSize / 10) == 0)
                     System.out.print(".");
             }
-        }
-        finally
-        {
+        } finally {
             metaClassGenerator.printStats();
 
             SQLQueriesStats sqlStats = ctx.getBean(SQLQueriesStats.class);
@@ -148,10 +140,8 @@ public class BaseEntityStressExecutor
             System.out.println("|  count  |");
             System.out.println("+---------+");
             List<String> tables = SetUtils.asSortedList(tableCounts.keySet());
-            for (String table : tables)
-            {
+            for (String table : tables) {
                 long count = tableCounts.get(table);
-
                 System.out.printf("| %7d | %s%n", count, table);
             }
             System.out.println("+---------+");
@@ -159,16 +149,14 @@ public class BaseEntityStressExecutor
 
             storage.clear();
 
-            if(sqlStats != null)
-            {
+            if(sqlStats != null) {
                 System.out.println();
                 System.out.println("+---------+------------------+------------------------+");
                 System.out.println("|  count  |     avg (ms)     |       total (ms)       |");
                 System.out.println("+---------+------------------+------------------------+");
 
                 List<String> queries = SetUtils.asSortedList(sqlStats.getStats().keySet());
-                for (String query : queries)
-                {
+                for (String query : queries) {
                     QueryEntry qe = sqlStats.getStats().get(query);
 
                     System.out.printf("| %7d | %16.6f | %22.6f | %s%n", qe.count,
@@ -176,9 +164,7 @@ public class BaseEntityStressExecutor
                 }
 
                 System.out.println("+---------+------------------+------------------------+");
-            }
-            else
-            {
+            } else {
                 System.out.println("SQL stats off.");
             }
         }

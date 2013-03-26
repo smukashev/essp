@@ -7,7 +7,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
 
-    <context:component-scan base-package="kz.bsbnb.usci.eav_persistance" />
+    <context:component-scan base-package="kz.bsbnb.usci.eav" />
     <context:component-scan base-package="kz.bsbnb.usci.core.service.impl" />
 
     <context:annotation-config/>
@@ -32,12 +32,6 @@
         </property>
     </bean>
 
-    <bean id="stRawGroupDir" class="org.stringtemplate.v4.STRawGroupDir">
-        <constructor-arg index="0" value="${ds.templates_dir}"/>
-        <constructor-arg index="1" value="$"/>
-        <constructor-arg index="2" value="$"/>
-    </bean>
-
     <!-- spring transaction manager -->
     <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
@@ -53,7 +47,7 @@
         <property name="maxActive" value="${ds.pool.maxActive}"/>
     </bean>
 
-    <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav_persistance.repository.impl.BatchRepository"/>
+    <bean id="batchReporsitory" class="kz.bsbnb.usci.eav.repository.impl.BatchRepository"/>
 
     <!-- services -->
     <bean id="entityRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
@@ -75,6 +69,10 @@
         <property name="service" ref="metaFactoryServiceImpl"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IMetaFactoryService"/>
         <property name="registryPort" value="1099"/>
+    </bean>
+
+    <bean id="sqlGenerator" class="org.jooq.impl.Executor">
+        <constructor-arg index="0" value="POSTGRES"/>
     </bean>
 
 </beans>

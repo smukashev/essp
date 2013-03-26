@@ -73,4 +73,8 @@
 
     <bean class="kz.bsbnb.usci.sync.job.impl.DataJob" id="dataJob" init-method="start" />
 
+    <bean id="sqlGenerator" class="org.jooq.impl.Executor">
+        <constructor-arg index="0" value="POSTGRES"/>
+    </bean>
+
 </beans>
