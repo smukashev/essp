@@ -21,13 +21,11 @@ import java.io.File;
  *
  * @author k.tulbassiyev
  */
-public class Main
-{
+public class Main {
     private static Logger logger = Logger.getLogger(Main.class);
     private static final String FILE_PATH = "/opt/xmls/test.xml";
 
-    public static void main(String args[])
-    {
+    public static void main(String args[]) {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 
         IServiceRepository serviceFactory = ctx.getBean(IServiceRepository.class);
@@ -48,32 +46,21 @@ public class Main
         JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
         Job job = ctx.getBean(Job.class);
 
-        try
-        {
+        try {
             JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
             jobParametersBuilder.addParameter("fileName", new JobParameter(FILE_PATH));
             jobParametersBuilder.addParameter("batchId", new JobParameter(batchId));
 
             jobLauncher.run(job, jobParametersBuilder.toJobParameters());
-        }
-        catch (JobExecutionAlreadyRunningException e)
-        {
+        } catch (JobExecutionAlreadyRunningException e) {
             e.printStackTrace();
-        }
-        catch (JobRestartException e)
-        {
+        } catch (JobRestartException e) {
             e.printStackTrace();
-        }
-        catch (JobInstanceAlreadyCompleteException e)
-        {
+        } catch (JobInstanceAlreadyCompleteException e) {
             e.printStackTrace();
-        }
-        catch (JobParametersInvalidException e)
-        {
+        } catch (JobParametersInvalidException e) {
             e.printStackTrace();
-        }
-        finally
-        {
+        } finally {
             client.shutdown();
         }
     }

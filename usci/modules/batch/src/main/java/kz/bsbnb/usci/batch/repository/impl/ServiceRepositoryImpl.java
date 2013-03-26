@@ -15,8 +15,7 @@ import javax.annotation.PostConstruct;
  * @author k.tulbassiyev
  */
 @Repository
-public class ServiceRepositoryImpl implements IServiceRepository
-{
+public class ServiceRepositoryImpl implements IServiceRepository {
     @Autowired
     @Qualifier(value = "remoteEntityService")
     private RmiProxyFactoryBean entityRmiService;
@@ -34,28 +33,24 @@ public class ServiceRepositoryImpl implements IServiceRepository
     private IMetaFactoryService metaFactoryService;
 
     @PostConstruct
-    public void init()
-    {
+    public void init() {
         entityService = (IEntityService) entityRmiService.getObject();
         batchService = (IBatchService) batchRmiService.getObject();
         metaFactoryService = (IMetaFactoryService) metaFactoryRmiService.getObject();
     }
 
     @Override
-    public IEntityService getEntityService()
-    {
+    public IEntityService getEntityService() {
         return entityService;
     }
 
     @Override
-    public IBatchService getBatchService()
-    {
+    public IBatchService getBatchService() {
         return batchService;
     }
 
     @Override
-    public IMetaFactoryService getMetaFactoryService()
-    {
+    public IMetaFactoryService getMetaFactoryService() {
         return metaFactoryService;
     }
 }
