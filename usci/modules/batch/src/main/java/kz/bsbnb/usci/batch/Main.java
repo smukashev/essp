@@ -4,6 +4,7 @@ import com.couchbase.client.CouchbaseClient;
 import kz.bsbnb.usci.batch.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.batch.repository.IServiceRepository;
 import kz.bsbnb.usci.batch.helper.impl.FileHelper;
+import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import org.apache.log4j.Logger;
 import org.springframework.batch.core.*;

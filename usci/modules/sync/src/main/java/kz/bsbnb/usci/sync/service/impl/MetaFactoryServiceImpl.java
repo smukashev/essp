@@ -1,10 +1,9 @@
 package kz.bsbnb.usci.sync.service.impl;
 
-import kz.bsbnb.usci.core.Main;
-import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav_model.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav_model.model.meta.IMetaType;
-import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,7 +27,8 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService
     @PostConstruct
     public void init()
     {
-        remoteMetaFactoryService = (kz.bsbnb.usci.core.service.IMetaFactoryService) rmiProxyFactoryBean.getObject();
+        remoteMetaFactoryService =
+                (kz.bsbnb.usci.core.service.IMetaFactoryService) rmiProxyFactoryBean.getObject();
     }
 
     @Override

@@ -1,9 +1,9 @@
 package kz.bsbnb.usci.sync.service;
 
-import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav_model.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav_model.model.meta.IMetaType;
-import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
 /**
  * @author k.tulbassiyev

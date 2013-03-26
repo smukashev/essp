@@ -1,11 +1,11 @@
 package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.IMetaFactoryService;
-import kz.bsbnb.usci.eav_model.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav_model.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav_model.model.meta.IMetaType;
-import kz.bsbnb.usci.eav_model.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav_persistance.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

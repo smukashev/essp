@@ -1,8 +1,6 @@
 package kz.bsbnb.usci.sync.service.impl;
 
-import kz.bsbnb.usci.core.Main;
-import kz.bsbnb.usci.core.service.IMetaFactoryService;
-import kz.bsbnb.usci.eav_model.model.Batch;
+import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
