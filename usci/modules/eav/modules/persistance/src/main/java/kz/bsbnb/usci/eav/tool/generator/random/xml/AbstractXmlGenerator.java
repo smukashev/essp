@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav.tool.generator.xml;
+package kz.bsbnb.usci.eav.tool.generator.random.xml;
 
 import org.w3c.dom.Document;
 

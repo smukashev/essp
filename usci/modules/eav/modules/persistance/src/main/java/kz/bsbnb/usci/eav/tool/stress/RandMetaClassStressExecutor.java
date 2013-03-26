@@ -5,7 +5,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
-import kz.bsbnb.usci.eav.tool.generator.data.impl.MetaClassGenerator;
+import kz.bsbnb.usci.eav.tool.generator.random.data.impl.MetaClassGenerator;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +16,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-public class MetaClassStressExecutor {
-    private final static Logger logger = LoggerFactory.getLogger(MetaClassStressExecutor.class);
+public class RandMetaClassStressExecutor {
+    private final static Logger logger = LoggerFactory.getLogger(RandMetaClassStressExecutor.class);
 
     private final static int dataSize = 1000;
 
