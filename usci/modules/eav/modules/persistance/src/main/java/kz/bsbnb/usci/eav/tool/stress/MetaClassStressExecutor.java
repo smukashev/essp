@@ -39,107 +39,105 @@ public class MetaClassStressExecutor
 
         ArrayList<MetaClass> data = new ArrayList<MetaClass>();
 
-        try
+        if(!storage.testConnection())
         {
-            if(!storage.testConnection())
-            {
-                logger.error("Can't connect to storage.");
-                System.exit(1);
-            }
+            logger.error("Can't connect to storage.");
+            System.exit(1);
+        }
 
-            storage.clear();
-            storage.initialize();
+        storage.clear();
+        storage.initialize();
 
-            System.out.println("Generation: ..........");
-            System.out.print(  "Progress  : ");
+        System.out.println("Generation: ..........");
+        System.out.print(  "Progress  : ");
 
-            for(int i = 0; i < dataSize; i++)
+        for(int i = 0; i < dataSize; i++)
+        {
+            t = System.nanoTime();
+            MetaClass metaClass = gen.generateMetaClass();
+            sqlStats.put("GENERATE_METACLASS", (double)(System.nanoTime() - t) / 1000000);
+
+            t = System.nanoTime();
+            dao.save(metaClass);
+            sqlStats.put("SAVE_METACLASS", (double)(System.nanoTime() - t) / 1000000);
+            data.add(i, metaClass);
+
+            sqlStats.put("HEAP", (double)(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576);
+
+            if(i % (dataSize / 10) == 0)
+                System.out.print(".");
+        }
+
+        System.out.println();
+
+        // --------
+
+        System.out.println("Testing   : ..........");
+        System.out.print(  "Progress  : ");
+
+        int delta = data.size() / 10;
+        int i = 0;
+
+        for(MetaClass mc : data)
+        {
+            MetaClass loadedMetaClassById = dao.load(mc.getId());
+
+            if(!mc.equals(loadedMetaClassById))
+                logger.error("Mismatch with loaded by Id");
+
+            try
             {
                 t = System.nanoTime();
-                MetaClass metaClass = gen.generateMetaClass();
-                sqlStats.put("GENERATE_METACLASS", (double)(System.nanoTime() - t) / 1000000);
+                MetaClass loadedMetaClassByName = dao.load(mc.getClassName());
+                sqlStats.put("LOAD_METACLASS", (double)(System.nanoTime() - t) / 1000000);
 
-                t = System.nanoTime();
-                dao.save(metaClass);
-                sqlStats.put("SAVE_METACLASS", (double)(System.nanoTime() - t) / 1000000);
-                data.add(i, metaClass);
-
-                if(i % (dataSize / 10) == 0)
-                    System.out.print(".");
+                if(!mc.equals(loadedMetaClassByName))
+                    logger.error("Mismatch with loaded by Name");
             }
-
-            System.out.println();
-
-            // --------
-
-            System.out.println("Testing   : ..........");
-            System.out.print(  "Progress  : ");
-
-            int delta = data.size() / 10;
-            int i = 0;
-
-            for(MetaClass mc : data)
+            catch(IllegalArgumentException e)
             {
-                MetaClass loadedMetaClassById = dao.load(mc.getId());
-
-                if(!mc.equals(loadedMetaClassById))
-                    logger.error("Mismatch with loaded by Id");
-
-                try
-                {
-                    t = System.nanoTime();
-                    MetaClass loadedMetaClassByName = dao.load(mc.getClassName());
-                    sqlStats.put("LOAD_METACLASS", (double)(System.nanoTime() - t) / 1000000);
-
-                    if(!mc.equals(loadedMetaClassByName))
-                        logger.error("Mismatch with loaded by Name");
-                }
-                catch(IllegalArgumentException e)
-                {
-                    if(mc.isDisabled())
-                        logger.debug("Disabled class skipped");
-                    else
-                        logger.error("Can't load class: " + e.getMessage());
-                }
-
-                i++;
-
-                if(i > delta)
-                {
-                    i = 0;
-                    System.out.print(".");
-                }
+                if(mc.isDisabled())
+                    logger.debug("Disabled class skipped");
+                else
+                    logger.error("Can't load class: " + e.getMessage());
             }
 
-            System.out.println();
+            sqlStats.put("HEAP", (double)(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576);
 
-            System.out.println("Removing  : ..........");
-            System.out.print("Progress  : ");
+            i++;
 
-            delta = gen.getMetaClasses().size() / 10;
-
-            i = 0;
-
-            for(MetaClass mc : gen.getMetaClasses())
+            if(i > delta)
             {
-                dao.remove(mc);
-
-                i++;
-
-                if(i > delta)
-                {
-                    i = 0;
-                    System.out.print(".");
-                }
+                i = 0;
+                System.out.print(".");
             }
-
-            if(!storage.isClean())
-                logger.error("Storage is not clean after test");
         }
-        finally
+
+        System.out.println();
+
+        System.out.println("Removing  : ..........");
+        System.out.print("Progress  : ");
+
+        delta = gen.getMetaClasses().size() / 10;
+
+        i = 0;
+
+        for(MetaClass mc : gen.getMetaClasses())
         {
-            storage.clear();
+            dao.remove(mc);
+
+            i++;
+
+            if(i > delta)
+            {
+                i = 0;
+                System.out.print(".");
+            }
         }
+
+        if(!storage.isClean())
+            logger.error("Storage is not clean after test");
+
 
         System.out.println();
         System.out.println("Test ended at: " + Calendar.getInstance().getTime());
