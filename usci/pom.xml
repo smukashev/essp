@@ -12,8 +12,7 @@
   <description>Uniform System of Collecting Indicators</description>
 
   <modules>
-      <module>modules/eav_model</module>
-      <module>modules/eav_persistance</module>
+      <module>modules/eav</module>
       <module>modules/core</module>
       <module>modules/batch</module>
       <module>modules/sync</module>

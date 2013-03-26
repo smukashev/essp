@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.core.service;
 
-import kz.bsbnb.usci.eav_model.model.Batch;
+import kz.bsbnb.usci.eav.model.Batch;
 
 /**
  * @author k.tulbassiyev

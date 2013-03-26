@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.batch;
 
+<<<<<<< HEAD
 import com.couchbase.client.CouchbaseClient;
 import kz.bsbnb.usci.batch.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.batch.repository.IServiceRepository;
@@ -14,8 +15,8 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import java.io.File;
+import java.util.Date;
 
 /**
  *

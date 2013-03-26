@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+
+    <context:annotation-config/>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:properties/dataSource.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="log4jInitializer" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="staticMethod" value="org.springframework.util.Log4jConfigurer.initLogging"/>
+        <property name="arguments">
+            <list>
+                <value>classpath:properties/log4j.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- datasource to the database -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${ds.driver}"/>
+        <property name="url" value="${ds.url}"/>
+        <property name="username" value="${ds.user}"/>
+        <property name="password" value="${ds.password}"/>
+        <property name="initialSize" value="${ds.pool.initialSize}"/>
+        <property name="maxActive" value="${ds.pool.maxActive}"/>
+    </bean>
+</beans>
