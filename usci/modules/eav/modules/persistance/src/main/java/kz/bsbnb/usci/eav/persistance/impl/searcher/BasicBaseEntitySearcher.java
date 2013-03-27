@@ -57,8 +57,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         }
     }
 
-    @Override
-    public ArrayList<BaseEntity> findAll(BaseEntity entity)
+    private SelectConditionStep generateSQL(BaseEntity entity)
     {
         MetaClass meta = entity.getMeta();
 
@@ -68,8 +67,6 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         {
             throw new IllegalArgumentException("MetaData can't be null");
         }
-
-        ArrayList<BaseEntity> result = new ArrayList<BaseEntity>();
 
         Set<String> names = meta.getMemberNames();
 
@@ -98,7 +95,6 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
             {
                 if (!type.isComplex())
                 {
-                    //joins = joins.leftOuterJoin()
                     MetaValue simple_value = (MetaValue)type;
 
                     switch (simple_value.getTypeCode())
@@ -133,6 +129,12 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                             throw new IllegalStateException("Unknown data type: " + simple_value.getTypeCode() +
                                     " for attribute: " + name);
                     }
+                }
+                else
+                {
+                    joins = joins.leftOuterJoin(EAV_BE_COMPLEX_VALUES.as(name)).
+                            on(EAV_ENTITIES.ID.equal(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_ID).
+                                    and(EAV_BE_COMPLEX_VALUES.as(name).ATTRIBUTE_ID.equal((int)attribute.getId())));
                 }
             }
         }
@@ -170,7 +172,6 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
             {
                 if (!type.isComplex())
                 {
-                    //joins = joins.leftOuterJoin()
                     MetaValue simple_value = (MetaValue)type;
 
                     switch (simple_value.getTypeCode())
@@ -240,12 +241,41 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                     " for attribute: " + name);
                     }
                 }
+                else
+                {
+                    BaseEntity actual_complex_value = (BaseEntity)value.getValue();
+
+                    SelectConditionStep innerSQL = generateSQL(actual_complex_value);
+
+                    if (condition == null)
+                    {
+                        condition = EAV_BE_COMPLEX_VALUES.as(name).ENTITY_VALUE_ID.in(innerSQL);
+                    }
+                    else
+                    {
+                        if (and)
+                            condition = condition.and(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_VALUE_ID.in(innerSQL));
+                        else
+                            condition = condition.or(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_VALUE_ID.in(innerSQL));
+                    }
+                }
             }
         }
 
         where = where.and(condition);
 
         logger.debug("Searcher SQL after conditions generated: " + where.toString());
+
+        return where;
+    }
+
+    @Override
+    public ArrayList<BaseEntity> findAll(BaseEntity entity)
+    {
+        MetaClass meta = entity.getMeta();
+        ArrayList<BaseEntity> result = new ArrayList<BaseEntity>();
+
+        SelectConditionStep where = generateSQL(entity);
 
         List<Map<String, Object>> rows = queryForListWithStats(where.getSQL(), where.getBindValues().toArray());
 
