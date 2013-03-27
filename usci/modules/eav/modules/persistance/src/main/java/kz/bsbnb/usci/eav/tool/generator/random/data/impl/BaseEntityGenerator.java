@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav.tool.generator.data.impl;
+package kz.bsbnb.usci.eav.tool.generator.random.data.impl;
 
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -6,7 +6,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.*;
-import kz.bsbnb.usci.eav.tool.generator.data.AbstractDataGenerator;
+import kz.bsbnb.usci.eav.tool.generator.random.data.AbstractDataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
