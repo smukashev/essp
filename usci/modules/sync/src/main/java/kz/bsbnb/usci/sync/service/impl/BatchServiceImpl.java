@@ -13,29 +13,25 @@ import javax.annotation.PostConstruct;
  * @author k.tulbassiyev
  */
 @Service
-public class BatchServiceImpl implements IBatchService
-{
+public class BatchServiceImpl implements IBatchService {
     @Autowired
-    @Qualifier(value = "batchService")
+    @Qualifier(value = "remoteBatchService")
     RmiProxyFactoryBean rmiProxyFactoryBean;
 
     kz.bsbnb.usci.core.service.IBatchService remoteBatchService;
 
     @PostConstruct
-    public void init()
-    {
+    public void init() {
         remoteBatchService = (kz.bsbnb.usci.core.service.IBatchService) rmiProxyFactoryBean.getObject();
     }
 
     @Override
-    public long save(Batch batch)
-    {
+    public long save(Batch batch) {
         return remoteBatchService.save(batch);
     }
 
     @Override
-    public Batch load(long batchId)
-    {
+    public Batch load(long batchId) {
         return remoteBatchService.load(batchId);
     }
 }

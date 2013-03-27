@@ -8,8 +8,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 /**
  * @author k.tulbassiyev
  */
-public interface IMetaFactoryService
-{
+public interface IMetaFactoryService {
     public BaseEntity getBaseEntity(String className);
     public BaseEntity getBaseEntity(MetaClass metaClass);
     public BaseSet getBaseSet(IMetaType meta);

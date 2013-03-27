@@ -12,14 +12,12 @@ import java.util.List;
  * @author k.tulbassiyev
  */
 @Service
-public class EntityServiceImpl implements IEntityService
-{
+public class EntityServiceImpl implements IEntityService {
     @Autowired
     private DataJob dataJob;
 
     @Override
-    public void process(List<BaseEntity> entities)
-    {
+    public void process(List<BaseEntity> entities) {
         dataJob.addAll(entities);
     }
 }

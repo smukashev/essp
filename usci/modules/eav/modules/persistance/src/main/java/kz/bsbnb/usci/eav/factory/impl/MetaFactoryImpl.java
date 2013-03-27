@@ -13,25 +13,21 @@ import org.springframework.stereotype.Repository;
  * @author k.tulbassiyev
  */
 @Repository
-public class MetaFactoryImpl implements IMetaFactory
-{
+public class MetaFactoryImpl implements IMetaFactory {
     @Autowired
     private IMetaClassRepository metaClassRepository;
 
-    public BaseEntity getBaseEntity(String className)
-    {
+    public BaseEntity getBaseEntity(String className) {
         return new BaseEntity(metaClassRepository.getMetaClass(className));
     }
 
     @Override
-    public BaseSet getBaseSet(IMetaType meta)
-    {
+    public BaseSet getBaseSet(IMetaType meta) {
         return new BaseSet(meta);
     }
 
     @Override
-    public BaseEntity getBaseEntity(MetaClass metaClass)
-    {
+    public BaseEntity getBaseEntity(MetaClass metaClass) {
         return new BaseEntity(metaClass);
     }
 }
