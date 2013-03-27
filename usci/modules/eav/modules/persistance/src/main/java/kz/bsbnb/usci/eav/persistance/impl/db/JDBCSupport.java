@@ -99,6 +99,7 @@ public class JDBCSupport {
         return count;
     }
 
+<<<<<<< HEAD
     protected int[] batchUpdateWithStats(String sql, List<Object[]> batchArgs)
     {
         double t1 = 0;
@@ -120,6 +121,9 @@ public class JDBCSupport {
     }
 
     protected int batchUpdateWithStats1(String sql, List<Object> batchArgs)
+=======
+    protected int batchUpdateWithStats(String sql, List<Object> batchArgs)
+>>>>>>> cbc25a0b91cee82831038203e1eeb2aac7c1ca63
     {
         double t1 = 0;
         if(sqlStats != null)
@@ -128,11 +132,9 @@ public class JDBCSupport {
         int counts = jdbcTemplate.update(sql, batchArgs.toArray());
 
         double t2 = System.nanoTime() - t1;
-        //double t3 = (t2 % batchArgs.size()) / 1000;
 
         if(sqlStats != null)
         {
-            //for (int i = 0; i < batchArgs.size(); i++)
             sqlStats.put(sql, t2 / 1000);
         }
 
