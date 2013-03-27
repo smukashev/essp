@@ -12,7 +12,7 @@ import java.util.Iterator;
 /**
  * @author k.tulbassiyev
  */
-public class DataJob extends AbstractDataJob
+public class DataJob extends AbstractDataJobz
 {
     @Autowired
     @Qualifier(value = "entityService")
