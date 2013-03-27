@@ -8,6 +8,7 @@ import com.couchbase.client.protocol.views.Query;
 import com.couchbase.client.protocol.views.View;
 import com.couchbase.client.protocol.views.ViewDesign;
 import junit.framework.Assert;
+import kz.bsbnb.usci.batch.helper.impl.FileHelper;
 import kz.bsbnb.usci.eav.model.Batch;
 import net.spy.memcached.internal.OperationFuture;
 import org.apache.log4j.Logger;
@@ -15,6 +16,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.sql.Timestamp;
@@ -34,6 +36,7 @@ public class CouchbaseTest {
     private static final String PROD_PREFIX = "";
     public static String MODE_PREFIX;
     private static final String BUCKET_NAME = "test";
+    private static final String FILE_PATH = "/opt/xmls/test.xml";
 
     private Logger logger = Logger.getLogger(CouchbaseTest.class);
 
@@ -83,6 +86,17 @@ public class CouchbaseTest {
             logger.info("ExecutionException while doing set: " + e.getMessage());
             System.exit(1);
         }
+
+
+
+        FileHelper fileHelper = new FileHelper();
+        File file  = new File(FILE_PATH);
+        byte bytes[] = fileHelper.getFileBytes(file);
+
+        client.set("Batch",0,bytes);
+
+        Assert.assertEquals(bytes,client.get("Batch"));
+
 
 
         for (int i=1;i<=10000;i++){
@@ -153,7 +167,7 @@ public class CouchbaseTest {
 
         String res2 = String.valueOf(client.query(view,new Query()));
       //  System.out.println(res2);
-        Assert.assertEquals(client.query(view,new Query()).size(),10002);
+        Assert.assertEquals(client.query(view,new Query()).size(),10003);
 
 
 
