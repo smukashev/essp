@@ -38,8 +38,7 @@
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
-    <context:component-scan base-package="kz.bsbnb.usci.eav.persistance.impl.db.postgresql" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav.model.meta.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.eav" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.helper.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.reader.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.writer.impl" />
@@ -63,12 +62,6 @@
         </batch:step>
     </batch:job>
 
-    <bean id="stRawGroupDir" class="org.stringtemplate.v4.STRawGroupDir">
-        <constructor-arg index="0" value="${ds.templates_dir}"/>
-        <constructor-arg index="1" value="$"/>
-        <constructor-arg index="2" value="$"/>
-    </bean>
-
     <!-- remote services -->
     <bean id="remoteEntityService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1098/entityService"/>
@@ -83,6 +76,10 @@
     <bean id="remoteMetaFactoryService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1098/metaFactoryService"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IMetaFactoryService"/>
+    </bean>
+
+    <bean id="sqlGenerator" class="org.jooq.impl.Executor">
+        <constructor-arg index="0" value="POSTGRES"/>
     </bean>
 
 </beans>

@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav.tool.generator.data;
+package kz.bsbnb.usci.eav.tool.generator.random.data;
 
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 
@@ -11,17 +11,14 @@ import java.util.Random;
 /**
  * @author k.tulbassiyev
  */
-public abstract class AbstractDataGenerator
-{
+public abstract class AbstractDataGenerator {
     protected Random rand = new Random(10000);
 
     protected final String date_format = "yyyy-MM-dd";
     protected final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(date_format);
 
-    protected Object getCastObject(DataTypes typeCode)
-    {
-        switch(typeCode)
-        {
+    protected Object getCastObject(DataTypes typeCode) {
+        switch(typeCode) {
             case INTEGER:
                 return rand.nextInt(1000);
             case DATE:
@@ -33,12 +30,10 @@ public abstract class AbstractDataGenerator
 
                 Date date = null;
 
-                try
-                {
-                    date = simpleDateFormat.parse(simpleDateFormat.format(new Date(timestamp.getTime())));
-                }
-                catch (ParseException ex)
-                {
+                try {
+                    date = simpleDateFormat.parse(simpleDateFormat
+                            .format(new Date(timestamp.getTime())));
+                } catch (ParseException ex) {
                     ex.printStackTrace();
                 }
 

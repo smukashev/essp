@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav.tool.generator.xml.impl;
+package kz.bsbnb.usci.eav.tool.generator.random.xml.impl;
 
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
@@ -6,7 +6,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.model.meta.impl.*;
-import kz.bsbnb.usci.eav.tool.generator.xml.AbstractXmlGenerator;
+import kz.bsbnb.usci.eav.tool.generator.random.xml.AbstractXmlGenerator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -16,10 +16,8 @@ import java.util.List;
 /**
  * @author k.tulbassiyev
  */
-public class BaseEntityXmlGenerator extends AbstractXmlGenerator
-{
-    public Document getGeneratedDocument(List<BaseEntity> baseEntities)
-    {
+public class BaseEntityXmlGenerator extends AbstractXmlGenerator {
+    public Document getGeneratedDocument(List<BaseEntity> baseEntities) {
         Document document = getDocument();
 
         Element batchElement = document.createElement("batch");
@@ -37,8 +35,7 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
     }
 
     private void processBaseEntity(Document document, BaseEntity entity, String nameInParent,
-                                         boolean firstTime, Element parentElement)
-    {
+                                         boolean firstTime, Element parentElement) {
         MetaClass meta = entity.getMeta();
 
         Element element = document.createElement(nameInParent);
@@ -46,8 +43,7 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
         if(firstTime)
             element.setAttribute("class", entity.getMeta().getClassName());
 
-        for (String name : meta.getMemberNames())
-        {
+        for (String name : meta.getMemberNames()) {
             IMetaType metaType = meta.getMemberType(name);
 
             if(metaType.isComplex() && metaType.isSet())
@@ -64,14 +60,11 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
     }
 
     public void doComplexArray(BaseEntity entity, IMetaType metaType, Document document,
-                                Element parentElement, String name)
-    {
+                                Element parentElement, String name) {
         Element arrayContainer = document.createElement(name);
 
-        for (IBaseValue batchValue : (((BaseSet)entity.getBaseValue(name).getValue()).get()))
-        {
+        for (IBaseValue batchValue : (((BaseSet)entity.getBaseValue(name).getValue()).get())) {
             BaseEntity memberEntity = (BaseEntity) batchValue.getValue();
-
             processBaseEntity(document, memberEntity, "item", false, arrayContainer);
         }
 
@@ -79,22 +72,17 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
     }
 
     public void doComplexValue(BaseEntity entity, IMetaType metaType, Document document,
-                               Element parentElement, String name)
-    {
+                               Element parentElement, String name) {
         BaseEntity memberEntity = (BaseEntity) entity.getBaseValue(name).getValue();
-
         processBaseEntity(document, memberEntity, name, false, parentElement);
     }
 
     public void doSimpleArray(BaseEntity entity, IMetaType metaType, Document document,
-                                 Element parentElement, String name)
-    {
+                                 Element parentElement, String name) {
         MetaSet metaSet = (MetaSet) metaType;
-
         Element arrayContainer = document.createElement(name);
 
-        for (IBaseValue batchValue : (((BaseSet)entity.getBaseValue(name).getValue()).get()))
-        {
+        for (IBaseValue batchValue : (((BaseSet)entity.getBaseValue(name).getValue()).get())) {
             Element childElement = document.createElement("item");
 
             Object value = batchValue.getValue();
@@ -111,12 +99,9 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
     }
 
     public void doSimpleValue(BaseEntity entity, IMetaType metaType, Document document,
-                              Element parentElement, String name)
-    {
+                              Element parentElement, String name) {
         MetaValue metaValue = (MetaValue) metaType;
-
         Element childElement = document.createElement(name);
-
         Object value = entity.getBaseValue(name).getValue();
 
         childElement.appendChild(document.createTextNode(

@@ -13,19 +13,16 @@ import java.rmi.server.UnicastRemoteObject;
  * @author k.tulbassiyev
  */
 @Service
-public class EntityServiceImpl extends UnicastRemoteObject implements IEntityService
-{
+public class EntityServiceImpl extends UnicastRemoteObject implements IEntityService {
     @Autowired
     IBaseEntityDao baseEntityDao;
 
-    public EntityServiceImpl() throws RemoteException
-    {
+    public EntityServiceImpl() throws RemoteException {
         super();
     }
 
     @Override
-    public void save(BaseEntity baseEntity)
-    {
+    public void save(BaseEntity baseEntity) {
         long t1 = System.currentTimeMillis();
         baseEntityDao.save(baseEntity);
         long t2 = System.currentTimeMillis() - t1;

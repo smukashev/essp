@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav.tool.generator.entry;
+package kz.bsbnb.usci.eav.tool.generator.random.entry;
 
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -6,9 +6,9 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
-import kz.bsbnb.usci.eav.tool.generator.data.impl.BaseEntityGenerator;
-import kz.bsbnb.usci.eav.tool.generator.data.impl.MetaClassGenerator;
-import kz.bsbnb.usci.eav.tool.generator.xml.impl.BaseEntityXmlGenerator;
+import kz.bsbnb.usci.eav.tool.generator.random.data.impl.BaseEntityGenerator;
+import kz.bsbnb.usci.eav.tool.generator.random.data.impl.MetaClassGenerator;
+import kz.bsbnb.usci.eav.tool.generator.random.xml.impl.BaseEntityXmlGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -23,8 +23,7 @@ import java.util.Date;
 /**
  * @author k.tulbassiyev
  */
-public class GenerateSimpleInsertXml
-{
+public class GenerateSimpleInsertXml {
     private final static Logger logger
             = LoggerFactory.getLogger(GenerateSimpleInsertXml.class);
 
@@ -34,8 +33,7 @@ public class GenerateSimpleInsertXml
     private final static String FILE_PATH_WINDOWS = "D:/DevTemp/test.xml";
 
     public static void main(String args[])
-            throws ParserConfigurationException, TransformerException
-    {
+            throws ParserConfigurationException, TransformerException {
         MetaClassGenerator metaClassGenerator = new MetaClassGenerator(25, 20, 2, 3);
         BaseEntityGenerator baseEntityGenerator = new BaseEntityGenerator();
 
@@ -51,8 +49,7 @@ public class GenerateSimpleInsertXml
         ArrayList<MetaClass> data = new ArrayList<MetaClass>();
         ArrayList<BaseEntity> entities = new ArrayList<BaseEntity>();
 
-        if(!storage.testConnection())
-        {
+        if(!storage.testConnection()) {
             logger.error("Can't connect to storage.");
             System.exit(1);
         }
@@ -62,8 +59,7 @@ public class GenerateSimpleInsertXml
 
         logger.info("Generating data...");
 
-        for(int i = 0; i < DATA_SIZE; i++)
-        {
+        for(int i = 0; i < DATA_SIZE; i++) {
             MetaClass metaClass = metaClassGenerator.generateMetaClass();
 
             long metaClassId = metaClassDao.save(metaClass);

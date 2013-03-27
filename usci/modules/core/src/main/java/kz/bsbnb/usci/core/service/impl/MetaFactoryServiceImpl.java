@@ -13,26 +13,22 @@ import org.springframework.stereotype.Service;
  * @author k.tulbassiyev
  */
 @Service
-public class MetaFactoryServiceImpl implements IMetaFactoryService
-{
+public class MetaFactoryServiceImpl implements IMetaFactoryService {
     @Autowired
     private IMetaClassRepository metaClassRepository;
 
     @Override
-    public BaseEntity getBaseEntity(String className)
-    {
+    public BaseEntity getBaseEntity(String className) {
         return new BaseEntity(metaClassRepository.getMetaClass(className));
     }
 
     @Override
-    public BaseEntity getBaseEntity(MetaClass metaClass)
-    {
+    public BaseEntity getBaseEntity(MetaClass metaClass) {
         return new BaseEntity(metaClass);
     }
 
     @Override
-    public BaseSet getBaseSet(IMetaType meta)
-    {
+    public BaseSet getBaseSet(IMetaType meta) {
         return new BaseSet(meta);
     }
 }
