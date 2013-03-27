@@ -11,13 +11,12 @@ public class AttributeTree {
     private AttributeTree parent = null;
     private String name;
 
-
     public AttributeTree(String name,AttributeTree parent) {
         this.name = name;
         this.parent = parent;
     }
 
-    public AttributeTree addChild(AttributeTree child){
+    public AttributeTree addChild(AttributeTree child) {
         this.Children.add(child);
         return child;
     }
@@ -33,5 +32,4 @@ public class AttributeTree {
     public Boolean hasChildren(){
         return !this.getChildren().isEmpty();
     }
-
 }

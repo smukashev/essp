@@ -18,18 +18,14 @@ import java.util.List;
  */
 public class BaseEntityXmlGenerator extends AbstractXmlGenerator
 {
-    public Document getGeneratedDocument(List<BaseEntity> baseEntities)
-    {
+    public Document getGeneratedDocument(List<BaseEntity> baseEntities) {
         Document document = getDocument();
-
         Element batchElement = document.createElement("batch");
-
         document.appendChild(batchElement);
-
-        Element entitiesElement = document.createElement("packages");
+        Element entitiesElement = document.createElement("entities");
 
         for (BaseEntity baseEntity : baseEntities)
-            processBaseEntity(document, baseEntity, "package", true, entitiesElement);
+            processBaseEntity(document, baseEntity, "entity", true, entitiesElement);
 
         batchElement.appendChild(entitiesElement);
 
@@ -37,22 +33,19 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
     }
 
     private void processBaseEntity(Document document, BaseEntity entity, String nameInParent,
-                                   boolean firstTime, Element parentElement)
-    {
+                                   boolean firstTime, Element parentElement) {
         MetaClass meta = entity.getMeta();
-
         Element element = document.createElement(nameInParent);
 
         if(firstTime)
             element.setAttribute("class", entity.getMeta().getClassName());
 
-        for (String name : meta.getMemberNames())
-        {
-
+        for (String name : meta.getMemberNames()) {
             IMetaType metaType = meta.getMemberType(name);
 
             if(metaType.isComplex() && !metaType.isSet())
                 doComplexValue(entity, metaType, document, element, name);
+
             if(!metaType.isComplex() && !metaType.isSet())
                 doSimpleValue(entity, metaType, document, element, name);
         }
@@ -61,20 +54,15 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
     }
 
     public void doComplexValue(BaseEntity entity, IMetaType metaType, Document document,
-                               Element parentElement, String name)
-    {
+                               Element parentElement, String name) {
         BaseEntity memberEntity = (BaseEntity) entity.getBaseValue(name).getValue();
-
         processBaseEntity(document, memberEntity, name, false, parentElement);
     }
 
     public void doSimpleValue(BaseEntity entity, IMetaType metaType, Document document,
-                              Element parentElement, String name)
-    {
+                              Element parentElement, String name) {
         MetaValue metaValue = (MetaValue) metaType;
-
         Element childElement = document.createElement(name);
-
         Object value = entity.getBaseValue(name).getValue();
 
         childElement.appendChild(document.createTextNode(
