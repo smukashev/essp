@@ -59,7 +59,7 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator {
         parentElement.appendChild(element);
     }
 
-    public void doComplexArray(BaseEntity entity, IMetaType metaType, Document document,
+    private void doComplexArray(BaseEntity entity, IMetaType metaType, Document document,
                                 Element parentElement, String name) {
         Element arrayContainer = document.createElement(name);
 
@@ -71,13 +71,13 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator {
         parentElement.appendChild(arrayContainer);
     }
 
-    public void doComplexValue(BaseEntity entity, IMetaType metaType, Document document,
+    private void doComplexValue(BaseEntity entity, IMetaType metaType, Document document,
                                Element parentElement, String name) {
         BaseEntity memberEntity = (BaseEntity) entity.getBaseValue(name).getValue();
         processBaseEntity(document, memberEntity, name, false, parentElement);
     }
 
-    public void doSimpleArray(BaseEntity entity, IMetaType metaType, Document document,
+    private void doSimpleArray(BaseEntity entity, IMetaType metaType, Document document,
                                  Element parentElement, String name) {
         MetaSet metaSet = (MetaSet) metaType;
         Element arrayContainer = document.createElement(name);
@@ -98,7 +98,7 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator {
         parentElement.appendChild(arrayContainer);
     }
 
-    public void doSimpleValue(BaseEntity entity, IMetaType metaType, Document document,
+    private void doSimpleValue(BaseEntity entity, IMetaType metaType, Document document,
                               Element parentElement, String name) {
         MetaValue metaValue = (MetaValue) metaType;
         Element childElement = document.createElement(name);

@@ -106,27 +106,22 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-        {
-            throw new IllegalArgumentException("More then one class found. Can't load.");
-        }
+            throw new IllegalArgumentException("More then one class found. Can't load class : "
+                    + metaClass.getClassName());
 
         if (rows.size() < 1)
-        {
-            throw new IllegalArgumentException("Class not found. Can't load.");
-        }
+            throw new IllegalArgumentException("Class not found. Can't load class : "
+                    + metaClass.getClassName());
 
         Map<String, Object> row = rows.get(0);
 
-        if(row != null)
-        {
+        if(row != null) {
             metaClass.setDisabled((Boolean)row.get("is_disabled"));
             metaClass.setBeginDate((Timestamp)row.get("begin_date"));
             metaClass.setId((Integer)row.get("id"));
             metaClass.setClassName((String)row.get("name"));
             metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
-        }
-        else
-        {
+        } else {
             logger.error("Can't load metaClass, empty data set.");
         }
     }

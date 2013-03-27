@@ -44,6 +44,7 @@
     <context:component-scan base-package="kz.bsbnb.usci.batch.writer.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.processor.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.batch.factory.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.batch.service.impl" />
 
     <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
         <property name="transactionManager" ref="transactionManager" />

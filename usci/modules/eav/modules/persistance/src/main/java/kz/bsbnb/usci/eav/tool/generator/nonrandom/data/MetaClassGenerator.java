@@ -17,7 +17,6 @@ import java.util.Map;
  * @author abukabayev
  */
 public class MetaClassGenerator extends AbstractDataGenerator {
-
     private static int index,index2;
     private Map<String, MetaClass> metaClasses = new HashMap<String, MetaClass>();
 
@@ -30,62 +29,58 @@ public class MetaClassGenerator extends AbstractDataGenerator {
     }
 
     public int getIndex() {
-
         return ++index;
     }
 
     public int getIndex2() {
-
         return index2;
     }
 
     public MetaClassGenerator() {
-
+        super();
     }
 
-
-    private IMetaAttribute generateMetaAttribute(AttributeTree tree){
+    private IMetaAttribute generateMetaAttribute(AttributeTree tree) {
         IMetaAttribute attribute;
 
-        if (tree.hasChildren())
-        {
+        if (tree.hasChildren()) {
             MetaClass metaClass = generateMetaClass(tree);
 
             metaClass.setComplexKeyType(ComplexKeyTypes.values()[
                     rand.nextInt(ComplexKeyTypes.values().length)]);
 
             attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(), metaClass);
-        }else{
+        } else {
 
             attribute = new MetaAttribute(rand.nextBoolean(), rand.nextBoolean(),
                     new MetaValue(DataTypes.values()[rand.nextInt(DataTypes.values().length)]));
         }
 
-
         return attribute;
     }
 
-    private MetaClass generateMetaClass(AttributeTree tree){
+    private MetaClass generateMetaClass(AttributeTree tree) {
         MetaClass meta = new MetaClass(tree.getName()+"_"+getIndex2()+"_"+getIndex());
 
-        meta.setDisabled(rand.nextBoolean());
+        meta.setDisabled(false); // todo: rand.nextBoolean();
         meta.setComplexKeyType(ComplexKeyTypes.values()[rand.nextInt(ComplexKeyTypes.values().length)]);
 
-        for (AttributeTree child:tree.getChildren()){
+        for (AttributeTree child:tree.getChildren()) {
             IMetaAttribute type = generateMetaAttribute(child);
             meta.setMetaAttribute(child.getName(),type);
         }
+
         metaClasses.put(meta.getClassName(),meta);
         return meta;
     }
 
-    public MetaClass generateMetaClass(AttributeTree tree,int index){
+    public MetaClass generateMetaClass(AttributeTree tree,int index) {
         setIndex(1);
         setIndex2(index);
         return generateMetaClass(tree);
     }
 
-    public Collection<MetaClass> getMetaClasses(){
+    public Collection<MetaClass> getMetaClasses() {
         return metaClasses.values();
     }
 }

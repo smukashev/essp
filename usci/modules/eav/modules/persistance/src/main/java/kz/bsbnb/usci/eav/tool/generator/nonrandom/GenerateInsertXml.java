@@ -43,14 +43,14 @@ public class GenerateInsertXml {
         ArrayList<BaseEntity> entities = new ArrayList<BaseEntity>();
 
         ClassPathXmlApplicationContext ctx
-                = new ClassPathXmlApplicationContext("stressApplicationContext.xml");
+                = new ClassPathXmlApplicationContext("applicationContext.xml");
 
         IStorage storage = ctx.getBean(IStorage.class);
         IMetaClassDao metaClassDao = ctx.getBean(IMetaClassDao.class);
         IBaseEntityDao baseEntityDao = ctx.getBean(IBaseEntityDao.class);
         IBatchDao batchDao = ctx.getBean(IBatchDao.class);
 
-        AttributeTree tree = new AttributeTree("packages",null);
+        AttributeTree tree = new AttributeTree("entities",null);
         TreeGenerator helper = new TreeGenerator();
 
         if(!storage.testConnection())
