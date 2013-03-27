@@ -33,6 +33,7 @@ import java.util.Set;
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 //TODO: refactor all id casts!
+//TODO: refactor all field names. Get field names from generated classes.
 
 @Repository
 public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {

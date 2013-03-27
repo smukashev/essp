@@ -362,4 +362,15 @@ public class BaseEntity extends Persistable implements IBaseContainer
         return meta.getClassName();
     }
 
+    public IBaseValue safeGetValue(String name)
+    {
+        try
+        {
+            return getBaseValue(name);
+        }
+        catch(Exception e)
+        {
+            return null;
+        }
+    }
 }
