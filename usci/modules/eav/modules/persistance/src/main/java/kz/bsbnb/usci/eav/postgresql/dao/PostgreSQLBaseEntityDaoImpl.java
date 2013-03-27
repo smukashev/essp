@@ -18,6 +18,7 @@ import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.DateUtils;
 import org.jooq.BatchBindStep;
 import org.jooq.InsertOnDuplicateStep;
+import org.jooq.InsertValuesStep6;
 import org.jooq.SelectForUpdateStep;
 import org.jooq.impl.Executor;
 import org.slf4j.Logger;
@@ -334,20 +335,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         /*INSERT_COMPLEX_VALUE_SQL = String.format("INSERT INTO %s (entity_id, batch_id, attribute_id, index, rep_date, entity_value_id) VALUES ( ?, ?, ?, ?, ?, ? )",
                 getConfig().getBaseComplexValuesTableName());*/
 
-        BatchBindStep batch =
-                sqlGenerator
-                        .batch(
-                                sqlGenerator
-                                        .insertInto(
-                                                EAV_BE_COMPLEX_VALUES,
-                                                EAV_BE_COMPLEX_VALUES.ENTITY_ID,
-                                                EAV_BE_COMPLEX_VALUES.BATCH_ID,
-                                                EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID,
-                                                EAV_BE_COMPLEX_VALUES.INDEX,
-                                                EAV_BE_COMPLEX_VALUES.REP_DATE,
-                                                EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID));
-
-        InsertOnDuplicateStep insert = sqlGenerator
+        InsertValuesStep6 insert = sqlGenerator
                 .insertInto(
                         EAV_BE_COMPLEX_VALUES,
                         EAV_BE_COMPLEX_VALUES.ENTITY_ID,
@@ -372,13 +360,16 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             Object[] insertArgs = new Object[] {baseEntity.getId(), batchValue.getBatch().getId(),
                     metaAttribute.getId(), batchValue.getIndex(), batchValue.getRepDate(), childBaseEntityId};          // todo: check
 
+            insert = insert.values(Arrays.asList(insertArgs));
+
             batchArgs.add(insertArgs);
         }
 
 
 
-        logger.debug(batch.toString());
-        batchUpdateWithStats(INSERT_COMPLEX_VALUE_SQL, batchArgs);
+        logger.debug(insert.toString());
+        //batchUpdateWithStats(INSERT_COMPLEX_VALUE_SQL, batchArgs);
+        batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
     }
 
     private void insertEntitySet(BaseEntity baseEntity, String attributeName)
