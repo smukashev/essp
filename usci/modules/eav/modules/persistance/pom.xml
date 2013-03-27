@@ -47,9 +47,9 @@
             <version>3.0.0-RC2</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.ddlutils</groupId>
+            <groupId>kz.bsbnb.ddlutils</groupId>
             <artifactId>ddlutils</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
         </dependency>
     </dependencies>
 
