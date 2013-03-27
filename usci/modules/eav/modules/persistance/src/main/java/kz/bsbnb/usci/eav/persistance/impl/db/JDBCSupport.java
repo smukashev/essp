@@ -119,6 +119,26 @@ public class JDBCSupport {
         return counts;
     }
 
+    protected int batchUpdateWithStats(String sql, List<Object> batchArgs)
+    {
+        double t1 = 0;
+        if(sqlStats != null)
+            t1 = System.nanoTime();
+
+        int counts = jdbcTemplate.update(sql, batchArgs.toArray());
+
+        double t2 = System.nanoTime() - t1;
+        //double t3 = (t2 % batchArgs.size()) / 1000;
+
+        if(sqlStats != null)
+        {
+            //for (int i = 0; i < batchArgs.size(); i++)
+            sqlStats.put(sql, t2 / 1000);
+        }
+
+        return counts;
+    }
+
     protected List<Map<String, Object>> queryForListWithStats(String sql, Object... args)
     {
         double t1 = 0;

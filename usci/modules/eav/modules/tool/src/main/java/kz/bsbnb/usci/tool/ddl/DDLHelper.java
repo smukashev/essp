@@ -1,9 +1,9 @@
 package kz.bsbnb.usci.tool.ddl;
 
-import org.apache.ddlutils.Platform;
-import org.apache.ddlutils.PlatformFactory;
-import org.apache.ddlutils.io.DatabaseIO;
-import org.apache.ddlutils.model.Database;
+import kz.bsbnb.ddlutils.Platform;
+import kz.bsbnb.ddlutils.PlatformFactory;
+import kz.bsbnb.ddlutils.io.DatabaseIO;
+import kz.bsbnb.ddlutils.model.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

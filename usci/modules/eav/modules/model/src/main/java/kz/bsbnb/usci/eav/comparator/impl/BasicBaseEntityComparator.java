@@ -20,18 +20,6 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
 {
     Logger logger = Logger.getLogger(BasicBaseEntityComparator.class);
 
-    private IBaseValue safeGetValue(BaseEntity entity, String name)
-    {
-        try
-        {
-            return entity.getBaseValue(name);
-        }
-        catch(Exception e)
-        {
-            return null;
-        }
-    }
-
     private boolean compareValue(IMetaType type, IBaseValue value1, IBaseValue value2)
     {
         boolean res;
@@ -135,8 +123,8 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
 
             logger.debug("It's a key!");
 
-            IBaseValue value1 = safeGetValue(c1, name);
-            IBaseValue value2 = safeGetValue(c2, name);
+            IBaseValue value1 = c1.safeGetValue(name);
+            IBaseValue value2 = c2.safeGetValue(name);
 
             if(value1 == null || value2 == null)
             {

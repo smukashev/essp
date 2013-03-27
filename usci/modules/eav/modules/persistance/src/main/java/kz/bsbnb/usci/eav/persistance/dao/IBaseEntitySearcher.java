@@ -7,6 +7,6 @@ import java.util.ArrayList;
 public interface IBaseEntitySearcher
 {
     public String getClassName();
-    public BaseEntity findSingle(BaseEntity meta);
-    public ArrayList<BaseEntity> findAll(BaseEntity meta);
+    public BaseEntity findSingle(BaseEntity entity);
+    public ArrayList<BaseEntity> findAll(BaseEntity entity);
 }
