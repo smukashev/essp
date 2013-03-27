@@ -11,10 +11,13 @@ import java.util.List;
 /**
  * @author k.tulbassiyev
  */
-public abstract class AbstractDataJob extends AbstractJob
-{
-    protected final List<BaseEntity> entities = Collections.synchronizedList(new ArrayList<BaseEntity>());
-    protected final List<BaseEntity> entitiesInProcess = Collections.synchronizedList(new ArrayList<BaseEntity>());
+public abstract class AbstractDataJob extends AbstractJob {
+    protected final List<BaseEntity> entities
+            = Collections.synchronizedList(new ArrayList<BaseEntity>());
+
+    protected final List<BaseEntity> entitiesInProcess
+            = Collections.synchronizedList(new ArrayList<BaseEntity>());
+
     protected final List<ProcessJob> processJobs = new ArrayList<ProcessJob>();
     protected final List<ProcessJob> waitingJobs = new ArrayList<ProcessJob>();
 
@@ -25,16 +28,13 @@ public abstract class AbstractDataJob extends AbstractJob
 
     protected volatile int skip_count = 0;
 
-    protected BaseEntity getClearEntity()
-    {
+    protected BaseEntity getClearEntity() {
         Iterator<BaseEntity> iterator = entities.iterator();
 
-        while(iterator.hasNext())
-        {
+        while(iterator.hasNext()) {
             BaseEntity entity = iterator.next();
 
-            if(isClear(entity))
-            {
+            if(isClear(entity)) {
                 iterator.remove();
                 return entity;
             }
@@ -43,8 +43,7 @@ public abstract class AbstractDataJob extends AbstractJob
         return null;
     }
 
-    protected boolean isClear(BaseEntity baseEntity)
-    {
+    protected boolean isClear(BaseEntity baseEntity) {
         for (BaseEntity entity : entitiesInProcess)
             if(hasCrossLine(baseEntity, entity))
                 return false;
@@ -52,8 +51,7 @@ public abstract class AbstractDataJob extends AbstractJob
         return true;
     }
 
-    protected boolean hasCrossLine(BaseEntity entity1, BaseEntity entity2)
-    {
+    protected boolean hasCrossLine(BaseEntity entity1, BaseEntity entity2) {
         // todo: implement
         /*if(entity1.equals(entity2))
             return true;*/
@@ -61,8 +59,7 @@ public abstract class AbstractDataJob extends AbstractJob
         return false;
     }
 
-    public void addAll(List<BaseEntity> entities)
-    {
+    public void addAll(List<BaseEntity> entities) {
         this.entities.addAll(entities);
     }
 }

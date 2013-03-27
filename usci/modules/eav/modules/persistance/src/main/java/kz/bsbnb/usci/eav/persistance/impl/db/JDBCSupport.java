@@ -119,7 +119,7 @@ public class JDBCSupport {
         return counts;
     }
 
-    protected int batchUpdateWithStats(String sql, List<Object> batchArgs)
+    protected int batchUpdateWithStats1(String sql, List<Object> batchArgs)
     {
         double t1 = 0;
         if(sqlStats != null)

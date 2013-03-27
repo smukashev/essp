@@ -12,10 +12,9 @@ import java.util.Iterator;
 /**
  * @author k.tulbassiyev
  */
-public class DataJob extends AbstractDataJobz
-{
+public class DataJob extends AbstractDataJob {
     @Autowired
-    @Qualifier(value = "entityService")
+    @Qualifier(value = "remoteEntityService")
     RmiProxyFactoryBean rmiProxyFactoryBean;
 
    /* @Autowired
@@ -26,20 +25,16 @@ public class DataJob extends AbstractDataJobz
     private final Logger logger = Logger.getLogger(DataJob.class);
 
     @Override
-    public void run()
-    {
+    public void run() {
         logger.info("DataJob has been executed");
 
         entityService = (IEntityService) rmiProxyFactoryBean.getObject();
 
-        while(true)
-        {
-            try
-            {
+        while(true) {
+            try {
                 if(entities.size() > 0 && entitiesInProcess.size() < MAX_THREAD)
                     processNewEntities();
-                else
-                {
+                else {
                     if(++skip_count > SKIP_TIME_MAX)
                         Thread.sleep(SLEEP_TIME_LONG);
 
@@ -51,48 +46,38 @@ public class DataJob extends AbstractDataJobz
 
                 if(processJobs.size() > 0)
                     removeDeadJobs();
-            }
-            catch(Exception e)
-            {
+            } catch(Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void processNewEntities() throws InterruptedException
-    {
+    private void processNewEntities() throws InterruptedException {
         final BaseEntity entity = getClearEntity();
 
-        if(entity != null)
-        {
+        if(entity != null) {
             entitiesInProcess.add(entity);
 
             final ProcessJob processJob = new ProcessJob(entityService, entity);
 
-            if(processJobs.size() < MAX_THREAD)
-            {
+            if(processJobs.size() < MAX_THREAD) {
                 processJobs.add(processJob);
                 processJob.start();
-            }
-            else
+            } else
                 waitingJobs.add(processJob);
-        }
-        else
+        } else
             Thread.sleep(SLEEP_TIME_NORMAL);
 
         skip_count = 0;
     }
 
-    private void processWaitingJobs()
-    {
+    private void processWaitingJobs() {
         Iterator<ProcessJob> iterator = waitingJobs.iterator();
 
-        while(iterator.hasNext())
-        {
+        while(iterator.hasNext()) {
             final ProcessJob waitingJob = iterator.next();
 
-            if(processJobs.size() < MAX_THREAD && isClear(waitingJob.getBaseEntity()))
-            {
+            if(processJobs.size() < MAX_THREAD && isClear(waitingJob.getBaseEntity())) {
                 iterator.remove();
 
                 processJobs.add(waitingJob);
@@ -105,26 +90,21 @@ public class DataJob extends AbstractDataJobz
         skip_count = 0;
     }
 
-    private void removeDeadJobs()
-    {
+    private void removeDeadJobs() {
         Iterator<ProcessJob> processJobIterator = processJobs.iterator();
 
-        while(processJobIterator.hasNext())
-        {
+        while(processJobIterator.hasNext()) {
             ProcessJob processJob = processJobIterator.next();
 
-            if(!processJob.isAlive())
-            {
+            if(!processJob.isAlive()) {
                 BaseEntity entity = processJob.getBaseEntity();
 
                 Iterator<BaseEntity> entityProcessIterator = entitiesInProcess.iterator();
 
                 boolean found = false;
 
-                while(entityProcessIterator.hasNext())
-                {
-                    if(entity.hashCode() == entityProcessIterator.next().hashCode())
-                    {
+                while(entityProcessIterator.hasNext()) {
+                    if(entity.hashCode() == entityProcessIterator.next().hashCode()) {
                         entityProcessIterator.remove();
                         found = true;
                         break;

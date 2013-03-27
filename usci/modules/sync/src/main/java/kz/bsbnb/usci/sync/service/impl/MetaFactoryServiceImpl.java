@@ -16,36 +16,31 @@ import javax.annotation.PostConstruct;
  * @author k.tulbassiyev
  */
 @Service
-public class MetaFactoryServiceImpl implements IMetaFactoryService
-{
+public class MetaFactoryServiceImpl implements IMetaFactoryService {
     @Autowired
-    @Qualifier(value = "metaFactoryService")
+    @Qualifier(value = "remoteMetaFactoryService")
     RmiProxyFactoryBean rmiProxyFactoryBean;
 
     kz.bsbnb.usci.core.service.IMetaFactoryService remoteMetaFactoryService;
 
     @PostConstruct
-    public void init()
-    {
+    public void init() {
         remoteMetaFactoryService =
                 (kz.bsbnb.usci.core.service.IMetaFactoryService) rmiProxyFactoryBean.getObject();
     }
 
     @Override
-    public BaseEntity getBaseEntity(String className)
-    {
+    public BaseEntity getBaseEntity(String className) {
         return remoteMetaFactoryService.getBaseEntity(className);
     }
 
     @Override
-    public BaseEntity getBaseEntity(MetaClass metaClass)
-    {
+    public BaseEntity getBaseEntity(MetaClass metaClass) {
         return remoteMetaFactoryService.getBaseEntity(metaClass);
     }
 
     @Override
-    public BaseSet getBaseSet(IMetaType meta)
-    {
+    public BaseSet getBaseSet(IMetaType meta) {
         return remoteMetaFactoryService.getBaseSet(meta);
     }
 }

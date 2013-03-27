@@ -328,7 +328,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
 
         logger.debug(insert.toString());
-        batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
+        batchUpdateWithStats1(insert.getSQL(), insert.getBindValues());
     }
 
     private void updateSimpleValues(BaseEntity baseEntity, Set<String> attributeNames, String query) {
@@ -368,7 +368,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
 
         logger.debug(insert.toString());
-        batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
+        batchUpdateWithStats1(insert.getSQL(), insert.getBindValues());
     }
 
     private void insertEntitySet(BaseEntity baseEntity, String attributeName)
@@ -481,7 +481,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 insert = insert.values(Arrays.asList(insertArgs));
             }
             logger.debug(insert.toString());
-            batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
+            batchUpdateWithStats1(insert.getSQL(), insert.getBindValues());
         }
         else
         {
@@ -568,7 +568,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 insert = insert.values(Arrays.asList(insertArgs));
             }
             logger.debug(insert.toString());
-            batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
+            batchUpdateWithStats1(insert.getSQL(), insert.getBindValues());
         }
 
         return setId;
@@ -605,7 +605,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 insert = insert.values(Arrays.asList(insertArgs));
             }
             logger.debug(insert.toString());
-            batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
+            batchUpdateWithStats1(insert.getSQL(), insert.getBindValues());
         }
         else
         {
@@ -636,7 +636,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 insert = insert.values(Arrays.asList(insertArgs));
             }
             logger.debug(insert.toString());
-            batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
+            batchUpdateWithStats1(insert.getSQL(), insert.getBindValues());
         }
 
         return setId;
