@@ -38,7 +38,7 @@ public class TreeGenerator {
 
         try {
 
-            Document doc = docBuilder.parse(new File("usci/modules/eav_persistance/src/main/resources/generate.xml"));
+            Document doc = docBuilder.parse(new File("usci/modules/eav/modules/persistance/src/main/resources/generate.xml"));
             doc.getDocumentElement().normalize();
             NodeList list = doc.getChildNodes();
 

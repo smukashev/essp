@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.tool.generator.nonrandom.data;
 
-
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
@@ -13,32 +12,23 @@ import kz.bsbnb.usci.eav.tool.generator.random.data.AbstractDataGenerator;
  * @author abukabayev
  */
 
-public class BaseEntityGenerator  extends AbstractDataGenerator
-{
-
-    public BaseEntity generateBaseEntity(Batch batch, MetaClass metaClass, long index)
-    {
+public class BaseEntityGenerator  extends AbstractDataGenerator {
+    public BaseEntity generateBaseEntity(Batch batch, MetaClass metaClass, long index) {
         BaseEntity entity = new BaseEntity(metaClass);
 
-        for (String name : metaClass.getMemberNames())
-        {
+        for (String name : metaClass.getMemberNames()) {
             IMetaType metaType = metaClass.getMemberType(name);
 
-            if(metaType.isComplex())
-            {
+            if(metaType.isComplex()) {
                 BaseEntity tmpEntity = generateBaseEntity(batch, ((MetaClass) metaType), index);
-
                 entity.put(name, new BaseValue(batch, index, batch.getRepDate(), tmpEntity));
-            }
-            else
-            {
+            } else {
                 MetaValue metaValue = (MetaValue) metaType;
-                entity.put(name, new BaseValue(batch, index, batch.getRepDate(), getCastObject(metaValue.getTypeCode())));
+                entity.put(name, new BaseValue(batch, index, batch.getRepDate(),
+                        getCastObject(metaValue.getTypeCode())));
             }
         }
 
         return entity;
     }
-
-
 }

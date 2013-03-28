@@ -2,7 +2,6 @@ package kz.bsbnb.usci.batch.test.database;
 
 
 import com.couchbase.client.CouchbaseClient;
-import com.couchbase.client.internal.HttpFuture;
 import com.couchbase.client.protocol.views.DesignDocument;
 import com.couchbase.client.protocol.views.Query;
 import com.couchbase.client.protocol.views.View;
@@ -21,12 +20,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
  * @author abukabayev
  */
+
 public class CouchbaseTest {
 
     private CouchbaseClient client;
@@ -95,7 +96,9 @@ public class CouchbaseTest {
 
         client.set("Batch",0,bytes);
 
-        Assert.assertEquals(bytes,client.get("Batch"));
+
+        Assert.assertEquals(bytes.length, ((byte[])client.get("Batch")).length);
+        Assert.assertTrue(Arrays.equals(bytes, (byte[]) client.get("Batch")));
 
 
 
@@ -168,8 +171,6 @@ public class CouchbaseTest {
         String res2 = String.valueOf(client.query(view,new Query()));
       //  System.out.println(res2);
         Assert.assertEquals(client.query(view,new Query()).size(),10003);
-
-
 
     }
 
