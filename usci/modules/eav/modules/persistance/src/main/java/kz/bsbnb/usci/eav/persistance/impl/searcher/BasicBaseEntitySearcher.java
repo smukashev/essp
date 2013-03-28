@@ -13,6 +13,7 @@ import org.jooq.Condition;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectJoinStep;
 import org.jooq.impl.Executor;
+import org.jooq.impl.Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,11 +58,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         }
     }
 
-    private SelectConditionStep generateSQL(BaseEntity entity)
+    private SelectConditionStep generateSQL(BaseEntity entity, String entityName)
     {
         MetaClass meta = entity.getMeta();
 
-        SelectJoinStep joins = sqlGenerator.select(EAV_ENTITIES.ID).from(EAV_ENTITIES);
+        String the_name = (entityName == null ? "root" : "e_" + entityName);
+
+        SelectJoinStep joins = sqlGenerator.select(EAV_ENTITIES.as(the_name).ID).from(EAV_ENTITIES.as(the_name));
 
         if (meta == null)
         {
@@ -101,29 +104,29 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                     {
                         case BOOLEAN:
                             joins = joins.leftOuterJoin(EAV_BE_BOOLEAN_VALUES.as(name)).
-                                    on(EAV_ENTITIES.ID.equal(EAV_BE_BOOLEAN_VALUES.as(name).ENTITY_ID).
-                                            and(EAV_BE_BOOLEAN_VALUES.as(name).ATTRIBUTE_ID.equal((int) attribute.getId())));
+                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_BOOLEAN_VALUES.as(name).ENTITY_ID).
+                                            and(EAV_BE_BOOLEAN_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                             break;
                         case DATE:
                             joins = joins.leftOuterJoin(EAV_BE_DATE_VALUES.as(name)).
-                                    on(EAV_ENTITIES.ID.equal(EAV_BE_DATE_VALUES.as(name).ENTITY_ID).
-                                            and(EAV_BE_DATE_VALUES.as(name).ATTRIBUTE_ID.equal((int)attribute.getId())));
+                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_DATE_VALUES.as(name).ENTITY_ID).
+                                            and(EAV_BE_DATE_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                             break;
                         case DOUBLE:
                             joins = joins.leftOuterJoin(EAV_BE_DOUBLE_VALUES.as(name)).
-                                    on(EAV_ENTITIES.ID.equal(EAV_BE_DOUBLE_VALUES.as(name).ENTITY_ID).
-                                            and(EAV_BE_DOUBLE_VALUES.as(name).ATTRIBUTE_ID.equal((int)attribute.getId())));
+                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_DOUBLE_VALUES.as(name).ENTITY_ID).
+                                            and(EAV_BE_DOUBLE_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                             break;
                         case INTEGER:
                             joins = joins.leftOuterJoin(EAV_BE_INTEGER_VALUES.as(name)).
-                                    on(EAV_ENTITIES.ID.equal(EAV_BE_INTEGER_VALUES.as(name).ENTITY_ID).
-                                            and(EAV_BE_INTEGER_VALUES.as(name).ATTRIBUTE_ID.equal((int)attribute.getId())));
+                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_INTEGER_VALUES.as(name).ENTITY_ID).
+                                            and(EAV_BE_INTEGER_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
 
                             break;
                         case STRING:
                             joins = joins.leftOuterJoin(EAV_BE_STRING_VALUES.as(name)).
-                                    on(EAV_ENTITIES.ID.equal(EAV_BE_STRING_VALUES.as(name).ENTITY_ID).
-                                            and(EAV_BE_STRING_VALUES.as(name).ATTRIBUTE_ID.equal((int)attribute.getId())));
+                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_STRING_VALUES.as(name).ENTITY_ID).
+                                            and(EAV_BE_STRING_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                             break;
                         default:
                             throw new IllegalStateException("Unknown data type: " + simple_value.getTypeCode() +
@@ -133,15 +136,28 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                 else
                 {
                     joins = joins.leftOuterJoin(EAV_BE_COMPLEX_VALUES.as(name)).
-                            on(EAV_ENTITIES.ID.equal(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_ID).
-                                    and(EAV_BE_COMPLEX_VALUES.as(name).ATTRIBUTE_ID.equal((int)attribute.getId())));
+                            on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_ID).
+                                    and(EAV_BE_COMPLEX_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                 }
             }
         }
 
         logger.debug("Searcher SQL after joins generated: " + joins.toString());
 
-        SelectConditionStep where = joins.where(EAV_ENTITIES.CLASS_ID.equal((int)meta.getId()));
+        SelectConditionStep where;
+
+        if (entityName != null)
+        {
+            where = joins.where(
+                (EAV_ENTITIES.as(the_name).CLASS_ID.equal(meta.getId())).and(
+                        EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(entityName).ENTITY_VALUE_ID)
+                    )
+                );
+        }
+        else
+        {
+            where = joins.where(EAV_ENTITIES.as(the_name).CLASS_ID.equal(meta.getId()));
+        }
 
         Condition condition = null;
 
@@ -245,18 +261,18 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                 {
                     BaseEntity actual_complex_value = (BaseEntity)value.getValue();
 
-                    SelectConditionStep innerSQL = generateSQL(actual_complex_value);
+                    SelectConditionStep innerSQL = generateSQL(actual_complex_value, name);
 
                     if (condition == null)
                     {
-                        condition = EAV_BE_COMPLEX_VALUES.as(name).ENTITY_VALUE_ID.in(innerSQL);
+                        condition = Factory.exists(innerSQL);
                     }
                     else
                     {
                         if (and)
-                            condition = condition.and(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_VALUE_ID.in(innerSQL));
+                            condition = condition.andExists(innerSQL);
                         else
-                            condition = condition.or(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_VALUE_ID.in(innerSQL));
+                            condition = condition.orExists(innerSQL);
                     }
                 }
             }
@@ -275,14 +291,14 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         MetaClass meta = entity.getMeta();
         ArrayList<BaseEntity> result = new ArrayList<BaseEntity>();
 
-        SelectConditionStep where = generateSQL(entity);
+        SelectConditionStep where = generateSQL(entity, null);
 
         List<Map<String, Object>> rows = queryForListWithStats(where.getSQL(), where.getBindValues().toArray());
 
         for (Map<String, Object> row : rows)
         {
             BaseEntity resultEntity = new BaseEntity(meta);
-            resultEntity.setId((Integer)row.get(EAV_ENTITIES.ID.getName()));
+            resultEntity.setId((Long)row.get(EAV_ENTITIES.ID.getName()));
 
             result.add(resultEntity);
         }
