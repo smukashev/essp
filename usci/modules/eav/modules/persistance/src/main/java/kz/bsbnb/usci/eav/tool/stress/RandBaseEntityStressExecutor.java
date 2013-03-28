@@ -23,7 +23,7 @@ import java.util.Date;
 
 public class RandBaseEntityStressExecutor {
     private final static Logger logger = LoggerFactory.getLogger(RandBaseEntityStressExecutor.class);
-    private final static int dataSize = 10;
+    private final static int dataSize = 1000;
 
     public static void main(String[] args) {
         System.out.println("Test started at: " + Calendar.getInstance().getTime());
@@ -147,7 +147,7 @@ public class RandBaseEntityStressExecutor {
             System.out.println("+---------+");
 
 
-            storage.clear();
+            //storage.clear();
 
             if(sqlStats != null) {
                 System.out.println();
