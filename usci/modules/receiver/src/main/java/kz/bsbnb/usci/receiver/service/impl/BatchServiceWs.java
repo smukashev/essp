@@ -15,6 +15,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -37,7 +38,8 @@ public class BatchServiceWs implements IBatchReceive {
     JobLauncher jobLauncher;
 
     @Autowired
-    Job job;
+    @Qualifier(value = "batchJob")
+    Job batchJob;
 
     IBatchService batchService;
     CouchbaseClient couchbaseClient;
@@ -62,12 +64,12 @@ public class BatchServiceWs implements IBatchReceive {
 
         couchbaseClient.set("batch:"+batchId, 0, bytes);
 
-        /*try {
+       /* try {
             JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
             jobParametersBuilder.addParameter("fileName", new JobParameter(FILE_PATH));
             jobParametersBuilder.addParameter("batchId", new JobParameter(batchId));
 
-            jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+            jobLauncher.run(batchJob, jobParametersBuilder.toJobParameters());
         } catch (JobExecutionAlreadyRunningException e) {
             e.printStackTrace();
         } catch (JobRestartException e) {

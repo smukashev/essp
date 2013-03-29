@@ -12,7 +12,11 @@
        http://jax-ws.dev.java.net/spring/servlet
        http://jax-ws.dev.java.net/spring/servlet.xsd
        http://www.springframework.org/schema/context
-       http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/batch
+       http://www.springframework.org/schema/batch/spring-batch.xsd">
 
     <context:annotation-config/>
 
@@ -53,7 +57,7 @@
         <property name="jobRepository" ref="jobRepository" />
     </bean>
 
-    <batch:job id="job">
+    <batch:job id="batchJob">
         <batch:step id="workflow">
             <batch:tasklet>
                 <batch:chunk reader="staxEventEntityReader"
