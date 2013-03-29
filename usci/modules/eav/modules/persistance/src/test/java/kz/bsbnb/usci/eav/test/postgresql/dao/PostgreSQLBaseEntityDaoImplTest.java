@@ -23,6 +23,7 @@ import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.test.GenericTestCase;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -35,10 +36,9 @@ import java.sql.Date;
 import java.util.Calendar;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -408,6 +408,71 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         long countCreate = entityCreate.getAttributeCount();
         long countLoad = entityLoad.getAttributeCount();
         assertEquals(countCreate, countLoad);
+    }
+
+    @Test
+    public void updateBaseEntityWithDateValues() throws Exception {
+        MetaClass metaCreate = new MetaClass("testMetaClass");
+
+        metaCreate.setMetaAttribute("uuid",
+                new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
+
+        metaCreate.setMetaAttribute("date_first",
+                new MetaAttribute(false, true, new MetaValue(DataTypes.DATE)));
+        metaCreate.setMetaAttribute("date_second",
+                new MetaAttribute(false, true, new MetaValue(DataTypes.DATE)));
+        metaCreate.setMetaAttribute("date_third",
+                new MetaAttribute(false, true, new MetaValue(DataTypes.DATE)));
+        metaCreate.setMetaAttribute("date_fourth",
+                new MetaAttribute(false, true, new MetaValue(DataTypes.DATE)));
+
+        long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
+        MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
+
+        Batch batchFirst = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
+        Batch batchSecond = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
+
+        UUID uuid = UUID.randomUUID();
+
+        BaseEntity entityForSave = new BaseEntity(metaLoad);
+        entityForSave.put("uuid",
+                new BaseValue(batchFirst, 1L, uuid.toString()));
+        entityForSave.put("date_first",
+                new BaseValue(batchFirst, 1L, DateUtils.nowPlus(Calendar.DATE, 1)));
+        entityForSave.put("date_second",
+                new BaseValue(batchFirst, 1L, DateUtils.nowPlus(Calendar.DATE, 2)));
+        entityForSave.put("date_third",
+                new BaseValue(batchFirst, 1L, DateUtils.nowPlus(Calendar.DATE, 3)));
+
+        long entitySavedId = postgreSQLBaseEntityDaoImpl.save(entityForSave);
+        BaseEntity entitySaved = postgreSQLBaseEntityDaoImpl.load(entitySavedId);
+
+        BaseEntity entityForUpdate = new BaseEntity(metaLoad);
+        entityForUpdate.put("uuid",
+                new BaseValue(batchSecond, 2L, uuid.toString()));
+        entityForUpdate.put("date_first",
+                new BaseValue(batchSecond, 2L, null));
+        entityForUpdate.put("date_second",
+                new BaseValue(batchSecond, 2L, DateUtils.nowPlus(Calendar.DATE, 4)));
+        entityForUpdate.put("date_fourth",
+                new BaseValue(batchSecond, 2L, DateUtils.nowPlus(Calendar.DATE, 5)));
+
+        postgreSQLBaseEntityDaoImpl.update(entityForUpdate);
+        BaseEntity entityUpdated = postgreSQLBaseEntityDaoImpl.load(entitySavedId);
+
+        assertEquals("Incorrect number of attributes in the saved BaseEntity,",
+                4, entitySaved.getAttributeCount());
+        assertEquals("Incorrect number of attributes in the updated BaseEntity,",
+                4, entityUpdated.getAttributeCount());
+
+        Set<String> attributeNames = entityUpdated.getAttributeNames();
+
+        assertFalse("Attribute designed to remove is not removed.", attributeNames.contains("date_first"));
+        assertTrue("Attribute designed to insert is not inserted.", attributeNames.contains("date_fourth"));
+        assertTrue("Attribute value designed to update is not updated.",
+                DateUtils.compareBeginningOfTheDay(
+                        (java.util.Date) entityUpdated.getBaseValue("date_second").getValue(),
+                        DateUtils.nowPlus(Calendar.DATE, 4)) == 0);
     }
 
 }

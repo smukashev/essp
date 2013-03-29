@@ -99,26 +99,6 @@ public class JDBCSupport {
         return count;
     }
 
-    protected int[] batchArrayUpdateWithStats(String sql, List<Object[]> batchArgs)
-    {
-        double t1 = 0;
-        if(sqlStats != null)
-            t1 = System.nanoTime();
-
-        int[] counts = jdbcTemplate.batchUpdate(sql, batchArgs);
-
-        double t2 = System.nanoTime() - t1;
-        //double t3 = (t2 % batchArgs.size()) / 1000;
-
-        if(sqlStats != null)
-        {
-            //for (int i = 0; i < batchArgs.size(); i++)
-                sqlStats.put(sql, t2 / 1000);
-        }
-
-        return counts;
-    }
-
     protected int batchUpdateWithStats(String sql, List<Object> batchArgs)
     {
         double t1 = 0;
@@ -165,4 +145,5 @@ public class JDBCSupport {
 
         return keyHolder.getKey().longValue();
     }
+
 }

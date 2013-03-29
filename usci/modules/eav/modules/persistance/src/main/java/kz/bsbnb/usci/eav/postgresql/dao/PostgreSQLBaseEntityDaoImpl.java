@@ -13,6 +13,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
+import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.DateUtils;
@@ -49,6 +50,9 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private Executor sqlGenerator;
+
+    @Autowired
+    private BasicBaseEntitySearcherPool searcherPool;
 
     @PostConstruct
     public void init()
@@ -119,12 +123,261 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     @Override
     @Transactional
     public void update(BaseEntity baseEntity) {
-        if (baseEntity.getId() < 1)
+        MetaClass meta = baseEntity.getMeta();
+        List<BaseEntity> baseEntities = searcherPool.getSearcher(meta.getClassName())
+                .findAll(baseEntity);
+
+        if (baseEntities.isEmpty())
         {
-            throw new IllegalArgumentException("BaseEntity must contain the id.");
+            save(baseEntity);
+            return;
         }
 
+        BaseEntity baseEntityLoad = load(baseEntities.get(0).getId());
 
+        Map<DataTypes, Set<String>> removeSimpleAttributes = new HashMap<DataTypes, Set<String>>();
+        Map<DataTypes, Set<String>> updateSimpleAttributes = new HashMap<DataTypes, Set<String>>();
+        Map<DataTypes, Set<String>> insertSimpleAttributes = new HashMap<DataTypes, Set<String>>();
+
+        Set<String> attributes = baseEntity.getAttributeNames();
+        Set<String> attributesLoad = baseEntityLoad.getAttributeNames();
+
+        Iterator<String> it = attributes.iterator();
+        while (it.hasNext())
+        {
+            String attribute = it.next();
+            IMetaType metaType = meta.getMemberType(attribute);
+
+            //TODO: Whether first to collect the attributes, and then execute query
+            if (metaType.isSet())
+            {
+                //TODO: Implement this functionality
+            }
+            else
+            {
+                if (metaType.isComplex())
+                {
+                    //TODO: Implement this functionality
+                }
+                else
+                {
+                    IBaseValue baseValue = baseEntity.getBaseValue(attribute);
+                    if (baseValue.getValue() == null)
+                    {
+                        DataTypes type = ((MetaValue)metaType).getTypeCode();
+                        if (removeSimpleAttributes.containsKey(type))
+                        {
+                            removeSimpleAttributes.get(type).add(attribute);
+                        }
+                        else
+                        {
+                            Set<String> removeAttributes = new HashSet<String>();
+                            removeAttributes.add(attribute);
+
+                            removeSimpleAttributes.put(type, removeAttributes);
+                        }
+                    }
+                    else
+                    {
+                        if (attributesLoad.contains(attribute))
+                        {
+                            DataTypes type = ((MetaValue)metaType).getTypeCode();
+                            if (updateSimpleAttributes.containsKey(type))
+                            {
+                                updateSimpleAttributes.get(type).add(attribute);
+                            }
+                            else
+                            {
+                                Set<String> updateAttributes = new HashSet<String>();
+                                updateAttributes.add(attribute);
+
+                                updateSimpleAttributes.put(type, updateAttributes);
+                            }
+
+                            // Put value for update in the loaded BaseEntity
+                            baseEntityLoad.put(attribute, baseValue);
+                        }
+                        else
+                        {
+                            DataTypes type = ((MetaValue)metaType).getTypeCode();
+                            if (insertSimpleAttributes.containsKey(type))
+                            {
+                                insertSimpleAttributes.get(type).add(attribute);
+                            }
+                            else
+                            {
+                                Set<String> insertAttributes = new HashSet<String>();
+                                insertAttributes.add(attribute);
+
+                                insertSimpleAttributes.put(type, insertAttributes);
+                            }
+
+                            // Put value for insert in the loaded BaseEntity
+                            baseEntityLoad.put(attribute, baseValue);
+                        }
+                    }
+                }
+            }
+        }
+
+        // insert simple values (bulk insert)
+        if (!insertSimpleAttributes.isEmpty())
+        {
+            for (DataTypes dataType: insertSimpleAttributes.keySet())
+            {
+                insertSimpleValues(baseEntityLoad, insertSimpleAttributes.get(dataType), dataType);
+            }
+        }
+
+        // remove simple values
+        if (!updateSimpleAttributes.isEmpty())
+        {
+            for (DataTypes dataType: updateSimpleAttributes.keySet())
+            {
+                for (String attribute: updateSimpleAttributes.get(dataType))
+                {
+                    updateSimpleAttribute(baseEntityLoad, attribute);
+                }
+            }
+        }
+
+        // remove simple values
+        if (!removeSimpleAttributes.isEmpty())
+        {
+            for (DataTypes dataType: removeSimpleAttributes.keySet())
+            {
+                for (String attribute: removeSimpleAttributes.get(dataType))
+                {
+                    removeSimpleAttribute(baseEntityLoad, attribute);
+                    //TODO: Add remove attribute from the BaseEntity
+                }
+            }
+        }
+    }
+
+    private void removeSimpleAttribute(BaseEntity baseEntity, String attribute) {
+        MetaClass meta = baseEntity.getMeta();
+        IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
+        IMetaType metaType = metaAttribute.getMetaType();
+
+        long metaAttributeId =  metaAttribute.getId();
+        long baseEntityId = baseEntity.getId();
+
+        DeleteConditionStep delete;
+        switch(((MetaValue)metaType).getTypeCode())
+        {
+            case INTEGER: {
+                delete = sqlGenerator
+                        .delete(EAV_BE_INTEGER_VALUES)
+                        .where(EAV_BE_INTEGER_VALUES.ENTITY_ID.eq((int)baseEntityId))
+                        .and(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                break;
+            }
+            case DATE: {
+                delete = sqlGenerator
+                        .delete(EAV_BE_DATE_VALUES)
+                        .where(EAV_BE_DATE_VALUES.ENTITY_ID.eq((int)baseEntityId))
+                        .and(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                break;
+            }
+            case STRING: {
+                delete = sqlGenerator
+                        .delete(EAV_BE_STRING_VALUES)
+                        .where(EAV_BE_STRING_VALUES.ENTITY_ID.eq((int)baseEntityId))
+                        .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                break;
+            }
+            case BOOLEAN: {
+                delete = sqlGenerator
+                        .delete(EAV_BE_BOOLEAN_VALUES)
+                        .where(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.eq((int)baseEntityId))
+                        .and(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                break;
+            }
+            case DOUBLE: {
+                delete = sqlGenerator
+                        .delete(EAV_BE_DOUBLE_VALUES)
+                        .where(EAV_BE_DOUBLE_VALUES.ENTITY_ID.eq((int)baseEntityId))
+                        .and(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                break;
+            }
+            default:
+                throw new IllegalArgumentException("Unknown type.");
+        }
+
+        logger.debug(delete.toString());
+        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+    }
+
+    private void updateSimpleAttribute(BaseEntity baseEntity, String attribute) {
+        MetaClass meta = baseEntity.getMeta();
+        IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
+        IMetaType metaType = metaAttribute.getMetaType();
+
+        long metaAttributeId =  metaAttribute.getId();
+        long baseEntityId = baseEntity.getId();
+
+        IBaseValue baseValue = baseEntity.getBaseValue(attribute);
+
+        UpdateConditionStep update;
+        switch(((MetaValue)metaType).getTypeCode())
+        {
+            case INTEGER: {
+                update = sqlGenerator
+                        .update(EAV_BE_INTEGER_VALUES)
+                        .set(EAV_BE_INTEGER_VALUES.VALUE, (Integer)baseValue.getValue())
+                        .set(EAV_BE_INTEGER_VALUES.BATCH_ID, baseValue.getBatch().getId())
+                        .set(EAV_BE_INTEGER_VALUES.INDEX, baseValue.getIndex())
+                        .where(EAV_BE_INTEGER_VALUES.ENTITY_ID.eq((int)baseEntityId))
+                        .and(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                break;
+            }
+            case DATE: {
+                update = sqlGenerator
+                        .update(EAV_BE_DATE_VALUES)
+                        .set(EAV_BE_DATE_VALUES.VALUE, DateUtils.convert((java.util.Date)baseValue.getValue()))
+                        .set(EAV_BE_DATE_VALUES.BATCH_ID, baseValue.getBatch().getId())
+                        .set(EAV_BE_DATE_VALUES.INDEX, baseValue.getIndex())
+                        .where(EAV_BE_DATE_VALUES.ENTITY_ID.eq((int)baseEntityId))
+                        .and(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                break;
+            }
+            case STRING: {
+                update = sqlGenerator
+                        .update(EAV_BE_STRING_VALUES)
+                        .set(EAV_BE_STRING_VALUES.VALUE, (String)baseValue.getValue())
+                        .set(EAV_BE_STRING_VALUES.BATCH_ID, baseValue.getBatch().getId())
+                        .set(EAV_BE_STRING_VALUES.INDEX, baseValue.getIndex())
+                        .where(EAV_BE_STRING_VALUES.ENTITY_ID.eq((int)baseEntityId))
+                        .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                break;
+            }
+            case BOOLEAN: {
+                update = sqlGenerator
+                        .update(EAV_BE_STRING_VALUES)
+                        .set(EAV_BE_BOOLEAN_VALUES.VALUE, (Boolean)baseValue.getValue())
+                        .set(EAV_BE_BOOLEAN_VALUES.BATCH_ID, baseValue.getBatch().getId())
+                        .set(EAV_BE_BOOLEAN_VALUES.INDEX, baseValue.getIndex())
+                        .where(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.eq((int)baseEntityId))
+                        .and(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                break;
+            }
+            case DOUBLE: {
+                update = sqlGenerator
+                        .update(EAV_BE_DOUBLE_VALUES)
+                        .set(EAV_BE_DOUBLE_VALUES.VALUE, (Double)baseValue.getValue())
+                        .set(EAV_BE_DOUBLE_VALUES.BATCH_ID, baseValue.getBatch().getId())
+                        .set(EAV_BE_DOUBLE_VALUES.INDEX, baseValue.getIndex())
+                        .where(EAV_BE_DOUBLE_VALUES.ENTITY_ID.eq((int)baseEntityId))
+                        .and(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                break;
+            }
+            default:
+                throw new IllegalArgumentException("Unknown type.");
+        }
+
+        logger.debug(update.toString());
+        updateWithStats(update.getSQL(), update.getBindValues().toArray());
     }
 
     @Override
@@ -148,12 +401,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
 
         MetaClass meta = baseEntity.getMeta();
-        Set<String> entityAttributeNames = baseEntity.getAttributeNames();
+        Set<String> attributeNames = baseEntity.getAttributeNames();
 
         Map<DataTypes, Set<String>> simpleAttributeNames = new HashMap<DataTypes, Set<String>>();
         Set<String> complexAttributeNames = new HashSet<String>();
 
-        Iterator<String> it = entityAttributeNames.iterator();
+        Iterator<String> it = attributeNames.iterator();
         while (it.hasNext())
         {
             String attributeName = it.next();
@@ -312,7 +565,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             String attributeNameForInsert = it.next();
 
             IMetaAttribute metaAttribute = meta.getMetaAttribute(attributeNameForInsert);
-
 
             IBaseValue batchValue = baseEntity.getBaseValue(attributeNameForInsert);
 
@@ -493,12 +745,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 {
                     insert = sqlGenerator
                             .insertInto(
-                                EAV_BE_INTEGER_SET_VALUES,
-                                EAV_BE_INTEGER_SET_VALUES.SET_ID,
-                                EAV_BE_INTEGER_SET_VALUES.BATCH_ID,
-                                EAV_BE_INTEGER_SET_VALUES.INDEX,
-                                EAV_BE_INTEGER_SET_VALUES.REP_DATE,
-                                EAV_BE_INTEGER_SET_VALUES.VALUE);
+                                    EAV_BE_INTEGER_SET_VALUES,
+                                    EAV_BE_INTEGER_SET_VALUES.SET_ID,
+                                    EAV_BE_INTEGER_SET_VALUES.BATCH_ID,
+                                    EAV_BE_INTEGER_SET_VALUES.INDEX,
+                                    EAV_BE_INTEGER_SET_VALUES.REP_DATE,
+                                    EAV_BE_INTEGER_SET_VALUES.VALUE);
                     break;
                 }
                 case DATE:
