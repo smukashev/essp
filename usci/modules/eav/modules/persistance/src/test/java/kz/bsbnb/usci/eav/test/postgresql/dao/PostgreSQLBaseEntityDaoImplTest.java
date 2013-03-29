@@ -460,15 +460,15 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         postgreSQLBaseEntityDaoImpl.update(entityForUpdate);
         BaseEntity entityUpdated = postgreSQLBaseEntityDaoImpl.load(entitySavedId);
 
-        assertEquals("Incorrect number of attributes in the saved BaseEntity,",
+        assertEquals("Incorrect number of attribute values in the saved BaseEntity,",
                 4, entitySaved.getAttributeCount());
-        assertEquals("Incorrect number of attributes in the updated BaseEntity,",
+        assertEquals("Incorrect number of attribute values in the updated BaseEntity,",
                 4, entityUpdated.getAttributeCount());
 
         Set<String> attributeNames = entityUpdated.getAttributeNames();
 
-        assertFalse("Attribute designed to remove is not removed.", attributeNames.contains("date_first"));
-        assertTrue("Attribute designed to insert is not inserted.", attributeNames.contains("date_fourth"));
+        assertFalse("Attribute value designed to remove is not removed.", attributeNames.contains("date_first"));
+        assertTrue("Attribute value designed to insert is not inserted.", attributeNames.contains("date_fourth"));
         assertTrue("Attribute value designed to update is not updated.",
                 DateUtils.compareBeginningOfTheDay(
                         (java.util.Date) entityUpdated.getBaseValue("date_second").getValue(),

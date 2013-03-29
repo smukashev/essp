@@ -181,21 +181,25 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     {
                         if (attributesLoad.contains(attribute))
                         {
-                            DataTypes type = ((MetaValue)metaType).getTypeCode();
-                            if (updateSimpleAttributes.containsKey(type))
+                            IBaseValue baseValueLoad = baseEntityLoad.getBaseValue(attribute);
+                            if (!baseValue.getValue().equals(baseValueLoad.getValue()))
                             {
-                                updateSimpleAttributes.get(type).add(attribute);
-                            }
-                            else
-                            {
-                                Set<String> updateAttributes = new HashSet<String>();
-                                updateAttributes.add(attribute);
+                                DataTypes type = ((MetaValue)metaType).getTypeCode();
+                                if (updateSimpleAttributes.containsKey(type))
+                                {
+                                    updateSimpleAttributes.get(type).add(attribute);
+                                }
+                                else
+                                {
+                                    Set<String> updateAttributes = new HashSet<String>();
+                                    updateAttributes.add(attribute);
 
-                                updateSimpleAttributes.put(type, updateAttributes);
-                            }
+                                    updateSimpleAttributes.put(type, updateAttributes);
+                                }
 
-                            // Put value for update in the loaded BaseEntity
-                            baseEntityLoad.put(attribute, baseValue);
+                                // Put value for update in the loaded BaseEntity
+                                baseEntityLoad.put(attribute, baseValue);
+                            }
                         }
                         else
                         {
