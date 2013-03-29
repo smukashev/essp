@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
+import com.couchbase.client.CouchbaseClient;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
@@ -42,14 +43,16 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     private IBatchService batchService;
     private IMetaFactoryService metaFactoryService;
 
+    private CouchbaseClient couchbaseClient;
+
     @PostConstruct
     public void init() {
         batchService = serviceRepository.getBatchService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
 
-        File file = new File(fileName);
+        couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
 
-        byte[] byteArray = fileHelper.getFileBytes(file);
+        byte[] byteArray = (byte[]) couchbaseClient.get("batch:" + batchId);
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray);
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();

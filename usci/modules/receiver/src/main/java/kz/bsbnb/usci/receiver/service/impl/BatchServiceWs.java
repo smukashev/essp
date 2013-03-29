@@ -64,9 +64,9 @@ public class BatchServiceWs implements IBatchReceive {
 
         couchbaseClient.set("batch:"+batchId, 0, bytes);
 
-       /* try {
+        try {
             JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-            jobParametersBuilder.addParameter("fileName", new JobParameter(FILE_PATH));
+            //jobParametersBuilder.addParameter("fileName", new JobParameter(FILE_PATH));
             jobParametersBuilder.addParameter("batchId", new JobParameter(batchId));
 
             jobLauncher.run(batchJob, jobParametersBuilder.toJobParameters());
@@ -80,7 +80,7 @@ public class BatchServiceWs implements IBatchReceive {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
-        }*/
+        }
 
         return batchId;
     }
