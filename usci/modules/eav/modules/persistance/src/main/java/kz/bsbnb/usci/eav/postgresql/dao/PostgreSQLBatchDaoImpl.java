@@ -126,7 +126,7 @@ public class PostgreSQLBatchDaoImpl extends JDBCSupport implements IBatchDao
 
         if(row != null)
         {
-            batch.setId((Integer)row.get("id"));
+            batch.setId((Long)row.get("id"));
             logger.debug("CLASS: " + row.get("receipt_date").getClass());
             batch.setReceiptDate((Timestamp)row.get("receipt_date"));
             logger.debug("CLASS: " + row.get("rep_date").getClass());
