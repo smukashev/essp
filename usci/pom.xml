@@ -14,7 +14,7 @@
   <modules>
       <module>modules/eav</module>
       <module>modules/core</module>
-      <module>modules/batch</module>
+      <module>modules/receiver</module>
       <module>modules/sync</module>
       <module>modules/parent</module>
   </modules>
