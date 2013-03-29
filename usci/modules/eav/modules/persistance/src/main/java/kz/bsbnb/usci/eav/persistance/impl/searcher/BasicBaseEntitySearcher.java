@@ -45,7 +45,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
     }
 
     @Override
-    public BaseEntity findSingle(BaseEntity entity)
+    public Long findSingle(BaseEntity entity)
     {
         try
         {
@@ -139,6 +139,52 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                             on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_ID).
                                     and(EAV_BE_COMPLEX_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                 }
+            }
+            else
+            {
+                if (!type.isComplex())
+                {
+                    MetaValue simple_value = (MetaValue)type;
+
+                    switch (simple_value.getTypeCode())
+                    {
+                        case BOOLEAN:
+                            joins = joins.leftOuterJoin(EAV_BE_BOOLEAN_SET_VALUES.as(name)).
+                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_BOOLEAN_VALUES.as(name).ENTITY_ID).
+                                            and(EAV_BE_BOOLEAN_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
+                            break;
+                        case DATE:
+                            joins = joins.leftOuterJoin(EAV_BE_DATE_VALUES.as(name)).
+                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_DATE_VALUES.as(name).ENTITY_ID).
+                                            and(EAV_BE_DATE_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
+                            break;
+                        case DOUBLE:
+                            joins = joins.leftOuterJoin(EAV_BE_DOUBLE_VALUES.as(name)).
+                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_DOUBLE_VALUES.as(name).ENTITY_ID).
+                                            and(EAV_BE_DOUBLE_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
+                            break;
+                        case INTEGER:
+                            joins = joins.leftOuterJoin(EAV_BE_INTEGER_VALUES.as(name)).
+                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_INTEGER_VALUES.as(name).ENTITY_ID).
+                                            and(EAV_BE_INTEGER_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
+
+                            break;
+                        case STRING:
+                            joins = joins.leftOuterJoin(EAV_BE_STRING_VALUES.as(name)).
+                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_STRING_VALUES.as(name).ENTITY_ID).
+                                            and(EAV_BE_STRING_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
+                            break;
+                        default:
+                            throw new IllegalStateException("Unknown data type: " + simple_value.getTypeCode() +
+                                    " for attribute: " + name);
+                    }
+                }
+                /*else
+                {
+                    joins = joins.leftOuterJoin(EAV_BE_COMPLEX_VALUES.as(name)).
+                            on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_ID).
+                                    and(EAV_BE_COMPLEX_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
+                }*/
             }
         }
 
@@ -286,10 +332,10 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
     }
 
     @Override
-    public ArrayList<BaseEntity> findAll(BaseEntity entity)
+    public ArrayList<Long> findAll(BaseEntity entity)
     {
         MetaClass meta = entity.getMeta();
-        ArrayList<BaseEntity> result = new ArrayList<BaseEntity>();
+        ArrayList<Long> result = new ArrayList<Long>();
 
         SelectConditionStep where = generateSQL(entity, null);
 
@@ -298,9 +344,8 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         for (Map<String, Object> row : rows)
         {
             BaseEntity resultEntity = new BaseEntity(meta);
-            resultEntity.setId((Long)row.get(EAV_ENTITIES.ID.getName()));
 
-            result.add(resultEntity);
+            result.add((Long)row.get(EAV_ENTITIES.ID.getName()));
         }
 
         logger.debug("Result size: " + result.size());
