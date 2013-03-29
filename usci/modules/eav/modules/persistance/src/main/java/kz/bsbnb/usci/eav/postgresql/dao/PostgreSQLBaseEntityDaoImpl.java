@@ -124,7 +124,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     @Transactional
     public void update(BaseEntity baseEntity) {
         MetaClass meta = baseEntity.getMeta();
-        List<BaseEntity> baseEntities = searcherPool.getSearcher(meta.getClassName())
+        List<Long> baseEntities = searcherPool.getSearcher(meta.getClassName())
                 .findAll(baseEntity);
 
         if (baseEntities.isEmpty())
@@ -133,7 +133,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             return;
         }
 
-        BaseEntity baseEntityLoad = load(baseEntities.get(0).getId());
+        BaseEntity baseEntityLoad = load(baseEntities.get(0));
 
         Map<DataTypes, Set<String>> removeSimpleAttributes = new HashMap<DataTypes, Set<String>>();
         Map<DataTypes, Set<String>> updateSimpleAttributes = new HashMap<DataTypes, Set<String>>();
@@ -269,36 +269,36 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             case INTEGER: {
                 delete = sqlGenerator
                         .delete(EAV_BE_INTEGER_VALUES)
-                        .where(EAV_BE_INTEGER_VALUES.ENTITY_ID.eq((int)baseEntityId))
-                        .and(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                        .where(EAV_BE_INTEGER_VALUES.ENTITY_ID.eq(baseEntityId))
+                        .and(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
                 break;
             }
             case DATE: {
                 delete = sqlGenerator
                         .delete(EAV_BE_DATE_VALUES)
-                        .where(EAV_BE_DATE_VALUES.ENTITY_ID.eq((int)baseEntityId))
-                        .and(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                        .where(EAV_BE_DATE_VALUES.ENTITY_ID.eq(baseEntityId))
+                        .and(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
                 break;
             }
             case STRING: {
                 delete = sqlGenerator
                         .delete(EAV_BE_STRING_VALUES)
-                        .where(EAV_BE_STRING_VALUES.ENTITY_ID.eq((int)baseEntityId))
-                        .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                        .where(EAV_BE_STRING_VALUES.ENTITY_ID.eq(baseEntityId))
+                        .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
                 break;
             }
             case BOOLEAN: {
                 delete = sqlGenerator
                         .delete(EAV_BE_BOOLEAN_VALUES)
-                        .where(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.eq((int)baseEntityId))
-                        .and(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                        .where(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.eq(baseEntityId))
+                        .and(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
                 break;
             }
             case DOUBLE: {
                 delete = sqlGenerator
                         .delete(EAV_BE_DOUBLE_VALUES)
-                        .where(EAV_BE_DOUBLE_VALUES.ENTITY_ID.eq((int)baseEntityId))
-                        .and(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                        .where(EAV_BE_DOUBLE_VALUES.ENTITY_ID.eq(baseEntityId))
+                        .and(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
                 break;
             }
             default:
@@ -328,8 +328,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         .set(EAV_BE_INTEGER_VALUES.VALUE, (Integer)baseValue.getValue())
                         .set(EAV_BE_INTEGER_VALUES.BATCH_ID, baseValue.getBatch().getId())
                         .set(EAV_BE_INTEGER_VALUES.INDEX, baseValue.getIndex())
-                        .where(EAV_BE_INTEGER_VALUES.ENTITY_ID.eq((int)baseEntityId))
-                        .and(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                        .where(EAV_BE_INTEGER_VALUES.ENTITY_ID.eq(baseEntityId))
+                        .and(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
                 break;
             }
             case DATE: {
@@ -338,8 +338,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         .set(EAV_BE_DATE_VALUES.VALUE, DateUtils.convert((java.util.Date)baseValue.getValue()))
                         .set(EAV_BE_DATE_VALUES.BATCH_ID, baseValue.getBatch().getId())
                         .set(EAV_BE_DATE_VALUES.INDEX, baseValue.getIndex())
-                        .where(EAV_BE_DATE_VALUES.ENTITY_ID.eq((int)baseEntityId))
-                        .and(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                        .where(EAV_BE_DATE_VALUES.ENTITY_ID.eq(baseEntityId))
+                        .and(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
                 break;
             }
             case STRING: {
@@ -348,8 +348,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         .set(EAV_BE_STRING_VALUES.VALUE, (String)baseValue.getValue())
                         .set(EAV_BE_STRING_VALUES.BATCH_ID, baseValue.getBatch().getId())
                         .set(EAV_BE_STRING_VALUES.INDEX, baseValue.getIndex())
-                        .where(EAV_BE_STRING_VALUES.ENTITY_ID.eq((int)baseEntityId))
-                        .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                        .where(EAV_BE_STRING_VALUES.ENTITY_ID.eq(baseEntityId))
+                        .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
                 break;
             }
             case BOOLEAN: {
@@ -358,8 +358,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         .set(EAV_BE_BOOLEAN_VALUES.VALUE, (Boolean)baseValue.getValue())
                         .set(EAV_BE_BOOLEAN_VALUES.BATCH_ID, baseValue.getBatch().getId())
                         .set(EAV_BE_BOOLEAN_VALUES.INDEX, baseValue.getIndex())
-                        .where(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.eq((int)baseEntityId))
-                        .and(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                        .where(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.eq(baseEntityId))
+                        .and(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
                 break;
             }
             case DOUBLE: {
@@ -368,8 +368,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         .set(EAV_BE_DOUBLE_VALUES.VALUE, (Double)baseValue.getValue())
                         .set(EAV_BE_DOUBLE_VALUES.BATCH_ID, baseValue.getBatch().getId())
                         .set(EAV_BE_DOUBLE_VALUES.INDEX, baseValue.getIndex())
-                        .where(EAV_BE_DOUBLE_VALUES.ENTITY_ID.eq((int)baseEntityId))
-                        .and(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID.eq((int)metaAttributeId));
+                        .where(EAV_BE_DOUBLE_VALUES.ENTITY_ID.eq(baseEntityId))
+                        .and(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
                 break;
             }
             default:
