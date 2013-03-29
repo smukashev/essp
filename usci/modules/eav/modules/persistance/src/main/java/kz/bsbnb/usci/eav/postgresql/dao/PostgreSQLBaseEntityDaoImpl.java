@@ -71,7 +71,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_ENTITIES.ID, EAV_ENTITIES.CLASS_ID)
                 .from(EAV_ENTITIES)
-                .where(EAV_ENTITIES.ID.equal((int)id));
+                .where(EAV_ENTITIES.ID.equal(id));
 
         logger.debug(select.toString());
 
@@ -92,10 +92,10 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         if(row != null)
         {
-            MetaClass meta = metaClassRepository.getMetaClass((Integer)row.get(EAV_ENTITIES.CLASS_ID.getName()));
+            MetaClass meta = metaClassRepository.getMetaClass((Long)row.get(EAV_ENTITIES.CLASS_ID.getName()));
 
             baseEntity = new BaseEntity(meta);
-            baseEntity.setId((Integer)row.get(EAV_ENTITIES.ID.getName()));
+            baseEntity.setId((Long)row.get(EAV_ENTITIES.ID.getName()));
         }
         else
         {
@@ -478,7 +478,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         InsertOnDuplicateStep insert = sqlGenerator
                 .insertInto(EAV_ENTITIES, EAV_ENTITIES.CLASS_ID)
-                .values((int)baseEntity.getMeta().getId());
+                .values(baseEntity.getMeta().getId());
 
         logger.debug(insert.toString());
 
@@ -659,7 +659,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                             EAV_BE_ENTITY_SET_OF_SETS.ENTITY_ID,
                             EAV_BE_ENTITY_SET_OF_SETS.ATTRIBUTE_ID,
                             EAV_BE_ENTITY_SET_OF_SETS.SET_ID)
-                    .values((int)baseEntity.getId(), (int)metaAttribute.getId(), (int)setId);
+                    .values(baseEntity.getId(), metaAttribute.getId(), setId);
         }
         else
         {
@@ -671,7 +671,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                                 EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID,
                                 EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID,
                                 EAV_BE_ENTITY_COMPLEX_SETS.SET_ID)
-                        .values((int)baseEntity.getId(), (int)metaAttribute.getId(), (int)setId);
+                        .values(baseEntity.getId(), metaAttribute.getId(), setId);
             }
             else
             {
@@ -681,7 +681,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                                 EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID,
                                 EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID,
                                 EAV_BE_ENTITY_SIMPLE_SETS.SET_ID)
-                        .values((int)baseEntity.getId(), (int)metaAttribute.getId(), (int)setId);
+                        .values(baseEntity.getId(), metaAttribute.getId(), setId);
             }
         }
 
@@ -903,7 +903,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         EAV_BE_INTEGER_VALUES.VALUE)
                 .from(EAV_BE_INTEGER_VALUES)
                 .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
-                .where(EAV_BE_INTEGER_VALUES.ENTITY_ID.equal((int)baseEntity.getId()));
+                .where(EAV_BE_INTEGER_VALUES.ENTITY_ID.equal(baseEntity.getId()));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -933,7 +933,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         EAV_BE_DATE_VALUES.VALUE)
                 .from(EAV_BE_DATE_VALUES)
                 .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
-                .where(EAV_BE_DATE_VALUES.ENTITY_ID.equal((int)baseEntity.getId()));
+                .where(EAV_BE_DATE_VALUES.ENTITY_ID.equal(baseEntity.getId()));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -963,7 +963,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         EAV_BE_BOOLEAN_VALUES.VALUE)
                 .from(EAV_BE_BOOLEAN_VALUES)
                 .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
-                .where(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.equal((int)baseEntity.getId()));
+                .where(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.equal(baseEntity.getId()));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -993,7 +993,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         EAV_BE_STRING_VALUES.VALUE)
                 .from(EAV_BE_STRING_VALUES)
                 .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
-                .where(EAV_BE_STRING_VALUES.ENTITY_ID.equal((int)baseEntity.getId()));
+                .where(EAV_BE_STRING_VALUES.ENTITY_ID.equal(baseEntity.getId()));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -1023,7 +1023,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         EAV_BE_DOUBLE_VALUES.VALUE)
                 .from(EAV_BE_DOUBLE_VALUES)
                 .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
-                .where(EAV_BE_DOUBLE_VALUES.ENTITY_ID.equal((int)baseEntity.getId()));
+                .where(EAV_BE_DOUBLE_VALUES.ENTITY_ID.equal(baseEntity.getId()));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -1054,7 +1054,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID)
                 .from(EAV_BE_COMPLEX_VALUES)
                 .join(EAV_COMPLEX_ATTRIBUTES).on(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID.eq(EAV_COMPLEX_ATTRIBUTES.ID))
-                .where(EAV_BE_COMPLEX_VALUES.ENTITY_ID.equal((int)baseEntity.getId()));
+                .where(EAV_BE_COMPLEX_VALUES.ENTITY_ID.equal(baseEntity.getId()));
 
 
         logger.debug(select.toString());
@@ -1091,7 +1091,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 .from(EAV_BE_ENTITY_SIMPLE_SETS)
                 .join(EAV_BE_SETS).on(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID.eq(EAV_BE_SETS.ID))
                 .join(EAV_SIMPLE_SET).on(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID.eq(EAV_SIMPLE_SET.ID))
-                .where(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID.equal((int)baseEntity.getId()));
+                .where(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID.equal(baseEntity.getId()));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -1104,7 +1104,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             String attributeName = (String)row.get(EAV_SIMPLE_SET.NAME.getName());
             IMetaType metaType = metaClass.getMemberType(attributeName);
 
-            BaseSet baseSet = new BaseSet((Integer)row.get(EAV_BE_SETS.ID.getName()), ((MetaSet)metaType).getMemberType());
+            BaseSet baseSet = new BaseSet((Long)row.get(EAV_BE_SETS.ID.getName()), ((MetaSet)metaType).getMemberType());
 
             if (metaType.isComplex())
             {
@@ -1133,7 +1133,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 .from(EAV_BE_ENTITY_COMPLEX_SETS)
                 .join(EAV_BE_SETS).on(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.eq(EAV_BE_SETS.ID))
                 .join(EAV_COMPLEX_SET).on(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID.eq(EAV_COMPLEX_SET.ID))
-                .where(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID.equal((int)baseEntity.getId()));
+                .where(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID.equal(baseEntity.getId()));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -1146,7 +1146,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             String attributeName = (String)row.get(EAV_COMPLEX_SET.NAME.getName());
             IMetaType metaType = metaClass.getMemberType(attributeName);
 
-            BaseSet baseSet = new BaseSet((Integer)row.get(EAV_BE_SETS.ID.getName()), ((MetaSet)metaType).getMemberType());
+            BaseSet baseSet = new BaseSet((Long)row.get(EAV_BE_SETS.ID.getName()), ((MetaSet)metaType).getMemberType());
 
             if (metaType.isComplex())
             {
@@ -1175,7 +1175,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 .from(EAV_BE_ENTITY_SET_OF_SETS)
                 .join(EAV_BE_SETS).on(EAV_BE_ENTITY_SET_OF_SETS.SET_ID.eq(EAV_BE_SETS.ID))
                 .join(EAV_SET_OF_SETS).on(EAV_BE_ENTITY_SET_OF_SETS.ATTRIBUTE_ID.eq(EAV_SET_OF_SETS.ID))
-                .where(EAV_BE_ENTITY_SET_OF_SETS.ENTITY_ID.equal((int)baseEntity.getId()));
+                .where(EAV_BE_ENTITY_SET_OF_SETS.ENTITY_ID.equal(baseEntity.getId()));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -1188,7 +1188,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             String attributeName = (String)row.get(EAV_SET_OF_SETS.NAME.getName());
             IMetaType metaType = metaClass.getMemberType(attributeName);
 
-            BaseSet baseSet = new BaseSet((Integer)row.get(EAV_BE_SETS.ID.getName()), ((MetaSet)metaType).getMemberType());
+            BaseSet baseSet = new BaseSet((Long)row.get(EAV_BE_SETS.ID.getName()), ((MetaSet)metaType).getMemberType());
 
             if (metaType.isComplex())
             {
@@ -1213,7 +1213,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         EAV_BE_SETS.REP_DATE)
                 .from(EAV_BE_SET_OF_SIMPLE_SETS)
                 .join(EAV_BE_SETS).on(EAV_BE_SET_OF_SIMPLE_SETS.CHILD_SET_ID.eq(EAV_BE_SETS.ID))
-                .where(EAV_BE_SET_OF_SIMPLE_SETS.PARENT_SET_ID.equal((int) baseSet.getId()));
+                .where(EAV_BE_SET_OF_SIMPLE_SETS.PARENT_SET_ID.equal(baseSet.getId()));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -1222,7 +1222,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             Map<String, Object> row = it.next();
             IMetaType metaType = baseSet.getMemberType();
-            BaseSet baseSetChild = new BaseSet((Integer)row.get(EAV_BE_SETS.ID.getName()), ((MetaSet)metaType).getMemberType());
+            BaseSet baseSetChild = new BaseSet((Long)row.get(EAV_BE_SETS.ID.getName()), ((MetaSet)metaType).getMemberType());
 
             if (metaType.isComplex())
             {
@@ -1247,7 +1247,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         EAV_BE_SETS.REP_DATE)
                 .from(EAV_BE_SET_OF_COMPLEX_SETS)
                 .join(EAV_BE_SETS).on(EAV_BE_SET_OF_COMPLEX_SETS.CHILD_SET_ID.eq(EAV_BE_SETS.ID))
-                .where(EAV_BE_SET_OF_COMPLEX_SETS.PARENT_SET_ID.equal((int)baseSet.getId()));
+                .where(EAV_BE_SET_OF_COMPLEX_SETS.PARENT_SET_ID.equal(baseSet.getId()));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -1257,7 +1257,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             Map<String, Object> row = it.next();
             IMetaType metaType = baseSet.getMemberType();
-            BaseSet baseSetChild = new BaseSet((Integer)row.get(EAV_BE_SETS.ID.getName()), ((MetaSet)metaType).getMemberType());
+            BaseSet baseSetChild = new BaseSet((Long)row.get(EAV_BE_SETS.ID.getName()), ((MetaSet)metaType).getMemberType());
 
             if (metaType.isComplex())
             {
