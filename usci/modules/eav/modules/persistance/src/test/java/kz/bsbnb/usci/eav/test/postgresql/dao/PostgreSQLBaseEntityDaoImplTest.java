@@ -457,8 +457,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityForUpdate.put("date_fourth",
                 new BaseValue(batchSecond, 2L, DateUtils.nowPlus(Calendar.DATE, 5)));
 
-        postgreSQLBaseEntityDaoImpl.update(entityForUpdate);
-        BaseEntity entityUpdated = postgreSQLBaseEntityDaoImpl.load(entitySavedId);
+        BaseEntity entityUpdated = postgreSQLBaseEntityDaoImpl.update(entityForUpdate);
 
         assertEquals("Incorrect number of attribute values in the saved BaseEntity,",
                 4, entitySaved.getAttributeCount());

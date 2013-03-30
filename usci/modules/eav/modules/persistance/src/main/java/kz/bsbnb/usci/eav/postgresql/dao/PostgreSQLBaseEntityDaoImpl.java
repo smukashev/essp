@@ -120,26 +120,47 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         return baseEntity;
     }
 
-    @Override
-    @Transactional
-    public void update(BaseEntity baseEntity) {
+    public BaseEntity search(BaseEntity baseEntity) {
         MetaClass meta = baseEntity.getMeta();
         List<Long> baseEntities = searcherPool.getSearcher(meta.getClassName())
                 .findAll(baseEntity);
 
         if (baseEntities.isEmpty())
         {
-            save(baseEntity);
-            return;
+            return null;
         }
 
-        BaseEntity baseEntityLoad = load(baseEntities.get(0));
+        return load(baseEntities.get(0));
+    }
+
+    @Override
+    @Transactional
+    public BaseEntity update(BaseEntity baseEntity) {
+        BaseEntity baseEntityLoad = search(baseEntity);
+        if (baseEntityLoad == null)
+        {
+            long baseEntityId = save(baseEntity);
+            return load(baseEntityId);
+        }
+        else
+        {
+            return update(baseEntity, baseEntityLoad);
+        }
+    }
+
+    public BaseEntity update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad) {
+        if (baseEntityLoad.getId() < 1)
+        {
+            throw new IllegalArgumentException("BaseEntity for update does not contain id.");
+        }
+
+        MetaClass meta = baseEntitySave.getMeta();
 
         Map<DataTypes, Set<String>> removeSimpleAttributes = new HashMap<DataTypes, Set<String>>();
         Map<DataTypes, Set<String>> updateSimpleAttributes = new HashMap<DataTypes, Set<String>>();
         Map<DataTypes, Set<String>> insertSimpleAttributes = new HashMap<DataTypes, Set<String>>();
 
-        Set<String> attributes = baseEntity.getAttributeNames();
+        Set<String> attributes = baseEntitySave.getAttributeNames();
         Set<String> attributesLoad = baseEntityLoad.getAttributeNames();
 
         Iterator<String> it = attributes.iterator();
@@ -161,7 +182,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 }
                 else
                 {
-                    IBaseValue baseValue = baseEntity.getBaseValue(attribute);
+                    IBaseValue baseValue = baseEntitySave.getBaseValue(attribute);
                     DataTypes type = ((MetaValue)metaType).getTypeCode();
                     if (baseValue.getValue() == null)
                     {
@@ -204,7 +225,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             {
                 for (String attribute: updateSimpleAttributes.get(dataType))
                 {
-                    updateSimpleAttribute(baseEntityLoad, attribute);
+                    updateSimpleValue(baseEntityLoad, attribute);
                 }
             }
         }
@@ -216,13 +237,14 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             {
                 for (String attribute: removeSimpleAttributes.get(dataType))
                 {
-                    removeSimpleAttribute(baseEntityLoad, attribute);
+                    removeSimpleValue(baseEntityLoad, attribute);
 
                     //TODO: Whether remove attribute from the BaseEntity
                     baseEntityLoad.remove(attribute);
                 }
             }
         }
+        return baseEntityLoad;
     }
 
     private <K, V> void putMapValue(Map<K, Set<V>> map, K key, V value) {
@@ -233,13 +255,30 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         map.get(key).add(value);
     }
 
-    private void removeSimpleAttribute(BaseEntity baseEntity, String attribute) {
+    private void removeSimpleValue(BaseEntity baseEntity, String attribute) {
         MetaClass meta = baseEntity.getMeta();
         IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
+
+        if (metaAttribute == null) {
+            throw new IllegalArgumentException("Attribute " + attribute + " not found in the MetaClass. " +
+                    "Removing a simple value is not possible.");
+        }
+
         IMetaType metaType = metaAttribute.getMetaType();
 
         long metaAttributeId =  metaAttribute.getId();
         long baseEntityId = baseEntity.getId();
+
+        if (baseEntityId < 1)
+        {
+            throw new IllegalArgumentException("BaseEntity does not contain id. " +
+                    "Removing a simple value is not possible.");
+        }
+        if (metaAttributeId < 1)
+        {
+            throw new IllegalArgumentException("MetaAttribute does not contain id. " +
+                    "Removing a simple value is not possible.");
+        }
 
         DeleteConditionStep delete;
         switch(((MetaValue)metaType).getTypeCode())
@@ -287,13 +326,30 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
     }
 
-    private void updateSimpleAttribute(BaseEntity baseEntity, String attribute) {
+    private void updateSimpleValue(BaseEntity baseEntity, String attribute) {
         MetaClass meta = baseEntity.getMeta();
         IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
+
+        if (metaAttribute == null) {
+            throw new IllegalArgumentException("Attribute " + attribute + " not found in the MetaClass. " +
+                    "Updating a simple value is not possible.");
+        }
+
         IMetaType metaType = metaAttribute.getMetaType();
 
         long metaAttributeId =  metaAttribute.getId();
         long baseEntityId = baseEntity.getId();
+
+        if (baseEntityId < 1)
+        {
+            throw new IllegalArgumentException("BaseEntity does not contain id. " +
+                    "Updating a simple value is not possible.");
+        }
+        if (metaAttributeId < 1)
+        {
+            throw new IllegalArgumentException("MetaAttribute does not contain id. " +
+                    "Updating a simple value is not possible.");
+        }
 
         IBaseValue baseValue = baseEntity.getBaseValue(attribute);
 
