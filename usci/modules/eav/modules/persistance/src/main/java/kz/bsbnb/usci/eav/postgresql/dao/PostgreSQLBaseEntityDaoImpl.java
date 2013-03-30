@@ -151,31 +151,21 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             //TODO: Whether first to collect the attributes, and then execute query
             if (metaType.isSet())
             {
-                //TODO: Implement this functionality
+                //TODO: Implement this functionality for set values
             }
             else
             {
                 if (metaType.isComplex())
                 {
-                    //TODO: Implement this functionality
+                    //TODO: Implement this functionality for complex values
                 }
                 else
                 {
                     IBaseValue baseValue = baseEntity.getBaseValue(attribute);
+                    DataTypes type = ((MetaValue)metaType).getTypeCode();
                     if (baseValue.getValue() == null)
                     {
-                        DataTypes type = ((MetaValue)metaType).getTypeCode();
-                        if (removeSimpleAttributes.containsKey(type))
-                        {
-                            removeSimpleAttributes.get(type).add(attribute);
-                        }
-                        else
-                        {
-                            Set<String> removeAttributes = new HashSet<String>();
-                            removeAttributes.add(attribute);
-
-                            removeSimpleAttributes.put(type, removeAttributes);
-                        }
+                        putMapValue(removeSimpleAttributes, type, attribute);
                     }
                     else
                     {
@@ -184,40 +174,14 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                             IBaseValue baseValueLoad = baseEntityLoad.getBaseValue(attribute);
                             if (!baseValue.getValue().equals(baseValueLoad.getValue()))
                             {
-                                DataTypes type = ((MetaValue)metaType).getTypeCode();
-                                if (updateSimpleAttributes.containsKey(type))
-                                {
-                                    updateSimpleAttributes.get(type).add(attribute);
-                                }
-                                else
-                                {
-                                    Set<String> updateAttributes = new HashSet<String>();
-                                    updateAttributes.add(attribute);
-
-                                    updateSimpleAttributes.put(type, updateAttributes);
-                                }
-
-                                // Put value for update in the loaded BaseEntity
                                 baseEntityLoad.put(attribute, baseValue);
+                                putMapValue(updateSimpleAttributes, type, attribute);
                             }
                         }
                         else
                         {
-                            DataTypes type = ((MetaValue)metaType).getTypeCode();
-                            if (insertSimpleAttributes.containsKey(type))
-                            {
-                                insertSimpleAttributes.get(type).add(attribute);
-                            }
-                            else
-                            {
-                                Set<String> insertAttributes = new HashSet<String>();
-                                insertAttributes.add(attribute);
-
-                                insertSimpleAttributes.put(type, insertAttributes);
-                            }
-
-                            // Put value for insert in the loaded BaseEntity
                             baseEntityLoad.put(attribute, baseValue);
+                            putMapValue(insertSimpleAttributes, type, attribute);
                         }
                     }
                 }
@@ -233,7 +197,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             }
         }
 
-        // remove simple values
+        // update simple values
         if (!updateSimpleAttributes.isEmpty())
         {
             for (DataTypes dataType: updateSimpleAttributes.keySet())
@@ -253,10 +217,20 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 for (String attribute: removeSimpleAttributes.get(dataType))
                 {
                     removeSimpleAttribute(baseEntityLoad, attribute);
-                    //TODO: Add remove attribute from the BaseEntity
+
+                    //TODO: Whether remove attribute from the BaseEntity
+                    baseEntityLoad.remove(attribute);
                 }
             }
         }
+    }
+
+    private <K, V> void putMapValue(Map<K, Set<V>> map, K key, V value) {
+        if (!map.containsKey(key))
+        {
+            map.put(key, new HashSet<V>());
+        }
+        map.get(key).add(value);
     }
 
     private void removeSimpleAttribute(BaseEntity baseEntity, String attribute) {
@@ -430,18 +404,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 {
                     MetaValue metaValue = (MetaValue)metaType;
                     DataTypes type = metaValue.getTypeCode();
-
-                    if (simpleAttributeNames.containsKey(type))
-                    {
-                        simpleAttributeNames.get(type).add(attributeName);
-                    }
-                    else
-                    {
-                        Set<String> attributes = new HashSet<String>();
-                        attributes.add(attributeName);
-
-                        simpleAttributeNames.put(type, attributes);
-                    }
+                    putMapValue(simpleAttributeNames, type, attributeName);
                 }
             }
         }

@@ -163,6 +163,10 @@ public class BaseEntity extends Persistable implements IBaseContainer
         values.put(name, value);
     }
 
+    public void remove(String name) {
+        values.remove(name);
+    }
+
     @Override
     public Set<IBaseValue> get() {
         List<IBaseValue> list = new ArrayList<IBaseValue>(values.values());
