@@ -27,27 +27,25 @@ import javax.jws.WebService;
  */
 @WebService
 public class BatchServiceWs implements IBatchReceive {
+    @Autowired
+    private IServiceRepository serviceRepository;
 
     @Autowired
-    IServiceRepository serviceRepository;
+    private ICouchbaseClientFactory couchbaseClientFactory;
 
     @Autowired
-    ICouchbaseClientFactory couchbaseClientFactory;
-
-    @Autowired
-    JobLauncher jobLauncher;
+    private JobLauncher jobLauncher;
 
     @Autowired
     @Qualifier(value = "batchJob")
-    Job batchJob;
+    private Job batchJob;
 
-    IBatchService batchService;
-    CouchbaseClient couchbaseClient;
+    private IBatchService batchService;
+    private CouchbaseClient couchbaseClient;
 
     @PostConstruct
     public void init() {
         batchService = serviceRepository.getBatchService();
-
         couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
     }
 
@@ -66,7 +64,6 @@ public class BatchServiceWs implements IBatchReceive {
 
         try {
             JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-            //jobParametersBuilder.addParameter("fileName", new JobParameter(FILE_PATH));
             jobParametersBuilder.addParameter("batchId", new JobParameter(batchId));
 
             jobLauncher.run(batchJob, jobParametersBuilder.toJobParameters());

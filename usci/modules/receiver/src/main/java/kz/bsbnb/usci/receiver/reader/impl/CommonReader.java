@@ -32,9 +32,6 @@ public abstract class CommonReader<T> implements AbstractReader<T> {
     @Autowired
     protected FileHelper fileHelper;
 
-    /*@Value("#{jobParameters['fileName']}")
-    protected String fileName;*/
-
     @Value("#{jobParameters['batchId']}")
     protected Long batchId;
 
