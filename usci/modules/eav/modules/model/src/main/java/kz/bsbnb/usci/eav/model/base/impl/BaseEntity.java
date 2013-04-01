@@ -26,6 +26,9 @@ import java.util.*;
 public class BaseEntity extends Persistable implements IBaseContainer
 {
     Logger logger = LoggerFactory.getLogger(BaseEntity.class);
+
+    private UUID uuid = UUID.randomUUID();
+
     /**
      * Holds data about entity structure
      * @see MetaClass
@@ -64,6 +67,10 @@ public class BaseEntity extends Persistable implements IBaseContainer
     public MetaClass getMeta()
     {
         return meta;
+    }
+
+    public UUID getUuid() {
+        return uuid;
     }
 
     /**
@@ -161,6 +168,10 @@ public class BaseEntity extends Persistable implements IBaseContainer
         }
 
         values.put(name, value);
+    }
+
+    public void remove(String name) {
+        values.remove(name);
     }
 
     @Override

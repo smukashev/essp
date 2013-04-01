@@ -7,12 +7,15 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author k.tulbassiyev
  */
 public class BaseSet extends Persistable implements IBaseContainer
 {
+
+    private UUID uuid = UUID.randomUUID();
 
     /**
      * Holds data about entity structure
@@ -36,6 +39,10 @@ public class BaseSet extends Persistable implements IBaseContainer
     {
         super(id);
         this.meta = meta;
+    }
+
+    public UUID getUuid() {
+        return uuid;
     }
 
     @Override
