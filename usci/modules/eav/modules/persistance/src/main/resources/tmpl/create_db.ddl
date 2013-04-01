@@ -58,7 +58,7 @@
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <column name="value" primaryKey="false" required="false" type="BIT" size="1" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches">
@@ -82,7 +82,7 @@
       <column name="entity_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <column name="value" primaryKey="false" required="false" type="BIT" size="1" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches">
@@ -111,7 +111,7 @@
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <column name="entity_value_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches">
@@ -141,7 +141,7 @@
       <column name="entity_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <column name="entity_value_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches">
@@ -176,7 +176,7 @@
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <column name="value" primaryKey="false" required="false" type="DATE" size="13" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches">
@@ -200,7 +200,7 @@
       <column name="entity_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <column name="value" primaryKey="false" required="false" type="DATE" size="13" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches">
@@ -229,7 +229,7 @@
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <column name="value" primaryKey="false" required="false" type="DOUBLE" size="17,17" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches">
@@ -253,7 +253,7 @@
       <column name="entity_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <column name="value" primaryKey="false" required="false" type="DOUBLE" size="17,17" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches">
@@ -390,7 +390,7 @@
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <column name="value" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches">
@@ -411,7 +411,7 @@
       <column name="entity_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <column name="value" primaryKey="false" required="false" type="INTEGER" size="10" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches">
@@ -509,7 +509,7 @@
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches">
         <reference local="batch_id" foreign="id"/>
@@ -533,7 +533,7 @@
     <table name="eav_be_sets">
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches">
         <reference local="batch_id" foreign="id"/>
@@ -549,7 +549,7 @@
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <column name="value" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches">
@@ -573,7 +573,7 @@
       <column name="entity_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <column name="value" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches">
@@ -603,7 +603,7 @@
       <column name="entity_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
-      <column name="index" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <foreign-key foreignTable="eav_attributes">
         <reference local="attribute_id" foreign="id"/>
