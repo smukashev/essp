@@ -120,7 +120,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         return baseEntity;
     }
 
-    public BaseEntity search(BaseEntity baseEntity) {
+    public BaseEntity search(BaseEntity baseEntity)
+    {
         MetaClass meta = baseEntity.getMeta();
         List<Long> baseEntities = searcherPool.getSearcher(meta.getClassName())
                 .findAll(baseEntity);
@@ -135,7 +136,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
     @Override
     @Transactional
-    public BaseEntity update(BaseEntity baseEntity) {
+    public BaseEntity update(BaseEntity baseEntity)
+    {
         BaseEntity baseEntityLoad = search(baseEntity);
         if (baseEntityLoad == null)
         {
@@ -148,7 +150,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    public BaseEntity update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad) {
+    public BaseEntity update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad)
+    {
         if (baseEntityLoad.getId() < 1)
         {
             throw new IllegalArgumentException("BaseEntity for update does not contain id.");
@@ -247,7 +250,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         return baseEntityLoad;
     }
 
-    private <K, V> void putMapValue(Map<K, Set<V>> map, K key, V value) {
+    private <K, V> void putMapValue(Map<K, Set<V>> map, K key, V value)
+    {
         if (!map.containsKey(key))
         {
             map.put(key, new HashSet<V>());
@@ -255,7 +259,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         map.get(key).add(value);
     }
 
-    private void removeSimpleValue(BaseEntity baseEntity, String attribute) {
+    private void removeSimpleValue(BaseEntity baseEntity, String attribute)
+    {
         MetaClass meta = baseEntity.getMeta();
         IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
 
@@ -326,7 +331,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
     }
 
-    private void updateSimpleValue(BaseEntity baseEntity, String attribute) {
+    private void updateSimpleValue(BaseEntity baseEntity, String attribute)
+    {
         MetaClass meta = baseEntity.getMeta();
         IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
 
@@ -606,10 +612,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
     }
 
-    private void updateSimpleValues(BaseEntity baseEntity, Set<String> attributeNames, String query) {
-
-    }
-
     private void insertComplexValues(BaseEntity baseEntity, Set<String> attributeNames)
     {
         MetaClass meta = baseEntity.getMeta();
@@ -712,7 +714,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
-    private long insertSet(IBaseValue baseValue) {
+    private long insertSet(IBaseValue baseValue)
+    {
         InsertOnDuplicateStep insert = sqlGenerator
                 .insertInto(
                         EAV_BE_SETS,
@@ -917,7 +920,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         return setId;
     }
 
-    private void loadIntegerValues(BaseEntity baseEntity) {
+    private void loadIntegerValues(BaseEntity baseEntity)
+    {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_INTEGER_VALUES.BATCH_ID,
                         EAV_SIMPLE_ATTRIBUTES.NAME,
@@ -947,7 +951,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadDateValues(BaseEntity baseEntity) {
+    private void loadDateValues(BaseEntity baseEntity)
+    {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_DATE_VALUES.BATCH_ID,
                         EAV_SIMPLE_ATTRIBUTES.NAME,
@@ -977,7 +982,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadBooleanValues(BaseEntity baseEntity) {
+    private void loadBooleanValues(BaseEntity baseEntity)
+    {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_BOOLEAN_VALUES.BATCH_ID,
                         EAV_SIMPLE_ATTRIBUTES.NAME,
@@ -1007,7 +1013,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadStringValues(BaseEntity baseEntity) {
+    private void loadStringValues(BaseEntity baseEntity)
+    {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_STRING_VALUES.BATCH_ID,
                         EAV_SIMPLE_ATTRIBUTES.NAME,
@@ -1037,7 +1044,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadDoubleValues(BaseEntity baseEntity) {
+    private void loadDoubleValues(BaseEntity baseEntity)
+    {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_DOUBLE_VALUES.BATCH_ID,
                         EAV_SIMPLE_ATTRIBUTES.NAME,
@@ -1102,7 +1110,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadEntitySimpleSets(BaseEntity baseEntity) {
+    private void loadEntitySimpleSets(BaseEntity baseEntity)
+    {
         MetaClass metaClass = baseEntity.getMeta();
 
         SelectForUpdateStep select = sqlGenerator
@@ -1144,7 +1153,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadEntityComplexSets(BaseEntity baseEntity) {
+    private void loadEntityComplexSets(BaseEntity baseEntity)
+    {
         MetaClass metaClass = baseEntity.getMeta();
 
         SelectForUpdateStep select = sqlGenerator
@@ -1186,7 +1196,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadEntitySetOfSets(BaseEntity baseEntity) {
+    private void loadEntitySetOfSets(BaseEntity baseEntity)
+    {
         MetaClass metaClass = baseEntity.getMeta();
 
         SelectForUpdateStep select = sqlGenerator
@@ -1228,7 +1239,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadSetOfSimpleSets(BaseSet baseSet) {
+    private void loadSetOfSimpleSets(BaseSet baseSet)
+    {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_SETS.ID,
                         EAV_BE_SETS.BATCH_ID,
@@ -1262,7 +1274,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadSetOfComplexSets(BaseSet baseSet) {
+    private void loadSetOfComplexSets(BaseSet baseSet)
+    {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_SETS.ID,
                         EAV_BE_SETS.BATCH_ID,
@@ -1298,7 +1311,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadSimpleSetValues(BaseSet baseSet) {
+    private void loadSimpleSetValues(BaseSet baseSet)
+    {
         IMetaType metaType = baseSet.getMemberType();
         if (metaType.isComplex())
             throw new RuntimeException("Load the simple set values is not possible. " +
@@ -1346,7 +1360,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadIntegerSetValues(BaseSet baseSet) {
+    private void loadIntegerSetValues(BaseSet baseSet)
+    {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_INTEGER_SET_VALUES.BATCH_ID,
                         EAV_BE_INTEGER_SET_VALUES.INDEX_,
@@ -1373,7 +1388,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadDateSetValues(BaseSet baseSet) {
+    private void loadDateSetValues(BaseSet baseSet)
+    {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_DATE_SET_VALUES.BATCH_ID,
                         EAV_BE_DATE_SET_VALUES.INDEX_,
@@ -1400,7 +1416,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadStringSetValues(BaseSet baseSet) {
+    private void loadStringSetValues(BaseSet baseSet)
+    {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_STRING_SET_VALUES.BATCH_ID,
                         EAV_BE_STRING_SET_VALUES.INDEX_,
@@ -1427,7 +1444,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadBooleanSetValues(BaseSet baseSet) {
+    private void loadBooleanSetValues(BaseSet baseSet)
+    {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_BOOLEAN_SET_VALUES.BATCH_ID,
                         EAV_BE_BOOLEAN_SET_VALUES.INDEX_,
@@ -1454,7 +1472,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void loadDoubleSetValues(BaseSet baseSet) {
+    private void loadDoubleSetValues(BaseSet baseSet)
+    {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_DOUBLE_SET_VALUES.BATCH_ID,
                         EAV_BE_DOUBLE_SET_VALUES.INDEX_,
@@ -1516,6 +1535,81 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         (Date) row.get(EAV_BE_COMPLEX_SET_VALUES.REP_DATE.getName()), baseEntity));
             }
         }
+    }
+
+    private boolean compare(BaseSet comparingBaseSet, BaseSet anotherBaseSet)
+    {
+        IMetaType comparingMetaType = comparingBaseSet.getMemberType();
+        if (comparingMetaType.isSet())
+        {
+            throw new UnsupportedOperationException("Comparing an set of sets is not implemented.");
+        }
+        IMetaType anotherMetaType = anotherBaseSet.getMemberType();
+        if (anotherMetaType.isSet())
+        {
+            throw new UnsupportedOperationException("Comparing an set of sets is not implemented.");
+        }
+        if (!comparingMetaType.equals(anotherMetaType))
+        {
+            throw new IllegalArgumentException("Comparing an set of sets with different types " +
+                    "of embedded objects can not be performed");
+        }
+
+        Set<UUID> uuids = new HashSet<UUID>();
+
+        Iterator<IBaseValue> comparingIt = comparingBaseSet.get().iterator();
+        while (comparingIt.hasNext())
+        {
+            IBaseValue comparingBaseValue = comparingIt.next();
+
+            Iterator<IBaseValue> anotherIt = anotherBaseSet.get().iterator();
+            while (anotherIt.hasNext())
+            {
+                IBaseValue anotherBaseValue = anotherIt.next();
+                if (comparingMetaType.isComplex()) {
+                    BaseEntity comparingBaseEntity = (BaseEntity)comparingBaseValue.getValue();
+                    if (comparingBaseEntity == null) {
+                        throw new IllegalArgumentException("Element of the set can not be equal to null.");
+                    }
+
+                    BaseEntity anotherBaseEntity = (BaseEntity)anotherBaseValue.getValue();
+                    if (anotherBaseEntity == null) {
+                        throw new IllegalArgumentException("Element of the set can not be equal to null.");
+                    }
+
+                    if (!uuids.contains(anotherBaseEntity.getUuid())) {
+                        boolean compare = compare(comparingBaseEntity, anotherBaseEntity);
+                        if (compare)
+                        {
+                            uuids.add(anotherBaseEntity.getUuid());
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (comparingBaseSet.get().size() == uuids.size()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean compare(BaseEntity comparingBaseEntity, BaseEntity anotherBaseEntity)
+    {
+        MetaClass comparingMetaClass = comparingBaseEntity.getMeta();
+        MetaClass anotherMetaClass = anotherBaseEntity.getMeta();
+        if (!comparingMetaClass.getClassName().equals(anotherMetaClass.getClassName())) {
+            throw new IllegalArgumentException("Comparison BaseEntity with different metadata impossible.");
+        }
+
+        long comparingBaseEntityId = comparingBaseEntity.getId();
+        long anotherBaseEntityId = anotherBaseEntity.getId();
+        if (comparingBaseEntityId >= 1 && anotherBaseEntityId >= 1 && comparingBaseEntityId == anotherBaseEntityId)
+        {
+            return true;
+        }
+        return false;
     }
 
 }
