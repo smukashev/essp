@@ -26,14 +26,12 @@ import java.util.Date;
  * @author abukabayev
  */
 public class GenerateInsertXml {
-
-    private static final int DATA_SIZE=1;   // Number of entities to generate
-    private static String OS = System.getProperty("os.name").toLowerCase();
+    private final static int DATA_SIZE = 1;   // Number of entities to generate
+    private final static String OS = System.getProperty("os.name").toLowerCase();
     private final static String FILE_PATH_UNIX = "/opt/xmls/test.xml";
     private final static String FILE_PATH_WINDOWS = "D:/DevTemp/test.xml";
 
-    public static void main(String args[]){
-
+    public static void main(String args[]) {
         BaseEntityXmlGenerator baseEntityXmlGenerator = new BaseEntityXmlGenerator();
 
         MetaClassGenerator metaClassGenerator = new MetaClassGenerator();
@@ -54,38 +52,29 @@ public class GenerateInsertXml {
         TreeGenerator helper = new TreeGenerator();
 
         if(!storage.testConnection())
-        {
-            //logger.error("Can't connect to storage.");
             System.exit(1);
-        }
 
         storage.clear();
         storage.initialize();
 
         try {
-
             tree = helper.generateTree(tree);
             tree = tree.getChildren().get(0);
 
-            for (int i=1; i<=DATA_SIZE; i++){
-
+            for (int i=1; i<=DATA_SIZE; i++) {
                 MetaClass metaClass = metaClassGenerator.generateMetaClass(tree,i);
 
                 Long id = metaClassDao.save(metaClass);
                 data.add(metaClassDao.load(id));
-//                Set<String> ss = metaClass.getAttributeNames();
-//                for (String s:ss){
-//                    System.out.print(s+" ");
-//                }
-
-//               System.out.println(metaClass.equals(metaClassDao.load(id)));
             }
 
-            for (MetaClass m:metaClassGenerator.getMetaClasses()){
+            for (MetaClass m:metaClassGenerator.getMetaClasses()) {
                 metaClassDao.save(m);
             }
 
-            Batch batch = new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime()));
+            Batch batch = new Batch(new Timestamp(new Date().getTime()),
+                    new java.sql.Date(new Date().getTime()));
+
             long batchId = batchDao.save(batch);
 
             batch = batchDao.load(batchId);
