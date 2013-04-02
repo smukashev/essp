@@ -72,4 +72,9 @@ public class BaseSet extends Persistable implements IBaseContainer
     {
         return data;
     }
+
+    public int getElementCount()
+    {
+        return data.size();
+    }
 }

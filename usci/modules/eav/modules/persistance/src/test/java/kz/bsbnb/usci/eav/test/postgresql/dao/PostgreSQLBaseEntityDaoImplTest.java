@@ -474,4 +474,124 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
                         DateUtils.nowPlus(Calendar.DATE, 4)) == 0);
     }
 
+    @Test
+    public void updateBaseEntityWithComplexValues() throws Exception {
+        MetaClass metaCreate = new MetaClass("meta_class");
+
+        metaCreate.setMetaAttribute("uuid",
+                new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
+
+        metaCreate.setMetaAttribute("inner_meta_class_first",
+                new MetaAttribute(false, true, new MetaClass("meta_class_first")));
+        metaCreate.setMetaAttribute("inner_meta_class_second",
+                new MetaAttribute(false, true, new MetaClass("meta_class_second")));
+        metaCreate.setMetaAttribute("inner_meta_class_third",
+                new MetaAttribute(false, true, new MetaClass("meta_class_third")));
+        metaCreate.setMetaAttribute("inner_meta_class_fourth",
+                new MetaAttribute(false, true, new MetaClass("meta_class_fourth")));
+
+        long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
+        MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
+
+        Batch batchFirst = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
+        Batch batchSecond = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
+
+        UUID uuid = UUID.randomUUID();
+
+        BaseEntity entityForSave = new BaseEntity(metaLoad);
+        BaseEntity entityFirstForSave =
+                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_first"));
+        BaseEntity entitySecondForSave =
+                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_second"));
+        BaseEntity entityThirdForSave =
+                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_third"));
+
+        entityForSave.put("uuid",
+                new BaseValue(batchFirst, 1L, uuid.toString()));
+        entityForSave.put("inner_meta_class_first",
+                new BaseValue(batchFirst, 1L, entityFirstForSave));
+        entityForSave.put("inner_meta_class_second",
+                new BaseValue(batchFirst, 1L, entitySecondForSave));
+        entityForSave.put("inner_meta_class_third",
+                new BaseValue(batchFirst, 1L, entityThirdForSave));
+
+        long entitySavedId = postgreSQLBaseEntityDaoImpl.save(entityForSave);
+        BaseEntity entitySaved = postgreSQLBaseEntityDaoImpl.load(entitySavedId);
+
+        BaseEntity entityForUpdate = new BaseEntity(metaLoad);
+        BaseEntity entitySecondForUpdate =
+                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_second"));
+        BaseEntity entityFourthForUpdate =
+                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_second"));
+        entityForUpdate.put("uuid",
+                new BaseValue(batchSecond, 2L, uuid.toString()));
+        entityForUpdate.put("inner_meta_class_first",
+                new BaseValue(batchSecond, 2L, null));
+        entityForUpdate.put("inner_meta_class_second",
+                new BaseValue(batchSecond, 2L, entitySecondForUpdate));
+        entityForUpdate.put("inner_meta_class_fourth",
+                new BaseValue(batchSecond, 2L, entityFourthForUpdate));
+
+        BaseEntity entityUpdated = postgreSQLBaseEntityDaoImpl.update(entityForUpdate);
+
+        assertEquals("Incorrect number of attribute values in the saved BaseEntity,",
+                4, entitySaved.getAttributeCount());
+        assertEquals("Incorrect number of attribute values in the updated BaseEntity,",
+                4, entityUpdated.getAttributeCount());
+
+        Set<String> attributeNames = entityUpdated.getAttributeNames();
+
+        assertFalse("Attribute value designed to remove is not removed.",
+                attributeNames.contains("inner_meta_class_first"));
+        assertTrue("Attribute value designed to insert is not inserted.",
+                attributeNames.contains("inner_meta_class_fourth"));
+
+        IBaseValue baseValueFirstUpdated = entityUpdated.getBaseValue("inner_meta_class_first");
+        assertNull("The upgrade process was not deleted attribute.", baseValueFirstUpdated);
+
+        IBaseValue baseValueSecond = entityUpdated.getBaseValue("inner_meta_class_second");
+        assertNotNull("The upgrade process has been removed or not loaded attribute.", baseValueSecond);
+        assertEquals("During the update field INDEX was not changed,",
+                2L, baseValueSecond.getIndex());
+        assertEquals("During the update field BATCH_ID was not changed,",
+                batchSecond.getId(), baseValueSecond.getBatch().getId());
+
+        IBaseValue baseValueThird = entityUpdated.getBaseValue("inner_meta_class_third");
+        assertNotNull("The upgrade process has been removed or not loaded attribute.", baseValueThird);
+        assertEquals("During the update field INDEX was changed,",
+                1L, baseValueThird.getIndex());
+        assertEquals("During the update field BATCH_ID was changed,",
+                batchFirst.getId(), baseValueThird.getBatch().getId());
+    }
+
+    @Test
+    public void  searchBaseEntity() throws Exception {
+        MetaClass metaCreate = new MetaClass("meta_class");
+        metaCreate.setMetaAttribute("uuid",
+                new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
+
+        long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
+        MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
+
+        Batch batch = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
+
+        UUID uuid = UUID.randomUUID();
+
+        BaseEntity entityForSave = new BaseEntity(metaLoad);
+        entityForSave.put("uuid",
+                new BaseValue(batch, 1L, uuid.toString()));
+
+        long entitySavedId = postgreSQLBaseEntityDaoImpl.save(entityForSave);
+        BaseEntity entitySaved = postgreSQLBaseEntityDaoImpl.load(entitySavedId);
+
+        BaseEntity entityForSearch = new BaseEntity(metaLoad);
+        entityForSearch.put("uuid",
+                new BaseValue(batch, 1L, uuid.toString()));
+
+        BaseEntity entitySearched = postgreSQLBaseEntityDaoImpl.search(entityForSearch);
+        assertNotNull("Search engine was not found necessary BaseEntity.", entitySearched);
+        assertEquals("Search engine was found BaseEntity with incorrect id,",
+                entitySearched.getId(), entitySaved.getId());
+    }
+
 }
