@@ -15,6 +15,7 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import java.io.File;
+import java.rmi.RMISecurityManager;
 
 /**
  *
@@ -22,45 +23,18 @@ import java.io.File;
  */
 public class RmiServiceMain {
     private static Logger logger = Logger.getLogger(SimpleMain.class);
-    private static final String FILE_PATH = "/opt/xmls/test.xml";
 
     public static void main(String args[]) {
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextSimple.xml");
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextRmi.xml");
 
-        IServiceRepository serviceFactory = ctx.getBean(IServiceRepository.class);
-        IBatchService batchService = serviceFactory.getBatchService();
+        logger.info("RMI server started");
 
-        ICouchbaseClientFactory couchbaseClientFactory = ctx.getBean(ICouchbaseClientFactory.class);
-        CouchbaseClient client = couchbaseClientFactory.getCouchbaseClient();
-
-        FileHelper fileHelper = ctx.getBean(FileHelper.class);
-        File file  = new File(FILE_PATH);
-        byte bytes[] = fileHelper.getFileBytes(file);
-
-        Batch batch = new Batch(new java.sql.Date(new java.util.Date().getTime()));
-        long batchId = batchService.save(batch);
-
-        client.set("batch:"+batchId, 0, bytes);
-
-        JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
-        Job job = ctx.getBean(Job.class);
-
-        try {
-            JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-            jobParametersBuilder.addParameter("fileName", new JobParameter(FILE_PATH));
-            jobParametersBuilder.addParameter("batchId", new JobParameter(batchId));
-
-            jobLauncher.run(job, jobParametersBuilder.toJobParameters());
-        } catch (JobExecutionAlreadyRunningException e) {
-            e.printStackTrace();
-        } catch (JobRestartException e) {
-            e.printStackTrace();
-        } catch (JobInstanceAlreadyCompleteException e) {
-            e.printStackTrace();
-        } catch (JobParametersInvalidException e) {
-            e.printStackTrace();
-        } finally {
-            client.shutdown();
+        // Create and install a security manager
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new RMISecurityManager());
+            logger.info("Security manager installed.");
+        } else {
+            logger.info("Security manager already exists.");
         }
     }
 }
