@@ -4,7 +4,7 @@ import com.couchbase.client.CouchbaseClient;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.receiver.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
-import kz.bsbnb.usci.receiver.service.IBatchReceive;
+import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameter;
@@ -16,19 +16,18 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import java.sql.Date;
 
 /**
  * @author k.tulbassiyev
  */
-@WebService
-public class BatchServiceWs implements IBatchReceive {
+@Service
+public class BatchProcessServiceImpl implements IBatchProcessService {
     @Autowired
-    private IServiceRepository serviceRepository;
+    private IServiceRepository serviceFactory;
 
     @Autowired
     private ICouchbaseClientFactory couchbaseClientFactory;
@@ -45,22 +44,16 @@ public class BatchServiceWs implements IBatchReceive {
 
     @PostConstruct
     public void init() {
-        batchService = serviceRepository.getBatchService();
+        batchService = serviceFactory.getBatchService();
         couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
     }
 
-    @PreDestroy
-    public void destroy() {
-        couchbaseClient.shutdown();
-    }
-
-    @WebMethod
     @Override
-    public long process(byte[] bytes) {
-        Batch batch = new Batch(new java.sql.Date(new java.util.Date().getTime()));
+    public long processBatch(String fileName, String creditor, byte[] bytes) {
+        Batch batch = new Batch(new Date(new java.util.Date().getTime()));
         long batchId = batchService.save(batch);
 
-        couchbaseClient.set("batch:"+batchId, 0, bytes);
+        couchbaseClient.set("batch:" + batchId, 0, bytes);
 
         try {
             JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
@@ -75,8 +68,8 @@ public class BatchServiceWs implements IBatchReceive {
             e.printStackTrace();
         } catch (JobParametersInvalidException e) {
             e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } finally {
+            couchbaseClient.shutdown();
         }
 
         return batchId;

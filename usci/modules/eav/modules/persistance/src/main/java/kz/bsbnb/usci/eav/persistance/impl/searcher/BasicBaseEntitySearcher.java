@@ -2,13 +2,16 @@ package kz.bsbnb.usci.eav.persistance.impl.searcher;
 
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
+import kz.bsbnb.usci.eav.util.DateUtils;
 import org.jooq.Condition;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectJoinStep;
@@ -146,38 +149,9 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                 {
                     MetaValue simple_value = (MetaValue)type;
 
-                    switch (simple_value.getTypeCode())
-                    {
-                        case BOOLEAN:
-                            joins = joins.leftOuterJoin(EAV_BE_BOOLEAN_SET_VALUES.as(name)).
-                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_BOOLEAN_VALUES.as(name).ENTITY_ID).
-                                            and(EAV_BE_BOOLEAN_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
-                            break;
-                        case DATE:
-                            joins = joins.leftOuterJoin(EAV_BE_DATE_VALUES.as(name)).
-                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_DATE_VALUES.as(name).ENTITY_ID).
-                                            and(EAV_BE_DATE_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
-                            break;
-                        case DOUBLE:
-                            joins = joins.leftOuterJoin(EAV_BE_DOUBLE_VALUES.as(name)).
-                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_DOUBLE_VALUES.as(name).ENTITY_ID).
-                                            and(EAV_BE_DOUBLE_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
-                            break;
-                        case INTEGER:
-                            joins = joins.leftOuterJoin(EAV_BE_INTEGER_VALUES.as(name)).
-                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_INTEGER_VALUES.as(name).ENTITY_ID).
-                                            and(EAV_BE_INTEGER_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
-
-                            break;
-                        case STRING:
-                            joins = joins.leftOuterJoin(EAV_BE_STRING_VALUES.as(name)).
-                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_STRING_VALUES.as(name).ENTITY_ID).
-                                            and(EAV_BE_STRING_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
-                            break;
-                        default:
-                            throw new IllegalStateException("Unknown data type: " + simple_value.getTypeCode() +
-                                    " for attribute: " + name);
-                    }
+                    joins = joins.leftOuterJoin(EAV_BE_ENTITY_SIMPLE_SETS.as(name)).
+                            on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_ENTITY_SIMPLE_SETS.as(name).ENTITY_ID).
+                                    and(EAV_BE_ENTITY_SIMPLE_SETS.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                 }
                 /*else
                 {
@@ -320,6 +294,453 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                         else
                             condition = condition.orExists(innerSQL);
                     }
+                }
+            }
+            else
+            {
+                if (!type.isComplex())
+                {
+                    MetaSet simple_value = (MetaSet)type;
+
+                    switch (simple_value.getTypeCode())
+                    {
+                        case BOOLEAN:
+                            SelectConditionStep outerBooleanSQL = null;
+
+                            BaseSet actual_set_value = (BaseSet)value.getValue();
+
+                            for (IBaseValue actSetElementValue : actual_set_value.get())
+                            {
+                                Boolean actualBooleanValue = (Boolean)actSetElementValue.getValue();
+
+                                SelectConditionStep innerSQL = sqlGenerator.select(
+                                        EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID
+                                ).from(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values"))
+                                        .where(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").SET_ID.equal(
+                                                EAV_BE_ENTITY_SIMPLE_SETS.as(name).SET_ID
+                                        )).and(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").VALUE.equal(actualBooleanValue));
+
+                                if (outerBooleanSQL == null) {
+                                    outerBooleanSQL = innerSQL;
+                                }
+                                else {
+                                    outerBooleanSQL.unionAll(innerSQL);
+                                }
+                            }
+
+
+                            if (condition == null)
+                            {
+                                if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                {
+                                    condition = sqlGenerator.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
+                                        count()).from(outerBooleanSQL).asField(name + "_values_c").eq(actual_set_value.get().
+                                        size());
+                                }
+                                else
+                                {
+                                    condition = sqlGenerator.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
+                                            count()).from(outerBooleanSQL).asField(name + "_values_c").ge(0);
+                                }
+                            }
+                            else
+                            {
+                                if (and)
+                                {
+                                    if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                    {
+                                        condition = condition.and(sqlGenerator.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerBooleanSQL).asField(name + "_values_c").eq(actual_set_value.get().
+                                                size()));
+                                    }
+                                    else
+                                    {
+                                        condition = condition.and(sqlGenerator.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerBooleanSQL).asField(name + "_values_c").ge(0));
+                                    }
+                                }
+                                else
+                                {
+                                    if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                    {
+                                        condition = condition.or(sqlGenerator.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerBooleanSQL).asField(name + "_values_c").eq(actual_set_value.get().
+                                                size()));
+                                    }
+                                    else
+                                    {
+                                        condition = condition.or(sqlGenerator.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerBooleanSQL).asField(name + "_values_c").ge(0));
+                                    }
+                                }
+                            }
+                            break;
+                        case DATE:
+                            SelectConditionStep outerDateSQL = null;
+
+                            BaseSet actual_date_value = (BaseSet)value.getValue();
+
+                            for (IBaseValue actDateElementValue : actual_date_value.get())
+                            {
+                                java.sql.Date actualDateValue = DateUtils.convert((java.util.Date)actDateElementValue.
+                                        getValue());
+
+                                SelectConditionStep innerSQL = sqlGenerator.select(
+                                        EAV_BE_DATE_SET_VALUES.as(name + "_values").ID
+                                ).from(EAV_BE_DATE_SET_VALUES.as(name + "_values"))
+                                        .where(EAV_BE_DATE_SET_VALUES.as(name + "_values").SET_ID.equal(
+                                                EAV_BE_ENTITY_SIMPLE_SETS.as(name).SET_ID
+                                        )).and(EAV_BE_DATE_SET_VALUES.as(name + "_values").VALUE.equal(actualDateValue));
+
+                                if (outerDateSQL == null) {
+                                    outerDateSQL = innerSQL;
+                                }
+                                else {
+                                    outerDateSQL.unionAll(innerSQL);
+                                }
+                            }
+
+
+                            if (condition == null)
+                            {
+                                if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                {
+                                    condition = sqlGenerator.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
+                                            count()).from(outerDateSQL).asField(name + "_values_c").eq(actual_date_value.get().
+                                            size());
+                                }
+                                else
+                                {
+                                    condition = sqlGenerator.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
+                                            count()).from(outerDateSQL).asField(name + "_values_c").ge(0);
+                                }
+                            }
+                            else
+                            {
+                                if (and)
+                                {
+                                    if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                    {
+                                        condition = condition.and(sqlGenerator.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerDateSQL).asField(name + "_values_c").eq(actual_date_value.get().
+                                                size()));
+                                    }
+                                    else
+                                    {
+                                        condition = condition.and(sqlGenerator.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerDateSQL).asField(name + "_values_c").ge(0));
+                                    }
+                                }
+                                else
+                                {
+                                    if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                    {
+                                        condition = condition.or(sqlGenerator.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerDateSQL).asField(name + "_values_c").eq(actual_date_value.get().
+                                                size()));
+                                    }
+                                    else
+                                    {
+                                        condition = condition.or(sqlGenerator.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerDateSQL).asField(name + "_values_c").ge(0));
+                                    }
+                                }
+                            }
+
+                            break;
+                        case DOUBLE:
+                            SelectConditionStep outerDoubleSQL = null;
+
+                            BaseSet actual_double_value = (BaseSet)value.getValue();
+
+                            for (IBaseValue actDoubleElementValue : actual_double_value.get())
+                            {
+                                Double actualDoubleValue =(Double)actDoubleElementValue.
+                                        getValue();
+
+                                SelectConditionStep innerSQL = sqlGenerator.select(
+                                        EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID
+                                ).from(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values"))
+                                        .where(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").SET_ID.equal(
+                                                EAV_BE_ENTITY_SIMPLE_SETS.as(name).SET_ID
+                                        )).and(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").VALUE.equal(actualDoubleValue));
+
+                                if (outerDoubleSQL == null) {
+                                    outerDoubleSQL = innerSQL;
+                                }
+                                else {
+                                    outerDoubleSQL.unionAll(innerSQL);
+                                }
+                            }
+
+
+                            if (condition == null)
+                            {
+                                if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                {
+                                    condition = sqlGenerator.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
+                                            count()).from(outerDoubleSQL).asField(name + "_values_c").eq(actual_double_value.get().
+                                            size());
+                                }
+                                else
+                                {
+                                    condition = sqlGenerator.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
+                                            count()).from(outerDoubleSQL).asField(name + "_values_c").ge(0);
+                                }
+                            }
+                            else
+                            {
+                                if (and)
+                                {
+                                    if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                    {
+                                        condition = condition.and(sqlGenerator.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerDoubleSQL).asField(name + "_values_c").eq(actual_double_value.get().
+                                                size()));
+                                    }
+                                    else
+                                    {
+                                        condition = condition.and(sqlGenerator.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerDoubleSQL).asField(name + "_values_c").ge(0));
+                                    }
+                                }
+                                else
+                                {
+                                    if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                    {
+                                        condition = condition.or(sqlGenerator.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerDoubleSQL).asField(name + "_values_c").eq(actual_double_value.get().
+                                                size()));
+                                    }
+                                    else
+                                    {
+                                        condition = condition.or(sqlGenerator.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerDoubleSQL).asField(name + "_values_c").ge(0));
+                                    }
+                                }
+                            }
+
+                            break;
+                        case INTEGER:
+                            SelectConditionStep outerIntegerSQL = null;
+
+                            BaseSet actual_integer_value = (BaseSet)value.getValue();
+
+                            for (IBaseValue actIntegerElementValue : actual_integer_value.get())
+                            {
+                                Long actualIntegerValue = ((Integer)actIntegerElementValue.
+                                        getValue()).longValue();
+
+                                SelectConditionStep innerSQL = sqlGenerator.select(
+                                        EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID
+                                ).from(EAV_BE_INTEGER_SET_VALUES.as(name + "_values"))
+                                        .where(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").SET_ID.equal(
+                                                EAV_BE_ENTITY_SIMPLE_SETS.as(name).SET_ID
+                                        )).and(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").VALUE.equal(actualIntegerValue));
+
+                                if (outerIntegerSQL == null) {
+                                    outerIntegerSQL = innerSQL;
+                                }
+                                else {
+                                    outerIntegerSQL.unionAll(innerSQL);
+                                }
+                            }
+
+
+                            if (condition == null)
+                            {
+                                if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                {
+                                    condition = sqlGenerator.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
+                                            count()).from(outerIntegerSQL).asField(name + "_values_c").eq(actual_integer_value.get().
+                                            size());
+                                }
+                                else
+                                {
+                                    condition = sqlGenerator.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
+                                            count()).from(outerIntegerSQL).asField(name + "_values_c").ge(0);
+                                }
+                            }
+                            else
+                            {
+                                if (and)
+                                {
+                                    if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                    {
+                                        condition = condition.and(sqlGenerator.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerIntegerSQL).asField(name + "_values_c").eq(actual_integer_value.get().
+                                                size()));
+                                    }
+                                    else
+                                    {
+                                        condition = condition.and(sqlGenerator.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerIntegerSQL).asField(name + "_values_c").ge(0));
+                                    }
+                                }
+                                else
+                                {
+                                    if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                    {
+                                        condition = condition.or(sqlGenerator.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerIntegerSQL).asField(name + "_values_c").eq(actual_integer_value.get().
+                                                size()));
+                                    }
+                                    else
+                                    {
+                                        condition = condition.or(sqlGenerator.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerIntegerSQL).asField(name + "_values_c").ge(0));
+                                    }
+                                }
+                            }
+
+                            break;
+                        case STRING:
+                            SelectConditionStep outerStringSQL = null;
+
+                            BaseSet actual_string_value = (BaseSet)value.getValue();
+
+                            for (IBaseValue actStringElementValue : actual_string_value.get())
+                            {
+                                String actualStringValue = (String)actStringElementValue.
+                                        getValue();
+
+                                SelectConditionStep innerSQL = sqlGenerator.select(
+                                        EAV_BE_STRING_SET_VALUES.as(name + "_values").ID
+                                ).from(EAV_BE_STRING_SET_VALUES.as(name + "_values"))
+                                        .where(EAV_BE_STRING_SET_VALUES.as(name + "_values").SET_ID.equal(
+                                                EAV_BE_ENTITY_SIMPLE_SETS.as(name).SET_ID
+                                        )).and(EAV_BE_STRING_SET_VALUES.as(name + "_values").VALUE.equal(actualStringValue));
+
+                                if (outerStringSQL == null) {
+                                    outerStringSQL = innerSQL;
+                                }
+                                else {
+                                    outerStringSQL.unionAll(innerSQL);
+                                }
+                            }
+
+
+                            if (condition == null)
+                            {
+                                if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                {
+                                    condition = sqlGenerator.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
+                                            count()).from(outerStringSQL).asField(name + "_values_c").eq(actual_string_value.get().
+                                            size());
+                                }
+                                else
+                                {
+                                    condition = sqlGenerator.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
+                                            count()).from(outerStringSQL).asField(name + "_values_c").ge(0);
+                                }
+                            }
+                            else
+                            {
+                                if (and)
+                                {
+                                    if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                    {
+                                        condition = condition.and(sqlGenerator.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerStringSQL).asField(name + "_values_c").eq(actual_string_value.get().
+                                                size()));
+                                    }
+                                    else
+                                    {
+                                        condition = condition.and(sqlGenerator.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerStringSQL).asField(name + "_values_c").ge(0));
+                                    }
+                                }
+                                else
+                                {
+                                    if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                    {
+                                        condition = condition.or(sqlGenerator.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerStringSQL).asField(name + "_values_c").eq(actual_string_value.get().
+                                                size()));
+                                    }
+                                    else
+                                    {
+                                        condition = condition.or(sqlGenerator.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
+                                                count()).from(outerStringSQL).asField(name + "_values_c").ge(0));
+                                    }
+                                }
+                            }
+
+                            break;
+                        default:
+                            throw new IllegalStateException("Unknown data type: " + simple_value.getTypeCode() +
+                                    " for attribute: " + name);
+                    }
+                }
+                else
+                {
+                    SelectConditionStep outerComplexSQL = null;
+
+                    BaseSet actual_set_value = (BaseSet)value.getValue();
+
+                    for (IBaseValue actSetElementValue : actual_set_value.get())
+                    {
+                        BaseEntity actualBaseEntityValue = (BaseEntity)actSetElementValue.getValue();
+
+                        SelectConditionStep innerSQL = generateSQL(actualBaseEntityValue, name);
+
+                        if (outerComplexSQL == null) {
+                            outerComplexSQL = innerSQL;
+                        }
+                        else {
+                            outerComplexSQL.unionAll(innerSQL);
+                        }
+                    }
+
+                    MetaClass simple_value = (MetaClass)type;
+
+
+                    if (condition == null)
+                    {
+                        if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
+                        {
+                            condition = sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
+                                    count()).from(outerComplexSQL).asField(name + "_values_c").eq(actual_set_value.get().
+                                    size());
+                        }
+                        else
+                        {
+                            condition = sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
+                                    count()).from(outerComplexSQL).asField(name + "_values_c").ge(0);
+                        }
+                    }
+                    else
+                    {
+                        if (and)
+                        {
+                            if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
+                            {
+                                condition = condition.and(sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
+                                        count()).from(outerComplexSQL).asField(name + "_values_c").eq(actual_set_value.get().
+                                        size()));
+                            }
+                            else
+                            {
+                                condition = condition.and(sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
+                                        count()).from(outerComplexSQL).asField(name + "_values_c").ge(0));
+                            }
+                        }
+                        else
+                        {
+                            if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
+                            {
+                                condition = condition.or(sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
+                                        count()).from(outerComplexSQL).asField(name + "_values_c").eq(actual_set_value.get().
+                                        size()));
+                            }
+                            else
+                            {
+                                condition = condition.or(sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
+                                        count()).from(outerComplexSQL).asField(name + "_values_c").ge(0));
+                            }
+                        }
+                    }
+                    break;
                 }
             }
         }
