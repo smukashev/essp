@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav.model.base;
 
 
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 
 import java.sql.Date;
 
@@ -12,7 +13,7 @@ import java.sql.Date;
  *
  * @author a.motov
  */
-public interface IBaseValue
+public interface IBaseValue extends IPersistable
 {
     /**
      * Returns the <code>Batch</code> that contains information about the origin of this value.

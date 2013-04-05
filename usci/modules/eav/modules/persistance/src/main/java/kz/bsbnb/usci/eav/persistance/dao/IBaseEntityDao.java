@@ -10,8 +10,8 @@ public interface IBaseEntityDao extends IDao<BaseEntity>
 
     public BaseEntity search(BaseEntity baseEntity);
 
-    public BaseEntity update(BaseEntity baseEntity);
+    public long saveOrUpdate(BaseEntity baseEntity);
 
-    public BaseEntity update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
+    public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
 
 }

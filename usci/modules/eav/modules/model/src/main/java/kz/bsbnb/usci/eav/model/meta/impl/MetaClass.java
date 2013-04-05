@@ -23,7 +23,9 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
 
     private Timestamp beginDate = new Timestamp(java.util.Calendar.getInstance().getTimeInMillis());
 
-    private boolean isDisabled = false;
+    private boolean disabled = false;
+
+    private boolean searchable = false;
 	
 	/**
 	 * Holds type values. Keys of hash are type names.
@@ -52,7 +54,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
     {
         this.className = meta.className;
         this.id = meta.id;
-        this.isDisabled = meta.isDisabled;
+        this.disabled = meta.disabled;
         this.beginDate = meta.beginDate;
         this.complexKeyType = meta.complexKeyType;
 
@@ -136,7 +138,19 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
 
 	public void removeMemberType(String name)
     {
-		members.remove(name);
+        members.remove(name);
+
+        searchable = false;
+        Iterator<IMetaAttribute> it = members.values().iterator();
+        while (it.hasNext())
+        {
+            IMetaAttribute metaAttribute = it.next();
+            if (metaAttribute.isKey())
+            {
+                searchable = true;
+                break;
+            }
+        }
 	}
 
 	/**
@@ -148,7 +162,11 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
 	 */
 	public void setMetaAttribute(String name, IMetaAttribute metaAttribute)
     {
-		members.put(name, metaAttribute);
+		if (!searchable && metaAttribute.isKey())
+        {
+            searchable = true;
+        }
+        members.put(name, metaAttribute);
 	}
 
     @Override
@@ -179,16 +197,17 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
 
     public boolean isDisabled()
     {
-        return isDisabled;
+        return disabled;
     }
 
     public void setDisabled(boolean disabled)
     {
-        isDisabled = disabled;
+        this.disabled = disabled;
     }
 
     public void removeMembers()
     {
+        searchable = false;
         members.clear();
     }
 
@@ -373,4 +392,9 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
     {
         return members.size();
     }
+
+    public boolean isSearchable() {
+        return searchable;
+    }
+
 }
