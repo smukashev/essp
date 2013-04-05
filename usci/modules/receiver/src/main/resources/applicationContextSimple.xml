@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:ws="http://jax-ws.dev.java.net/spring/core"
-       xmlns:wss="http://jax-ws.dev.java.net/spring/servlet"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:batch="http://www.springframework.org/schema/batch"
@@ -13,11 +11,7 @@
        http://www.springframework.org/schema/tx
        http://www.springframework.org/schema/tx/spring-tx.xsd
        http://www.springframework.org/schema/batch
-       http://www.springframework.org/schema/batch/spring-batch.xsd
-       http://jax-ws.dev.java.net/spring/core
-       http://jax-ws.dev.java.net/spring/core.xsd
-       http://jax-ws.dev.java.net/spring/servlet
-       http://jax-ws.dev.java.net/spring/servlet.xsd">
+       http://www.springframework.org/schema/batch/spring-batch.xsd">
 
     <context:annotation-config/>
 
@@ -87,14 +81,5 @@
     <bean id="sqlGenerator" class="org.jooq.impl.Executor">
         <constructor-arg index="0" value="POSTGRES"/>
     </bean>
-
-    <wss:binding url="/batchService">
-        <wss:service>
-            <ws:service bean="#batchService"/>
-        </wss:service>
-    </wss:binding>
-
-    <!-- Services -->
-    <bean id="batchService" class="kz.bsbnb.usci.receiver.service.impl.BatchServiceWs" />
 
 </beans>

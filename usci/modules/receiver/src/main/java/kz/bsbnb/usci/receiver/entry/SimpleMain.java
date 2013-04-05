@@ -47,7 +47,6 @@ public class SimpleMain {
 
         try {
             JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-            jobParametersBuilder.addParameter("fileName", new JobParameter(FILE_PATH));
             jobParametersBuilder.addParameter("batchId", new JobParameter(batchId));
 
             jobLauncher.run(job, jobParametersBuilder.toJobParameters());

@@ -6,6 +6,7 @@ import kz.bsbnb.usci.sync.service.IEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.jws.Oneway;
 import java.util.List;
 
 /**
@@ -17,6 +18,7 @@ public class EntityServiceImpl implements IEntityService {
     private DataJob dataJob;
 
     @Override
+    @Oneway
     public void process(List<BaseEntity> entities) {
         dataJob.addAll(entities);
     }

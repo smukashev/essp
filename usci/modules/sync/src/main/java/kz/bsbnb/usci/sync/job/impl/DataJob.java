@@ -12,86 +12,49 @@ import java.util.Iterator;
 /**
  * @author k.tulbassiyev
  */
-public class DataJob extends AbstractDataJob {
+public final class DataJob extends AbstractDataJob {
     @Autowired
     @Qualifier(value = "remoteEntityService")
-    RmiProxyFactoryBean rmiProxyFactoryBean;
+    private RmiProxyFactoryBean rmiProxyFactoryBean;
 
-   /* @Autowired
-    BasicBaseEntitySearcherPool basicBaseEntitySearcherPool;*/
+    /*@Autowired
+    private BasicBaseEntitySearcherPool basicBaseEntitySearcherPool;*/
 
-    IEntityService entityService;
-
+    private IEntityService entityService;
     private final Logger logger = Logger.getLogger(DataJob.class);
 
     @Override
     public void run() {
-        logger.info("DataJob has been executed");
-
         entityService = (IEntityService) rmiProxyFactoryBean.getObject();
 
         while(true) {
             try {
                 if(entities.size() > 0 && entitiesInProcess.size() < MAX_THREAD)
                     processNewEntities();
-                else {
-                    if(++skip_count > SKIP_TIME_MAX)
-                        Thread.sleep(SLEEP_TIME_LONG);
 
+                if(processingJobs.size() > 0)
+                    removeDeadJobs();
+
+                if(entities.size() == 0 && entitiesInProcess.size() == 0) {
+                    skip_count++;
                     Thread.sleep(SLEEP_TIME_NORMAL);
                 }
 
-                if(waitingJobs.size() > 0 && processJobs.size() < MAX_THREAD)
-                    processWaitingJobs();
+                if(skip_count > SKIP_TIME_MAX)
+                    Thread.sleep(SLEEP_TIME_LONG);
 
-                if(processJobs.size() > 0)
-                    removeDeadJobs();
+                /* Debug */
+                if(entitiesInProcess.size() != processingJobs.size())
+                    throw new IllegalStateException("CRITICAL: EntitiesInProcess != ProcessJobs");
+
             } catch(Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void processNewEntities() throws InterruptedException {
-        final BaseEntity entity = getClearEntity();
-
-        if(entity != null) {
-            entitiesInProcess.add(entity);
-
-            final ProcessJob processJob = new ProcessJob(entityService, entity);
-
-            if(processJobs.size() < MAX_THREAD) {
-                processJobs.add(processJob);
-                processJob.start();
-            } else
-                waitingJobs.add(processJob);
-        } else
-            Thread.sleep(SLEEP_TIME_NORMAL);
-
-        skip_count = 0;
-    }
-
-    private void processWaitingJobs() {
-        Iterator<ProcessJob> iterator = waitingJobs.iterator();
-
-        while(iterator.hasNext()) {
-            final ProcessJob waitingJob = iterator.next();
-
-            if(processJobs.size() < MAX_THREAD && isClear(waitingJob.getBaseEntity())) {
-                iterator.remove();
-
-                processJobs.add(waitingJob);
-                entitiesInProcess.add(waitingJob.getBaseEntity());
-
-                waitingJob.start();
-            }
-        }
-
-        skip_count = 0;
-    }
-
     private void removeDeadJobs() {
-        Iterator<ProcessJob> processJobIterator = processJobs.iterator();
+        Iterator<ProcessJob> processJobIterator = processingJobs.iterator();
 
         while(processJobIterator.hasNext()) {
             ProcessJob processJob = processJobIterator.next();
@@ -117,5 +80,48 @@ public class DataJob extends AbstractDataJob {
                 processJobIterator.remove();
             }
         }
+    }
+
+    private void processNewEntities() {
+        final BaseEntity entity = getClearEntity();
+        final ProcessJob processJob = new ProcessJob(entityService, entity);
+
+        if(entity != null) {
+            entitiesInProcess.add(entity);
+            processingJobs.add(processJob);
+
+            processJob.start();
+            skip_count = 0;
+        } else {
+
+        }
+    }
+
+    private BaseEntity getClearEntity() {
+        Iterator<BaseEntity> iterator = entities.iterator();
+
+        while(iterator.hasNext()) {
+            BaseEntity entity = iterator.next();
+
+            if(isInProcess(entity)) {
+                iterator.remove();
+                return entity;
+            }
+        }
+
+        return null;
+    }
+
+    private boolean isInProcess(BaseEntity baseEntity) {
+        for (BaseEntity entity : entitiesInProcess)
+            if(hasCrossLine(baseEntity, entity))
+                return true;
+
+        return false;
+    }
+
+    private boolean hasCrossLine(BaseEntity entity1, BaseEntity entity2) {
+        // todo: implement
+        return false;
     }
 }
