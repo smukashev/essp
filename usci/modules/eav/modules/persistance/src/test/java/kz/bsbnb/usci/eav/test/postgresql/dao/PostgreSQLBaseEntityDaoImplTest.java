@@ -613,29 +613,39 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
         IBaseValue valueSetSaved = entityParentSaved.getBaseValue("complex_set");
         IBaseValue valueSetUpdated = entityParentUpdated.getBaseValue("complex_set");
-        assertNotNull(valueSetSaved);
-        assertNotNull(valueSetUpdated);
-        assertTrue(valueSetSaved.getId() != valueSetUpdated.getId());
+        assertNotNull("BaseValue instance contains an instance of BaseSet " +
+                "after saving was equal to null.", valueSetSaved);
+        assertNotNull("BaseValue instance contains an instance of BaseSet " +
+                "after updating was equal to null.", valueSetUpdated);
+        assertTrue("Identifiers of BaseValue instances containing instances of BaseSet " +
+                "before and after updating the set of complex values should be different,",
+                valueSetSaved.getId() != valueSetUpdated.getId());
 
         BaseSet setSaved = (BaseSet)valueSetSaved.getValue();
         BaseSet setUpdated = (BaseSet)valueSetUpdated.getValue();
-        assertNotNull(setUpdated);
+        assertNotNull("After saving instance of BaseSet was equal to null.", setSaved);
+        assertNotNull("After updating instance of BaseSet was equal to null.", setUpdated);
 
         Set<IBaseValue> setValuesSaved = setSaved.get();
         Set<IBaseValue> setValuesUpdated = setUpdated.get();
-        assertEquals(1, setValuesSaved.size());
-        assertEquals(1, setValuesUpdated.size());
+        assertEquals("Wrong number of elements in the set of complex values after saving, ",
+                1, setValuesSaved.size());
+        assertEquals("Wrong number of elements in the set of complex values after updating, ",
+                1, setValuesUpdated.size());
 
         BaseValue valueEntityChildSaved = (BaseValue)setValuesSaved.toArray()[0];
         BaseValue valueEntityChildUpdated = (BaseValue)setValuesUpdated.toArray()[0];
-        assertNotNull(valueEntityChildSaved);
-        assertNotNull(valueEntityChildUpdated);
+        assertNotNull("BaseValue instance contains an instance of BaseEntity " +
+                "after saving was equal null.", valueEntityChildSaved);
+        assertNotNull("BaseValue instance contains an instance of BaseEntity " +
+                "after updating was equal null.", valueEntityChildUpdated);
 
         BaseEntity entityChildSaved = (BaseEntity)valueEntityChildSaved.getValue();
         BaseEntity entityChildUpdated = (BaseEntity)valueEntityChildUpdated.getValue();
-        assertNotNull(entityChildSaved);
-        assertNotNull(entityChildUpdated);
-        assertTrue(entityChildSaved.getId() != entityChildUpdated.getId());
+        assertNotNull("After saving instance of BaseEntity was equal to null.", entityChildSaved);
+        assertNotNull("After updating instance of BaseEntity was equal to null.", entityChildUpdated);
+        assertTrue("BaseEntity identifiers before and after updating the set of complex values should be different, ",
+                entityChildSaved.getId() != entityChildUpdated.getId());
 
         try
         {
@@ -646,9 +656,6 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         {
             // Nothing
         }
-
-
-
     }
 
     @Test
