@@ -2064,11 +2064,11 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
     private boolean compare(BaseSet comparingBaseSet, BaseSet anotherBaseSet) {
         IMetaType comparingMetaType = comparingBaseSet.getMemberType();
-        if (comparingMetaType.isSet()) {
+        if (comparingMetaType.isSetOfSets()) {
             throw new UnsupportedOperationException("Comparing an set of sets is not implemented.");
         }
         IMetaType anotherMetaType = anotherBaseSet.getMemberType();
-        if (anotherMetaType.isSet()) {
+        if (anotherMetaType.isSetOfSets()) {
             throw new UnsupportedOperationException("Comparing an set of sets is not implemented.");
         }
         if (!comparingMetaType.equals(anotherMetaType)) {
