@@ -71,7 +71,6 @@ public class JDBCConfig {
         classesTableName = tablePrefix + "classes";
         attributesTableName = tablePrefix + "attributes";
         simpleAttributesTableName = tablePrefix + "simple_attributes";
-        entitiesTableName = tablePrefix + "entities";
         arrayKeyFilterTableName = tablePrefix + "array_key_filter";
         arrayKeyFilterValuesTableName = tablePrefix + "array_key_filter_values";
         complexAttributesTableName = tablePrefix + "complex_attributes";
@@ -80,6 +79,8 @@ public class JDBCConfig {
         setOfSetsTableName = tablePrefix + "set_of_sets";
         simpleSetTableName = tablePrefix + "simple_set";
         batchesTableName = tablePrefix + "batches";
+
+        entitiesTableName = tablePrefix + "be_entities";
 
         baseValuesTableName = tablePrefix + "be_values";
         baseDateValuesTableName = tablePrefix + "be_date_values";

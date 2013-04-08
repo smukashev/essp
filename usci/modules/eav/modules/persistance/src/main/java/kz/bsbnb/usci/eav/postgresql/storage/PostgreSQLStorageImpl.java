@@ -115,15 +115,6 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
             return false;
         }
 
-        //values
-        query = String.format(COUNT_TABLE, getConfig().getBaseValuesTableName());
-        logger.debug(query);
-        if(jdbcTemplate.queryForLong(query) > 0)
-        {
-            logger.debug("Table " + getConfig().getBaseValuesTableName() + " is not clean.");
-            return false;
-        }
-
         return true;
     }
 
