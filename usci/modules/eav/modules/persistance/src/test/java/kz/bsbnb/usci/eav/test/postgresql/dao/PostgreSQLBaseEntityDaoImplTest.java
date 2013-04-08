@@ -578,8 +578,9 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
         long metaId = postgreSQLMetaClassDaoImpl.save(metaParentCreate);
         MetaClass metaParentLoad = postgreSQLMetaClassDaoImpl.load(metaId);
+        MetaSet metaSetLoad = (MetaSet)metaParentLoad.getMemberType("complex_set");
         MetaClass metaChildLoad =
-                (MetaClass)((MetaSet)metaParentLoad.getMemberType("complex_set")).getMemberType();
+                (MetaClass)metaSetLoad.getMemberType();
         assertTrue("Searchable valueSetUpdated must be equal to true.", metaParentLoad.isSearchable());
         assertFalse("Searchable valueSetUpdated must be equal to false.", metaChildLoad.isSearchable());
 
@@ -589,7 +590,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         UUID uuid = UUID.randomUUID();
 
         BaseEntity entityParentForSave = new BaseEntity(metaParentLoad);
-        BaseSet baseSetForSave = new BaseSet(metaParentLoad.getMemberType("complex_set"));
+        BaseSet baseSetForSave = new BaseSet(metaChildLoad);
         baseSetForSave.put(new BaseValue(batchFirst, 1L, new BaseEntity(metaChildLoad)));
         entityParentForSave.put("uuid", new BaseValue(batchFirst, 1L, uuid.toString()));
         entityParentForSave.put("complex_set", new BaseValue(batchFirst, 1L, baseSetForSave));
@@ -598,7 +599,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         BaseEntity entityParentSaved = postgreSQLBaseEntityDaoImpl.load(entityParentSavedId);
 
         BaseEntity entityParentForUpdate = new BaseEntity(metaParentLoad);
-        BaseSet baseSetForUpdate = new BaseSet(metaParentLoad.getMemberType("complex_set"));
+        BaseSet baseSetForUpdate = new BaseSet(metaChildLoad);
         baseSetForUpdate.put(new BaseValue(batchSecond, 2L, new BaseEntity(metaChildLoad)));
         entityParentForUpdate.put("uuid", new BaseValue(batchSecond, 2L, uuid.toString()));
         entityParentForUpdate.put("complex_set", new BaseValue(batchSecond, 2L, baseSetForUpdate));
