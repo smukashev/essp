@@ -36,7 +36,7 @@ public class ParserHelper implements IHelper {
             case DOUBLE:
                 return Double.parseDouble(value);
             default:
-                throw new IllegalArgumentException("Unknown type. Can not be returned an appropriate class.");
+                throw new IllegalArgumentException("Unknown type");
         }
     }
 }

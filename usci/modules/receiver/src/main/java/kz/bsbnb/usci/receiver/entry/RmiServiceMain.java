@@ -6,6 +6,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import java.rmi.RMISecurityManager;
 
 /**
+ * Production entry point
  *
  * @author k.tulbassiyev
  */
