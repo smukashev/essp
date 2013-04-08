@@ -67,7 +67,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
         String the_name = (entityName == null ? "root" : "e_" + entityName);
 
-        SelectJoinStep joins = sqlGenerator.select(EAV_ENTITIES.as(the_name).ID).from(EAV_ENTITIES.as(the_name));
+        SelectJoinStep joins = sqlGenerator.select(EAV_BE_ENTITIES.as(the_name).ID).from(EAV_BE_ENTITIES.as(the_name));
 
         if (meta == null)
         {
@@ -107,28 +107,28 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                     {
                         case BOOLEAN:
                             joins = joins.leftOuterJoin(EAV_BE_BOOLEAN_VALUES.as(name)).
-                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_BOOLEAN_VALUES.as(name).ENTITY_ID).
+                                    on(EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_BOOLEAN_VALUES.as(name).ENTITY_ID).
                                             and(EAV_BE_BOOLEAN_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                             break;
                         case DATE:
                             joins = joins.leftOuterJoin(EAV_BE_DATE_VALUES.as(name)).
-                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_DATE_VALUES.as(name).ENTITY_ID).
+                                    on(EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_DATE_VALUES.as(name).ENTITY_ID).
                                             and(EAV_BE_DATE_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                             break;
                         case DOUBLE:
                             joins = joins.leftOuterJoin(EAV_BE_DOUBLE_VALUES.as(name)).
-                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_DOUBLE_VALUES.as(name).ENTITY_ID).
+                                    on(EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_DOUBLE_VALUES.as(name).ENTITY_ID).
                                             and(EAV_BE_DOUBLE_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                             break;
                         case INTEGER:
                             joins = joins.leftOuterJoin(EAV_BE_INTEGER_VALUES.as(name)).
-                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_INTEGER_VALUES.as(name).ENTITY_ID).
+                                    on(EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_INTEGER_VALUES.as(name).ENTITY_ID).
                                             and(EAV_BE_INTEGER_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
 
                             break;
                         case STRING:
                             joins = joins.leftOuterJoin(EAV_BE_STRING_VALUES.as(name)).
-                                    on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_STRING_VALUES.as(name).ENTITY_ID).
+                                    on(EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_STRING_VALUES.as(name).ENTITY_ID).
                                             and(EAV_BE_STRING_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                             break;
                         default:
@@ -139,7 +139,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                 else
                 {
                     joins = joins.leftOuterJoin(EAV_BE_COMPLEX_VALUES.as(name)).
-                            on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_ID).
+                            on(EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_ID).
                                     and(EAV_BE_COMPLEX_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                 }
             }
@@ -150,13 +150,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                     MetaValue simple_value = (MetaValue)type;
 
                     joins = joins.leftOuterJoin(EAV_BE_ENTITY_SIMPLE_SETS.as(name)).
-                            on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_ENTITY_SIMPLE_SETS.as(name).ENTITY_ID).
+                            on(EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_ENTITY_SIMPLE_SETS.as(name).ENTITY_ID).
                                     and(EAV_BE_ENTITY_SIMPLE_SETS.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                 }
                 /*else
                 {
                     joins = joins.leftOuterJoin(EAV_BE_COMPLEX_VALUES.as(name)).
-                            on(EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_ID).
+                            on(EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_ID).
                                     and(EAV_BE_COMPLEX_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                 }*/
             }
@@ -169,14 +169,14 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         if (entityName != null)
         {
             where = joins.where(
-                (EAV_ENTITIES.as(the_name).CLASS_ID.equal(meta.getId())).and(
-                        EAV_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(entityName).ENTITY_VALUE_ID)
+                (EAV_BE_ENTITIES.as(the_name).CLASS_ID.equal(meta.getId())).and(
+                        EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(entityName).ENTITY_VALUE_ID)
                     )
                 );
         }
         else
         {
-            where = joins.where(EAV_ENTITIES.as(the_name).CLASS_ID.equal(meta.getId()));
+            where = joins.where(EAV_BE_ENTITIES.as(the_name).CLASS_ID.equal(meta.getId()));
         }
 
         Condition condition = null;
@@ -766,7 +766,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         {
             BaseEntity resultEntity = new BaseEntity(meta);
 
-            result.add((Long)row.get(EAV_ENTITIES.ID.getName()));
+            result.add((Long)row.get(EAV_BE_ENTITIES.ID.getName()));
         }
 
         logger.debug("Result size: " + result.size());

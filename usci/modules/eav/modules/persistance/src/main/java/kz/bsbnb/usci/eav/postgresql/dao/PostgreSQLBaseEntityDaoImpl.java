@@ -72,9 +72,9 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
 
         SelectForUpdateStep select = sqlGenerator
-                .select(EAV_ENTITIES.ID, EAV_ENTITIES.CLASS_ID)
-                .from(EAV_ENTITIES)
-                .where(EAV_ENTITIES.ID.equal(id));
+                .select(EAV_BE_ENTITIES.ID, EAV_BE_ENTITIES.CLASS_ID)
+                .from(EAV_BE_ENTITIES)
+                .where(EAV_BE_ENTITIES.ID.equal(id));
 
         logger.debug(select.toString());
 
@@ -95,10 +95,10 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         if(row != null)
         {
-            MetaClass meta = metaClassRepository.getMetaClass((Long)row.get(EAV_ENTITIES.CLASS_ID.getName()));
+            MetaClass meta = metaClassRepository.getMetaClass((Long)row.get(EAV_BE_ENTITIES.CLASS_ID.getName()));
 
             baseEntity = new BaseEntity(meta);
-            baseEntity.setId((Long)row.get(EAV_ENTITIES.ID.getName()));
+            baseEntity.setId((Long)row.get(EAV_BE_ENTITIES.ID.getName()));
         }
         else
         {
@@ -525,8 +525,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             }
 
             DeleteConditionStep delete = sqlGenerator
-                    .delete(EAV_ENTITIES)
-                    .where(EAV_ENTITIES.ID.eq(baseEntity.getId()));
+                    .delete(EAV_BE_ENTITIES)
+                    .where(EAV_BE_ENTITIES.ID.eq(baseEntity.getId()));
 
             logger.debug(delete.toString());
             updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
@@ -556,7 +556,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
 
         InsertOnDuplicateStep insert = sqlGenerator
-                .insertInto(EAV_ENTITIES, EAV_ENTITIES.CLASS_ID)
+                .insertInto(EAV_BE_ENTITIES, EAV_BE_ENTITIES.CLASS_ID)
                 .values(baseEntity.getMeta().getId());
 
         logger.debug(insert.toString());
