@@ -14,20 +14,20 @@ import java.io.IOException;
 @Component
 public class FileHelper implements IHelper {
     public byte[] getFileBytes(File file) {
-        FileInputStream fii;
-        byte bytes[];
+        FileInputStream fii = null;
+        byte bytes[] = null;
 
         try {
             fii = new FileInputStream(file);
         } catch (FileNotFoundException e) {
-            fii = null;
+            e.printStackTrace();
         }
 
         try {
             bytes = new byte[fii.available()];
             fii.read(bytes);
         } catch (IOException e) {
-            bytes = null;
+            e.printStackTrace();
         }
 
         return bytes;

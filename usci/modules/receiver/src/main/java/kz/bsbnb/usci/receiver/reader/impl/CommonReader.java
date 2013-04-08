@@ -40,6 +40,5 @@ public abstract class CommonReader<T> implements AbstractReader<T> {
     protected DateFormat dateFormat = new SimpleDateFormat(Global.DATE_FORMAT);
 
     @Override
-    public abstract T read() throws UnexpectedInputException,
-            ParseException, NonTransientResourceException;
+    public abstract T read() throws UnexpectedInputException, ParseException, NonTransientResourceException;
 }

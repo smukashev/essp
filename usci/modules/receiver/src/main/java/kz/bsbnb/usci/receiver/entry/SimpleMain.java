@@ -17,6 +17,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import java.io.File;
 
 /**
+ * Development entry point
  *
  * @author k.tulbassiyev
  */
