@@ -32,7 +32,7 @@
         <unique-column name="id"/>
       </unique>
       <index>
-        <index-column name="containing_id "/>
+        <index-column name="containing_id"/>
         <index-column name="container_type"/>
       </index>
       <index>
