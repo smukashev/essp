@@ -8,6 +8,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.log4j.Logger;
@@ -52,7 +53,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
         couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
 
-        byte[] byteArray = (byte[]) couchbaseClient.get("batch:" + batchId);
+        byte[] byteArray = (byte[]) couchbaseClient.get("batch:" + batchId + ":content");
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray);
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -64,6 +65,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         }
 
         batch = batchService.load(batchId);
+        couchbaseClient.set("batch:" + batchId + ":status", 0, Global.BATCH_STATUS_STARTED);
     }
 
     public void startElement(XMLEvent event, StartElement startElement, String localName) {
@@ -72,8 +74,14 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         } else if(localName.equals("entities")) {
             logger.info("entities");
         } else if(localName.equals("entity")) {
+            couchbaseClient.set("batch:" + batchId + ":contract:" + index + ":status", 0,
+                    Global.CONTRACT_STATUS_STARTED);
+
             currentContainer = metaFactoryService.getBaseEntity(
                     startElement.getAttributeByName(new QName("class")).getValue());
+
+            couchbaseClient.set("batch:" + batchId + ":contract:" + index + ":status", 0,
+                    Global.CONTRACT_STATUS_PROCESSING);
         } else {
             IMetaType metaType = currentContainer.getMemberType(localName);
 
@@ -109,6 +117,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
             if(event.isStartDocument()) {
                 logger.info("start document");
+                couchbaseClient.set("batch:" + batchId + ":status", 0, Global.BATCH_STATUS_PROCESSING);
             } else if(event.isStartElement()) {
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
@@ -123,6 +132,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 } else if(localName.equals("entities")) {
                     logger.info("entities");
                 } else if(localName.equals("entity")) {
+                    couchbaseClient.set("batch:" + batchId + ":contract:" + index + ":status", 0,
+                            Global.CONTRACT_STATUS_COMPLETED);
+
                     T entity = (T) currentContainer;
                     currentContainer = null;
                     index++;
@@ -146,6 +158,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 }
             } else if(event.isEndDocument()) {
                 logger.info("end document");
+                couchbaseClient.set("batch:" + batchId + ":status", 0, Global.BATCH_STATUS_COMPLETED);
             } else {
                 logger.info(event);
             }
