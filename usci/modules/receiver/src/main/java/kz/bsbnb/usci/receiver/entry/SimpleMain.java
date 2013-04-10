@@ -41,16 +41,16 @@ public class SimpleMain {
         Batch batch = new Batch(new java.sql.Date(new java.util.Date().getTime()));
         long batchId = batchService.save(batch);
 
-        client.set("batch:"+batchId, 0, bytes);
+        client.set("batch:" + batchId + ":content", 0, bytes);
 
         JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
-        Job job = ctx.getBean(Job.class);
+        Job batchJob = ctx.getBean("batchJob", Job.class);
 
         try {
             JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
             jobParametersBuilder.addParameter("batchId", new JobParameter(batchId));
 
-            jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+            jobLauncher.run(batchJob, jobParametersBuilder.toJobParameters());
         } catch (JobExecutionAlreadyRunningException e) {
             e.printStackTrace();
         } catch (JobRestartException e) {
