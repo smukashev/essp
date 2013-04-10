@@ -217,7 +217,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                             where = where.and(EAV_BE_BOOLEAN_VALUES.as(name).VALUE.equal(actual_boolean_value));
                             break;
                         case DATE:
-                            Date actual_date_value = (Date)value.getValue();
+                            Date actual_date_value = DateUtils.convert((java.util.Date)value.getValue());
                             if (condition == null)
                             {
                                 condition = EAV_BE_DATE_VALUES.as(name).VALUE.equal(actual_date_value);
