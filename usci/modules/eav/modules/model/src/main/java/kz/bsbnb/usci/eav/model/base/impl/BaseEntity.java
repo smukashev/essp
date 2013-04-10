@@ -3,10 +3,12 @@ package kz.bsbnb.usci.eav.model.base.impl;
 import com.sun.org.apache.bcel.internal.generic.ACONST_NULL;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.SetUtils;
@@ -367,12 +369,6 @@ public class BaseEntity extends Persistable implements IBaseContainer
         }
     }
 
-    @Override
-    public String toString()
-    {
-        return meta.getClassName();
-    }
-
     public IBaseValue safeGetValue(String name)
     {
         try
@@ -383,5 +379,11 @@ public class BaseEntity extends Persistable implements IBaseContainer
         {
             return null;
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        return BaseEntityOutput.toString(this);
     }
 }

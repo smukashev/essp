@@ -77,4 +77,24 @@ public class BaseSet extends Persistable implements IBaseContainer
     {
         return data.size();
     }
+
+    @Override
+    public String toString()
+    {
+        String str = "[";
+        boolean first = true;
+
+        for (IBaseValue value : data) {
+            if (first) {
+                str += value.getValue().toString();
+                first = false;
+            } else {
+                str += ", " + value.getValue().toString();
+            }
+        }
+
+        str += "]";
+
+        return str;
+    }
 }

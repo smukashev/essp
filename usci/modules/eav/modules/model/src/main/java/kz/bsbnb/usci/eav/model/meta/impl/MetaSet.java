@@ -120,4 +120,24 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
     {
         return ContainerTypes.SET;
     }
+
+    public String toString(String prefix)
+    {
+        if(isComplex()) {
+            if (isSetOfSets()) {
+                return "metaSet, complex, setOfSets";
+            }
+            else {
+                return "metaSet, complex, setOfValues";
+            }
+        }
+        else {
+            if (isSetOfSets()) {
+                return "metaSet, simple, setOfSets";
+            }
+            else {
+                return "metaSet, simple, setOfValues";
+            }
+        }
+    }
 }

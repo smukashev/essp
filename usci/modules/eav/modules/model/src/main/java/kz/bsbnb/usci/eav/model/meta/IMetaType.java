@@ -10,4 +10,6 @@ public interface IMetaType extends Serializable
 
     public boolean isSetOfSets();
 
+    public String toString(String prefix);
+
 }

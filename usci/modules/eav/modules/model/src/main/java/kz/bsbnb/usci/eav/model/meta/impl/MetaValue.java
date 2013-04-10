@@ -77,4 +77,12 @@ public class MetaValue implements IMetaType
     public boolean isSetOfSets() {
         return false;
     }
+
+    @Override
+    public String toString(String prefix)
+    {
+        return "metaValue: " + typeCode;
+    }
+
+
 }

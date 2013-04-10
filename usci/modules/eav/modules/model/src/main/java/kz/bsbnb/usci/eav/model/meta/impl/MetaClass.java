@@ -397,4 +397,23 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
         return searchable;
     }
 
+    public String toString(String prefix)
+    {
+        String str = "metaClass;";
+
+        for (String memberName : members.keySet())
+        {
+            IMetaAttribute attribute = members.get(memberName);
+            IMetaType type = attribute.getMetaType();
+
+            str += "\n" + prefix + memberName + ": " + type.toString(prefix + "\t");
+        }
+
+        return str;
+    }
+
+    public String toString()
+    {
+        return toString("");
+    }
 }
