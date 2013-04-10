@@ -60,6 +60,9 @@
                              processor="entityProcessor" commit-interval="1"/>
             </batch:tasklet>
         </batch:step>
+        <batch:listeners>
+            <batch:listener ref="batchJobListener" after-job-method="afterJob" before-job-method="beforeJob"/>
+        </batch:listeners>
     </batch:job>
 
     <!-- remote services -->

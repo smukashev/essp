@@ -51,8 +51,10 @@ public class GenerateInsertXml {
         AttributeTree tree = new AttributeTree("entities",null);
         TreeGenerator helper = new TreeGenerator();
 
-        if(!storage.testConnection())
+        if(!storage.testConnection()) {
+            System.out.println("Can not connect to database");
             System.exit(1);
+        }
 
         storage.clear();
         storage.initialize();
