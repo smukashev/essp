@@ -4,7 +4,7 @@ import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.receiver.helper.impl.FileHelper;
 import kz.bsbnb.usci.receiver.helper.impl.ParserHelper;
-import kz.bsbnb.usci.receiver.reader.AbstractReader;
+import kz.bsbnb.usci.receiver.reader.IReader;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat;
 /**
  * @author k.tulbassiyev
  */
-public abstract class CommonReader<T> implements AbstractReader<T> {
+public abstract class CommonReader<T> implements IReader<T> {
     @Autowired
     protected ICouchbaseClientFactory couchbaseClientFactory;
 
