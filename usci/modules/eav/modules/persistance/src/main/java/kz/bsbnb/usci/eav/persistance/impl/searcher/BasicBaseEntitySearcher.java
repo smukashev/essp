@@ -745,7 +745,11 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
             }
         }
 
-        where = where.and(condition);
+        if(condition != null) {
+            where = where.and(condition);
+        } else {
+            logger.warn("No key attributes in entity.");
+        }
 
         logger.debug("Searcher SQL after conditions generated: " + where.toString());
 
