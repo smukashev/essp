@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.receiver.writer.impl;
 
-import kz.bsbnb.usci.receiver.writer.AbstractWriter;
+import kz.bsbnb.usci.receiver.writer.IWriter;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Component
 @Scope("step")
-public class RmiEventEntityWriter<T> implements AbstractWriter<T> {
+public class RmiEventEntityWriter<T> implements IWriter<T> {
     @Autowired
     @Qualifier(value = "remoteEntityService")
     private RmiProxyFactoryBean rmiProxyFactoryBean;
