@@ -1,4 +1,4 @@
-package main.kz.bsbnb.usci.receiver.test.couchbase;
+package kz.bsbnb.usci.receiver.test.couchbase;
 
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.internal.HttpFuture;

@@ -1,4 +1,4 @@
-package main.kz.bsbnb.usci.receiver.test.helper;
+package kz.bsbnb.usci.receiver.test.helper;
 
 import junit.framework.Assert;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
