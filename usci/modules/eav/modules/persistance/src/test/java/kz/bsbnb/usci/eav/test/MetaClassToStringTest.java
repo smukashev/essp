@@ -103,47 +103,49 @@ public class MetaClassToStringTest
 
     protected BaseEntity generateBaseEntity(Batch batch)
     {
-        BaseEntity streetEntity = new BaseEntity(metaStreetHolder);
+        java.util.Date reportDate = new java.util.Date();
+
+        BaseEntity streetEntity = new BaseEntity(metaStreetHolder, reportDate);
         streetEntity.put("lang", new BaseValue(batch, 1, "KAZ"));
         streetEntity.put("value", new BaseValue(batch, 1, "ABAY"));
 
-        BaseEntity houseEntity = new BaseEntity(metaHouseHolder);
+        BaseEntity houseEntity = new BaseEntity(metaHouseHolder, reportDate);
         BaseSet houseSet = new BaseSet(((MetaSet)(houseEntity.getMemberType("value"))).getMemberType());
         houseSet.put(new BaseValue(batch, 2, 111));
         houseSet.put(new BaseValue(batch, 2, 222));
         houseSet.put(new BaseValue(batch, 2, 333));
         houseEntity.put("value", new BaseValue(batch, 2, houseSet));
 
-        BaseEntity addressEntity = new BaseEntity(metaAddressHolder);
+        BaseEntity addressEntity = new BaseEntity(metaAddressHolder, reportDate);
         addressEntity.put("country", new BaseValue(batch, 3, "KAZAKHSTAN"));
         addressEntity.put("city", new BaseValue(batch, 3, "ALMATY"));
         addressEntity.put("street", new BaseValue(batch, 3, streetEntity));
         addressEntity.put("house", new BaseValue(batch, 3, houseEntity));
 
-        BaseEntity documentEntity1 = new BaseEntity(metaDocumentHolder);
+        BaseEntity documentEntity1 = new BaseEntity(metaDocumentHolder, reportDate);
         documentEntity1.put("type", new BaseValue(batch, 4, "RNN"));
         documentEntity1.put("no", new BaseValue(batch, 4, "1234567890"));
 
-        BaseEntity documentEntity2 = new BaseEntity(metaDocumentHolder);
+        BaseEntity documentEntity2 = new BaseEntity(metaDocumentHolder, reportDate);
         documentEntity2.put("type", new BaseValue(batch, 4, "PASSPORT"));
         documentEntity2.put("no", new BaseValue(batch, 4, "0987654321"));
 
-        BaseEntity documentsEntity = new BaseEntity(metaDocumentsHolder);
+        BaseEntity documentsEntity = new BaseEntity(metaDocumentsHolder, reportDate);
         BaseSet documentsSet = new BaseSet(((MetaSet)(documentsEntity.getMemberType("document"))).getMemberType());
         documentsSet.put(new BaseValue(batch, 5, documentEntity1));
         documentsSet.put(new BaseValue(batch, 5, documentEntity2));
         documentsEntity.put("document", new BaseValue(batch, 5, documentsSet));
 
-        BaseEntity nameEntity = new BaseEntity(metaNameHolder);
+        BaseEntity nameEntity = new BaseEntity(metaNameHolder, reportDate);
         nameEntity.put("firstname", new BaseValue(batch, 6, "KANAT"));
         nameEntity.put("lastname", new BaseValue(batch, 6, "TULBASSIYEV"));
 
-        BaseEntity subjectEntity = new BaseEntity(metaSubjectHolder);
+        BaseEntity subjectEntity = new BaseEntity(metaSubjectHolder, reportDate);
         subjectEntity.put("name", new BaseValue(batch, 7, nameEntity));
         subjectEntity.put("documents", new BaseValue(batch, 7, documentsEntity));
         subjectEntity.put("address", new BaseValue(batch, 7, addressEntity));
 
-        BaseEntity contractEntity = new BaseEntity(metaContractHolder);
+        BaseEntity contractEntity = new BaseEntity(metaContractHolder, reportDate);
         contractEntity.put("no", new BaseValue(batch, 8, 12345));
         contractEntity.put("subject", new BaseValue(batch, 8, subjectEntity));
 

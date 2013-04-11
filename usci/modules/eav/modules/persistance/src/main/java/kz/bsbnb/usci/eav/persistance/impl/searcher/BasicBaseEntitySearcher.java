@@ -760,6 +760,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
     public ArrayList<Long> findAll(BaseEntity entity)
     {
         MetaClass meta = entity.getMeta();
+        java.util.Date reportDate =  entity.getReportDate();
         ArrayList<Long> result = new ArrayList<Long>();
 
         SelectConditionStep where = generateSQL(entity, null);
@@ -768,7 +769,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
         for (Map<String, Object> row : rows)
         {
-            BaseEntity resultEntity = new BaseEntity(meta);
+            BaseEntity resultEntity = new BaseEntity(meta, reportDate);
 
             result.add((Long)row.get(EAV_BE_ENTITIES.ID.getName()));
         }

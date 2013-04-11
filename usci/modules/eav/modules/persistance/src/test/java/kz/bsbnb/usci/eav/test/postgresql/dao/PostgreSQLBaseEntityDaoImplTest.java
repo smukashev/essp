@@ -153,7 +153,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
 
         Batch batch = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
-        BaseEntity entityCreate = new BaseEntity(metaLoad);
+        BaseEntity entityCreate = new BaseEntity(metaLoad, batch.getRepDate());
         Random random = new Random();
 
         // date values
@@ -197,9 +197,11 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
                 new BaseValue(batch, 1L, "Test value with a string type for attribute string_third."));
 
         // complex values
-        BaseEntity baseEntityInnerFirst = new BaseEntity((MetaClass)metaLoad.getMemberType("complex_first"));
+        BaseEntity baseEntityInnerFirst =
+                new BaseEntity((MetaClass)metaLoad.getMemberType("complex_first"), batch.getRepDate());
         entityCreate.put("complex_first", new BaseValue(batch, 1L, baseEntityInnerFirst));
-        BaseEntity baseEntityInnerSecond = new BaseEntity((MetaClass)metaLoad.getMemberType("complex_second"));
+        BaseEntity baseEntityInnerSecond =
+                new BaseEntity((MetaClass)metaLoad.getMemberType("complex_second"), batch.getRepDate());
         entityCreate.put("complex_second", new BaseValue(batch, 1L, baseEntityInnerSecond));
 
         // date array values
@@ -324,7 +326,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
         Batch batch = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
-        BaseEntity entityCreate = new BaseEntity(metaLoad);
+        BaseEntity entityCreate = new BaseEntity(metaLoad, batch.getRepDate());
 
         MetaSet metaSetParent = (MetaSet)metaLoad.getMemberType("set_of_date_sets");
         MetaSet metaSetChild = (MetaSet)metaSetParent.getMemberType();
@@ -357,7 +359,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
         Batch batch = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
-        BaseEntity entityCreate = new BaseEntity(metaLoad);
+        BaseEntity entityCreate = new BaseEntity(metaLoad, batch.getRepDate());
 
         Random random = new Random();
 
@@ -386,15 +388,15 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
         Batch batch = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
-        BaseEntity entityCreate = new BaseEntity(metaLoad);
+        BaseEntity entityCreate = new BaseEntity(metaLoad, batch.getRepDate());
 
         Random random = new Random();
 
         BaseSet baseSetForComplex = new BaseSet(((MetaSet)metaLoad.getMemberType("complex_set")).getMemberType());
 
         MetaClass metaClassForArrayElement = (MetaClass)((MetaSet)metaLoad.getMemberType("complex_set")).getMemberType();
-        BaseEntity baseEntityForArrayFirst = new BaseEntity(metaClassForArrayElement);
-        BaseEntity baseEntityForArraySecond = new BaseEntity(metaClassForArrayElement);
+        BaseEntity baseEntityForArrayFirst = new BaseEntity(metaClassForArrayElement, batch.getRepDate());
+        BaseEntity baseEntityForArraySecond = new BaseEntity(metaClassForArrayElement, batch.getRepDate());
 
         baseSetForComplex.put(new BaseValue(batch, 1L, baseEntityForArrayFirst));
         baseSetForComplex.put(new BaseValue(batch, 1L, baseEntityForArraySecond));
@@ -433,7 +435,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
         UUID uuid = UUID.randomUUID();
 
-        BaseEntity entityForSave = new BaseEntity(metaLoad);
+        BaseEntity entityForSave = new BaseEntity(metaLoad, batchFirst.getRepDate());
         entityForSave.put("uuid",
                 new BaseValue(batchFirst, 1L, uuid.toString()));
         entityForSave.put("date_first",
@@ -446,7 +448,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         long entitySavedId = postgreSQLBaseEntityDaoImpl.save(entityForSave);
         BaseEntity entitySaved = postgreSQLBaseEntityDaoImpl.load(entitySavedId);
 
-        BaseEntity entityForUpdate = new BaseEntity(metaLoad);
+        BaseEntity entityForUpdate = new BaseEntity(metaLoad, batchSecond.getRepDate());
         entityForUpdate.put("uuid",
                 new BaseValue(batchSecond, 2L, uuid.toString()));
         entityForUpdate.put("date_first",
@@ -498,13 +500,13 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
         UUID uuid = UUID.randomUUID();
 
-        BaseEntity entityForSave = new BaseEntity(metaLoad);
+        BaseEntity entityForSave = new BaseEntity(metaLoad, batchFirst.getRepDate());
         BaseEntity entityFirstForSave =
-                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_first"));
+                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_first"), batchFirst.getRepDate());
         BaseEntity entitySecondForSave =
-                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_second"));
+                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_second"), batchFirst.getRepDate());
         BaseEntity entityThirdForSave =
-                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_third"));
+                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_third"), batchFirst.getRepDate());
 
         entityForSave.put("uuid",
                 new BaseValue(batchFirst, 1L, uuid.toString()));
@@ -518,11 +520,11 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         long entitySavedId = postgreSQLBaseEntityDaoImpl.save(entityForSave);
         BaseEntity entitySaved = postgreSQLBaseEntityDaoImpl.load(entitySavedId);
 
-        BaseEntity entityForUpdate = new BaseEntity(metaLoad);
+        BaseEntity entityForUpdate = new BaseEntity(metaLoad, batchSecond.getRepDate());
         BaseEntity entitySecondForUpdate =
-                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_second"));
+                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_second"), batchSecond.getRepDate());
         BaseEntity entityFourthForUpdate =
-                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_second"));
+                new BaseEntity((MetaClass)metaLoad.getMemberType("inner_meta_class_second"), batchSecond.getRepDate());
         entityForUpdate.put("uuid",
                 new BaseValue(batchSecond, 2L, uuid.toString()));
         entityForUpdate.put("inner_meta_class_first",
@@ -589,18 +591,18 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
         UUID uuid = UUID.randomUUID();
 
-        BaseEntity entityParentForSave = new BaseEntity(metaParentLoad);
+        BaseEntity entityParentForSave = new BaseEntity(metaParentLoad, batchFirst.getRepDate());
         BaseSet baseSetForSave = new BaseSet(metaChildLoad);
-        baseSetForSave.put(new BaseValue(batchFirst, 1L, new BaseEntity(metaChildLoad)));
+        baseSetForSave.put(new BaseValue(batchFirst, 1L, new BaseEntity(metaChildLoad, batchFirst.getRepDate())));
         entityParentForSave.put("uuid", new BaseValue(batchFirst, 1L, uuid.toString()));
         entityParentForSave.put("complex_set", new BaseValue(batchFirst, 1L, baseSetForSave));
 
         long entityParentSavedId = postgreSQLBaseEntityDaoImpl.save(entityParentForSave);
         BaseEntity entityParentSaved = postgreSQLBaseEntityDaoImpl.load(entityParentSavedId);
 
-        BaseEntity entityParentForUpdate = new BaseEntity(metaParentLoad);
+        BaseEntity entityParentForUpdate = new BaseEntity(metaParentLoad, batchSecond.getRepDate());
         BaseSet baseSetForUpdate = new BaseSet(metaChildLoad);
-        baseSetForUpdate.put(new BaseValue(batchSecond, 2L, new BaseEntity(metaChildLoad)));
+        baseSetForUpdate.put(new BaseValue(batchSecond, 2L, new BaseEntity(metaChildLoad, batchSecond.getRepDate())));
         entityParentForUpdate.put("uuid", new BaseValue(batchSecond, 2L, uuid.toString()));
         entityParentForUpdate.put("complex_set", new BaseValue(batchSecond, 2L, baseSetForUpdate));
 
@@ -672,14 +674,14 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
         UUID uuid = UUID.randomUUID();
 
-        BaseEntity entityForSave = new BaseEntity(metaLoad);
+        BaseEntity entityForSave = new BaseEntity(metaLoad, batch.getRepDate());
         entityForSave.put("uuid",
                 new BaseValue(batch, 1L, uuid.toString()));
 
         long entitySavedId = postgreSQLBaseEntityDaoImpl.save(entityForSave);
         BaseEntity entitySaved = postgreSQLBaseEntityDaoImpl.load(entitySavedId);
 
-        BaseEntity entityForSearch = new BaseEntity(metaLoad);
+        BaseEntity entityForSearch = new BaseEntity(metaLoad, batch.getRepDate());
         entityForSearch.put("uuid",
                 new BaseValue(batch, 1L, uuid.toString()));
 

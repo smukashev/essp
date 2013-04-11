@@ -8,13 +8,16 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.tool.generator.random.data.AbstractDataGenerator;
 
+import java.util.Date;
+
 /**
  * @author abukabayev
  */
 
 public class BaseEntityGenerator  extends AbstractDataGenerator {
     public BaseEntity generateBaseEntity(Batch batch, MetaClass metaClass, long index) {
-        BaseEntity entity = new BaseEntity(metaClass);
+        // TODO: Implement generation of the reporting date.
+        BaseEntity entity = new BaseEntity(metaClass, new Date());
 
         for (String name : metaClass.getMemberNames()) {
             IMetaType metaType = metaClass.getMemberType(name);

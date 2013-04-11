@@ -2,6 +2,9 @@ package kz.bsbnb.usci.eav.persistance.dao;
 
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 
+import java.util.Date;
+import java.util.Set;
+
 /**
  *
  * @author a.motov
@@ -28,5 +31,9 @@ public interface IBaseEntityDao extends IDao<BaseEntity>
     public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
 
     public boolean isUsed(long baseEntityId);
+
+    public Set<Date> getAvailableReportDates(long baseEntityId);
+
+    public java.util.Date getMaxReportDate(long baseEntityId);
 
 }

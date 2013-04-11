@@ -10,6 +10,8 @@ import kz.bsbnb.usci.eav.tool.generator.random.data.AbstractDataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+
 /**
  * @author k.tulbassiyev
  */
@@ -19,7 +21,8 @@ public class BaseEntityGenerator  extends AbstractDataGenerator {
     private final int MIN_ARRAY_ELEMENTS = 3;
 
     public BaseEntity generateBaseEntity(Batch batch, MetaClass metaClass, long index) {
-        BaseEntity entity = new BaseEntity(metaClass);
+        // TODO: Implement generation of the reporting date.
+        BaseEntity entity = new BaseEntity(metaClass, new Date());
 
         for (String name : metaClass.getMemberNames()) {
             IMetaType metaType = metaClass.getMemberType(name);
