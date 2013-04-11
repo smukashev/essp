@@ -61,7 +61,13 @@ public class MetaValue implements IMetaType
         }
 	}
 
-	@Override
+    @Override
+    public int hashCode()
+    {
+        return typeCode.hashCode();
+    }
+
+    @Override
 	public boolean isSet()
     {
 		return false;

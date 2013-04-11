@@ -1,9 +1,7 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
-import com.sun.org.apache.bcel.internal.generic.ACONST_NULL;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -385,5 +383,14 @@ public class BaseEntity extends Persistable implements IBaseContainer
     public String toString()
     {
         return BaseEntityOutput.toString(this);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + meta.hashCode();
+        result = 31 * result + values.hashCode();
+        return result;
     }
 }
