@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.receiver.test.helper;
+package main.kz.bsbnb.usci.receiver.test.helper;
 
 import kz.bsbnb.usci.receiver.helper.impl.FileHelper;
 import org.junit.Test;
