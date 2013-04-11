@@ -20,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -81,7 +82,6 @@ public class CouchbaseTest {
 
         client.set("Batch",0,bytes);
 
-//        Assert.assertEquals(bytes,client.get("Batch"));
         Assert.assertEquals(bytes.length, ((byte[])client.get("Batch")).length);
         Assert.assertTrue(Arrays.equals(bytes, (byte[]) client.get("Batch")));
 
