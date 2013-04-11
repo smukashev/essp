@@ -39,12 +39,12 @@ public class JDBCSupport {
 
         public GenericInsertPreparedStatementCreator(String query, Object[] values) {
             this.query = query;
-            this.values = values;
+            this.values = values.clone();
         }
 
         public GenericInsertPreparedStatementCreator(String query, Object[] values, String keyName) {
             this.query = query;
-            this.values = values;
+            this.values = values.clone();
             this.keyName = keyName;
         }
 

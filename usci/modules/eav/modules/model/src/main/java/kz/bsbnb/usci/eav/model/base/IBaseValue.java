@@ -44,8 +44,5 @@ public interface IBaseValue extends IPersistable
 
     public void setValue(Object value);
 
-    @Override
-    public boolean equals(Object obj);
-
     public Date getRepDate();
 }

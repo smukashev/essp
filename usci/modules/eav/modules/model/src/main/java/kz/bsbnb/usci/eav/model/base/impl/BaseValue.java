@@ -172,4 +172,15 @@ public class BaseValue extends Persistable implements IBaseValue
     {
         this.repDate = repDate;
     }
+
+    @Override
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + (int) (index ^ (index >>> 32));
+        result = 31 * result + batch.hashCode();
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + repDate.hashCode();
+        return result;
+    }
 }

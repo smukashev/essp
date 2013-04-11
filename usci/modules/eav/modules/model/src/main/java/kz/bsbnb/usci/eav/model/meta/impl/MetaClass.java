@@ -412,6 +412,20 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
         return str;
     }
 
+    @Override
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + className.hashCode();
+        result = 31 * result + beginDate.hashCode();
+        result = 31 * result + (disabled ? 1 : 0);
+        result = 31 * result + (searchable ? 1 : 0);
+        result = 31 * result + members.hashCode();
+        result = 31 * result + complexKeyType.hashCode();
+        result = 31 * result + (searchProcedureName != null ? searchProcedureName.hashCode() : 0);
+        return result;
+    }
+
     public String toString()
     {
         return toString("");
