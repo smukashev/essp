@@ -81,7 +81,9 @@ public class CouchbaseTest {
 
         client.set("Batch",0,bytes);
 
-        Assert.assertEquals(bytes,client.get("Batch"));
+//        Assert.assertEquals(bytes,client.get("Batch"));
+        Assert.assertEquals(bytes.length, ((byte[])client.get("Batch")).length);
+        Assert.assertTrue(Arrays.equals(bytes, (byte[]) client.get("Batch")));
 
         for (int i=1;i<=10000;i++)
             client.set("Batch_"+i,0,"batch_"+i);
