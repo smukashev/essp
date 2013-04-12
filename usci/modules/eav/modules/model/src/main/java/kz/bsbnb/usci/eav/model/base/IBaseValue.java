@@ -5,6 +5,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 
 import java.sql.Date;
+import java.util.UUID;
 
 /**
  * Actual value placeholder used in BaseEntity.
@@ -45,4 +46,7 @@ public interface IBaseValue extends IPersistable
     public void setValue(Object value);
 
     public Date getRepDate();
+
+    public UUID getUuid();
+
 }
