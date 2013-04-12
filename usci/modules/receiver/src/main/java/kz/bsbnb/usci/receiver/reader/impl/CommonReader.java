@@ -6,6 +6,7 @@ import kz.bsbnb.usci.receiver.helper.impl.FileHelper;
 import kz.bsbnb.usci.receiver.helper.impl.ParserHelper;
 import kz.bsbnb.usci.receiver.reader.IReader;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
+import kz.bsbnb.usci.receiver.singleton.StatusSingleton;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
@@ -25,6 +26,9 @@ public abstract class CommonReader<T> implements IReader<T> {
 
     @Autowired
     protected IServiceRepository serviceRepository;
+
+    @Autowired
+    protected StatusSingleton statusSingleton;
 
     @Autowired
     protected ParserHelper parserHelper;

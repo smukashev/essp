@@ -7,8 +7,11 @@ import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.receiver.helper.impl.FileHelper;
 import kz.bsbnb.usci.receiver.model.BatchModel;
+import kz.bsbnb.usci.receiver.model.BatchStatusModel;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
+import kz.bsbnb.usci.receiver.singleton.StatusSingleton;
 import kz.bsbnb.usci.sync.service.IBatchService;
+import net.spy.memcached.internal.OperationFuture;
 import org.apache.log4j.Logger;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -38,6 +41,8 @@ public class SimpleMain {
         ICouchbaseClientFactory couchbaseClientFactory = ctx.getBean(ICouchbaseClientFactory.class);
         CouchbaseClient client = couchbaseClientFactory.getCouchbaseClient();
 
+        StatusSingleton statusSingleton = ctx.getBean(StatusSingleton.class);
+
         FileHelper fileHelper = ctx.getBean(FileHelper.class);
         File file  = new File(FILE_PATH);
         byte bytes[] = fileHelper.getFileBytes(file);
@@ -45,9 +50,12 @@ public class SimpleMain {
         Batch batch = new Batch(new java.sql.Date(new java.util.Date().getTime()));
         long batchId = batchService.save(batch);
 
-        BatchModel batchModel = new BatchModel(batchId, FILE_PATH, bytes, Global.BATCH_STATUS_STARTED);
+        BatchModel batchModel = new BatchModel(batchId, FILE_PATH, bytes);
+        statusSingleton.startBatch(batchId);
+        statusSingleton.addBatchStatus(batchId, new BatchStatusModel(Global.BATCH_STATUS_STARTED, null));
+        OperationFuture<Boolean> result = client.set("batch:" + batchId, 0, gson.toJson(batchModel));
 
-        client.set("batch:" + batchId, 0, gson.toJson(batchModel));
+        while(true) if(result.isDone()) break; // must be completed
 
         JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
         Job batchJob = ctx.getBean("batchJob", Job.class);

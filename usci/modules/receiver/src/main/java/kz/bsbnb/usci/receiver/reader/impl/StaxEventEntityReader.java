@@ -11,6 +11,9 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.model.BatchModel;
+import kz.bsbnb.usci.receiver.model.BatchStatusModel;
+import kz.bsbnb.usci.receiver.model.ContractStatusModel;
+import kz.bsbnb.usci.receiver.model.StatusModel;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.log4j.Logger;
@@ -41,7 +44,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
     private IBaseContainer currentContainer;
     private Batch batch;
-    private int index = 1, level = 0;
+    private Long index = 1L, level = 0L;
 
     private IBatchService batchService;
     private IMetaFactoryService metaFactoryService;
@@ -68,7 +71,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         }
 
         batch = batchService.load(batchId);
-        couchbaseClient.set("batch:" + batchId + ":status", 0, Global.BATCH_STATUS_STARTED);
+        statusSingleton.addBatchStatus(batchId, new BatchStatusModel(Global.BATCH_STATUS_PROCESSING, null));
     }
 
     public void startElement(XMLEvent event, StartElement startElement, String localName) {
@@ -80,8 +83,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             currentContainer = metaFactoryService.getBaseEntity(
                     startElement.getAttributeByName(new QName("class")).getValue());
 
-            couchbaseClient.set("batch:" + batchId + ":contract:" + index + ":status", 0,
-                    Global.CONTRACT_STATUS_PROCESSING);
+            statusSingleton.addContractStatus(batchId, new ContractStatusModel(index,
+                    Global.CONTRACT_STATUS_STARTED, null));
         } else {
             IMetaType metaType = currentContainer.getMemberType(localName);
 
@@ -117,7 +120,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
             if(event.isStartDocument()) {
                 logger.info("start document");
-                couchbaseClient.set("batch:" + batchId + ":status", 0, Global.BATCH_STATUS_PROCESSING);
+                statusSingleton.addContractStatus(batchId, new ContractStatusModel(index,
+                        Global.CONTRACT_STATUS_PROCESSING, null));
             } else if(event.isStartElement()) {
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
@@ -132,8 +136,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 } else if(localName.equals("entities")) {
                     logger.info("entities");
                 } else if(localName.equals("entity")) {
-                    couchbaseClient.set("batch:" + batchId + ":contract:" + index + ":status", 0,
-                            Global.CONTRACT_STATUS_COMPLETED);
+                    statusSingleton.addContractStatus(batchId, new ContractStatusModel(index,
+                            Global.CONTRACT_STATUS_COMPLETED, null));
 
                     T entity = (T) currentContainer;
                     currentContainer = null;
@@ -158,7 +162,10 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 }
             } else if(event.isEndDocument()) {
                 logger.info("end document");
-                couchbaseClient.set("batch:" + batchId + ":status", 0, Global.BATCH_STATUS_COMPLETED);
+                statusSingleton.addBatchStatus(batchId, new BatchStatusModel(Global.BATCH_STATUS_COMPLETED, null));
+                StatusModel statusModel = statusSingleton.endBatch(batchId);
+
+                couchbaseClient.set("status:" + batchId, 0, gson.toJson(statusModel));
             } else {
                 logger.info(event);
             }

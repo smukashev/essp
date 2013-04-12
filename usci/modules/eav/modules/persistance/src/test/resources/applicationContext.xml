@@ -44,13 +44,6 @@
         <property name="maxActive" value="${ds.pool.maxActive}"/>
     </bean>
 
-    <!--<context:component-scan base-package="kz.bsbnb.usci.eav.meta.impl" />
-    <context:component-scan base-package="kz.bsbnb.usci.eavimpl" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav.impl.db" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav.impl.searcher" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav   <context:component-scan base-package="kz.bsbnb.usci.eavstorage" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav.dao" />-->
-
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
 
     <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav.repository.impl.BatchRepository"/>
