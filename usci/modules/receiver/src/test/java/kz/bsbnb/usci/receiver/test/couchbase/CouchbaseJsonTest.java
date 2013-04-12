@@ -24,7 +24,7 @@ public class CouchbaseJsonTest {
     private static final String BUCKET_NAME = "test";
     private static final String FILE_PATH = "/opt/xmls/test.xml";
 
-    private Logger logger = Logger.getLogger(CouchbaseTest.class);
+    private Logger logger = Logger.getLogger(CouchbaseDataTest.class);
 
     @Before
     public void setUp() throws Exception {
@@ -41,6 +41,7 @@ public class CouchbaseJsonTest {
 
     @Test
     public void jsonBytes() throws Exception {
+        System.setProperty("viewmode", "development");
         Random r = new Random();
         Gson gson = new Gson();
 
@@ -73,37 +74,13 @@ public class CouchbaseJsonTest {
     }
 
     class BatchSample {
-        private long id;
-        private String fileName;
-        private byte bytes[];
+        long id;
+        String fileName;
+        byte bytes[];
 
         public BatchSample(long id, String fileName, byte bytes[]) {
             this.id = id;
             this.fileName = fileName;
-            this.bytes = bytes;
-        }
-
-        long getId() {
-            return id;
-        }
-
-        void setId(long id) {
-            this.id = id;
-        }
-
-        String getFileName() {
-            return fileName;
-        }
-
-        void setFileName(String fileName) {
-            this.fileName = fileName;
-        }
-
-        byte[] getBytes() {
-            return bytes;
-        }
-
-        void setBytes(byte[] bytes) {
             this.bytes = bytes;
         }
 
