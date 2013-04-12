@@ -3,6 +3,7 @@ package kz.bsbnb.usci.receiver.test.couchbase;
 import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
 import junit.framework.Assert;
+import net.spy.memcached.CASValue;
 import net.spy.memcached.internal.OperationFuture;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -85,14 +86,6 @@ public class CouchbaseUpdateTest {
         for(int i = 1; i < 10; i++)
             couchBaseClient.delete("student:" + i);
 
-    }
-
-    @Test
-    public void append() {
-        /*for(int i = 1; i < 5; i++) {
-           Student student = new Student(i, "Student" + i);
-            couchBaseClient.set("student:append:" + i, 0, )
-        }*/
     }
 
     @After()

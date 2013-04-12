@@ -24,7 +24,7 @@ public class CouchbaseJsonTest {
     private static final String BUCKET_NAME = "test";
     private static final String FILE_PATH = "/opt/xmls/test.xml";
 
-    private Logger logger = Logger.getLogger(CouchbaseDataTest.class);
+    private Logger logger = Logger.getLogger(CouchbaseInsertTest.class);
 
     @Before
     public void setUp() throws Exception {

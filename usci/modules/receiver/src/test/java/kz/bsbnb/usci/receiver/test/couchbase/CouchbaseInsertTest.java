@@ -15,14 +15,14 @@ import java.util.concurrent.ExecutionException;
 /**
  * @author abukabayev
  */
-public class CouchbaseDataTest {
+public class CouchbaseInsertTest {
     private CouchbaseClient client;
     private static final String MODE_PRODUCTION = "production";
     private static final String MODE_DEVELOPMENT = "development";
     private static final String BUCKET_NAME = "test";
     private static final String FILE_PATH = "/opt/xmls/test.xml";
 
-    private Logger logger = Logger.getLogger(CouchbaseDataTest.class);
+    private Logger logger = Logger.getLogger(CouchbaseInsertTest.class);
 
     @Before
     public void setUp() throws Exception {
