@@ -15,7 +15,7 @@ import java.util.ArrayList;
 /**
  * @author k.tulbassiyev
  */
-public class CouchbaseReplaceTest {
+public class CouchbaseUpdateTest {
     private CouchbaseClient couchBaseClient;
     private static final String MODE_PRODUCTION = "production";
     private static final String MODE_DEVELOPMENT = "development";
@@ -23,7 +23,7 @@ public class CouchbaseReplaceTest {
     private static final String FILE_PATH = "/opt/xmls/test.xml";
 
     private Gson gson = new Gson();
-    private Logger logger = Logger.getLogger(CouchbaseReplaceTest.class);
+    private Logger logger = Logger.getLogger(CouchbaseUpdateTest.class);
 
     @Before
     public void setUp() throws Exception {
@@ -41,7 +41,7 @@ public class CouchbaseReplaceTest {
     }
 
     @Test
-    public void replaceField() throws Exception {
+    public void update() throws Exception {
         for(int i = 1; i < 10; i++) {
             Student student = new Student(i, "Student" + i);
             OperationFuture<Boolean> result = couchBaseClient.set("student:" + i, 0, gson.toJson(student));
@@ -52,10 +52,8 @@ public class CouchbaseReplaceTest {
             while(true) if(result.isDone()) break;
         }
 
-        for(int i = 0; i < 10; i++) {
+        for(int i = 1; i < 10; i++) {
             Object o = couchBaseClient.get("student:" + i);
-
-            if(o == null) continue;
 
             Student student = gson.fromJson(o.toString(), Student.class);
 
@@ -75,10 +73,8 @@ public class CouchbaseReplaceTest {
             while(true) if(result.isDone()) break;
         }
 
-        for(int i = 0; i < 10; i++) {
+        for(int i = 1; i < 10; i++) {
             Object o = couchBaseClient.get("student:" + i);
-
-            if(o == null) continue;
 
             Student student = gson.fromJson(o.toString(), Student.class);
 
@@ -86,9 +82,17 @@ public class CouchbaseReplaceTest {
                 Assert.fail("Id or Name is not equal!");
         }
 
-        for(int i = 0; i < 10; i++)
+        for(int i = 1; i < 10; i++)
             couchBaseClient.delete("student:" + i);
 
+    }
+
+    @Test
+    public void append() {
+        /*for(int i = 1; i < 5; i++) {
+           Student student = new Student(i, "Student" + i);
+            couchBaseClient.set("student:append:" + i, 0, )
+        }*/
     }
 
     @After()

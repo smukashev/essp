@@ -41,7 +41,7 @@ public class CouchbaseDataTest {
     }
 
     @Test
-    public void testGetSet() throws Exception {
+    public void insert() throws Exception {
         OperationFuture<Boolean> setOp = client.set("test_key",0,"test_value");
 
         try {
