@@ -27,12 +27,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.sql.Date;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 import static org.jooq.impl.Factory.count;
+import static org.jooq.impl.Factory.max;
 
 /**
  * @author a.motov
@@ -41,8 +41,6 @@ import static org.jooq.impl.Factory.count;
 public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao
 {
     private final Logger logger = LoggerFactory.getLogger(PostgreSQLBaseEntityDaoImpl.class);
-
-    //private String DELETE_ENTITY_BY_ID_SQL;
 
     @Autowired
     IBatchRepository batchRepository;
@@ -57,12 +55,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     @Autowired
     private BasicBaseEntitySearcherPool searcherPool;
 
-    @PostConstruct
-    public void init()
-    {
-        //DELETE_ENTITY_BY_ID_SQL = String.format("DELETE FROM %s WHERE id = ?", getConfig().getEntitiesTableName());
-    }
-
     @Override
     public BaseEntity load(long id)
     {
@@ -71,13 +63,17 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             throw new IllegalArgumentException("Does not have id. Can't load.");
         }
 
-        SelectForUpdateStep select = sqlGenerator
-                .select(EAV_BE_ENTITIES.ID, EAV_BE_ENTITIES.CLASS_ID)
+        Select select = sqlGenerator
+                .select(
+                        EAV_BE_ENTITIES.CLASS_ID,
+                        sqlGenerator
+                                .select(max(EAV_BE_ENTITY_REPORT_DATES.REP_DATE))
+                                .from(EAV_BE_ENTITY_REPORT_DATES)
+                                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID)).asField("max_report_date"))
                 .from(EAV_BE_ENTITIES)
                 .where(EAV_BE_ENTITIES.ID.equal(id));
 
         logger.debug(select.toString());
-
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
@@ -95,10 +91,17 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         if(row != null)
         {
-            MetaClass meta = metaClassRepository.getMetaClass((Long)row.get(EAV_BE_ENTITIES.CLASS_ID.getName()));
+            java.util.Date maxReportDate = (java.util.Date)row.get("max_report_date");
 
-            baseEntity = new BaseEntity(meta);
-            baseEntity.setId((Long)row.get(EAV_BE_ENTITIES.ID.getName()));
+            if (maxReportDate == null)
+            {
+                throw new IllegalStateException("When executing a query the maximum reporting date was " +
+                        "equal to null. Instance of BaseEntity loading is not possible.");
+            }
+
+            MetaClass meta = metaClassRepository.getMetaClass((Long)row.get(EAV_BE_ENTITIES.CLASS_ID.getName()));
+            Set<java.util.Date> availableReportDates = getAvailableReportDates(id);
+            baseEntity = new BaseEntity(id, meta, maxReportDate, availableReportDates);
         }
         else
         {
@@ -168,6 +171,26 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         if (baseEntityLoaded.getId() < 1)
         {
             throw new IllegalArgumentException("BaseEntity for saveOrUpdate does not contain id.");
+        }
+
+        java.util.Date reportDateForSave = baseEntityForSave.getReportDate();
+        DateUtils.toBeginningOfTheDay(reportDateForSave);
+
+        java.util.Date reportDateLoaded = baseEntityLoaded.getReportDate();
+        DateUtils.toBeginningOfTheDay(reportDateLoaded);
+
+        int reportDateCompare = reportDateLoaded.compareTo(reportDateForSave);
+
+        if (reportDateCompare == 1)
+        {
+            throw new UnsupportedOperationException("BaseEntity update for previous " +
+                    "report date is not implemented.");
+        }
+
+        if (reportDateCompare == -1)
+        {
+            baseEntityLoaded.setReportDate(reportDateForSave);
+            insertReportDate(baseEntityLoaded);
         }
 
         MetaClass meta = baseEntityForSave.getMeta();
@@ -306,6 +329,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             }
         }
 
+        Set<BaseEntity> entitiesForRemove = new HashSet<BaseEntity>();
+
         // insert simple values (bulk insert)
         if (!insertSimpleAttributes.isEmpty())
         {
@@ -373,23 +398,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
 
                 IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
-                Set<BaseEntity> entitiesLoaded =
-                        collectComplexSetValues((BaseSet)baseValueLoaded.getValue());
+                entitiesForRemove.addAll(
+                        collectComplexSetValues((BaseSet)baseValueLoaded.getValue()));
 
                 removeEntitySet(baseEntityLoaded, attribute);
                 baseEntityLoaded.put(attribute, baseValueForSave);
                 insertEntitySet(baseEntityLoaded, attribute);
-                loadEntitySet(baseEntityLoaded, attribute);
-
-                IBaseValue baseValueLoadedAfterUpdate = baseEntityLoaded.getBaseValue(attribute);
-                Set<BaseEntity> entitiesLoadedAfterUpdate =
-                        collectComplexSetValues((BaseSet)baseValueLoadedAfterUpdate.getValue());
-
-                Set<BaseEntity> entitiesForRemove = SetUtils.difference(entitiesLoaded, entitiesLoadedAfterUpdate);
-                for (BaseEntity entityForRemove: entitiesForRemove)
-                {
-                    remove(entityForRemove);
-                }
             }
         }
 
@@ -399,15 +413,16 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             for(String attribute: removeComplexSetAttributes)
             {
                 IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
-                Set<BaseEntity> entitiesForRemove =
-                        collectComplexSetValues((BaseSet)baseValueLoaded.getValue());
+                entitiesForRemove.addAll(
+                        collectComplexSetValues((BaseSet)baseValueLoaded.getValue()));
                 removeEntitySet(baseEntityLoaded, attribute);
-
-                for (BaseEntity entityForRemove: entitiesForRemove)
-                {
-                    remove(entityForRemove);
-                }
             }
+        }
+
+        // Remove unused BaseEntities
+        for (BaseEntity entityForRemove: entitiesForRemove)
+        {
+            remove(entityForRemove);
         }
     }
 
@@ -415,6 +430,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     @Transactional
     public long save(BaseEntity baseEntity)
     {
+        if (baseEntity.getReportDate() == null)
+        {
+            throw new IllegalArgumentException("Report date must be set before instance " +
+                    "of BaseEntity saving to the DB.");
+        }
+
         if(baseEntity.getMeta() == null)
         {
             throw new IllegalArgumentException("MetaClass must be set before entity insertion to DB.");
@@ -429,6 +450,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             long baseEntityId = insertBaseEntity(baseEntity);
             baseEntity.setId(baseEntityId);
+
+            insertReportDate(baseEntity);
         }
 
         MetaClass meta = baseEntity.getMeta();
@@ -524,6 +547,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 }
             }
 
+            removeReportDates(baseEntity);
+
             DeleteConditionStep delete = sqlGenerator
                     .delete(EAV_BE_ENTITIES)
                     .where(EAV_BE_ENTITIES.ID.eq(baseEntity.getId()));
@@ -546,6 +571,71 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         long count = (Long)rows.get(0).get("VALUE_COUNT");
 
         return count != 0;
+    }
+
+    public Set<java.util.Date> getAvailableReportDates(long baseEntityId)
+    {
+        Set<java.util.Date> reportDates = new HashSet<java.util.Date>();
+
+        Select select = sqlGenerator
+                .select(EAV_BE_ENTITY_REPORT_DATES.REP_DATE)
+                .from(EAV_BE_ENTITY_REPORT_DATES)
+                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        Iterator<Map<String, Object>> it = rows.iterator();
+        while (it.hasNext())
+        {
+            Map<String, Object> row = it.next();
+            reportDates.add(DateUtils.convert((Date)row.get(EAV_BE_ENTITY_REPORT_DATES.REP_DATE.getName())));
+        }
+
+        return reportDates;
+    }
+
+    public java.util.Date getMaxReportDate(long baseEntityId)
+    {
+        Select select = sqlGenerator
+                .select(max(EAV_BE_ENTITY_REPORT_DATES.REP_DATE).as("max_report_date"))
+                .from(EAV_BE_ENTITY_REPORT_DATES)
+                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+        {
+            throw new IllegalArgumentException(String.format(
+                    "More then one report date for BaseEntity with identifier {0} found.", baseEntityId));
+        }
+
+        if (rows.size() < 1)
+        {
+            throw new IllegalStateException(String.format(
+                    "Report date for BaseEntity with identifier {0} was not found.", baseEntityId));
+        }
+
+        Map<String, Object> row = rows.get(0);
+        return DateUtils.convert((Date)row.get("max_report_date"));
+    }
+
+    private void insertReportDate(BaseEntity baseEntity) {
+        if (baseEntity.getReportDate() == null)
+        {
+            throw new IllegalArgumentException("Report date must be set before instance " +
+                    "of BaseEntity saving to the DB.");
+        }
+        InsertOnDuplicateStep insert = sqlGenerator
+                .insertInto(
+                        EAV_BE_ENTITY_REPORT_DATES,
+                        EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID,
+                        EAV_BE_ENTITY_REPORT_DATES.REP_DATE)
+                .values(baseEntity.getId(), DateUtils.convert(baseEntity.getReportDate()));
+
+        logger.debug(insert.toString());
+        updateWithStats(insert.getSQL(), insert.getBindValues().toArray());
     }
 
     private long insertBaseEntity(BaseEntity baseEntity)
@@ -974,6 +1064,26 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         return setId;
     }
 
+    /*private java.util.Date getMaxReportDate(long baseEntityId)
+    {
+        Select select = sqlGenerator
+                .select(max(EAV_BE_ENTITY_REPORT_DATES.REP_DATE))
+                        .from(EAV_BE_ENTITY_REPORT_DATES)
+                        .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() == 1)
+        {
+
+        }
+        else
+        {
+
+        }
+    }*/
+
     private void loadIntegerValues(BaseEntity baseEntity)
     {
         SelectForUpdateStep select = sqlGenerator
@@ -1206,11 +1316,11 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             Map<String, Object> row = rows.get(0);
             loadEntitySet(
                     baseEntity,
-                    (String)row.get(EAV_SIMPLE_SET.NAME.getName()),
-                    (Long)row.get("set_id"),
-                    (Long)row.get("entity_simple_set_id"),
-                    (Long)row.get(EAV_BE_SETS.BATCH_ID.getName()),
-                    (Long)row.get(EAV_BE_SETS.INDEX_.getName()),
+                    (String) row.get(EAV_SIMPLE_SET.NAME.getName()),
+                    (Long) row.get("set_id"),
+                    (Long) row.get("entity_simple_set_id"),
+                    (Long) row.get(EAV_BE_SETS.BATCH_ID.getName()),
+                    (Long) row.get(EAV_BE_SETS.INDEX_.getName()),
                     (Date) row.get(EAV_BE_SETS.REP_DATE.getName()));
         }
         else
@@ -1775,7 +1885,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         logger.debug(delete.toString());
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
-        remove((BaseEntity)baseEntity.getBaseValue(attribute).getValue());
+        remove((BaseEntity) baseEntity.getBaseValue(attribute).getValue());
     }
 
     private void removeEntitySet(BaseEntity baseEntity, String attribute) {
@@ -1930,7 +2040,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             while (itValue.hasNext())
             {
                 IBaseValue baseValueChild = itValue.next();
-                removeComplexSet((BaseSet)baseValueChild.getValue());
+                removeComplexSet((BaseSet) baseValueChild.getValue());
             }
         }
         else
@@ -1944,6 +2054,15 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
             removeSet(baseSet);
         }
+    }
+
+    private void removeReportDates(BaseEntity baseEntity) {
+        DeleteConditionStep delete = sqlGenerator
+                .delete(EAV_BE_ENTITY_REPORT_DATES)
+                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntity.getId()));
+
+        logger.debug(delete.toString());
+        batchUpdateWithStats(delete.getSQL(), delete.getBindValues());
     }
 
     private void updateSimpleValue(BaseEntity baseEntity, String attribute)

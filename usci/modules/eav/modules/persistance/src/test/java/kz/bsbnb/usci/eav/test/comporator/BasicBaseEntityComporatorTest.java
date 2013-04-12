@@ -37,9 +37,10 @@ public class BasicBaseEntityComporatorTest {
         batchDao.save(batch);
         MetaClass meta1 = new MetaClass("testClass1");
         MetaClass meta2 = new MetaClass("testClass2");
-        BaseEntity entity1 = new BaseEntity(meta1);
-        BaseEntity entity2 = new BaseEntity(meta1);
-        BaseEntity entity3 = new BaseEntity(meta2);
+        // TODO: Implement generation of the reporting date.
+        BaseEntity entity1 = new BaseEntity(meta1, new java.util.Date());
+        BaseEntity entity2 = new BaseEntity(meta1, new java.util.Date());
+        BaseEntity entity3 = new BaseEntity(meta2, new java.util.Date());
 
         IBaseEntityComparator instance = new BasicBaseEntityComparator();
 
@@ -85,8 +86,9 @@ public class BasicBaseEntityComporatorTest {
         batchDao.save(batch);
         MetaClass meta1 = new MetaClass("testClass1");
 //        MetaClass meta2 = new MetaClass("testClass2");
-        BaseEntity entity1 = new BaseEntity(meta1);
-        BaseEntity entity2 = new BaseEntity(meta1);
+        // TODO: Implement generation of the reporting date.
+        BaseEntity entity1 = new BaseEntity(meta1, new java.util.Date());
+        BaseEntity entity2 = new BaseEntity(meta1, new java.util.Date());
 
         IBaseEntityComparator instance = new BasicBaseEntityComparator();
 
@@ -103,7 +105,8 @@ public class BasicBaseEntityComporatorTest {
         //Assert.assertFalse(instance.compare(entity1, entity2));
 
         MetaClass meta3 = new MetaClass("testClass3");
-        BaseEntity expEntity = new BaseEntity(meta3);
+        // TODO: Implement generation of the reporting date.
+        BaseEntity expEntity = new BaseEntity(meta3, new java.util.Date());
 
         expEntity.getMeta().setMetaAttribute("testString",new MetaAttribute(true,false,new MetaValue(DataTypes.STRING)));
         expEntity.getMeta().setMetaAttribute("testArrayInteger", new MetaAttribute(true, false, new MetaSet(new MetaValue(DataTypes.INTEGER))));

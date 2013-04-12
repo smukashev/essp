@@ -9,6 +9,8 @@ import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 /**
  * @author k.tulbassiyev
  */
@@ -19,12 +21,14 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
 
     @Override
     public BaseEntity getBaseEntity(String className) {
-        return new BaseEntity(metaClassRepository.getMetaClass(className));
+        // TODO: Implement generation of the reporting date.
+        return new BaseEntity(metaClassRepository.getMetaClass(className), new Date());
     }
 
     @Override
     public BaseEntity getBaseEntity(MetaClass metaClass) {
-        return new BaseEntity(metaClass);
+        // TODO: Implement generation of the reporting date.
+        return new BaseEntity(metaClass, new Date());
     }
 
     @Override

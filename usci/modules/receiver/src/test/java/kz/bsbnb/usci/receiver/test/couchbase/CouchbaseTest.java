@@ -85,7 +85,7 @@ public class CouchbaseTest {
         Assert.assertEquals(bytes.length, ((byte[])client.get("Batch")).length);
         Assert.assertTrue(Arrays.equals(bytes, (byte[]) client.get("Batch")));
 
-        for (int i=1;i<=10000;i++)
+        for (int i = 1; i <= 100; i++)
             client.set("Batch_"+i,0,"batch_"+i);
 
         Assert.assertEquals((String) client.get("Batch_1"),"batch_1");
@@ -120,13 +120,13 @@ public class CouchbaseTest {
         ViewDesign viewDesign = new ViewDesign(viewname,mapfunction);
         designDoc.getViews().add(viewDesign);
 
-        client.asyncCreateDesignDoc(designDoc);
-        Assert.assertTrue(client.asyncCreateDesignDoc(designDoc).get());
+        HttpFuture<Boolean> result = client.asyncCreateDesignDoc(designDoc);
+        Assert.assertTrue(result.get());
 
         View view = client.asyncGetView("tt","test_view").get();
 
         String res2 = String.valueOf(client.query(view,new Query()));
-        Assert.assertEquals(client.query(view,new Query()).size(),10003);
+        Assert.assertEquals(client.query(view,new Query()).size(),103);
     }
 
     @After()

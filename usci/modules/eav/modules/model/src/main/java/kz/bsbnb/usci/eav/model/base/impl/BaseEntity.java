@@ -30,6 +30,16 @@ public class BaseEntity extends Persistable implements IBaseContainer
     private UUID uuid = UUID.randomUUID();
 
     /**
+     * Reporting date on which instance of BaseEntity was loaded.
+     */
+    private Date reportDate;
+
+    /**
+     * The list of available reporting dates for this instance BaseEntity.
+     */
+    private Set<Date> availableReportDates = new HashSet<Date>();
+
+    /**
      * Holds data about entity structure
      * @see MetaClass
      */
@@ -54,9 +64,18 @@ public class BaseEntity extends Persistable implements IBaseContainer
      *
      * @param meta MetaClass of the entity..
      */
-    public BaseEntity(MetaClass meta)
+    public BaseEntity(MetaClass meta, Date reportDate)
     {
+        this.reportDate = reportDate;
         this.meta = meta;
+    }
+
+    public BaseEntity(long id, MetaClass meta, Date reportDate, Set<Date> availableReportDates)
+    {
+        super(id);
+        this.meta = meta;
+        this.reportDate = reportDate;
+        this.availableReportDates = availableReportDates;
     }
 
     /**
@@ -67,6 +86,10 @@ public class BaseEntity extends Persistable implements IBaseContainer
     public MetaClass getMeta()
     {
         return meta;
+    }
+
+    public Set<Date> getAvailableReportDates() {
+        return availableReportDates;
     }
 
     public UUID getUuid() {
@@ -238,6 +261,15 @@ public class BaseEntity extends Persistable implements IBaseContainer
     public int getAttributeCount() {
 
         return values.size();
+    }
+
+    public Date getReportDate() {
+        return reportDate;
+    }
+
+    public void setReportDate(Date reportDate) {
+        this.reportDate = reportDate;
+        this.availableReportDates.add(reportDate);
     }
 
     @Override
