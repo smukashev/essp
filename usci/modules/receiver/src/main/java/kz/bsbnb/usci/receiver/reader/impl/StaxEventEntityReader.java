@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
 import com.couchbase.client.CouchbaseClient;
+import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
@@ -9,6 +10,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.receiver.common.Global;
+import kz.bsbnb.usci.receiver.model.BatchModel;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.log4j.Logger;
@@ -45,17 +47,18 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     private IMetaFactoryService metaFactoryService;
 
     private CouchbaseClient couchbaseClient;
+    private Gson gson = new Gson();
+
+    private BatchModel batchModel;
 
     @PostConstruct
     public void init() {
         batchService = serviceRepository.getBatchService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
-
         couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
+        batchModel = gson.fromJson(couchbaseClient.get("batch:" + batchId).toString(), BatchModel.class);
 
-        byte[] byteArray = (byte[]) couchbaseClient.get("batch:" + batchId + ":content");
-
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray);
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(batchModel.getContent());
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 
         try {
@@ -74,9 +77,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         } else if(localName.equals("entities")) {
             logger.info("entities");
         } else if(localName.equals("entity")) {
-            couchbaseClient.set("batch:" + batchId + ":contract:" + index + ":status", 0,
-                    Global.CONTRACT_STATUS_STARTED);
-
             currentContainer = metaFactoryService.getBaseEntity(
                     startElement.getAttributeByName(new QName("class")).getValue());
 

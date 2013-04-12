@@ -1,9 +1,12 @@
 package kz.bsbnb.usci.receiver.entry;
 
 import com.couchbase.client.CouchbaseClient;
+import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.receiver.helper.impl.FileHelper;
+import kz.bsbnb.usci.receiver.model.BatchModel;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import org.apache.log4j.Logger;
@@ -24,6 +27,7 @@ import java.io.File;
 public class SimpleMain {
     private static Logger logger = Logger.getLogger(SimpleMain.class);
     private static final String FILE_PATH = "/opt/xmls/test.xml";
+    private static Gson gson = new Gson();
 
     public static void main(String args[]) {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextSimple.xml");
@@ -41,7 +45,9 @@ public class SimpleMain {
         Batch batch = new Batch(new java.sql.Date(new java.util.Date().getTime()));
         long batchId = batchService.save(batch);
 
-        client.set("batch:" + batchId + ":content", 0, bytes);
+        BatchModel batchModel = new BatchModel(batchId, FILE_PATH, bytes, Global.BATCH_STATUS_STARTED);
+
+        client.set("batch:" + batchId, 0, gson.toJson(batchModel));
 
         JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
         Job batchJob = ctx.getBean("batchJob", Job.class);
