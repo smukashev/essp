@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Date;
+import java.util.UUID;
 
 /**
  * Attributes value place holder for BaseEntity. Contains information about batch and record number of the value's
@@ -21,6 +22,9 @@ import java.sql.Date;
 public class BaseValue extends Persistable implements IBaseValue
 {
     Logger logger = LoggerFactory.getLogger(BaseValue.class);
+
+    private UUID uuid = UUID.randomUUID();
+
     /**
      * Information about the sequential number of record in the batch
      */
@@ -129,6 +133,10 @@ public class BaseValue extends Persistable implements IBaseValue
     public void setValue(Object value)
     {
         this.value = value;
+    }
+
+    public UUID getUuid() {
+        return uuid;
     }
 
     @Override
