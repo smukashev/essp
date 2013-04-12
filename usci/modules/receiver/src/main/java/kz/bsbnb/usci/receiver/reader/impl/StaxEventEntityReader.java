@@ -71,7 +71,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         }
 
         batch = batchService.load(batchId);
-        statusSingleton.addBatchStatus(batchId, new BatchStatusModel(Global.BATCH_STATUS_PROCESSING, null));
     }
 
     public void startElement(XMLEvent event, StartElement startElement, String localName) {
@@ -84,7 +83,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     startElement.getAttributeByName(new QName("class")).getValue());
 
             statusSingleton.addContractStatus(batchId, new ContractStatusModel(index,
-                    Global.CONTRACT_STATUS_STARTED, null));
+                    Global.CONTRACT_STATUS_PROCESSING, null));
         } else {
             IMetaType metaType = currentContainer.getMemberType(localName);
 
@@ -120,8 +119,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
             if(event.isStartDocument()) {
                 logger.info("start document");
-                statusSingleton.addContractStatus(batchId, new ContractStatusModel(index,
-                        Global.CONTRACT_STATUS_PROCESSING, null));
+                statusSingleton.addBatchStatus(batchId, new BatchStatusModel(Global.BATCH_STATUS_PROCESSING, null));
             } else if(event.isStartElement()) {
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
