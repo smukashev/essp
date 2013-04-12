@@ -329,6 +329,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             }
         }
 
+        Set<BaseEntity> entitiesForRemove = new HashSet<BaseEntity>();
+
         // insert simple values (bulk insert)
         if (!insertSimpleAttributes.isEmpty())
         {
@@ -396,23 +398,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
 
                 IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
-                Set<BaseEntity> entitiesLoaded =
-                        collectComplexSetValues((BaseSet)baseValueLoaded.getValue());
+                entitiesForRemove.addAll(
+                        collectComplexSetValues((BaseSet)baseValueLoaded.getValue()));
 
                 removeEntitySet(baseEntityLoaded, attribute);
                 baseEntityLoaded.put(attribute, baseValueForSave);
                 insertEntitySet(baseEntityLoaded, attribute);
-                loadEntitySet(baseEntityLoaded, attribute);
-
-                IBaseValue baseValueLoadedAfterUpdate = baseEntityLoaded.getBaseValue(attribute);
-                Set<BaseEntity> entitiesLoadedAfterUpdate =
-                        collectComplexSetValues((BaseSet)baseValueLoadedAfterUpdate.getValue());
-
-                Set<BaseEntity> entitiesForRemove = SetUtils.difference(entitiesLoaded, entitiesLoadedAfterUpdate);
-                for (BaseEntity entityForRemove: entitiesForRemove)
-                {
-                    remove(entityForRemove);
-                }
             }
         }
 
@@ -422,15 +413,16 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             for(String attribute: removeComplexSetAttributes)
             {
                 IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
-                Set<BaseEntity> entitiesForRemove =
-                        collectComplexSetValues((BaseSet)baseValueLoaded.getValue());
+                entitiesForRemove.addAll(
+                        collectComplexSetValues((BaseSet)baseValueLoaded.getValue()));
                 removeEntitySet(baseEntityLoaded, attribute);
-
-                for (BaseEntity entityForRemove: entitiesForRemove)
-                {
-                    remove(entityForRemove);
-                }
             }
+        }
+
+        // Remove unused BaseEntities
+        for (BaseEntity entityForRemove: entitiesForRemove)
+        {
+            remove(entityForRemove);
         }
     }
 
@@ -1324,11 +1316,11 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             Map<String, Object> row = rows.get(0);
             loadEntitySet(
                     baseEntity,
-                    (String)row.get(EAV_SIMPLE_SET.NAME.getName()),
-                    (Long)row.get("set_id"),
-                    (Long)row.get("entity_simple_set_id"),
-                    (Long)row.get(EAV_BE_SETS.BATCH_ID.getName()),
-                    (Long)row.get(EAV_BE_SETS.INDEX_.getName()),
+                    (String) row.get(EAV_SIMPLE_SET.NAME.getName()),
+                    (Long) row.get("set_id"),
+                    (Long) row.get("entity_simple_set_id"),
+                    (Long) row.get(EAV_BE_SETS.BATCH_ID.getName()),
+                    (Long) row.get(EAV_BE_SETS.INDEX_.getName()),
                     (Date) row.get(EAV_BE_SETS.REP_DATE.getName()));
         }
         else
@@ -1893,7 +1885,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         logger.debug(delete.toString());
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
-        remove((BaseEntity)baseEntity.getBaseValue(attribute).getValue());
+        remove((BaseEntity) baseEntity.getBaseValue(attribute).getValue());
     }
 
     private void removeEntitySet(BaseEntity baseEntity, String attribute) {
@@ -2048,7 +2040,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             while (itValue.hasNext())
             {
                 IBaseValue baseValueChild = itValue.next();
-                removeComplexSet((BaseSet)baseValueChild.getValue());
+                removeComplexSet((BaseSet) baseValueChild.getValue());
             }
         }
         else
