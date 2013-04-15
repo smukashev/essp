@@ -55,50 +55,50 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             if(beginDateStrict)
             {
                 select = sqlGenerator.select(
-                        EAV_CLASSES.IS_DISABLED,
-                        EAV_CLASSES.BEGIN_DATE,
-                        EAV_CLASSES.ID,
-                        EAV_CLASSES.NAME,
-                        EAV_CLASSES.COMPLEX_KEY_TYPE
-                    ).from(EAV_CLASSES).
+                        EAV_M_CLASSES.IS_DISABLED,
+                        EAV_M_CLASSES.BEGIN_DATE,
+                        EAV_M_CLASSES.ID,
+                        EAV_M_CLASSES.NAME,
+                        EAV_M_CLASSES.COMPLEX_KEY_TYPE
+                    ).from(EAV_M_CLASSES).
                     where(
-                            EAV_CLASSES.NAME.equal(metaClass.getClassName())
+                            EAV_M_CLASSES.NAME.equal(metaClass.getClassName())
                     ).and(
-                        EAV_CLASSES.BEGIN_DATE.eq(metaClass.getBeginDate())
+                        EAV_M_CLASSES.BEGIN_DATE.eq(metaClass.getBeginDate())
                     ).and(
-                        EAV_CLASSES.IS_DISABLED.equal(false)
-                    ).orderBy(EAV_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
+                        EAV_M_CLASSES.IS_DISABLED.equal(false)
+                    ).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
             }
             else
             {
                 select = sqlGenerator.select(
-                        EAV_CLASSES.IS_DISABLED,
-                        EAV_CLASSES.BEGIN_DATE,
-                        EAV_CLASSES.ID,
-                        EAV_CLASSES.NAME,
-                        EAV_CLASSES.COMPLEX_KEY_TYPE
-                    ).from(EAV_CLASSES).
+                        EAV_M_CLASSES.IS_DISABLED,
+                        EAV_M_CLASSES.BEGIN_DATE,
+                        EAV_M_CLASSES.ID,
+                        EAV_M_CLASSES.NAME,
+                        EAV_M_CLASSES.COMPLEX_KEY_TYPE
+                    ).from(EAV_M_CLASSES).
                     where(
-                        EAV_CLASSES.NAME.equal(metaClass.getClassName())
+                        EAV_M_CLASSES.NAME.equal(metaClass.getClassName())
                     ).and(
-                        EAV_CLASSES.BEGIN_DATE.le(metaClass.getBeginDate())
+                        EAV_M_CLASSES.BEGIN_DATE.le(metaClass.getBeginDate())
                     ).and(
-                        EAV_CLASSES.IS_DISABLED.equal(false)
-                    ).orderBy(EAV_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
+                        EAV_M_CLASSES.IS_DISABLED.equal(false)
+                    ).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
             }
 
         }
         else
         {
             select = sqlGenerator.select(
-                    EAV_CLASSES.IS_DISABLED,
-                    EAV_CLASSES.BEGIN_DATE,
-                    EAV_CLASSES.ID,
-                    EAV_CLASSES.NAME,
-                    EAV_CLASSES.COMPLEX_KEY_TYPE
-                ).from(EAV_CLASSES).
+                    EAV_M_CLASSES.IS_DISABLED,
+                    EAV_M_CLASSES.BEGIN_DATE,
+                    EAV_M_CLASSES.ID,
+                    EAV_M_CLASSES.NAME,
+                    EAV_M_CLASSES.COMPLEX_KEY_TYPE
+                ).from(EAV_M_CLASSES).
                 where(
-                    EAV_CLASSES.ID.equal(metaClass.getId())
+                    EAV_M_CLASSES.ID.equal(metaClass.getId())
                 ).limit(1).offset(0);
         }
 
@@ -131,11 +131,11 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         try
         {
             InsertOnDuplicateStep insert = sqlGenerator.insertInto(
-                    EAV_CLASSES,
-                    EAV_CLASSES.NAME,
-                    EAV_CLASSES.COMPLEX_KEY_TYPE,
-                    EAV_CLASSES.BEGIN_DATE,
-                    EAV_CLASSES.IS_DISABLED
+                    EAV_M_CLASSES,
+                    EAV_M_CLASSES.NAME,
+                    EAV_M_CLASSES.COMPLEX_KEY_TYPE,
+                    EAV_M_CLASSES.BEGIN_DATE,
+                    EAV_M_CLASSES.IS_DISABLED
                 ).values(metaClass.getClassName(),
                     metaClass.getComplexKeyType().toString(),
                     metaClass.getBeginDate(),
@@ -168,12 +168,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             throw new IllegalArgumentException("MetaClass must have id to be updated");
         }
 
-        UpdateConditionStep update = sqlGenerator.update(EAV_CLASSES
-            ).set(EAV_CLASSES.NAME, metaClass.getClassName()
-            ).set(EAV_CLASSES.COMPLEX_KEY_TYPE, metaClass.getComplexKeyType().toString()
-            ).set(EAV_CLASSES.BEGIN_DATE, metaClass.getBeginDate()
-            ).set(EAV_CLASSES.IS_DISABLED, metaClass.isDisabled()
-            ).where(EAV_CLASSES.ID.eq(metaClass.getId()));
+        UpdateConditionStep update = sqlGenerator.update(EAV_M_CLASSES
+            ).set(EAV_M_CLASSES.NAME, metaClass.getClassName()
+            ).set(EAV_M_CLASSES.COMPLEX_KEY_TYPE, metaClass.getComplexKeyType().toString()
+            ).set(EAV_M_CLASSES.BEGIN_DATE, metaClass.getBeginDate()
+            ).set(EAV_M_CLASSES.IS_DISABLED, metaClass.isDisabled()
+            ).where(EAV_M_CLASSES.ID.eq(metaClass.getId()));
 
         logger.debug(update.toString());
 
@@ -204,13 +204,13 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         if(metaSet.getMemberType().isSet())
         {
             insert = sqlGenerator.insertInto(
-                    EAV_SET_OF_SETS,
-                    EAV_SET_OF_SETS.CONTAINING_ID,
-                    EAV_SET_OF_SETS.CONTAINER_TYPE,
-                    EAV_SET_OF_SETS.NAME,
-                    EAV_SET_OF_SETS.IS_KEY,
-                    EAV_SET_OF_SETS.IS_NULLABLE,
-                    EAV_SET_OF_SETS.ARRAY_KEY_TYPE
+                    EAV_M_SET_OF_SETS,
+                    EAV_M_SET_OF_SETS.CONTAINING_ID,
+                    EAV_M_SET_OF_SETS.CONTAINER_TYPE,
+                    EAV_M_SET_OF_SETS.NAME,
+                    EAV_M_SET_OF_SETS.IS_KEY,
+                    EAV_M_SET_OF_SETS.IS_NULLABLE,
+                    EAV_M_SET_OF_SETS.ARRAY_KEY_TYPE
                 ).values(parentId, parentType, attributeName,
                     metaAttribute.isKey(), metaAttribute.isNullable(),
                     metaSet.getArrayKeyType().toString());
@@ -240,28 +240,28 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 long innerId = save((MetaClass)metaSet.getMemberType());
 
                 insert = sqlGenerator.insertInto(
-                        EAV_COMPLEX_SET,
-                        EAV_COMPLEX_SET.CONTAINING_ID,
-                        EAV_COMPLEX_SET.CONTAINER_TYPE,
-                        EAV_COMPLEX_SET.NAME,
-                        EAV_COMPLEX_SET.IS_KEY,
-                        EAV_COMPLEX_SET.IS_NULLABLE,
-                        EAV_COMPLEX_SET.CLASS_ID,
-                        EAV_COMPLEX_SET.ARRAY_KEY_TYPE
+                        EAV_M_COMPLEX_SET,
+                        EAV_M_COMPLEX_SET.CONTAINING_ID,
+                        EAV_M_COMPLEX_SET.CONTAINER_TYPE,
+                        EAV_M_COMPLEX_SET.NAME,
+                        EAV_M_COMPLEX_SET.IS_KEY,
+                        EAV_M_COMPLEX_SET.IS_NULLABLE,
+                        EAV_M_COMPLEX_SET.CLASS_ID,
+                        EAV_M_COMPLEX_SET.ARRAY_KEY_TYPE
                     ).values(parentId, parentType, attributeName, metaAttribute.isKey(), metaAttribute.isNullable(),
                         innerId, metaSet.getArrayKeyType().toString());
             }
             else
             {
                 insert = sqlGenerator.insertInto(
-                        EAV_SIMPLE_SET,
-                        EAV_SIMPLE_SET.CONTAINING_ID,
-                        EAV_SIMPLE_SET.CONTAINER_TYPE,
-                        EAV_SIMPLE_SET.NAME,
-                        EAV_SIMPLE_SET.TYPE_CODE,
-                        EAV_SIMPLE_SET.IS_KEY,
-                        EAV_SIMPLE_SET.IS_NULLABLE,
-                        EAV_COMPLEX_SET.ARRAY_KEY_TYPE
+                        EAV_M_SIMPLE_SET,
+                        EAV_M_SIMPLE_SET.CONTAINING_ID,
+                        EAV_M_SIMPLE_SET.CONTAINER_TYPE,
+                        EAV_M_SIMPLE_SET.NAME,
+                        EAV_M_SIMPLE_SET.TYPE_CODE,
+                        EAV_M_SIMPLE_SET.IS_KEY,
+                        EAV_M_SIMPLE_SET.IS_NULLABLE,
+                        EAV_M_COMPLEX_SET.ARRAY_KEY_TYPE
                     ).values(parentId, parentType, attributeName, metaSet.getTypeCode().toString(),
                         metaAttribute.isKey(), metaAttribute.isNullable(),
                         metaSet.getArrayKeyType().toString());
@@ -303,26 +303,26 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             long innerId = save((MetaClass)type);
 
             insert = sqlGenerator.insertInto(
-                    EAV_COMPLEX_ATTRIBUTES,
-                    EAV_COMPLEX_ATTRIBUTES.CONTAINING_ID,
-                    EAV_COMPLEX_ATTRIBUTES.CONTAINER_TYPE,
-                    EAV_COMPLEX_ATTRIBUTES.NAME,
-                    EAV_COMPLEX_ATTRIBUTES.IS_KEY,
-                    EAV_COMPLEX_ATTRIBUTES.IS_NULLABLE,
-                    EAV_COMPLEX_ATTRIBUTES.CLASS_ID
+                    EAV_M_COMPLEX_ATTRIBUTES,
+                    EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID,
+                    EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE,
+                    EAV_M_COMPLEX_ATTRIBUTES.NAME,
+                    EAV_M_COMPLEX_ATTRIBUTES.IS_KEY,
+                    EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE,
+                    EAV_M_COMPLEX_ATTRIBUTES.CLASS_ID
                 ).values(parentId, parentType, attributeName, metaAttribute.isKey(), metaAttribute.isNullable(),
                     innerId);
         }
         else
         {
             insert = sqlGenerator.insertInto(
-                    EAV_SIMPLE_ATTRIBUTES,
-                    EAV_SIMPLE_ATTRIBUTES.CONTAINING_ID,
-                    EAV_SIMPLE_ATTRIBUTES.CONTAINER_TYPE,
-                    EAV_SIMPLE_ATTRIBUTES.NAME,
-                    EAV_SIMPLE_ATTRIBUTES.TYPE_CODE,
-                    EAV_SIMPLE_ATTRIBUTES.IS_KEY,
-                    EAV_SIMPLE_ATTRIBUTES.IS_NULLABLE
+                    EAV_M_SIMPLE_ATTRIBUTES,
+                    EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID,
+                    EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE,
+                    EAV_M_SIMPLE_ATTRIBUTES.NAME,
+                    EAV_M_SIMPLE_ATTRIBUTES.TYPE_CODE,
+                    EAV_M_SIMPLE_ATTRIBUTES.IS_KEY,
+                    EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE
                 ).values(parentId, parentType, attributeName, ((MetaValue)type).getTypeCode().toString(),
                     metaAttribute.isKey(), metaAttribute.isNullable());
         }
@@ -381,17 +381,17 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             if(meta.getMemberType(typeName).isComplex())
             {
-                delete = sqlGenerator.delete(EAV_COMPLEX_ATTRIBUTES
-                    ).where(EAV_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
-                    ).and(EAV_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
-                    ).and(EAV_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
+                delete = sqlGenerator.delete(EAV_M_COMPLEX_ATTRIBUTES
+                    ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
+                    ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
             }
             else
             {
-                delete = sqlGenerator.delete(EAV_SIMPLE_ATTRIBUTES
-                    ).where(EAV_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
-                    ).and(EAV_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
-                    ).and(EAV_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
+                delete = sqlGenerator.delete(EAV_M_SIMPLE_ATTRIBUTES
+                    ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
+                    ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
             }
 
             logger.debug(delete.toString());
@@ -412,18 +412,18 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     void loadSimpleAttributes(IMetaContainer meta)
     {
         SelectForUpdateStep select = sqlGenerator.select(
-                EAV_SIMPLE_ATTRIBUTES.ID,
-                EAV_SIMPLE_ATTRIBUTES.NAME,
-                EAV_SIMPLE_ATTRIBUTES.TYPE_CODE,
-                EAV_SIMPLE_ATTRIBUTES.CONTAINER_TYPE,
-                EAV_SIMPLE_ATTRIBUTES.CONTAINING_ID,
-                EAV_SIMPLE_ATTRIBUTES.IS_KEY,
-                EAV_SIMPLE_ATTRIBUTES.IS_NULLABLE
-            ).from(EAV_SIMPLE_ATTRIBUTES
+                EAV_M_SIMPLE_ATTRIBUTES.ID,
+                EAV_M_SIMPLE_ATTRIBUTES.NAME,
+                EAV_M_SIMPLE_ATTRIBUTES.TYPE_CODE,
+                EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE,
+                EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID,
+                EAV_M_SIMPLE_ATTRIBUTES.IS_KEY,
+                EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE
+            ).from(EAV_M_SIMPLE_ATTRIBUTES
         ).where(
-                EAV_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
+                EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
         ).and(
-                EAV_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(meta.getType())
+                EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(meta.getType())
         );
 
         logger.debug(select.toString());
@@ -454,17 +454,17 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     void loadSimpleArrays(IMetaContainer meta)
     {
         SelectForUpdateStep select = sqlGenerator.select(
-                EAV_SIMPLE_SET.ID,
-                EAV_SIMPLE_SET.NAME,
-                EAV_SIMPLE_SET.CONTAINER_TYPE,
-                EAV_SIMPLE_SET.CONTAINING_ID,
-                EAV_SIMPLE_SET.IS_KEY,
-                EAV_SIMPLE_SET.IS_NULLABLE,
-                EAV_SIMPLE_SET.TYPE_CODE,
-                EAV_SIMPLE_SET.ARRAY_KEY_TYPE
-            ).from(EAV_SIMPLE_SET
-        ).where(EAV_SIMPLE_SET.CONTAINING_ID.eq(meta.getId())
-        ).and(EAV_SIMPLE_SET.CONTAINER_TYPE.eq(meta.getType()));
+                EAV_M_SIMPLE_SET.ID,
+                EAV_M_SIMPLE_SET.NAME,
+                EAV_M_SIMPLE_SET.CONTAINER_TYPE,
+                EAV_M_SIMPLE_SET.CONTAINING_ID,
+                EAV_M_SIMPLE_SET.IS_KEY,
+                EAV_M_SIMPLE_SET.IS_NULLABLE,
+                EAV_M_SIMPLE_SET.TYPE_CODE,
+                EAV_M_SIMPLE_SET.ARRAY_KEY_TYPE
+            ).from(EAV_M_SIMPLE_SET
+        ).where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(meta.getId())
+        ).and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(meta.getType()));
 
         long t = 0;
 
@@ -504,18 +504,18 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     void loadComplexAttributes(IMetaContainer meta)
     {
         SelectForUpdateStep select = sqlGenerator.select(
-                EAV_COMPLEX_ATTRIBUTES.ID,
-                EAV_COMPLEX_ATTRIBUTES.IS_KEY,
-                EAV_COMPLEX_ATTRIBUTES.IS_NULLABLE,
-                EAV_COMPLEX_ATTRIBUTES.NAME,
-                EAV_COMPLEX_ATTRIBUTES.CONTAINER_TYPE,
-                EAV_COMPLEX_ATTRIBUTES.CONTAINING_ID,
-                EAV_COMPLEX_ATTRIBUTES.CLASS_ID,
-                EAV_CLASSES.NAME.as("cname")
-            ).from(EAV_COMPLEX_ATTRIBUTES).leftOuterJoin(EAV_CLASSES
-        ).on(EAV_COMPLEX_ATTRIBUTES.CLASS_ID.eq(EAV_CLASSES.ID)
-        ).where(EAV_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
-        ).and(EAV_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(meta.getType()));
+                EAV_M_COMPLEX_ATTRIBUTES.ID,
+                EAV_M_COMPLEX_ATTRIBUTES.IS_KEY,
+                EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE,
+                EAV_M_COMPLEX_ATTRIBUTES.NAME,
+                EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE,
+                EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID,
+                EAV_M_COMPLEX_ATTRIBUTES.CLASS_ID,
+                EAV_M_CLASSES.NAME.as("cname")
+            ).from(EAV_M_COMPLEX_ATTRIBUTES).leftOuterJoin(EAV_M_CLASSES
+        ).on(EAV_M_COMPLEX_ATTRIBUTES.CLASS_ID.eq(EAV_M_CLASSES.ID)
+        ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
+        ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(meta.getType()));
 
         long t = 0;
 
@@ -549,19 +549,19 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     void loadComplexArrays(IMetaContainer meta)
     {
         SelectForUpdateStep select = sqlGenerator.select(
-                EAV_COMPLEX_SET.ID,
-                EAV_COMPLEX_SET.IS_NULLABLE,
-                EAV_COMPLEX_SET.IS_KEY,
-                EAV_COMPLEX_SET.NAME,
-                EAV_COMPLEX_SET.CLASS_ID,
-                EAV_COMPLEX_SET.ARRAY_KEY_TYPE,
-                EAV_COMPLEX_SET.CONTAINER_TYPE,
-                EAV_COMPLEX_SET.CONTAINING_ID,
-                EAV_CLASSES.NAME.as("cname")
-            ).from(EAV_COMPLEX_SET
-        ).leftOuterJoin(EAV_CLASSES).on(EAV_COMPLEX_SET.CLASS_ID.eq(EAV_CLASSES.ID)
-        ).where(EAV_COMPLEX_SET.CONTAINING_ID.eq(meta.getId())
-        ).and(EAV_COMPLEX_SET.CONTAINER_TYPE.eq(meta.getType()));
+                EAV_M_COMPLEX_SET.ID,
+                EAV_M_COMPLEX_SET.IS_NULLABLE,
+                EAV_M_COMPLEX_SET.IS_KEY,
+                EAV_M_COMPLEX_SET.NAME,
+                EAV_M_COMPLEX_SET.CLASS_ID,
+                EAV_M_COMPLEX_SET.ARRAY_KEY_TYPE,
+                EAV_M_COMPLEX_SET.CONTAINER_TYPE,
+                EAV_M_COMPLEX_SET.CONTAINING_ID,
+                EAV_M_CLASSES.NAME.as("cname")
+            ).from(EAV_M_COMPLEX_SET
+        ).leftOuterJoin(EAV_M_CLASSES).on(EAV_M_COMPLEX_SET.CLASS_ID.eq(EAV_M_CLASSES.ID)
+        ).where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(meta.getId())
+        ).and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(meta.getType()));
         long t = 0;
 
         logger.debug(select.toString());
@@ -597,16 +597,16 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     void loadArrayArrays(IMetaContainer meta)
     {
         SelectForUpdateStep select = sqlGenerator.select(
-                EAV_SET_OF_SETS.ID,
-                EAV_SET_OF_SETS.NAME,
-                EAV_SET_OF_SETS.IS_NULLABLE,
-                EAV_SET_OF_SETS.IS_KEY,
-                EAV_SET_OF_SETS.CONTAINER_TYPE,
-                EAV_SET_OF_SETS.CONTAINING_ID,
-                EAV_SET_OF_SETS.ARRAY_KEY_TYPE
-            ).from(EAV_SET_OF_SETS
-        ).where(EAV_SET_OF_SETS.CONTAINING_ID.eq(meta.getId())
-        ).and(EAV_SET_OF_SETS.CONTAINER_TYPE.eq(meta.getType()));
+                EAV_M_SET_OF_SETS.ID,
+                EAV_M_SET_OF_SETS.NAME,
+                EAV_M_SET_OF_SETS.IS_NULLABLE,
+                EAV_M_SET_OF_SETS.IS_KEY,
+                EAV_M_SET_OF_SETS.CONTAINER_TYPE,
+                EAV_M_SET_OF_SETS.CONTAINING_ID,
+                EAV_M_SET_OF_SETS.ARRAY_KEY_TYPE
+            ).from(EAV_M_SET_OF_SETS
+        ).where(EAV_M_SET_OF_SETS.CONTAINING_ID.eq(meta.getId())
+        ).and(EAV_M_SET_OF_SETS.CONTAINER_TYPE.eq(meta.getType()));
         long t = 0;
 
         logger.debug(select.toString());
@@ -745,9 +745,9 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
     private void removeAllAttributes(long id, int type)
     {
-        DeleteConditionStep delete = sqlGenerator.delete(EAV_SIMPLE_ATTRIBUTES
-            ).where(EAV_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(id)
-        ).and(EAV_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(type));
+        DeleteConditionStep delete = sqlGenerator.delete(EAV_M_SIMPLE_ATTRIBUTES
+            ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(id)
+        ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(type));
 
         logger.debug(delete.toString());
 
@@ -762,9 +762,9 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
         }
 
-        delete = sqlGenerator.delete(EAV_COMPLEX_ATTRIBUTES
-            ).where(EAV_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(id)
-            ).and(EAV_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(type));
+        delete = sqlGenerator.delete(EAV_M_COMPLEX_ATTRIBUTES
+            ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(id)
+            ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(type));
 
         logger.debug(delete.toString());
 
@@ -815,7 +815,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         removeAllAttributes(metaClass.getId(), ContainerTypes.CLASS);
 
         //delete class
-        DeleteConditionStep delete = sqlGenerator.delete(EAV_CLASSES).where(EAV_CLASSES.ID.eq(metaClass.getId()));
+        DeleteConditionStep delete = sqlGenerator.delete(EAV_M_CLASSES).where(EAV_M_CLASSES.ID.eq(metaClass.getId()));
 
         logger.debug(delete.toString());
 

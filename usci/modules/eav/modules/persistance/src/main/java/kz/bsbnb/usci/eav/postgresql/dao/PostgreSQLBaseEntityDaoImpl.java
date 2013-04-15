@@ -1070,12 +1070,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_INTEGER_VALUES.BATCH_ID,
-                        EAV_SIMPLE_ATTRIBUTES.NAME,
+                        EAV_M_SIMPLE_ATTRIBUTES.NAME,
                         EAV_BE_INTEGER_VALUES.INDEX_,
                         EAV_BE_INTEGER_VALUES.REP_DATE,
                         EAV_BE_INTEGER_VALUES.VALUE)
                 .from(EAV_BE_INTEGER_VALUES)
-                .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
+                .join(EAV_M_SIMPLE_ATTRIBUTES).on(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
                 .where(EAV_BE_INTEGER_VALUES.ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_INTEGER_VALUES.IS_LAST.eq(true));
 
@@ -1089,7 +1089,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
             Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_INTEGER_VALUES.BATCH_ID.getName()));
             baseEntity.put(
-                    (String) row.get(EAV_SIMPLE_ATTRIBUTES.NAME.getName()),
+                    (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
                             batch,
                             (Long) row.get(EAV_BE_INTEGER_VALUES.INDEX_.getName()),
@@ -1102,12 +1102,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_DATE_VALUES.BATCH_ID,
-                        EAV_SIMPLE_ATTRIBUTES.NAME,
+                        EAV_M_SIMPLE_ATTRIBUTES.NAME,
                         EAV_BE_DATE_VALUES.INDEX_,
                         EAV_BE_DATE_VALUES.REP_DATE,
                         EAV_BE_DATE_VALUES.VALUE)
                 .from(EAV_BE_DATE_VALUES)
-                .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
+                .join(EAV_M_SIMPLE_ATTRIBUTES).on(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
                 .where(EAV_BE_DATE_VALUES.ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_DATE_VALUES.IS_LAST.eq(true));
 
@@ -1121,7 +1121,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
             Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_DATE_VALUES.BATCH_ID.getName()));
             baseEntity.put(
-                    (String) row.get(EAV_SIMPLE_ATTRIBUTES.NAME.getName()),
+                    (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
                             batch,
                             (Long) row.get(EAV_BE_DATE_VALUES.INDEX_.getName()),
@@ -1134,12 +1134,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_BOOLEAN_VALUES.BATCH_ID,
-                        EAV_SIMPLE_ATTRIBUTES.NAME,
+                        EAV_M_SIMPLE_ATTRIBUTES.NAME,
                         EAV_BE_BOOLEAN_VALUES.INDEX_,
                         EAV_BE_BOOLEAN_VALUES.REP_DATE,
                         EAV_BE_BOOLEAN_VALUES.VALUE)
                 .from(EAV_BE_BOOLEAN_VALUES)
-                .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
+                .join(EAV_M_SIMPLE_ATTRIBUTES).on(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
                 .where(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_BOOLEAN_VALUES.IS_LAST.eq(true));
 
@@ -1153,7 +1153,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
             Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_BOOLEAN_VALUES.BATCH_ID.getName()));
             baseEntity.put(
-                    (String) row.get(EAV_SIMPLE_ATTRIBUTES.NAME.getName()),
+                    (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
                             batch,
                             (Long) row.get(EAV_BE_BOOLEAN_VALUES.INDEX_.getName()),
@@ -1166,12 +1166,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_STRING_VALUES.BATCH_ID,
-                        EAV_SIMPLE_ATTRIBUTES.NAME,
+                        EAV_M_SIMPLE_ATTRIBUTES.NAME,
                         EAV_BE_STRING_VALUES.INDEX_,
                         EAV_BE_STRING_VALUES.REP_DATE,
                         EAV_BE_STRING_VALUES.VALUE)
                 .from(EAV_BE_STRING_VALUES)
-                .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
+                .join(EAV_M_SIMPLE_ATTRIBUTES).on(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
                 .where(EAV_BE_STRING_VALUES.ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_STRING_VALUES.IS_LAST.eq(true));
 
@@ -1185,7 +1185,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
             Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_STRING_VALUES.BATCH_ID.getName()));
             baseEntity.put(
-                    (String) row.get(EAV_SIMPLE_ATTRIBUTES.NAME.getName()),
+                    (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
                             batch,
                             (Long) row.get(EAV_BE_STRING_VALUES.INDEX_.getName()),
@@ -1198,12 +1198,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_DOUBLE_VALUES.BATCH_ID,
-                        EAV_SIMPLE_ATTRIBUTES.NAME,
+                        EAV_M_SIMPLE_ATTRIBUTES.NAME,
                         EAV_BE_DOUBLE_VALUES.INDEX_,
                         EAV_BE_DOUBLE_VALUES.REP_DATE,
                         EAV_BE_DOUBLE_VALUES.VALUE)
                 .from(EAV_BE_DOUBLE_VALUES)
-                .join(EAV_SIMPLE_ATTRIBUTES).on(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID.eq(EAV_SIMPLE_ATTRIBUTES.ID))
+                .join(EAV_M_SIMPLE_ATTRIBUTES).on(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
                 .where(EAV_BE_DOUBLE_VALUES.ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_DOUBLE_VALUES.IS_LAST.eq(true));
 
@@ -1217,7 +1217,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
             Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_DOUBLE_VALUES.BATCH_ID.getName()));
             baseEntity.put(
-                    (String) row.get(EAV_SIMPLE_ATTRIBUTES.NAME.getName()),
+                    (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
                             batch,
                             (Long) row.get(EAV_BE_DOUBLE_VALUES.INDEX_.getName()),
@@ -1230,12 +1230,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_COMPLEX_VALUES.BATCH_ID,
-                        EAV_COMPLEX_ATTRIBUTES.NAME,
+                        EAV_M_COMPLEX_ATTRIBUTES.NAME,
                         EAV_BE_COMPLEX_VALUES.INDEX_,
                         EAV_BE_COMPLEX_VALUES.REP_DATE,
                         EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID)
                 .from(EAV_BE_COMPLEX_VALUES)
-                .join(EAV_COMPLEX_ATTRIBUTES).on(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID.eq(EAV_COMPLEX_ATTRIBUTES.ID))
+                .join(EAV_M_COMPLEX_ATTRIBUTES).on(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID.eq(EAV_M_COMPLEX_ATTRIBUTES.ID))
                 .where(EAV_BE_COMPLEX_VALUES.ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_COMPLEX_VALUES.IS_LAST.eq(true));
 
@@ -1253,7 +1253,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             BaseEntity childBaseEntity = load(entityValueId);
 
             baseEntity.put(
-                    (String) row.get(EAV_COMPLEX_ATTRIBUTES.NAME.getName()),
+                    (String) row.get(EAV_M_COMPLEX_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
                             batch,
                             (Long) row.get(EAV_BE_COMPLEX_VALUES.INDEX_.getName()),
@@ -1288,12 +1288,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 .select(EAV_BE_SETS.ID.as("set_id"),
                         EAV_BE_SETS.BATCH_ID,
                         EAV_BE_ENTITY_SIMPLE_SETS.ID.as("entity_simple_set_id"),
-                        EAV_SIMPLE_SET.NAME,
+                        EAV_M_SIMPLE_SET.NAME,
                         EAV_BE_SETS.INDEX_,
                         EAV_BE_SETS.REP_DATE)
                 .from(EAV_BE_ENTITY_SIMPLE_SETS)
                 .join(EAV_BE_SETS).on(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID.eq(EAV_BE_SETS.ID))
-                .join(EAV_SIMPLE_SET).on(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID.eq(EAV_SIMPLE_SET.ID))
+                .join(EAV_M_SIMPLE_SET).on(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_SET.ID))
                 .where(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID.equal(metaAttribute.getId()));
 
@@ -1304,7 +1304,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             Map<String, Object> row = rows.get(0);
             loadEntitySet(
                     baseEntity,
-                    (String) row.get(EAV_SIMPLE_SET.NAME.getName()),
+                    (String) row.get(EAV_M_SIMPLE_SET.NAME.getName()),
                     (Long) row.get("set_id"),
                     (Long) row.get("entity_simple_set_id"),
                     (Long) row.get(EAV_BE_SETS.BATCH_ID.getName()),
@@ -1323,12 +1323,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 .select(EAV_BE_SETS.ID.as("set_id"),
                         EAV_BE_SETS.BATCH_ID,
                         EAV_BE_ENTITY_SIMPLE_SETS.ID.as("entity_simple_set_id"),
-                        EAV_SIMPLE_SET.NAME,
+                        EAV_M_SIMPLE_SET.NAME,
                         EAV_BE_SETS.INDEX_,
                         EAV_BE_SETS.REP_DATE)
                 .from(EAV_BE_ENTITY_SIMPLE_SETS)
                 .join(EAV_BE_SETS).on(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID.eq(EAV_BE_SETS.ID))
-                .join(EAV_SIMPLE_SET).on(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID.eq(EAV_SIMPLE_SET.ID))
+                .join(EAV_M_SIMPLE_SET).on(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_SET.ID))
                 .where(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST.eq(true));
 
@@ -1341,7 +1341,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             Map<String, Object> row = it.next();
             loadEntitySet(
                     baseEntity,
-                    (String)row.get(EAV_SIMPLE_SET.NAME.getName()),
+                    (String)row.get(EAV_M_SIMPLE_SET.NAME.getName()),
                     (Long)row.get("set_id"),
                     (Long)row.get("entity_simple_set_id"),
                     (Long)row.get(EAV_BE_SETS.BATCH_ID.getName()),
@@ -1359,12 +1359,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 .select(EAV_BE_SETS.ID.as("set_id"),
                         EAV_BE_SETS.BATCH_ID,
                         EAV_BE_ENTITY_COMPLEX_SETS.ID.as("entity_complex_set_id"),
-                        EAV_COMPLEX_SET.NAME,
+                        EAV_M_COMPLEX_SET.NAME,
                         EAV_BE_SETS.INDEX_,
                         EAV_BE_SETS.REP_DATE)
                 .from(EAV_BE_ENTITY_COMPLEX_SETS)
                 .join(EAV_BE_SETS).on(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.eq(EAV_BE_SETS.ID))
-                .join(EAV_COMPLEX_SET).on(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID.eq(EAV_COMPLEX_SET.ID))
+                .join(EAV_M_COMPLEX_SET).on(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID.eq(EAV_M_COMPLEX_SET.ID))
                 .where(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST.eq(true));
@@ -1376,7 +1376,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             Map<String, Object> row = rows.get(0);
             loadEntitySet(
                     baseEntity,
-                    (String)row.get(EAV_COMPLEX_SET.NAME.getName()),
+                    (String)row.get(EAV_M_COMPLEX_SET.NAME.getName()),
                     (Long)row.get("set_id"),
                     (Long)row.get("entity_complex_set_id"),
                     (Long)row.get(EAV_BE_SETS.BATCH_ID.getName()),
@@ -1395,12 +1395,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 .select(EAV_BE_SETS.ID.as("set_id"),
                         EAV_BE_SETS.BATCH_ID,
                         EAV_BE_ENTITY_COMPLEX_SETS.ID.as("entity_complex_set_id"),
-                        EAV_COMPLEX_SET.NAME,
+                        EAV_M_COMPLEX_SET.NAME,
                         EAV_BE_SETS.INDEX_,
                         EAV_BE_SETS.REP_DATE)
                 .from(EAV_BE_ENTITY_COMPLEX_SETS)
                 .join(EAV_BE_SETS).on(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.eq(EAV_BE_SETS.ID))
-                .join(EAV_COMPLEX_SET).on(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID.eq(EAV_COMPLEX_SET.ID))
+                .join(EAV_M_COMPLEX_SET).on(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID.eq(EAV_M_COMPLEX_SET.ID))
                 .where(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST.eq(true));
 
@@ -1413,7 +1413,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             Map<String, Object> row = it.next();
             loadEntitySet(
                     baseEntity,
-                    (String)row.get(EAV_COMPLEX_SET.NAME.getName()),
+                    (String)row.get(EAV_M_COMPLEX_SET.NAME.getName()),
                     (Long)row.get("set_id"),
                     (Long)row.get("entity_complex_set_id"),
                     (Long)row.get(EAV_BE_SETS.BATCH_ID.getName()),
@@ -1426,14 +1426,14 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     {
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_SETS.ID.as("set_id"),
-                        EAV_SET_OF_SETS.NAME,
+                        EAV_M_SET_OF_SETS.NAME,
                         EAV_BE_ENTITY_SET_OF_SETS.ID.as("entity_set_of_set_id"),
                         EAV_BE_SETS.BATCH_ID,
                         EAV_BE_SETS.INDEX_,
                         EAV_BE_SETS.REP_DATE)
                 .from(EAV_BE_ENTITY_SET_OF_SETS)
                 .join(EAV_BE_SETS).on(EAV_BE_ENTITY_SET_OF_SETS.SET_ID.eq(EAV_BE_SETS.ID))
-                .join(EAV_SET_OF_SETS).on(EAV_BE_ENTITY_SET_OF_SETS.ATTRIBUTE_ID.eq(EAV_SET_OF_SETS.ID))
+                .join(EAV_M_SET_OF_SETS).on(EAV_BE_ENTITY_SET_OF_SETS.ATTRIBUTE_ID.eq(EAV_M_SET_OF_SETS.ID))
                 .where(EAV_BE_ENTITY_SET_OF_SETS.ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_ENTITY_SET_OF_SETS.IS_LAST.eq(true));
 
@@ -1446,7 +1446,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             Map<String, Object> row = it.next();
             loadEntitySet(
                     baseEntity,
-                    (String)row.get(EAV_SET_OF_SETS.NAME.getName()),
+                    (String)row.get(EAV_M_SET_OF_SETS.NAME.getName()),
                     (Long)row.get("set_id"),
                     (Long)row.get("entity_set_of_set_id"),
                     (Long)row.get(EAV_BE_SETS.BATCH_ID.getName()),
