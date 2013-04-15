@@ -22,9 +22,6 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
     private final static String COUNT_TABLE = "SELECT count(*) FROM %s";
 
-    //TODO: Remove?
-    //private final static String BATCH_FILES_TABLE = "CREATE TABLE IF NOT EXISTS %s (id serial NOT NULL, file_data BYTEA NOT NULL, file_size double precision NOT NULL, file_name character varying(%d), batch_id int references %s(id) ON DELETE CASCADE, CONSTRAINT %s_primary_key_index PRIMARY KEY (id))";
-
     @Override
 	public void initialize() {
         URL dbConfigFileUrl = this.getClass().getClassLoader().getResource(getConfig().getSchema());

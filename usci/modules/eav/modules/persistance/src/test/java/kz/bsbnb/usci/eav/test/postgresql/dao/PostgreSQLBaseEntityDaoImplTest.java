@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import sun.org.mozilla.javascript.internal.ErrorReporter;
 
 import java.sql.Date;
 import java.util.Calendar;
@@ -157,7 +158,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         Random random = new Random();
 
         // date values
-        entityCreate.put("date_first",
+        /*entityCreate.put("date_first",
                 new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 1)));
         entityCreate.put("date_second",
                 new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 2)));
@@ -170,7 +171,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityCreate.put("double_second",
                 new BaseValue(batch, 1L, null));
         entityCreate.put("double_third",
-                new BaseValue(batch, 1L, random.nextInt() * random.nextDouble()));
+                new BaseValue(batch, 1L, random.nextInt() * random.nextDouble()));*/
 
         // integer values
         entityCreate.put("integer_first",
@@ -181,7 +182,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
                 new BaseValue(batch, 1L, random.nextInt()));
 
         // boolean values
-        entityCreate.put("boolean_first",
+        /*entityCreate.put("boolean_first",
                 new BaseValue(batch, 1L, false));
         entityCreate.put("boolean_second",
                 new BaseValue(batch, 1L, true));
@@ -194,7 +195,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityCreate.put("string_second",
                 new BaseValue(batch, 1L, null));
         entityCreate.put("string_third",
-                new BaseValue(batch, 1L, "Test value with a string type for attribute string_third."));
+                new BaseValue(batch, 1L, "Test value with a string type for attribute string_third.")); */
 
         // complex values
         BaseEntity baseEntityInnerFirst =
@@ -430,8 +431,10 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
         MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
-        Batch batchFirst = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
-        Batch batchSecond = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
+        // 1 january 2013
+        Batch batchFirst = batchRepository.addBatch(new Batch(new Date(new Long("1356976800000"))));
+        // 1 february 2013
+        Batch batchSecond = batchRepository.addBatch(new Batch(new Date(new Long("1359655200000"))));
 
         UUID uuid = UUID.randomUUID();
 
@@ -474,6 +477,10 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
                 DateUtils.compareBeginningOfTheDay(
                         (java.util.Date) entityUpdated.getBaseValue("date_second").getValue(),
                         DateUtils.nowPlus(Calendar.DATE, 4)) == 0);
+        assertTrue("",
+                DateUtils.compareBeginningOfTheDay(
+                        entityUpdated.getBaseValue("date_second").getRepDate(),
+                        batchSecond.getRepDate()) == 0);
     }
 
     @Test
