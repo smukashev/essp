@@ -68,16 +68,16 @@ public class JDBCConfig {
     public void init()
     {
         metaObjectTableName = tablePrefix + "meta_object";
-        classesTableName = tablePrefix + "classes";
-        attributesTableName = tablePrefix + "attributes";
-        simpleAttributesTableName = tablePrefix + "simple_attributes";
-        arrayKeyFilterTableName = tablePrefix + "array_key_filter";
-        arrayKeyFilterValuesTableName = tablePrefix + "array_key_filter_values";
-        complexAttributesTableName = tablePrefix + "complex_attributes";
-        setTableName = tablePrefix + "set";
-        complexSetTableName = tablePrefix + "complex_set";
-        setOfSetsTableName = tablePrefix + "set_of_sets";
-        simpleSetTableName = tablePrefix + "simple_set";
+        classesTableName = tablePrefix + "m_classes";
+        attributesTableName = tablePrefix + "m_attributes";
+        simpleAttributesTableName = tablePrefix + "m_simple_attributes";
+        arrayKeyFilterTableName = tablePrefix + "m_array_key_filter";
+        arrayKeyFilterValuesTableName = tablePrefix + "m_array_key_filter_values";
+        complexAttributesTableName = tablePrefix + "m_complex_attributes";
+        setTableName = tablePrefix + "m_set";
+        complexSetTableName = tablePrefix + "m_complex_set";
+        setOfSetsTableName = tablePrefix + "m_set_of_sets";
+        simpleSetTableName = tablePrefix + "m_simple_set";
         batchesTableName = tablePrefix + "batches";
 
         entitiesTableName = tablePrefix + "be_entities";
