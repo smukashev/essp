@@ -40,6 +40,11 @@ import static org.jooq.impl.Factory.max;
 @Repository
 public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao
 {
+    private static final int HISTORY_ALGORITHM_FILL_BIG_DATE = 1;
+    private static final int HISTORY_ALGORITHM_NOT_FILL = 2;
+
+    private static final java.util.Date HISTORY_MAX_DATE = new java.util.Date(new Long("4102423200000"));
+
     private final Logger logger = LoggerFactory.getLogger(PostgreSQLBaseEntityDaoImpl.class);
 
     @Autowired
@@ -54,6 +59,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
     @Autowired
     private BasicBaseEntitySearcherPool searcherPool;
+
+    private int historyAlgorithm = HISTORY_ALGORITHM_FILL_BIG_DATE;
 
     @Override
     public BaseEntity load(long id)
@@ -207,10 +214,10 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         Set<String> updateComplexSetAttributes = new HashSet<String>();
         Set<String> insertComplexSetAttributes = new HashSet<String>();
 
-        Set<String> attributes = baseEntityForSave.getAttributeNames();
+        Set<String> attributesForSave = baseEntityForSave.getAttributeNames();
         Set<String> attributesLoad = baseEntityLoaded.getAttributeNames();
 
-        Iterator<String> it = attributes.iterator();
+        Iterator<String> it = attributesForSave.iterator();
         while (it.hasNext())
         {
             String attribute = it.next();
@@ -298,7 +305,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                                 java.util.Date anotherDate = (java.util.Date)baseValueLoad.getValue();
                                 if (DateUtils.compareBeginningOfTheDay(comparingDate, anotherDate) != 0)
                                 {
-                                    baseEntityLoaded.put(attribute, baseValueForSave);
+                                    //baseEntityLoaded.put(attribute, baseValueForSave);
                                     SetUtils.putMapValue(updateSimpleAttributes, type, attribute);
                                 }
                             }
@@ -306,7 +313,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                             {
                                 if (!baseValueForSave.getValue().equals(baseValueLoad.getValue()))
                                 {
-                                    baseEntityLoaded.put(attribute, baseValueForSave);
+                                    //baseEntityLoaded.put(attribute, baseValueForSave);
                                     SetUtils.putMapValue(updateSimpleAttributes, type, attribute);
                                 }
                             }
@@ -339,7 +346,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             {
                 for (String attribute: updateSimpleAttributes.get(dataType))
                 {
-                    updateSimpleValue(baseEntityLoaded, attribute);
+                    updateSimpleValue(baseEntityLoaded, baseEntityForSave, attribute);
                 }
             }
         }
@@ -658,7 +665,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     {
         MetaClass meta = baseEntity.getMeta();
 
-        InsertValuesStep7 insert;
+        InsertValuesStep8 insert;
         switch(dataType)
         {
             case INTEGER: {
@@ -668,7 +675,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         EAV_BE_INTEGER_VALUES.BATCH_ID,
                         EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID,
                         EAV_BE_INTEGER_VALUES.INDEX_,
-                        EAV_BE_INTEGER_VALUES.REP_DATE,
+                        EAV_BE_INTEGER_VALUES.OPEN_DATE,
+                        EAV_BE_INTEGER_VALUES.CLOSE_DATE,
                         EAV_BE_INTEGER_VALUES.VALUE,
                         EAV_BE_INTEGER_VALUES.IS_LAST);
                 break;
@@ -680,7 +688,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         EAV_BE_DATE_VALUES.BATCH_ID,
                         EAV_BE_DATE_VALUES.ATTRIBUTE_ID,
                         EAV_BE_DATE_VALUES.INDEX_,
-                        EAV_BE_DATE_VALUES.REP_DATE,
+                        EAV_BE_DATE_VALUES.OPEN_DATE,
+                        EAV_BE_DATE_VALUES.CLOSE_DATE,
                         EAV_BE_DATE_VALUES.VALUE,
                         EAV_BE_DATE_VALUES.IS_LAST);
                 break;
@@ -692,12 +701,13 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         EAV_BE_STRING_VALUES.BATCH_ID,
                         EAV_BE_STRING_VALUES.ATTRIBUTE_ID,
                         EAV_BE_STRING_VALUES.INDEX_,
-                        EAV_BE_STRING_VALUES.REP_DATE,
+                        EAV_BE_STRING_VALUES.OPEN_DATE,
+                        EAV_BE_STRING_VALUES.CLOSE_DATE,
                         EAV_BE_STRING_VALUES.VALUE,
                         EAV_BE_STRING_VALUES.IS_LAST);
                 break;
             }
-            case BOOLEAN: {
+            /*case BOOLEAN: {
                 insert = sqlGenerator.insertInto(
                         EAV_BE_BOOLEAN_VALUES,
                         EAV_BE_BOOLEAN_VALUES.ENTITY_ID,
@@ -720,7 +730,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         EAV_BE_DOUBLE_VALUES.VALUE,
                         EAV_BE_DOUBLE_VALUES.IS_LAST);
                 break;
-            }
+            }    */
             default:
                 throw new IllegalArgumentException("Unknown type.");
         }
@@ -742,6 +752,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         metaAttribute.getId(),
                         batchValue.getIndex(),
                         batchValue.getRepDate(),
+                        historyAlgorithm == HISTORY_ALGORITHM_NOT_FILL ? null : HISTORY_MAX_DATE,
                         batchValue.getValue(),
                         true
                 };
@@ -1068,16 +1079,22 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
     private void loadIntegerValues(BaseEntity baseEntity)
     {
-        SelectForUpdateStep select = sqlGenerator
-                .select(EAV_BE_INTEGER_VALUES.BATCH_ID,
-                        EAV_M_SIMPLE_ATTRIBUTES.NAME,
-                        EAV_BE_INTEGER_VALUES.INDEX_,
-                        EAV_BE_INTEGER_VALUES.REP_DATE,
-                        EAV_BE_INTEGER_VALUES.VALUE)
-                .from(EAV_BE_INTEGER_VALUES)
-                .join(EAV_M_SIMPLE_ATTRIBUTES).on(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
-                .where(EAV_BE_INTEGER_VALUES.ENTITY_ID.equal(baseEntity.getId()))
-                .and(EAV_BE_INTEGER_VALUES.IS_LAST.eq(true));
+        Date reportDate = DateUtils.convert(baseEntity.getReportDate());
+        Select select = sqlGenerator
+                    .select(EAV_BE_INTEGER_VALUES.ID,
+                            EAV_BE_INTEGER_VALUES.BATCH_ID,
+                            EAV_M_SIMPLE_ATTRIBUTES.NAME,
+                            EAV_BE_INTEGER_VALUES.INDEX_,
+                            EAV_BE_INTEGER_VALUES.OPEN_DATE,
+                            EAV_BE_INTEGER_VALUES.VALUE)
+                    .from(EAV_BE_INTEGER_VALUES)
+                    .join(EAV_M_SIMPLE_ATTRIBUTES).on(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
+                    .where(EAV_BE_INTEGER_VALUES.ENTITY_ID.equal(baseEntity.getId()))
+                    .and(EAV_BE_INTEGER_VALUES.OPEN_DATE.lessOrEqual(reportDate))
+                    .and(historyAlgorithm == HISTORY_ALGORITHM_NOT_FILL ?
+                            EAV_BE_INTEGER_VALUES.CLOSE_DATE.greaterThan(reportDate)
+                                    .or(EAV_BE_INTEGER_VALUES.CLOSE_DATE.isNull()) :
+                            EAV_BE_INTEGER_VALUES.CLOSE_DATE.greaterThan(reportDate));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -1086,30 +1103,35 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         while (it.hasNext())
         {
             Map<String, Object> row = it.next();
-
-            Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_INTEGER_VALUES.BATCH_ID.getName()));
             baseEntity.put(
                     (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
-                            batch,
+                            (Long) row.get(EAV_BE_INTEGER_VALUES.ID.getName()),
+                            batchRepository.getBatch((Long)row.get(EAV_BE_INTEGER_VALUES.BATCH_ID.getName())),
                             (Long) row.get(EAV_BE_INTEGER_VALUES.INDEX_.getName()),
-                            (java.sql.Date) row.get(EAV_BE_INTEGER_VALUES.REP_DATE.getName()),
+                            (java.sql.Date) row.get(EAV_BE_INTEGER_VALUES.OPEN_DATE.getName()),
                             row.get(EAV_BE_INTEGER_VALUES.VALUE.getName())));
         }
     }
 
     private void loadDateValues(BaseEntity baseEntity)
     {
-        SelectForUpdateStep select = sqlGenerator
-                .select(EAV_BE_DATE_VALUES.BATCH_ID,
+        Date reportDate = DateUtils.convert(baseEntity.getReportDate());
+        Select select = sqlGenerator
+                .select(EAV_BE_DATE_VALUES.ID,
+                        EAV_BE_DATE_VALUES.BATCH_ID,
                         EAV_M_SIMPLE_ATTRIBUTES.NAME,
                         EAV_BE_DATE_VALUES.INDEX_,
-                        EAV_BE_DATE_VALUES.REP_DATE,
+                        EAV_BE_DATE_VALUES.OPEN_DATE,
                         EAV_BE_DATE_VALUES.VALUE)
                 .from(EAV_BE_DATE_VALUES)
                 .join(EAV_M_SIMPLE_ATTRIBUTES).on(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
                 .where(EAV_BE_DATE_VALUES.ENTITY_ID.equal(baseEntity.getId()))
-                .and(EAV_BE_DATE_VALUES.IS_LAST.eq(true));
+                .and(EAV_BE_DATE_VALUES.OPEN_DATE.lessOrEqual(reportDate))
+                .and(historyAlgorithm == HISTORY_ALGORITHM_NOT_FILL ?
+                        EAV_BE_DATE_VALUES.CLOSE_DATE.greaterThan(reportDate)
+                                .or(EAV_BE_DATE_VALUES.CLOSE_DATE.isNull()) :
+                        EAV_BE_DATE_VALUES.CLOSE_DATE.greaterThan(reportDate));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -1118,14 +1140,13 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         while (it.hasNext())
         {
             Map<String, Object> row = it.next();
-
-            Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_DATE_VALUES.BATCH_ID.getName()));
             baseEntity.put(
                     (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
-                            batch,
+                            (Long) row.get(EAV_BE_DATE_VALUES.ID.getName()),
+                            batchRepository.getBatch((Long)row.get(EAV_BE_DATE_VALUES.BATCH_ID.getName())),
                             (Long) row.get(EAV_BE_DATE_VALUES.INDEX_.getName()),
-                            (java.sql.Date) row.get(EAV_BE_DATE_VALUES.REP_DATE.getName()),
+                            (java.sql.Date) row.get(EAV_BE_DATE_VALUES.OPEN_DATE.getName()),
                             DateUtils.convert((java.sql.Date) row.get(EAV_BE_DATE_VALUES.VALUE.getName()))));
         }
     }
@@ -1133,7 +1154,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     private void loadBooleanValues(BaseEntity baseEntity)
     {
         SelectForUpdateStep select = sqlGenerator
-                .select(EAV_BE_BOOLEAN_VALUES.BATCH_ID,
+                .select(EAV_BE_BOOLEAN_VALUES.ID,
+                        EAV_BE_BOOLEAN_VALUES.BATCH_ID,
                         EAV_M_SIMPLE_ATTRIBUTES.NAME,
                         EAV_BE_BOOLEAN_VALUES.INDEX_,
                         EAV_BE_BOOLEAN_VALUES.REP_DATE,
@@ -1150,12 +1172,11 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         while (it.hasNext())
         {
             Map<String, Object> row = it.next();
-
-            Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_BOOLEAN_VALUES.BATCH_ID.getName()));
             baseEntity.put(
                     (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
-                            batch,
+                            (Long) row.get(EAV_BE_BOOLEAN_VALUES.ID.getName()),
+                            batchRepository.getBatch((Long)row.get(EAV_BE_BOOLEAN_VALUES.BATCH_ID.getName())),
                             (Long) row.get(EAV_BE_BOOLEAN_VALUES.INDEX_.getName()),
                             (java.sql.Date) row.get(EAV_BE_BOOLEAN_VALUES.REP_DATE.getName()),
                             row.get(EAV_BE_BOOLEAN_VALUES.VALUE.getName())));
@@ -1164,16 +1185,22 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
     private void loadStringValues(BaseEntity baseEntity)
     {
-        SelectForUpdateStep select = sqlGenerator
-                .select(EAV_BE_STRING_VALUES.BATCH_ID,
+        Date reportDate = DateUtils.convert(baseEntity.getReportDate());
+        Select select = sqlGenerator
+                .select(EAV_BE_STRING_VALUES.ID,
+                        EAV_BE_STRING_VALUES.BATCH_ID,
                         EAV_M_SIMPLE_ATTRIBUTES.NAME,
                         EAV_BE_STRING_VALUES.INDEX_,
-                        EAV_BE_STRING_VALUES.REP_DATE,
+                        EAV_BE_STRING_VALUES.OPEN_DATE,
                         EAV_BE_STRING_VALUES.VALUE)
                 .from(EAV_BE_STRING_VALUES)
                 .join(EAV_M_SIMPLE_ATTRIBUTES).on(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
                 .where(EAV_BE_STRING_VALUES.ENTITY_ID.equal(baseEntity.getId()))
-                .and(EAV_BE_STRING_VALUES.IS_LAST.eq(true));
+                .and(EAV_BE_STRING_VALUES.OPEN_DATE.lessOrEqual(reportDate))
+                .and(historyAlgorithm == HISTORY_ALGORITHM_NOT_FILL ?
+                        EAV_BE_STRING_VALUES.CLOSE_DATE.greaterThan(reportDate)
+                                .or(EAV_BE_STRING_VALUES.CLOSE_DATE.isNull()) :
+                        EAV_BE_STRING_VALUES.CLOSE_DATE.greaterThan(reportDate));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -1182,14 +1209,13 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         while (it.hasNext())
         {
             Map<String, Object> row = it.next();
-
-            Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_STRING_VALUES.BATCH_ID.getName()));
             baseEntity.put(
                     (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
-                            batch,
+                            (Long) row.get(EAV_BE_STRING_VALUES.ID.getName()),
+                            batchRepository.getBatch((Long)row.get(EAV_BE_STRING_VALUES.BATCH_ID.getName())),
                             (Long) row.get(EAV_BE_STRING_VALUES.INDEX_.getName()),
-                            (java.sql.Date) row.get(EAV_BE_STRING_VALUES.REP_DATE.getName()),
+                            (java.sql.Date) row.get(EAV_BE_STRING_VALUES.OPEN_DATE.getName()),
                             row.get(EAV_BE_STRING_VALUES.VALUE.getName())));
         }
     }
@@ -1197,7 +1223,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     private void loadDoubleValues(BaseEntity baseEntity)
     {
         SelectForUpdateStep select = sqlGenerator
-                .select(EAV_BE_DOUBLE_VALUES.BATCH_ID,
+                .select(EAV_BE_DOUBLE_VALUES.ID,
+                        EAV_BE_DOUBLE_VALUES.BATCH_ID,
                         EAV_M_SIMPLE_ATTRIBUTES.NAME,
                         EAV_BE_DOUBLE_VALUES.INDEX_,
                         EAV_BE_DOUBLE_VALUES.REP_DATE,
@@ -1214,12 +1241,11 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         while (it.hasNext())
         {
             Map<String, Object> row = it.next();
-
-            Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_DOUBLE_VALUES.BATCH_ID.getName()));
             baseEntity.put(
                     (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
-                            batch,
+                            (Long) row.get(EAV_BE_DOUBLE_VALUES.ID.getName()),
+                            batchRepository.getBatch((Long)row.get(EAV_BE_DOUBLE_VALUES.BATCH_ID.getName())),
                             (Long) row.get(EAV_BE_DOUBLE_VALUES.INDEX_.getName()),
                             (java.sql.Date) row.get(EAV_BE_DOUBLE_VALUES.REP_DATE.getName()),
                             row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())));
@@ -2057,85 +2083,89 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         batchUpdateWithStats(delete.getSQL(), delete.getBindValues());
     }
 
-    private void updateSimpleValue(BaseEntity baseEntity, String attribute)
+    private void updateSimpleValue(BaseEntity baseEntityLoaded, BaseEntity baseEntityForSave, String attribute)
     {
-        MetaClass meta = baseEntity.getMeta();
-        IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
+        MetaClass meta = baseEntityLoaded.getMeta();
+        IMetaType metaType = meta.getMemberType(attribute);
+        DataTypes dataType = ((MetaValue)metaType).getTypeCode();
 
-        if (metaAttribute == null) {
-            throw new IllegalArgumentException("Attribute " + attribute + " not found in the MetaClass. " +
-                    "Updating a simple value is not possible.");
-        }
+        IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
+        IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
 
-        IMetaType metaType = metaAttribute.getMetaType();
-
-        long metaAttributeId =  metaAttribute.getId();
-        long baseEntityId = baseEntity.getId();
-
-        if (baseEntityId < 1)
+        int compare = DateUtils.compareBeginningOfTheDay(baseValueLoaded.getRepDate(), baseValueForSave.getRepDate());
+        if (compare == 1)
         {
-            throw new IllegalArgumentException("BaseEntity does not contain id. " +
-                    "Updating a simple value is not possible.");
+            throw new UnsupportedOperationException("Updating a simple attribute value for " +
+                    "the earlier period is not implemented.");
         }
-        if (metaAttributeId < 1)
+        else
         {
-            throw new IllegalArgumentException("MetaAttribute does not contain id. " +
-                    "Updating a simple value is not possible.");
-        }
+            if (compare == -1)
+            {
+                //TODO: Update old record here
+                Set<String> attributes = new HashSet<String>();
+                attributes.add(attribute);
 
-        IBaseValue baseValue = baseEntity.getBaseValue(attribute);
+                baseEntityLoaded.put(attribute, baseValueForSave);
+                insertSimpleValues(baseEntityLoaded, attributes, dataType);
+            }
+            else
+            {
+                updateSimpleValue(baseValueLoaded, baseValueForSave, dataType);
+            }
+        }
+    }
+
+    private void updateSimpleValue(IBaseValue baseValueLoaded, IBaseValue baseValueForSave, DataTypes dataType)
+    {
+        long baseValueLoadedId = baseValueLoaded.getId();
 
         UpdateConditionStep update;
-        switch(((MetaValue)metaType).getTypeCode())
+        switch(dataType)
         {
             case INTEGER: {
                 update = sqlGenerator
                         .update(EAV_BE_INTEGER_VALUES)
-                        .set(EAV_BE_INTEGER_VALUES.VALUE, (Integer)baseValue.getValue())
-                        .set(EAV_BE_INTEGER_VALUES.BATCH_ID, baseValue.getBatch().getId())
-                        .set(EAV_BE_INTEGER_VALUES.INDEX_, baseValue.getIndex())
-                        .where(EAV_BE_INTEGER_VALUES.ENTITY_ID.eq(baseEntityId))
-                        .and(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
+                        .set(EAV_BE_INTEGER_VALUES.VALUE, (Integer)baseValueForSave.getValue())
+                        .set(EAV_BE_INTEGER_VALUES.BATCH_ID, baseValueForSave.getBatch().getId())
+                        .set(EAV_BE_INTEGER_VALUES.INDEX_, baseValueForSave.getIndex())
+                        .where(EAV_BE_INTEGER_VALUES.ID.eq(baseValueLoadedId));
                 break;
             }
             case DATE: {
                 update = sqlGenerator
                         .update(EAV_BE_DATE_VALUES)
-                        .set(EAV_BE_DATE_VALUES.VALUE, DateUtils.convert((java.util.Date)baseValue.getValue()))
-                        .set(EAV_BE_DATE_VALUES.BATCH_ID, baseValue.getBatch().getId())
-                        .set(EAV_BE_DATE_VALUES.INDEX_, baseValue.getIndex())
-                        .where(EAV_BE_DATE_VALUES.ENTITY_ID.eq(baseEntityId))
-                        .and(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
+                        .set(EAV_BE_DATE_VALUES.VALUE, DateUtils.convert((java.util.Date) baseValueForSave.getValue()))
+                        .set(EAV_BE_DATE_VALUES.BATCH_ID, baseValueForSave.getBatch().getId())
+                        .set(EAV_BE_DATE_VALUES.INDEX_, baseValueForSave.getIndex())
+                        .where(EAV_BE_DATE_VALUES.ID.eq(baseValueLoadedId));
                 break;
             }
             case STRING: {
                 update = sqlGenerator
                         .update(EAV_BE_STRING_VALUES)
-                        .set(EAV_BE_STRING_VALUES.VALUE, (String)baseValue.getValue())
-                        .set(EAV_BE_STRING_VALUES.BATCH_ID, baseValue.getBatch().getId())
-                        .set(EAV_BE_STRING_VALUES.INDEX_, baseValue.getIndex())
-                        .where(EAV_BE_STRING_VALUES.ENTITY_ID.eq(baseEntityId))
-                        .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
+                        .set(EAV_BE_STRING_VALUES.VALUE, (String)baseValueForSave.getValue())
+                        .set(EAV_BE_STRING_VALUES.BATCH_ID, baseValueForSave.getBatch().getId())
+                        .set(EAV_BE_STRING_VALUES.INDEX_, baseValueForSave.getIndex())
+                        .where(EAV_BE_STRING_VALUES.ID.eq(baseValueLoadedId));
                 break;
             }
             case BOOLEAN: {
                 update = sqlGenerator
                         .update(EAV_BE_STRING_VALUES)
-                        .set(EAV_BE_BOOLEAN_VALUES.VALUE, (Boolean)baseValue.getValue())
-                        .set(EAV_BE_BOOLEAN_VALUES.BATCH_ID, baseValue.getBatch().getId())
-                        .set(EAV_BE_BOOLEAN_VALUES.INDEX_, baseValue.getIndex())
-                        .where(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.eq(baseEntityId))
-                        .and(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
+                        .set(EAV_BE_BOOLEAN_VALUES.VALUE, (Boolean)baseValueForSave.getValue())
+                        .set(EAV_BE_BOOLEAN_VALUES.BATCH_ID, baseValueForSave.getBatch().getId())
+                        .set(EAV_BE_BOOLEAN_VALUES.INDEX_, baseValueForSave.getIndex())
+                        .where(EAV_BE_BOOLEAN_VALUES.ID.eq(baseValueLoadedId));
                 break;
             }
             case DOUBLE: {
                 update = sqlGenerator
                         .update(EAV_BE_DOUBLE_VALUES)
-                        .set(EAV_BE_DOUBLE_VALUES.VALUE, (Double)baseValue.getValue())
-                        .set(EAV_BE_DOUBLE_VALUES.BATCH_ID, baseValue.getBatch().getId())
-                        .set(EAV_BE_DOUBLE_VALUES.INDEX_, baseValue.getIndex())
-                        .where(EAV_BE_DOUBLE_VALUES.ENTITY_ID.eq(baseEntityId))
-                        .and(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
+                        .set(EAV_BE_DOUBLE_VALUES.VALUE, (Double)baseValueForSave.getValue())
+                        .set(EAV_BE_DOUBLE_VALUES.BATCH_ID, baseValueForSave.getBatch().getId())
+                        .set(EAV_BE_DOUBLE_VALUES.INDEX_, baseValueForSave.getIndex())
+                        .where(EAV_BE_DOUBLE_VALUES.ID.eq(baseValueLoadedId));
                 break;
             }
             default:
@@ -2144,6 +2174,11 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         logger.debug(update.toString());
         updateWithStats(update.getSQL(), update.getBindValues().toArray());
+    }
+
+    private void updateComplexValue(BaseEntity baseEntityLoaded, BaseEntity baseEntityForSave, String attribute)
+    {
+
     }
 
     private Set<BaseEntity> collectComplexSetValues(BaseSet baseSet)
