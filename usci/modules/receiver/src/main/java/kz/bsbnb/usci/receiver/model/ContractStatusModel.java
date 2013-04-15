@@ -5,13 +5,13 @@ package kz.bsbnb.usci.receiver.model;
  */
 public class ContractStatusModel {
     private Long index;
-    private String status;
-    private String statusDescription;
+    private String protocol;
+    private String description;
 
-    public ContractStatusModel(Long id, String status, String statusDescription) {
-        this.index = id;
-        this.status = status;
-        this.statusDescription = statusDescription;
+    public ContractStatusModel(Long index, String protocol, String description) {
+        this.index = index;
+        this.protocol = protocol;
+        this.description = description;
     }
 
     public Long getIndex() {
@@ -22,19 +22,19 @@ public class ContractStatusModel {
         this.index = index;
     }
 
-    public String getStatus() {
-        return status;
+    public String getProtocol() {
+        return protocol;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 
-    public String getStatusDescription() {
-        return statusDescription;
+    public String getDescription() {
+        return description;
     }
 
-    public void setStatusDescription(String statusDescription) {
-        this.statusDescription = statusDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

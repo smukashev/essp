@@ -4,27 +4,27 @@ package kz.bsbnb.usci.receiver.model;
  * @author k.tulbassiyev
  */
 public class BatchStatusModel {
-    private String status;
-    private String statusDescription;
+    private String protocol;
+    private String description;
 
-    public BatchStatusModel(String status, String statusDescription) {
-        this.status = status;
-        this.statusDescription = statusDescription;
+    public BatchStatusModel(String protocol, String description) {
+        this.protocol = protocol;
+        this.description = description;
     }
 
-    public String getStatus() {
-        return status;
+    public String getProtocol() {
+        return protocol;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 
-    public String getStatusDescription() {
-        return statusDescription;
+    public String getDescription() {
+        return description;
     }
 
-    public void setStatusDescription(String statusDescription) {
-        this.statusDescription = statusDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
