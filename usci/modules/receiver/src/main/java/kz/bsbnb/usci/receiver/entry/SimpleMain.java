@@ -52,7 +52,7 @@ public class SimpleMain {
 
         BatchModel batchModel = new BatchModel(batchId, FILE_PATH, bytes);
         statusSingleton.startBatch(batchId);
-        statusSingleton.addBatchStatus(batchId, new BatchStatusModel(Global.BATCH_STATUS_STARTED, null));
+        statusSingleton.addBatchStatus(batchId, new BatchStatusModel(Global.BATCH_STATUS_PROCESSING, null));
         OperationFuture<Boolean> result = client.set("batch:" + batchId, 0, gson.toJson(batchModel));
 
         while(true) if(result.isDone()) break; // must be completed
