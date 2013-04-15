@@ -7,35 +7,22 @@ import java.util.List;
  * @author k.tulbassiyev
  */
 public class StatusModel {
-    private Long batchId;
-    private List<BatchStatusModel> batchStatusModelList = new ArrayList<BatchStatusModel>();
-    private List<ContractStatusModel> contractStatusModelList = new ArrayList<ContractStatusModel>();
+    private List<BatchStatusModel> batchStatuses = new ArrayList<BatchStatusModel>();
+    private List<ContractStatusModel> contractStatuses = new ArrayList<ContractStatusModel>();
 
-    public StatusModel(Long batchId) {
-        this.batchId = batchId;
+    public List<BatchStatusModel> getBatchStatuses() {
+        return batchStatuses;
     }
 
-    public Long getBatchId() {
-        return batchId;
+    public void setBatchStatuses(List<BatchStatusModel> batchStatuses) {
+        this.batchStatuses = batchStatuses;
     }
 
-    public void setBatchId(Long batchId) {
-        this.batchId = batchId;
+    public List<ContractStatusModel> getContractStatuses() {
+        return contractStatuses;
     }
 
-    public List<BatchStatusModel> getBatchStatusModelList() {
-        return batchStatusModelList;
-    }
-
-    public void setBatchStatusModelList(List<BatchStatusModel> batchStatusModelList) {
-        this.batchStatusModelList = batchStatusModelList;
-    }
-
-    public List<ContractStatusModel> getContractStatusModelList() {
-        return contractStatusModelList;
-    }
-
-    public void setContractStatusModelList(List<ContractStatusModel> contractStatusModelList) {
-        this.contractStatusModelList = contractStatusModelList;
+    public void setContractStatuses(List<ContractStatusModel> contractStatuses) {
+        this.contractStatuses = contractStatuses;
     }
 }
