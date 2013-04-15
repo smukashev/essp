@@ -31,7 +31,6 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.util.Stack;
 
 /**
@@ -119,7 +118,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
             if(event.isStartDocument()) {
                 logger.info("start document");
-                statusSingleton.addBatchStatus(batchId, new BatchStatusModel(Global.BATCH_STATUS_PROCESSING, null));
             } else if(event.isStartElement()) {
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
@@ -129,35 +127,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 EndElement endElement = event.asEndElement();
                 String localName = endElement.getName().getLocalPart();
 
-                if(localName.equals("batch")) {
-                    logger.info("batch");
-                } else if(localName.equals("entities")) {
-                    logger.info("entities");
-                } else if(localName.equals("entity")) {
-                    statusSingleton.addContractStatus(batchId, new ContractStatusModel(index,
-                            Global.CONTRACT_STATUS_COMPLETED, null));
-
-                    T entity = (T) currentContainer;
-                    currentContainer = null;
-                    index++;
-
-                    return entity;
-                } else {
-                    IMetaType metaType;
-
-                    if(level == stack.size())
-                        metaType = stack.peek().getMemberType(localName);
-                    else
-                        metaType = currentContainer.getMemberType(localName);
-
-                    if(metaType.isComplex() || metaType.isSet()) {
-                        Object o = currentContainer;
-                        currentContainer = stack.pop();
-
-                        currentContainer.put(localName, new BaseValue(batch, index, o));
-                        level--;
-                    }
-                }
+                endElement(localName);
             } else if(event.isEndDocument()) {
                 logger.info("end document");
                 statusSingleton.addBatchStatus(batchId, new BatchStatusModel(Global.BATCH_STATUS_COMPLETED, null));
@@ -166,6 +136,40 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 couchbaseClient.set("status:" + batchId, 0, gson.toJson(statusModel));
             } else {
                 logger.info(event);
+            }
+        }
+
+        return null;
+    }
+
+    public T endElement(String localName) {
+        if(localName.equals("batch")) {
+            logger.info("batch");
+        } else if(localName.equals("entities")) {
+            logger.info("entities");
+        } else if(localName.equals("entity")) {
+            statusSingleton.addContractStatus(batchId, new ContractStatusModel(index,
+                    Global.CONTRACT_STATUS_COMPLETED, null));
+
+            T entity = (T) currentContainer;
+            currentContainer = null;
+            index++;
+
+            return entity;
+        } else {
+            IMetaType metaType;
+
+            if(level == stack.size())
+                metaType = stack.peek().getMemberType(localName);
+            else
+                metaType = currentContainer.getMemberType(localName);
+
+            if(metaType.isComplex() || metaType.isSet()) {
+                Object o = currentContainer;
+                currentContainer = stack.pop();
+
+                currentContainer.put(localName, new BaseValue(batch, index, o));
+                level--;
             }
         }
 

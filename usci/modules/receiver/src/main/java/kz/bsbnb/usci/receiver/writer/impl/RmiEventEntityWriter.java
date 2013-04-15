@@ -32,10 +32,6 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
     @Override
     public void write(List items) throws Exception {
-        long t1 = System.currentTimeMillis();
         entityService.process(items);
-        long t2 = System.currentTimeMillis() - t1;
-
-        logger.info("[batch][service][data]               :               " + t2);
     }
 }
