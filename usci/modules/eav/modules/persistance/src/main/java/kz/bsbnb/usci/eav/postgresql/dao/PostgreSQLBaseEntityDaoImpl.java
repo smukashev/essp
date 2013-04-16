@@ -1153,17 +1153,22 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
     private void loadBooleanValues(BaseEntity baseEntity)
     {
+        Date reportDate = DateUtils.convert(baseEntity.getReportDate());
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_BOOLEAN_VALUES.ID,
                         EAV_BE_BOOLEAN_VALUES.BATCH_ID,
                         EAV_M_SIMPLE_ATTRIBUTES.NAME,
                         EAV_BE_BOOLEAN_VALUES.INDEX_,
-                        EAV_BE_BOOLEAN_VALUES.REP_DATE,
+                        EAV_BE_BOOLEAN_VALUES.OPEN_DATE,
                         EAV_BE_BOOLEAN_VALUES.VALUE)
                 .from(EAV_BE_BOOLEAN_VALUES)
                 .join(EAV_M_SIMPLE_ATTRIBUTES).on(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
                 .where(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.equal(baseEntity.getId()))
-                .and(EAV_BE_BOOLEAN_VALUES.IS_LAST.eq(true));
+                .and(EAV_BE_BOOLEAN_VALUES.OPEN_DATE.lessOrEqual(reportDate))
+                .and(historyAlgorithm == HISTORY_ALGORITHM_NOT_FILL ?
+                        EAV_BE_BOOLEAN_VALUES.CLOSE_DATE.greaterThan(reportDate)
+                                .or(EAV_BE_BOOLEAN_VALUES.CLOSE_DATE.isNull()) :
+                        EAV_BE_BOOLEAN_VALUES.CLOSE_DATE.greaterThan(reportDate));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -1178,7 +1183,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                             (Long) row.get(EAV_BE_BOOLEAN_VALUES.ID.getName()),
                             batchRepository.getBatch((Long)row.get(EAV_BE_BOOLEAN_VALUES.BATCH_ID.getName())),
                             (Long) row.get(EAV_BE_BOOLEAN_VALUES.INDEX_.getName()),
-                            (java.sql.Date) row.get(EAV_BE_BOOLEAN_VALUES.REP_DATE.getName()),
+                            (java.sql.Date) row.get(EAV_BE_BOOLEAN_VALUES.OPEN_DATE.getName()),
                             row.get(EAV_BE_BOOLEAN_VALUES.VALUE.getName())));
         }
     }
@@ -1222,17 +1227,22 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
     private void loadDoubleValues(BaseEntity baseEntity)
     {
+        Date reportDate = DateUtils.convert(baseEntity.getReportDate());
         SelectForUpdateStep select = sqlGenerator
                 .select(EAV_BE_DOUBLE_VALUES.ID,
                         EAV_BE_DOUBLE_VALUES.BATCH_ID,
                         EAV_M_SIMPLE_ATTRIBUTES.NAME,
                         EAV_BE_DOUBLE_VALUES.INDEX_,
-                        EAV_BE_DOUBLE_VALUES.REP_DATE,
+                        EAV_BE_DOUBLE_VALUES.OPEN_DATE,
                         EAV_BE_DOUBLE_VALUES.VALUE)
                 .from(EAV_BE_DOUBLE_VALUES)
                 .join(EAV_M_SIMPLE_ATTRIBUTES).on(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
                 .where(EAV_BE_DOUBLE_VALUES.ENTITY_ID.equal(baseEntity.getId()))
-                .and(EAV_BE_DOUBLE_VALUES.IS_LAST.eq(true));
+                .and(EAV_BE_DOUBLE_VALUES.OPEN_DATE.lessOrEqual(reportDate))
+                .and(historyAlgorithm == HISTORY_ALGORITHM_NOT_FILL ?
+                        EAV_BE_DOUBLE_VALUES.CLOSE_DATE.greaterThan(reportDate)
+                                .or(EAV_BE_DOUBLE_VALUES.CLOSE_DATE.isNull()) :
+                        EAV_BE_DOUBLE_VALUES.CLOSE_DATE.greaterThan(reportDate));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -1247,7 +1257,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                             (Long) row.get(EAV_BE_DOUBLE_VALUES.ID.getName()),
                             batchRepository.getBatch((Long)row.get(EAV_BE_DOUBLE_VALUES.BATCH_ID.getName())),
                             (Long) row.get(EAV_BE_DOUBLE_VALUES.INDEX_.getName()),
-                            (java.sql.Date) row.get(EAV_BE_DOUBLE_VALUES.REP_DATE.getName()),
+                            (java.sql.Date) row.get(EAV_BE_DOUBLE_VALUES.OPEN_DATE.getName()),
                             row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())));
         }
     }
@@ -2102,25 +2112,84 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             if (compare == -1)
             {
-                //TODO: Update old record here
                 Set<String> attributes = new HashSet<String>();
                 attributes.add(attribute);
 
                 baseEntityLoaded.put(attribute, baseValueForSave);
                 insertSimpleValues(baseEntityLoaded, attributes, dataType);
+                updateSimpleValueLastDate(baseValueLoaded, baseValueForSave, dataType);
             }
             else
             {
-                updateSimpleValue(baseValueLoaded, baseValueForSave, dataType);
+                updateSimpleValueCurrentDate(baseValueLoaded, baseValueForSave, dataType);
             }
         }
     }
 
-    private void updateSimpleValue(IBaseValue baseValueLoaded, IBaseValue baseValueForSave, DataTypes dataType)
+    private void updateSimpleValueLastDate(IBaseValue baseValueLoaded,
+                                           IBaseValue baseValueForSave,
+                                           DataTypes dataType)
     {
         long baseValueLoadedId = baseValueLoaded.getId();
 
-        UpdateConditionStep update;
+        Update update;
+        switch(dataType)
+        {
+            case INTEGER: {
+                update = sqlGenerator
+                        .update(EAV_BE_INTEGER_VALUES)
+                        .set(EAV_BE_INTEGER_VALUES.IS_LAST, false)
+                        .set(EAV_BE_INTEGER_VALUES.CLOSE_DATE, baseValueForSave.getRepDate())
+                        .where(EAV_BE_INTEGER_VALUES.ID.eq(baseValueLoadedId));
+                break;
+            }
+            case DATE: {
+                update = sqlGenerator
+                        .update(EAV_BE_DATE_VALUES)
+                        .set(EAV_BE_DATE_VALUES.IS_LAST, false)
+                        .set(EAV_BE_DATE_VALUES.CLOSE_DATE, baseValueForSave.getRepDate())
+                        .where(EAV_BE_DATE_VALUES.ID.eq(baseValueLoadedId));
+                break;
+            }
+            case STRING: {
+                update = sqlGenerator
+                        .update(EAV_BE_STRING_VALUES)
+                        .set(EAV_BE_STRING_VALUES.IS_LAST, false)
+                        .set(EAV_BE_STRING_VALUES.CLOSE_DATE, baseValueForSave.getRepDate())
+                        .where(EAV_BE_STRING_VALUES.ID.eq(baseValueLoadedId));
+                break;
+            }
+            case BOOLEAN: {
+                update = sqlGenerator
+                        .update(EAV_BE_STRING_VALUES)
+                        .set(EAV_BE_BOOLEAN_VALUES.IS_LAST, false)
+                        .set(EAV_BE_BOOLEAN_VALUES.CLOSE_DATE, baseValueForSave.getRepDate())
+                        .where(EAV_BE_BOOLEAN_VALUES.ID.eq(baseValueLoadedId));
+                break;
+            }
+            case DOUBLE: {
+                update = sqlGenerator
+                        .update(EAV_BE_DOUBLE_VALUES)
+                        .set(EAV_BE_DOUBLE_VALUES.IS_LAST, false)
+                        .set(EAV_BE_DOUBLE_VALUES.CLOSE_DATE, baseValueForSave.getRepDate())
+                        .where(EAV_BE_DOUBLE_VALUES.ID.eq(baseValueLoadedId));
+                break;
+            }
+            default:
+                throw new IllegalArgumentException("Unknown type.");
+        }
+
+        logger.debug(update.toString());
+        updateWithStats(update.getSQL(), update.getBindValues().toArray());
+    }
+
+    private void updateSimpleValueCurrentDate(IBaseValue baseValueLoaded,
+                                              IBaseValue baseValueForSave,
+                                              DataTypes dataType)
+    {
+        long baseValueLoadedId = baseValueLoaded.getId();
+
+        Update update;
         switch(dataType)
         {
             case INTEGER: {
