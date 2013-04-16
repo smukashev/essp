@@ -18,15 +18,15 @@ public class StatusSingleton {
             Collections.synchronizedMap(new HashMap<Long, StatusModel>());
 
     public void startBatch(Long batchId) {
-        map.put(batchId, new StatusModel(batchId));
+        map.put(batchId, new StatusModel());
     }
 
     public void addBatchStatus(Long batchId, BatchStatusModel batchStatusModel) {
-        map.get(batchId).getBatchStatusModelList().add(batchStatusModel);
+        map.get(batchId).getBatchStatuses().add(batchStatusModel);
     }
 
     public void addContractStatus(Long batchId, ContractStatusModel contractStatusModel) {
-        map.get(batchId).getContractStatusModelList().add(contractStatusModel);
+        map.get(batchId).getContractStatuses().add(contractStatusModel);
     }
 
     public StatusModel endBatch(Long batchId) {

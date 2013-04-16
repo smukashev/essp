@@ -11,6 +11,7 @@ public class BatchModel {
     private Long id;
     private String fileName;
     private byte[] content;
+    private StatusModel status;
 
     public BatchModel(Long id, String fileName, byte[] content) {
         this.id = id;
@@ -40,5 +41,13 @@ public class BatchModel {
 
     public void setContent(byte[] content) {
         this.content = content;
+    }
+
+    public StatusModel getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusModel status) {
+        this.status = status;
     }
 }

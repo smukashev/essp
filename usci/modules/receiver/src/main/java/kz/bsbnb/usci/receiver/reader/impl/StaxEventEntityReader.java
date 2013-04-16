@@ -132,8 +132,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 logger.info("end document");
                 statusSingleton.addBatchStatus(batchId, new BatchStatusModel(Global.BATCH_STATUS_COMPLETED, null));
                 StatusModel statusModel = statusSingleton.endBatch(batchId);
+                batchModel.setStatus(statusModel);
 
-                couchbaseClient.set("status:" + batchId, 0, gson.toJson(statusModel));
+                couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchModel));
             } else {
                 logger.info(event);
             }
