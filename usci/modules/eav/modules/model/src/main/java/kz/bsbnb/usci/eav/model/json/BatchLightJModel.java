@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav.model.json;
 
+import java.util.Date;
+
 /**
  * Batch model to save in NoSQL database with all parameters
  *
@@ -8,10 +10,12 @@ package kz.bsbnb.usci.eav.model.json;
 public class BatchLightJModel {
     private Long id;
     private String fileName;
+    private Date received;
 
-    public BatchLightJModel(Long id, String fileName) {
+    public BatchLightJModel(Long id, String fileName, Date received) {
         this.id = id;
         this.fileName = fileName;
+        this.received = received;
     }
 
     public Long getId() {
@@ -30,11 +34,11 @@ public class BatchLightJModel {
         this.fileName = fileName;
     }
 
-    @Override
-    public String toString() {
-        return "BatchLightJModel{" +
-                "id=" + id +
-                ", fileName='" + fileName + '\'' +
-                '}';
+    public Date getReceived() {
+        return received;
+    }
+
+    public void setReceived(Date received) {
+        this.received = received;
     }
 }

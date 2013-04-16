@@ -31,6 +31,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.ByteArrayInputStream;
+import java.util.Date;
 import java.util.Stack;
 
 /**
@@ -82,7 +83,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     startElement.getAttributeByName(new QName("class")).getValue());
 
             statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
-                    Global.CONTRACT_STATUS_PROCESSING, null));
+                    Global.CONTRACT_STATUS_PROCESSING, null, new Date()));
         } else {
             IMetaType metaType = currentContainer.getMemberType(localName);
 
@@ -130,7 +131,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 endElement(localName);
             } else if(event.isEndDocument()) {
                 logger.info("end document");
-                statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(Global.BATCH_STATUS_COMPLETED, null));
+                statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
+                        Global.BATCH_STATUS_COMPLETED, null, new Date()));
+
                 StatusJModel statusJModel = statusSingleton.endBatch(batchId);
                 batchFullJModel.setStatus(statusJModel);
 
@@ -150,7 +153,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             logger.info("entities");
         } else if(localName.equals("entity")) {
             statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
-                    Global.CONTRACT_STATUS_COMPLETED, null));
+                    Global.CONTRACT_STATUS_COMPLETED, null, new Date()));
 
             T entity = (T) currentContainer;
             currentContainer = null;

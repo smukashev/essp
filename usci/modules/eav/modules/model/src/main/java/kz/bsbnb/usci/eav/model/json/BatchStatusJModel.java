@@ -1,15 +1,19 @@
 package kz.bsbnb.usci.eav.model.json;
 
+import java.util.Date;
+
 /**
  * @author k.tulbassiyev
  */
 public class BatchStatusJModel {
     private String protocol;
     private String description;
+    private Date received;
 
-    public BatchStatusJModel(String protocol, String description) {
+    public BatchStatusJModel(String protocol, String description, Date received) {
         this.protocol = protocol;
         this.description = description;
+        this.received = received;
     }
 
     public String getProtocol() {
@@ -28,11 +32,11 @@ public class BatchStatusJModel {
         this.description = description;
     }
 
-    @Override
-    public String toString() {
-        return "BatchStatusJModel{" +
-                "protocol='" + protocol + '\'' +
-                ", description='" + description + '\'' +
-                '}';
+    public Date getReceived() {
+        return received;
+    }
+
+    public void setReceived(Date received) {
+        this.received = received;
     }
 }

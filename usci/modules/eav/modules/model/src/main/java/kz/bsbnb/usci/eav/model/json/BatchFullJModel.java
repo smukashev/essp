@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.model.json;
 
-import java.util.Arrays;
+import java.util.Date;
 
 /**
  * Batch model to save in NoSQL database with all parameters
@@ -12,11 +12,13 @@ public class BatchFullJModel {
     private String fileName;
     private byte[] content;
     private StatusJModel status;
+    private Date received;
 
-    public BatchFullJModel(Long id, String fileName, byte[] content) {
+    public BatchFullJModel(Long id, String fileName, byte[] content, Date received) {
         this.id = id;
         this.fileName = fileName;
         this.content = content;
+        this.received = received;
     }
 
     public Long getId() {
@@ -51,12 +53,11 @@ public class BatchFullJModel {
         this.status = status;
     }
 
-    @Override
-    public String toString() {
-        return "BatchFullJModel{" +
-                "id=" + id +
-                ", fileName='" + fileName + '\'' +
-                ", status=" + status +
-                '}';
+    public Date getReceived() {
+        return received;
+    }
+
+    public void setReceived(Date received) {
+        this.received = received;
     }
 }
