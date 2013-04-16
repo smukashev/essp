@@ -1,14 +1,14 @@
-package kz.bsbnb.usci.receiver.model;
+package kz.bsbnb.usci.eav.model.json;
 
 /**
  * @author k.tulbassiyev
  */
-public class ContractStatusModel {
+public class ContractStatusJModel {
     private Long index;
     private String protocol;
     private String description;
 
-    public ContractStatusModel(Long index, String protocol, String description) {
+    public ContractStatusJModel(Long index, String protocol, String description) {
         this.index = index;
         this.protocol = protocol;
         this.description = description;
@@ -36,5 +36,14 @@ public class ContractStatusModel {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "ContractStatusJModel{" +
+                "index=" + index +
+                ", protocol='" + protocol + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

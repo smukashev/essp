@@ -1,22 +1,18 @@
-package kz.bsbnb.usci.receiver.model;
-
-import java.util.*;
+package kz.bsbnb.usci.eav.model.json;
 
 /**
  * Batch model to save in NoSQL database with all parameters
  *
  * @author k.tulbassiyev
  */
-public class BatchModel {
+public class BatchNormalJModel {
     private Long id;
     private String fileName;
-    private byte[] content;
-    private StatusModel status;
+    private StatusJModel status;
 
-    public BatchModel(Long id, String fileName, byte[] content) {
+    public BatchNormalJModel(Long id, String fileName) {
         this.id = id;
         this.fileName = fileName;
-        this.content = content;
     }
 
     public Long getId() {
@@ -35,19 +31,20 @@ public class BatchModel {
         this.fileName = fileName;
     }
 
-    public byte[] getContent() {
-        return content;
-    }
-
-    public void setContent(byte[] content) {
-        this.content = content;
-    }
-
-    public StatusModel getStatus() {
+    public StatusJModel getStatus() {
         return status;
     }
 
-    public void setStatus(StatusModel status) {
+    public void setStatus(StatusJModel status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "BatchNormalJModel{" +
+                "id=" + id +
+                ", fileName='" + fileName + '\'' +
+                ", status=" + status +
+                '}';
     }
 }

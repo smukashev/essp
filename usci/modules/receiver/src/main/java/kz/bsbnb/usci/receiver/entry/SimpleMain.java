@@ -3,11 +3,11 @@ package kz.bsbnb.usci.receiver.entry;
 import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
+import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
 import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.receiver.helper.impl.FileHelper;
-import kz.bsbnb.usci.receiver.model.BatchModel;
-import kz.bsbnb.usci.receiver.model.BatchStatusModel;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.receiver.singleton.StatusSingleton;
 import kz.bsbnb.usci.sync.service.IBatchService;
@@ -50,10 +50,10 @@ public class SimpleMain {
         Batch batch = new Batch(new java.sql.Date(new java.util.Date().getTime()));
         long batchId = batchService.save(batch);
 
-        BatchModel batchModel = new BatchModel(batchId, FILE_PATH, bytes);
+        BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, FILE_PATH, bytes);
         statusSingleton.startBatch(batchId);
-        statusSingleton.addBatchStatus(batchId, new BatchStatusModel(Global.BATCH_STATUS_PROCESSING, null));
-        OperationFuture<Boolean> result = client.set("batch:" + batchId, 0, gson.toJson(batchModel));
+        statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(Global.BATCH_STATUS_PROCESSING, null));
+        OperationFuture<Boolean> result = client.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
 
         while(true) if(result.isDone()) break; // must be completed
 

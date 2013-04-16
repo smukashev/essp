@@ -1,13 +1,13 @@
-package kz.bsbnb.usci.receiver.model;
+package kz.bsbnb.usci.eav.model.json;
 
 /**
  * @author k.tulbassiyev
  */
-public class BatchStatusModel {
+public class BatchStatusJModel {
     private String protocol;
     private String description;
 
-    public BatchStatusModel(String protocol, String description) {
+    public BatchStatusJModel(String protocol, String description) {
         this.protocol = protocol;
         this.description = description;
     }
@@ -26,5 +26,13 @@ public class BatchStatusModel {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "BatchStatusJModel{" +
+                "protocol='" + protocol + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }
