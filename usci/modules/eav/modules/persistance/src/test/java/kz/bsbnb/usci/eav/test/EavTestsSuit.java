@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.test;
 
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
+
 import kz.bsbnb.usci.eav.test.comporator.BasicBaseEntityComporatorTest;
 import kz.bsbnb.usci.eav.test.model.BaseEntityTest;
 import kz.bsbnb.usci.eav.test.model.BatchTest;
@@ -33,7 +34,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
        // BasicBaseEntitySearcherTest.class,
         BasicBaseEntityComporatorTest.class,
         RelationTest1.class
-
             })
 public class EavTestsSuit
 {
