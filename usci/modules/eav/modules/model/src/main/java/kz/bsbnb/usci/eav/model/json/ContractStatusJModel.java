@@ -1,17 +1,21 @@
-package kz.bsbnb.usci.receiver.model;
+package kz.bsbnb.usci.eav.model.json;
+
+import java.util.Date;
 
 /**
  * @author k.tulbassiyev
  */
-public class ContractStatusModel {
+public class ContractStatusJModel {
     private Long index;
     private String protocol;
     private String description;
+    private Date received;
 
-    public ContractStatusModel(Long index, String protocol, String description) {
+    public ContractStatusJModel(Long index, String protocol, String description, Date received) {
         this.index = index;
         this.protocol = protocol;
         this.description = description;
+        this.received = received;
     }
 
     public Long getIndex() {
@@ -36,5 +40,13 @@ public class ContractStatusModel {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Date getReceived() {
+        return received;
+    }
+
+    public void setReceived(Date received) {
+        this.received = received;
     }
 }
