@@ -185,6 +185,9 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             throw new IllegalArgumentException("BaseEntity for saveOrUpdate does not contain id.");
         }
 
+
+        baseEntityForSave.setId(baseEntityLoaded.getId());
+
         java.util.Date reportDateForSave = baseEntityForSave.getReportDate();
         DateUtils.toBeginningOfTheDay(reportDateForSave);
 
@@ -206,13 +209,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
 
         MetaClass meta = baseEntityForSave.getMeta();
-
-        Map<DataTypes, Set<String>> removeSimpleAttributes =
-                new HashMap<DataTypes, Set<String>>();
-        Map<DataTypes, Set<String>> updateSimpleAttributes =
-                new HashMap<DataTypes, Set<String>>();
-        Map<DataTypes, Set<String>> insertSimpleAttributes =
-                new HashMap<DataTypes, Set<String>>();
 
         Set<BaseEntity> entitiesForRemove = new HashSet<BaseEntity>();
 
@@ -302,76 +298,10 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 // SIMPLE VALUES
                 else
                 {
-                    DataTypes dataType = ((MetaValue)metaType).getTypeCode();
-                    if (baseValueForSave.getValue() == null)
-                    {
-                        updateSimpleValue(baseEntityLoaded, baseEntityForSave, attribute);
-                    }
-                    else
-                    {
-                        if (attributesLoaded.contains(attribute))
-                        {
-                            IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
-                            if (dataType.equals(DataTypes.DATE))
-                            {
-                                java.util.Date comparingDate = (java.util.Date)baseValueForSave.getValue();
-                                java.util.Date anotherDate = (java.util.Date)baseValueLoaded.getValue();
-                                if (DateUtils.compareBeginningOfTheDay(comparingDate, anotherDate) != 0)
-                                {
-                                    updateSimpleValue(baseEntityLoaded, baseEntityForSave, attribute);
-                                }
-                            }
-                            else
-                            {
-                                if (!baseValueForSave.getValue().equals(baseValueLoaded.getValue()))
-                                {
-                                    updateSimpleValue(baseEntityLoaded, baseEntityForSave, attribute);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            baseEntityLoaded.put(attribute, baseValueForSave);
-                            SetUtils.putMapValue(insertSimpleAttributes, dataType, attribute);
-                        }
-                    }
-                }
-            }
-        }
-
-        // insert simple values (bulk insert)
-        if (!insertSimpleAttributes.isEmpty())
-        {
-            for (DataTypes dataType: insertSimpleAttributes.keySet())
-            {
-                insertSimpleValues(baseEntityLoaded, insertSimpleAttributes.get(dataType), dataType);
-            }
-        }
-
-        // update simple values
-        /*if (!updateSimpleAttributes.isEmpty())
-        {
-            for (DataTypes dataType: updateSimpleAttributes.keySet())
-            {
-                for (String attribute: updateSimpleAttributes.get(dataType))
-                {
                     updateSimpleValue(baseEntityLoaded, baseEntityForSave, attribute);
                 }
             }
-        }*/
-
-        // remove simple values
-        /*if (!removeSimpleAttributes.isEmpty())
-        {
-            for (DataTypes dataType: removeSimpleAttributes.keySet())
-            {
-                for (String attribute: removeSimpleAttributes.get(dataType))
-                {
-                    removeSimpleValue(baseEntityLoaded, attribute);
-                    baseEntityLoaded.remove(attribute);
-                }
-            }
-        }*/
+        }
 
         // insert complex values
         if (!insertComplexAttributes.isEmpty())
@@ -2102,6 +2032,49 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
         IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
 
+        if (baseValueLoaded == null)
+        {
+            if (baseValueForSave.getValue() == null)
+            {
+                logger.warn(String.format("An attempt was made to remove a missing value for the " +
+                        "attribute {0} of BaseEntity instance with identifier {1} for the report date {2}.",
+                        baseEntityLoaded.getId(), attribute, baseValueForSave.getRepDate()));
+            }
+
+            boolean previousClosed = isPreviousSimpleValueClosed(baseEntityForSave, attribute);
+            if (previousClosed)
+            {
+                updateSimpleValueRemoveRollback(baseEntityForSave, attribute, dataType);
+            }
+            else
+            {
+                insertSimpleValue(baseEntityForSave, attribute, dataType);
+            }
+            return;
+        }
+        else
+        {
+            if (baseValueForSave.getValue() != null)
+            {
+                if (dataType.equals(DataTypes.DATE))
+                {
+                    java.util.Date comparingDate = (java.util.Date)baseValueForSave.getValue();
+                    java.util.Date anotherDate = (java.util.Date)baseValueLoaded.getValue();
+                    if (DateUtils.compareBeginningOfTheDay(comparingDate, anotherDate) == 0)
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    if (baseValueForSave.getValue().equals(baseValueLoaded.getValue()))
+                    {
+                        return;
+                    }
+                }
+            }
+        }
+
         int compare = DateUtils.compareBeginningOfTheDay(baseValueLoaded.getRepDate(), baseValueForSave.getRepDate());
         if (compare == 1)
         {
@@ -2114,31 +2087,13 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             {
                 if (baseValueForSave.getValue() != null)
                 {
-                    baseEntityLoaded.put(attribute, baseValueForSave);
-                    boolean previousClosed = isPreviousSimpleValueClosed(baseEntityForSave, attribute);
-                    if (previousClosed)
-                    {
-                        updateSimpleValueRemoveRollback(baseEntityLoaded, attribute, dataType);
-                    }
-                    else
-                    {
-                        insertSimpleValue(baseEntityLoaded, attribute, dataType);
-                    }
+                    insertSimpleValue(baseEntityForSave, attribute, dataType);
                 }
                 updateSimpleValueRemove(baseValueLoaded, baseValueForSave, dataType);
             }
             else
             {
-                if (baseEntityLoaded != null)
-                {
-                    updateSimpleValueCurrentDate(baseValueLoaded, baseValueForSave, dataType);
-                }
-                else
-                {
-                    logger.warn(String.format("An attempt was made to remove a missing value for the " +
-                            "attribute {0} of BaseEntity instance with identifier {1} for the report date {2}.",
-                            baseEntityLoaded.getId(), attribute, baseValueForSave.getRepDate()));
-                }
+                updateSimpleValueCurrentDate(baseValueLoaded, baseValueForSave, dataType);
             }
         }
     }

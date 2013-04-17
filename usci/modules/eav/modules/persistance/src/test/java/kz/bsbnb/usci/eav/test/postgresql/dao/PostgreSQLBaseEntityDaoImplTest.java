@@ -162,19 +162,19 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityCreate.put("date_second",
                 new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 2)));
         entityCreate.put("date_third",
-                new BaseValue(batch, 1L, null));
+                new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 3)));
 
         // double values
         entityCreate.put("double_first",
                 new BaseValue(batch, 1L, random.nextInt() * random.nextDouble()));
         entityCreate.put("double_second",
-                new BaseValue(batch, 1L, null));
+                new BaseValue(batch, 1L, random.nextInt() * random.nextDouble()));
         entityCreate.put("double_third",
                 new BaseValue(batch, 1L, random.nextInt() * random.nextDouble()));
 
         // integer values
         entityCreate.put("integer_first",
-                new BaseValue(batch, 1L, null));
+                new BaseValue(batch, 1L, random.nextInt()));
         entityCreate.put("integer_second",
                 new BaseValue(batch, 1L, random.nextInt()));
         entityCreate.put("integer_third",
@@ -186,13 +186,13 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityCreate.put("boolean_second",
                 new BaseValue(batch, 1L, true));
         entityCreate.put("boolean_third",
-                new BaseValue(batch, 1L, null));
+                new BaseValue(batch, 1L, false));
 
         // string values
         entityCreate.put("string_first",
                 new BaseValue(batch, 1L, "Test value with a string type for attribute string_first."));
         entityCreate.put("string_second",
-                new BaseValue(batch, 1L, null));
+                new BaseValue(batch, 1L, "Test value with a string type for attribute string_second."));
         entityCreate.put("string_third",
                 new BaseValue(batch, 1L, "Test value with a string type for attribute string_third."));
 
@@ -434,52 +434,98 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         Batch batchFirst = batchRepository.addBatch(new Batch(new Date(new Long("1356976800000"))));
         // 1 february 2013
         Batch batchSecond = batchRepository.addBatch(new Batch(new Date(new Long("1359655200000"))));
+        Batch batchThird = batchRepository.addBatch(new Batch(new Date(new Long("1359655200000"))));
+        // 1 march 2013
+        Batch batchFourth = batchRepository.addBatch(new Batch(new Date(new Long("1362074400000"))));
 
         UUID uuid = UUID.randomUUID();
 
-        BaseEntity entityForSave = new BaseEntity(metaLoad, batchFirst.getRepDate());
-        entityForSave.put("uuid",
+        // first batch
+        BaseEntity entityFirstForSave = new BaseEntity(metaLoad, batchFirst.getRepDate());
+        entityFirstForSave.put("uuid",
                 new BaseValue(batchFirst, 1L, uuid.toString()));
-        entityForSave.put("date_first",
+        entityFirstForSave.put("date_first",
                 new BaseValue(batchFirst, 1L, DateUtils.nowPlus(Calendar.DATE, 1)));
-        entityForSave.put("date_second",
+        entityFirstForSave.put("date_second",
                 new BaseValue(batchFirst, 1L, DateUtils.nowPlus(Calendar.DATE, 2)));
-        entityForSave.put("date_third",
+        entityFirstForSave.put("date_third",
                 new BaseValue(batchFirst, 1L, DateUtils.nowPlus(Calendar.DATE, 3)));
 
-        long entitySavedId = postgreSQLBaseEntityDaoImpl.save(entityForSave);
-        BaseEntity entitySaved = postgreSQLBaseEntityDaoImpl.load(entitySavedId);
+        long entityFirstSavedId = postgreSQLBaseEntityDaoImpl.save(entityFirstForSave);
+        BaseEntity entityFirstSaved = postgreSQLBaseEntityDaoImpl.load(entityFirstSavedId);
 
-        BaseEntity entityForUpdate = new BaseEntity(metaLoad, batchSecond.getRepDate());
-        entityForUpdate.put("uuid",
+        assertEquals("Incorrect number of attribute values in the saved BaseEntity after processing first batch,",
+                4, entityFirstSaved.getAttributeCount());
+
+        IBaseValue baseValueFirstAfterFirstBatch = entityFirstSaved.getBaseValue("date_first");
+        assertNotNull("Value for attribute <date_first> has not been loaded after processing first batch.",
+                baseValueFirstAfterFirstBatch);
+
+        IBaseValue baseValueSecondAfterFirstBatch = entityFirstSaved.getBaseValue("date_second");
+        assertNotNull("Value for attribute <date_second> has not been loaded after processing first batch.",
+                baseValueSecondAfterFirstBatch);
+
+        // second batch
+        BaseEntity entitySecondForUpdate = new BaseEntity(metaLoad, batchSecond.getRepDate());
+        entitySecondForUpdate.put("uuid",
                 new BaseValue(batchSecond, 2L, uuid.toString()));
-        entityForUpdate.put("date_first",
+        entitySecondForUpdate.put("date_first",
                 new BaseValue(batchSecond, 2L, null));
-        entityForUpdate.put("date_second",
+        entitySecondForUpdate.put("date_second",
                 new BaseValue(batchSecond, 2L, DateUtils.nowPlus(Calendar.DATE, 4)));
-        entityForUpdate.put("date_fourth",
+        entitySecondForUpdate.put("date_fourth",
                 new BaseValue(batchSecond, 2L, DateUtils.nowPlus(Calendar.DATE, 5)));
 
-        long entityUpdatedId = postgreSQLBaseEntityDaoImpl.saveOrUpdate(entityForUpdate);
-        BaseEntity entityUpdated = postgreSQLBaseEntityDaoImpl.load(entityUpdatedId);
+        long entitySecondUpdatedId = postgreSQLBaseEntityDaoImpl.saveOrUpdate(entitySecondForUpdate);
+        BaseEntity entitySecondUpdated = postgreSQLBaseEntityDaoImpl.load(entitySecondUpdatedId);
 
-        assertEquals("Incorrect number of attribute values in the saved BaseEntity,",
-                4, entitySaved.getAttributeCount());
-        assertEquals("Incorrect number of attribute values in the updated BaseEntity,",
-                4, entityUpdated.getAttributeCount());
+        assertEquals("Incorrect number of attribute values in the updated BaseEntity after processing second batch,",
+                4, entitySecondUpdated.getAttributeCount());
 
-        Set<String> attributeNames = entityUpdated.getAttributeNames();
+        IBaseValue baseValueFirstAfterSecondBatch = entitySecondUpdated.getBaseValue("date_first");
+        assertNull("Value for attribute <date_first> designed to remove has been loaded " +
+                "after processing second batch.", baseValueFirstAfterSecondBatch);
 
-        assertFalse("Attribute value designed to remove is not removed.", attributeNames.contains("date_first"));
-        assertTrue("Attribute value designed to insert is not inserted.", attributeNames.contains("date_fourth"));
-        assertTrue("Attribute value designed to update is not updated.",
+        IBaseValue baseValueSecondAfterSecondBatch = entitySecondUpdated.getBaseValue("date_second");
+        assertNotNull("Value for attribute <date_second> designed to update has not been loaded " +
+                "after processing second batch.", baseValueSecondAfterSecondBatch);
+        assertEquals("During the processing second batch the field INDEX has not been changed,",
+                baseValueSecondAfterSecondBatch.getIndex(), 2L);
+        assertTrue("During the processing second batch the field ID has not been changed,",
+                baseValueSecondAfterSecondBatch.getId() != baseValueSecondAfterFirstBatch.getId());
+        assertTrue("During the processing second batch the field VALUE has not been changed.",
                 DateUtils.compareBeginningOfTheDay(
-                        (java.util.Date) entityUpdated.getBaseValue("date_second").getValue(),
+                        (java.util.Date) baseValueSecondAfterSecondBatch.getValue(),
                         DateUtils.nowPlus(Calendar.DATE, 4)) == 0);
-        assertTrue("",
+        assertTrue("During the processing second batch the field REP_DATE has not been changed.",
                 DateUtils.compareBeginningOfTheDay(
-                        entityUpdated.getBaseValue("date_second").getRepDate(),
+                        baseValueSecondAfterSecondBatch.getRepDate(),
                         batchSecond.getRepDate()) == 0);
+
+        IBaseValue baseValueFourthAfterSecondBatch = entitySecondUpdated.getBaseValue("date_fourth");
+        assertNotNull("Value for attribute <date_fourth> designed to insert has been loaded " +
+                "after processing second batch.", baseValueFourthAfterSecondBatch);
+
+        // third batch
+        BaseEntity entityThirdForUpdate = new BaseEntity(metaLoad, batchThird.getRepDate());
+        entityThirdForUpdate.put("uuid",
+                new BaseValue(batchThird, 3L, uuid.toString()));
+        entityThirdForUpdate.put("date_first",
+                new BaseValue(batchThird, 3L, entityFirstForSave.getBaseValue("date_first").getValue()));
+        entitySecondForUpdate.put("date_second",
+                new BaseValue(batchThird, 3L, DateUtils.nowPlus(Calendar.DATE, 6)));
+
+        long entityThirdUpdatedId = postgreSQLBaseEntityDaoImpl.saveOrUpdate(entityThirdForUpdate);
+        BaseEntity entityThirdUpdated = postgreSQLBaseEntityDaoImpl.load(entityThirdUpdatedId);
+
+        assertEquals("Incorrect number of attribute values in the updated BaseEntity after processing third batch,",
+                5, entityThirdUpdated.getAttributeCount());
+
+        IBaseValue baseValueFirstAfterThirdBatch = entityThirdUpdated.getBaseValue("date_first");
+        assertNotNull("Value for attribute <date_first> designed to update has not been loaded " +
+                "after processing third batch.", baseValueFirstAfterThirdBatch);
+        assertTrue("During the processing third batch the field ID has been changed.",
+                baseValueFirstAfterThirdBatch.getId() == baseValueFirstAfterFirstBatch.getId());
     }
 
     @Test
@@ -560,9 +606,9 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
         IBaseValue baseValueSecond = entityUpdated.getBaseValue("inner_meta_class_second");
         assertNotNull("The upgrade process has been removed or not loaded attribute.", baseValueSecond);
-        /*assertEquals("During the saveOrUpdate field INDEX was not changed,",
+        /*assertEquals("During the update field INDEX was not changed,",
                 2L, baseValueSecond.getIndex());*/
-        /*assertEquals("During the saveOrUpdate field BATCH_ID was not changed,",
+        /*assertEquals("During the update field BATCH_ID was not changed,",
                 batchSecond.getId(), baseValueSecond.getBatch().getId());*/
 
         IBaseValue baseValueThird = entityUpdated.getBaseValue("inner_meta_class_third");
