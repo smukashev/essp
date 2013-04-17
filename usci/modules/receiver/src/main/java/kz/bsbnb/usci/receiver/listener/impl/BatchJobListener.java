@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BatchJobListener implements IListener {
-
     @AfterJob
     public void afterJob(JobExecution jobExecution) {
         System.out.println(" --- AFTER JOB ---");

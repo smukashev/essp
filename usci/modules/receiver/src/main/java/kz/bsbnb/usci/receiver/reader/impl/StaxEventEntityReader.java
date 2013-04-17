@@ -1,9 +1,14 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
 import com.couchbase.client.CouchbaseClient;
+import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
+import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
+import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
+import kz.bsbnb.usci.eav.model.json.StatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -26,7 +31,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.ByteArrayInputStream;
-import java.io.File;
+import java.util.Date;
 import java.util.Stack;
 
 /**
@@ -39,23 +44,24 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
     private IBaseContainer currentContainer;
     private Batch batch;
-    private int index = 1, level = 0;
+    private Long index = 1L, level = 0L;
 
     private IBatchService batchService;
     private IMetaFactoryService metaFactoryService;
 
     private CouchbaseClient couchbaseClient;
+    private Gson gson = new Gson();
+
+    private BatchFullJModel batchFullJModel;
 
     @PostConstruct
     public void init() {
         batchService = serviceRepository.getBatchService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
-
         couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
+        batchFullJModel = gson.fromJson(couchbaseClient.get("batch:" + batchId).toString(), BatchFullJModel.class);
 
-        byte[] byteArray = (byte[]) couchbaseClient.get("batch:" + batchId + ":content");
-
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray);
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(batchFullJModel.getContent());
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 
         try {
@@ -65,7 +71,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         }
 
         batch = batchService.load(batchId);
-        couchbaseClient.set("batch:" + batchId + ":status", 0, Global.BATCH_STATUS_STARTED);
     }
 
     public void startElement(XMLEvent event, StartElement startElement, String localName) {
@@ -74,14 +79,11 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         } else if(localName.equals("entities")) {
             logger.info("entities");
         } else if(localName.equals("entity")) {
-            couchbaseClient.set("batch:" + batchId + ":contract:" + index + ":status", 0,
-                    Global.CONTRACT_STATUS_STARTED);
-
             currentContainer = metaFactoryService.getBaseEntity(
                     startElement.getAttributeByName(new QName("class")).getValue());
 
-            couchbaseClient.set("batch:" + batchId + ":contract:" + index + ":status", 0,
-                    Global.CONTRACT_STATUS_PROCESSING);
+            statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
+                    Global.CONTRACT_STATUS_PROCESSING, null, new Date()));
         } else {
             IMetaType metaType = currentContainer.getMemberType(localName);
 
@@ -117,7 +119,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
             if(event.isStartDocument()) {
                 logger.info("start document");
-                couchbaseClient.set("batch:" + batchId + ":status", 0, Global.BATCH_STATUS_PROCESSING);
             } else if(event.isStartElement()) {
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
@@ -127,40 +128,52 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 EndElement endElement = event.asEndElement();
                 String localName = endElement.getName().getLocalPart();
 
-                if(localName.equals("batch")) {
-                    logger.info("batch");
-                } else if(localName.equals("entities")) {
-                    logger.info("entities");
-                } else if(localName.equals("entity")) {
-                    couchbaseClient.set("batch:" + batchId + ":contract:" + index + ":status", 0,
-                            Global.CONTRACT_STATUS_COMPLETED);
-
-                    T entity = (T) currentContainer;
-                    currentContainer = null;
-                    index++;
-
-                    return entity;
-                } else {
-                    IMetaType metaType;
-
-                    if(level == stack.size())
-                        metaType = stack.peek().getMemberType(localName);
-                    else
-                        metaType = currentContainer.getMemberType(localName);
-
-                    if(metaType.isComplex() || metaType.isSet()) {
-                        Object o = currentContainer;
-                        currentContainer = stack.pop();
-
-                        currentContainer.put(localName, new BaseValue(batch, index, o));
-                        level--;
-                    }
-                }
+                endElement(localName);
             } else if(event.isEndDocument()) {
                 logger.info("end document");
-                couchbaseClient.set("batch:" + batchId + ":status", 0, Global.BATCH_STATUS_COMPLETED);
+                statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
+                        Global.BATCH_STATUS_COMPLETED, null, new Date()));
+
+                StatusJModel statusJModel = statusSingleton.endBatch(batchId);
+                batchFullJModel.setStatus(statusJModel);
+
+                couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
             } else {
                 logger.info(event);
+            }
+        }
+
+        return null;
+    }
+
+    public T endElement(String localName) {
+        if(localName.equals("batch")) {
+            logger.info("batch");
+        } else if(localName.equals("entities")) {
+            logger.info("entities");
+        } else if(localName.equals("entity")) {
+            statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
+                    Global.CONTRACT_STATUS_COMPLETED, null, new Date()));
+
+            T entity = (T) currentContainer;
+            currentContainer = null;
+            index++;
+
+            return entity;
+        } else {
+            IMetaType metaType;
+
+            if(level == stack.size())
+                metaType = stack.peek().getMemberType(localName);
+            else
+                metaType = currentContainer.getMemberType(localName);
+
+            if(metaType.isComplex() || metaType.isSet()) {
+                Object o = currentContainer;
+                currentContainer = stack.pop();
+
+                currentContainer.put(localName, new BaseValue(batch, index, o));
+                level--;
             }
         }
 

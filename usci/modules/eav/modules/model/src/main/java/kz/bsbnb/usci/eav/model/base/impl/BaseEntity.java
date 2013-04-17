@@ -9,6 +9,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.util.DateUtils;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +27,6 @@ import java.util.*;
 public class BaseEntity extends Persistable implements IBaseContainer
 {
     Logger logger = LoggerFactory.getLogger(BaseEntity.class);
-
-    private UUID uuid = UUID.randomUUID();
 
     /**
      * Reporting date on which instance of BaseEntity was loaded.
@@ -74,8 +73,20 @@ public class BaseEntity extends Persistable implements IBaseContainer
     {
         super(id);
         this.meta = meta;
-        this.reportDate = reportDate;
         this.availableReportDates = availableReportDates;
+
+        if (reportDate == null)
+        {
+            throw new IllegalArgumentException("Can not create instance of BaseEntity " +
+                    "with report date equal to null.");
+        }
+        else
+        {
+            Date newReportDate = (Date)reportDate.clone();
+            DateUtils.toBeginningOfTheDay(newReportDate);
+
+            this.reportDate = newReportDate;
+        }
     }
 
     /**
@@ -90,10 +101,6 @@ public class BaseEntity extends Persistable implements IBaseContainer
 
     public Set<Date> getAvailableReportDates() {
         return availableReportDates;
-    }
-
-    public UUID getUuid() {
-        return uuid;
     }
 
     /**

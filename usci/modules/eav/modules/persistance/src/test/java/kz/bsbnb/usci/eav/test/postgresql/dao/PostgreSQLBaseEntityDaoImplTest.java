@@ -430,8 +430,10 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
         MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
-        Batch batchFirst = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
-        Batch batchSecond = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
+        // 1 january 2013
+        Batch batchFirst = batchRepository.addBatch(new Batch(new Date(new Long("1356976800000"))));
+        // 1 february 2013
+        Batch batchSecond = batchRepository.addBatch(new Batch(new Date(new Long("1359655200000"))));
 
         UUID uuid = UUID.randomUUID();
 
@@ -474,6 +476,10 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
                 DateUtils.compareBeginningOfTheDay(
                         (java.util.Date) entityUpdated.getBaseValue("date_second").getValue(),
                         DateUtils.nowPlus(Calendar.DATE, 4)) == 0);
+        assertTrue("",
+                DateUtils.compareBeginningOfTheDay(
+                        entityUpdated.getBaseValue("date_second").getRepDate(),
+                        batchSecond.getRepDate()) == 0);
     }
 
     @Test
@@ -655,7 +661,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
             BaseEntity entityChildSearched = postgreSQLBaseEntityDaoImpl.load(entityChildSaved.getId());
             fail("Expected an illegal state exception.");
         }
-        catch(IllegalStateException e)
+        catch(Exception e)
         {
             // Nothing
         }
@@ -690,7 +696,5 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         assertEquals("Search engine was found BaseEntity with incorrect id,",
                 entitySearched.getId(), entitySaved.getId());
     }
-
-
 
 }

@@ -1,11 +1,17 @@
 package kz.bsbnb.usci.receiver.entry;
 
 import com.couchbase.client.CouchbaseClient;
+import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
+import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
+import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.receiver.helper.impl.FileHelper;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
+import kz.bsbnb.usci.receiver.singleton.StatusSingleton;
 import kz.bsbnb.usci.sync.service.IBatchService;
+import net.spy.memcached.internal.OperationFuture;
 import org.apache.log4j.Logger;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -15,6 +21,7 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import java.io.File;
+import java.util.Date;
 
 /**
  * Development entry point
@@ -24,6 +31,7 @@ import java.io.File;
 public class SimpleMain {
     private static Logger logger = Logger.getLogger(SimpleMain.class);
     private static final String FILE_PATH = "/opt/xmls/test.xml";
+    private static Gson gson = new Gson();
 
     public static void main(String args[]) {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextSimple.xml");
@@ -34,6 +42,8 @@ public class SimpleMain {
         ICouchbaseClientFactory couchbaseClientFactory = ctx.getBean(ICouchbaseClientFactory.class);
         CouchbaseClient client = couchbaseClientFactory.getCouchbaseClient();
 
+        StatusSingleton statusSingleton = ctx.getBean(StatusSingleton.class);
+
         FileHelper fileHelper = ctx.getBean(FileHelper.class);
         File file  = new File(FILE_PATH);
         byte bytes[] = fileHelper.getFileBytes(file);
@@ -41,7 +51,14 @@ public class SimpleMain {
         Batch batch = new Batch(new java.sql.Date(new java.util.Date().getTime()));
         long batchId = batchService.save(batch);
 
-        client.set("batch:" + batchId + ":content", 0, bytes);
+        BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, FILE_PATH, bytes, new Date());
+        statusSingleton.startBatch(batchId);
+        statusSingleton.addBatchStatus(batchId,
+                new BatchStatusJModel(Global.BATCH_STATUS_PROCESSING, null, new Date()));
+
+        OperationFuture<Boolean> result = client.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
+
+        while(true) if(result.isDone()) break; // must be completed
 
         JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
         Job batchJob = ctx.getBean("batchJob", Job.class);
