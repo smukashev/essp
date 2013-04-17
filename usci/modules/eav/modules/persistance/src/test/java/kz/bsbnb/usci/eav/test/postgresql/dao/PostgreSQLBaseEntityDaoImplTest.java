@@ -157,7 +157,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         Random random = new Random();
 
         // date values
-        /*entityCreate.put("date_first",
+        entityCreate.put("date_first",
                 new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 1)));
         entityCreate.put("date_second",
                 new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 2)));
@@ -170,7 +170,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityCreate.put("double_second",
                 new BaseValue(batch, 1L, null));
         entityCreate.put("double_third",
-                new BaseValue(batch, 1L, random.nextInt() * random.nextDouble()));*/
+                new BaseValue(batch, 1L, random.nextInt() * random.nextDouble()));
 
         // integer values
         entityCreate.put("integer_first",
@@ -181,7 +181,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
                 new BaseValue(batch, 1L, random.nextInt()));
 
         // boolean values
-        /*entityCreate.put("boolean_first",
+        entityCreate.put("boolean_first",
                 new BaseValue(batch, 1L, false));
         entityCreate.put("boolean_second",
                 new BaseValue(batch, 1L, true));
@@ -194,7 +194,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityCreate.put("string_second",
                 new BaseValue(batch, 1L, null));
         entityCreate.put("string_third",
-                new BaseValue(batch, 1L, "Test value with a string type for attribute string_third.")); */
+                new BaseValue(batch, 1L, "Test value with a string type for attribute string_third."));
 
         // complex values
         BaseEntity baseEntityInnerFirst =
@@ -661,7 +661,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
             BaseEntity entityChildSearched = postgreSQLBaseEntityDaoImpl.load(entityChildSaved.getId());
             fail("Expected an illegal state exception.");
         }
-        catch(IllegalStateException e)
+        catch(Exception e)
         {
             // Nothing
         }
@@ -696,7 +696,5 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         assertEquals("Search engine was found BaseEntity with incorrect id,",
                 entitySearched.getId(), entitySaved.getId());
     }
-
-
 
 }

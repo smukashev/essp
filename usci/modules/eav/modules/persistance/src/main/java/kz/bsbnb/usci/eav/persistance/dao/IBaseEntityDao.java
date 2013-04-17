@@ -26,6 +26,8 @@ public interface IBaseEntityDao extends IDao<BaseEntity>
      */
     public BaseEntity search(BaseEntity baseEntity);
 
+    public BaseEntity load(long id, Date reportDate);
+
     public long saveOrUpdate(BaseEntity baseEntity);
 
     public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
