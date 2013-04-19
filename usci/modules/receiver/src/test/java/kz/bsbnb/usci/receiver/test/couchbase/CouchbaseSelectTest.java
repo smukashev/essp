@@ -5,26 +5,25 @@ import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.protocol.views.*;
 import junit.framework.Assert;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.receiver.helper.impl.FileHelper;
 import net.spy.memcached.internal.OperationFuture;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.net.URI;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 
 /**
  * @author abukabayev
  */
-public class CouchbaseTest {
+public class CouchbaseSelectTest {
 
     private CouchbaseClient client;
     private ClusterManager manager;
@@ -36,11 +35,9 @@ public class CouchbaseTest {
     private static final String DEV_PREFIX = "dev_";
     public static String MODE_PREFIX;
     private static final String BUCKET_NAME = "test";
-    private static final String FILE_PATH = "/opt/xmls/test.xml";
-
     private static final int ITEM_NUM = 100;
 
-    private Logger logger = Logger.getLogger(CouchbaseTest.class);
+    private Logger logger = Logger.getLogger(CouchbaseSelectTest.class);
 
     @Before
     public void setUp() throws Exception {
@@ -81,15 +78,13 @@ public class CouchbaseTest {
         View view = client.getView("tt","test_view");
         Assert.assertNotNull(view);
 
-//            Boolean res = client.asyncQuery(view,new Query()).getStatus().isSuccess();
-//            Assert.assertTrue(res);
-
         client.deleteDesignDoc("tt");
         client.delete("test_view");
     }
 
     @Test
     public void testGetSet() throws Exception {
+        Random r = new Random();
         Batch batch = new Batch(new Timestamp(new java.util.Date().getTime()),
                 new java.sql.Date(new java.util.Date().getTime()));
 
@@ -106,9 +101,9 @@ public class CouchbaseTest {
         client.delete("test_key");
 
 
-        FileHelper fileHelper = new FileHelper();
-        File file = new File(FILE_PATH);
-        byte bytes[] = fileHelper.getFileBytes(file);
+        byte bytes[] = new byte[1024];
+        for(int i = 0; i < bytes.length; i++)
+            bytes[i] = ((byte) r.nextInt());
 
         client.set("Batch",0,bytes);
         Assert.assertEquals(bytes.length, ((byte[])client.get("Batch")).length);
