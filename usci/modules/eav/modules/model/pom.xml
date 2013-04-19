@@ -9,55 +9,10 @@
     <version>1.0-SNAPSHOT</version>
     <name>EAV model</name>
 
-    <properties>
-        <versionfile>version.properties</versionfile>
-    </properties>
-
     <parent>
         <groupId>kz.bsbnb.usci.eav</groupId>
         <artifactId>parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../parent</relativePath>
     </parent>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2</version>
-                <executions>
-                    <execution>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <workingDirectory>${project.basedir}</workingDirectory>
-                    <executable>/bin/sh</executable>
-                    <arguments>
-                        <argument>git_version.sh</argument>
-                        <argument>src/main/resources/properties</argument>
-                        <argument>${versionfile}</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>${project.basedir}/src/main/resources/properties</directory>
-                            <includes>
-                                <include>${versionfile}</include>
-                            </includes>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
