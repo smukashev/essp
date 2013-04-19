@@ -82,7 +82,7 @@
 
                 <dependencies>
                     <dependency>
-                        <groupId>kz.bsbnb.usci</groupId>
+                        <groupId>kz.bsbnb.usci.eav</groupId>
                         <artifactId>tool</artifactId>
                         <version>0.0.1-SNAPSHOT</version>
                     </dependency>
