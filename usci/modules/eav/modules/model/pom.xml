@@ -10,7 +10,7 @@
     <name>EAV model</name>
 
     <properties>
-        <versionfile>${project.basedir}/version.properties</versionfile>
+        <versionfile>version.properties</versionfile>
     </properties>
 
     <parent>
@@ -39,6 +39,7 @@
                     <executable>/bin/sh</executable>
                     <arguments>
                         <argument>git_version.sh</argument>
+                        <argument>src/main/resources/properties</argument>
                         <argument>${versionfile}</argument>
                     </arguments>
                 </configuration>
@@ -49,7 +50,7 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>${project.basedir}</directory>
+                            <directory>${project.basedir}/src/main/resources/properties</directory>
                             <includes>
                                 <include>${versionfile}</include>
                             </includes>
