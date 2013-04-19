@@ -5,7 +5,7 @@
     <groupId>kz.bsbnb.usci.eav</groupId>
     <artifactId>persistance</artifactId>
     <name>EAV persistance</name>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -34,12 +34,12 @@
         <dependency>
             <groupId>kz.bsbnb.usci.eav</groupId>
             <artifactId>model</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>kz.bsbnb.usci</groupId>
             <artifactId>tool</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.jooq</groupId>
@@ -84,7 +84,7 @@
                     <dependency>
                         <groupId>kz.bsbnb.usci</groupId>
                         <artifactId>tool</artifactId>
-                        <version>1.0-SNAPSHOT</version>
+                        <version>0.0.1-SNAPSHOT</version>
                     </dependency>
                 </dependencies>
 
@@ -151,4 +151,16 @@
         </plugins>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>http://cigit.bsbnb.kz:8080/nexus-2.3.1-01/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>deployment</id>
+            <name>Internal Snapshots</name>
+            <url>http://cigit.bsbnb.kz:8080/nexus-2.3.1-01/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

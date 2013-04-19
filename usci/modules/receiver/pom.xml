@@ -5,7 +5,7 @@
     <groupId>kz.bsbnb.usci</groupId>
     <artifactId>receiver</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
     <name>USCI receiver</name>
     <url>http://maven.apache.org</url>
 
@@ -74,12 +74,12 @@
         <dependency>
             <groupId>kz.bsbnb.usci.eav</groupId>
             <artifactId>model</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>kz.bsbnb.usci</groupId>
             <artifactId>sync</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
@@ -95,4 +95,16 @@
         <finalName>receiver</finalName>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>http://cigit.bsbnb.kz:8080/nexus-2.3.1-01/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>deployment</id>
+            <name>Internal Snapshots</name>
+            <url>http://cigit.bsbnb.kz:8080/nexus-2.3.1-01/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
