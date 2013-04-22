@@ -185,18 +185,18 @@
                         </dependencies>
                         <configuration>
                             <jdbc>
-                                <driver>${ds.driver}</driver>
-                                <url>${ds.url}</url>
-                                <user>${ds.user}</user>
-                                <password>${ds.password}</password>
+                                <driver>${jdbc.driver}</driver>
+                                <url>${jdbc.url}</url>
+                                <user>${jdbc.user}</user>
+                                <password>${jdbc.password}</password>
                             </jdbc>
                             <generator>
                                 <name>org.jooq.util.DefaultGenerator</name>
                                 <database>
-                                    <name>org.jooq.util.postgres.PostgresDatabase</name>
+                                    <name>${jooq.db.name}</name>
                                     <includes>.*</includes>
                                     <excludes></excludes>
-                                    <inputSchema>public</inputSchema>
+                                    <inputSchema>${jooq.db.schema}</inputSchema>
                                 </database>
                                 <target>
                                     <packageName>kz.bsbnb.eav.persistance.generated</packageName>
@@ -260,18 +260,18 @@
                         </dependencies>
                         <configuration>
                             <jdbc>
-                                <driver>${ds.driver}</driver>
-                                <url>${ds.url}</url>
-                                <user>${ds.user}</user>
-                                <password>{ds.password}</password>
+                                <driver>${jdbc.driver}</driver>
+                                <url>${jdbc.url}</url>
+                                <user>${jdbc.user}</user>
+                                <password>${jdbc.password}</password>
                             </jdbc>
                             <generator>
                                 <name>org.jooq.util.DefaultGenerator</name>
                                 <database>
-                                    <name>org.jooq.util.postgres.PostgresDatabase</name>
+                                    <name>${jooq.db.name}</name>
                                     <includes>.*</includes>
                                     <excludes></excludes>
-                                    <inputSchema>public</inputSchema>
+                                    <inputSchema>${jooq.db.schema}</inputSchema>
                                 </database>
                                 <target>
                                     <packageName>kz.bsbnb.eav.persistance.generated</packageName>
