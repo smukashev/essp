@@ -236,7 +236,7 @@
                         </executions>
                         <configuration>
                             <files>
-                                <file>src/test/resources/properties/profiles/postgres.properties</file>
+                                <file>src/test/resources/properties/profiles/oracle.properties</file>
                             </files>
                         </configuration>
                     </plugin>
@@ -255,7 +255,7 @@
                             <dependency>
                                 <groupId>com.oracle</groupId>
                                 <artifactId>ojdbc6</artifactId>
-                                <version>11.2.0.3</version>
+                                <version>11.2.0.3.0</version>
                             </dependency>
                         </dependencies>
                         <configuration>
