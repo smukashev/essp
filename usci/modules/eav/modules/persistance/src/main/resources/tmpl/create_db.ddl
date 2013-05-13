@@ -586,6 +586,8 @@
       <column name="begin_date" primaryKey="false" required="true" type="TIMESTAMP" size="35,6" autoIncrement="false"/>
       <column name="is_disabled" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
+      <column name="is_immutable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
+      <column name="is_reference" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <unique>
         <unique-column name="name"/>
         <unique-column name="begin_date"/>
@@ -627,6 +629,8 @@
       <column name="is_nullable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <column name="array_key_type" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
       <column name="class_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
+      <column name="is_immutable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
+      <column name="is_reference" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <unique>
         <unique-column name="id"/>
       </unique>
@@ -662,6 +666,8 @@
       <column name="is_key" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <column name="is_nullable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <column name="array_key_type" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
+      <column name="is_immutable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
+      <column name="is_reference" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <unique>
         <unique-column name="id"/>
       </unique>
@@ -678,6 +684,8 @@
       <column name="is_key" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <column name="is_nullable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <column name="array_key_type" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
+      <column name="is_immutable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
+      <column name="is_reference" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <unique>
         <unique-column name="id"/>
       </unique>
@@ -711,6 +719,8 @@
       <column name="is_nullable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <column name="array_key_type" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
       <column name="type_code" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
+      <column name="is_immutable" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
+      <column name="is_reference" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <unique>
         <unique-column name="id"/>
       </unique>

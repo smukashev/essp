@@ -69,8 +69,12 @@ public class PostgreSQLMetaClassDaoImplTest extends GenericTestCase
         //Simple array
         metaCreate.setMetaAttribute("testArray", new MetaAttribute(false, false,
                 new MetaSet(new MetaValue(DataTypes.DATE))));
+        MetaSet simpleSet = new MetaSet(new MetaValue(DataTypes.INTEGER));
+        simpleSet.setReference(true);
+        simpleSet.setImmutable(true);
+
         metaCreate.setMetaAttribute("testArray", new MetaAttribute(false, false,
-                new MetaSet(new MetaValue(DataTypes.INTEGER))));
+                simpleSet));
         metaCreate.setMetaAttribute("testArray", new MetaAttribute(false, false,
                 new MetaSet(new MetaValue(DataTypes.DOUBLE))));
         metaCreate.setMetaAttribute("testArray", new MetaAttribute(false, false,
@@ -80,6 +84,8 @@ public class PostgreSQLMetaClassDaoImplTest extends GenericTestCase
 
         //Complex attribute
         MetaClass metaClass = new MetaClass("innerClass");
+        metaClass.setReference(true);
+        metaClass.setImmutable(true);
         metaClass.setMetaAttribute("testInteger",
                 new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
         metaClass.setMetaAttribute("testDouble",
@@ -97,8 +103,12 @@ public class PostgreSQLMetaClassDaoImplTest extends GenericTestCase
                 new MetaAttribute(false, false, metaClass));
 
         //Simple array of array of dates
+        MetaSet setOfSets = new MetaSet(new MetaSet(new MetaSet(new MetaValue(DataTypes.DATE))));
+        setOfSets.setReference(true);
+        setOfSets.setImmutable(true);
+
         metaCreate.setMetaAttribute("testArrayArray",
-                new MetaAttribute(false, false, new MetaSet(new MetaSet(new MetaSet(new MetaValue(DataTypes.DATE))))));
+                new MetaAttribute(false, false, setOfSets));
 
         //Complex array
         MetaClass metaClassForArray = new MetaClass("innerClassForArray");
@@ -107,8 +117,13 @@ public class PostgreSQLMetaClassDaoImplTest extends GenericTestCase
         metaClassForArray.setMetaAttribute("testDouble",
                 new MetaAttribute(false, false, new MetaValue(DataTypes.DOUBLE)));
         metaClassForArray.setComplexKeyType(ComplexKeyTypes.ANY);
+
+        MetaSet complexSet = new MetaSet(metaClassForArray);
+        complexSet.setReference(true);
+        complexSet.setImmutable(true);
+
         metaCreate.setMetaAttribute("testInnerClassArray",
-                new MetaAttribute(false, false, new MetaSet(metaClassForArray)));
+                new MetaAttribute(false, false, complexSet));
 
         return metaCreate;
     }

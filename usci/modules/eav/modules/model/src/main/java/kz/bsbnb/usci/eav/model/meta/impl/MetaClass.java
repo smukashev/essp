@@ -26,6 +26,10 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
     private boolean disabled = false;
 
     private boolean searchable = false;
+
+    private boolean immutable = false;
+
+    private boolean reference = false;
 	
 	/**
 	 * Holds type values. Keys of hash are type names.
@@ -429,5 +433,29 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
     public String toString()
     {
         return toString("");
+    }
+
+    @Override
+    public boolean isImmutable()
+    {
+        return immutable;
+    }
+
+    @Override
+    public boolean isReference()
+    {
+        return reference;
+    }
+
+    @Override
+    public void setImmutable(boolean value)
+    {
+        immutable = value;
+    }
+
+    @Override
+    public void setReference(boolean value)
+    {
+        reference = value;
     }
 }
