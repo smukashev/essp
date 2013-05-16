@@ -12,6 +12,10 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
 {
     IMetaType metaType;
 
+    private boolean immutable = false;
+
+    private boolean reference = false;
+
     public MetaSet()
     {
     }
@@ -139,5 +143,29 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
                 return "metaSet, simple, setOfValues";
             }
         }
+    }
+
+    @Override
+    public boolean isImmutable()
+    {
+        return immutable;
+    }
+
+    @Override
+    public boolean isReference()
+    {
+        return reference;
+    }
+
+    @Override
+    public void setImmutable(boolean value)
+    {
+        immutable = value;
+    }
+
+    @Override
+    public void setReference(boolean value)
+    {
+        reference = value;
     }
 }

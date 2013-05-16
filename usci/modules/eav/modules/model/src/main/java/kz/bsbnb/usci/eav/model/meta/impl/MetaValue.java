@@ -16,6 +16,10 @@ public class MetaValue implements IMetaType
 	 */
     private DataTypes typeCode;
 
+    private boolean immutable = false;
+
+    private boolean reference = false;
+
     public MetaValue()
     {
         super();
@@ -90,5 +94,27 @@ public class MetaValue implements IMetaType
         return "metaValue: " + typeCode;
     }
 
+    @Override
+    public boolean isImmutable()
+    {
+        return immutable;
+    }
 
+    @Override
+    public boolean isReference()
+    {
+        return reference;
+    }
+
+    @Override
+    public void setImmutable(boolean value)
+    {
+        immutable = value;
+    }
+
+    @Override
+    public void setReference(boolean value)
+    {
+        reference = value;
+    }
 }

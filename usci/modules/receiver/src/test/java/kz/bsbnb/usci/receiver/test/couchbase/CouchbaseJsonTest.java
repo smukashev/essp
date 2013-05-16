@@ -22,7 +22,6 @@ import java.util.Random;
 public class CouchbaseJsonTest {
     private CouchbaseClient client;
     private static final String BUCKET_NAME = "test";
-    private static final String FILE_PATH = "/opt/xmls/test.xml";
 
     private Logger logger = Logger.getLogger(CouchbaseInsertTest.class);
 
@@ -45,9 +44,10 @@ public class CouchbaseJsonTest {
         Random r = new Random();
         Gson gson = new Gson();
 
-        FileHelper fileHelper = new FileHelper();
-        File file = new File(FILE_PATH);
-        byte bytes[] = fileHelper.getFileBytes(file);
+
+        byte bytes[] = new byte[1024];
+        for(int i = 0; i < bytes.length; i++)
+            bytes[i] = ((byte) r.nextInt());
 
         long batchId = r.nextLong();
         BatchSample batchSample = new BatchSample(batchId, "batch-file-" + batchId, bytes);
