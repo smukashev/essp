@@ -11,6 +11,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 /**
  * @author k.tulbassiyev
@@ -43,4 +44,10 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     public BaseSet getBaseSet(IMetaType meta) {
         return remoteMetaFactoryService.getBaseSet(meta);
     }
+
+    @Override
+    public List<BaseEntity> getBaseEntities() {
+        return remoteMetaFactoryService.getBaseEntities();
+    }
+
 }
