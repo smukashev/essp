@@ -4,6 +4,8 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.sync.job.impl.DataJob;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Service;
 
 import javax.jws.Oneway;
@@ -17,9 +19,30 @@ public class EntityServiceImpl implements IEntityService {
     @Autowired
     private DataJob dataJob;
 
+    @Autowired
+    @Qualifier(value = "remoteEntityService")
+    RmiProxyFactoryBean rmiProxyFactoryBean;
+
+    kz.bsbnb.usci.core.service.IEntityService remoteEntityService;
+
     @Override
     @Oneway
     public void process(List<BaseEntity> entities) {
         dataJob.addAll(entities);
+    }
+
+    @Override
+    public void save(BaseEntity baseEntity) {
+        remoteEntityService.save(baseEntity);
+    }
+
+    @Override
+    public BaseEntity search(BaseEntity baseEntity) {
+        return remoteEntityService.search(baseEntity);  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad) {
+        remoteEntityService.update(baseEntitySave,baseEntityLoad);
     }
 }

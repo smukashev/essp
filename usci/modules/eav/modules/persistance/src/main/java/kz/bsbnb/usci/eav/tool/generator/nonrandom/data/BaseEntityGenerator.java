@@ -31,7 +31,6 @@ public class BaseEntityGenerator  extends AbstractDataGenerator {
                         getCastObject(metaValue.getTypeCode())));
             }
         }
-
         return entity;
     }
 }

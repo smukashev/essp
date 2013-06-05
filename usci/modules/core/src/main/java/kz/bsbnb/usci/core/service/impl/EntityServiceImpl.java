@@ -29,4 +29,14 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
         System.out.println("[core][save]                :           " + t2);
     }
+
+    @Override
+    public BaseEntity search(BaseEntity baseEntity) {
+        return baseEntityDao.search(baseEntity);
+    }
+
+    @Override
+    public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad) {
+         baseEntityDao.update(baseEntitySave,baseEntityLoad);
+    }
 }

@@ -76,7 +76,6 @@ public class BasicBaseEntitySearcherTest extends GenericTestCase
         BaseEntity streetEntity = metaFactory.getBaseEntity("street");
         streetEntity.put("lang", new BaseValue(batch, 1, "KAZ"));
         streetEntity.put("value", new BaseValue(batch, 1, str));
-
         return streetEntity;
     }
 

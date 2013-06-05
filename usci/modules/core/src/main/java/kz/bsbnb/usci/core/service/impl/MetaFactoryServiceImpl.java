@@ -45,8 +45,6 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
         for (MetaClass metaClass : metaClassRepository.getMetaClasses()){
             baseEntityList.add(new BaseEntity(metaClass,new Date()));
         }
-        System.out.println("LIST SIZE : ");
-        System.out.println(baseEntityList.size());
         return baseEntityList;
     }
 }

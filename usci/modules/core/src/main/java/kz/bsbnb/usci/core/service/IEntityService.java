@@ -7,4 +7,6 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
  */
 public interface IEntityService {
     public void save(BaseEntity baseEntity);
+    public BaseEntity search(BaseEntity baseEntity);
+    public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
 }
