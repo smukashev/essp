@@ -177,6 +177,8 @@ public class PostgreSQLMetaClassDaoImplTest extends GenericTestCase
 
         postgreSQLMetaClassDaoImpl.save(metaCreate);
 
+        assertTrue(metaCreate.getMetaAttribute("testNewDate").getId() == 0);
+
         MetaClass loaded = postgreSQLMetaClassDaoImpl.load(metaCreate.getId());
 
         assertTrue(metaCreate.equals(loaded));

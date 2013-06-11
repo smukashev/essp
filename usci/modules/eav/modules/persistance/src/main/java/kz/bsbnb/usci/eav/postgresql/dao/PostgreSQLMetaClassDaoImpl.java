@@ -386,7 +386,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             }
             else
             {
-                saveAttribute(metaType, meta.getId(), ContainerTypes.CLASS, metaAttribute, typeName);
+                metaAttribute.setId(saveAttribute(metaType, meta.getId(), ContainerTypes.CLASS,
+                        metaAttribute, typeName));
             }
         }
     }
