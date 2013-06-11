@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.jws.Oneway;
 import java.util.List;
 
@@ -25,6 +26,12 @@ public class EntityServiceImpl implements IEntityService {
 
     kz.bsbnb.usci.core.service.IEntityService remoteEntityService;
 
+    @PostConstruct
+    public void init() {
+        remoteEntityService =
+                (kz.bsbnb.usci.core.service.IEntityService) rmiProxyFactoryBean.getObject();
+    }
+
     @Override
     @Oneway
     public void process(List<BaseEntity> entities) {
@@ -38,7 +45,7 @@ public class EntityServiceImpl implements IEntityService {
 
     @Override
     public BaseEntity search(BaseEntity baseEntity) {
-        return remoteEntityService.search(baseEntity);  //To change body of implemented methods use File | Settings | File Templates.
+        return remoteEntityService.search(baseEntity);
     }
 
     @Override
