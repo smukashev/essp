@@ -9,7 +9,9 @@ import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author k.tulbassiyev
@@ -34,5 +36,17 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     @Override
     public BaseSet getBaseSet(IMetaType meta) {
         return new BaseSet(meta);
+    }
+
+    @Override
+    public List<BaseEntity> getBaseEntities() {
+        List<BaseEntity> baseEntityList = new ArrayList<BaseEntity>();
+
+        for (MetaClass metaClass : metaClassRepository.getMetaClasses()){
+            baseEntityList.add(new BaseEntity(metaClass,new Date()));
+        }
+        System.out.println("LIST SIZE : ");
+        System.out.println(baseEntityList.size());
+        return baseEntityList;
     }
 }

@@ -47,11 +47,10 @@ public class CouchbaseSelectTest {
         ArrayList<URI> nodes = new ArrayList<URI>();
         nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
-        manager = new ClusterManager(nodes,CLUSTER_ADMIN_USER,CLUSTER_ADMIN_PWD);
-
         try {
 
             client = new CouchbaseClient(nodes, BUCKET_NAME, "");
+            manager = new ClusterManager(nodes,CLUSTER_ADMIN_USER,CLUSTER_ADMIN_PWD);
         } catch (Exception e) {
             logger.info("Error connecting to Couchbase: " + e.getMessage());
             System.exit(1);

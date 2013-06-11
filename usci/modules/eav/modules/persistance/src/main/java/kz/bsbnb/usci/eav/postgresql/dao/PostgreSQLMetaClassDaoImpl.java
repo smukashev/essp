@@ -26,6 +26,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,6 +43,54 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private Executor sqlGenerator;
+
+    private void loadAllClasses(List<MetaClass> metaClassList){
+        SelectForUpdateStep select;
+
+
+
+                select = sqlGenerator.select(
+                        EAV_M_CLASSES.IS_DISABLED,
+                        EAV_M_CLASSES.BEGIN_DATE,
+                        EAV_M_CLASSES.ID,
+                        EAV_M_CLASSES.NAME,
+                        EAV_M_CLASSES.COMPLEX_KEY_TYPE,
+                        EAV_M_CLASSES.IS_IMMUTABLE,
+                        EAV_M_CLASSES.IS_REFERENCE
+                ).from(EAV_M_CLASSES).
+                  orderBy(EAV_M_CLASSES.BEGIN_DATE.desc());
+
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+
+        if (rows.size() < 1)
+            throw new IllegalArgumentException("Classes not found.");
+
+        for (Map<String, Object> row : rows){
+
+            MetaClass metaClass = new MetaClass();
+
+                metaClass.setDisabled((Boolean)row.get("is_disabled"));
+                metaClass.setBeginDate((Timestamp)row.get("begin_date"));
+                metaClass.setId((Long)row.get("id"));
+                metaClass.setClassName((String)row.get("name"));
+                metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
+                metaClass.setImmutable((Boolean)row.get("is_immutable"));
+                metaClass.setReference((Boolean)row.get("is_reference"));
+                loadAttributes(metaClass);
+            metaClassList.add(metaClass);
+        }
+    }
+
+    public List<MetaClass> loadAll(){
+
+        List<MetaClass> metaClassList = new ArrayList<MetaClass>();
+        loadAllClasses(metaClassList);
+
+      return metaClassList;
+    }
 
     private void loadClass(MetaClass metaClass, boolean beginDateStrict)
     {
