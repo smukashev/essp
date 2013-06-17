@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav.model.base.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -431,5 +432,55 @@ public class BaseEntity extends Persistable implements IBaseContainer
         result = 31 * result + meta.hashCode();
         result = 31 * result + values.hashCode();
         return result;
+    }
+
+    public Object getEl(String path)
+    {
+        StringTokenizer tokenizer = new StringTokenizer(path, ".");
+
+        BaseEntity entity = this;
+        MetaClass theMeta = meta;
+        Object valueOut = null;
+
+        while (tokenizer.hasMoreTokens())
+        {
+            String token = tokenizer.nextToken();
+            String arrayIndexes = "";
+
+            IMetaAttribute attribute = theMeta.getMetaAttribute(token);
+            IMetaType type = attribute.getMetaType();
+
+            if (token.contains("["))
+            {
+                arrayIndexes = token.substring(token.indexOf("["));
+            }
+
+            IBaseValue value = entity.getBaseValue(token);
+
+            if (value == null || value.getValue() == null) {
+                valueOut = null;
+                break;
+            }
+
+            valueOut = value.getValue();
+
+            if (type.isSet())
+            {
+                throw new IllegalArgumentException("Path can't have intermediate set values");
+            }
+
+            if (type.isComplex())
+            {
+                entity = (BaseEntity)valueOut;
+                theMeta = (MetaClass)type;
+            } else {
+                if (tokenizer.hasMoreTokens())
+                {
+                    throw new IllegalArgumentException("Path can't have intermediate simple values");
+                }
+            }
+        }
+
+        return valueOut;
     }
 }
