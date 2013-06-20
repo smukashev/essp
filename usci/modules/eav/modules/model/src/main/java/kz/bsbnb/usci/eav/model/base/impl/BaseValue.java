@@ -3,7 +3,9 @@ package kz.bsbnb.usci.eav.model.base.impl;
 
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,5 +192,35 @@ public class BaseValue extends Persistable implements IBaseValue
         result = 31 * result + (value != null ? value.hashCode() : 0);
         result = 31 * result + repDate.hashCode();
         return result;
+    }
+
+    public boolean equalsToString(String str, DataTypes type)
+    {
+        switch (type)
+        {
+            case INTEGER:
+                if (value.equals(Integer.parseInt(str)))
+                    return true;
+                break;
+            case DATE:
+                //TODO: add date format
+                break;
+            case STRING:
+                if (value.equals(str))
+                    return true;
+                break;
+            case BOOLEAN:
+                if (value.equals(Boolean.parseBoolean(str)))
+                    return true;
+                break;
+            case DOUBLE:
+                if (value.equals(Double.parseDouble(str)))
+                    return true;
+                break;
+            default:
+                throw new IllegalStateException("Unknown DataType: " + type);
+        }
+
+        return false;
     }
 }

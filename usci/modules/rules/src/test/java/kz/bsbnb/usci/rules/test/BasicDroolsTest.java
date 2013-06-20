@@ -145,7 +145,7 @@ public class BasicDroolsTest {
     }
 
     @Test
-    public void generateSQLTest() throws Exception
+    public void simpleRulesTest() throws Exception
     {
         assertTrue(ksession != null);
 
@@ -155,10 +155,25 @@ public class BasicDroolsTest {
         System.out.println("------------------------");
         BaseEntity entity = generateBaseEntity(batch);
         System.out.println(entity.toString());
-        System.out.println("------------------------");
-        System.out.println(entity.getEl("subject.name.lastname"));
 
         ksession.execute(entity);
+    }
+
+    @Test
+    public void shortenBaseEntityAccessTest() throws Exception
+    {
+        generateMetaClass();
+        Batch batch = new Batch(new Date(System.currentTimeMillis()));
+        batch.setId(1);
+        BaseEntity entity = generateBaseEntity(batch);
+
+        assertTrue(entity.getEl("subject.name.lastname").equals("TULBASSIYEV"));
+        assertTrue(entity.getEl("subject.address.house.value[333]").equals(new Integer(333)));
+        assertTrue(entity.getEl("subject.address.house.value[444]") == null);
+        assertTrue(entity.getEl("subject.documents.document[type=RNN].no").equals("1234567890"));
+        assertTrue(entity.getEl("subject.documents.document[type=RNN,no=1234567890].no").equals("1234567890"));
+        assertTrue(entity.getEl("subject.documents.document[type=RNN,no=0987654322].no") == null);
+        assertTrue(entity.getEl("subject.documents.document[type=RNN,no=0987654321].no") == null);
     }
 
     public StatelessKnowledgeSession getKsession()

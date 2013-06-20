@@ -447,13 +447,17 @@ public class BaseEntity extends Persistable implements IBaseContainer
             String token = tokenizer.nextToken();
             String arrayIndexes = "";
 
+            if (token.contains("["))
+            {
+                arrayIndexes = token.substring(token.indexOf("[") + 1, token.length() - 1);
+                token = token.substring(0, token.indexOf("["));
+            }
+
             IMetaAttribute attribute = theMeta.getMetaAttribute(token);
             IMetaType type = attribute.getMetaType();
 
-            if (token.contains("["))
-            {
-                arrayIndexes = token.substring(token.indexOf("["));
-            }
+            if (entity == null)
+                return null;
 
             IBaseValue value = entity.getBaseValue(token);
 
@@ -466,7 +470,8 @@ public class BaseEntity extends Persistable implements IBaseContainer
 
             if (type.isSet())
             {
-                throw new IllegalArgumentException("Path can't have intermediate set values");
+                valueOut = ((BaseSet)valueOut).getEl(arrayIndexes);
+                type = ((MetaSet)type).getMemberType();
             }
 
             if (type.isComplex())
@@ -482,5 +487,26 @@ public class BaseEntity extends Persistable implements IBaseContainer
         }
 
         return valueOut;
+    }
+
+    public boolean equalsToString(HashMap<String, String> params)
+    {
+        for (String fieldName : params.keySet())
+        {
+            IMetaType mtype = meta.getMemberType(fieldName);
+
+            if (mtype == null)
+                throw new IllegalArgumentException("No such field: " + fieldName);
+
+            if (mtype.isComplex() || mtype.isSet())
+                throw new IllegalArgumentException("Can't handle complex fields or arrays: " + fieldName);
+
+            BaseValue bvalue = (BaseValue)getBaseValue(fieldName);
+
+            if (!bvalue.equalsToString(params.get(fieldName), ((MetaValue)mtype).getTypeCode()))
+                return false;
+        }
+
+        return true;
     }
 }

@@ -2,12 +2,13 @@ package kz.bsbnb.usci.eav.model.base.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author k.tulbassiyev
@@ -96,5 +97,76 @@ public class BaseSet extends Persistable implements IBaseContainer
         str += "]";
 
         return str;
+    }
+
+    public Object getElSimple(String filter)
+    {
+        if (meta.isComplex() || meta.isSet())
+        {
+            throw new IllegalArgumentException("Get simple attribute method called for complex attribute or array");
+        }
+
+        for (IBaseValue value : data)
+        {
+            Object innerValue = value.getValue();
+            if (innerValue == null)
+            {
+                continue;
+            }
+
+            if (((BaseValue)value).equalsToString(filter, ((MetaValue)meta).getTypeCode()))
+                return innerValue;
+        }
+
+        return null;
+    }
+
+    public Object getElComplex(String filter)
+    {
+        if (!meta.isComplex() || meta.isSet())
+        {
+            throw new IllegalArgumentException("Get complex attribute method called for simple attribute or array");
+        }
+
+        StringTokenizer tokenizer = new StringTokenizer(filter, ",");
+
+        Object valueOut = null;
+        HashMap<String, String> params = new HashMap<String, String>();
+
+        while (tokenizer.hasMoreTokens())
+        {
+            String token = tokenizer.nextToken();
+
+            StringTokenizer innerTokenizer = new StringTokenizer(token, "=");
+
+            String fieldName = innerTokenizer.nextToken().trim();
+            if (!innerTokenizer.hasMoreTokens())
+                throw new IllegalStateException("Field value expected.");
+
+            String fieldValue = innerTokenizer.nextToken().trim();
+
+            params.put(fieldName, fieldValue);
+        }
+
+        for (IBaseValue value : data)
+        {
+            Object innerValue = value.getValue();
+            if (innerValue == null)
+            {
+                continue;
+            }
+
+            if (((BaseEntity)innerValue).equalsToString(params))
+                return innerValue;
+        }
+
+        return valueOut;
+    }
+
+    public Object getEl(String filter)
+    {
+        if (meta.isComplex())
+            return getElComplex(filter);
+        return getElSimple(filter);
     }
 }
