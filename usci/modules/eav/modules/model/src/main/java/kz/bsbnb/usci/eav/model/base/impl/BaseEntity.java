@@ -59,6 +59,8 @@ public class BaseEntity extends Persistable implements IBaseContainer
 
     }
 
+    private Set<String> validationErrors = new HashSet<String>();
+
     /**
      * Initializes entity with a class name.
      *
@@ -508,5 +510,20 @@ public class BaseEntity extends Persistable implements IBaseContainer
         }
 
         return true;
+    }
+
+    public void addValidationError(String errorMsg)
+    {
+        validationErrors.add(errorMsg);
+    }
+
+    public void clearValidationErrors()
+    {
+        validationErrors.clear();
+    }
+
+    public Set<String> getValidationErrors()
+    {
+        return validationErrors;
     }
 }

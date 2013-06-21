@@ -10,7 +10,7 @@
 		http://drools.org/schema/drools-spring http://anonsvn.jboss.org/repos/labs/labs/jbossrules/trunk/drools-container/drools-spring/src/main/resources/org/drools/container/spring/drools-spring.xsd">
 
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
-    <context:component-scan base-package="kz.bsbnb.usci.rules.test" />
+    <context:component-scan base-package="kz.bsbnb.usci.rules" />
 
     <context:annotation-config/>
 

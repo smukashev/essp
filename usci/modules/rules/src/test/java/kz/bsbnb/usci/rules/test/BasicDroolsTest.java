@@ -9,6 +9,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.rules.RulesSingleton;
 import org.drools.runtime.StatelessKnowledgeSession;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 @ContextConfiguration(locations = {"classpath:applicationContextTest.xml"})
 public class BasicDroolsTest {
     @Autowired
-    private StatelessKnowledgeSession ksession;
+    RulesSingleton rules;
 
     MetaClass metaStreetHolder;
     MetaClass metaHouseHolder;
@@ -147,7 +148,7 @@ public class BasicDroolsTest {
     @Test
     public void simpleRulesTest() throws Exception
     {
-        assertTrue(ksession != null);
+        assertTrue(rules != null);
 
         System.out.println(generateMetaClass().toString());
         Batch batch = new Batch(new Date(System.currentTimeMillis()));
@@ -156,7 +157,56 @@ public class BasicDroolsTest {
         BaseEntity entity = generateBaseEntity(batch);
         System.out.println(entity.toString());
 
+        StatelessKnowledgeSession ksession = rules.getSession();
         ksession.execute(entity);
+        for (String str : entity.getValidationErrors())
+        {
+            System.out.println(str);
+        }
+
+        String newRules = "package drl;\n" +
+                "dialect  \"mvel\"\n" +
+                "\n" +
+                "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n" +
+                "\n" +
+                "rule \"test1\"\n" +
+                "    when\n" +
+                "        $entity : BaseEntity ()\n" +
+                "    then\n" +
+                "        System.out.println(\"Test rule, always executes.\");\n" +
+                "end\n" +
+                "\n" +
+                "rule \"test2\"\n" +
+                "    when\n" +
+                "        $entity : BaseEntity ( getEl(\"subject.name.lastname\") == \"TULBASSIYEV\" )\n" +
+                "    then\n" +
+                "        $entity.addValidationError(\"Test rule, that is true for TULBASSIYEV123\");\n" +
+                "end\n" +
+                "\n" +
+                "rule \"test3\"\n" +
+                "    when\n" +
+                "        $entity : BaseEntity ( getEl(\"subject.name.lastname\") != \"TULBASSIYEV\" )\n" +
+                "    then\n" +
+                "        $entity.addValidationError(\"Test rule, that is false for TULBASSIYEV123\");\n" +
+                "end";
+
+        rules.setRules(newRules);
+
+        StatelessKnowledgeSession ksession1 = rules.getSession();
+        System.out.println("-------------------------- New session");
+        entity.clearValidationErrors();
+        ksession1.execute(entity);
+        for (String str : entity.getValidationErrors())
+        {
+            System.out.println(str);
+        }
+        System.out.println("-------------------------- Old session");
+        entity.clearValidationErrors();
+        ksession.execute(entity);
+        for (String str : entity.getValidationErrors())
+        {
+            System.out.println(str);
+        }
     }
 
     @Test
@@ -176,13 +226,13 @@ public class BasicDroolsTest {
         assertTrue(entity.getEl("subject.documents.document[type=RNN,no=0987654321].no") == null);
     }
 
-    public StatelessKnowledgeSession getKsession()
+    public RulesSingleton getRules()
     {
-        return ksession;
+        return rules;
     }
 
-    public void setKsession(StatelessKnowledgeSession ksession)
+    public void setRules(RulesSingleton rules)
     {
-        this.ksession = ksession;
+        this.rules = rules;
     }
 }
