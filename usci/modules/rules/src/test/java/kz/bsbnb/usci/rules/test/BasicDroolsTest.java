@@ -158,7 +158,19 @@ public class BasicDroolsTest {
         System.out.println(entity.toString());
 
         StatelessKnowledgeSession ksession = rules.getSession();
-        ksession.execute(entity);
+        //ksession.execute(entity);
+        System.out.println("Run package drl");
+        entity.clearValidationErrors();
+        rules.runRules(entity, "drl");
+        assertTrue(entity.getValidationErrors().size() == 1);
+        for (String str : entity.getValidationErrors())
+        {
+            System.out.println(str);
+        }
+        System.out.println("Run package no_such_package");
+        entity.clearValidationErrors();
+        rules.runRules(entity, "no_such_package");
+        assertTrue(entity.getValidationErrors().size() == 0);
         for (String str : entity.getValidationErrors())
         {
             System.out.println(str);
@@ -203,6 +215,7 @@ public class BasicDroolsTest {
         System.out.println("-------------------------- Old session");
         entity.clearValidationErrors();
         ksession.execute(entity);
+
         for (String str : entity.getValidationErrors())
         {
             System.out.println(str);
