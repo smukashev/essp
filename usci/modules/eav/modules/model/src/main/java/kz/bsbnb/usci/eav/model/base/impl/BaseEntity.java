@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav.model.base.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -57,6 +58,8 @@ public class BaseEntity extends Persistable implements IBaseContainer
     {
 
     }
+
+    private Set<String> validationErrors = new HashSet<String>();
 
     /**
      * Initializes entity with a class name.
@@ -431,5 +434,96 @@ public class BaseEntity extends Persistable implements IBaseContainer
         result = 31 * result + meta.hashCode();
         result = 31 * result + values.hashCode();
         return result;
+    }
+
+    public Object getEl(String path)
+    {
+        StringTokenizer tokenizer = new StringTokenizer(path, ".");
+
+        BaseEntity entity = this;
+        MetaClass theMeta = meta;
+        Object valueOut = null;
+
+        while (tokenizer.hasMoreTokens())
+        {
+            String token = tokenizer.nextToken();
+            String arrayIndexes = "";
+
+            if (token.contains("["))
+            {
+                arrayIndexes = token.substring(token.indexOf("[") + 1, token.length() - 1);
+                token = token.substring(0, token.indexOf("["));
+            }
+
+            IMetaAttribute attribute = theMeta.getMetaAttribute(token);
+            IMetaType type = attribute.getMetaType();
+
+            if (entity == null)
+                return null;
+
+            IBaseValue value = entity.getBaseValue(token);
+
+            if (value == null || value.getValue() == null) {
+                valueOut = null;
+                break;
+            }
+
+            valueOut = value.getValue();
+
+            if (type.isSet())
+            {
+                valueOut = ((BaseSet)valueOut).getEl(arrayIndexes);
+                type = ((MetaSet)type).getMemberType();
+            }
+
+            if (type.isComplex())
+            {
+                entity = (BaseEntity)valueOut;
+                theMeta = (MetaClass)type;
+            } else {
+                if (tokenizer.hasMoreTokens())
+                {
+                    throw new IllegalArgumentException("Path can't have intermediate simple values");
+                }
+            }
+        }
+
+        return valueOut;
+    }
+
+    public boolean equalsToString(HashMap<String, String> params)
+    {
+        for (String fieldName : params.keySet())
+        {
+            IMetaType mtype = meta.getMemberType(fieldName);
+
+            if (mtype == null)
+                throw new IllegalArgumentException("No such field: " + fieldName);
+
+            if (mtype.isComplex() || mtype.isSet())
+                throw new IllegalArgumentException("Can't handle complex fields or arrays: " + fieldName);
+
+            BaseValue bvalue = (BaseValue)getBaseValue(fieldName);
+
+            if (!bvalue.equalsToString(params.get(fieldName), ((MetaValue)mtype).getTypeCode()))
+                return false;
+        }
+
+        return true;
+    }
+
+    public void addValidationError(String errorMsg)
+    {
+        validationErrors.add(errorMsg);
+    }
+
+    public void clearValidationErrors()
+    {
+        validationErrors.clear();
+    }
+
+    public Set<String> getValidationErrors()
+    {
+        return validationErrors;
     }
 }

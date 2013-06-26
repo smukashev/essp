@@ -1,0 +1,25 @@
+package drl;
+dialect  "mvel"
+
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+
+rule "test1"
+    when
+        $entity : BaseEntity ()
+    then
+        System.out.println("Test rule, always executes.");
+end
+
+rule "test2"
+    when
+        $entity : BaseEntity ( getEl("subject.name.lastname") == "TULBASSIYEV" )
+    then
+        $entity.addValidationError("Test rule, that is true for TULBASSIYEV");
+end
+
+rule "test3"
+    when
+        $entity : BaseEntity ( getEl("subject.name.lastname") != "TULBASSIYEV" )
+    then
+        $entity.addValidationError("Test rule, that is false for TULBASSIYEV");
+end
