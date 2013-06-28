@@ -10,4 +10,5 @@ import java.util.List;
  */
 public interface IEntityService {
     public void process(List<BaseEntity> entities);
+    public BaseEntity load(long id);
 }

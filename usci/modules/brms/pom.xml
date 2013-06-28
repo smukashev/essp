@@ -3,22 +3,24 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>kz.bsbnb</groupId>
-  <artifactId>usci</artifactId>
+  <groupId>kz.bsbnb.usci</groupId>
+  <artifactId>brms</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>USCI</name>
+  <name>BRMS</name>
   <inceptionYear>2013</inceptionYear>
   <packaging>pom</packaging>
-  <description>Uniform System of Collecting Indicators</description>
+  <description>USCI BRMS related modules</description>
+
+    <parent>
+        <groupId>kz.bsbnb.usci</groupId>
+        <artifactId>parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../parent</relativePath>
+    </parent>
 
   <modules>
-      <module>modules/eav</module>
-      <module>modules/core</module>
-      <module>modules/receiver</module>
-      <module>modules/sync</module>
-      <module>modules/brms</module>
-      <module>modules/portlets</module>
-      <module>modules/parent</module>
+      <module>rulesvr</module>
+      <module>rulesingleton</module>
   </modules>
 
     <distributionManagement>

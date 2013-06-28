@@ -1,0 +1,80 @@
+-- Table: package_versions
+
+-- DROP TABLE package_versions;
+
+CREATE TABLE package_versions
+(
+  repdate date NOT NULL,
+  package_id bigint NOT NULL,
+  id serial NOT NULL,
+  CONSTRAINT pk_package_versions PRIMARY KEY (id),
+  CONSTRAINT fk_packages FOREIGN KEY (package_id)
+      REFERENCES packages (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE package_versions
+  OWNER TO postgres;
+
+
+
+-- Table: packages
+
+-- DROP TABLE packages;
+
+CREATE TABLE packages
+(
+  name character varying,
+  repdate date,
+  id serial NOT NULL,
+  CONSTRAINT pk_packages PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE packages
+  OWNER TO postgres;
+
+
+-- Table: rule_package_versions
+
+-- DROP TABLE rule_package_versions;
+
+CREATE TABLE rule_package_versions
+(
+  rule_id bigint NOT NULL,
+  package_versions_id bigint NOT NULL,
+  id serial NOT NULL,
+  CONSTRAINT pk PRIMARY KEY (id),
+  CONSTRAINT fk_package_versions FOREIGN KEY (package_versions_id)
+      REFERENCES package_versions (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_rule FOREIGN KEY (rule_id)
+      REFERENCES rules (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE rule_package_versions
+  OWNER TO postgres;
+
+
+-- Table: rules
+
+-- DROP TABLE rules;
+
+CREATE TABLE rules
+(
+  id serial NOT NULL,
+  rule character varying,
+  title character varying,
+  CONSTRAINT rules_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE rules
+  OWNER TO postgres;
