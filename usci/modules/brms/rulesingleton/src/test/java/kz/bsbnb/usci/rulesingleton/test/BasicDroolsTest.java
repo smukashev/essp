@@ -145,7 +145,7 @@ public class BasicDroolsTest {
         return contractEntity;
     }
 
-    @Test
+    /*@Test
     public void simpleRulesTest() throws Exception
     {
         assertTrue(rules != null);
@@ -220,7 +220,7 @@ public class BasicDroolsTest {
         {
             System.out.println(str);
         }
-    }
+    }    */
 
     @Test
     public void shortenBaseEntityAccessTest() throws Exception
