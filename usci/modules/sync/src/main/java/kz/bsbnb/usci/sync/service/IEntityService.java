@@ -9,6 +9,7 @@ import java.util.List;
  * @author k.tulbassiyev
  */
 public interface IEntityService {
+    public BaseEntity load(Long id);
     public void process(List<BaseEntity> entities);
     public void save(BaseEntity baseEntity);
     public BaseEntity search(BaseEntity baseEntity);

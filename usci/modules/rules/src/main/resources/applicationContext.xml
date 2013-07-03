@@ -28,4 +28,18 @@
             <drools:resource source="classpath:drl/test.drl" />
         </drools:resources>
     </drools:kbase>
+
+    <bean id="remoteBatchService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1099/batchService"/>
+        <property name="serviceInterface" value="rules.service.IBatchService"/>
+    </bean>
+    <bean id="remoteBatchVersionService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1099/batchVersionService"/>
+        <property name="serviceInterface" value="rules.service.IBatchVersionService"/>
+    </bean>
+    <bean id="remoteRuleService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1099/ruleService"/>
+        <property name="serviceInterface" value="rules.service.IRuleService"/>
+    </bean>
+
 </beans>

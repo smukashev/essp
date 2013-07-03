@@ -51,26 +51,21 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Override
     public BaseEntity search(BaseEntity baseEntity) {
-//        return baseEntityDao.search(baseEntity);
         ArrayList<Long> result = searcher.findAll(baseEntity) ;
-//        System.out.println(result.size());
 
        return baseEntityDao.load(result.get(0));
     }
 
     @Override
     public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad) {
-        for (String s : baseEntityLoad.getMeta().getAttributeNames()){
-            System.out.println(s);
-        }
-//        System.out.println(baseEntityLoad.getMeta().getMemberType("test"));
+
 
         Long id = metaClassDao.save(baseEntityLoad.getMeta());
-
-        MetaClass meta = baseEntityLoad.getMeta();
-        IMetaAttribute attribute = meta.getMetaAttribute("test");
-
-        System.out.println(attribute.getId());
          baseEntityDao.saveOrUpdate(baseEntityLoad);
+    }
+
+    @Override
+    public BaseEntity load(long id) {
+        return baseEntityDao.load(id);
     }
 }

@@ -33,6 +33,11 @@ public class EntityServiceImpl implements IEntityService {
     }
 
     @Override
+    public BaseEntity load(Long id) {
+        return remoteEntityService.load(id);
+    }
+
+    @Override
     @Oneway
     public void process(List<BaseEntity> entities) {
         dataJob.addAll(entities);

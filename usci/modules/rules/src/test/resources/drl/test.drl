@@ -1,4 +1,4 @@
-package drl;
+package testdrl;
 dialect  "mvel"
 
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;

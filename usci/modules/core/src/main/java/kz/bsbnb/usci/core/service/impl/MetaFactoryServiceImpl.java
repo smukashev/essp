@@ -37,10 +37,6 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     @Autowired
     IBaseEntityDao baseEntityDao;
 
-    @Autowired
-    private IBatchDao batchDao;
-
-
     @Override
     public BaseEntity getBaseEntity(String className) {
         // TODO: Implement generation of the reporting date.
@@ -60,35 +56,13 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
 
     @Override
     public List<BaseEntity> getBaseEntities() {
+        List<BaseEntity> baseEntityList = new ArrayList<BaseEntity>();
 
+        for (MetaClass metaClass : metaClassRepository.getMetaClasses()){
+            baseEntityList.add(new BaseEntity(metaClass,new Date()));
+        }
 
-
-        MetaClass metaStreetHolder = new MetaClass("street");
-        metaStreetHolder.setMetaAttribute("lang",
-                new MetaAttribute(false, false, new MetaValue(DataTypes.STRING)));
-        metaStreetHolder.setMetaAttribute("value",
-                new MetaAttribute(true, false, new MetaValue(DataTypes.STRING)));
-        metaStreetHolder.setMetaAttribute("repDate",
-                new MetaAttribute(false, false, new MetaValue(DataTypes.DATE)));
-
-        metaClassDao.save(metaStreetHolder);
-
-        Batch batch = new Batch(new Timestamp(new java.util.Date().getTime()), new java.sql.Date(new java.util.Date().getTime()));
-        batchDao.save(batch);
-
-        BaseEntity streetEntity = new BaseEntity(metaClassRepository.getMetaClass("street"), new Date());
-        streetEntity.put("lang", new BaseValue(batch, 1, "KAZ"));
-        streetEntity.put("value", new BaseValue(batch, 1, "Street1"));
-        streetEntity.put("repDate", new BaseValue(batch, 1, new Date()));
-        baseEntityDao.save(streetEntity);
-                return null;
-//        List<BaseEntity> baseEntityList = new ArrayList<BaseEntity>();
-//
-//        for (MetaClass metaClass : metaClassRepository.getMetaClasses()){
-//            baseEntityList.add(new BaseEntity(metaClass,new Date()));
-//        }
-//
-//        return baseEntityList;
+        return baseEntityList;
 
     }
 
