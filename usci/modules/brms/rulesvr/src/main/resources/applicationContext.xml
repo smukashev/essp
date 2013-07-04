@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+
+
+
+    <!--<context:component-scan base-package="rules" />-->
+    <context:component-scan base-package="rulesvr.service.impl" />
+
+    <context:annotation-config/>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:properties/dataSource.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${ds.driver}"/>
+        <property name="url" value="${ds.url}"/>
+        <property name="username" value="${ds.user}"/>
+        <property name="password" value="${ds.password}"/>
+    </bean>
+
+
+
+    <bean id="BatchDao" class="rulesvr.dao.impl.BatchDao">
+           <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="BatchVersionDao" class="rulesvr.dao.impl.BatchVersionDao">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="RuleDao" class="rulesvr.dao.impl.RuleDao">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="batchRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="batchService"/>
+        <property name="service" ref="batchService"/>
+        <property name="serviceInterface" value="rulesvr.service.IBatchService"/>
+        <property name="registryPort" value="1097"/>
+    </bean>
+
+    <bean id="batchVersionRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="batchVersionService"/>
+        <property name="service" ref="batchVersionService"/>
+        <property name="serviceInterface" value="rulesvr.service.IBatchVersionService"/>
+        <property name="registryPort" value="1097"/>
+    </bean>
+
+    <bean id="ruleRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="ruleService"/>
+        <property name="service" ref="ruleService"/>
+        <property name="serviceInterface" value="rulesvr.service.IRuleService"/>
+        <property name="registryPort" value="1097"/>
+    </bean>
+
+</beans>

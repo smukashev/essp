@@ -1,14 +1,12 @@
 package kz.bsbnb.usci.sync.service.impl;
 
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.sync.job.impl.DataJob;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import javax.jws.Oneway;
 import java.util.List;
 
@@ -21,21 +19,7 @@ public class EntityServiceImpl implements IEntityService {
     private DataJob dataJob;
 
     @Autowired
-    @Qualifier(value = "remoteEntityService")
-    RmiProxyFactoryBean rmiProxyFactoryBean;
-
-    kz.bsbnb.usci.core.service.IEntityService remoteEntityService;
-
-    @PostConstruct
-    public void init() {
-        remoteEntityService =
-                (kz.bsbnb.usci.core.service.IEntityService) rmiProxyFactoryBean.getObject();
-    }
-
-    @Override
-    public BaseEntity load(Long id) {
-        return remoteEntityService.load(id);
-    }
+    IBaseEntityDao baseEntityDao;
 
     @Override
     @Oneway
@@ -44,17 +28,7 @@ public class EntityServiceImpl implements IEntityService {
     }
 
     @Override
-    public void save(BaseEntity baseEntity) {
-        remoteEntityService.save(baseEntity);
-    }
-
-    @Override
-    public BaseEntity search(BaseEntity baseEntity) {
-        return remoteEntityService.search(baseEntity);
-    }
-
-    @Override
-    public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad) {
-        remoteEntityService.update(baseEntitySave,baseEntityLoad);
+    public BaseEntity load(long id) {
+        return baseEntityDao.load(id);
     }
 }

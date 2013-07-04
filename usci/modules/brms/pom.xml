@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>kz.bsbnb.usci</groupId>
+  <artifactId>brms</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>BRMS</name>
+  <inceptionYear>2013</inceptionYear>
+  <packaging>pom</packaging>
+  <description>USCI BRMS related modules.</description>
+
+    <parent>
+        <groupId>kz.bsbnb.usci</groupId>
+        <artifactId>parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../parent</relativePath>
+    </parent>
+
+  <modules>
+      <module>rulesvr</module>
+      <module>rulesingleton</module>
+  </modules>
+
+    <distributionManagement>
+        <repository>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>http://cigit.bsbnb.kz:8080/nexus-2.3.1-01/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>deployment</id>
+            <name>Internal Snapshots</name>
+            <url>http://cigit.bsbnb.kz:8080/nexus-2.3.1-01/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+</project>

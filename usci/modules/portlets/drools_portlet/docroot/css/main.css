@@ -1,0 +1,244 @@
+.container{
+    padding-left: 7px;
+    padding-top: 7px;
+}
+
+.packageInfo{
+    padding:7px;
+}
+
+.addRules{
+    padding:7px;
+}
+
+.rules{
+    padding:7px;
+}
+
+.container span{
+    /*display:block;*/
+}
+
+/*.container select{*/
+    /*style="-webkit-appearance:none; -moz-appearance:none; background:url('http://surefireweb.wpengine.netdna-cdn.com/wp-content/uploads/2013/02/arrows.png') 180px 7px no-repeat rgba(255,255,255,0); padding:5px 5px 5px 10px; width:110%; border:none; font-weight:bold;*/
+/*}*/
+
+body{
+    font-family:"Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
+    font-size:12px;
+}
+p, h1, form, button{border:0; margin:0; padding:0;}
+.spacer{clear:both; height:1px;}
+/* ----------- My Form ----------- */
+.myform,.stylized{
+    margin:0 auto;
+    width:250px;
+    padding:14px;
+}
+
+/*.addRules{*/
+    /*margin:0;*/
+    /*float:left;*/
+    /*width:600px;*/
+    /*padding:14px;*/
+/*}*/
+
+/* ----------- stylized ----------- */
+#stylized, .stylized{
+    border:solid 2px #b7ddf2;
+    background:#ebf4fb;
+}
+#stylized h1, .stylized h1 {
+    font-size:14px;
+    font-weight:bold;
+    margin-bottom:8px;
+}
+#stylized p, .stylized p{
+    font-size:11px;
+    color:#666666;
+    margin-bottom:20px;
+    border-bottom:solid 1px #b7ddf2;
+    padding-bottom:10px;
+}
+#stylized label, .stylized label{
+    display:block;
+    font-weight:bold;
+    text-align:right;
+    width:140px;
+    float:left;
+}
+#stylized .small, .stylized .small{
+    color:#666666;
+    display:block;
+    font-size:11px;
+    font-weight:normal;
+    text-align:right;
+    width:140px;
+}
+#stylized input, .stylized input{
+    float:left;
+    font-size:12px;
+    padding:4px 2px;
+    border:solid 1px #aacfe4;
+    width:90px;
+    margin:2px 0 20px 10px;
+}
+#stylized select{
+    float:left;
+    font-size:12px;
+    padding:4px 2px;
+    border:solid 1px #aacfe4;
+    width:100px;
+    margin:2px 0 20px 10px;
+}
+#stylized button, .stylized button{
+    clear:both;
+    margin-left:80px;
+    width:85px;
+    height:31px;
+    /*background:#666666 url(img/button.png) no-repeat;*/
+    text-align:center;
+    line-height:31px;
+    color:#FFFFFF;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.packageInfo p{
+    font-size:11px;
+    color:#666666;
+    margin-bottom:20px;
+    border-bottom:solid 1px #282828 ;
+    padding-bottom:10px;
+}
+
+.packageInfo label{
+
+    font-weight:bold;
+    text-align:left;
+    width:140px;
+    margin-bottom: 2px;
+    /*float:left;*/
+}
+
+.packageInfo span{
+    /*display:block;*/
+}
+
+.rules textarea{
+    font-size:12px;
+    padding:4px 2px;
+    border:solid 1px #aacfe4;
+    width:500px;
+    height: 200px;
+    margin:2px 0 20px 10px;
+
+}
+
+.rules label{
+    font-weight:bold;
+    text-align:left;
+    width:140px;
+    margin:2px 0 20px 10px;
+
+}
+
+.rules{
+    margin-top: 10px;
+}
+
+.addRules textarea{
+    float:left;
+    font-size:12px;
+    padding:4px 2px;
+    border:solid 1px #aacfe4;
+    width:500px;
+    height: 200px;
+    margin:2px 0 20px 10px;
+}
+.addRules input{
+    float:left;
+    font-size:12px;
+    padding:4px 2px;
+    border:solid 1px #aacfe4;
+    width:120px;
+    margin:2px 0 20px 10px;
+}
+
+.addRules button{
+    float:left;
+
+}
+.addRules label{
+    display:block;
+    font-weight:bold;
+    text-align:right;
+    width:140px;
+    float:left;
+}
+
+.addRuleForm {
+    border:0; margin:0; padding:0;
+}
+
+.addRules {
+    width: 350px;
+    margin: 10px;
+}
+
+.addRules select{
+    float:left;
+    font-size:12px;
+    padding:4px 2px;
+    border:solid 1px #aacfe4;
+    width:100px;
+    margin:2px 0 20px 10px;
+}
+
+.addRules span{
+    /*display:block;*/
+    /*font-weight:bold;*/
+    /*text-align:right;*/
+    width:240px;
+    float:left;
+    margin:2px 0 20px 10px;
+    /*padding:4px 2px;*/
+}
+
+
+.info, .success, .warning, .error, .validation {
+    border: 1px solid;
+    margin-bottom: 5px;
+    padding:5px 5px 5px 40px;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+}
+.info {
+    color: #00529B;
+    background-color: #BDE5F8;
+    /*background-image: url('info.png');*/
+}
+.success {
+    color: #4F8A10;
+    background-color: #DFF2BF;
+    /*background-image:url('success.png');*/
+}
+.warning {
+    color: #9F6000;
+    background-color: #FEEFB3;
+    /*background-image: url('warning.png');*/
+}
+.error {
+    color: #D8000C;
+    background-color: #FFBABA;
+    /*background-image: url('error.png');*/
+}
+
+.messageBox{
+    margin-bottom: 2px;
+    padding-bottom: 2px;
+    height: 20px;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+
+}
