@@ -93,7 +93,9 @@ public class RulesSingleton
 
     public RulesSingleton() {
         kbase = KnowledgeBaseFactory.newKnowledgeBase();
+    }
 
+    public void reloadCache() {
         if (remoteBatchService == null ||
                 remoteRuleService == null ||
                 remoteBatchVersionService == null) {
@@ -134,13 +136,7 @@ public class RulesSingleton
 
     public void runRules(BaseEntity entity, String pkgName)
     {
-        StatelessKnowledgeSession ksession = getSession();
-
-        @SuppressWarnings("rawtypes")
-        List<Command> commands = new ArrayList<Command>();
-        commands.add(CommandFactory.newInsert(entity));
-        commands.add(new FireAllRulesCommand(new PackageAgendaFilter(pkgName)));
-        ksession.execute(CommandFactory.newBatchExecution(commands));
+        runRules(entity, pkgName, new Date());
     }
 
     public void fillPackagesCache() {
@@ -166,8 +162,10 @@ public class RulesSingleton
 
                 for (Rule r : rules)
                 {
-                    packages += r.getRule();
+                    packages += r.getRule() + "\n";
                 }
+
+                logger.debug(packages);
 
                 setRules(packages);
 
