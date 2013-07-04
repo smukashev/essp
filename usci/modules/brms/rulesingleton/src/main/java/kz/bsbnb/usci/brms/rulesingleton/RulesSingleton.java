@@ -8,7 +8,7 @@ import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import org.drools.KnowledgeBase;
-import org.drools.StatelessSession;
+import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
@@ -17,23 +17,67 @@ import org.drools.command.CommandFactory;
 import org.drools.command.runtime.rule.FireAllRulesCommand;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatelessKnowledgeSession;
-import org.drools.spi.Activation;
 import org.drools.runtime.rule.AgendaFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Scope(value = "singleton")
 public class RulesSingleton
 {
-    @Autowired
+    Logger logger = LoggerFactory.getLogger(RulesSingleton.class);
+
     private KnowledgeBase kbase;
+
+    private class RuleCasheEntry implements Comparable {
+        private Date repDate;
+        private String rules;
+
+        private RuleCasheEntry(Date repDate, String rules)
+        {
+            this.repDate = repDate;
+            this.rules = rules;
+        }
+
+        @Override
+        public int compareTo(Object obj)
+        {
+            if (obj == null)
+                return 0;
+            if (!(getClass() == obj.getClass()))
+                return 0;
+
+            return repDate.compareTo(((RuleCasheEntry)obj).getRepDate());
+        }
+
+        private Date getRepDate()
+        {
+            return repDate;
+        }
+
+        private void setRepDate(Date repDate)
+        {
+            this.repDate = repDate;
+        }
+
+        private String getRules()
+        {
+            return rules;
+        }
+
+        private void setRules(String rules)
+        {
+            this.rules = rules;
+        }
+    }
+
+    private HashMap<String, ArrayList<RuleCasheEntry>> ruleCache = new HashMap<String, ArrayList<RuleCasheEntry>>();
 
     @Autowired(required = false)
     private IBatchService remoteBatchService;
@@ -47,14 +91,18 @@ public class RulesSingleton
         return kbase.newStatelessKnowledgeSession();
     }
 
-    public KnowledgeBase getKbase()
-    {
-        return kbase;
+    public RulesSingleton() {
+        kbase = KnowledgeBaseFactory.newKnowledgeBase();
     }
 
-    public void setKbase(KnowledgeBase kbase)
-    {
-        this.kbase = kbase;
+    public void reloadCache() {
+        if (remoteBatchService == null ||
+                remoteRuleService == null ||
+                remoteBatchVersionService == null) {
+            logger.warn("RuleServer services are null, using local cache only");
+        } else {
+            fillPackagesCache();
+        }
     }
 
     public void setRules(String rules)
@@ -88,57 +136,77 @@ public class RulesSingleton
 
     public void runRules(BaseEntity entity, String pkgName)
     {
-        StatelessKnowledgeSession ksession = getSession();
+        runRules(entity, pkgName, new Date());
+    }
 
-        @SuppressWarnings("rawtypes")
-        List<Command> commands = new ArrayList<Command>();
-        commands.add(CommandFactory.newInsert(entity));
-        commands.add(new FireAllRulesCommand(new PackageAgendaFilter(pkgName)));
-        ksession.execute(CommandFactory.newBatchExecution(commands));
+    public void fillPackagesCache() {
+        List<Batch> allBatches = remoteBatchService.getAllBatches();
+
+        for (Batch curBatch : allBatches) {
+            if (curBatch == null) {
+                throw new IllegalArgumentException("Null package recieved from service " + curBatch);
+            }
+
+            List<BatchVersion> versions = remoteBatchVersionService.getBatchVersions(curBatch);
+
+            ArrayList<RuleCasheEntry> ruleCasheEntries = new ArrayList<RuleCasheEntry>();
+
+            for (BatchVersion curVersion : versions) {
+                List<Rule> rules = remoteRuleService.load(curVersion);
+
+                String packages = "";
+
+                packages += "package " + curBatch.getName() + "_" + curVersion.getId() + "\n";
+                packages += "dialect \"mvel\"\n";
+                packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
+
+                for (Rule r : rules)
+                {
+                    packages += r.getRule() + "\n";
+                }
+
+                logger.debug(packages);
+
+                setRules(packages);
+
+                ruleCasheEntries.add(new RuleCasheEntry(curVersion.getRepDate(),
+                        curBatch.getName() + "_" + curVersion.getId()));
+            }
+
+            Collections.sort(ruleCasheEntries);
+            ruleCache.put(curBatch.getName(), ruleCasheEntries);
+        }
+    }
+
+    public String getRulePackageName(String pkgName, Date repDate)
+    {
+        List<RuleCasheEntry> versions = ruleCache.get(pkgName);
+
+        if (versions == null)
+            throw new IllegalArgumentException("No such package " + pkgName);
+        if (versions.size() < 1)
+            throw new IllegalArgumentException("Package " + pkgName + " has no versions information!");
+
+        RuleCasheEntry result = versions.get(0);
+        for (RuleCasheEntry entry : versions)
+        {
+            if (entry.getRepDate().compareTo(result.getRepDate()) > 0)
+                return result.getRules();
+            result = entry;
+        }
+
+        return result.getRules();
     }
 
     public void runRules(BaseEntity entity, String pkgName, Date repDate)
     {
         StatelessKnowledgeSession ksession = getSession();
 
-        List<Batch> b = remoteBatchService.getAllBatches();
-
-        Batch batch = null;
-
-        for (Batch bb : b) {
-            if (bb.getName().equals(pkgName)) {
-                batch = bb;
-                break;
-            }
-        }
-
-        if (batch == null) {
-            throw new IllegalArgumentException("No such package " + pkgName);
-        }
-
-        BatchVersion version = remoteBatchVersionService.load(batch, repDate);
-        List<Rule> rules = remoteRuleService.load(version);
-
-        String packages = "";
-
-        packages += "package " + pkgName + "_" + version.getId() + "\n";
-        packages += "dialect \"mvel\"\n";
-        packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
-
-        for (Rule r : rules)
-        {
-            packages += r.getRule();
-        }
-
-        System.out.println("###");
-        System.out.println(packages);
-
-        setRules(packages);
-
         @SuppressWarnings("rawtypes")
         List<Command> commands = new ArrayList<Command>();
         commands.add(CommandFactory.newInsert(entity));
-        commands.add(new FireAllRulesCommand(new PackageAgendaFilter(pkgName + "_" + version.getId())));
+        commands.add(new FireAllRulesCommand(new PackageAgendaFilter(
+                getRulePackageName(pkgName, repDate))));
         ksession.execute(CommandFactory.newBatchExecution(commands));
     }
 

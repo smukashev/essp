@@ -23,6 +23,13 @@
         <jackson.mapper.version>1.5.6</jackson.mapper.version>
     </properties>
 
+    <parent>
+        <groupId>kz.bsbnb.usci</groupId>
+        <artifactId>parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../../../modules/parent</relativePath>
+    </parent>
+
     <dependencies>
         <dependency>
             <groupId>log4j</groupId>

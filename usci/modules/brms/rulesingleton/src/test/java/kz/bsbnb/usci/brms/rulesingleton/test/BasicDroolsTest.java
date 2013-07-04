@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.rulesingleton.test;
+package kz.bsbnb.usci.brms.rulesingleton.test;
 
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.eav.model.Batch;
@@ -10,7 +10,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import org.drools.runtime.StatelessKnowledgeSession;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,10 +144,11 @@ public class BasicDroolsTest {
         return contractEntity;
     }
 
-//    @Test
+    @Test
     public void simpleRulesTest() throws Exception
     {
         assertTrue(rules != null);
+        rules.reloadCache();
 
         System.out.println(generateMetaClass().toString());
         Batch batch = new Batch(new Date(System.currentTimeMillis()));
@@ -157,86 +157,45 @@ public class BasicDroolsTest {
         BaseEntity entity = generateBaseEntity(batch);
         System.out.println(entity.toString());
 
-        StatelessKnowledgeSession ksession = rules.getSession();
-        //ksession.execute(entity);
         System.out.println("Run package drl");
         entity.clearValidationErrors();
-        rules.runRules(entity, "testdrl");
-        assertTrue(entity.getValidationErrors().size() == 1);
+        rules.runRules(entity, "drl");
+
         for (String str : entity.getValidationErrors())
         {
             System.out.println(str);
         }
+        assertTrue(entity.getValidationErrors().size() == 1);
         System.out.println("Run package no_such_package");
         entity.clearValidationErrors();
-        rules.runRules(entity, "no_such_package");
-        assertTrue(entity.getValidationErrors().size() == 0);
-        for (String str : entity.getValidationErrors())
-        {
-            System.out.println(str);
-        }
+        try {
+            rules.runRules(entity, "no_such_package");
 
-        String newRules = "package drl;\n" +
-                "dialect  \"mvel\"\n" +
-                "\n" +
-                "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n" +
-                "\n" +
-                "rule \"test1\"\n" +
-                "    when\n" +
-                "        $entity : BaseEntity ()\n" +
-                "    then\n" +
-                "        System.out.println(\"Test rule, always executes.\");\n" +
-                "end\n" +
-                "\n" +
-                "rule \"test2\"\n" +
-                "    when\n" +
-                "        $entity : BaseEntity ( getEl(\"subject.name.lastname\") == \"TULBASSIYEV\" )\n" +
-                "    then\n" +
-                "        $entity.addValidationError(\"Test rule, that is true for TULBASSIYEV123\");\n" +
-                "end\n" +
-                "\n" +
-                "rule \"test3\"\n" +
-                "    when\n" +
-                "        $entity : BaseEntity ( getEl(\"subject.name.lastname\") != \"TULBASSIYEV\" )\n" +
-                "    then\n" +
-                "        $entity.addValidationError(\"Test rule, that is false for TULBASSIYEV123\");\n" +
-                "end";
-
-        rules.setRules(newRules);
-
-        StatelessKnowledgeSession ksession1 = rules.getSession();
-        System.out.println("-------------------------- New session");
-        entity.clearValidationErrors();
-        ksession1.execute(entity);
-        for (String str : entity.getValidationErrors())
-        {
-            System.out.println(str);
-        }
-        System.out.println("-------------------------- Old session");
-        entity.clearValidationErrors();
-        ksession.execute(entity);
-
-        for (String str : entity.getValidationErrors())
-        {
-            System.out.println(str);
+            for (String str : entity.getValidationErrors())
+            {
+                System.out.println(str);
+            }
+            assertTrue(entity.getValidationErrors().size() == 0);
+        } catch (Exception e) {
+            System.out.println("No such message exception and it's ok.");
         }
     }
 
     @Test
     public void shortenBaseEntityAccessTest() throws Exception
     {
-//        generateMetaClass();
-//        Batch batch = new Batch(new Date(System.currentTimeMillis()));
-//        batch.setId(1);
-//        BaseEntity entity = generateBaseEntity(batch);
-//
-//        assertTrue(entity.getEl("subject.name.lastname").equals("TULBASSIYEV"));
-//        assertTrue(entity.getEl("subject.address.house.value[333]").equals(new Integer(333)));
-//        assertTrue(entity.getEl("subject.address.house.value[444]") == null);
-//        assertTrue(entity.getEl("subject.documents.document[type=RNN].no").equals("1234567890"));
-//        assertTrue(entity.getEl("subject.documents.document[type=RNN,no=1234567890].no").equals("1234567890"));
-//        assertTrue(entity.getEl("subject.documents.document[type=RNN,no=0987654322].no") == null);
-//        assertTrue(entity.getEl("subject.documents.document[type=RNN,no=0987654321].no") == null);
+        generateMetaClass();
+        Batch batch = new Batch(new Date(System.currentTimeMillis()));
+        batch.setId(1);
+        BaseEntity entity = generateBaseEntity(batch);
+
+        assertTrue(entity.getEl("subject.name.lastname").equals("TULBASSIYEV"));
+        assertTrue(entity.getEl("subject.address.house.value[333]").equals(new Integer(333)));
+        assertTrue(entity.getEl("subject.address.house.value[444]") == null);
+        assertTrue(entity.getEl("subject.documents.document[type=RNN].no").equals("1234567890"));
+        assertTrue(entity.getEl("subject.documents.document[type=RNN,no=1234567890].no").equals("1234567890"));
+        assertTrue(entity.getEl("subject.documents.document[type=RNN,no=0987654322].no") == null);
+        assertTrue(entity.getEl("subject.documents.document[type=RNN,no=0987654321].no") == null);
     }
 
     public RulesSingleton getRules()
