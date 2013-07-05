@@ -31,4 +31,14 @@ public class EntityServiceImpl implements IEntityService {
     public BaseEntity load(long id) {
         return baseEntityDao.load(id);
     }
+
+    @Override
+    public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad) {
+        baseEntityDao.update(baseEntitySave,baseEntityLoad);
+    }
+
+    @Override
+    public BaseEntity search(BaseEntity baseEntity) {
+        return baseEntityDao.search(baseEntity);
+    }
 }

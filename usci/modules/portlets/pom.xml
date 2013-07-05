@@ -21,6 +21,7 @@
   <modules>
       <module>drools_portlet</module>
       <module>batch_portlet</module>
+      <module>baseentity_portlet</module>
   </modules>
 
     <distributionManagement>

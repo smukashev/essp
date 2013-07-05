@@ -47,7 +47,7 @@
         <property name="serviceInterface" value="IRuleService"/>
     </bean>
 
-    <!--<context:component-scan base-package="kz.bsbnb.usci.porltet.entity" />-->
+    <!--<context:component-scan base-package="kz.bsbnb.usci.porltetss.entity" />-->
 
     <!--&lt;!&ndash; remote services &ndash;&gt;-->
     <!--<bean id="remoteBatchService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">-->

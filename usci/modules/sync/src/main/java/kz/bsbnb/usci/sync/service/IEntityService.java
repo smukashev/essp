@@ -11,4 +11,6 @@ import java.util.List;
 public interface IEntityService {
     public void process(List<BaseEntity> entities);
     public BaseEntity load(long id);
+    public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
+    public BaseEntity search(BaseEntity baseEntity);
 }
