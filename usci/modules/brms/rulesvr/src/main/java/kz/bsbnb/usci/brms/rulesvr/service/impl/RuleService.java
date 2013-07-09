@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.brms.rulesvr.service.impl;
 
+import kz.bsbnb.usci.brms.rulesvr.dao.IBatchDao;
+import kz.bsbnb.usci.brms.rulesvr.service.IListenerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
@@ -19,9 +21,15 @@ public class RuleService implements IRuleService {
     @Autowired
     private IRuleDao ruleDao;
 
+    @Autowired
+    private IListenerService listenerService;
+
+    @Autowired
+    private IBatchDao batchDao;
+
     @Override
     public long save(Rule rule, BatchVersion batchVersion) {
-
+        listenerService.update(batchVersion.getId(),batchDao.loadBatch(batchVersion.getPackage_id()).getName());
         return ruleDao.save(rule,batchVersion);
     }
 
