@@ -4,7 +4,7 @@
 	<portlet>
 		<portlet-name>drules</portlet-name>
 		<display-name>drules-portlet</display-name>
-		<portlet-class>drules.MainPortlet</portlet-class>
+		<portlet-class>kz.bsbnb.usci.portlets.drules_portlet.MainPortlet</portlet-class>
 		<init-param>
 			<name>view-template</name>
 			<value>/view.jsp</value>

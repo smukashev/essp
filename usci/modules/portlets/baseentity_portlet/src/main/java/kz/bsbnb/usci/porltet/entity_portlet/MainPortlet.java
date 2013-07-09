@@ -1,5 +1,8 @@
 package kz.bsbnb.usci.porltet.entity_portlet;
+
+
 import com.google.gson.Gson;
+
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -11,8 +14,6 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
@@ -22,6 +23,8 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import org.json.JSONObject;
+import org.json.JSONException;
 
 /**
  * @author abukabayev
@@ -42,13 +45,6 @@ public class MainPortlet extends MVCPortlet {
 
     @Override
     public void init() throws PortletException {
-
-//        ApplicationContext ctx = new ClassPathXmlApplicationContext("portletContext.xml");
-//        ctx.getBean("remoteEntityService");
-
-        metaFactoryService = (IMetaFactoryService) metaFactoryServiceFactoryBean.getObject();
-        batchService = (IBatchService) batchServiceFactoryBean.getObject();
-        entityService = (IEntityService) entityServiceFactoryBean.getObject();
 
         entityServiceFactoryBean = new RmiProxyFactoryBean();
         entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
@@ -136,7 +132,7 @@ public class MainPortlet extends MVCPortlet {
 
                 BaseEntity baseEntityNew = new BaseEntity(meta,new Date());
 
-                Long batchId = batchService.save(new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime())));
+                Long batchId = batchService.save(new Batch(new Timestamp(new java.util.Date().getTime()), new java.sql.Date(new java.util.Date().getTime())));
                 batch = batchService.load(batchId);
 
                 for (int i=1;i<=count;i++){
@@ -182,7 +178,7 @@ public class MainPortlet extends MVCPortlet {
                 jjson = new JSONObject(keyAttributes);
 
 
-             Long batchId = batchService.save(new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime())));
+             Long batchId = batchService.save(new Batch(new Timestamp(new java.util.Date().getTime()), new java.sql.Date(new java.util.Date().getTime())));
              batch = batchService.load(batchId);
             BaseEntity baseEntity1 = new BaseEntity(metaClass,new Date());
 
@@ -273,7 +269,7 @@ public class MainPortlet extends MVCPortlet {
             result = baseEntity2;
             result = new BaseEntity(baseEntity2.getMeta(),baseEntity2.getReportDate());
 
-            Long batchId = batchService.save(new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime())));
+            Long batchId = batchService.save(new Batch(new Timestamp(new java.util.Date().getTime()), new java.sql.Date(new java.util.Date().getTime())));
             Batch batchNew = batchService.load(batchId);
 
             while (iterator.hasNext()){

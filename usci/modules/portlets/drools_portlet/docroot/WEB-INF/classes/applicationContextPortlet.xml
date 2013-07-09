@@ -18,8 +18,8 @@
 
     <!--http://drools.org/schema/drools-spring http://anonsvn.jboss.org/repos/labs/labs/jbossrules/trunk/drools-container/drools-spring/src/main/resources/org/drools/container/spring/drools-spring.xsd">-->
     <!--http://drools.org/schema/drools-spring drools-spring.xsd"-->
-    <context:component-scan base-package="kz.bsbnb.usci.eav"/>
-    <context:component-scan base-package="kz.bsbnb.usci.rulesingleton"/>
+
+    <context:component-scan base-package="kz.bsbnb.usci.brms.rulesingleton"/>
 
 
     <context:annotation-config/>
@@ -36,18 +36,18 @@
 
     <bean id="remoteBatchService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1097/batchService"/>
-        <property name="serviceInterface" value="IBatchService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulesvr.service.IBatchService"/>
     </bean>
     <bean id="remoteBatchVersionService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1097/batchVersionService"/>
-        <property name="serviceInterface" value="IBatchVersionService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService"/>
     </bean>
     <bean id="remoteRuleService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1097/ruleService"/>
-        <property name="serviceInterface" value="IRuleService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulesvr.service.IRuleService"/>
     </bean>
 
-    <!--<context:component-scan base-package="kz.bsbnb.usci.porltetss.entity" />-->
+    <!--<context:component-scan base-package="kz.bsbnb.usci.porltet.entity" />-->
 
     <!--&lt;!&ndash; remote services &ndash;&gt;-->
     <!--<bean id="remoteBatchService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">-->

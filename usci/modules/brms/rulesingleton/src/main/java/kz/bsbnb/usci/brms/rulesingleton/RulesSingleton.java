@@ -100,7 +100,9 @@ public class RulesSingleton
                 remoteRuleService == null ||
                 remoteBatchVersionService == null) {
             logger.warn("RuleServer services are null, using local cache only");
+            System.out.println("%%%%%%%%%%%%%%%%% no services wiered");
         } else {
+            System.out.println("%%%%%%%%%%%%%%%%% filling cache");
             fillPackagesCache();
         }
     }
@@ -166,7 +168,7 @@ public class RulesSingleton
                 }
 
                 logger.debug(packages);
-
+                System.out.println("%%%%%%%%%%%%%%%%% packages:" + packages);
                 setRules(packages);
 
                 ruleCasheEntries.add(new RuleCasheEntry(curVersion.getRepDate(),

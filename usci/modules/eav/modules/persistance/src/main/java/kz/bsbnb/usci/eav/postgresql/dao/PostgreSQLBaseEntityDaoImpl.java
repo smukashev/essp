@@ -66,7 +66,9 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     public BaseEntity load(long id)
     {
         java.util.Date maxReportDate = getMaxReportDate(id);
-        return load(id, maxReportDate);
+        if (maxReportDate != null)
+            return load(id, maxReportDate);
+        return load(id, new java.util.Date());
     }
 
     public BaseEntity load(long id, java.util.Date reportDate)

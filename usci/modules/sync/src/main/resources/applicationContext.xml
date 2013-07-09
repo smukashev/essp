@@ -39,7 +39,7 @@
     </bean>
 
     <context:component-scan base-package="kz.bsbnb.usci.sync.service.impl" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav" />
+
 
     <!-- remote services -->
     <bean id="remoteEntityService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">

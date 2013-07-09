@@ -1,6 +1,8 @@
-<%@ page import="Batch" %>
+
+<%@ page import="kz.bsbnb.usci.brms.rulesvr.model.impl.Batch" %>
+
+<%@ page import="kz.bsbnb.usci.brms.rulesvr.model.impl.Rule" %>
 <%@ page import="java.util.List" %>
-<%@ page import="Rule" %>
 <%
 /**
  * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
@@ -61,9 +63,12 @@
             success: function(data){
                 if (data!="error")
                 {
+                    location.reload();
                     $("#messageBox").removeClass().addClass("success").html("Successfully added").fadeIn(2000).fadeOut(4000);
+
                 } else
                 {
+
                     $("#messageBox").removeClass().addClass("error").html("Ooops , Package with such name alreade exists").fadeIn(2000).fadeOut(4000);
                 }
 
@@ -71,6 +76,7 @@
         });
         document.getElementById("packageName").value="";
         document.getElementById("datepicker2").value="";
+
     }
 
     function updateRule(id){
@@ -122,8 +128,6 @@
 
 
     function displayRules2(){
-
-
         document.getElementById("hideable").style.display="none";
         document.getElementById("rules_id").style.display="";
 
@@ -224,7 +228,7 @@
         packageName = $("#selectBatch option:selected").text();
         packageVersionDate = document.getElementById("datepicker").value;
 
-        alert("Running");
+
         jQuery('.rules').html('');
         jQuery('.packageInfo').html('');
         var divPackageInfo = "<div><label>Package title: </label><span>"+packageName+"</span><br><label>Description: </label><span>"+packageDesc+"</span><br><label>Version: </label><span>"+packageVersionDate+"</span><br><p></p></div>" ;
@@ -235,7 +239,7 @@
             url: "<%=getDataURL%>" ,
             data: {"type":"runRules","name":packageName,"versionDate":document.getElementById("datepicker").value,"entityId":document.getElementById("entity_id").value},
             success: function(data){
-                $(".rules").append(data);
+                $(".rules").append("<label>"+data+"</label>");
 
             }
         });
@@ -271,9 +275,11 @@
                                             <span class="small">Select package name</span>
                                         </label>
                                        <select id="selectBatch">
-                                            <%for (Batch b:batchList) {%>
+                                            <%
+                                                if (batchList.size()>0){
+                                                for (Batch b:batchList) {%>
                                                 <option value="<%=b.getId()%>"><%=b.getName()%></option>
-                                            <%}%>
+                                            <%}}%>
                                         </select>
                                         <label>Version
                                             <span class="small">Select version date</span>
@@ -340,9 +346,11 @@
                                 <form id="addRuleForm" class="addRuleForm" >
                                     <label>Select Rule:</label>
                                     <select id="selectRule" >
-                                    <%for (Rule r:ruleList) {%>
+                                    <%
+                                        if (ruleList.size()>0){
+                                        for (Rule r:ruleList) {%>
                                     <option value="<%=r.getId()%>"><%=r.getTitle()%></option>
-                                    <%}%>
+                                    <%}}%>
                                      </select>
                                     <button type="button" onclick="javascript:saveRule()">Add</button>
                                     <button type="button" onclick="javascript:addNewRule()">Add new</button>
