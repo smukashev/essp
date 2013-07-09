@@ -29,7 +29,7 @@ public class RuleService implements IRuleService {
 
     @Override
     public long save(Rule rule, BatchVersion batchVersion) {
-        listenerService.update(batchVersion.getId(),batchDao.loadBatch(batchVersion.getPackage_id()).getName());
+        listenerService.update(batchVersion.getId(),batchVersion.getRepDate(),batchDao.loadBatch(batchVersion.getPackage_id()).getName());
         return ruleDao.save(rule,batchVersion);
     }
 
