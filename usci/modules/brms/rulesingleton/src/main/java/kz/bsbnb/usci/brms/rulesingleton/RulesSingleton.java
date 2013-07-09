@@ -284,4 +284,5 @@ public class RulesSingleton implements IListenerService
             Collections.sort(ruleCasheEntries);
         }
     }
+
 }
