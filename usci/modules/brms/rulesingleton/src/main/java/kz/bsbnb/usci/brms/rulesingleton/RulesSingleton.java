@@ -5,7 +5,9 @@ import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
+import kz.bsbnb.usci.brms.rulesvr.service.IListenerService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
+import kz.bsbnb.usci.brms.rulesvr.service.impl.ListenerService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -29,7 +31,7 @@ import java.util.*;
 
 @Component
 @Scope(value = "singleton")
-public class RulesSingleton
+public class RulesSingleton implements IListenerService
 {
     Logger logger = LoggerFactory.getLogger(RulesSingleton.class);
 
@@ -78,6 +80,8 @@ public class RulesSingleton
     }
 
     private HashMap<String, ArrayList<RuleCasheEntry>> ruleCache = new HashMap<String, ArrayList<RuleCasheEntry>>();
+
+    private ArrayList<RulePackageError> rulePackageErrors = new ArrayList<RulePackageError>();
 
     @Autowired(required = false)
     private IBatchService remoteBatchService;
@@ -141,8 +145,10 @@ public class RulesSingleton
         runRules(entity, pkgName, new Date());
     }
 
-    public void fillPackagesCache() {
+    synchronized public void fillPackagesCache() {
         List<Batch> allBatches = remoteBatchService.getAllBatches();
+
+        rulePackageErrors.clear();
 
         for (Batch curBatch : allBatches) {
             if (curBatch == null) {
@@ -169,7 +175,12 @@ public class RulesSingleton
 
                 logger.debug(packages);
                 System.out.println("%%%%%%%%%%%%%%%%% packages:" + packages);
-                setRules(packages);
+                try {
+                    setRules(packages);
+                } catch (Exception e) {
+                    rulePackageErrors.add(new RulePackageError(curBatch.getName() + "_" + curVersion.getId(),
+                            e.getMessage()));
+                }
 
                 ruleCasheEntries.add(new RuleCasheEntry(curVersion.getRepDate(),
                         curBatch.getName() + "_" + curVersion.getId()));
@@ -217,5 +228,60 @@ public class RulesSingleton
         StatelessKnowledgeSession ksession = getSession();
 
         ksession.execute(entity);
+    }
+
+    @Override
+    synchronized public void update(Long versionId, Date date, String packageName)
+    {
+        System.out.println("%%%%%%%%%%%%%%%%% Update called!!!");
+        rulePackageErrors.clear();
+
+        BatchVersion curVersion = new BatchVersion();
+        curVersion.setId(versionId);
+        curVersion.setRepDate(date);
+
+        List<Rule> rules = remoteRuleService.load(curVersion);
+
+        String packages = "";
+
+        packages += "package " + packageName + "_" + curVersion.getId() + "\n";
+        packages += "dialect \"mvel\"\n";
+        packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
+
+        for (Rule r : rules)
+        {
+            packages += r.getRule() + "\n";
+        }
+
+        logger.debug(packages);
+        System.out.println("%%%%%%%%%%%%%%%%% packages:" + packages);
+        try {
+            setRules(packages);
+        } catch (Exception e) {
+            rulePackageErrors.add(new RulePackageError(packageName + "_" + curVersion.getId(),
+                    e.getMessage()));
+        }
+
+        ArrayList<RuleCasheEntry> ruleCasheEntries = ruleCache.get(packageName);
+
+        if (ruleCasheEntries != null)
+        {
+            boolean found = false;
+            for (RuleCasheEntry entry : ruleCasheEntries)
+            {
+                if (entry.getRules().equals(packageName + "_" + curVersion.getId())) {
+                    found = true;
+                    entry.setRepDate(curVersion.getRepDate());
+                    break;
+                }
+            }
+
+            if(!found) {
+                ruleCasheEntries.add(new RuleCasheEntry(curVersion.getRepDate(),
+                        packageName + "_" + curVersion.getId()));
+            }
+
+            Collections.sort(ruleCasheEntries);
+        }
     }
 }
