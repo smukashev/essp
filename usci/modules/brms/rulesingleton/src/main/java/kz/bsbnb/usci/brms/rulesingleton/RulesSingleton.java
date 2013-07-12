@@ -7,7 +7,6 @@ import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulesvr.service.IListenerService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
-import kz.bsbnb.usci.brms.rulesvr.service.impl.ListenerService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
