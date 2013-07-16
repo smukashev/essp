@@ -5,9 +5,7 @@ import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
-import kz.bsbnb.usci.brms.rulesvr.service.IListenerService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
-import kz.bsbnb.usci.brms.rulesvr.service.impl.ListenerService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -27,11 +25,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
+import java.io.Serializable;
 import java.util.*;
 
 @Component
 @Scope(value = "singleton")
-public class RulesSingleton implements IListenerService
+public class RulesSingleton
 {
     Logger logger = LoggerFactory.getLogger(RulesSingleton.class);
 
@@ -55,7 +54,7 @@ public class RulesSingleton implements IListenerService
             if (!(getClass() == obj.getClass()))
                 return 0;
 
-            return repDate.compareTo(((RuleCasheEntry)obj).getRepDate());
+            return -(repDate.compareTo(((RuleCasheEntry)obj).getRepDate()));
         }
 
         private Date getRepDate()
@@ -149,6 +148,7 @@ public class RulesSingleton implements IListenerService
         List<Batch> allBatches = remoteBatchService.getAllBatches();
 
         rulePackageErrors.clear();
+        ruleCache.clear();
 
         for (Batch curBatch : allBatches) {
             if (curBatch == null) {
@@ -203,8 +203,8 @@ public class RulesSingleton implements IListenerService
         RuleCasheEntry result = versions.get(0);
         for (RuleCasheEntry entry : versions)
         {
-            if (entry.getRepDate().compareTo(result.getRepDate()) > 0)
-                return result.getRules();
+            if (entry.getRepDate().compareTo(repDate) <= 0)
+                return entry.getRules();
             result = entry;
         }
 
@@ -230,7 +230,6 @@ public class RulesSingleton implements IListenerService
         ksession.execute(entity);
     }
 
-    @Override
     synchronized public void update(Long versionId, Date date, String packageName)
     {
         System.out.println("%%%%%%%%%%%%%%%%% Update called!!!");

@@ -6,9 +6,7 @@ import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
-import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
-import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
-import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
+import kz.bsbnb.usci.brms.rulesvr.service.*;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +29,7 @@ public class MainPortlet extends MVCPortlet {
     private RmiProxyFactoryBean batchServiceFactoryBean;
     private RmiProxyFactoryBean batchVersionServiceFactoryBean;
     private RmiProxyFactoryBean ruleServiceFactoryBean;
+    private RmiProxyFactoryBean listenerServiceFactoryBean;
 
     private RmiProxyFactoryBean entityServiceFactoryBean;
 
@@ -210,22 +209,34 @@ public class MainPortlet extends MVCPortlet {
              }
          } else
           if (type.equals("runRules")){
+          try{
               String packageName = resourceRequest.getParameter("name");
               String versionDate = resourceRequest.getParameter("versionDate");
               String entityId = resourceRequest.getParameter("entityId");
 
+              System.out.println("########### ID:");
+              System.out.println(entityId);
+              System.out.println(versionDate);
+              Date date = new SimpleDateFormat("MM/dd/yyyy").parse(versionDate);
+
               BaseEntity baseEntity = entityService.load(Long.parseLong(entityId, 10));
 
-              rulesSingleton.runRules(baseEntity,packageName,new Date());
+              //TODO: refactor
+              rulesSingleton.reloadCache();
+
+              rulesSingleton.runRules(baseEntity,packageName,date);
               System.out.print("SIZEL:: ");
               System.out.println(baseEntity.getValidationErrors().size());
               String ss="";
               for (String s: baseEntity.getValidationErrors()){
                 System.out.println(s);
-                  ss=ss + s + "\n";
+                  ss+= s + "<br>";
               }
 
               writer.write(ss);
+          }catch(Exception e){
+              e.printStackTrace();
+          }
           }
     }
 }
