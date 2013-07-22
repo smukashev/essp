@@ -8,6 +8,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
+import kz.bsbnb.usci.eav.model.persistable.impl.BaseObject;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DateUtils;
@@ -15,6 +16,7 @@ import kz.bsbnb.usci.eav.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -25,9 +27,23 @@ import java.util.*;
  * @see MetaClass
  * @see DataTypes
  */
-public class BaseEntity extends Persistable implements IBaseContainer
+public class BaseEntity extends BaseObject implements IBaseContainer
 {
     Logger logger = LoggerFactory.getLogger(BaseEntity.class);
+
+    private static final Method ATTRIBUTE_CHANGE_METHOD;
+    static
+    {
+        try
+        {
+            ATTRIBUTE_CHANGE_METHOD = AttributeChangeListener.class
+                    .getDeclaredMethod("attributeChange", new Class[] {  AttributeChangeEvent.class });
+        }
+        catch (NoSuchMethodException ex)
+        {
+            throw new java.lang.RuntimeException("Internal error, attribute change method not found.");
+        }
+    }
 
     /**
      * Reporting date on which instance of BaseEntity was loaded.
@@ -38,6 +54,10 @@ public class BaseEntity extends Persistable implements IBaseContainer
      * The list of available reporting dates for this instance BaseEntity.
      */
     private Set<Date> availableReportDates = new HashSet<Date>();
+
+    private Set<String> insertedObjects = new HashSet<String>();
+    private Set<String> updatedObjects = new HashSet<String>();
+    private Set<String> deletedObjects = new HashSet<String>();
 
     /**
      * Holds data about entity structure
@@ -141,8 +161,9 @@ public class BaseEntity extends Persistable implements IBaseContainer
      * @see DataTypes
      */
     @Override
-    public void put(String name, IBaseValue value)
+    public void put(String name, final IBaseValue value)
     {
+        boolean needListening = false;
         IMetaType type = meta.getMemberType(name);
 
         if(type == null)
@@ -165,6 +186,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 else
                 {
                     expValueClass = BaseEntity.class;
+                    needListening = true;
                 }
             else
             {
@@ -184,7 +206,6 @@ public class BaseEntity extends Persistable implements IBaseContainer
                                 getDataTypeClass();
                     }
 
-
                 }
                 else
                 {
@@ -198,6 +219,36 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 throw new IllegalArgumentException("Type mismatch in class: " +
                         meta.getClassName() + ". Needed " + expValueClass + ", got: " +
                         valueClass);
+        }
+
+        if (values.containsKey(name))
+        {
+            if (!value.equals(values.get(name)))
+            {
+                fireAttributeChange(name);
+            }
+        }
+        else
+        {
+            if (needListening)
+            {
+                BaseEntity baseEntity = (BaseEntity)value.getValue();
+                baseEntity.addListener(new AttributeChangeListener() {
+                    @Override
+                    public void attributeChange(AttributeChangeEvent event) {
+                        List<String> keys = new ArrayList<String>();
+                        for (Map.Entry<String, IBaseValue> entry : values.entrySet()) {
+                            if (entry.getValue().equals(value)) {
+                                keys.add(entry.getKey());
+                            }
+                        }
+                        if (keys.size() == 1) {
+                            fireAttributeChange(keys.get(0) + "." + event.getAttribute());
+                        }
+                    }
+                });
+            }
+            fireAttributeChange(name);
         }
 
         values.put(name, value);
@@ -526,4 +577,29 @@ public class BaseEntity extends Persistable implements IBaseContainer
     {
         return validationErrors;
     }
+
+    @Override
+    public void addListener(AttributeChangeListener listener)
+    {
+        addListener(AttributeChangeEvent.class, listener, ATTRIBUTE_CHANGE_METHOD);
+    }
+
+    @Override
+    public void removeListener(AttributeChangeListener listener)
+    {
+        removeListener(AttributeChangeEvent.class, listener, ATTRIBUTE_CHANGE_METHOD);
+    }
+
+    protected void fireAttributeChange(String attribute)
+    {
+        fireEvent(new IBaseContainer.AttributeChangeEvent(this, attribute));
+    }
+
+    public void clearHistory()
+    {
+        insertedObjects.clear();
+        updatedObjects.clear();
+        deletedObjects.clear();
+    }
+
 }
