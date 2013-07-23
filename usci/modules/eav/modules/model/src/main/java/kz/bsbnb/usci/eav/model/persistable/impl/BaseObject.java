@@ -6,6 +6,8 @@ import kz.bsbnb.usci.eav.model.persistable.IBaseObject;
 import kz.bsbnb.usci.eav.util.ReflectUtils;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *
@@ -73,6 +75,15 @@ public class BaseObject extends Persistable
         if (eventRouter != null) {
             eventRouter.fireEvent(event);
         }
+    }
+
+    public Collection<?> getListeners(Class<?> eventType)
+    {
+        if (eventRouter != null)
+        {
+            return eventRouter.getListeners(eventType);
+        }
+        return new ArrayList<Object>();
     }
 
 }

@@ -9,7 +9,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.persistable.impl.BaseObject;
-import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DateUtils;
 import kz.bsbnb.usci.eav.util.SetUtils;
@@ -41,7 +40,7 @@ public class BaseEntity extends BaseObject implements IBaseContainer
         }
         catch (NoSuchMethodException ex)
         {
-            throw new java.lang.RuntimeException("Internal error, attribute change method not found.");
+            throw new java.lang.RuntimeException("Internal error, key change method not found.");
         }
     }
 
@@ -55,9 +54,7 @@ public class BaseEntity extends BaseObject implements IBaseContainer
      */
     private Set<Date> availableReportDates = new HashSet<Date>();
 
-    private Set<String> insertedObjects = new HashSet<String>();
-    private Set<String> updatedObjects = new HashSet<String>();
-    private Set<String> deletedObjects = new HashSet<String>();
+    private Set<String> modifiedObjects = new HashSet<String>();
 
     /**
      * Holds data about entity structure
@@ -127,12 +124,12 @@ public class BaseEntity extends BaseObject implements IBaseContainer
     }
 
     /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>
+     * Retrieves key titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>
      *
-     * @param name attribute name. Must exist in entity meta
-     * @return attribute value, null if value is not set
-     * @throws IllegalArgumentException if attribute name does not exist in entity meta,
-     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
+     * @param name key name. Must exist in entity meta
+     * @return key value, null if value is not set
+     * @throws IllegalArgumentException if key name does not exist in entity meta,
+     * 	                                or key has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
     public IBaseValue getBaseValue(String name)
@@ -152,16 +149,16 @@ public class BaseEntity extends BaseObject implements IBaseContainer
     }
 
     /**
-     * Retrieves attribute titled <code>name</code>.
+     * Retrieves key titled <code>name</code>.
      *
-     * @param name name attribute name. Must exist in entity meta
-     * @param value new value of the attribute
-     * @throws IllegalArgumentException if attribute name does not exist in entity meta,
-     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
+     * @param name name key name. Must exist in entity meta
+     * @param value new value of the key
+     * @throws IllegalArgumentException if key name does not exist in entity meta,
+     * 	                                or key has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
     @Override
-    public void put(String name, final IBaseValue value)
+    public void put(final String name, IBaseValue value)
     {
         boolean needListening = false;
         IMetaType type = meta.getMemberType(name);
@@ -223,8 +220,9 @@ public class BaseEntity extends BaseObject implements IBaseContainer
 
         if (values.containsKey(name))
         {
-            if (!value.equals(values.get(name)))
+            if (value.getValue() == null || !value.equals(values.get(name)))
             {
+                modifiedObjects.add(name);
                 fireAttributeChange(name);
             }
         }
@@ -233,21 +231,24 @@ public class BaseEntity extends BaseObject implements IBaseContainer
             if (needListening)
             {
                 BaseEntity baseEntity = (BaseEntity)value.getValue();
-                baseEntity.addListener(new AttributeChangeListener() {
+                baseEntity.addListener(new AttributeChangeListener(name) {
                     @Override
                     public void attributeChange(AttributeChangeEvent event) {
-                        List<String> keys = new ArrayList<String>();
-                        for (Map.Entry<String, IBaseValue> entry : values.entrySet()) {
-                            if (entry.getValue().equals(value)) {
-                                keys.add(entry.getKey());
-                            }
-                        }
-                        if (keys.size() == 1) {
-                            fireAttributeChange(keys.get(0) + "." + event.getAttribute());
-                        }
+                        String childAttribute = event.getAttribute();
+                        String parentAttribute = getParentAttribute();
+                        String attribute = parentAttribute + "." + childAttribute;
+
+                        modifiedObjects.add(attribute);
+                        fireAttributeChange(attribute);
+                    }
+
+                    @Override
+                    public String getParentAttribute() {
+                        return name;
                     }
                 });
             }
+            modifiedObjects.add(name);
             fireAttributeChange(name);
         }
 
@@ -270,7 +271,7 @@ public class BaseEntity extends BaseObject implements IBaseContainer
     }
 
     /**
-     * Set of simple attribute names that are actually set in entity
+     * Set of simple key names that are actually set in entity
      *
      * @param dataType - attributes are filtered by this type
      * @return - set of needed attributes
@@ -281,7 +282,7 @@ public class BaseEntity extends BaseObject implements IBaseContainer
     }
 
     /**
-     * Set of complex attribute names that are actually set in entity
+     * Set of complex key names that are actually set in entity
      *
      * @return - set of needed attributes
      */
@@ -291,7 +292,7 @@ public class BaseEntity extends BaseObject implements IBaseContainer
     }
 
     /**
-     * Set of simpleSet attribute names that are actually set in entity
+     * Set of simpleSet key names that are actually set in entity
      *
      * @param dataType - attributes are filtered by this type
      * @return - set of needed attributes
@@ -302,7 +303,7 @@ public class BaseEntity extends BaseObject implements IBaseContainer
     }
 
     /**
-     * Set of complexSet attribute names that are actually set in entity
+     * Set of complexSet key names that are actually set in entity
      *
      * @return - set of needed attributes
      */
@@ -595,11 +596,71 @@ public class BaseEntity extends BaseObject implements IBaseContainer
         fireEvent(new IBaseContainer.AttributeChangeEvent(this, attribute));
     }
 
-    public void clearHistory()
+    public void clearModifiedObjects()
     {
-        insertedObjects.clear();
-        updatedObjects.clear();
-        deletedObjects.clear();
+        this.modifiedObjects.clear();
+    }
+
+    protected void addModifiedObject(String name)
+    {
+        this.modifiedObjects.add(name);
+    }
+
+    public Set<String> getModifiedObjects()
+    {
+        return this.modifiedObjects;
+    }
+
+    public void setListeners(boolean hierarchically)
+    {
+        for (String key : values.keySet())
+        {
+            IMetaType metaType = meta.getMemberType(key);
+            if (!metaType.isSet() && metaType.isComplex())
+            {
+                IBaseValue baseValue = values.get(key);
+                BaseEntity baseEntity = (BaseEntity)baseValue;
+
+                baseEntity.addListener(new AttributeChangeListener(key) {
+                    @Override
+                    public void attributeChange(AttributeChangeEvent event) {
+                        String childAttribute = event.getAttribute();
+                        String parentAttribute = getParentAttribute();
+                        String attribute = parentAttribute + "." + childAttribute;
+
+                        modifiedObjects.add(attribute);
+                        fireAttributeChange(attribute);
+                    }
+                });
+
+                if (hierarchically)
+                {
+                    baseEntity.setListeners(hierarchically);
+                }
+            }
+        }
+    }
+
+    public void removeListeners(boolean hierarchically)
+    {
+        for (String key : values.keySet())
+        {
+            IMetaType metaType = meta.getMemberType(key);
+            if (!metaType.isSet() && metaType.isComplex())
+            {
+                IBaseValue baseValue = values.get(key);
+                BaseEntity baseEntity = (BaseEntity)baseValue;
+
+                List<AttributeChangeListener> listeners =
+                        (List<AttributeChangeListener>)baseEntity.getListeners(AttributeChangeEvent.class);
+                final Iterator<AttributeChangeListener> it = listeners.iterator();
+                while (it.hasNext())
+                {
+                    final AttributeChangeListener listener = it.next();
+                    //if (listener.)
+                }
+            }
+        }
     }
 
 }

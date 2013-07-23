@@ -33,9 +33,21 @@ public interface IBaseContainer extends Serializable
         }
     }
 
-    public interface AttributeChangeListener
+    public abstract class AttributeChangeListener
     {
-        public void attributeChange(AttributeChangeEvent event);
+        String parentAttribute;
+
+        public AttributeChangeListener(String parentAttribute)
+        {
+            this.parentAttribute = parentAttribute;
+        }
+
+        public abstract void attributeChange(AttributeChangeEvent event);
+
+        public String getParentAttribute()
+        {
+            return parentAttribute;
+        }
     }
 
     public void addListener(AttributeChangeListener listener);
