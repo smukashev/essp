@@ -28,6 +28,8 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -46,6 +48,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
+@ActiveProfiles({ "postgres" })
 public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 {
 
@@ -714,7 +717,8 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
     }
 
     @Test
-    public void  searchBaseEntity() throws Exception {
+    public void  searchBaseEntity() throws Exception
+    {
         MetaClass metaCreate = new MetaClass("meta_class");
         metaCreate.setMetaAttribute("uuid",
                 new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
@@ -741,6 +745,34 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         assertNotNull("Search engine was not found necessary BaseEntity.", entitySearched);
         assertEquals("Search engine was found BaseEntity with incorrect id,",
                 entitySearched.getId(), entitySaved.getId());
+    }
+
+    @Test
+    public void getHistory() throws Exception
+    {
+        MetaClass parentMetaCreate = new MetaClass("parent_meta_class");
+        MetaClass childMetaCreate = new MetaClass("child_meta_class");
+        childMetaCreate.setMetaAttribute("uuid", new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
+        parentMetaCreate.setMetaAttribute("child_meta_class", new MetaAttribute(true, true, childMetaCreate));
+
+        long parentMetaId = postgreSQLMetaClassDaoImpl.save(parentMetaCreate);
+        MetaClass parentMetaLoad = postgreSQLMetaClassDaoImpl.load(parentMetaId);
+
+        Batch batch = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
+
+        BaseEntity childEntity = new BaseEntity((MetaClass)parentMetaLoad.getMemberType("child_meta_class"), batch.getRepDate());
+        childEntity.put("uuid", new BaseValue(batch, 1L, UUID.randomUUID().toString()));
+
+        BaseEntity parentEntity = new BaseEntity(parentMetaLoad, batch.getRepDate());
+        parentEntity.put("child_meta_class", new BaseValue(batch, 1L, childEntity));
+
+        childEntity.clearModifiedObjects();
+        parentEntity.clearModifiedObjects();
+
+        childEntity.put("uuid", new BaseValue(batch, 1L, UUID.randomUUID().toString()));
+
+        System.out.println(childEntity.getModifiedObjects().size());
+        System.out.println(parentEntity.getModifiedObjects().size());
     }
 
 }

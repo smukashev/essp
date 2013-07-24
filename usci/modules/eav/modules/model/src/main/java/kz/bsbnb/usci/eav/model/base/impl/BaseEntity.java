@@ -8,13 +8,14 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
-import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
+import kz.bsbnb.usci.eav.model.persistable.impl.BaseObject;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DateUtils;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -25,9 +26,23 @@ import java.util.*;
  * @see MetaClass
  * @see DataTypes
  */
-public class BaseEntity extends Persistable implements IBaseContainer
+public class BaseEntity extends BaseObject implements IBaseContainer
 {
     Logger logger = LoggerFactory.getLogger(BaseEntity.class);
+
+    private static final Method ATTRIBUTE_CHANGE_METHOD;
+    static
+    {
+        try
+        {
+            ATTRIBUTE_CHANGE_METHOD = AttributeChangeListener.class
+                    .getDeclaredMethod("attributeChange", new Class[] {  AttributeChangeEvent.class });
+        }
+        catch (NoSuchMethodException ex)
+        {
+            throw new java.lang.RuntimeException("Internal error, key change method not found.");
+        }
+    }
 
     /**
      * Reporting date on which instance of BaseEntity was loaded.
@@ -38,6 +53,8 @@ public class BaseEntity extends Persistable implements IBaseContainer
      * The list of available reporting dates for this instance BaseEntity.
      */
     private Set<Date> availableReportDates = new HashSet<Date>();
+
+    private Set<String> modifiedObjects = new HashSet<String>();
 
     /**
      * Holds data about entity structure
@@ -107,12 +124,12 @@ public class BaseEntity extends Persistable implements IBaseContainer
     }
 
     /**
-     * Retrieves attribute titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>
+     * Retrieves key titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>
      *
-     * @param name attribute name. Must exist in entity meta
-     * @return attribute value, null if value is not set
-     * @throws IllegalArgumentException if attribute name does not exist in entity meta,
-     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
+     * @param name key name. Must exist in entity meta
+     * @return key value, null if value is not set
+     * @throws IllegalArgumentException if key name does not exist in entity meta,
+     * 	                                or key has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
     public IBaseValue getBaseValue(String name)
@@ -132,17 +149,18 @@ public class BaseEntity extends Persistable implements IBaseContainer
     }
 
     /**
-     * Retrieves attribute titled <code>name</code>.
+     * Retrieves key titled <code>name</code>.
      *
-     * @param name name attribute name. Must exist in entity meta
-     * @param value new value of the attribute
-     * @throws IllegalArgumentException if attribute name does not exist in entity meta,
-     * 	                                or attribute has type different from <code>DataTypes.DATE</code>
+     * @param name name key name. Must exist in entity meta
+     * @param value new value of the key
+     * @throws IllegalArgumentException if key name does not exist in entity meta,
+     * 	                                or key has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
     @Override
-    public void put(String name, IBaseValue value)
+    public void put(final String name, IBaseValue value)
     {
+        boolean needListening = false;
         IMetaType type = meta.getMemberType(name);
 
         if(type == null)
@@ -165,6 +183,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 else
                 {
                     expValueClass = BaseEntity.class;
+                    needListening = true;
                 }
             else
             {
@@ -184,7 +203,6 @@ public class BaseEntity extends Persistable implements IBaseContainer
                                 getDataTypeClass();
                     }
 
-
                 }
                 else
                 {
@@ -198,6 +216,40 @@ public class BaseEntity extends Persistable implements IBaseContainer
                 throw new IllegalArgumentException("Type mismatch in class: " +
                         meta.getClassName() + ". Needed " + expValueClass + ", got: " +
                         valueClass);
+        }
+
+        if (values.containsKey(name))
+        {
+            if (value.getValue() == null || !value.equals(values.get(name)))
+            {
+                modifiedObjects.add(name);
+                fireAttributeChange(name);
+            }
+        }
+        else
+        {
+            if (needListening)
+            {
+                BaseEntity baseEntity = (BaseEntity)value.getValue();
+                baseEntity.addListener(new AttributeChangeListener(name) {
+                    @Override
+                    public void attributeChange(AttributeChangeEvent event) {
+                        String childAttribute = event.getAttribute();
+                        String parentAttribute = getParentAttribute();
+                        String attribute = parentAttribute + "." + childAttribute;
+
+                        modifiedObjects.add(attribute);
+                        fireAttributeChange(attribute);
+                    }
+
+                    @Override
+                    public String getParentAttribute() {
+                        return name;
+                    }
+                });
+            }
+            modifiedObjects.add(name);
+            fireAttributeChange(name);
         }
 
         values.put(name, value);
@@ -219,7 +271,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
     }
 
     /**
-     * Set of simple attribute names that are actually set in entity
+     * Set of simple key names that are actually set in entity
      *
      * @param dataType - attributes are filtered by this type
      * @return - set of needed attributes
@@ -230,7 +282,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
     }
 
     /**
-     * Set of complex attribute names that are actually set in entity
+     * Set of complex key names that are actually set in entity
      *
      * @return - set of needed attributes
      */
@@ -240,7 +292,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
     }
 
     /**
-     * Set of simpleSet attribute names that are actually set in entity
+     * Set of simpleSet key names that are actually set in entity
      *
      * @param dataType - attributes are filtered by this type
      * @return - set of needed attributes
@@ -251,7 +303,7 @@ public class BaseEntity extends Persistable implements IBaseContainer
     }
 
     /**
-     * Set of complexSet attribute names that are actually set in entity
+     * Set of complexSet key names that are actually set in entity
      *
      * @return - set of needed attributes
      */
@@ -526,4 +578,89 @@ public class BaseEntity extends Persistable implements IBaseContainer
     {
         return validationErrors;
     }
+
+    @Override
+    public void addListener(AttributeChangeListener listener)
+    {
+        addListener(AttributeChangeEvent.class, listener, ATTRIBUTE_CHANGE_METHOD);
+    }
+
+    @Override
+    public void removeListener(AttributeChangeListener listener)
+    {
+        removeListener(AttributeChangeEvent.class, listener, ATTRIBUTE_CHANGE_METHOD);
+    }
+
+    protected void fireAttributeChange(String attribute)
+    {
+        fireEvent(new IBaseContainer.AttributeChangeEvent(this, attribute));
+    }
+
+    public void clearModifiedObjects()
+    {
+        this.modifiedObjects.clear();
+    }
+
+    protected void addModifiedObject(String name)
+    {
+        this.modifiedObjects.add(name);
+    }
+
+    public Set<String> getModifiedObjects()
+    {
+        return this.modifiedObjects;
+    }
+
+    public void setListeners(boolean hierarchically)
+    {
+        for (String key : values.keySet())
+        {
+            IMetaType metaType = meta.getMemberType(key);
+            if (!metaType.isSet() && metaType.isComplex())
+            {
+                IBaseValue baseValue = values.get(key);
+                BaseEntity baseEntity = (BaseEntity)baseValue;
+
+                baseEntity.addListener(new AttributeChangeListener(key) {
+                    @Override
+                    public void attributeChange(AttributeChangeEvent event) {
+                        String childAttribute = event.getAttribute();
+                        String parentAttribute = getParentAttribute();
+                        String attribute = parentAttribute + "." + childAttribute;
+
+                        modifiedObjects.add(attribute);
+                        fireAttributeChange(attribute);
+                    }
+                });
+
+                if (hierarchically)
+                {
+                    baseEntity.setListeners(hierarchically);
+                }
+            }
+        }
+    }
+
+    public void removeListeners(boolean hierarchically)
+    {
+        for (String key : values.keySet())
+        {
+            IMetaType metaType = meta.getMemberType(key);
+            if (!metaType.isSet() && metaType.isComplex())
+            {
+                IBaseValue baseValue = values.get(key);
+                BaseEntity baseEntity = (BaseEntity)baseValue;
+
+                List<AttributeChangeListener> listeners =
+                        (List<AttributeChangeListener>)baseEntity.getListeners(AttributeChangeEvent.class);
+                final Iterator<AttributeChangeListener> it = listeners.iterator();
+                while (it.hasNext())
+                {
+                    final AttributeChangeListener listener = it.next();
+                    //if (listener.)
+                }
+            }
+        }
+    }
+
 }

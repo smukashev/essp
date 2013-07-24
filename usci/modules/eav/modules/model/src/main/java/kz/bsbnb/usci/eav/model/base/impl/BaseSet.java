@@ -169,4 +169,15 @@ public class BaseSet extends Persistable implements IBaseContainer
             return getElComplex(filter);
         return getElSimple(filter);
     }
+
+    @Override
+    public void addListener(AttributeChangeListener listener) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    @Override
+    public void removeListener(AttributeChangeListener listener) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
 }
