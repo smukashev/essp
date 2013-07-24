@@ -167,6 +167,7 @@ public class RulesSingleton
                 packages += "package " + curBatch.getName() + "_" + curVersion.getId() + "\n";
                 packages += "dialect \"mvel\"\n";
                 packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
+                packages += "import kz.bsbnb.usci.brms.rulesingleton.BRMSHelper;\n";
 
                 for (Rule r : rules)
                 {
@@ -246,6 +247,7 @@ public class RulesSingleton
         packages += "package " + packageName + "_" + curVersion.getId() + "\n";
         packages += "dialect \"mvel\"\n";
         packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
+        packages += "import kz.bsbnb.usci.brms.rulesingleton.BRMSHelper;\n";
 
         for (Rule r : rules)
         {
@@ -284,4 +286,8 @@ public class RulesSingleton
         }
     }
 
+    public ArrayList<RulePackageError> getRulePackageErrors()
+    {
+        return rulePackageErrors;
+    }
 }

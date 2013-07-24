@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.brms.rulesingleton.test;
 
+import kz.bsbnb.usci.brms.rulesingleton.BRMSHelper;
+import kz.bsbnb.usci.brms.rulesingleton.RulePackageError;
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -116,7 +118,7 @@ public class BasicDroolsTest {
 
         BaseEntity documentEntity1 = new BaseEntity(metaDocumentHolder, reportDate);
         documentEntity1.put("type", new BaseValue(batch, 4, "RNN"));
-        documentEntity1.put("no", new BaseValue(batch, 4, "1234567890"));
+        documentEntity1.put("no", new BaseValue(batch, 4, "600720355581"));
 
         BaseEntity documentEntity2 = new BaseEntity(metaDocumentHolder, reportDate);
         documentEntity2.put("type", new BaseValue(batch, 4, "PASSPORT"));
@@ -150,6 +152,11 @@ public class BasicDroolsTest {
         assertTrue(rules != null);
         rules.reloadCache();
 
+        for (RulePackageError rpe : rules.getRulePackageErrors())
+        {
+            System.out.println("Errors: " + rpe.getErrorMsg());
+        }
+
         System.out.println(generateMetaClass().toString());
         Batch batch = new Batch(new Date(System.currentTimeMillis()));
         batch.setId(1);
@@ -161,11 +168,13 @@ public class BasicDroolsTest {
         entity.clearValidationErrors();
         rules.runRules(entity, "drl");
 
+        System.out.println("===================");
         for (String str : entity.getValidationErrors())
         {
             System.out.println(str);
         }
-        assertTrue(entity.getValidationErrors().size() == 1);
+        System.out.println("===================");
+        assertTrue(entity.getValidationErrors().size() == 0);
         System.out.println("Run package no_such_package");
         entity.clearValidationErrors();
         try {
@@ -175,7 +184,7 @@ public class BasicDroolsTest {
             {
                 System.out.println(str);
             }
-            assertTrue(entity.getValidationErrors().size() == 0);
+            assertTrue(true);
         } catch (Exception e) {
             System.out.println("No such message exception and it's ok.");
         }
@@ -192,10 +201,17 @@ public class BasicDroolsTest {
         assertTrue(entity.getEl("subject.name.lastname").equals("TULBASSIYEV"));
         assertTrue(entity.getEl("subject.address.house.value[333]").equals(new Integer(333)));
         assertTrue(entity.getEl("subject.address.house.value[444]") == null);
-        assertTrue(entity.getEl("subject.documents.document[type=RNN].no").equals("1234567890"));
-        assertTrue(entity.getEl("subject.documents.document[type=RNN,no=1234567890].no").equals("1234567890"));
+        assertTrue(entity.getEl("subject.documents.document[type=RNN].no").equals("600720355581"));
+        assertTrue(entity.getEl("subject.documents.document[type=RNN,no=600720355581].no").equals("600720355581"));
         assertTrue(entity.getEl("subject.documents.document[type=RNN,no=0987654322].no") == null);
         assertTrue(entity.getEl("subject.documents.document[type=RNN,no=0987654321].no") == null);
+    }
+
+    @Test
+    public void rnnValidityTest() throws Exception
+    {
+        assertTrue(BRMSHelper.isValidRNN("600720355581"));
+        assertTrue(!BRMSHelper.isValidRNN("600720355582"));
     }
 
     public RulesSingleton getRules()
