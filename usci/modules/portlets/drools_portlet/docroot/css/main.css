@@ -1,6 +1,7 @@
 .container{
     padding-left: 7px;
     padding-top: 7px;
+    margin-left:270px;
 }
 
 .packageInfo{
@@ -26,12 +27,23 @@
 body{
     font-family:"Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
     font-size:12px;
+
 }
+
+/*.portlet_body{*/
+    /*width: 800px;*/
+    /*overflow: scroll;*/
+/*}*/
+
 p, h1, form, button{border:0; margin:0; padding:0;}
 .spacer{clear:both; height:1px;}
 /* ----------- My Form ----------- */
+.second_column{
+    left:260px;
+
+}
 .myform,.stylized{
-    margin:0 auto;
+
     width:250px;
     padding:14px;
 }

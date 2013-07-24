@@ -30,6 +30,29 @@
         <relativePath>../../../modules/parent</relativePath>
     </parent>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+              <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-classpath</argument><classpath />
+                        <argument>kz.bsbnb.usci.brms.rulesvr.Main</argument>
+                        <argument>-Djava.security.policy=${basedir}/src/main/resources/no.policy</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>log4j</groupId>
