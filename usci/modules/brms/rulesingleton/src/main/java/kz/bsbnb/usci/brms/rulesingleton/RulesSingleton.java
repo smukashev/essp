@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
-import java.io.Serializable;
 import java.util.*;
 
 @Component

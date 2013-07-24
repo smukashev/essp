@@ -252,11 +252,12 @@
 <div class="success" id="messageBox" style="display: none"></div>
 </div>
 <br>
+<div class="portlet_body" style="width:1500px">
 <div class="_20_documentLibraryContainer">
     <div class="aui-layout lfr-app-column-view">
         <div class="aui-layout-content lfr-app-column-view-content " style="background-color: #f8f8f8">
 
-            <div class="aui-column aui-w20 navigation-pane aui-column-first">
+            <div class="aui-column aui-w20 navigation-pane aui-column-first" >
                 <div class="aui-column-content aui-column-content-first navigation-pane-content ">
                     <div class="lfr-header-row">
                         <div class="lfr-header-row-content">
@@ -373,4 +374,5 @@
 
         </div>
     </div>
+</div>
 </div>
