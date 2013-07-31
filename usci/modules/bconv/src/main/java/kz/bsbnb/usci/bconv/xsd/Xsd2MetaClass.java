@@ -14,6 +14,8 @@ public class Xsd2MetaClass
 {
     static Logger logger = LoggerFactory.getLogger(Xsd2MetaClass.class);
 
+    static private boolean noFlatten = false;
+
     public static MetaClass convertXSD(InputStream schema, String metaClassName)
     {
         MetaClass meta = new MetaClass();
@@ -56,8 +58,11 @@ public class Xsd2MetaClass
     private static void processComplexType(String name, XSComplexType ct, int maxOccurs, String prefix)
     {
         String attributeStr = "";
+        int attrCount = 0;
+
         try {
             boolean first = true;
+            attrCount = ct.getAttributeUses().size();
             for (XSAttributeUse attributes : ct.getAttributeUses()) {
                 //System.out.println(prefix + "Attribute - " + attributes.getDecl().getName());
                 if(first) {
@@ -101,30 +106,45 @@ public class Xsd2MetaClass
         else
             comppType = " : ct_" + name;
 
-        if (maxOccurs == 1) {
-            System.out.println(prefix + name + comppType + subtypesStr + attributeStr + " {");
-        } else {
-            if (maxOccurs == -1) {
-                System.out.println(prefix + name + "[]" + comppType + subtypesStr + attributeStr + " {");
-            } else {
-                System.out.println(prefix + name + "[" + maxOccurs + "]" +
-                        comppType + subtypesStr + attributeStr + " {");
-            }
-        }
-
         try {
             XSParticle[] particles = getParticles(ct);
+            String offset = "";
+            int particlesCount = 0;
+            if (particles != null)
+                particlesCount = particles.length;
+
+            if ((particlesCount + attrCount) > 1 ||
+                    (!ct.getBaseType().getName().equals("anyType") && ct.getBaseType().isSimpleType()) ||
+                    noFlatten)
+            {
+                offset = "  ";
+                if (maxOccurs == 1) {
+                    System.out.println(prefix + name + comppType + subtypesStr + attributeStr + " {");
+                } else {
+                    if (maxOccurs == -1) {
+                        System.out.println(prefix + name + "[]" + comppType + subtypesStr + attributeStr + " {");
+                    } else {
+                        System.out.println(prefix + name + "[" + maxOccurs + "]" +
+                                comppType + subtypesStr + attributeStr + " {");
+                    }
+                }
+            }
+
             //System.out.println("## " + ct.getBaseType());
             if (!ct.getBaseType().getName().equals("anyType") && ct.getBaseType().isSimpleType())
-                processType(ct.getBaseType().getName(), ct.getBaseType(), maxOccurs, prefix + "  ");
+                processType(ct.getBaseType().getName(), ct.getBaseType(), maxOccurs, prefix + offset);
 
             if (particles != null) {
-                processModelGroupContents(particles, prefix + "  ");
+                processModelGroupContents(particles, prefix + offset);
             }
+
+            if ((particlesCount + attrCount) > 1 ||
+                    (!ct.getBaseType().getName().equals("anyType") && ct.getBaseType().isSimpleType()) ||
+                    noFlatten)
+                System.out.println(prefix + "}");
         } catch (Exception ex) {
             System.out.println(prefix + "Error in complex type contents!!!");
         }
-        System.out.println(prefix + "}");
     }
 
     private static void processModelGroupContents(XSParticle[] particles, String prefix)
