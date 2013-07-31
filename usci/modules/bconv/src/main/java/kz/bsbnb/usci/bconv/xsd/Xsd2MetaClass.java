@@ -48,12 +48,12 @@ public class Xsd2MetaClass
             throw new IllegalArgumentException("No such class: " + metaClassName);
         }
 
-        processComplexType("ct_package", ct, "");
+        processComplexType("ct_package", ct, 1, "");
 
         return meta;
     }
 
-    private static void processComplexType(String name, XSComplexType ct, String prefix)
+    private static void processComplexType(String name, XSComplexType ct, int maxOccurs, String prefix)
     {
         String attributeStr = "";
         try {
@@ -101,10 +101,23 @@ public class Xsd2MetaClass
         else
             comppType = " : ct_" + name;
 
-        System.out.println(prefix + name + comppType + subtypesStr + attributeStr + " {");
+        if (maxOccurs == 1) {
+            System.out.println(prefix + name + comppType + subtypesStr + attributeStr + " {");
+        } else {
+            if (maxOccurs == -1) {
+                System.out.println(prefix + name + "[]" + comppType + subtypesStr + attributeStr + " {");
+            } else {
+                System.out.println(prefix + name + "[" + maxOccurs + "]" +
+                        comppType + subtypesStr + attributeStr + " {");
+            }
+        }
 
         try {
             XSParticle[] particles = getParticles(ct);
+            //System.out.println("## " + ct.getBaseType());
+            if (!ct.getBaseType().getName().equals("anyType") && ct.getBaseType().isSimpleType())
+                processType(ct.getBaseType().getName(), ct.getBaseType(), maxOccurs, prefix + "  ");
+
             if (particles != null) {
                 processModelGroupContents(particles, prefix + "  ");
             }
@@ -120,11 +133,18 @@ public class Xsd2MetaClass
             XSTerm pterm = p.getTerm();
             if(pterm.isElementDecl()){ //xs:element inside complex type
                 //System.out.println(prefix + "Element - " + pterm.asElementDecl().getName());
-                processElement(pterm, prefix);
+                processElement(pterm, p.getMaxOccurs(), prefix);
             }
             if(pterm.isModelGroup()){ //xs:element inside complex type
-                if(p.getMaxOccurs() > 1) {
-                    System.out.print(prefix + "ModelGroup - " + p.getMaxOccurs() + " - ");
+                if(p.getMaxOccurs() != 1 || pterm.asModelGroup().getCompositor() == XSModelGroup.Compositor.CHOICE) {
+                    if (p.getMaxOccurs() != 1) {
+                        if (p.getMaxOccurs() == -1)
+                            System.out.print(prefix + "ModelGroup - unbound - ");
+                        else
+                            System.out.print(prefix + "ModelGroup - " + p.getMaxOccurs() + " - ");
+                    } else {
+                        System.out.print(prefix + "ModelGroup - ");
+                    }
                     if(pterm.asModelGroup().getCompositor() == XSModelGroup.Compositor.ALL)
                         System.out.println("All [");
                     if(pterm.asModelGroup().getCompositor() == XSModelGroup.Compositor.CHOICE)
@@ -136,7 +156,8 @@ public class Xsd2MetaClass
                 XSParticle[] pp = getParticles(p);
                 if (pp != null)
                 {
-                    if (p.getMaxOccurs() > 1) {
+                    if(p.getMaxOccurs() != 1 ||
+                            pterm.asModelGroup().getCompositor() == XSModelGroup.Compositor.CHOICE) {
                         processModelGroupContents(pp, prefix + "  ");
                         System.out.println(prefix + "]");
                     } else {
@@ -147,23 +168,36 @@ public class Xsd2MetaClass
         }
     }
 
-    private static void processSimpleType(String name, XSSimpleType ct, String prefix)
+    private static void processSimpleType(String name, XSSimpleType ct, int maxOccurs, String prefix)
     {
-        System.out.println(prefix + name + " : " + ct.getPrimitiveType().getName());
+        if (maxOccurs == 1) {
+            System.out.println(prefix + name + " : " + ct.getPrimitiveType().getName());
+        } else {
+            if (maxOccurs == -1) {
+                System.out.println(prefix + name + "[] : " + ct.getPrimitiveType().getName());
+            } else {
+                System.out.println(prefix + name + "[" + maxOccurs + "] : " + ct.getPrimitiveType().getName());
+            }
+        }
     }
 
-    private static void processElement(XSTerm el, String prefix)
+    private static void processElement(XSTerm el, int maxOccurs, String prefix)
     {
         XSType type = el.asElementDecl().getType();
 
+        processType(el.asElementDecl().getName(), type, maxOccurs, prefix);
+    }
+
+    private static void processType(String name, XSType type, int maxOccurs, String prefix)
+    {
         if (type.isComplexType())
         {
-            processComplexType(el.asElementDecl().getName(), type.asComplexType(), prefix);
+            processComplexType(name, type.asComplexType(), maxOccurs, prefix);
         }
 
         if (type.isSimpleType())
         {
-            processSimpleType(el.asElementDecl().getName(), type.asSimpleType(), prefix);
+            processSimpleType(name, type.asSimpleType(), maxOccurs, prefix);
         }
     }
 
