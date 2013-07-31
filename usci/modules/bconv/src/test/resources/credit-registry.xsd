@@ -1,0 +1,1668 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 (x64) (http://www.altova.com) by Alexandr (Ru-Board) -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:element name="batch">
+		<xsd:annotation>
+			<xsd:documentation>Корневой элемент "Пакетный файл"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="info">
+					<xsd:annotation>
+						<xsd:documentation>Информация</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element ref="creditor"/>
+							<xsd:element name="account_date" type="st_date">
+								<xsd:annotation>
+									<xsd:documentation>Учетная дата </xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="packages">
+					<xsd:annotation>
+						<xsd:documentation>Пакеты данных</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="package" maxOccurs="unbounded">
+								<xsd:annotation>
+									<xsd:documentation>Пакет данных</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:complexContent>
+										<xsd:extension base="ct_package"/>
+									</xsd:complexContent>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!--
+	Global Complex Types
+	-->
+	<xsd:complexType name="ct_address">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Адрес"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="country"/>
+			<xsd:element ref="region" minOccurs="0"/>
+			<xsd:element ref="area" minOccurs="0"/>
+			<xsd:element ref="locality" minOccurs="0"/>
+			<xsd:element name="details" type="st_string" nillable="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Дополнительная информация</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="type" type="st_address_type" use="required">
+			<xsd:annotation>
+				<xsd:documentation>Тип адреса</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="ct_contact">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Контакт"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute ref="contact_type" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="ct_committee_decision">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Решение уполномоченного органа банка"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="credit_committee"/>
+			<xsd:element name="protocol_date">
+				<xsd:annotation>
+					<xsd:documentation>Дата протокола принятия решения</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="protocol_no" type="st_string" minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>№ протокола</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ct_contract">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Договор/дополнительное соглашение"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="no" type="st_string">
+				<xsd:annotation>
+					<xsd:documentation>Номер договора/дополнительного соглашения</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="date" type="st_date">
+				<xsd:annotation>
+					<xsd:documentation>Дата договора/дополнительного соглашения</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ct_dependent">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Иждивенец"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="dependent_age"/>
+			<xsd:element name="number" type="xsd:positiveInteger">
+				<xsd:annotation>
+					<xsd:documentation>Количество</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ct_doc">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Документ"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="name" type="st_string">
+				<xsd:annotation>
+					<xsd:documentation>Наименование</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="no" type="st_string">
+				<xsd:annotation>
+					<xsd:documentation>Номер</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="issue_date" type="st_date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Дата выдачи</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="expiry_date" type="st_date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Дата окончания срока действия</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute ref="doc_type" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="ct_sale_base">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Переуступка" (базовый)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="contract"/>
+			<xsd:choice>
+				<xsd:element ref="creditor"/>
+				<xsd:element name="organization" type="ct_organization_base">
+					<xsd:annotation>
+						<xsd:documentation> Организация,  выкупившая/принявшая заем/условное обязательство</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:element ref="subject_type"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ct_sale">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Переуступка"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ct_sale_base">
+				<xsd:sequence>
+					<xsd:element name="sale_type" type="st_sale_type">
+						<xsd:annotation>
+							<xsd:documentation>Реализация/переуступки займа</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ct_claim">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Взыскание по обеспечению"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="contract"/>
+			<xsd:element ref="pledge_type"/>
+			<xsd:element name="claim_type" type="st_claim_type">
+				<xsd:annotation>
+					<xsd:documentation>Тип взыскания</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="date" type="st_date">
+				<xsd:annotation>
+					<xsd:documentation>Дата взыскания</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="realization_date" type="st_date">
+				<xsd:annotation>
+					<xsd:documentation>Дата реализации</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="value" type="st_decimal">
+				<xsd:annotation>
+					<xsd:documentation>Стоимость реализации</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="fee" type="st_decimal">
+				<xsd:annotation>
+					<xsd:documentation>Расходы по реализации обеспечения</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ct_score">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Балл по критерию"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="score_group"/>
+			<xsd:element name="score" type="st_decimal">
+				<xsd:annotation>
+					<xsd:documentation>Балл</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--
+	Global Complex Types (turnover)-->
+	<xsd:complexType name="ct_turnover_charge">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Детализация денежных оборотов. Начисления"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="interest" type="st_decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Вознаграждение</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="fine" type="st_decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Штраф</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="penalty" type="st_decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Пеня</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ct_turnover_discharge">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Детализация денежных оборотов. Погашения"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ct_turnover_charge">
+				<xsd:sequence>
+					<xsd:element name="debt" type="st_decimal" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Основной долг</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="payment_method"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ct_turnover">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Детализация денежных оборотов. Изменения"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="debt" type="st_decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Основной долг</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="interest" type="st_decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Вознаграждение</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--
+	Global Complex Types (remains)-->
+	<xsd:complexType name="ct_remains_current">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Остаток. Текущая задолжность"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="balance_account"/>
+			<xsd:element name="value" type="st_decimal">
+				<xsd:annotation>
+					<xsd:documentation>Остаток</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ct_remains_pastdue">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Остаток. Просроченная задолжность"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ct_remains_current">
+				<xsd:sequence>
+					<xsd:element name="open_date" type="st_date">
+						<xsd:annotation>
+							<xsd:documentation>Дата вынесения</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="close_date" type="st_date" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Дата погашения</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ct_remains_write_off">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Остаток. Списанная задолжность"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ct_remains_current">
+				<xsd:sequence>
+					<xsd:element name="date" type="st_date">
+						<xsd:annotation>
+							<xsd:documentation>Дата списания</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ct_remains">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Остатки"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="current" type="ct_remains_current" minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Текущая задолжность</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="pastdue" type="ct_remains_pastdue" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Просроченная задолженность</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="write_off" type="ct_remains_write_off" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Списанная с баланса задолжность</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--
+	Global Complex Types (pledge)-->
+	<xsd:complexType name="ct_pledge_base">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Обеспечение" (базовый)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="pledge_type"/>
+			<xsd:element name="contract" type="ct_contract">
+				<xsd:annotation>
+					<xsd:documentation>Контракт</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="value" type="xsd:positiveInteger">
+				<xsd:annotation>
+					<xsd:documentation>Залоговая сумма</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="market_value" type="xsd:positiveInteger">
+				<xsd:annotation>
+					<xsd:documentation>Рыночная стоимость</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="appraisal_date" type="st_date">
+				<xsd:annotation>
+					<xsd:documentation>Дата оценки</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="country"/>
+			<xsd:element ref="region" minOccurs="0"/>
+			<xsd:element ref="area" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ct_pledge">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Обеспечение"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ct_pledge_base">
+				<xsd:sequence>
+					<xsd:element name="pledgers">
+						<xsd:annotation>
+							<xsd:documentation>Залогодатели</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="pledger" type="ct_subject_base" maxOccurs="unbounded">
+									<xsd:annotation>
+										<xsd:documentation>Залогодатель</xsd:documentation>
+									</xsd:annotation>
+								</xsd:element>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ct_pledges">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Обеспечения"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="pledge" type="ct_pledge" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Обеспечение</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--
+	Global Complex Types
+ (main)-->
+	<xsd:complexType name="ct_credit_base">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Кредит" (базовый)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="debt_grace_period" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Льготный период по основному долгу</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="start_date" type="st_date">
+							<xsd:annotation>
+								<xsd:documentation>Начало</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="end_date" type="st_date">
+							<xsd:annotation>
+								<xsd:documentation>Окончание</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="interest_grace_period" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Льготный период по вознаграждению</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="start_date" type="st_date">
+							<xsd:annotation>
+								<xsd:documentation>Начало</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="end_date" type="st_date">
+							<xsd:annotation>
+								<xsd:documentation>Окончание</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="succession" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Правоприемник по займу/условному обязательству</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="contract"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="sale" type="ct_sale_base" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Переуступка</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute ref="credit_type" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="ct_credit">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Кредит"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ct_credit_base">
+				<xsd:sequence>
+					<xsd:element ref="currency" minOccurs="0"/>
+					<xsd:element name="interest_rate_yaerly" type="st_percent" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Годовая ставка вознаграждения по договору, %</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="interest_rate_type" type="st_interest_rate_type" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Вид ставки вознаграждения</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="interest_effective_rate" type="st_percent" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Эффективная годовя ставка вознаграждения, %</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="period_payment_rate" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Периодичность погашения вознаграждения</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element ref="period_payment"/>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="period_payment_debt" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Периодичность погашения основного долга</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element ref="period_payment"/>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="fine" type="st_percent" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Ставка штрафа по договору, %</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="penalty" type="st_percent" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Ставка пени по договору, %</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="payment_type" minOccurs="0"/>
+					<xsd:element name="contract_maturity_date" type="st_date" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Дата погашения по договору</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="credit_purpose" minOccurs="0"/>
+					<xsd:element ref="credit_object" minOccurs="0"/>
+					<xsd:element name="amount" type="st_decimal" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Сумма займа в валюте договора </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="finance_source" minOccurs="0"/>
+					<xsd:element name="has_currency_earn" type="st_numeric_boolean" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Наличие валютной выручки у заемщика и/или инструментов хеджирования у заемщика </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="has_currency_risk" type="st_numeric_boolean" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Наличие валютного риска</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="econ_sector" minOccurs="0"/>
+					<xsd:element name="committee_decisions" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Решения о выдаче займа/кредитной линии/условного обязательства</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="committee_decision" type="ct_committee_decision" maxOccurs="2">
+									<xsd:annotation>
+										<xsd:documentation>Решение о выдаче займа/кредитной линии/условного обязательства</xsd:documentation>
+									</xsd:annotation>
+								</xsd:element>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element ref="debtor_status" minOccurs="0"/>
+					<xsd:element name="creditor_branch" type="ct_creditor" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Филиал БВУ/НО</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="limit" type="st_decimal" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Лимит кредитной линии/кредитной карты </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="line" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Кредитная линия/кредитная карта </xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element ref="contract"/>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element ref="portfolio" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ct_change">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Изменения за период"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="turnover" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Детализация денежных оборотов </xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="charge" type="ct_turnover_charge" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Начисления</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="issue" type="st_decimal" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Выдано по займу </xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="discharge" type="ct_turnover_discharge" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Погашения</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="exchange_difference" type="ct_turnover" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Курсовая разница</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="other" type="ct_turnover" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Другие изменения</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="remains" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Остатки</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="debt" type="ct_remains" minOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation>Основной долг</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="interest" type="ct_remains" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Вознаграждение</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="maturity_date" type="st_date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Дата фактического погашения</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="prolongation_date" type="st_date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Дата окончания пролонгации</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="risks" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Виды рисков на одного заемщика</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="risk_type" minOccurs="0" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+				<xsd:unique name="unique_change_risk_type">
+					<xsd:selector xpath="risk_type"/>
+					<xsd:field xpath="."/>
+				</xsd:unique>
+			</xsd:element>
+			<xsd:element ref="classification" minOccurs="0"/>
+			<xsd:element name="provision_value_afn" type="st_decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Фактически сформировання сумма провизий (резервов) - по требованиям АФН</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="provision_value_msfo" type="st_decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Фактически сформировання сумма провизий (резервов) - по требованиям МСФО</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="scores" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Баллы по критериям</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="score" type="ct_score" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+				<xsd:unique name="unique_score_group">
+					<xsd:selector xpath="score/score_group"/>
+					<xsd:field xpath="."/>
+				</xsd:unique>
+			</xsd:element>
+			<xsd:element name="claims" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Взыскания по обеспечению</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="claim" type="ct_claim" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Взыскание по обеспечению</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="committee_decision" type="ct_committee_decision" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Решение о прекращении требований</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="sale" type="ct_sale" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Переуступка</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="next_debt_value" type="st_decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Сумма предстоящего платежа - по основному долгу</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="next_interest_value" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Сумма предстоящего платежа - по вознаграждению</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ct_package">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Пакет данных"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="contract"/>
+			<xsd:choice maxOccurs="2">
+				<xsd:sequence>
+					<xsd:element name="credit" type="ct_credit">
+						<xsd:annotation>
+							<xsd:documentation>Кредит</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="subjects">
+						<xsd:annotation>
+							<xsd:documentation>Субъекты</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="subject" type="ct_subject" maxOccurs="unbounded"/>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="pledges" type="ct_pledges" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Залоги</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:element name="changes">
+					<xsd:annotation>
+						<xsd:documentation>Изменения за период </xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="change" type="ct_change" maxOccurs="unbounded">
+								<xsd:annotation>
+									<xsd:documentation>Изменение за период</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attribute name="operation_type" type="st_operation_type" use="required">
+			<xsd:annotation>
+				<xsd:documentation>Вид операции</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<!--
+	Global Complex Types (subject)-->
+	<xsd:complexType name="ct_entity">
+		<xsd:annotation>
+			<xsd:documentation>Базовый тип для всех ролей</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="country"/>
+			<xsd:element ref="offshore" minOccurs="0"/>
+			<xsd:element name="bank_relations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Признаки связанности с банком особыми отношениями</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="bank_relation" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+				<xsd:unique name="unique_subject_bank_relation">
+					<xsd:annotation>
+						<xsd:documentation>Уникальность признаков связанности с банком особыми отношениями</xsd:documentation>
+					</xsd:annotation>
+					<xsd:selector xpath="bank_relation"/>
+					<xsd:field xpath="."/>
+				</xsd:unique>
+			</xsd:element>
+			<xsd:element name="addresses" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Адреса</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="address" type="ct_address" maxOccurs="2"/>
+					</xsd:sequence>
+				</xsd:complexType>
+				<xsd:unique name="unique_subject_address_type">
+					<xsd:annotation>
+						<xsd:documentation>Уникальность на тип адреса</xsd:documentation>
+					</xsd:annotation>
+					<xsd:selector xpath="address"/>
+					<xsd:field xpath="@type"/>
+				</xsd:unique>
+			</xsd:element>
+			<xsd:element name="contacts" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Контакты</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="contact" type="ct_contact" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="share" type="st_subject_share" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>% доли от голосующих акций</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="pledges" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Залоги</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="pledge" type="ct_pledge_base" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Залог</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ct_person_base">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Физическое лицо" (базовый)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="names">
+				<xsd:annotation>
+					<xsd:documentation>Ф.И.О.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="name" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Ф.И.О.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="name" type="st_subject_name">
+										<xsd:annotation>
+											<xsd:documentation>Имя</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="surname" type="st_subject_name">
+										<xsd:annotation>
+											<xsd:documentation>Фамилия</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="lastname" type="st_subject_name" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Отчество</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+								</xsd:sequence>
+								<xsd:attribute ref="lang" use="required"/>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+				<xsd:unique name="unique_person_base_name_lang">
+					<xsd:annotation>
+						<xsd:documentation>Уникальность языка</xsd:documentation>
+					</xsd:annotation>
+					<xsd:selector xpath="name"/>
+					<xsd:field xpath="@lang"/>
+				</xsd:unique>
+			</xsd:element>
+			<xsd:element name="date_birth" type="st_date">
+				<xsd:annotation>
+					<xsd:documentation>Дата рождения</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="country"/>
+			<xsd:element name="docs">
+				<xsd:annotation>
+					<xsd:documentation>Документы</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:annotation>
+						<xsd:documentation>Документы</xsd:documentation>
+					</xsd:annotation>
+					<xsd:sequence>
+						<xsd:element ref="doc" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+				<xsd:unique name="unique_person_base_doc_type">
+					<xsd:annotation>
+						<xsd:documentation>Уникальность типа документа</xsd:documentation>
+					</xsd:annotation>
+					<xsd:selector xpath="doc"/>
+					<xsd:field xpath="@doc_type"/>
+				</xsd:unique>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ct_person">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Физическое лицо"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ct_entity">
+				<xsd:sequence>
+					<xsd:element name="names">
+						<xsd:annotation>
+							<xsd:documentation>Ф.И.О.</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="name" maxOccurs="unbounded">
+									<xsd:annotation>
+										<xsd:documentation>Ф.И.О.</xsd:documentation>
+									</xsd:annotation>
+									<xsd:complexType>
+										<xsd:sequence>
+											<xsd:element name="name" type="st_subject_name">
+												<xsd:annotation>
+													<xsd:documentation>Имя</xsd:documentation>
+												</xsd:annotation>
+											</xsd:element>
+											<xsd:element name="surname" type="st_subject_name">
+												<xsd:annotation>
+													<xsd:documentation>Фамилия</xsd:documentation>
+												</xsd:annotation>
+											</xsd:element>
+											<xsd:element name="lastname" type="st_subject_name" minOccurs="0">
+												<xsd:annotation>
+													<xsd:documentation>Отчество</xsd:documentation>
+												</xsd:annotation>
+											</xsd:element>
+										</xsd:sequence>
+										<xsd:attribute ref="lang" use="required"/>
+									</xsd:complexType>
+								</xsd:element>
+							</xsd:sequence>
+						</xsd:complexType>
+						<xsd:unique name="unique_person_name_lang">
+							<xsd:annotation>
+								<xsd:documentation>Уникальность языка</xsd:documentation>
+							</xsd:annotation>
+							<xsd:selector xpath="name"/>
+							<xsd:field xpath="@lang"/>
+						</xsd:unique>
+					</xsd:element>
+					<xsd:element name="date_birth" type="st_date">
+						<xsd:annotation>
+							<xsd:documentation>Дата рождения</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="gender" type="st_gender" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Пол</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="docs">
+						<xsd:annotation>
+							<xsd:documentation>Документы</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:annotation>
+								<xsd:documentation>Документы</xsd:documentation>
+							</xsd:annotation>
+							<xsd:sequence>
+								<xsd:element ref="doc" maxOccurs="unbounded"/>
+							</xsd:sequence>
+						</xsd:complexType>
+						<xsd:unique name="unique_person_doc_type">
+							<xsd:annotation>
+								<xsd:documentation>Уникальность типа документа</xsd:documentation>
+							</xsd:annotation>
+							<xsd:selector xpath="doc"/>
+							<xsd:field xpath="@doc_type"/>
+						</xsd:unique>
+					</xsd:element>
+					<xsd:element ref="social_status" minOccurs="0"/>
+					<xsd:element ref="education" minOccurs="0"/>
+					<xsd:element name="income" type="st_decimal" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Сумма ежемесячных совокупных доходов</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="expense" type="st_decimal" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Сумма ежемесячных обязательств</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="marital_status" minOccurs="0"/>
+					<xsd:element name="family_member_num" type="xsd:positiveInteger" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Количество членов семьи</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="dependents" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Иждевенцы</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="dependent" type="ct_dependent" maxOccurs="unbounded"/>
+							</xsd:sequence>
+						</xsd:complexType>
+						<xsd:unique name="unique_dependent_age">
+							<xsd:selector xpath="dependent/dependent_age"/>
+							<xsd:field xpath="."/>
+						</xsd:unique>
+					</xsd:element>
+					<xsd:element ref="debtor_status" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ct_organization_base">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Юридическое лицо" (базовый)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="names">
+				<xsd:annotation>
+					<xsd:documentation>Наименования</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="name" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Наименование</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:simpleContent>
+									<xsd:extension base="st_string">
+										<xsd:attribute ref="lang" use="required"/>
+									</xsd:extension>
+								</xsd:simpleContent>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+				<xsd:unique name="unique_organization_base_name_lang">
+					<xsd:annotation>
+						<xsd:documentation>Уникальность языка</xsd:documentation>
+					</xsd:annotation>
+					<xsd:selector xpath="name"/>
+					<xsd:field xpath="@lang"/>
+				</xsd:unique>
+			</xsd:element>
+			<xsd:element name="docs">
+				<xsd:annotation>
+					<xsd:documentation>Документы</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:annotation>
+						<xsd:documentation>Документы</xsd:documentation>
+					</xsd:annotation>
+					<xsd:sequence>
+						<xsd:element ref="doc" minOccurs="2" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+				<xsd:unique name="unique_organization_base_doc_type">
+					<xsd:annotation>
+						<xsd:documentation>Уникальность типа документа</xsd:documentation>
+					</xsd:annotation>
+					<xsd:selector xpath="doc"/>
+					<xsd:field xpath="@doc_type"/>
+				</xsd:unique>
+			</xsd:element>
+			<xsd:element ref="country"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ct_organization">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Юридическое лицо"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ct_entity">
+				<xsd:sequence>
+					<xsd:element name="names">
+						<xsd:annotation>
+							<xsd:documentation>Наименования</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="name" maxOccurs="unbounded">
+									<xsd:annotation>
+										<xsd:documentation>Наименование</xsd:documentation>
+									</xsd:annotation>
+									<xsd:complexType>
+										<xsd:simpleContent>
+											<xsd:extension base="st_string">
+												<xsd:attribute ref="lang" use="required"/>
+											</xsd:extension>
+										</xsd:simpleContent>
+									</xsd:complexType>
+								</xsd:element>
+							</xsd:sequence>
+						</xsd:complexType>
+						<xsd:unique name="unique_organization_name_lang">
+							<xsd:annotation>
+								<xsd:documentation>Уникальность языка</xsd:documentation>
+							</xsd:annotation>
+							<xsd:selector xpath="name"/>
+							<xsd:field xpath="@lang"/>
+						</xsd:unique>
+					</xsd:element>
+					<xsd:element ref="legal_form" minOccurs="0"/>
+					<xsd:element name="is_foreign_branch" type="st_numeric_boolean">
+						<xsd:annotation>
+							<xsd:documentation>Признак филиала или представительства иностранной компании, осуществляющего свою деятельность в РК</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="docs">
+						<xsd:annotation>
+							<xsd:documentation>Документы</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:annotation>
+								<xsd:documentation>Документы</xsd:documentation>
+							</xsd:annotation>
+							<xsd:sequence>
+								<xsd:element ref="doc" minOccurs="2" maxOccurs="unbounded"/>
+							</xsd:sequence>
+						</xsd:complexType>
+						<xsd:unique name="unique_organization_doc_type">
+							<xsd:annotation>
+								<xsd:documentation>Уникальность типа документа</xsd:documentation>
+							</xsd:annotation>
+							<xsd:selector xpath="doc"/>
+							<xsd:field xpath="@doc_type"/>
+						</xsd:unique>
+					</xsd:element>
+					<xsd:element ref="enterprise_type" minOccurs="0"/>
+					<xsd:element ref="econ_trade" minOccurs="0"/>
+					<xsd:element ref="staff_quantity" minOccurs="0"/>
+					<xsd:element name="has_determiner" type="st_numeric_boolean">
+						<xsd:annotation>
+							<xsd:documentation>Решения заемщика  определяются иным лицом, зарегистрированным в оффшорных зонах, в силу договора или иным образом</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="is_se" type="st_numeric_boolean">
+						<xsd:annotation>
+							<xsd:documentation>Признак ИП</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ct_subject_base">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Субъект" (базовый)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element name="person" type="ct_person_base">
+				<xsd:annotation>
+					<xsd:documentation>Физическое лицо</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="organization" type="ct_organization_base">
+				<xsd:annotation>
+					<xsd:documentation>Юридическое лицо</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="creditor"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="ct_subject">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Субъект"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:element name="person" type="ct_person">
+					<xsd:annotation>
+						<xsd:documentation>Физическое лицо</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="organization" type="ct_organization">
+					<xsd:annotation>
+						<xsd:documentation>Юридическое лицо</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element ref="creditor"/>
+			</xsd:choice>
+			<xsd:element name="is_successor" type="st_numeric_boolean">
+				<xsd:annotation>
+					<xsd:documentation>Правоприемник по займу/условному обязательству</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute ref="subject_type" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="ct_creditor">
+		<xsd:annotation>
+			<xsd:documentation>Тип "БВУ/НО"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="docs">
+				<xsd:annotation>
+					<xsd:documentation>Документы</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:annotation>
+						<xsd:documentation>Документы</xsd:documentation>
+					</xsd:annotation>
+					<xsd:sequence>
+						<xsd:element ref="doc" minOccurs="2" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+				<xsd:unique name="unique_creditor_doc_type">
+					<xsd:annotation>
+						<xsd:documentation>Уникальность типа документа</xsd:documentation>
+					</xsd:annotation>
+					<xsd:selector xpath="doc"/>
+					<xsd:field xpath="@doc_type"/>
+				</xsd:unique>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--
+	Global Simple Types
+	-->
+	<xsd:simpleType name="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Тип для кодов справочника</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[0-9]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="st_date">
+		<xsd:annotation>
+			<xsd:documentation>Тип Date</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:date">
+			<xsd:minInclusive value="1900-01-01"/>
+			<xsd:maxExclusive value="2101-01-01"/>
+			<!-- Минимальная дата -->
+			<!-- Максимальная дата -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="st_decimal">
+		<xsd:annotation>
+			<xsd:documentation>Тип Decimal</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:decimal">
+			<xsd:totalDigits value="18"/>
+			<xsd:fractionDigits value="2"/>
+			<!-- Максимальная длина (без знака дробной части) -->
+			<!-- Длина дробной части -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="st_numeric_boolean">
+		<xsd:annotation>
+			<xsd:documentation>Тип Boolean</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:int">
+			<xsd:enumeration value="0"/>
+			<xsd:enumeration value="1"/>
+			<!-- False -->
+			<!-- True -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="st_string">
+		<xsd:annotation>
+			<xsd:documentation>Тип String</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[\w\-\\ .,&apos;/№():_+|&quot;#?!;]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="st_percent">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Процент"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:decimal">
+			<xsd:totalDigits value="4"/>
+			<xsd:fractionDigits value="2"/>
+			<xsd:minInclusive value="0"/>
+			<xsd:maxInclusive value="100"/>
+			<!-- Максимальная длина (без символа дробной части) -->
+			<!-- Длина дробной части -->
+			<!-- Минимальное значение -->
+			<!-- Максимальное значение -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="st_subject_share">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Процент доли от голосующих акций субъекта"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:decimal">
+			<xsd:totalDigits value="4"/>
+			<xsd:fractionDigits value="2"/>
+			<xsd:minInclusive value="10"/>
+			<xsd:maxInclusive value="100"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="st_subject_name">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Наименование"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="\p{L}+(-\p{L}+)*( \p{L}+(-\p{L}+)*)*"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--
+	Global Simple Types
+ (shared)-->
+	<xsd:simpleType name="st_gender">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Пол"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="M"/>
+			<xsd:enumeration value="F"/>
+			<!-- Мужской -->
+			<!-- Женский -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="st_address_type">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Тип адреса"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="FA"/>
+			<xsd:enumeration value="RA"/>
+			<!-- Фактический -->
+			<!-- Регистрационный -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="st_lang">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Язык"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="RU"/>
+			<xsd:enumeration value="KZ"/>
+			<xsd:enumeration value="EN"/>
+			<!-- Русский язык -->
+			<!-- Казахский язык -->
+			<!-- Английский язык -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="st_fine_type">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Тип взыскания"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="FN"/>
+			<xsd:enumeration value="PN"/>
+			<!-- Штраф -->
+			<!-- Пеня -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="st_interest_rate_type">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Вид ставки вознаграждения"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="FX"/>
+			<xsd:enumeration value="FL"/>
+			<!-- Фиксированная -->
+			<!-- Плавающая -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="st_sale_type">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Реализация/переуступки займа"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:integer">
+			<xsd:minInclusive value="1"/>
+			<xsd:maxInclusive value="4"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="st_claim_type">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Тип взыскания по обеспечению"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="JC"/>
+			<xsd:enumeration value="EC"/>
+			<!-- Судебное -->
+			<!-- Внесудебное -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="st_operation_type">
+		<xsd:annotation>
+			<xsd:documentation>Тип "Вид операции"</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="insert"/>
+			<xsd:enumeration value="update"/>
+			<!-- Добавление информации -->
+			<!-- Изменение информации -->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- 
+	Global Elements
+	-->
+	<xsd:element name="doc" type="ct_doc">
+		<xsd:annotation>
+			<xsd:documentation>Документ</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="contract" type="ct_contract">
+		<xsd:annotation>
+			<xsd:documentation>Договор/дополнительное соглашение</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<!--
+	Global Elements (refernce book)
+	-->
+	<xsd:element name="area" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="ru">Справочник "Регионы"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="balance_account" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="ru">Справочник "Номера балансовых счетов (детализированный)"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="bank_relation" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="ru">Справочник "Признак связанности с банком особыми отношениями"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="classification" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="ru">Справочник "Классификационные категории"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="country" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="ru">Справочник "Страны"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="creditor" type="ct_creditor">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="ru">Справочник "БВУ/НО"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="credit_committee" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="ru">Справочник "Уполномоченный орган банка, принявший решение о выдаче/прекращении займа/условного обязательства"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="credit_object" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Объект кредитования"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="credit_purpose" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Цель кредитования"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="currency" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Вид валюты"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="debtor_status" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Негативные статусы заемщика"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="dependent_age" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Возраст иждивенца"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="econ_sector" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Секторы экономики"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="econ_trade" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Отрасли экономики"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="education" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Уровень образования заемщика"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="enterprise_type" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Субъект частного предпринимательства"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="finance_source" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Источник финансирования"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="legal_form" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Организационно-правовая форма"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="locality" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Города/населенные пункты"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="marital_status" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Семейное положение"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="offshore" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Оффшорные зоны"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ownership_form" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Формы собственности"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="payment_method" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Способ погашения"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="payment_type" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Метод погашения"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="period_payment" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Периодичность платежей"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="pledge_type" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Вид обеспечения"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="portfolio" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Наименование однородного портфеля"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="region" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Области"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="risk_type" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Виды рисков на одного заемщика"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="score_group" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Группы критериев для справочника "Баллы классификации"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="social_status" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Социальный статус заемщика"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="staff_quantity" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Размер предприятия по численности" </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="subject_type" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Тип субъекта"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<!--
+	Global Attributes
+	-->
+	<xsd:attribute name="lang" type="st_lang">
+		<xsd:annotation>
+			<xsd:documentation>Язык</xsd:documentation>
+		</xsd:annotation>
+	</xsd:attribute>
+	<!--
+	Global Attributes (refernce book)
+	-->
+	<xsd:attribute name="contact_type" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Вид связи"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:attribute>
+	<xsd:attribute name="credit_type" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Виды займов и условных обязательств"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:attribute>
+	<xsd:attribute name="doc_type" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Вид идентификационных документов"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:attribute>
+	<xsd:attribute name="subject_type" type="st_ref_code_numeric">
+		<xsd:annotation>
+			<xsd:documentation>Справочник "Роль субъекта"</xsd:documentation>
+		</xsd:annotation>
+	</xsd:attribute>
+</xsd:schema>

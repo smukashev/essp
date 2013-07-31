@@ -18,6 +18,7 @@
       <module>modules/sync</module>
       <module>modules/brms</module>
       <module>modules/portlets</module>
+      <module>modules/bconv</module>
       <module>modules/parent</module>
   </modules>
 
