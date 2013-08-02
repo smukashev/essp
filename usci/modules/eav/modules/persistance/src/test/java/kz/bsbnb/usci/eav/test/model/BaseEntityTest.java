@@ -31,6 +31,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -41,6 +42,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
+@ActiveProfiles({"postgres"})
 public class BaseEntityTest extends GenericTestCase{
     private final Logger logger = LoggerFactory.getLogger(BaseEntityTest.class);
 
@@ -238,7 +240,7 @@ public class BaseEntityTest extends GenericTestCase{
 
 
         //Set<IBaseValue> setBase = new TreeSet<IBaseValue>();
-        assertEquals(4,((Set<IBaseValue>)instance.get()).size());
+        assertEquals(5,((Set<IBaseValue>)instance.get()).size());
     }
 
     @Test

@@ -34,10 +34,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Date;
-import java.util.Calendar;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -48,7 +45,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-@ActiveProfiles({ "postgres" })
+@ActiveProfiles({"postgres"})
 public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 {
 
@@ -766,13 +763,15 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         BaseEntity parentEntity = new BaseEntity(parentMetaLoad, batch.getRepDate());
         parentEntity.put("child_meta_class", new BaseValue(batch, 1L, childEntity));
 
-        childEntity.clearModifiedObjects();
-        parentEntity.clearModifiedObjects();
-
+        parentEntity.setListeners();
         childEntity.put("uuid", new BaseValue(batch, 1L, UUID.randomUUID().toString()));
+        parentEntity.removeListeners();
 
-        System.out.println(childEntity.getModifiedObjects().size());
-        System.out.println(parentEntity.getModifiedObjects().size());
+        assertEquals(1, parentEntity.getModifiedObjects().size());
+        assertEquals(1, childEntity.getModifiedObjects().size());
+
+        assertEquals("uuid", childEntity.getModifiedObjects().iterator().next());
+        assertEquals("child_meta_class.uuid", parentEntity.getModifiedObjects().iterator().next());
     }
 
 }

@@ -28,14 +28,20 @@ public interface IBaseEntityDao extends IDao<BaseEntity>
 
     public BaseEntity load(long id, Date reportDate);
 
+    public BaseEntity prepare(BaseEntity baseEntity);
+
+    public BaseEntity apply(BaseEntity baseEntity);
+
+    public BaseEntity process(BaseEntity baseEntity);
+
     public long saveOrUpdate(BaseEntity baseEntity);
 
-    public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
+    public void update(BaseEntity baseEntityForSave, BaseEntity baseEntityLoaded);
 
     public boolean isUsed(long baseEntityId);
 
     public Set<Date> getAvailableReportDates(long baseEntityId);
 
-    public java.util.Date getMaxReportDate(long baseEntityId);
+    public Date getMaxReportDate(long baseEntityId);
 
 }

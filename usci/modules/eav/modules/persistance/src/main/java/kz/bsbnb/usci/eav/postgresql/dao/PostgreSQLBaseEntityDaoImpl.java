@@ -157,6 +157,141 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         return load(baseEntities.get(0));
     }
 
+    public BaseEntity prepare(BaseEntity baseEntity)
+    {
+        MetaClass metaClass = baseEntity.getMeta();
+        if (metaClass.isSearchable())
+        {
+            /*long baseEntityId = search(baseEntity);
+            if (baseEntityId > 1)
+            {
+                baseEntity.setId(baseEntityId);
+            }*/
+        }
+
+        for (String attribute: metaClass.getAttributeNames())
+        {
+            IMetaType metaType = metaClass.getMemberType(attribute);
+            if (metaType.isComplex())
+            {
+                Object value = baseEntity.getBaseValue(attribute).getValue();
+                if (value != null)
+                {
+                    if (metaType.isSet())
+                    {
+                       BaseSet baseSet = (BaseSet)value;
+                       for (IBaseValue baseValue: baseSet.get())
+                       {
+                           prepare((BaseEntity)baseValue.getValue());
+                       }
+                    }
+                    else
+                    {
+                        prepare((BaseEntity)value);
+                    }
+                }
+            }
+        }
+
+        return baseEntity;
+    }
+
+    public BaseEntity apply(BaseEntity baseEntityForSave)
+    {
+        if (baseEntityForSave.getId() < 1)
+        {
+            for (String attribute: baseEntityForSave.getAttributeNames())
+            {
+                IMetaType metaType = baseEntityForSave.getMemberType(attribute);
+                IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
+                if (metaType.isComplex())
+                {
+                    if (metaType.isSet())
+                    {
+
+                    }
+                    else
+                    {
+                        apply((BaseEntity)baseValueForSave.getValue());
+                    }
+                }
+            }
+
+            return baseEntityForSave;
+        }
+        else
+        {
+            BaseEntity baseEntityLoaded = load(baseEntityForSave.getId());
+
+            Set<String> insertedAttributes = SetUtils.difference(baseEntityForSave.getAttributeNames(),
+                    baseEntityLoaded.getAttributeNames());
+            for (String insertedAttribute: insertedAttributes)
+            {
+                baseEntityLoaded.put(insertedAttribute, baseEntityForSave.getBaseValue(insertedAttribute));
+            }
+
+            for (String attribute: baseEntityLoaded.getAttributeNames())
+            {
+                IMetaType metaType = baseEntityLoaded.getMemberType(attribute);
+                IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
+                IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
+
+                if (baseValueForSave.getValue() == null)
+                {
+                    baseEntityLoaded.remove(attribute);
+                }
+                else
+                {
+                    if (metaType.isComplex())
+                    {
+                        if (metaType.isSet())
+                        {
+                            // TODO: Implement the situation
+                        }
+                        else
+                        {
+                            long forSaveId = ((BaseEntity)baseValueForSave.getValue()).getId();
+                            long loadedId = ((BaseEntity)baseValueLoaded.getValue()).getId();
+                            if (forSaveId != loadedId)
+                            {
+                                apply((BaseEntity)baseValueForSave.getValue());
+                                baseEntityLoaded.put(attribute, baseValueForSave);
+                            }
+                            else
+                            {
+                                apply((BaseEntity)baseValueLoaded.getValue());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!baseValueForSave.getValue().equals(baseValueLoaded.getValue()))
+                        {
+                            baseEntityLoaded.put(attribute, baseValueForSave);
+                        }
+                    }
+                }
+            }
+
+            return baseEntityLoaded;
+        }
+    }
+
+    public void apply(BaseSet baseSet)
+    {
+
+    }
+
+    public BaseEntity process(BaseEntity baseEntity)
+    {
+        //BaseEntity baseEntityPrepared = prepare(baseEntity);
+        //BaseEntity baseEntityApplied = apply(baseEntityPrepared);
+        //BaseEntity baseEntitySaved = saveOrUpdate(baseEntityApplied);
+
+        return baseEntity;
+    }
+
+
     @Override
     @Transactional
     public long saveOrUpdate(BaseEntity baseEntity)
