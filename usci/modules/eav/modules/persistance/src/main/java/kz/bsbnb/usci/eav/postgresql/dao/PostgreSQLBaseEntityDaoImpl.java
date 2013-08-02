@@ -167,6 +167,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             {
                 baseEntity.setId(baseEntityId);
             }*/
+            // TODO: Change method search()
+            BaseEntity baseEntitySearched = search(baseEntity);
+            if (baseEntitySearched != null)
+            {
+                baseEntity.setId(baseEntitySearched.getId());
+            }
         }
 
         for (String attribute: metaClass.getAttributeNames())
@@ -196,7 +202,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         return baseEntity;
     }
 
-    public BaseEntity apply(BaseEntity baseEntityForSave)
+    public BaseEntity apply(final BaseEntity baseEntityForSave)
     {
         if (baseEntityForSave.getId() < 1)
         {
@@ -208,7 +214,14 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 {
                     if (metaType.isSet())
                     {
+                        if (metaType.isSetOfSets())
+                        {
+                            throw new UnsupportedOperationException("Not implemented yet.");
+                        }
+                        else
+                        {
 
+                        }
                     }
                     else
                     {
@@ -246,20 +259,51 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     {
                         if (metaType.isSet())
                         {
-                            // TODO: Implement the situation
+                            if (metaType.isSetOfSets())
+                            {
+                                throw new UnsupportedOperationException("Not implemented yet.");
+                            }
+                            else
+                            {
+                                long[] forSaveIds = new long[]{};
+                                BaseSet baseSetForSave = (BaseSet)baseValueForSave.getValue();
+                                for (IBaseValue baseValue : baseSetForSave.get())
+                                {
+                                    BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
+                                    forSaveIds[forSaveIds.length] = baseEntity.getId();
+                                }
+
+                                long[] loadedIds = new long[]{};
+                                BaseSet baseSetLoaded = (BaseSet)baseValueLoaded.getValue();
+                                for (IBaseValue baseValue : baseSetLoaded.get())
+                                {
+                                    BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
+                                    loadedIds[loadedIds.length] = baseEntity.getId();
+                                }
+
+                                Arrays.sort(forSaveIds);
+                                Arrays.sort(loadedIds);
+
+                                if (!Arrays.equals(forSaveIds, loadedIds))
+                                {
+                                    baseEntityLoaded.put(attribute, baseValueForSave);
+                                }
+                            }
                         }
                         else
                         {
                             long forSaveId = ((BaseEntity)baseValueForSave.getValue()).getId();
                             long loadedId = ((BaseEntity)baseValueLoaded.getValue()).getId();
+
+                            BaseEntity baseEntityApplied = apply((BaseEntity)baseValueForSave.getValue());
+
                             if (forSaveId != loadedId)
                             {
-                                apply((BaseEntity)baseValueForSave.getValue());
                                 baseEntityLoaded.put(attribute, baseValueForSave);
                             }
                             else
                             {
-                                apply((BaseEntity)baseValueLoaded.getValue());
+                                baseValueLoaded.setValue(baseEntityApplied);
                             }
                         }
                     }
@@ -275,11 +319,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
             return baseEntityLoaded;
         }
-    }
-
-    public void apply(BaseSet baseSet)
-    {
-
     }
 
     public BaseEntity process(BaseEntity baseEntity)
@@ -1185,7 +1224,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     private void loadComplexValues(BaseEntity baseEntity)
     {
         SelectForUpdateStep select = sqlGenerator
-                .select(EAV_BE_COMPLEX_VALUES.BATCH_ID,
+                .select(EAV_BE_COMPLEX_VALUES.ID,
+                        EAV_BE_COMPLEX_VALUES.BATCH_ID,
                         EAV_M_COMPLEX_ATTRIBUTES.NAME,
                         EAV_BE_COMPLEX_VALUES.INDEX_,
                         EAV_BE_COMPLEX_VALUES.REP_DATE,
@@ -1211,6 +1251,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             baseEntity.put(
                     (String) row.get(EAV_M_COMPLEX_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
+                            (Long) row.get(EAV_BE_COMPLEX_VALUES.ID.getName()),
                             batch,
                             (Long) row.get(EAV_BE_COMPLEX_VALUES.INDEX_.getName()),
                             (Date) row.get(EAV_BE_COMPLEX_VALUES.REP_DATE.getName()),
