@@ -132,7 +132,7 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
                 return "metaSet, complex, setOfSets";
             }
             else {
-                return "metaSet, complex, setOfValues";
+                return "metaSet, " + metaType.toString(prefix);
             }
         }
         else {
@@ -140,7 +140,7 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
                 return "metaSet, simple, setOfSets";
             }
             else {
-                return "metaSet, simple, setOfValues";
+                return "metaSet, " + metaType.toString(prefix);
             }
         }
     }

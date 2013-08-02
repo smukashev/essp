@@ -33,24 +33,38 @@ public class MockRuleService implements IRuleService
         rule.setTitle("Rule 1");
         rules.add(rule);
 
-        rule = new Rule("rule \"test2\"\n" +
+        rule = new Rule("rule \"RNN_test1\"\n" +
                 "    when\n" +
-                "        $entity : BaseEntity ( getEl(\"subject.name.lastname\") == \"TULBASSIYEV\" )\n" +
+                "        $entity : BaseEntity ( getEl(\"subject.documents.document[type=RNN].no\") == null )\n" +
                 "    then\n" +
-                "        $entity.addValidationError(\"Test rule, that is true for TULBASSIYEV\");\n" +
+                "        $entity.addValidationError(\"Отсутствует РНН\");\n" +
                 "end");
         rule.setId(2);
-        rule.setTitle("Rule 2");
+        rule.setTitle("RNN_test1");
         rules.add(rule);
 
-        rule = new Rule("rule \"test3\"\n" +
+        rule = new Rule("rule \"RNN_test2\"\n" +
                 "    when\n" +
-                "        $entity : BaseEntity ( getEl(\"subject.name.lastname\") != \"TULBASSIYEV\" )\n" +
+                "        $entity : BaseEntity ( " +
+                "           getEl(\"subject.documents.document[type=RNN].no\") != null && " +
+                "           ((String)getEl(\"subject.documents.document[type=RNN].no\")).length() != 12 )\n" +
                 "    then\n" +
-                "        $entity.addValidationError(\"Test rule, that is false for TULBASSIYEV\");\n" +
+                "        $entity.addValidationError(\"В РНН не 12 символов\");\n" +
                 "end");
-        rule.setId(3);
-        rule.setTitle("Rule 3");
+        rule.setId(2);
+        rule.setTitle("RNN_test2");
+        rules.add(rule);
+
+        rule = new Rule("rule \"RNN_test3\"\n" +
+                "    when\n" +
+                "        $entity : BaseEntity ( " +
+                "           getEl(\"subject.documents.document[type=RNN].no\") != null && " +
+                "           !BRMSHelper.isValidRNN((String)getEl(\"subject.documents.document[type=RNN].no\")) )\n" +
+                "    then\n" +
+                "        $entity.addValidationError(\"РНН не проходит проверку контрольной суммы\");\n" +
+                "end");
+        rule.setId(2);
+        rule.setTitle("RNN_test3");
         rules.add(rule);
 
         return rules;
