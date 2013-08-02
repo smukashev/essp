@@ -265,6 +265,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                             }
                             else
                             {
+
+
                                 long[] forSaveIds = new long[]{};
                                 BaseSet baseSetForSave = (BaseSet)baseValueForSave.getValue();
                                 for (IBaseValue baseValue : baseSetForSave.get())
@@ -284,9 +286,18 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                                 Arrays.sort(forSaveIds);
                                 Arrays.sort(loadedIds);
 
+                                for (IBaseValue baseValue : baseSetForSave.get())
+                                {
+                                    apply((BaseEntity)baseValue.getValue());
+                                }
+
                                 if (!Arrays.equals(forSaveIds, loadedIds))
                                 {
                                     baseEntityLoaded.put(attribute, baseValueForSave);
+                                }
+                                else
+                                {
+                                    baseValueLoaded.setValue(baseSetForSave);
                                 }
                             }
                         }
