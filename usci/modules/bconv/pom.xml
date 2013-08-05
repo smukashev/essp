@@ -36,7 +36,7 @@
                     <prefix>git</prefix>
                     <dateFormat>dd.MM.yyyy '@' HH:mm:ss z</dateFormat>
                     <verbose>true</verbose>
-                    <dotGitDirectory>${project.basedir}/../../../../.git</dotGitDirectory>
+                    <dotGitDirectory>${project.basedir}/../../../.git</dotGitDirectory>
                     <skipPoms>true</skipPoms>
                     <generateGitPropertiesFile>true</generateGitPropertiesFile>
                     <generateGitPropertiesFilename>src/main/resources/properties/version.properties</generateGitPropertiesFilename>
