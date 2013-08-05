@@ -7,6 +7,8 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.util.DateUtils;
 
 import java.util.*;
 
@@ -178,6 +180,97 @@ public class BaseSet extends Persistable implements IBaseContainer
     @Override
     public void removeListener(AttributeChangeListener listener) {
         throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+        {
+            return true;
+        }
+
+        if (obj == null)
+        {
+            return false;
+        }
+
+        if (!(getClass() == obj.getClass()))
+        {
+            return false;
+        }
+
+        BaseSet that = (BaseSet) obj;
+
+        IMetaType thisMetaType = this.getMemberType();
+        IMetaType thatMetaType = that.getMemberType();
+        if (!thisMetaType.equals(thatMetaType)) {
+            return false;
+        }
+
+        boolean date = false;
+        if (!thisMetaType.isSet() && !thisMetaType.isComplex())
+        {
+            MetaValue metaValue = (MetaValue)thisMetaType;
+            if (metaValue.getTypeCode().equals(DataTypes.DATE))
+            {
+                date = true;
+            }
+        }
+
+        if (this.getElementCount() != that.getElementCount())
+        {
+            return false;
+        }
+
+        Set<UUID> uuids = new HashSet<UUID>();
+        Iterator<IBaseValue> thisIt = this.get().iterator();
+        while (thisIt.hasNext())
+        {
+            IBaseValue thisBaseValue = thisIt.next();
+
+            boolean found = false;
+
+            Iterator<IBaseValue> thatIt = that.get().iterator();
+            while (thatIt.hasNext())
+            {
+                IBaseValue thatBaseValue = thatIt.next();
+                if (uuids.contains(thatBaseValue.getUuid()))
+                {
+                    continue;
+                }
+                else
+                {
+                    Object thisObject = thisBaseValue.getValue();
+                    if (thisObject == null) {
+                        throw new RuntimeException("Element of the set can not be equal to null.");
+                    }
+
+                    Object thatObject = thatBaseValue.getValue();
+                    if (thatObject == null) {
+                        throw new RuntimeException("Element of the set can not be equal to null.");
+                    }
+
+                    if (date)
+                    {
+                        DateUtils.toBeginningOfTheDay((Date)thisObject);
+                        DateUtils.toBeginningOfTheDay((Date)thatObject);
+                    }
+
+                    if (thisObject.equals(thatObject))
+                    {
+                        uuids.add(thatBaseValue.getUuid());
+                        found = true;
+                    }
+                }
+            }
+
+            if (!found)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

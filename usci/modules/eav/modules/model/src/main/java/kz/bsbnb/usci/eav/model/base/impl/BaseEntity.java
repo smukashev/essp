@@ -28,6 +28,24 @@ import java.util.*;
  */
 public class BaseEntity extends BaseObject implements IBaseContainer
 {
+
+    public abstract class AbstractAttributeChangeListener implements AttributeChangeListener
+    {
+        String parentAttribute;
+
+        public AbstractAttributeChangeListener(String parentAttribute)
+        {
+            this.parentAttribute = parentAttribute;
+        }
+
+        public abstract void attributeChange(AttributeChangeEvent event);
+
+        public String getParentAttribute()
+        {
+            return parentAttribute;
+        }
+    }
+
     Logger logger = LoggerFactory.getLogger(BaseEntity.class);
 
     private static final Method ATTRIBUTE_CHANGE_METHOD;
@@ -160,7 +178,6 @@ public class BaseEntity extends BaseObject implements IBaseContainer
     @Override
     public void put(final String name, IBaseValue value)
     {
-        boolean needListening = false;
         IMetaType type = meta.getMemberType(name);
 
         if(type == null)
@@ -183,7 +200,6 @@ public class BaseEntity extends BaseObject implements IBaseContainer
                 else
                 {
                     expValueClass = BaseEntity.class;
-                    needListening = true;
                 }
             else
             {
@@ -222,33 +238,11 @@ public class BaseEntity extends BaseObject implements IBaseContainer
         {
             if (value.getValue() == null || !value.equals(values.get(name)))
             {
-                modifiedObjects.add(name);
                 fireAttributeChange(name);
             }
         }
         else
         {
-            if (needListening)
-            {
-                BaseEntity baseEntity = (BaseEntity)value.getValue();
-                baseEntity.addListener(new AttributeChangeListener(name) {
-                    @Override
-                    public void attributeChange(AttributeChangeEvent event) {
-                        String childAttribute = event.getAttribute();
-                        String parentAttribute = getParentAttribute();
-                        String attribute = parentAttribute + "." + childAttribute;
-
-                        modifiedObjects.add(attribute);
-                        fireAttributeChange(attribute);
-                    }
-
-                    @Override
-                    public String getParentAttribute() {
-                        return name;
-                    }
-                });
-            }
-            modifiedObjects.add(name);
             fireAttributeChange(name);
         }
 
@@ -338,136 +332,71 @@ public class BaseEntity extends BaseObject implements IBaseContainer
     public boolean equals(Object obj) {
         if (obj == this)
         {
-            logger.debug("Same object");
             return true;
         }
 
-
         if (obj == null)
         {
-            logger.debug("Object is null");
             return false;
         }
 
         if (!(getClass() == obj.getClass()))
         {
-            logger.debug("Different classes");
             return false;
         }
-        else
+
+        BaseEntity that = (BaseEntity) obj;
+
+        int thisAttributeCount = this.getAttributeCount();
+        int thatAttributeCount = that.getAttributeCount();
+
+        if (thisAttributeCount != thatAttributeCount)
         {
-            BaseEntity that = (BaseEntity) obj;
+            return false;
+        }
 
-            int thisAttributeCount = this.getAttributeCount();
-            int thatAttributeCount = that.getAttributeCount();
+        for (String attribute : values.keySet())
+        {
+            Object thisObject = this.safeGetValue(attribute).getValue();
+            Object thatObject = that.safeGetValue(attribute).getValue();
 
-            if (thisAttributeCount != thatAttributeCount)
+            if (thisObject == null && thatObject == null)
             {
-                logger.debug("Different attributes count");
+                continue;
+            }
+
+            if (thisObject == null || thatObject == null)
+            {
                 return false;
             }
 
-            for (String attributeName : values.keySet())
+            IMetaType metaType = this.getMemberType(attribute);
+            if (!metaType.isSet() && !metaType.isComplex())
             {
-                IBaseValue thisValue;
-                IBaseValue thatValue;
-
-                try
+                MetaValue metaValue = (MetaValue)metaType;
+                if (metaValue.getTypeCode().equals(DataTypes.DATE))
                 {
-                    thisValue = this.getBaseValue(attributeName);
-                } catch (IllegalArgumentException e)
-                {
-                    thisValue = null;
-                }
-
-                try
-                {
-                    thatValue = that.getBaseValue(attributeName);
-                } catch (IllegalArgumentException e)
-                {
-                    thatValue = null;
-                }
-
-                logger.debug("Attribute: " + attributeName);
-                logger.debug("This: " + thisValue);
-                logger.debug("That: " + thatValue);
-
-                if (thisValue == null && thatValue == null)
-                {
-                    logger.debug("Both null skiped");
-                    continue;
-                }
-
-                if (thisValue == null || thatValue == null)
-                {
-                    logger.debug("Null met");
-                    return false;
-                }
-
-                if (!thisValue.getRepDate().equals(thatValue.getRepDate()))
-                {
-                    logger.debug("Different repDates");
-                    return false;
-                }
-
-                if (this.getMeta().getMemberType(attributeName).isSet())
-                {
-                    logger.debug("It is an array");
-                    BaseSet thisSet = (BaseSet) (thisValue.getValue());
-                    BaseSet thatSet = (BaseSet) (thatValue.getValue());
-
-                    Set<IBaseValue> thisBatchValues = thisSet.get();
-                    Set<IBaseValue> thatBatchValues = thatSet.get();
-
-                    logger.debug("Arrays sizes: " + thisBatchValues.size() + " " + thatBatchValues.size());
-                    if(thisBatchValues.size() != thatBatchValues.size())
-                    {
-                        logger.debug("Sizes are different");
-                        return false;
-                    }
-
-                    if (!thisBatchValues.containsAll(thatBatchValues))
-                    {
-                        logger.debug("Arrays are different");
-                        return false;
-                    }
-                } else
-                {
-                    logger.debug("It is a single value");
-                    Object thisActualValue = thisValue.getValue();
-                    Object thatActualValue = thatValue.getValue();
-
-                    if(thisActualValue == null && thatActualValue == null)
-                    {
-                        logger.debug("Both null so skipped.");
-                        continue;
-                    }
-
-                    if(thisActualValue == null || thatActualValue == null)
-                    {
-                        logger.debug("One is null");
-                        return false;
-                    }
-
-                    if (!thisActualValue.equals(thatActualValue))
-                    {
-                        logger.debug("Single values are different.");
-                        return false;
-                    }
+                    DateUtils.toBeginningOfTheDay((Date)thisObject);
+                    DateUtils.toBeginningOfTheDay((Date)thatObject);
                 }
             }
 
-            return true;
+            if (!thisObject.equals(thatObject))
+            {
+                return false;
+            }
         }
+
+        return true;
     }
 
     public IBaseValue safeGetValue(String name)
     {
-        try
+        if (this.getAttributeNames().contains(name))
         {
             return getBaseValue(name);
         }
-        catch(Exception e)
+        else
         {
             return null;
         }
@@ -601,27 +530,30 @@ public class BaseEntity extends BaseObject implements IBaseContainer
         this.modifiedObjects.clear();
     }
 
-    protected void addModifiedObject(String name)
-    {
-        this.modifiedObjects.add(name);
-    }
-
     public Set<String> getModifiedObjects()
     {
         return this.modifiedObjects;
     }
 
-    public void setListeners(boolean hierarchically)
+    public void setListeners()
     {
+        this.addListener(new AttributeChangeListener() {
+            @Override
+            public void attributeChange(AttributeChangeEvent event) {
+                modifiedObjects.add(event.getAttribute());
+            }
+        });
+
         for (String key : values.keySet())
         {
             IMetaType metaType = meta.getMemberType(key);
             if (!metaType.isSet() && metaType.isComplex())
             {
                 IBaseValue baseValue = values.get(key);
-                BaseEntity baseEntity = (BaseEntity)baseValue;
+                BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
 
-                baseEntity.addListener(new AttributeChangeListener(key) {
+                baseEntity.addListener(new AbstractAttributeChangeListener(key) {
+
                     @Override
                     public void attributeChange(AttributeChangeEvent event) {
                         String childAttribute = event.getAttribute();
@@ -633,34 +565,42 @@ public class BaseEntity extends BaseObject implements IBaseContainer
                     }
                 });
 
-                if (hierarchically)
-                {
-                    baseEntity.setListeners(hierarchically);
-                }
+                baseEntity.setListeners();
             }
         }
     }
 
-    public void removeListeners(boolean hierarchically)
+    public void removeListeners()
     {
+        List<AttributeChangeListener> parentListeners =
+                (List<AttributeChangeListener>)this.getListeners(AttributeChangeEvent.class);
+        final Iterator<AttributeChangeListener> parentIt = parentListeners.iterator();
+        while (parentIt.hasNext())
+        {
+            final AttributeChangeListener listener = parentIt.next();
+            this.removeListener(listener);
+        }
+
         for (String key : values.keySet())
         {
             IMetaType metaType = meta.getMemberType(key);
             if (!metaType.isSet() && metaType.isComplex())
             {
                 IBaseValue baseValue = values.get(key);
-                BaseEntity baseEntity = (BaseEntity)baseValue;
+                BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
 
-                List<AttributeChangeListener> listeners =
+                List<AttributeChangeListener> childListeners =
                         (List<AttributeChangeListener>)baseEntity.getListeners(AttributeChangeEvent.class);
-                final Iterator<AttributeChangeListener> it = listeners.iterator();
-                while (it.hasNext())
+                final Iterator<AttributeChangeListener> childIt = childListeners.iterator();
+                while (childIt.hasNext())
                 {
-                    final AttributeChangeListener listener = it.next();
-                    //if (listener.)
+                    final AttributeChangeListener listener = childIt.next();
+                    baseEntity.removeListener(listener);
                 }
             }
         }
     }
+
+
 
 }
