@@ -76,7 +76,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
     }
 
     @Test
-    public void prepareAndApplyFirstVariant() throws Exception
+    public void prepareAndApplyFirst() throws Exception
     {
         MetaClass childMetaCreate = new MetaClass("child_meta_class");
         childMetaCreate.setMetaAttribute("uuid",
@@ -145,7 +145,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
     }
 
     @Test
-    public void prepareAndApplySecondVariant() throws Exception
+    public void prepareAndApplySecond() throws Exception
     {
         MetaClass childMetaCreate = new MetaClass("child_meta_class");
         childMetaCreate.setMetaAttribute("uuid",
@@ -212,6 +212,72 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
                 (Date)parentEntitySaved.getBaseValue("child_meta_class").getRepDate(),
                 (Date)parentEntityApplied.getBaseValue("child_meta_class").getRepDate()) == 0);
     }
+
+    @Test
+    public void prepareAndApplyThird() throws Exception
+    {
+        MetaClass metaForSetCreated = new MetaClass("meta_class_for_set");
+        metaForSetCreated.setMetaAttribute("uuid",
+                new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
+        metaForSetCreated.setMetaAttribute("name",
+                new MetaAttribute(false, false, new MetaValue(DataTypes.STRING)));
+
+        MetaClass metaCreated = new MetaClass("meta_class");
+        metaCreated.setMetaAttribute("uuid",
+                new MetaAttribute(true, false, new MetaValue(DataTypes.STRING)));
+        metaCreated.setMetaAttribute("name",
+                new MetaAttribute(false, false, new MetaValue(DataTypes.STRING)));
+        metaCreated.setMetaAttribute("set_of_meta_class",
+                new MetaAttribute(false, true, new MetaSet(metaForSetCreated)));
+
+        long metaId = postgreSQLMetaClassDaoImpl.save(metaCreated);
+        MetaClass metaLoaded = postgreSQLMetaClassDaoImpl.load(metaId);
+        MetaClass metaForSetLoaded = postgreSQLMetaClassDaoImpl.load("meta_class_for_set");
+
+        // 1 january 2013
+        Batch batchFirst = batchRepository.addBatch(new Batch(new Date(new Long("1356976800000"))));
+        // 1 february 2013
+        Batch batchSecond = batchRepository.addBatch(new Batch(new Date(new Long("1359655200000"))));
+
+        // First batch
+        BaseEntity entityForSetCreated = new BaseEntity(metaForSetLoaded, batchFirst.getRepDate());
+        entityForSetCreated.put("uuid", new BaseValue(batchFirst, 1L, UUID.randomUUID().toString()));
+        entityForSetCreated.put("name", new BaseValue(batchFirst, 1L, "meta_class_for_set_name"));
+
+        BaseSet setCreated = new BaseSet(metaForSetLoaded);
+        setCreated.put(new BaseValue(batchFirst, 1L, entityForSetCreated));
+
+        BaseEntity entityCreated = new BaseEntity(metaLoaded, batchFirst.getRepDate());
+        entityCreated.put("uuid", new BaseValue(batchFirst, 1L, UUID.randomUUID().toString()));
+        entityCreated.put("name", new BaseValue(batchFirst, 1L, "meta_class_name"));
+        entityCreated.put("set_of_meta_class", new BaseValue(batchFirst, 1L, setCreated));
+
+        long entitySavedId = postgreSQLBaseEntityDaoImpl.saveOrUpdate(entityCreated);
+        BaseEntity entitySaved = postgreSQLBaseEntityDaoImpl.load(entitySavedId);
+
+        BaseEntity entityFirstForSetForUpdate = new BaseEntity(metaForSetLoaded, batchSecond.getRepDate());
+        entityFirstForSetForUpdate.put("uuid", new BaseValue(batchSecond, 2L, entityForSetCreated.getBaseValue("uuid").getValue()));
+        entityFirstForSetForUpdate.put("name", new BaseValue(batchSecond, 2L, "meta_class_for_set_name_updated"));
+
+        BaseEntity entitySecondForSetForUpdate = new BaseEntity(metaForSetLoaded, batchSecond.getRepDate());
+        entitySecondForSetForUpdate.put("uuid", new BaseValue(batchSecond, 2L, UUID.randomUUID().toString()));
+
+        BaseSet setForUpdate = new BaseSet(metaForSetLoaded);
+        setForUpdate.put(new BaseValue(batchSecond, 2L, entityFirstForSetForUpdate));
+        setForUpdate.put(new BaseValue(batchSecond, 2L, entitySecondForSetForUpdate));
+
+        BaseEntity entityForUpdate = new BaseEntity(metaLoaded, batchSecond.getRepDate());
+        entityForUpdate.put("uuid", new BaseValue(batchSecond, 2L, entityCreated.getBaseValue("uuid").getValue()));
+        entityForUpdate.put("name", new BaseValue(batchSecond, 2L, "meta_class_name_updated"));
+        entityForUpdate.put("set_of_meta_class", new BaseValue(batchSecond, 2L, setForUpdate));
+
+
+        BaseEntity entityPrepared = postgreSQLBaseEntityDaoImpl.prepare(entityForUpdate);
+        BaseEntity entityApplied = postgreSQLBaseEntityDaoImpl.apply(entityPrepared);
+
+        long entityUpdatedId = postgreSQLBaseEntityDaoImpl.saveOrUpdate(entityApplied);
+    }
+
 
     @Test
     public void saveBaseEntity() throws Exception {
@@ -760,7 +826,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
     }
 
     @Test
-    public void updateBaseEntityWithComplexSetValuesFirst() throws Exception {
+    public void updateBaseEntityWithComplexSetValues() throws Exception {
         MetaClass metaParentCreate = new MetaClass("meta_class_parent");
         MetaClass metaChildCreate = new MetaClass("meta_class_child");
         metaParentCreate.setMetaAttribute("uuid",
