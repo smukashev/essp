@@ -36,7 +36,7 @@
                     <prefix>git</prefix>
                     <dateFormat>dd.MM.yyyy '@' HH:mm:ss z</dateFormat>
                     <verbose>true</verbose>
-                    <dotGitDirectory>${project.basedir}/../../../../.git</dotGitDirectory>
+                    <dotGitDirectory>${project.basedir}/../../../.git</dotGitDirectory>
                     <skipPoms>true</skipPoms>
                     <generateGitPropertiesFile>true</generateGitPropertiesFile>
                     <generateGitPropertiesFilename>src/main/resources/properties/version.properties</generateGitPropertiesFilename>
@@ -66,6 +66,12 @@
             <groupId>kz.bsbnb.usci.eav</groupId>
             <artifactId>model</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>kz.bsbnb.usci.eav</groupId>
+            <artifactId>persistance</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

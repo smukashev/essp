@@ -11,6 +11,9 @@
 
     <context:annotation-config/>
 
+    <!-- Add this tag to enable annotations transactions -->
+    <tx:annotation-driven transaction-manager="txManager"/>
+
     <bean id="log4jInitializer" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="staticMethod" value="org.springframework.util.Log4jConfigurer.initLogging"/>
         <property name="arguments">
@@ -19,4 +22,49 @@
             </list>
         </property>
     </bean>
+
+    <!-- spring transaction manager -->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <context:component-scan base-package="kz.bsbnb.usci.eav" />
+
+    <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav.repository.impl.BatchRepository"/>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.user}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="initialSize" value="${jdbc.initialSize}"/>
+        <property name="maxActive" value="${jdbc.maxActive}"/>
+    </bean>
+
+    <bean id="sqlGenerator" class="org.jooq.impl.Executor">
+        <constructor-arg index="0" value="${jooq.executor.constructor.args.first}"/>
+    </bean>
+
+    <!-- datasource to the database -->
+    <beans profile="oracle">
+        <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+            <property name="locations">
+                <list>
+                    <value>classpath:properties/profiles/oracle.properties</value>
+                    <value>classpath:properties/main.properties</value>
+                </list>
+            </property>
+        </bean>
+    </beans>
+
+    <beans profile="postgres">
+        <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+            <property name="locations">
+                <list>
+                    <value>classpath:properties/profiles/postgres.properties</value>
+                    <value>classpath:properties/main.properties</value>
+                </list>
+            </property>
+        </bean>
+    </beans>
 </beans>

@@ -1,10 +1,7 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import kz.bsbnb.usci.eav.model.base.ContainerTypes;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
@@ -405,7 +402,13 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
     {
         String str = "metaClass;";
 
-        for (String memberName : members.keySet())
+        String[] names;
+
+        names = (String[]) members.keySet().toArray(new String[members.keySet().size()]);
+
+        Arrays.sort(names);
+
+        for (String memberName : names)
         {
             IMetaAttribute attribute = members.get(memberName);
             IMetaType type = attribute.getMetaType();
