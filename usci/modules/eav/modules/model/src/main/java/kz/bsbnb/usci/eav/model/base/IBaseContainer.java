@@ -49,4 +49,7 @@ public interface IBaseContainer extends Serializable
     public Set<IBaseValue> get();
 
     public IMetaType getMemberType(String name);
+
+    //public IBaseContainer copy();
+
 }

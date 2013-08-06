@@ -14,6 +14,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeComplexValueDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBeSetValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeSimpleValueDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcherPool;
@@ -54,6 +55,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     IBeSimpleValueDao beSimpleValueDao;
     @Autowired
     IBeComplexValueDao beComplexValueDao;
+    @Autowired
+    IBeSetValueDao beSetValueDao;
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -204,7 +207,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
     public BaseEntity apply(final BaseEntity baseEntityForSave)
     {
-        if (baseEntityForSave.getId() < 1)
+        if (baseEntityForSave.getId() < 1 || !baseEntityForSave.getMeta().isSearchable())
         {
             for (String attribute: baseEntityForSave.getAttributeNames())
             {
@@ -220,7 +223,10 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         }
                         else
                         {
-
+                            for (IBaseValue baseValue : ((BaseSet)baseValueForSave.getValue()).get())
+                            {
+                                apply((BaseEntity)baseValue.getValue());
+                            }
                         }
                     }
                     else
@@ -235,6 +241,17 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         else
         {
             BaseEntity baseEntityLoaded = load(baseEntityForSave.getId());
+
+            BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
+            if (!comparator.compare(baseEntityForSave, baseEntityLoaded))
+            {
+                BaseEntity baseEntitySearched = search(baseEntityForSave);
+                if (baseEntitySearched != null && baseEntityLoaded.getId() != baseEntitySearched.getId())
+                {
+                    throw new RuntimeException("Found a violation of uniqueness. " +
+                            "The saving process can not be continued.");
+                }
+            }
 
             Set<String> insertedAttributes = SetUtils.difference(baseEntityForSave.getAttributeNames(),
                     baseEntityLoaded.getAttributeNames());
@@ -265,33 +282,30 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                             }
                             else
                             {
-
-
-                                long[] forSaveIds = new long[]{};
+                                List<Long> forSaveIds = new ArrayList<Long>();
                                 BaseSet baseSetForSave = (BaseSet)baseValueForSave.getValue();
                                 for (IBaseValue baseValue : baseSetForSave.get())
                                 {
                                     BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
-                                    forSaveIds[forSaveIds.length] = baseEntity.getId();
+                                    forSaveIds.add(baseEntity.getId());
                                 }
 
-                                long[] loadedIds = new long[]{};
+                                List<Long> loadedIds = new ArrayList<Long>();
                                 BaseSet baseSetLoaded = (BaseSet)baseValueLoaded.getValue();
                                 for (IBaseValue baseValue : baseSetLoaded.get())
                                 {
                                     BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
-                                    loadedIds[loadedIds.length] = baseEntity.getId();
+                                    loadedIds.add(baseEntity.getId());
                                 }
-
-                                Arrays.sort(forSaveIds);
-                                Arrays.sort(loadedIds);
+                                Collections.sort(loadedIds);
+                                Collections.sort(loadedIds);
 
                                 for (IBaseValue baseValue : baseSetForSave.get())
                                 {
                                     apply((BaseEntity)baseValue.getValue());
                                 }
 
-                                if (!Arrays.equals(forSaveIds, loadedIds))
+                                if (!forSaveIds.equals(loadedIds))
                                 {
                                     baseEntityLoaded.put(attribute, baseValueForSave);
                                 }
@@ -430,10 +444,19 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     {
                         if (attributesLoaded.contains(attribute))
                         {
-                            IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
-                            boolean compare = compare((BaseSet) baseValueLoaded.getValue(),
-                                    (BaseSet) baseValueForSave.getValue());
-                            if (!compare)
+                            MetaSet metaSet = (MetaSet)metaType;
+                            MetaClass metaClass = (MetaClass)metaSet.getMemberType();
+                            if (metaClass.isSearchable())
+                            {
+                                IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
+                                BaseSet baseSetLoaded = (BaseSet) baseValueLoaded.getValue();
+                                BaseSet baseSetForSave = (BaseSet) baseValueForSave.getValue();
+                                if (!baseSetLoaded.equals(baseSetForSave))
+                                {
+                                    updateComplexSetAttributes.add(attribute);
+                                }
+                            }
+                            else
                             {
                                 updateComplexSetAttributes.add(attribute);
                             }
@@ -510,7 +533,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             for (String attribute: insertComplexSetAttributes)
             {
-                insertEntitySet(baseEntityLoaded, attribute);
+                beSetValueDao.save(baseEntityLoaded, attribute);
             }
         }
 
@@ -525,9 +548,9 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 entitiesForRemove.addAll(
                         collectComplexSetValues((BaseSet)baseValueLoaded.getValue()));
 
-                removeEntitySet(baseEntityLoaded, attribute);
+                beSetValueDao.remove(baseEntityLoaded, attribute);
                 baseEntityLoaded.put(attribute, baseValueForSave);
-                insertEntitySet(baseEntityLoaded, attribute);
+                beSetValueDao.save(baseEntityLoaded, attribute);
             }
         }
 
@@ -539,7 +562,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
                 entitiesForRemove.addAll(
                         collectComplexSetValues((BaseSet)baseValueLoaded.getValue()));
-                removeEntitySet(baseEntityLoaded, attribute);
+                beSetValueDao.remove(baseEntityLoaded, attribute);
             }
         }
 
@@ -592,7 +615,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             IMetaType metaType = meta.getMemberType(attributeName);
             if (metaType.isSet())
             {
-                insertEntitySet(baseEntity, attributeName);
+                beSetValueDao.save(baseEntity, attributeName);
             }
             else
             {
@@ -649,7 +672,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     IBaseValue baseValue = baseEntity.getBaseValue(attribute);
                     Set<BaseEntity> baseEntitiesForRemove = collectComplexSetValues((BaseSet)baseValue.getValue());
 
-                    removeEntitySet(baseEntity, attribute);
+                    beSetValueDao.remove(baseEntity, attribute);
 
                     Iterator<BaseEntity> baseEntityForRemoveIt = baseEntitiesForRemove.iterator();
                     while (baseEntityForRemoveIt.hasNext())
@@ -684,17 +707,30 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
     public boolean isUsed(long baseEntityId)
     {
-        Select select = sqlGenerator
+        Select select;
+        List<Map<String, Object>> rows;
+
+        select = sqlGenerator
                 .select(count().as("VALUE_COUNT"))
                 .from(EAV_BE_COMPLEX_VALUES)
                 .where(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.equal(baseEntityId));
 
         logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+        rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        long count = (Long)rows.get(0).get("VALUE_COUNT");
+        long complexValuesCount = (Long)rows.get(0).get("VALUE_COUNT");
 
-        return count != 0;
+        select = sqlGenerator
+                .select(count().as("VALUE_COUNT"))
+                .from(EAV_BE_COMPLEX_SET_VALUES)
+                .where(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID.equal(baseEntityId));
+
+        logger.debug(select.toString());
+        rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        long complexSetValuesCount = (Long)rows.get(0).get("VALUE_COUNT");
+
+        return complexValuesCount != 0 || complexSetValuesCount != 0;
     }
 
     public Set<java.util.Date> getAvailableReportDates(long baseEntityId)
@@ -772,279 +808,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
 
         return baseEntityId;
-    }
-
-    private void insertEntitySet(BaseEntity baseEntity, String attribute)
-    {
-        MetaClass meta = baseEntity.getMeta();
-        IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
-        IMetaType metaType = metaAttribute.getMetaType();
-        MetaSet metaSet = (MetaSet)metaType;
-
-        if (metaAttribute.getId() < 1)
-        {
-            throw new IllegalArgumentException("MetaAttribute does not contain an id. " +
-                    "The set can not be saved.");
-        }
-
-        IBaseValue baseValue = baseEntity.getBaseValue(attribute);
-
-        long setId;
-        if (metaType.isComplex())
-        {
-            setId = insertComplexSet(baseValue, metaSet);
-        }
-        else
-        {
-            setId = insertSimpleSet(baseValue, metaSet);
-        }
-
-        InsertOnDuplicateStep insert;
-        if (metaType.isSetOfSets())
-        {
-            insert = sqlGenerator
-                    .insertInto(
-                            EAV_BE_ENTITY_SET_OF_SETS,
-                            EAV_BE_ENTITY_SET_OF_SETS.ENTITY_ID,
-                            EAV_BE_ENTITY_SET_OF_SETS.ATTRIBUTE_ID,
-                            EAV_BE_ENTITY_SET_OF_SETS.SET_ID,
-                            EAV_BE_ENTITY_SET_OF_SETS.IS_LAST)
-                    .values(baseEntity.getId(), metaAttribute.getId(), setId, true);
-        }
-        else
-        {
-            if (metaType.isComplex())
-            {
-                insert = sqlGenerator
-                        .insertInto(
-                                EAV_BE_ENTITY_COMPLEX_SETS,
-                                EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID,
-                                EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID,
-                                EAV_BE_ENTITY_COMPLEX_SETS.SET_ID,
-                                EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST)
-                        .values(baseEntity.getId(), metaAttribute.getId(), setId, true);
-            }
-            else
-            {
-                insert = sqlGenerator
-                        .insertInto(
-                                EAV_BE_ENTITY_SIMPLE_SETS,
-                                EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID,
-                                EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID,
-                                EAV_BE_ENTITY_SIMPLE_SETS.SET_ID,
-                                EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST)
-                        .values(baseEntity.getId(), metaAttribute.getId(), setId, true);
-            }
-        }
-
-        logger.debug(insert.toString());
-        insertWithId(insert.getSQL(), insert.getBindValues().toArray());
-    }
-
-    private long insertSet(IBaseValue baseValue)
-    {
-        InsertOnDuplicateStep insert = sqlGenerator
-                .insertInto(
-                        EAV_BE_SETS,
-                        EAV_BE_SETS.BATCH_ID,
-                        EAV_BE_SETS.INDEX_,
-                        EAV_BE_SETS.REP_DATE)
-                .values(baseValue.getBatch().getId(), baseValue.getIndex(), baseValue.getRepDate());
-
-        logger.debug(insert.toString());
-        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
-    }
-
-    private long insertSimpleSet(IBaseValue baseValue, MetaSet metaSet)
-    {
-        BaseSet baseSet = (BaseSet)baseValue.getValue();
-        IMetaType metaType = metaSet.getMemberType();
-
-        long setId = insertSet(baseValue);
-        if (metaType.isSet())
-        {
-            InsertValuesStep2 insert = sqlGenerator
-                    .insertInto(
-                            EAV_BE_SET_OF_SIMPLE_SETS,
-                            EAV_BE_SET_OF_SIMPLE_SETS.PARENT_SET_ID,
-                            EAV_BE_SET_OF_SIMPLE_SETS.CHILD_SET_ID);
-
-            Set<IBaseValue> baseValues = baseSet.get();
-            Iterator<IBaseValue> itValue = baseValues.iterator();
-
-            while (itValue.hasNext())
-            {
-                IBaseValue baseValueChild = itValue.next();
-                MetaSet baseSetChild = (MetaSet)metaType;
-
-                long setIdChild = insertSimpleSet(baseValueChild, baseSetChild);
-
-                Object[] insertArgs = new Object[] {
-                        setId,
-                        setIdChild,
-                };
-                insert = insert.values(Arrays.asList(insertArgs));
-            }
-            logger.debug(insert.toString());
-            batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
-        }
-        else
-        {
-            InsertValuesStep5 insert;
-            DataTypes dataType = metaSet.getTypeCode();
-            switch(dataType)
-            {
-                case INTEGER:
-                {
-                    insert = sqlGenerator
-                            .insertInto(
-                                    EAV_BE_INTEGER_SET_VALUES,
-                                    EAV_BE_INTEGER_SET_VALUES.SET_ID,
-                                    EAV_BE_INTEGER_SET_VALUES.BATCH_ID,
-                                    EAV_BE_INTEGER_SET_VALUES.INDEX_,
-                                    EAV_BE_INTEGER_SET_VALUES.REP_DATE,
-                                    EAV_BE_INTEGER_SET_VALUES.VALUE);
-                    break;
-                }
-                case DATE:
-                {
-                    insert = sqlGenerator
-                            .insertInto(
-                                    EAV_BE_DATE_SET_VALUES,
-                                    EAV_BE_DATE_SET_VALUES.SET_ID,
-                                    EAV_BE_DATE_SET_VALUES.BATCH_ID,
-                                    EAV_BE_DATE_SET_VALUES.INDEX_,
-                                    EAV_BE_DATE_SET_VALUES.REP_DATE,
-                                    EAV_BE_DATE_SET_VALUES.VALUE);
-                    break;
-                }
-                case STRING:
-                {
-                    insert = sqlGenerator
-                            .insertInto(
-                                    EAV_BE_STRING_SET_VALUES,
-                                    EAV_BE_STRING_SET_VALUES.SET_ID,
-                                    EAV_BE_STRING_SET_VALUES.BATCH_ID,
-                                    EAV_BE_STRING_SET_VALUES.INDEX_,
-                                    EAV_BE_STRING_SET_VALUES.REP_DATE,
-                                    EAV_BE_STRING_SET_VALUES.VALUE);
-                    break;
-                }
-                case BOOLEAN:
-                {
-                    insert = sqlGenerator
-                            .insertInto(
-                                    EAV_BE_BOOLEAN_SET_VALUES,
-                                    EAV_BE_BOOLEAN_SET_VALUES.SET_ID,
-                                    EAV_BE_BOOLEAN_SET_VALUES.BATCH_ID,
-                                    EAV_BE_BOOLEAN_SET_VALUES.INDEX_,
-                                    EAV_BE_BOOLEAN_SET_VALUES.REP_DATE,
-                                    EAV_BE_BOOLEAN_SET_VALUES.VALUE);
-                    break;
-                }
-                case DOUBLE:
-                {
-                    insert = sqlGenerator
-                            .insertInto(
-                                    EAV_BE_DOUBLE_SET_VALUES,
-                                    EAV_BE_DOUBLE_SET_VALUES.SET_ID,
-                                    EAV_BE_DOUBLE_SET_VALUES.BATCH_ID,
-                                    EAV_BE_DOUBLE_SET_VALUES.INDEX_,
-                                    EAV_BE_DOUBLE_SET_VALUES.REP_DATE,
-                                    EAV_BE_DOUBLE_SET_VALUES.VALUE);
-                    break;
-                }
-                default:
-                    throw new IllegalArgumentException("Unknown type.");
-            }
-
-            Set<IBaseValue> baseValues = baseSet.get();
-            Iterator<IBaseValue> it = baseValues.iterator();
-            while (it.hasNext())
-            {
-                IBaseValue batchValueChild = it.next();
-                Object[] insertArgs = new Object[] {
-                        setId,
-                        batchValueChild.getBatch().getId(),
-                        batchValueChild.getIndex(),
-                        batchValueChild.getRepDate(),
-                        batchValueChild.getValue()
-                };
-                insert = insert.values(Arrays.asList(insertArgs));
-            }
-            logger.debug(insert.toString());
-            batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
-        }
-
-        return setId;
-    }
-
-    private long insertComplexSet(IBaseValue baseValue, MetaSet metaSet)
-    {
-        BaseSet baseSet = (BaseSet)baseValue.getValue();
-        IMetaType metaType = metaSet.getMemberType();
-
-        long setId = insertSet(baseValue);
-        if (metaType.isSet())
-        {
-            InsertValuesStep2 insert = sqlGenerator
-                    .insertInto(
-                            EAV_BE_SET_OF_COMPLEX_SETS,
-                            EAV_BE_SET_OF_COMPLEX_SETS.PARENT_SET_ID,
-                            EAV_BE_SET_OF_COMPLEX_SETS.CHILD_SET_ID);
-
-            Set<IBaseValue> baseValues = baseSet.get();
-            Iterator<IBaseValue> it = baseValues.iterator();
-
-            while (it.hasNext())
-            {
-                IBaseValue baseValueChild = it.next();
-                MetaSet baseSetChild = (MetaSet)metaType;
-
-                long setIdChild = insertComplexSet(baseValueChild, baseSetChild);
-
-                Object[] insertArgs = new Object[] {
-                        setId,
-                        setIdChild,
-                };
-                insert = insert.values(Arrays.asList(insertArgs));
-            }
-            logger.debug(insert.toString());
-            batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
-        }
-        else
-        {
-            InsertValuesStep5 insert = sqlGenerator
-                    .insertInto(
-                            EAV_BE_COMPLEX_SET_VALUES,
-                            EAV_BE_COMPLEX_SET_VALUES.SET_ID,
-                            EAV_BE_COMPLEX_SET_VALUES.BATCH_ID,
-                            EAV_BE_COMPLEX_SET_VALUES.INDEX_,
-                            EAV_BE_COMPLEX_SET_VALUES.REP_DATE,
-                            EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID);
-
-            Set<IBaseValue> baseValues = baseSet.get();
-            Iterator<IBaseValue> itValue = baseValues.iterator();
-            while (itValue.hasNext()) {
-                IBaseValue baseValueChild = itValue.next();
-
-                BaseEntity baseEntityChild = (BaseEntity)baseValueChild.getValue();
-                long baseEntityChildId = saveOrUpdate(baseEntityChild);
-
-                Object[] insertArgs = new Object[] {
-                        setId,
-                        baseValueChild.getBatch().getId(),
-                        baseValueChild.getIndex(),
-                        baseValue.getRepDate(),
-                        baseEntityChildId
-                };
-                insert = insert.values(Arrays.asList(insertArgs));
-            }
-            logger.debug(insert.toString());
-            batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
-        }
-
-        return setId;
     }
 
     private void loadIntegerValues(BaseEntity baseEntity)
@@ -1781,174 +1544,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    private void removeEntitySet(BaseEntity baseEntity, String attribute) {
-        MetaClass meta = baseEntity.getMeta();
-        IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
-        IMetaType metaType = metaAttribute.getMetaType();
-
-        DeleteConditionStep delete;
-        if (metaType.isSetOfSets())
-        {
-            delete = sqlGenerator
-                    .delete(EAV_BE_ENTITY_SET_OF_SETS)
-                    .where(EAV_BE_ENTITY_SET_OF_SETS.ENTITY_ID.eq(baseEntity.getId())
-                    .and(EAV_BE_ENTITY_SET_OF_SETS.ATTRIBUTE_ID.eq(metaAttribute.getId())));
-        }
-        else
-        {
-            if (metaType.isComplex())
-            {
-                delete = sqlGenerator
-                        .delete(EAV_BE_ENTITY_COMPLEX_SETS)
-                        .where(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID.eq(baseEntity.getId())
-                                .and(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID.eq(metaAttribute.getId())));
-            }
-            else
-            {
-                delete = sqlGenerator
-                        .delete(EAV_BE_ENTITY_SIMPLE_SETS)
-                        .where(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID.eq(baseEntity.getId())
-                                .and(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID.eq(metaAttribute.getId())));
-            }
-        }
-
-        logger.debug(delete.toString());
-        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-
-        BaseSet baseSet = (BaseSet)baseEntity.getBaseValue(attribute).getValue();
-        if (metaType.isComplex())
-        {
-            removeComplexSet(baseSet);
-        }
-        else
-        {
-            removeSimpleSet(baseSet);
-        }
-    }
-
-    private void removeSet(BaseSet baseSet) {
-        if (baseSet.getId() < 1)
-        {
-            throw new IllegalArgumentException("Can't remove BaseSet without id.");
-        }
-
-            DeleteConditionStep delete = sqlGenerator
-                    .delete(EAV_BE_SETS)
-                    .where(EAV_BE_SETS.ID.eq(baseSet.getId()));
-
-        logger.debug(delete.toString());
-        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-    }
-
-    private void removeSimpleSet(BaseSet baseSet) {
-        long setId = baseSet.getId();
-        IMetaType metaType = baseSet.getMemberType();
-        MetaSet metaSet = (MetaSet)metaType;
-        if (metaType.isSet())
-        {
-            DeleteConditionStep delete = sqlGenerator
-                    .delete(EAV_BE_SET_OF_SIMPLE_SETS)
-                    .where(EAV_BE_SET_OF_SIMPLE_SETS.PARENT_SET_ID.eq(setId));
-
-            logger.debug(delete.toString());
-            updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-
-            removeSet(baseSet);
-
-            Set<IBaseValue> baseValues = baseSet.get();
-            Iterator<IBaseValue> itValue = baseValues.iterator();
-            while (itValue.hasNext())
-            {
-                IBaseValue baseValueChild = itValue.next();
-                removeSimpleSet((BaseSet)baseValueChild.getValue());
-            }
-        }
-        else
-        {
-            DeleteConditionStep delete;
-            DataTypes dataType = metaSet.getTypeCode();
-            switch(dataType)
-            {
-                case INTEGER:
-                {
-                    delete = sqlGenerator
-                            .delete(EAV_BE_INTEGER_SET_VALUES)
-                            .where(EAV_BE_INTEGER_SET_VALUES.SET_ID.eq(setId));
-                    break;
-                }
-                case DATE:
-                {
-                    delete = sqlGenerator
-                            .delete(EAV_BE_DATE_SET_VALUES)
-                            .where(EAV_BE_DATE_SET_VALUES.SET_ID.eq(setId));
-                    break;
-                }
-                case STRING:
-                {
-                    delete = sqlGenerator
-                            .delete(EAV_BE_STRING_SET_VALUES)
-                            .where(EAV_BE_STRING_SET_VALUES.SET_ID.eq(setId));
-                    break;
-                }
-                case BOOLEAN:
-                {
-                    delete = sqlGenerator
-                            .delete(EAV_BE_BOOLEAN_SET_VALUES)
-                            .where(EAV_BE_BOOLEAN_SET_VALUES.SET_ID.eq(setId));
-                    break;
-                }
-                case DOUBLE:
-                {
-                    delete = sqlGenerator
-                            .delete(EAV_BE_DOUBLE_SET_VALUES)
-                            .where(EAV_BE_DOUBLE_SET_VALUES.SET_ID.eq(setId));
-                    break;
-                }
-                default:
-                    throw new IllegalArgumentException("Unknown type.");
-            }
-            logger.debug(delete.toString());
-            batchUpdateWithStats(delete.getSQL(), delete.getBindValues());
-
-            removeSet(baseSet);
-        }
-    }
-
-    private void removeComplexSet(BaseSet baseSet) {
-        long setId = baseSet.getId();
-        IMetaType metaType = baseSet.getMemberType();
-        if (metaType.isSet())
-        {
-            DeleteConditionStep delete = sqlGenerator
-                    .delete(EAV_BE_SET_OF_COMPLEX_SETS)
-                    .where(EAV_BE_SET_OF_COMPLEX_SETS.PARENT_SET_ID.eq(setId));
-
-            logger.debug(delete.toString());
-            updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-
-            removeSet(baseSet);
-
-            Set<IBaseValue> baseValues = baseSet.get();
-            Iterator<IBaseValue> itValue = baseValues.iterator();
-            while (itValue.hasNext())
-            {
-                IBaseValue baseValueChild = itValue.next();
-                removeComplexSet((BaseSet) baseValueChild.getValue());
-            }
-        }
-        else
-        {
-            DeleteConditionStep delete = sqlGenerator
-                    .delete(EAV_BE_COMPLEX_SET_VALUES)
-                    .where(EAV_BE_COMPLEX_SET_VALUES.SET_ID.eq(setId));
-
-            logger.debug(delete.toString());
-            batchUpdateWithStats(delete.getSQL(), delete.getBindValues());
-
-            removeSet(baseSet);
-        }
-    }
-
     private void removeReportDates(BaseEntity baseEntity) {
         DeleteConditionStep delete = sqlGenerator
                 .delete(EAV_BE_ENTITY_REPORT_DATES)
@@ -1983,103 +1578,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
 
         return entities;
-    }
-
-    private boolean compare(BaseSet comparingBaseSet, BaseSet anotherBaseSet) {
-        IMetaType comparingMetaType = comparingBaseSet.getMemberType();
-        IMetaType anotherMetaType = anotherBaseSet.getMemberType();
-        if (!comparingMetaType.equals(anotherMetaType)) {
-            throw new IllegalArgumentException("Comparing an set of sets with different types " +
-                    "of embedded objects can not be performed");
-        }
-
-        if (comparingBaseSet.getElementCount() != anotherBaseSet.getElementCount())
-        {
-            return false;
-        }
-
-        Set<UUID> uuids = new HashSet<UUID>();
-        Iterator<IBaseValue> comparingIt = comparingBaseSet.get().iterator();
-        while (comparingIt.hasNext())
-        {
-            IBaseValue comparingBaseValue = comparingIt.next();
-
-            boolean find = false;
-
-            Iterator<IBaseValue> anotherIt = anotherBaseSet.get().iterator();
-            while (anotherIt.hasNext())
-            {
-                IBaseValue anotherBaseValue = anotherIt.next();
-                if (uuids.contains(anotherBaseValue.getUuid()))
-                {
-                    continue;
-                }
-                else
-                {
-                    Object comparingObject = comparingBaseValue.getValue();
-                    if (comparingObject == null) {
-                        throw new IllegalArgumentException("Element of the set can not be equal to null.");
-                    }
-
-                    Object anotherObject = anotherBaseValue.getValue();
-                    if (anotherObject == null) {
-                        throw new IllegalArgumentException("Element of the set can not be equal to null.");
-                    }
-
-                    boolean compare;
-                    if (comparingMetaType.isSet())
-                    {
-                        compare = compare((BaseSet)comparingObject, (BaseSet)anotherObject);
-                    }
-                    else
-                    {
-                        if (comparingMetaType.isComplex())
-                        {
-                            compare = compare((BaseEntity)comparingObject, (BaseEntity)anotherObject);
-                        }
-                        else
-                        {
-                            throw new UnsupportedOperationException("Not implemented yet");
-                        }
-                    }
-
-                    if (compare)
-                    {
-                        uuids.add(anotherBaseValue.getUuid());
-                        find = true;
-                    }
-                }
-            }
-
-            if (!find)
-            {
-                return false;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean compare(BaseEntity comparingBaseEntity, BaseEntity anotherBaseEntity)
-    {
-        MetaClass comparingMetaClass = comparingBaseEntity.getMeta();
-        MetaClass anotherMetaClass = anotherBaseEntity.getMeta();
-        if (!comparingMetaClass.getClassName().equals(anotherMetaClass.getClassName()))
-        {
-            throw new IllegalArgumentException("Comparison BaseEntity with different metadata impossible.");
-        }
-
-        long comparingBaseEntityId = comparingBaseEntity.getId();
-        long anotherBaseEntityId = anotherBaseEntity.getId();
-        if (comparingBaseEntityId >= 1 && anotherBaseEntityId >= 1 && comparingBaseEntityId == anotherBaseEntityId)
-        {
-            return true;
-        }
-        else
-        {
-            BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
-            return comparator.compare(comparingBaseEntity, anotherBaseEntity);
-        }
     }
 
 }
