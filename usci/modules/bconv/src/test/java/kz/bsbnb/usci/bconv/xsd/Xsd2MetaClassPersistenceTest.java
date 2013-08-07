@@ -62,11 +62,11 @@ public class Xsd2MetaClassPersistenceTest
         System.out.println("------- Loading -------------");
         MetaClass metaClassLoadedById = metaClassDao.load(id);
 
-        Assert.assertEquals(metaClassLoadedById, meta);
+        Assert.assertEquals(meta, metaClassLoadedById);
 
         System.out.println("------- Loading by name -----");
         MetaClass metaClassLoadedByName = metaClassDao.load("ct_package");
 
-        Assert.assertEquals(metaClassLoadedByName, meta);
+        Assert.assertEquals(meta, metaClassLoadedByName);
     }
 }

@@ -3,6 +3,7 @@ package kz.bsbnb.usci.bconv.xsd;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -11,6 +12,7 @@ import java.io.InputStream;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContextTest.xml"})
+@ActiveProfiles({"postgres"})
 public class Xsd2MetaClassTest
 {
     @Test
