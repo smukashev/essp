@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -53,7 +54,7 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                             EAV_BE_SET_OF_SIMPLE_SETS.PARENT_SET_ID,
                             EAV_BE_SET_OF_SIMPLE_SETS.CHILD_SET_ID);
 
-            Set<IBaseValue> baseValues = baseSet.get();
+            Collection<IBaseValue> baseValues = baseSet.get();
             Iterator<IBaseValue> itValue = baseValues.iterator();
 
             while (itValue.hasNext())
@@ -142,7 +143,7 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                     throw new IllegalArgumentException("Unknown type.");
             }
 
-            Set<IBaseValue> baseValues = baseSet.get();
+            Collection<IBaseValue> baseValues = baseSet.get();
             Iterator<IBaseValue> it = baseValues.iterator();
             while (it.hasNext())
             {
@@ -179,12 +180,12 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
 
             beSetValueDao.remove(baseSet);
 
-            Set<IBaseValue> baseValues = baseSet.get();
+            Collection<IBaseValue> baseValues = baseSet.get();
             Iterator<IBaseValue> itValue = baseValues.iterator();
             while (itValue.hasNext())
             {
                 IBaseValue baseValueChild = itValue.next();
-                remove((BaseSet)baseValueChild.getValue());
+                remove((BaseSet) baseValueChild.getValue());
             }
         }
         else

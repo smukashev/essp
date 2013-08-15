@@ -887,8 +887,8 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         assertNotNull("After saving instance of BaseSet was equal to null.", setSaved);
         assertNotNull("After updating instance of BaseSet was equal to null.", setUpdated);
 
-        Set<IBaseValue> setValuesSaved = setSaved.get();
-        Set<IBaseValue> setValuesUpdated = setUpdated.get();
+        Collection<IBaseValue> setValuesSaved = setSaved.get();
+        Collection<IBaseValue> setValuesUpdated = setUpdated.get();
         assertEquals("Wrong number of elements in the set of complex values after saving, ",
                 1, setValuesSaved.size());
         assertEquals("Wrong number of elements in the set of complex values after updating, ",
@@ -953,31 +953,52 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
     @Test
     public void getHistory() throws Exception
     {
-        MetaClass parentMetaCreate = new MetaClass("parent_meta_class");
-        MetaClass childMetaCreate = new MetaClass("child_meta_class");
-        childMetaCreate.setMetaAttribute("uuid", new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
-        parentMetaCreate.setMetaAttribute("child_meta_class", new MetaAttribute(true, true, childMetaCreate));
+        MetaClass metaForSetCreated = new MetaClass("meta_class_for_set");
+        metaForSetCreated.setMetaAttribute("uuid",
+                new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
+        metaForSetCreated.setMetaAttribute("name",
+                new MetaAttribute(false, false, new MetaValue(DataTypes.STRING)));
 
-        long parentMetaId = postgreSQLMetaClassDaoImpl.save(parentMetaCreate);
-        MetaClass parentMetaLoad = postgreSQLMetaClassDaoImpl.load(parentMetaId);
+        MetaClass metaChildCreated = new MetaClass("meta_class_child");
+        metaChildCreated.setMetaAttribute("uuid", new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
+
+        MetaClass metaParentCreated = new MetaClass("meta_class_parent");
+        metaParentCreated.setMetaAttribute("meta_class_child", new MetaAttribute(true, true, metaChildCreated));
+        metaParentCreated.setMetaAttribute("set_of_meta_class",
+                new MetaAttribute(false, true, new MetaSet(metaForSetCreated)));
+
+        long metaParentId = postgreSQLMetaClassDaoImpl.save(metaParentCreated);
+        MetaClass metaParentLoaded = postgreSQLMetaClassDaoImpl.load(metaParentId);
+        MetaClass metaChildLoaded = postgreSQLMetaClassDaoImpl.load("meta_class_child");
+        MetaClass metaForSetLoaded = postgreSQLMetaClassDaoImpl.load("meta_class_for_set");
 
         Batch batch = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
 
-        BaseEntity childEntity = new BaseEntity((MetaClass)parentMetaLoad.getMemberType("child_meta_class"), batch.getRepDate());
-        childEntity.put("uuid", new BaseValue(batch, 1L, UUID.randomUUID().toString()));
+        BaseEntity baseEntityChild = new BaseEntity(metaChildLoaded, batch.getRepDate());
+        baseEntityChild.put("uuid", new BaseValue(batch, 1L, UUID.randomUUID().toString()));
 
-        BaseEntity parentEntity = new BaseEntity(parentMetaLoad, batch.getRepDate());
-        parentEntity.put("child_meta_class", new BaseValue(batch, 1L, childEntity));
+        BaseEntity baseEntityForSet = new BaseEntity(metaForSetLoaded, batch.getRepDate());
+        baseEntityForSet.put("uuid", new BaseValue(batch, 1L, UUID.randomUUID().toString()));
 
-        parentEntity.setListeners();
-        childEntity.put("uuid", new BaseValue(batch, 1L, UUID.randomUUID().toString()));
-        parentEntity.removeListeners();
+        BaseSet baseSet = new BaseSet(metaForSetLoaded).put(new BaseValue(batch, 1L, baseEntityForSet));
 
-        assertEquals(1, parentEntity.getModifiedObjects().size());
-        assertEquals(1, childEntity.getModifiedObjects().size());
+        BaseEntity baseEntityParent = new BaseEntity(metaParentLoaded, batch.getRepDate());
+        baseEntityParent.put("meta_class_child", new BaseValue(batch, 1L, baseEntityChild));
+        baseEntityParent.put("set_of_meta_class", new BaseValue(batch, 1L, baseSet));
 
-        assertEquals("uuid", childEntity.getModifiedObjects().iterator().next());
-        assertEquals("child_meta_class.uuid", parentEntity.getModifiedObjects().iterator().next());
+        baseEntityParent.setListeners();
+        baseEntityChild.put("uuid", new BaseValue(batch, 1L, UUID.randomUUID().toString()));
+        baseEntityForSet.put("uuid", new BaseValue(batch, 1L, UUID.randomUUID().toString()));
+        baseEntityParent.removeListeners();
+
+        assertEquals(2, baseEntityParent.getModifiedObjects().size());
+        assertEquals(1, baseEntityChild.getModifiedObjects().size());
+        assertEquals(1, baseEntityForSet.getModifiedObjects().size());
+
+        assertTrue(baseEntityParent.getModifiedObjects().contains("meta_class_child.uuid"));
+        assertTrue(baseEntityParent.getModifiedObjects().contains("set_of_meta_class"));
+        assertTrue(baseEntityChild.getModifiedObjects().contains("uuid"));
+        assertTrue(baseEntityForSet.getModifiedObjects().contains("uuid"));
     }
 
 }

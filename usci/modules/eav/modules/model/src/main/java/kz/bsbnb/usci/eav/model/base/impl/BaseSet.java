@@ -1,11 +1,9 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
+import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
-import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DateUtils;
@@ -15,7 +13,7 @@ import java.util.*;
 /**
  * @author k.tulbassiyev
  */
-public class BaseSet extends Persistable implements IBaseContainer
+public class BaseSet extends BaseContainer implements IBaseSet
 {
 
     private UUID uuid = UUID.randomUUID();
@@ -26,7 +24,9 @@ public class BaseSet extends Persistable implements IBaseContainer
      */
     private IMetaType meta;
 
-    private Set<IBaseValue> data = new HashSet<IBaseValue>();
+    private Map<String, IBaseValue> data = new HashMap<String, IBaseValue>();
+
+    private Set<String> modifiedObjects = new HashSet<String>();
 
     /**
      * Initializes entity with a class name.
@@ -62,18 +62,26 @@ public class BaseSet extends Persistable implements IBaseContainer
     @Override
     public void put(String name, IBaseValue value)
     {
-        data.add(value);
+        if (name == null)
+        {
+            UUID uuid = UUID.randomUUID();
+            put(uuid.toString(), value);
+        }
+        data.put(name, value);
     }
 
-    public void put(IBaseValue value)
+    public BaseSet put(IBaseValue value)
     {
-        data.add(value);
+        UUID uuid = UUID.randomUUID();
+        put(uuid.toString(), value);
+
+        return this;
     }
 
     @Override
-    public Set<IBaseValue> get()
+    public Collection<IBaseValue> get()
     {
-        return data;
+        return data.values();
     }
 
     public int getElementCount()
@@ -87,7 +95,7 @@ public class BaseSet extends Persistable implements IBaseContainer
         String str = "[";
         boolean first = true;
 
-        for (IBaseValue value : data) {
+        for (IBaseValue value : data.values()) {
             if (first) {
                 str += value.getValue().toString();
                 first = false;
@@ -108,7 +116,7 @@ public class BaseSet extends Persistable implements IBaseContainer
             throw new IllegalArgumentException("Get simple attribute method called for complex attribute or array");
         }
 
-        for (IBaseValue value : data)
+        for (IBaseValue value : data.values())
         {
             Object innerValue = value.getValue();
             if (innerValue == null)
@@ -150,7 +158,7 @@ public class BaseSet extends Persistable implements IBaseContainer
             params.put(fieldName, fieldValue);
         }
 
-        for (IBaseValue value : data)
+        for (IBaseValue value : data.values())
         {
             Object innerValue = value.getValue();
             if (innerValue == null)
@@ -170,16 +178,6 @@ public class BaseSet extends Persistable implements IBaseContainer
         if (meta.isComplex())
             return getElComplex(filter);
         return getElSimple(filter);
-    }
-
-    @Override
-    public void addListener(AttributeChangeListener listener) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    @Override
-    public void removeListener(AttributeChangeListener listener) {
-        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     @Override
@@ -271,6 +269,44 @@ public class BaseSet extends Persistable implements IBaseContainer
         }
 
         return true;
+    }
+
+    public Set<String> getModifiedObjects()
+    {
+        return modifiedObjects;
+    }
+
+    public void setListeners()
+    {
+        if (meta.isComplex())
+        {
+            for (String key: data.keySet())
+            {
+                IBaseValue baseValue = data.get(key);
+                IBaseContainer baseContainer = (IBaseContainer)baseValue.getValue();
+                baseContainer.addListener(new ValueChangeListener(key) {
+
+                    @Override
+                    public void valueChange(ValueChangeEvent event) {
+                        String identifier = this.getParentIdentifier();
+
+                        if (event.getSource() instanceof IBaseSet)
+                        {
+                            identifier += "." + event.getIdentifier();;
+                        }
+
+                        modifiedObjects.add(identifier);
+                        fireValueChange(identifier);
+                    }
+                });
+                baseContainer.setListeners();
+            }
+        }
+    }
+
+    public void removeListeners()
+    {
+
     }
 
 }

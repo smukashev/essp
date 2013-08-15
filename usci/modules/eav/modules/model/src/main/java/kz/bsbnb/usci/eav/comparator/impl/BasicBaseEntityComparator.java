@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import org.apache.log4j.Logger;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -48,8 +49,8 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
         BaseSet set1 = (BaseSet)value1.getValue();
         BaseSet set2 = (BaseSet)value2.getValue();
 
-        Set<IBaseValue> ar1 = set1.get();
-        Set<IBaseValue> ar2 = set2.get();
+        Collection<IBaseValue> ar1 = set1.get();
+        Collection<IBaseValue> ar2 = set2.get();
 
         if(ar1.size() != ar2.size())
             return false;
