@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -57,7 +58,7 @@ public class BeComplexSetValueDaoImpl extends JDBCSupport implements IBeComplexS
                             EAV_BE_SET_OF_COMPLEX_SETS.PARENT_SET_ID,
                             EAV_BE_SET_OF_COMPLEX_SETS.CHILD_SET_ID);
 
-            Set<IBaseValue> baseValues = baseSet.get();
+            Collection<IBaseValue> baseValues = baseSet.get();
             Iterator<IBaseValue> it = baseValues.iterator();
 
             while (it.hasNext())
@@ -87,7 +88,7 @@ public class BeComplexSetValueDaoImpl extends JDBCSupport implements IBeComplexS
                             EAV_BE_COMPLEX_SET_VALUES.REP_DATE,
                             EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID);
 
-            Set<IBaseValue> baseValues = baseSet.get();
+            Collection<IBaseValue> baseValues = baseSet.get();
             Iterator<IBaseValue> itValue = baseValues.iterator();
             while (itValue.hasNext()) {
                 IBaseValue baseValueChild = itValue.next();
@@ -126,7 +127,7 @@ public class BeComplexSetValueDaoImpl extends JDBCSupport implements IBeComplexS
 
             beSetValueDao.remove(baseSet);
 
-            Set<IBaseValue> baseValues = baseSet.get();
+            Collection<IBaseValue> baseValues = baseSet.get();
             Iterator<IBaseValue> itValue = baseValues.iterator();
             while (itValue.hasNext())
             {

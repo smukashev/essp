@@ -18,9 +18,9 @@ public interface IBaseObject extends IPersistable, Serializable {
             super(source);
         }
 
-        public IBaseObject getBaseObject()
+        public IBaseObject getSource()
         {
-            return (IBaseObject) getSource();
+            return (IBaseObject) super.getSource();
         }
     }
 

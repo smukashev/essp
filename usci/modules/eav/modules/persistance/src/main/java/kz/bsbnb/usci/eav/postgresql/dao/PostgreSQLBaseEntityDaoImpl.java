@@ -1560,7 +1560,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaType metaType = baseSet.getMemberType();
         if (metaType.isSetOfSets())
         {
-            Set<IBaseValue> baseValues = baseSet.get();
+            Collection<IBaseValue> baseValues = baseSet.get();
             Iterator<IBaseValue> it = baseValues.iterator();
             while (it.hasNext())
             {
@@ -1568,7 +1568,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 entities.addAll(collectComplexSetValues((BaseSet)baseValue.getValue()));
             }
         } else {
-            Set<IBaseValue> baseValues = baseSet.get();
+            Collection<IBaseValue> baseValues = baseSet.get();
             Iterator<IBaseValue> it = baseValues.iterator();
             while (it.hasNext())
             {

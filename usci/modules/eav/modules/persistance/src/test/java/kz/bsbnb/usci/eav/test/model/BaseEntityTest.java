@@ -240,7 +240,7 @@ public class BaseEntityTest extends GenericTestCase{
 
 
         //Set<IBaseValue> setBase = new TreeSet<IBaseValue>();
-        assertEquals(5,((Set<IBaseValue>)instance.get()).size());
+        assertEquals(5,instance.get().size());
     }
 
     @Test
