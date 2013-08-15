@@ -128,7 +128,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 EndElement endElement = event.asEndElement();
                 String localName = endElement.getName().getLocalPart();
 
-                endElement(localName);
+                return endElement(localName);
             } else if(event.isEndDocument()) {
                 logger.info("end document");
                 statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(

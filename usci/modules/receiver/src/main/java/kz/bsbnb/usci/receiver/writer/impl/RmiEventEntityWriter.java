@@ -27,11 +27,13 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
     @PostConstruct
     public void init() {
+        logger.info("Writer init");
         entityService = (IEntityService) rmiProxyFactoryBean.getObject();
     }
 
     @Override
     public void write(List items) throws Exception {
+        logger.info("Writer write: " + items.size());
         entityService.process(items);
     }
 }

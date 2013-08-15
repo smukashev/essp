@@ -10,20 +10,24 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
+@Component
 public class Xsd2MetaClass
 {
     static Logger logger = LoggerFactory.getLogger(Xsd2MetaClass.class);
 
-    static private boolean noFlatten = false;
+    private boolean noFlatten = false;
+    private ArrayList<String> usedClassesNames = new ArrayList<String>();
 
-    public static MetaClass convertXSD(InputStream schema, String metaClassName)
+    public MetaClass convertXSD(InputStream schema, String metaClassName)
     {
         XSSchema xsSchema;
 
@@ -49,6 +53,8 @@ public class Xsd2MetaClass
             System.out.println(name);
         }
 
+        usedClassesNames.clear();
+
         System.out.println("----------------------------");
         XSComplexType ct = xsSchema.getComplexType(metaClassName);
 
@@ -59,7 +65,7 @@ public class Xsd2MetaClass
         return (MetaClass)processComplexType("ct_package", ct, 1, "");
     }
 
-    private static IMetaType processComplexType(String name, XSComplexType ct, int maxOccurs, String prefix)
+    private IMetaType processComplexType(String name, XSComplexType ct, int maxOccurs, String prefix)
     {
         String attributeStr = "";
         int attrCount = 0;
@@ -174,7 +180,15 @@ public class Xsd2MetaClass
         }
 
         if (members.size() > 1) {
-            MetaClass metaClass = new MetaClass(name);
+            int i = 1;
+            String actualName = name;
+            while (usedClassesNames.contains(actualName))
+            {
+                actualName = name + i++;
+            }
+
+            MetaClass metaClass = new MetaClass(actualName);
+            usedClassesNames.add(actualName);
 
             for(String memberName : members.keySet()) {
                 MetaAttribute attr = new MetaAttribute(members.get(memberName));
@@ -196,7 +210,7 @@ public class Xsd2MetaClass
         }
     }
 
-    private static void processModelGroupContents(HashMap<String, IMetaType> members,
+    private void processModelGroupContents(HashMap<String, IMetaType> members,
                                                   XSParticle[] particles, String prefix)
     {
         for(XSParticle p : particles ){
@@ -239,7 +253,7 @@ public class Xsd2MetaClass
         }
     }
 
-    private static IMetaType processSimpleType(String name, XSSimpleType ct, int maxOccurs, String prefix)
+    private IMetaType processSimpleType(String name, XSSimpleType ct, int maxOccurs, String prefix)
     {
         if (maxOccurs == 1) {
             System.out.println(prefix + name + " : " + ct.getPrimitiveType().getName());
@@ -280,14 +294,14 @@ public class Xsd2MetaClass
         }
     }
 
-    private static IMetaType processElement(XSTerm el, int maxOccurs, String prefix)
+    private IMetaType processElement(XSTerm el, int maxOccurs, String prefix)
     {
         XSType type = el.asElementDecl().getType();
 
         return processType(el.asElementDecl().getName(), type, maxOccurs, prefix);
     }
 
-    private static IMetaType processType(String name, XSType type, int maxOccurs, String prefix)
+    private IMetaType processType(String name, XSType type, int maxOccurs, String prefix)
     {
         if (type.isComplexType())
         {
@@ -302,7 +316,7 @@ public class Xsd2MetaClass
         throw new IllegalStateException("Type is not complex or simple.");
     }
 
-    private static XSParticle[] getParticles(XSParticle particle)
+    private XSParticle[] getParticles(XSParticle particle)
     {
         if(particle != null){
             XSTerm term = particle.getTerm();
@@ -315,14 +329,24 @@ public class Xsd2MetaClass
         return null;
     }
 
-    private static XSParticle[] getParticles(XSComplexType type)
+    private XSParticle[] getParticles(XSComplexType type)
     {
         return getParticles(asParticle(type));
     }
 
-    private static XSParticle asParticle(XSComplexType type)
+    private XSParticle asParticle(XSComplexType type)
     {
         XSContentType xsContentType = type.getContentType();
         return xsContentType.asParticle();
+    }
+
+    public boolean isNoFlatten()
+    {
+        return noFlatten;
+    }
+
+    public void setNoFlatten(boolean noFlatten)
+    {
+        this.noFlatten = noFlatten;
     }
 }

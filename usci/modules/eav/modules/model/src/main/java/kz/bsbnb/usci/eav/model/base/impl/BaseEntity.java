@@ -175,6 +175,7 @@ public class BaseEntity extends BaseObject implements IBaseContainer
      * 	                                or key has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
+    //TODO: Add exception on metaClass mismatch
     @Override
     public void put(final String name, IBaseValue value)
     {

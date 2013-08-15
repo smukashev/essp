@@ -3,6 +3,7 @@ package kz.bsbnb.usci.bconv.xsd;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -15,15 +16,28 @@ import java.io.InputStream;
 @ActiveProfiles({"postgres"})
 public class Xsd2MetaClassTest
 {
+    @Autowired
+    private Xsd2MetaClass converter;
+
     @Test
     public void testConvertXSD() throws Exception
     {
         InputStream in = this.getClass().getClassLoader()
                 .getResourceAsStream("credit-registry.xsd");
 
-        MetaClass meta = Xsd2MetaClass.convertXSD(in, "ct_package");
+        MetaClass meta = converter.convertXSD(in, "ct_package");
 
         System.out.println("---------------------");
         System.out.println(meta.toString());
+    }
+
+    public Xsd2MetaClass getConverter()
+    {
+        return converter;
+    }
+
+    public void setConverter(Xsd2MetaClass converter)
+    {
+        this.converter = converter;
     }
 }
