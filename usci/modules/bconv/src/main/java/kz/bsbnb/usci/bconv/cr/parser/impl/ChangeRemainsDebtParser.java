@@ -27,7 +27,7 @@ public class ChangeRemainsDebtParser extends BatchParser {
     }
     
     @Override
-    public void startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("debt")) {
         } else if(localName.equals("current")) {
             //ctRemainsTypeCurrent = new CtRemainsTypeCurrentNonNegative();
@@ -47,6 +47,8 @@ public class ChangeRemainsDebtParser extends BatchParser {
         } else {
             throw new UnknownTagException(localName);
         }
+
+        return false;
     }
     
     @Override

@@ -22,7 +22,7 @@ public class SubjectCreditorParser extends BatchParser {
     }
     
     @Override
-    public void startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("creditor")) {
         } else if(localName.equals("code")) {
         } else if(localName.equals("docs")) {
@@ -35,6 +35,8 @@ public class SubjectCreditorParser extends BatchParser {
         } else {
             throw new UnknownTagException(localName);
         }
+
+        return false;
     }
     
     @Override

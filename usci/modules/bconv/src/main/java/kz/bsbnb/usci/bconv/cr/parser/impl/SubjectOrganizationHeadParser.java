@@ -29,7 +29,7 @@ public class SubjectOrganizationHeadParser extends BatchParser {
     }
     
     @Override
-    public void startElement(XMLEvent event, StartElement startElement, String localName)
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName)
             throws SAXException {
         if(localName.equals("head")) {
         } else if(localName.equals("names")) {
@@ -39,6 +39,8 @@ public class SubjectOrganizationHeadParser extends BatchParser {
         } else {
             throw new UnknownTagException(localName);
         }
+
+        return false;
     }
     
     @Override

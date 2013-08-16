@@ -34,7 +34,7 @@ public class ChangeParser extends BatchParser {
     }
     
     @Override
-    public void startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("change")) {
         } else if(localName.equals("turnover")) {
             changeTurnoverParser.parse(xmlReader, batch);
@@ -47,6 +47,8 @@ public class ChangeParser extends BatchParser {
         } else {
             throw new UnknownTagException(localName);
         }
+
+        return false;
     }
     
     @Override

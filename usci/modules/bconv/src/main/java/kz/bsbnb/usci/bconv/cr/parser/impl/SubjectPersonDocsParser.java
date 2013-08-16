@@ -2,14 +2,18 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.Date;
 
 /**
  *
@@ -20,19 +24,37 @@ public class SubjectPersonDocsParser extends BatchParser {
     public SubjectPersonDocsParser() {
         super();
     }
+
+    @Override
+    public void init()
+    {
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("doc1"), new Date());
+    }
     
     @Override
-    public void startElement(XMLEvent event, StartElement startElement, String localName)
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName)
             throws SAXException {
         if(localName.equals("docs")) {
         } else if(localName.equals("doc")) {
             //ctDoc = new CtDoc();
             //ctDoc.setDocType(attributes.getValue("doc_type"));
+            currentBaseEntity.put("doc_type", new BaseValue(batch, 0,
+                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
         } else if(localName.equals("name")) {
+            event = (XMLEvent) xmlReader.next();
+            currentBaseEntity.put("name", new BaseValue(batch, 0,
+                    event.asCharacters().getData()
+                ));
         } else if(localName.equals("no")) {
+            event = (XMLEvent) xmlReader.next();
+            currentBaseEntity.put("no", new BaseValue(batch, 0,
+                    event.asCharacters().getData()
+                ));
         } else {
             throw new UnknownTagException(localName);
         }
+
+        return false;
     }
     
     @Override
@@ -50,9 +72,12 @@ public class SubjectPersonDocsParser extends BatchParser {
             
             ctPerson.setDocs(docs);*/
             //xmlReader.setContentHandler(contentHandler);
+            hasMore = false;
             return true;
         } else if(localName.equals("doc")) {
             //docs.getDoc().add(ctDoc);
+            hasMore = true;
+            return true;
         } else if(localName.equals("name")) {
             /*if(ctDoc.getDocType().equals(DocTypes.OTHER.getCode()))
                 ctDoc.setName(contents.toString());*/

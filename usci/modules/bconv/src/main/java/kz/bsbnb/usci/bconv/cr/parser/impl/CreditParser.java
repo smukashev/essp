@@ -49,7 +49,7 @@ public class CreditParser extends BatchParser {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit"), new Date());
     }
 
-    public void startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         try {
             if(localName.equals("credit")) {
             } else if(localName.equals("contract")) {
@@ -115,6 +115,8 @@ public class CreditParser extends BatchParser {
         } catch(ParseException parseException) {
             throw new TypeErrorException(localName);
         }
+
+        return false;
     }
 
     public boolean endElement(String localName) throws SAXException {

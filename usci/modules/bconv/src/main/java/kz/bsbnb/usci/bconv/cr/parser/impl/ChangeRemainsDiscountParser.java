@@ -23,7 +23,7 @@ public class ChangeRemainsDiscountParser extends BatchParser {
     }
     
     @Override
-    public void startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("discount")) {
         } else if(localName.equals("value")) {
         } else if(localName.equals("value_currency")) {
@@ -31,6 +31,8 @@ public class ChangeRemainsDiscountParser extends BatchParser {
         } else {
             throw new UnknownTagException(localName);
         }
+
+        return false;
     }
     
     @Override

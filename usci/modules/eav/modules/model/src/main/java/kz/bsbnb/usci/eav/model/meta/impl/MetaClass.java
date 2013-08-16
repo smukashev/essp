@@ -400,7 +400,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
 
     public String toString(String prefix)
     {
-        String str = "metaClass;";
+        String str = className + ":metaClass;";
 
         String[] names;
 

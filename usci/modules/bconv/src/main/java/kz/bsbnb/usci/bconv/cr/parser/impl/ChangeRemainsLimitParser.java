@@ -22,7 +22,7 @@ public class ChangeRemainsLimitParser extends BatchParser {
     }
     
     @Override
-    public void startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("limit")) {
         } else if(localName.equals("value")) {
         } else if(localName.equals("value_currency")) {
@@ -30,6 +30,8 @@ public class ChangeRemainsLimitParser extends BatchParser {
         } else {
             throw new UnknownTagException(localName);
         }
+
+        return false;
     }
     
     @Override

@@ -23,7 +23,7 @@ public class PledgesParser extends BatchParser {
     }
     
     @Override
-    public void startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("pledges")) {
         } else if(localName.equals("pledge")) {
             //ctPledge = new CtPledge();
@@ -35,6 +35,8 @@ public class PledgesParser extends BatchParser {
         } else {
             throw new UnknownTagException(localName);
         }
+
+        return false;
     }
     
     @Override

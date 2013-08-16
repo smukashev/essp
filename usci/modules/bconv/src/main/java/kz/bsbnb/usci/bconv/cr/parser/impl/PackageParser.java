@@ -5,7 +5,10 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,6 +22,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.Date;
 
 //import com.bsbnb.creditregistry.ws.objects.BatchInfo;
 
@@ -44,10 +48,14 @@ public class PackageParser extends BatchParser {
     
     private Logger logger = Logger.getLogger(PackageParser.class);
 
-    private long index = 1;
+    @Override
+    public void init()
+    {
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ct_package"), new Date());
+    }
 
     @Override
-    public void startElement(XMLEvent event, StartElement startElement, String localName)
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName)
             throws SAXException {
 
         if(localName.equals("packages")) {
@@ -62,19 +70,38 @@ public class PackageParser extends BatchParser {
             } else {
                 throw new UnknownValException(localName, attributes.getValue("operation_type"));
             } */
-            System.out.println("Package #" + index++);
+            currentBaseEntity.put("operation_type", new BaseValue(batch, 0,
+                    event.asStartElement().getAttributeByName(new QName("operation_type")).getValue()));
+            currentBaseEntity.put("no", new BaseValue(batch, 0,
+                    new Double(event.asStartElement().getAttributeByName(new QName("no")).getValue())));
         } else if(localName.equals("primary_contract")) {
             primaryContractParser.parse(xmlReader, batch);
             BaseEntity primaryContract = primaryContractParser.getCurrentBaseEntity();
+
+            currentBaseEntity.put("primary_contract", new BaseValue(batch, 0, primaryContract));
         } else if(localName.equals("credit")) {
             //attributes.getValue("credit_type")
             creditParser.parse(xmlReader, batch);
             BaseEntity credit = creditParser.getCurrentBaseEntity();
             credit.put("credit_type", new BaseValue(batch, 0,
                     event.asStartElement().getAttributeByName(new QName("credit_type")).getValue()));
-            System.out.println(credit.toString());
+            //System.out.println(credit.toString());
+            currentBaseEntity.put("credit", new BaseValue(batch, 0, credit));
         } else if(localName.equals("subjects")) {
-            subjectsParser.parse(xmlReader, batch);
+            BaseEntity subjects = new BaseEntity(metaClassRepository.getMetaClass("subject"), new Date());
+
+            while(true) {
+                subjectsParser.parse(xmlReader, batch);
+                if (subjectsParser.hasMore()) {
+                    BaseEntity subject = subjectsParser.getCurrentBaseEntity();
+                    subjects.put(subject.getMeta().getClassName(),
+                            new BaseValue(batch, 0, subject));
+                } else {
+                    break;
+                }
+            }
+
+            currentBaseEntity.put("subjects", new BaseValue(batch, 0, subjects));
         } else if(localName.equals("pledges")) {
             pledgesParser.parse(xmlReader, batch);
         } else if(localName.equals("change")) {
@@ -82,6 +109,8 @@ public class PackageParser extends BatchParser {
         } else {
             throw new UnknownTagException(localName);
         }
+
+        return false;
     }
 
     @Override
@@ -91,14 +120,15 @@ public class PackageParser extends BatchParser {
             
             //batch.setPackages(packages);
             //xmlReader.setContentHandler(contentHandler);
-            return true;
+            hasMore = false;
         } else if(localName.equals("package")) {
             //handlePackage(currentPackage);
+            hasMore = true;
         } else {
             throw new UnknownTagException(localName);
         }
 
-        return false;
+        return true;
     }
 
     /*public void handlePackage(Package p) {

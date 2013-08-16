@@ -3,6 +3,8 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
 import kz.bsbnb.usci.eav.model.json.StatusJModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,8 @@ public class MainParser extends BatchParser {
     @Autowired
     private PortfolioDataParser portfolioDataParser;
 
+    private long index = 1;
+
     private static final Logger logger
             = Logger.getLogger(MainParser.class.getName());
     
@@ -57,12 +61,12 @@ public class MainParser extends BatchParser {
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
 
-                startElement(event, startElement, localName);
+                if(startElement(event, startElement, localName)) break;
             } else if(event.isEndElement()) {
                 EndElement endElement = event.asEndElement();
                 String localName = endElement.getName().getLocalPart();
 
-                endElement(localName);
+                if(endElement(localName)) break;
             } else if(event.isEndDocument()) {
                 logger.info("end document");
             } else {
@@ -74,17 +78,32 @@ public class MainParser extends BatchParser {
     public void endDocument() throws SAXException {
     }
 
-    public void startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
+    public void parseNextPackage() throws SAXException
+    {
+        System.out.println("Package #" + index++);
+        packageParser.parse(xmlReader, batch);
+        if (packageParser.hasMore()) {
+            currentBaseEntity = packageParser.getCurrentBaseEntity();
+            hasMore = true;
+        } else {
+            hasMore = false;
+        }
+    }
+
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("batch")) {
         } else if(localName.equals("info")) {
             infoParser.parse(xmlReader, batch);
         } else if(localName.equals("packages")) {
-            packageParser.parse(xmlReader, batch);
+            parseNextPackage();
+            return true;
         } else if(localName.equals("portfolio_data")) {
             portfolioDataParser.parse(xmlReader, batch);
         } else {
             throw new UnknownTagException(localName);
         }
+
+        return false;
     }
 
     public boolean endElement(String localName) throws SAXException {

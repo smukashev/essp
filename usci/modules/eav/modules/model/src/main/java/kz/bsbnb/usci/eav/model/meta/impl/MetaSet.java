@@ -132,7 +132,7 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
                 return "metaSet, complex, setOfSets";
             }
             else {
-                return "metaSet, " + ((MetaClass)metaType).getClassName() + ":" + metaType.toString(prefix);
+                return "metaSet, " + metaType.toString(prefix);
             }
         }
         else {

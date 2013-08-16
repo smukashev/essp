@@ -22,7 +22,7 @@ public class ChangeRemainsCorrectionParser extends BatchParser {
     }
     
     @Override
-    public void startElement(XMLEvent event, StartElement startElement, String localName)
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName)
             throws SAXException {
         if(localName.equals("correction")) {
         } else if(localName.equals("value")) {
@@ -31,6 +31,8 @@ public class ChangeRemainsCorrectionParser extends BatchParser {
         } else {
             throw new UnknownTagException(localName);
         }
+
+        return false;
     }
     
     @Override

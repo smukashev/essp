@@ -33,7 +33,7 @@ public class CreditContractParser  extends BatchParser {
     }
     
     @Override
-    public void startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         try {
             if(localName.equals("contract")) {
             } else if(localName.equals("no")) {
@@ -50,6 +50,8 @@ public class CreditContractParser  extends BatchParser {
         } catch(ParseException parseException) {
             throw new UnknownValException(localName, event.asCharacters().getData());
         }
+
+        return false;
     }       
     
     @Override

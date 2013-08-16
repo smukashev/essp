@@ -59,7 +59,6 @@ public class Xsd2MetaClassCRParserTest
     }
 
     @Test
-    @Ignore
     public void testMetaClassFromXSDCRParser() throws Exception
     {
         InputStream in = this.getClass().getClassLoader()
@@ -77,6 +76,8 @@ public class Xsd2MetaClassCRParserTest
         Batch batchFirst = batchRepository.addBatch(new Batch(new Date(new Long("1356976800000"))));
 
         crParser.parse(in_str, batchFirst);
+
+        System.out.println(crParser.getCurrentBaseEntity());
     }
 
     public Xsd2MetaClass getConverter()

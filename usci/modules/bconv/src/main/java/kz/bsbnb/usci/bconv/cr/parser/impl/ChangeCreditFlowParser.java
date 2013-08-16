@@ -24,7 +24,7 @@ public class ChangeCreditFlowParser extends BatchParser {
     }
     
     @Override
-    public void startElement(XMLEvent event, StartElement startElement, String localName)
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName)
             throws SAXException {
         if(localName.equals("credit_flow")) {
         } else if(localName.equals("classification")) {
@@ -39,6 +39,8 @@ public class ChangeCreditFlowParser extends BatchParser {
         } else {
             throw new UnknownTagException(localName);
         }
+
+        return false;
     }
     
     @Override

@@ -42,6 +42,8 @@ public abstract class BatchParser {
 
     protected BaseEntity currentBaseEntity = null;
 
+    protected boolean hasMore = false;
+
     @Autowired
     protected IMetaClassRepository metaClassRepository;
     
@@ -70,7 +72,7 @@ public abstract class BatchParser {
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
 
-                startElement(event, startElement, localName);
+                if (startElement(event, startElement, localName)) break;
             } else if(event.isEndElement()) {
                 EndElement endElement = event.asEndElement();
                 String localName = endElement.getName().getLocalPart();
@@ -84,12 +86,16 @@ public abstract class BatchParser {
         }
     }
 
-    public abstract void startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException;
+    public abstract boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException;
     public abstract boolean endElement(String localName) throws SAXException;
     public void init() {}
 
     public BaseEntity getCurrentBaseEntity()
     {
         return currentBaseEntity;
+    }
+
+    public boolean hasMore() {
+        return hasMore;
     }
 }
