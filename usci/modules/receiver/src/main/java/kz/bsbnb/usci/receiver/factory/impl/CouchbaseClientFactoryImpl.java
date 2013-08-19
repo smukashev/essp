@@ -23,7 +23,7 @@ public class CouchbaseClientFactoryImpl implements ICouchbaseClientFactory {
         nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
         try {
-            couchbaseClient = new CouchbaseClient(nodes, "default", "");
+            couchbaseClient = new CouchbaseClient(nodes, "test", "");
         } catch (Exception e) {
             logger.info("Error connecting to Couchbase: " + e.getMessage());
             System.exit(1);

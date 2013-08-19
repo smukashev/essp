@@ -42,6 +42,8 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Override
     public void save(BaseEntity baseEntity) {
+        //System.out.println(baseEntity.toString());
+
         long t1 = System.currentTimeMillis();
         baseEntityDao.save(baseEntity);
         long t2 = System.currentTimeMillis() - t1;

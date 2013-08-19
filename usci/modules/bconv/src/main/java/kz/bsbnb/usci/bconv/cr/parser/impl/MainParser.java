@@ -75,6 +75,35 @@ public class MainParser extends BatchParser {
         }
     }
 
+    @Override
+    public void parse(XMLEventReader xmlReader, Batch batch) throws SAXException
+    {
+        this.xmlReader = xmlReader;
+        this.batch = batch;
+
+        while(xmlReader.hasNext()) {
+            XMLEvent event = (XMLEvent) xmlReader.next();
+
+            if(event.isStartDocument()) {
+                logger.info("start document");
+            } else if(event.isStartElement()) {
+                StartElement startElement = event.asStartElement();
+                String localName = startElement.getName().getLocalPart();
+
+                if(startElement(event, startElement, localName)) break;
+            } else if(event.isEndElement()) {
+                EndElement endElement = event.asEndElement();
+                String localName = endElement.getName().getLocalPart();
+
+                if(endElement(localName)) break;
+            } else if(event.isEndDocument()) {
+                logger.info("end document");
+            } else {
+                //logger.info(event.toString());
+            }
+        }
+    }
+
     public void endDocument() throws SAXException {
     }
 
