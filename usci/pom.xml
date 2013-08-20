@@ -19,6 +19,7 @@
       <module>modules/brms</module>
       <module>modules/portlets</module>
       <module>modules/bconv</module>
+      <module>modules/cli</module>
       <module>modules/parent</module>
   </modules>
 

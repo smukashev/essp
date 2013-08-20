@@ -94,7 +94,8 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
             if(value == null)
             {
-                throw new IllegalArgumentException("Key attribute " + name + " can't be null");
+                //throw new IllegalArgumentException("Key attribute " + name + " can't be null");
+                logger.warn("Key is null! So Skipped.");
             }
 
             if (!type.isSet())

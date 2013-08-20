@@ -27,7 +27,7 @@ public class Xsd2MetaClass
     private boolean noFlatten = false;
     private ArrayList<String> usedClassesNames = new ArrayList<String>();
 
-    public MetaClass convertXSD(InputStream schema, String metaClassName)
+    public ArrayList<String> listClasses(InputStream schema)
     {
         XSSchema xsSchema;
 
@@ -48,14 +48,35 @@ public class Xsd2MetaClass
 
         Map<String, XSComplexType> types = xsSchema.getComplexTypes();
 
-        System.out.println("------- All types ----------");
+        ArrayList<String> out = new ArrayList<String>();
         for (String name : types.keySet()) {
-            System.out.println(name);
+            out.add(name);
+        }
+
+        return out;
+    }
+
+    public MetaClass convertXSD(InputStream schema, String metaClassName)
+    {
+        XSSchema xsSchema;
+
+        if (schema == null) {
+            throw new IllegalArgumentException("Schema stream can't be null");
+        }
+
+        try {
+            XSOMParser parser = new XSOMParser();
+            parser.parse(schema);
+            XSSchemaSet schemaSet = parser.getResult();
+            xsSchema = schemaSet.getSchema(1);
+        }
+        catch (Exception exp) {
+            logger.error("Can't open schema");
+            throw new IllegalArgumentException("Can't open schema");
         }
 
         usedClassesNames.clear();
 
-        System.out.println("----------------------------");
         XSComplexType ct = xsSchema.getComplexType(metaClassName);
 
         if (ct == null) {
