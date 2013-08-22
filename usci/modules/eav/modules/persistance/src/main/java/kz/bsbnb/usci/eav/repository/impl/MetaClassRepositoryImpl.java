@@ -35,7 +35,7 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository
     public MetaClass getMetaClass(long id) {
 
         MetaClass metaClass = storage.load(id);
-        cache.put(metaClass.getClassName(),metaClass);
+        cache.put(metaClass.getClassName(), metaClass);
 
         return metaClass;
 
@@ -46,4 +46,10 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository
         return storage.loadAll();
     }
 
+    @Override
+    public void saveMetaClass(MetaClass meta)
+    {
+        storage.save(meta);
+        cache.put(meta.getClassName(), meta);
+    }
 }

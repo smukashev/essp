@@ -12,9 +12,7 @@ import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DateUtils;
-import org.jooq.Condition;
-import org.jooq.SelectConditionStep;
-import org.jooq.SelectJoinStep;
+import org.jooq.*;
 import org.jooq.impl.Executor;
 import org.jooq.impl.Factory;
 import org.slf4j.Logger;
@@ -61,7 +59,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         }
     }
 
-    private SelectConditionStep generateSQL(BaseEntity entity, String entityName)
+    public SelectConditionStep generateSQL(BaseEntity entity, String entityName)
     {
         MetaClass meta = entity.getMeta();
 
@@ -154,12 +152,16 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                             on(EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_ENTITY_SIMPLE_SETS.as(name).ENTITY_ID).
                                     and(EAV_BE_ENTITY_SIMPLE_SETS.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                 }
-                /*else
+                else
                 {
-                    joins = joins.leftOuterJoin(EAV_BE_COMPLEX_VALUES.as(name)).
-                            on(EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_ID).
-                                    and(EAV_BE_COMPLEX_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
-                }*/
+                    joins = joins.join(EAV_BE_ENTITY_COMPLEX_SETS.as("s_" + name)).
+                            on(EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as("s_" + name).ENTITY_ID).
+                                    and(EAV_BE_ENTITY_COMPLEX_SETS.as("s_" + name).ATTRIBUTE_ID.equal(attribute.getId())))
+                            .join(EAV_BE_COMPLEX_SET_VALUES.as(name)).on(
+                                    EAV_BE_ENTITY_COMPLEX_SETS.as("s_" + name).SET_ID.
+                                            equal(EAV_BE_COMPLEX_SET_VALUES.as(name).SET_ID)
+                            );
+                }
             }
         }
 
@@ -693,21 +695,23 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                         }
                     }
 
-                    MetaClass simple_value = (MetaClass)type;
+                    MetaClass simple_value = (MetaClass)(((MetaSet)type).getMemberType());
 
+                    Table<Record> nested = outerComplexSQL.asTable(name + "_values");
 
                     if (condition == null)
                     {
                         if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
                         {
-                            condition = sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
-                                    count()).from(outerComplexSQL).asField(name + "_values_c").eq(actual_set_value.get().
-                                    size());
+                            condition = Factory.val(actual_set_value.get().size()).eq(
+                                    sqlGenerator.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
+                                    count()).from(nested));
                         }
                         else
                         {
-                            condition = sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
-                                    count()).from(outerComplexSQL).asField(name + "_values_c").ge(0);
+                            condition = Factory.val(actual_set_value.get().size()).le(
+                                    sqlGenerator.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
+                                            count()).from(nested));
                         }
                     }
                     else
@@ -716,32 +720,34 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                         {
                             if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
                             {
-                                condition = condition.and(sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
-                                        count()).from(outerComplexSQL).asField(name + "_values_c").eq(actual_set_value.get().
-                                        size()));
+                                condition = condition.and(Factory.val(actual_set_value.get().size()).eq(
+                                        sqlGenerator.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
+                                                count()).from(nested)));
                             }
                             else
                             {
-                                condition = condition.and(sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
-                                        count()).from(outerComplexSQL).asField(name + "_values_c").ge(0));
+                                condition = condition.and(Factory.val(actual_set_value.get().size()).le(
+                                        sqlGenerator.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
+                                                count()).from(nested)));
                             }
                         }
                         else
                         {
                             if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
                             {
-                                condition = condition.or(sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
-                                        count()).from(outerComplexSQL).asField(name + "_values_c").eq(actual_set_value.get().
-                                        size()));
+                                condition = condition.or(Factory.val(actual_set_value.get().size()).eq(
+                                        sqlGenerator.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
+                                                count()).from(nested)));
                             }
                             else
                             {
-                                condition = condition.or(sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
-                                        count()).from(outerComplexSQL).asField(name + "_values_c").ge(0));
+                                condition = condition.or(Factory.val(actual_set_value.get().size()).le(
+                                        sqlGenerator.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
+                                                count()).from(nested)));
                             }
                         }
                     }
-                    break;
+                    //break;
                 }
             }
         }

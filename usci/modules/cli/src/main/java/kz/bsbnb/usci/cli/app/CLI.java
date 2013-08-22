@@ -4,12 +4,15 @@ import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Component;
@@ -47,7 +50,10 @@ public class CLI
     private MainParser crParser;
 
     @Autowired
-    IBaseEntityDao baseEntityDao;
+    private IBaseEntityDao baseEntityDao;
+
+    @Autowired
+    private BasicBaseEntitySearcher searcher;
 
     public void processCRBatch(String fname, int count) throws SAXException, IOException, XMLStreamException
     {
@@ -125,6 +131,40 @@ public class CLI
         }
     }
 
+    public void toggleMetaClassKey(long id, String attrName) {
+        MetaClass meta = metaClassRepository.getMetaClass(id);
+
+        if (meta == null) {
+            System.out.println("No such meta class with id: " + id);
+        } else {
+            IMetaAttribute attr = meta.getMetaAttribute(attrName);
+
+            if (attr != null) {
+                attr.setKey(!attr.isKey());
+                metaClassRepository.saveMetaClass(meta);
+            } else {
+                System.out.println("No such attribute: " + attrName);
+            }
+        }
+    }
+
+    public void toggleMetaClassKey(String className, String attrName) {
+        MetaClass meta = metaClassRepository.getMetaClass(className);
+
+        if (meta == null) {
+            System.out.println("No such meta class with name: " + className);
+        } else {
+            IMetaAttribute attr = meta.getMetaAttribute(attrName);
+
+            if (attr != null) {
+                attr.setKey(!attr.isKey());
+                metaClassRepository.saveMetaClass(meta);
+            } else {
+                System.out.println("No such attribute: " + attrName);
+            }
+        }
+    }
+
     public void showEntity(long id) {
         BaseEntity entity = baseEntityDao.load(id);
 
@@ -151,6 +191,22 @@ public class CLI
         }
     }
 
+    public void showEntitySQ(long id) {
+        BaseEntity entity = baseEntityDao.load(id);
+
+        if (entity == null) {
+            System.out.println("No such entity with id: " + id);
+        } else {
+            SelectConditionStep where = searcher.generateSQL(entity, null);
+
+            if (where != null) {
+                System.out.println(where.getSQL(true));
+            } else {
+                System.out.println("Error generating SQL.");
+            }
+        }
+    }
+
     public void commandXSD() throws FileNotFoundException
     {
         if (args.size() > 1) {
@@ -166,7 +222,7 @@ public class CLI
                 System.out.println("No such operation: " + args.get(0));
             }
         } else {
-            System.out.println("Argument needed: <list, convert> <fileName>");
+            System.out.println("Argument needed: <list, convert> <fileName> [className]");
         }
     }
 
@@ -190,11 +246,23 @@ public class CLI
                 } else {
                     System.out.println("No such metaClass identification method: " + args.get(1));
                 }
+            } else if (args.get(0).equals("key")) {
+                if (args.size() > 3) {
+                    if (args.get(1).equals("id")) {
+                        toggleMetaClassKey(Long.parseLong(args.get(2)), args.get(3));
+                    } else if (args.get(1).equals("name")) {
+                        toggleMetaClassKey(args.get(2), args.get(3));
+                    } else {
+                        System.out.println("No such metaClass identification method: " + args.get(1));
+                    }
+                } else {
+                    System.out.println("Argument needed: <key> <id, name> <id or name> <attributeName>");
+                }
             } else {
                 System.out.println("No such operation: " + args.get(0));
             }
         } else {
-            System.out.println("Argument needed: <show> <id, name> <id or name>");
+            System.out.println("Argument needed: <show, key> <id, name> <id or name> [attributeName]");
         }
     }
 
@@ -210,6 +278,12 @@ public class CLI
                     } else {
                         System.out.println("Argument needed: <show> <attr> <id> <attributePath>");
                     }
+                } else if (args.get(1).equals("sq")) {
+                    if (args.size() > 2) {
+                        showEntitySQ(Long.parseLong(args.get(2)));
+                    } else {
+                        System.out.println("Argument needed: <show> <sq> <id> <attributePath>");
+                    }
                 } else {
                     System.out.println("No such entity identification method: " + args.get(1));
                 }
@@ -217,7 +291,7 @@ public class CLI
                 System.out.println("No such operation: " + args.get(0));
             }
         } else {
-            System.out.println("Argument needed: <show> <id, attr> <id> [attributePath]");
+            System.out.println("Argument needed: <show> <id, attr, sq> <id> [attributePath]");
         }
     }
 

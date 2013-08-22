@@ -84,4 +84,30 @@ public class MetaAttribute extends Persistable implements IMetaAttribute
     {
         this.metaType = metaType;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        MetaAttribute that = (MetaAttribute) o;
+
+        if (isKey != that.isKey) return false;
+        if (isNullable != that.isNullable) return false;
+        //if (!metaType.equals(that.metaType)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + metaType.hashCode();
+        result = 31 * result + (isKey ? 1 : 0);
+        result = 31 * result + (isNullable ? 1 : 0);
+        return result;
+    }
 }

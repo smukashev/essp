@@ -5,7 +5,7 @@
     <groupId>kz.bsbnb.usci</groupId>
 	<artifactId>bconv</artifactId>
 	<!--<packaging>war</packaging>-->
-	<name>Batch converter</name>
+	<name>USCI Batch converter</name>
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>

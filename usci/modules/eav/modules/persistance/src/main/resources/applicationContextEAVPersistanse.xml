@@ -49,6 +49,11 @@
 
     <bean id="sqlGenerator" class="org.jooq.impl.Executor">
         <constructor-arg index="0" value="POSTGRES"/>
+        <constructor-arg name="settings">
+            <bean class="org.jooq.conf.Settings">
+                <property name="renderFormatted" value="true" />
+            </bean>
+        </constructor-arg>
     </bean>
 
 </beans>
