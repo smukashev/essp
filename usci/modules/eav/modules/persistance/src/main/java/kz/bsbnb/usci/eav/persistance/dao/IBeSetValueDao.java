@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao;
 
+import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 
@@ -8,8 +9,8 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
  */
 public interface IBeSetValueDao extends IBeValueDao {
 
-    public long save(IBaseValue baseValue);
+    public long save(IBaseSet baseSet);
 
-    public void remove(BaseSet baseSet);
+    public void remove(IBaseSet baseSet);
 
 }

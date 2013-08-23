@@ -8,10 +8,10 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBeSetValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeSimpleSetValueDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
+import org.jooq.DSLContext;
 import org.jooq.DeleteConditionStep;
 import org.jooq.InsertValuesStep2;
 import org.jooq.InsertValuesStep5;
-import org.jooq.impl.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_DOUBLE_SET_VALUES;
@@ -35,7 +34,7 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
-    private Executor sqlGenerator;
+    private DSLContext context;
 
     @Autowired
     IBeSetValueDao beSetValueDao;
@@ -45,10 +44,10 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
         IMetaType metaType = metaSet.getMemberType();
         BaseSet baseSet = (BaseSet)baseValue.getValue();
 
-        long setId = beSetValueDao.save(baseValue);
+        long setId = beSetValueDao.save(baseSet);
         if (metaType.isSet())
         {
-            InsertValuesStep2 insert = sqlGenerator
+            InsertValuesStep2 insert = context
                     .insertInto(
                             EAV_BE_SET_OF_SIMPLE_SETS,
                             EAV_BE_SET_OF_SIMPLE_SETS.PARENT_SET_ID,
@@ -81,7 +80,7 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
             {
                 case INTEGER:
                 {
-                    insert = sqlGenerator
+                    insert = context
                             .insertInto(
                                     EAV_BE_INTEGER_SET_VALUES,
                                     EAV_BE_INTEGER_SET_VALUES.SET_ID,
@@ -93,7 +92,7 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                 }
                 case DATE:
                 {
-                    insert = sqlGenerator
+                    insert = context
                             .insertInto(
                                     EAV_BE_DATE_SET_VALUES,
                                     EAV_BE_DATE_SET_VALUES.SET_ID,
@@ -105,7 +104,7 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                 }
                 case STRING:
                 {
-                    insert = sqlGenerator
+                    insert = context
                             .insertInto(
                                     EAV_BE_STRING_SET_VALUES,
                                     EAV_BE_STRING_SET_VALUES.SET_ID,
@@ -117,7 +116,7 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                 }
                 case BOOLEAN:
                 {
-                    insert = sqlGenerator
+                    insert = context
                             .insertInto(
                                     EAV_BE_BOOLEAN_SET_VALUES,
                                     EAV_BE_BOOLEAN_SET_VALUES.SET_ID,
@@ -129,7 +128,7 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                 }
                 case DOUBLE:
                 {
-                    insert = sqlGenerator
+                    insert = context
                             .insertInto(
                                     EAV_BE_DOUBLE_SET_VALUES,
                                     EAV_BE_DOUBLE_SET_VALUES.SET_ID,
@@ -171,7 +170,7 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
         MetaSet metaSet = (MetaSet)metaType;
         if (metaType.isSet())
         {
-            DeleteConditionStep delete = sqlGenerator
+            DeleteConditionStep delete = context
                     .delete(EAV_BE_SET_OF_SIMPLE_SETS)
                     .where(EAV_BE_SET_OF_SIMPLE_SETS.PARENT_SET_ID.eq(setId));
 
@@ -196,35 +195,35 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
             {
                 case INTEGER:
                 {
-                    delete = sqlGenerator
+                    delete = context
                             .delete(EAV_BE_INTEGER_SET_VALUES)
                             .where(EAV_BE_INTEGER_SET_VALUES.SET_ID.eq(setId));
                     break;
                 }
                 case DATE:
                 {
-                    delete = sqlGenerator
+                    delete = context
                             .delete(EAV_BE_DATE_SET_VALUES)
                             .where(EAV_BE_DATE_SET_VALUES.SET_ID.eq(setId));
                     break;
                 }
                 case STRING:
                 {
-                    delete = sqlGenerator
+                    delete = context
                             .delete(EAV_BE_STRING_SET_VALUES)
                             .where(EAV_BE_STRING_SET_VALUES.SET_ID.eq(setId));
                     break;
                 }
                 case BOOLEAN:
                 {
-                    delete = sqlGenerator
+                    delete = context
                             .delete(EAV_BE_BOOLEAN_SET_VALUES)
                             .where(EAV_BE_BOOLEAN_SET_VALUES.SET_ID.eq(setId));
                     break;
                 }
                 case DOUBLE:
                 {
-                    delete = sqlGenerator
+                    delete = context
                             .delete(EAV_BE_DOUBLE_SET_VALUES)
                             .where(EAV_BE_DOUBLE_SET_VALUES.SET_ID.eq(setId));
                     break;

@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao;
 
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 
 import java.sql.Date;
@@ -10,12 +11,12 @@ import java.util.Set;
  */
 public interface IBeValueDao {
 
-    void save(BaseEntity baseEntity, String attribute);
+    long save(IBaseEntity baseEntity, String attribute);
 
-    void save(BaseEntity baseEntity, Set<String> attributes);
+    void save(IBaseEntity baseEntity, Set<String> attributes);
 
-    void update(BaseEntity baseEntityLoaded, BaseEntity baseEntityForSave, String attribute);
+    void update(IBaseEntity baseEntityLoaded, IBaseEntity baseEntityForSave, String attribute);
 
-    void remove(BaseEntity baseEntity, String attribute);
+    void remove(IBaseEntity baseEntity, String attribute);
 
 }

@@ -72,8 +72,10 @@ public class CLI
             entity = crParser.getCurrentBaseEntity();
 
             //System.out.println(entity);
-            long id = baseEntityDao.save(entity);
-            System.out.println("Saved with id: " + id);
+
+            // TODO: Fix this block
+            //long id = baseEntityDao.save(entity);
+            //System.out.println("Saved with id: " + id);
 
             crParser.parseNextPackage();
         }
@@ -166,17 +168,19 @@ public class CLI
     }
 
     public void showEntity(long id) {
-        BaseEntity entity = baseEntityDao.load(id);
+        // TODO: Fix this block
+        /*BaseEntity entity = baseEntityDao.load(id);
 
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
         } else {
             System.out.println(entity.toString());
-        }
+        }*/
     }
 
     public void showEntityAttr(String path, long id) {
-        BaseEntity entity = baseEntityDao.load(id);
+        // TODO: Fix this block
+        /*BaseEntity entity = baseEntityDao.load(id);
 
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
@@ -188,11 +192,12 @@ public class CLI
             } else {
                 System.out.println("No such attribute with path: " + path);
             }
-        }
+        }*/
     }
 
     public void showEntitySQ(long id) {
-        BaseEntity entity = baseEntityDao.load(id);
+        // TODO: Fix this block
+        /*BaseEntity entity = baseEntityDao.load(id);
 
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
@@ -204,7 +209,7 @@ public class CLI
             } else {
                 System.out.println("Error generating SQL.");
             }
-        }
+        }*/
     }
 
     public void commandXSD() throws FileNotFoundException

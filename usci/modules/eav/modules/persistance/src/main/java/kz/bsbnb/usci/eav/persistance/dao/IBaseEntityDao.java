@@ -1,8 +1,10 @@
 package kz.bsbnb.usci.eav.persistance.dao;
 
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -11,7 +13,7 @@ import java.util.Set;
  * @since 1.0
  * @version 1.0
  */
-public interface IBaseEntityDao extends IDao<BaseEntity>
+public interface IBaseEntityDao
 {
 
     /**
@@ -24,24 +26,38 @@ public interface IBaseEntityDao extends IDao<BaseEntity>
      * @return obtained instance of the BaseEntity by the search.
      * @since 1.0
      */
-    public BaseEntity search(BaseEntity baseEntity);
+    public long search(IBaseEntity baseEntity);
+
+    public List<Long> search(long metaClassId);
+
+    public List<Long> search(String className);
+
+    public IBaseEntity load(long id);
 
     public BaseEntity load(long id, Date reportDate);
 
-    public BaseEntity prepare(BaseEntity baseEntity);
+    public IBaseEntity prepare(IBaseEntity baseEntity);
 
-    public BaseEntity apply(BaseEntity baseEntity);
+    public IBaseEntity apply(IBaseEntity baseEntity);
 
-    public BaseEntity process(BaseEntity baseEntity);
+    public IBaseEntity process(IBaseEntity baseEntity);
 
-    public long saveOrUpdate(BaseEntity baseEntity);
+    public IBaseEntity saveOrUpdate(IBaseEntity baseEntity);
 
-    public void update(BaseEntity baseEntityForSave, BaseEntity baseEntityLoaded);
+    public IBaseEntity update(IBaseEntity baseEntityForSave, IBaseEntity baseEntityLoaded);
 
     public boolean isUsed(long baseEntityId);
 
     public Set<Date> getAvailableReportDates(long baseEntityId);
 
+    public Date getMinReportDate(long baseEntityId);
+
     public Date getMaxReportDate(long baseEntityId);
+
+    public Date getMaxReportDate(long baseEntityId, Date reportDate);
+
+    public IBaseEntity save(IBaseEntity baseEntity);
+
+    public void remove(IBaseEntity baseEntity);
 
 }

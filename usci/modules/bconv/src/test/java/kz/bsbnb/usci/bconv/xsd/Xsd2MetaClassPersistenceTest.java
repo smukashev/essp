@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,7 @@ public class Xsd2MetaClassPersistenceTest
     }
 
     @Test
+    @Ignore
     public void testMetaClassFromXSDPersistance() throws Exception
     {
         InputStream in = this.getClass().getClassLoader()

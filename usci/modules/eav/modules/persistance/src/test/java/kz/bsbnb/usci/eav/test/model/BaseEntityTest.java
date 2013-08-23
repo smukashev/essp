@@ -6,9 +6,7 @@ package kz.bsbnb.usci.eav.test.model;
 
 import static org.junit.Assert.*;
 
-import java.util.Date;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -25,6 +23,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.test.GenericTestCase;
+import kz.bsbnb.usci.eav.util.DateUtils;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -517,4 +516,26 @@ public class BaseEntityTest extends GenericTestCase{
             fail("Gives Boolean with illegal type");
         }
     }*/
+
+    @Test
+    public void testClone() {
+        Set<Date> availableReportDates = new HashSet<Date>() {{
+            // 1 january 2013
+            add(new Date(new Long("1356976800000")));
+            // 1 february 2013
+            add(new Date(new Long("1359655200000")));
+        }};
+
+        BaseEntity baseEntity = new BaseEntity(1, new MetaClass("meta_class"),
+                new Date(new Long("1356976800000")), availableReportDates);
+        BaseEntity baseEntityCloned = baseEntity.clone();
+
+        // 1 march 2013
+        baseEntity.getReportDate().setTime(new Long("1359655200000"));
+        baseEntity.getAvailableReportDates().iterator().next().setTime(new Long("1362074400000"));
+
+        assertFalse(baseEntity.getAvailableReportDates().equals(baseEntityCloned.getAvailableReportDates()));
+        assertFalse(baseEntity.getReportDate().equals(baseEntityCloned.getReportDate()));
+    }
+
 }

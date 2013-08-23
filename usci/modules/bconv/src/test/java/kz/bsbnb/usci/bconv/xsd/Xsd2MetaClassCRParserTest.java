@@ -24,6 +24,7 @@ import java.sql.Date;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContextCRParserTest.xml"})
 @ActiveProfiles({"postgres"})
+@Ignore
 public class Xsd2MetaClassCRParserTest
 {
     @Autowired

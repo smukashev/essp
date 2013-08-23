@@ -271,7 +271,7 @@ public class BaseSet extends BaseContainer implements IBaseSet
         return true;
     }
 
-    public Set<String> getModifiedObjects()
+    public Set<String> getModifiedAttributes()
     {
         return modifiedObjects;
     }

@@ -14,7 +14,7 @@ import java.util.UUID;
  *
  * @author a.motov
  */
-public interface IBaseValue extends IPersistable
+public interface IBaseValue extends IPersistable, Cloneable
 {
     /**
      * Returns the <code>Batch</code> that contains information about the origin of this value.

@@ -53,9 +53,11 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Override
     public BaseEntity search(BaseEntity baseEntity) {
-        ArrayList<Long> result = searcher.findAll(baseEntity) ;
+        // TODO: Fix this block
+        throw new UnsupportedOperationException("Not yet implemented.");
+        //ArrayList<Long> result = searcher.findAll(baseEntity) ;
 
-       return baseEntityDao.load(result.get(0));
+        //return baseEntityDao.load(result.get(0));
     }
 
     @Override
@@ -68,6 +70,8 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Override
     public BaseEntity load(long id) {
-        return baseEntityDao.load(id);
+        // TODO: Fix this block
+        throw new UnsupportedOperationException("Not yet implemented.");
+        //return baseEntityDao.load(id);
     }
 }

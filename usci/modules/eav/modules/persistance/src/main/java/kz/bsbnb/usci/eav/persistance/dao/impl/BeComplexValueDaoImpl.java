@@ -1,21 +1,22 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.dao.IBeComplexValueDao;
+import org.jooq.DSLContext;
 import org.jooq.DeleteConditionStep;
 import org.jooq.InsertValuesStep7;
-import org.jooq.impl.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Date;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_VALUES;
@@ -30,24 +31,21 @@ public class BeComplexValueDaoImpl extends JDBCSupport implements IBeComplexValu
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
-    private Executor sqlGenerator;
+    private DSLContext context;
 
     @Autowired
     private IBaseEntityDao baseEntityDao;
 
     @Override
-    public void save(BaseEntity baseEntity, String attribute) {
-        Set<String> attributes = new HashSet<String>();
-        attributes.add(attribute);
-
-        save(baseEntity, attributes);
+    public long save(IBaseEntity baseEntity, String attribute) {
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Override
-    public void save(BaseEntity baseEntity, Set<String> attributes) {
+    public void save(IBaseEntity baseEntity, Set<String> attributes) {
         MetaClass meta = baseEntity.getMeta();
 
-        InsertValuesStep7 insert = sqlGenerator
+        InsertValuesStep7 insert = context
                 .insertInto(
                         EAV_BE_COMPLEX_VALUES,
                         EAV_BE_COMPLEX_VALUES.ENTITY_ID,
@@ -59,7 +57,6 @@ public class BeComplexValueDaoImpl extends JDBCSupport implements IBeComplexValu
                         EAV_BE_COMPLEX_VALUES.IS_LAST);
 
         Iterator<String> it = attributes.iterator();
-        List<Object[]> batchArgs = new ArrayList<Object[]>();
         while (it.hasNext())
         {
             String attributeNameForInsert = it.next();
@@ -67,13 +64,16 @@ public class BeComplexValueDaoImpl extends JDBCSupport implements IBeComplexValu
             IBaseValue batchValue = baseEntity.getBaseValue(attributeNameForInsert);
             IMetaAttribute metaAttribute = meta.getMetaAttribute(attributeNameForInsert);
 
-            long childBaseEntityId = baseEntityDao.saveOrUpdate((BaseEntity) batchValue.getValue());
+            if (batchValue.getValue() != null)
+            {
+                IBaseEntity childBaseEntity = (BaseEntity) batchValue.getValue();
+                childBaseEntity = baseEntityDao.saveOrUpdate(childBaseEntity);
 
-            Object[] insertArgs = new Object[] {baseEntity.getId(), batchValue.getBatch().getId(),
-                    metaAttribute.getId(), batchValue.getIndex(), batchValue.getRepDate(), childBaseEntityId, true};
+                Object[] insertArgs = new Object[] {baseEntity.getId(), batchValue.getBatch().getId(),
+                        metaAttribute.getId(), batchValue.getIndex(), batchValue.getRepDate(), childBaseEntity.getId(), true};
 
-            insert = insert.values(Arrays.asList(insertArgs));
-            batchArgs.add(insertArgs);
+                insert = insert.values(Arrays.asList(insertArgs));
+            }
         }
 
         logger.debug(insert.toString());
@@ -81,13 +81,13 @@ public class BeComplexValueDaoImpl extends JDBCSupport implements IBeComplexValu
     }
 
     @Override
-    public void update(BaseEntity baseEntityLoaded, BaseEntity baseEntityForSave, String attribute) {
+    public void update(IBaseEntity baseEntityLoaded, IBaseEntity baseEntityForSave, String attribute) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
 
     @Override
-    public void remove(BaseEntity baseEntity, String attribute)
+    public void remove(IBaseEntity baseEntity, String attribute)
     {
         MetaClass meta = baseEntity.getMeta();
         IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
@@ -111,15 +111,13 @@ public class BeComplexValueDaoImpl extends JDBCSupport implements IBeComplexValu
                     "Removing a complex value is not possible.");
         }
 
-        DeleteConditionStep delete = sqlGenerator
+        DeleteConditionStep delete = context
                 .delete(EAV_BE_COMPLEX_VALUES)
                 .where(EAV_BE_COMPLEX_VALUES.ENTITY_ID.eq(baseEntityId))
                 .and(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
 
         logger.debug(delete.toString());
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-
-        baseEntityDao.remove((BaseEntity) baseEntity.getBaseValue(attribute).getValue());
     }
 
 }

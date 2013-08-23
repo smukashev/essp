@@ -84,8 +84,9 @@ public class GenerateInsertXml {
             for (MetaClass aData : data) {
                 BaseEntity baseEntity = baseEntityGenerator.generateBaseEntity(batch, aData, ++index);
                 entities.add(baseEntity);
-                Long id = baseEntityDao.save(baseEntity);
-                BaseEntity bb = baseEntityDao.load(id);
+                // TODO: Fix this block
+                //Long id = baseEntityDao.save(baseEntity);
+                //BaseEntity bb = baseEntityDao.load(id);
             }
 
             Document document = baseEntityXmlGenerator.getGeneratedDocument(entities);

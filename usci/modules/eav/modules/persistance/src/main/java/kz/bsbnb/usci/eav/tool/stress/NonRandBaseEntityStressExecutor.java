@@ -129,13 +129,15 @@ public class NonRandBaseEntityStressExecutor {
                 stats.put("_BASE_ENTITY_GENERATION", t2);
 
                 t1 = System.nanoTime();
-                long baseEntityId = baseEntityDao.save(baseEntityCreate);
+                // TODO: Fix this block
+                //long baseEntityId = baseEntityDao.save(baseEntityCreate);
                 t2 = (System.nanoTime() - t1) / 1000000;
 
                 stats.put("_BASE_ENTITY_SAVE", t2);
 
                 t1 = System.nanoTime();
-                BaseEntity baseEntityLoad = baseEntityDao.load(baseEntityId);
+                // TODO: Fix this block
+                //BaseEntity baseEntityLoad = baseEntityDao.load(baseEntityId);
                 t2 = (System.nanoTime() - t1) / 1000000;
 
                 stats.put("_BASE_ENTITY_LOAD", t2);

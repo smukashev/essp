@@ -44,12 +44,17 @@
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
-            <version>3.0.0-RC2</version>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>kz.bsbnb.ddlutils</groupId>
             <artifactId>ddlutils</artifactId>
             <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>14.0.1</version>
         </dependency>
     </dependencies>
 
@@ -168,7 +173,7 @@
                     <plugin>
                         <groupId>org.jooq</groupId>
                         <artifactId>jooq-codegen-maven</artifactId>
-                        <version>3.0.0-RC2</version>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <goals>

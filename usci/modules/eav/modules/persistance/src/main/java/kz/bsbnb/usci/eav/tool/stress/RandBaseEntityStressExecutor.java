@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.tool.stress;
 
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.util.SetUtils;
@@ -113,13 +114,15 @@ public class RandBaseEntityStressExecutor {
                 stats.put("_BASE_ENTITY_GENERATION", t2);
 
                 t1 = System.nanoTime();
-                long baseEntityId = baseEntityDao.save(baseEntityCreate);
+                // TODO: Fix this block
+                //long baseEntityId = baseEntityDao.save(baseEntityCreate);
                 t2 = (System.nanoTime() - t1) / 1000;
 
                 stats.put("_BASE_ENTITY_SAVE", t2);
 
                 t1 = System.nanoTime();
-                BaseEntity baseEntityLoad = baseEntityDao.load(baseEntityId);
+                // TODO: Fix this block
+                //BaseEntity baseEntityLoad = baseEntityDao.load(baseEntityId);
                 t2 = (System.nanoTime() - t1) / 1000;
 
                 stats.put("_BASE_ENTITY_LOAD", t2);

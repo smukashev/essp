@@ -34,12 +34,18 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      */
     private Date reportDate;
 
+    private Date maxReportDate;
+
+    private Date minReportDate;
+
     /**
      * The list of available reporting dates for this instance BaseEntity.
      */
     private Set<Date> availableReportDates = new HashSet<Date>();
 
-    private Set<String> modifiedObjects = new HashSet<String>();
+    private Set<String> modifiedAttributes = new HashSet<String>();
+
+    private boolean listening = false;
 
     /**
      * Holds data about entity structure
@@ -50,8 +56,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     /**
      * Holds attributes values
      */
-    private HashMap<String, IBaseValue> values =
-            new HashMap<String, IBaseValue>();
+    private HashMap<String, IBaseValue> values = new HashMap<String, IBaseValue>();
+
+    private Set<String> validationErrors = new HashSet<String>();
 
     /**
      * Initializes entity.
@@ -60,8 +67,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     {
 
     }
-
-    private Set<String> validationErrors = new HashSet<String>();
 
     /**
      * Initializes entity with a class name.
@@ -108,29 +113,95 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         return availableReportDates;
     }
 
+    public void setAvailableReportDates(Set<Date> availableReportDates) {
+        this.availableReportDates = availableReportDates;
+        this.maxReportDate = Collections.max(availableReportDates);
+        this.minReportDate = Collections.min(availableReportDates);
+    }
+
+    public Date getMaxReportDate()
+    {
+        if (availableReportDates.size() != 0)
+        {
+            maxReportDate = Collections.max(availableReportDates);
+            return maxReportDate;
+        }
+        return null;
+    }
+
+    public Date getMinReportDate()
+    {
+        if (availableReportDates.size() != 0)
+        {
+            minReportDate = Collections.min(availableReportDates);
+            return minReportDate;
+        }
+        return null;
+    }
+
     /**
      * Retrieves key titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>
      *
-     * @param name key name. Must exist in entity meta
+     * @param attribute key name. Must exist in entity meta
      * @return key value, null if value is not set
      * @throws IllegalArgumentException if key name does not exist in entity meta,
      * 	                                or key has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public IBaseValue getBaseValue(String name)
+    @Override
+    public IBaseValue getBaseValue(String attribute)
     {
-        IMetaType type = meta.getMemberType(name);
+        if (attribute.contains("."))
+        {
+            int index = attribute.indexOf(".");
+            String parentAttribute = attribute.substring(0, index);
+            String childAttribute = attribute.substring(index, attribute.length() - 1);
 
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name +
-                    ", not found in class: " + meta.getClassName());
+            IMetaType metaType = meta.getMemberType(parentAttribute);
+            if (metaType == null)
+            {
+                throw new IllegalArgumentException(String.format("Instance of MetaClass with class name {0} " +
+                        "does not contain attribute {1}.", meta.getClassName(), parentAttribute));
+            }
 
-        IBaseValue batchValue = values.get(name);
+            if (metaType.isComplex() && !metaType.isSet())
+            {
+                IBaseValue baseValue = values.get(parentAttribute);
+                if (baseValue == null)
+                {
+                    return null;
+                }
 
-        if(batchValue == null)
-            return null;
+                IBaseEntity baseEntity = (IBaseEntity)baseValue.getValue();
+                if (baseEntity == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return baseEntity.getBaseValue(childAttribute);
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+        {
+            IMetaType metaType = meta.getMemberType(attribute);
 
-        return batchValue;
+            if(metaType == null)
+                throw new IllegalArgumentException(String.format("Instance of MetaClass with class name {0} " +
+                        "does not contain attribute {1}.", meta.getClassName(), attribute));
+
+            IBaseValue baseValue = values.get(attribute);
+
+            if(baseValue == null)
+                return null;
+
+            return baseValue;
+        }
     }
 
     /**
@@ -218,6 +289,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     }
 
     public void remove(String name) {
+        fireValueChange(name);
         values.remove(name);
     }
 
@@ -228,7 +300,27 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     @Override
     public IMetaType getMemberType(String name) {
-        return meta.getMemberType(name);
+        if (name.contains("."))
+        {
+            int index = name.indexOf(".");
+            String parentIdentifier = name.substring(0, index);
+
+            IMetaType metaType = meta.getMemberType(parentIdentifier);
+            if (metaType.isComplex() && !metaType.isSet())
+            {
+                MetaClass childMeta = (MetaClass)metaType;
+                String childIdentifier = name.substring(index, name.length() - 1);
+                return childMeta.getMemberType(childIdentifier);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+        {
+            return meta.getMemberType(name);
+        }
     }
 
     /**
@@ -477,12 +569,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     public void clearModifiedObjects()
     {
-        this.modifiedObjects.clear();
+        this.modifiedAttributes.clear();
     }
 
-    public Set<String> getModifiedObjects()
+    public Set<String> getModifiedAttributes()
     {
-        return this.modifiedObjects;
+        return this.modifiedAttributes;
     }
 
     public void setListeners()
@@ -490,7 +582,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         this.addListener(new IValueChangeListener() {
             @Override
             public void valueChange(ValueChangeEvent event) {
-                modifiedObjects.add(event.getIdentifier());
+                modifiedAttributes.add(event.getIdentifier());
             }
         });
 
@@ -500,39 +592,43 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
             if (metaType.isComplex())
             {
                 IBaseValue baseValue = values.get(key);
-                if (metaType.isSet())
+                if (baseValue.getValue() != null)
                 {
-                    BaseSet baseSet = (BaseSet)baseValue.getValue();
-                    baseSet.addListener(new ValueChangeListener(key) {
+                    if (metaType.isSet())
+                    {
+                        BaseSet baseSet = (BaseSet)baseValue.getValue();
+                        baseSet.addListener(new ValueChangeListener(key) {
 
-                        @Override
-                        public void valueChange(ValueChangeEvent event) {
-                            String parentIdentifier = this.getParentIdentifier();
-                            String identifier = parentIdentifier;
+                            @Override
+                            public void valueChange(ValueChangeEvent event) {
+                                String parentIdentifier = this.getParentIdentifier();
+                                String identifier = parentIdentifier;
 
-                            modifiedObjects.add(identifier);
-                            fireValueChange(identifier);
-                        }
-                    });
-                    baseSet.setListeners();
-                }
-                else
-                {
-                    BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
-                    baseEntity.addListener(new ValueChangeListener(key) {
+                                modifiedAttributes.add(identifier);
+                                fireValueChange(identifier);
+                            }
+                        });
+                        baseSet.setListeners();
+                    }
+                    else
+                    {
 
-                        @Override
-                        public void valueChange(ValueChangeEvent event) {
-                            String childIdentifier = event.getIdentifier();
-                            String parentIdentifier = this.getParentIdentifier();
-                            String identifier = parentIdentifier + "." + childIdentifier;
+                        BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
+                        baseEntity.addListener(new ValueChangeListener(key) {
 
-                            modifiedObjects.add(identifier);
-                            fireValueChange(identifier);
-                        }
-                    });
+                            @Override
+                            public void valueChange(ValueChangeEvent event) {
+                                String childIdentifier = event.getIdentifier();
+                                String parentIdentifier = this.getParentIdentifier();
+                                String identifier = parentIdentifier + "." + childIdentifier;
 
-                    baseEntity.setListeners();
+                                modifiedAttributes.add(identifier);
+                                fireValueChange(identifier);
+                            }
+                        });
+
+                        baseEntity.setListeners();
+                    }
                 }
             }
         }
@@ -569,6 +665,41 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         }
     }
 
+    @Override
+    public BaseEntity clone()
+    {
+        BaseEntity baseEntity = null;
+        try
+        {
+            baseEntity = (BaseEntity)super.clone();
+            baseEntity.setReportDate((Date)reportDate.clone());
 
+            HashSet<Date> availableReportDatesCloned = new HashSet<Date>();
+            Iterator<Date> availableReportDatesIt = availableReportDates.iterator();
+            while(availableReportDatesIt.hasNext())
+            {
+                availableReportDatesCloned.add((Date)availableReportDatesIt.next().clone());
+            }
+            baseEntity.setAvailableReportDates(availableReportDatesCloned);
+
+            HashMap<String, IBaseValue> valuesCloned = new HashMap<String, IBaseValue>();
+            Iterator<String> attributesIt = values.keySet().iterator();
+            while(attributesIt.hasNext())
+            {
+                String attribute = attributesIt.next();
+
+                IBaseValue baseValue = values.get(attribute);
+                IBaseValue baseValueCloned = (IBaseValue)((BaseValue)baseValue).clone();
+                valuesCloned.put(attribute, baseValueCloned);
+            }
+            baseEntity.setAvailableReportDates(availableReportDatesCloned);
+
+        }
+        catch(CloneNotSupportedException ex)
+        {
+            throw new RuntimeException("BaseEntity class does not implement interface Cloneable.");
+        }
+        return baseEntity;
+    }
 
 }

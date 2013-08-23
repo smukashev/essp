@@ -1,20 +1,19 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
-import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeComplexSetValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeSetValueDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBeSimpleSetValueDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
+import org.jooq.DSLContext;
 import org.jooq.DeleteConditionStep;
 import org.jooq.InsertValuesStep2;
 import org.jooq.InsertValuesStep5;
-import org.jooq.impl.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
@@ -37,7 +35,7 @@ public class BeComplexSetValueDaoImpl extends JDBCSupport implements IBeComplexS
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
-    private Executor sqlGenerator;
+    private DSLContext context;
 
     @Autowired
     IBaseEntityDao baseEntityDao;
@@ -49,10 +47,10 @@ public class BeComplexSetValueDaoImpl extends JDBCSupport implements IBeComplexS
         BaseSet baseSet = (BaseSet)baseValue.getValue();
         IMetaType metaType = metaSet.getMemberType();
 
-        long setId = beSetValueDao.save(baseValue);
+        long setId = beSetValueDao.save(baseSet);
         if (metaType.isSet())
         {
-            InsertValuesStep2 insert = sqlGenerator
+            InsertValuesStep2 insert = context
                     .insertInto(
                             EAV_BE_SET_OF_COMPLEX_SETS,
                             EAV_BE_SET_OF_COMPLEX_SETS.PARENT_SET_ID,
@@ -79,7 +77,7 @@ public class BeComplexSetValueDaoImpl extends JDBCSupport implements IBeComplexS
         }
         else
         {
-            InsertValuesStep5 insert = sqlGenerator
+            InsertValuesStep5 insert = context
                     .insertInto(
                             EAV_BE_COMPLEX_SET_VALUES,
                             EAV_BE_COMPLEX_SET_VALUES.SET_ID,
@@ -93,15 +91,15 @@ public class BeComplexSetValueDaoImpl extends JDBCSupport implements IBeComplexS
             while (itValue.hasNext()) {
                 IBaseValue baseValueChild = itValue.next();
 
-                BaseEntity baseEntityChild = (BaseEntity)baseValueChild.getValue();
-                long baseEntityChildId = baseEntityDao.saveOrUpdate(baseEntityChild);
+                IBaseEntity baseEntityChild = (BaseEntity)baseValueChild.getValue();
+                baseEntityChild = baseEntityDao.saveOrUpdate(baseEntityChild);
 
                 Object[] insertArgs = new Object[] {
                         setId,
                         baseValueChild.getBatch().getId(),
                         baseValueChild.getIndex(),
                         baseValue.getRepDate(),
-                        baseEntityChildId
+                        baseEntityChild.getId()
                 };
                 insert = insert.values(Arrays.asList(insertArgs));
             }
@@ -118,7 +116,7 @@ public class BeComplexSetValueDaoImpl extends JDBCSupport implements IBeComplexS
         IMetaType metaType = baseSet.getMemberType();
         if (metaType.isSet())
         {
-            DeleteConditionStep delete = sqlGenerator
+            DeleteConditionStep delete = context
                     .delete(EAV_BE_SET_OF_COMPLEX_SETS)
                     .where(EAV_BE_SET_OF_COMPLEX_SETS.PARENT_SET_ID.eq(setId));
 
@@ -137,7 +135,7 @@ public class BeComplexSetValueDaoImpl extends JDBCSupport implements IBeComplexS
         }
         else
         {
-            DeleteConditionStep delete = sqlGenerator
+            DeleteConditionStep delete = context
                     .delete(EAV_BE_COMPLEX_SET_VALUES)
                     .where(EAV_BE_COMPLEX_SET_VALUES.SET_ID.eq(setId));
 

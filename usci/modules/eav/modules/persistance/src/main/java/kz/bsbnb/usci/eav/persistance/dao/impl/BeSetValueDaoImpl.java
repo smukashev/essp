@@ -1,7 +1,8 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -11,14 +12,15 @@ import kz.bsbnb.usci.eav.persistance.dao.IBeComplexSetValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeSetValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeSimpleSetValueDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
-import org.jooq.DeleteConditionStep;
-import org.jooq.InsertOnDuplicateStep;
-import org.jooq.impl.Executor;
+import kz.bsbnb.usci.eav.util.DateUtils;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
@@ -34,7 +36,7 @@ public class BeSetValueDaoImpl extends JDBCSupport implements IBeSetValueDao {
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
-    private Executor sqlGenerator;
+    private DSLContext context;
 
     @Autowired
     private IBeSimpleSetValueDao beSimpleSetValueDao;
@@ -42,7 +44,7 @@ public class BeSetValueDaoImpl extends JDBCSupport implements IBeSetValueDao {
     private IBeComplexSetValueDao beComplexSetValueDao;
 
     @Override
-    public void save(BaseEntity baseEntity, String attribute) {
+    public long save(final IBaseEntity baseEntity, String attribute) {
         MetaClass meta = baseEntity.getMeta();
         IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
         IMetaType metaType = metaAttribute.getMetaType();
@@ -55,7 +57,7 @@ public class BeSetValueDaoImpl extends JDBCSupport implements IBeSetValueDao {
         }
 
         IBaseValue baseValue = baseEntity.getBaseValue(attribute);
-
+        IBaseSet baseSet = (IBaseSet)baseValue.getValue();
         long setId;
         if (metaType.isComplex())
         {
@@ -65,61 +67,70 @@ public class BeSetValueDaoImpl extends JDBCSupport implements IBeSetValueDao {
         {
             setId = beSimpleSetValueDao.save(baseValue, metaSet);
         }
+        baseSet.setId(setId);
 
         InsertOnDuplicateStep insert;
         if (metaType.isSetOfSets())
         {
-            insert = sqlGenerator
-                    .insertInto(
-                            EAV_BE_ENTITY_SET_OF_SETS,
-                            EAV_BE_ENTITY_SET_OF_SETS.ENTITY_ID,
-                            EAV_BE_ENTITY_SET_OF_SETS.ATTRIBUTE_ID,
-                            EAV_BE_ENTITY_SET_OF_SETS.SET_ID,
-                            EAV_BE_ENTITY_SET_OF_SETS.IS_LAST)
-                    .values(baseEntity.getId(), metaAttribute.getId(), setId, true);
+            insert = context
+                    .insertInto(EAV_BE_ENTITY_SET_OF_SETS)
+                    .set(EAV_BE_ENTITY_SET_OF_SETS.ENTITY_ID, baseEntity.getId())
+                    .set(EAV_BE_ENTITY_SET_OF_SETS.ATTRIBUTE_ID, metaAttribute.getId())
+                    .set(EAV_BE_ENTITY_SET_OF_SETS.SET_ID, baseSet.getId())
+                    .set(EAV_BE_ENTITY_SET_OF_SETS.BATCH_ID, baseValue.getBatch().getId())
+                    .set(EAV_BE_ENTITY_SET_OF_SETS.INDEX_, baseValue.getIndex())
+                    .set(EAV_BE_ENTITY_SET_OF_SETS.OPEN_DATE, DateUtils.convert(baseEntity.getReportDate()))
+                    .set(EAV_BE_ENTITY_SET_OF_SETS.IS_LAST, true);
         }
         else
         {
             if (metaType.isComplex())
             {
-                insert = sqlGenerator
-                        .insertInto(
-                                EAV_BE_ENTITY_COMPLEX_SETS,
-                                EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID,
-                                EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID,
-                                EAV_BE_ENTITY_COMPLEX_SETS.SET_ID,
-                                EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST)
-                        .values(baseEntity.getId(), metaAttribute.getId(), setId, true);
+                insert = context
+                        .insertInto(EAV_BE_ENTITY_COMPLEX_SETS)
+                        .set(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID, baseEntity.getId())
+                        .set(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID, metaAttribute.getId())
+                        .set(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID, baseSet.getId())
+                        .set(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID, baseValue.getBatch().getId())
+                        .set(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_, baseValue.getIndex())
+                        .set(EAV_BE_ENTITY_COMPLEX_SETS.OPEN_DATE, DateUtils.convert(baseEntity.getReportDate()))
+                        .set(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST, true);
             }
             else
             {
-                insert = sqlGenerator
-                        .insertInto(
-                                EAV_BE_ENTITY_SIMPLE_SETS,
-                                EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID,
-                                EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID,
-                                EAV_BE_ENTITY_SIMPLE_SETS.SET_ID,
-                                EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST)
-                        .values(baseEntity.getId(), metaAttribute.getId(), setId, true);
+                insert = context
+                        .insertInto(EAV_BE_ENTITY_SIMPLE_SETS)
+                        .set(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID, baseEntity.getId())
+                        .set(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID, metaAttribute.getId())
+                        .set(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID, baseSet.getId())
+                        .set(EAV_BE_ENTITY_SIMPLE_SETS.BATCH_ID, baseValue.getBatch().getId())
+                        .set(EAV_BE_ENTITY_SIMPLE_SETS.INDEX_, baseValue.getIndex())
+                        .set(EAV_BE_ENTITY_SIMPLE_SETS.OPEN_DATE, DateUtils.convert(baseEntity.getReportDate()))
+                        .set(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST, true);
             }
         }
 
         logger.debug(insert.toString());
-        insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
     @Override
-    public void save(BaseEntity baseEntity, Set<String> attributes) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void save(final IBaseEntity baseEntity, Set<String> attributes) {
+        Iterator<String> it = attributes.iterator();
+        while(it.hasNext())
+        {
+            String attribute = it.next();
+            save(baseEntity, attribute);
+        }
     }
 
     @Override
-    public void update(BaseEntity baseEntityLoaded, BaseEntity baseEntityForSave, String attribute) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void update(IBaseEntity baseEntityLoaded, IBaseEntity baseEntityForSave, String attribute) {
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Override
-    public void remove(BaseEntity baseEntity, String attribute) {
+    public void remove(final IBaseEntity baseEntity, String attribute) {
         MetaClass meta = baseEntity.getMeta();
         IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
         IMetaType metaType = metaAttribute.getMetaType();
@@ -127,7 +138,7 @@ public class BeSetValueDaoImpl extends JDBCSupport implements IBeSetValueDao {
         DeleteConditionStep delete;
         if (metaType.isSetOfSets())
         {
-            delete = sqlGenerator
+            delete = context
                     .delete(EAV_BE_ENTITY_SET_OF_SETS)
                     .where(EAV_BE_ENTITY_SET_OF_SETS.ENTITY_ID.eq(baseEntity.getId())
                             .and(EAV_BE_ENTITY_SET_OF_SETS.ATTRIBUTE_ID.eq(metaAttribute.getId())));
@@ -136,14 +147,14 @@ public class BeSetValueDaoImpl extends JDBCSupport implements IBeSetValueDao {
         {
             if (metaType.isComplex())
             {
-                delete = sqlGenerator
+                delete = context
                         .delete(EAV_BE_ENTITY_COMPLEX_SETS)
                         .where(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID.eq(baseEntity.getId())
                                 .and(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID.eq(metaAttribute.getId())));
             }
             else
             {
-                delete = sqlGenerator
+                delete = context
                         .delete(EAV_BE_ENTITY_SIMPLE_SETS)
                         .where(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID.eq(baseEntity.getId())
                                 .and(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID.eq(metaAttribute.getId())));
@@ -162,30 +173,29 @@ public class BeSetValueDaoImpl extends JDBCSupport implements IBeSetValueDao {
         {
             beSimpleSetValueDao.remove(baseSet);
         }
+
+        baseEntity.remove(attribute);
     }
 
     @Override
-    public long save(IBaseValue baseValue) {
-        InsertOnDuplicateStep insert = sqlGenerator
-                .insertInto(
-                        EAV_BE_SETS,
-                        EAV_BE_SETS.BATCH_ID,
-                        EAV_BE_SETS.INDEX_,
-                        EAV_BE_SETS.REP_DATE)
-                .values(baseValue.getBatch().getId(), baseValue.getIndex(), baseValue.getRepDate());
+    public long save(IBaseSet baseSet) {
+        //TODO: Remove temp field
+        Insert insert = context
+                .insertInto(EAV_BE_SETS)
+                .set(EAV_BE_SETS.TEMP, new Long("0"));
 
         logger.debug(insert.toString());
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
     @Override
-    public void remove(BaseSet baseSet) {
+    public void remove(IBaseSet baseSet) {
         if (baseSet.getId() < 1)
         {
             throw new IllegalArgumentException("Can't remove BaseSet without id.");
         }
 
-        DeleteConditionStep delete = sqlGenerator
+        DeleteConditionStep delete = context
                 .delete(EAV_BE_SETS)
                 .where(EAV_BE_SETS.ID.eq(baseSet.getId()));
 

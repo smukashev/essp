@@ -305,6 +305,10 @@
       <column name="entity_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
+      <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="open_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
+      <column name="close_date" primaryKey="false" required="false" type="DATE" size="13" autoIncrement="false"/>
       <column name="is_last" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <foreign-key foreignTable="eav_be_sets" name="fk_1022">
         <reference local="set_id" foreign="id"/>
@@ -315,17 +319,24 @@
       <foreign-key foreignTable="eav_be_entities" name="fk_1024">
         <reference local="entity_id" foreign="id"/>
       </foreign-key>
+      <foreign-key foreignTable="eav_batches" name="fk_1025">
+        <reference local="batch_id" foreign="id"/>
+      </foreign-key>
       <unique>
         <unique-column name="id"/>
       </unique>
       <index>
+        <index-column name="entity_id"/>
         <index-column name="attribute_id"/>
+        <index-column name="set_id"/>
+        <index-column name="open_date"/>
+        <index-column name="close_date"/>
       </index>
       <index>
         <index-column name="entity_id"/>
-      </index>
-      <index>
+        <index-column name="attribute_id"/>
         <index-column name="set_id"/>
+        <index-column name="is_last"/>
       </index>
     </table>
     <table name="eav_be_entity_set_of_sets">
@@ -333,15 +344,22 @@
       <column name="entity_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
+      <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="open_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
+      <column name="close_date" primaryKey="false" required="false" type="DATE" size="13" autoIncrement="false"/>
       <column name="is_last" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
-      <foreign-key foreignTable="eav_be_sets" name="fk_1025">
+      <foreign-key foreignTable="eav_be_sets" name="fk_1026">
         <reference local="set_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_be_entities" name="fk_1026">
+      <foreign-key foreignTable="eav_be_entities" name="fk_1027">
         <reference local="entity_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_m_set_of_sets" name="fk_1027">
+      <foreign-key foreignTable="eav_m_set_of_sets" name="fk_1028">
         <reference local="attribute_id" foreign="id"/>
+      </foreign-key>
+      <foreign-key foreignTable="eav_batches" name="fk_1029">
+        <reference local="batch_id" foreign="id"/>
       </foreign-key>
       <unique>
         <unique-column name="id"/>
@@ -361,6 +379,10 @@
       <column name="entity_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="attribute_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
+      <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="open_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
+      <column name="close_date" primaryKey="false" required="false" type="DATE" size="13" autoIncrement="false"/>
       <column name="is_last" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
       <foreign-key foreignTable="eav_be_sets" name="fk_1030">
         <reference local="set_id" foreign="id"/>
@@ -371,17 +393,24 @@
       <foreign-key foreignTable="eav_m_simple_set" name="fk_1032">
         <reference local="attribute_id" foreign="id"/>
       </foreign-key>
+      <foreign-key foreignTable="eav_batches" name="fk_1033">
+        <reference local="batch_id" foreign="id"/>
+      </foreign-key>
       <unique>
         <unique-column name="id"/>
       </unique>
       <index>
+        <index-column name="entity_id"/>
         <index-column name="attribute_id"/>
+        <index-column name="set_id"/>
+        <index-column name="open_date"/>
+        <index-column name="close_date"/>
       </index>
       <index>
         <index-column name="entity_id"/>
-      </index>
-      <index>
+        <index-column name="attribute_id"/>
         <index-column name="set_id"/>
+        <index-column name="is_last"/>
       </index>
     </table>
     <table name="eav_be_integer_set_values">
@@ -391,10 +420,10 @@
       <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <column name="value" primaryKey="false" required="true" type="BIGINT" size="10" autoIncrement="false"/>
-      <foreign-key foreignTable="eav_batches" name="fk_1033">
+      <foreign-key foreignTable="eav_batches" name="fk_1034">
         <reference local="batch_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_be_sets">
+      <foreign-key foreignTable="eav_be_sets" name="fk_1035">
         <reference local="set_id" foreign="id"/>
       </foreign-key>
       <index>
@@ -414,13 +443,13 @@
       <column name="close_date" primaryKey="false" required="false" type="DATE" size="13" autoIncrement="false"/>
       <column name="value" primaryKey="false" required="true" type="INTEGER" size="10" autoIncrement="false"/>
       <column name="is_last" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
-      <foreign-key foreignTable="eav_batches" name="fk_1034">
+      <foreign-key foreignTable="eav_batches" name="fk_1036">
         <reference local="batch_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_be_entities" name="fk_1035">
+      <foreign-key foreignTable="eav_be_entities" name="fk_1037">
         <reference local="entity_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_m_simple_attributes" name="fk_1036">
+      <foreign-key foreignTable="eav_m_simple_attributes" name="fk_1038">
         <reference local="attribute_id" foreign="id"/>
       </foreign-key>
       <index>
@@ -440,11 +469,19 @@
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
       <column name="parent_set_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="child_set_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
-      <foreign-key foreignTable="eav_be_sets" name="fk_1037">
+      <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="open_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
+      <column name="close_date" primaryKey="false" required="false" type="DATE" size="13" autoIncrement="false"/>
+      <column name="is_last" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
+      <foreign-key foreignTable="eav_be_sets" name="fk_1039">
         <reference local="child_set_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_be_sets" name="fk_1038">
+      <foreign-key foreignTable="eav_be_sets" name="fk_1040">
         <reference local="parent_set_id" foreign="id"/>
+      </foreign-key>
+      <foreign-key foreignTable="eav_batches" name="fk_1041">
+        <reference local="batch_id" foreign="id"/>
       </foreign-key>
       <unique>
         <unique-column name="id"/>
@@ -463,10 +500,10 @@
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
       <column name="parent_set_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="child_set_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
-      <foreign-key foreignTable="eav_be_sets" name="fk_1039">
+      <foreign-key foreignTable="eav_be_sets" name="fk_1042">
         <reference local="child_set_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_be_sets" name="fk_1040">
+      <foreign-key foreignTable="eav_be_sets" name="fk_1043">
         <reference local="parent_set_id" foreign="id"/>
       </foreign-key>
       <unique>
@@ -486,11 +523,19 @@
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
       <column name="parent_set_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
       <column name="child_set_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
-      <foreign-key foreignTable="eav_be_sets" name="fk_1041">
+      <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="open_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
+      <column name="close_date" primaryKey="false" required="false" type="DATE" size="13" autoIncrement="false"/>
+      <column name="is_last" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
+      <foreign-key foreignTable="eav_be_sets" name="fk_1044">
         <reference local="child_set_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_be_sets" name="fk_1042">
+      <foreign-key foreignTable="eav_be_sets" name="fk_1045">
         <reference local="parent_set_id" foreign="id"/>
+      </foreign-key>
+      <foreign-key foreignTable="eav_batches" name="fk_1046">
+        <reference local="batch_id" foreign="id"/>
       </foreign-key>
       <unique>
         <unique-column name="id"/>
@@ -507,18 +552,10 @@
     </table>
     <table name="eav_be_sets">
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
-      <column name="batch_id" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
-      <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
-      <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
-      <foreign-key foreignTable="eav_batches" name="fk_1045">
-        <reference local="batch_id" foreign="id"/>
-      </foreign-key>
+      <column name="temp" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <unique>
         <unique-column name="id"/>
       </unique>
-      <index>
-        <index-column name="batch_id"/>
-      </index>
     </table>
     <table name="eav_be_string_set_values">
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
@@ -527,10 +564,10 @@
       <column name="index_" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
       <column name="value" primaryKey="false" required="true" type="VARCHAR" size="1024" autoIncrement="false"/>
-      <foreign-key foreignTable="eav_batches" name="fk_1046">
+      <foreign-key foreignTable="eav_batches" name="fk_1047">
         <reference local="batch_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_be_sets" name="fk_1047">
+      <foreign-key foreignTable="eav_be_sets" name="fk_1048">
         <reference local="set_id" foreign="id"/>
       </foreign-key>
       <index>
@@ -553,13 +590,13 @@
       <column name="close_date" primaryKey="false" required="false" type="DATE" size="13" autoIncrement="false"/>
       <column name="value" primaryKey="false" required="true" type="VARCHAR" size="1024" autoIncrement="false"/>
       <column name="is_last" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false"/>
-      <foreign-key foreignTable="eav_batches" name="fk_1048">
+      <foreign-key foreignTable="eav_batches" name="fk_1049">
         <reference local="batch_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_be_entities" name="fk_1049">
+      <foreign-key foreignTable="eav_be_entities" name="fk_1050">
         <reference local="entity_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_m_simple_attributes" name="fk_1050">
+      <foreign-key foreignTable="eav_m_simple_attributes" name="fk_1051">
         <reference local="attribute_id" foreign="id"/>
       </foreign-key>
       <index>
@@ -732,12 +769,25 @@
     <table name="eav_be_entity_report_dates">
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
       <column name="entity_id" primaryKey="false" required="true" type="BIGINT" size="10" autoIncrement="false"/>
-      <column name="rep_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
+      <column name="report_date" primaryKey="false" required="true" type="DATE" size="13" autoIncrement="false"/>
+      <column name="integer_values_count" primaryKey="false" required="true" type="BIGINT" size="10" autoIncrement="false"/>
+      <column name="date_values_count" primaryKey="false" required="true" type="BIGINT" size="10" autoIncrement="false"/>
+      <column name="string_values_count" primaryKey="false" required="true" type="BIGINT" size="10" autoIncrement="false"/>
+      <column name="boolean_values_count" primaryKey="false" required="true" type="BIGINT" size="10" autoIncrement="false"/>
+      <column name="double_values_count" primaryKey="false" required="true" type="BIGINT" size="10" autoIncrement="false"/>
+      <column name="complex_values_count" primaryKey="false" required="true" type="BIGINT" size="10" autoIncrement="false"/>
+      <column name="simple_sets_count" primaryKey="false" required="true" type="BIGINT" size="10" autoIncrement="false"/>
+      <column name="complex_sets_count" primaryKey="false" required="true" type="BIGINT" size="10" autoIncrement="false"/>
+      <column name="set_of_sets_count" primaryKey="false" required="true" type="BIGINT" size="10" autoIncrement="false"/>
       <unique>
         <unique-column name="id"/>
       </unique>
       <foreign-key foreignTable="eav_be_entities" name="fk_1052">
         <reference local="entity_id" foreign="id"/>
       </foreign-key>
+      <index>
+        <index-column name="entity_id"/>
+        <index-column name="report_date"/>
+      </index>
     </table>
   </database>

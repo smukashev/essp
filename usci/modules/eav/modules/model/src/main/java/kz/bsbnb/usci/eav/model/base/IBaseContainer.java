@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * @author k.tulbassiyev
  */
-public interface IBaseContainer extends IBaseObject, Serializable
+public interface IBaseContainer extends IBaseObject
 {
 
     public class ValueChangeEvent extends IBaseObject.Event
@@ -55,6 +55,6 @@ public interface IBaseContainer extends IBaseObject, Serializable
 
     public void removeListeners();
 
-    public Set<String> getModifiedObjects();
+    public Set<String> getModifiedAttributes();
 
 }

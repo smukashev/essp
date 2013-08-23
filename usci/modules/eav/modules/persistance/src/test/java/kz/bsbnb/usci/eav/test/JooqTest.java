@@ -1,11 +1,9 @@
 package kz.bsbnb.usci.eav.test;
 
-import static org.jooq.impl.Factory.fieldByName;
-import static org.jooq.impl.Factory.tableByName;
-
+import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.SQLDialect;
-import org.jooq.impl.Executor;
+import org.jooq.impl.DSL;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,19 +19,19 @@ public class JooqTest {
    public void generateSQLTest() throws Exception
    {
        Query query;
-       Executor create = new Executor(SQLDialect.POSTGRES);
+       DSLContext context = DSL.using(SQLDialect.POSTGRES);
 
-       query = create.select(fieldByName("BOOK","TITLE"), fieldByName("AUTHOR","FIRST_NAME"), fieldByName("AUTHOR","LAST_NAME"))
-               .from(tableByName("BOOK"))
-               .join(tableByName("AUTHOR")).on(fieldByName("BOOK", "AUTHOR_ID").equal(fieldByName("AUTHOR", "ID")))
-               .where(fieldByName("BOOK", "PUBLISHED_IN").equal(1948));
+       query = context.select(DSL.fieldByName("BOOK","TITLE"), DSL.fieldByName("AUTHOR","FIRST_NAME"), DSL.fieldByName("AUTHOR","LAST_NAME"))
+               .from(DSL.tableByName("BOOK"))
+               .join(DSL.tableByName("AUTHOR")).on(DSL.fieldByName("BOOK", "AUTHOR_ID").equal(DSL.fieldByName("AUTHOR", "ID")))
+               .where(DSL.fieldByName("BOOK", "PUBLISHED_IN").equal(1948));
        System.out.println("SELECT_SQL: " + query.getSQL());
        System.out.println("SELECT_SQL_BINDS: " + query.getBindValues());
 
-       query = create.update(tableByName("EAV_BE_DATE_VALUES"))
-               .set(fieldByName("EAV", "EAV_BE_DATE_VALUES", "BATCH_ID"), 1L)
-               .set(fieldByName("EAV_BE_DATE_VALUES", "INDEX"), 1000L)
-               .where(fieldByName("EAV_BE_DATE_VALUES", "ID").equal(5000));
+       query = context.update(DSL.tableByName("EAV_BE_DATE_VALUES"))
+               .set(DSL.fieldByName("EAV", "EAV_BE_DATE_VALUES", "BATCH_ID"), 1L)
+               .set(DSL.fieldByName("EAV_BE_DATE_VALUES", "INDEX"), 1000L)
+               .where(DSL.fieldByName("EAV_BE_DATE_VALUES", "ID").equal(5000));
        System.out.println("UPDATE_SQL: " + query.getSQL());
        System.out.println("UPDATE_SQL_BINDS: " + query.getBindValues());
    }
