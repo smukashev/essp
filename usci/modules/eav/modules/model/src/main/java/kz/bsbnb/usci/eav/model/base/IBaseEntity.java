@@ -16,7 +16,13 @@ public interface IBaseEntity extends IBaseContainer {
 
     public void setReportDate(Date reportDate);
 
+    public Date getMaxReportDate();
+
+    public Date getMinReportDate();
+
     public Set<Date> getAvailableReportDates();
+
+    public void setAvailableReportDates(Set<Date> availableReportDates);
 
     public MetaClass getMeta();
 

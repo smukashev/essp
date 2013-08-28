@@ -8,10 +8,7 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBeSetValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeSimpleSetValueDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
-import org.jooq.DSLContext;
-import org.jooq.DeleteConditionStep;
-import org.jooq.InsertValuesStep2;
-import org.jooq.InsertValuesStep5;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +71,7 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
         }
         else
         {
-            InsertValuesStep5 insert;
+            InsertValuesStep7 insert;
             DataTypes dataType = metaSet.getTypeCode();
             switch(dataType)
             {
@@ -86,8 +83,10 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                                     EAV_BE_INTEGER_SET_VALUES.SET_ID,
                                     EAV_BE_INTEGER_SET_VALUES.BATCH_ID,
                                     EAV_BE_INTEGER_SET_VALUES.INDEX_,
-                                    EAV_BE_INTEGER_SET_VALUES.REP_DATE,
-                                    EAV_BE_INTEGER_SET_VALUES.VALUE);
+                                    EAV_BE_INTEGER_SET_VALUES.REPORT_DATE,
+                                    EAV_BE_INTEGER_SET_VALUES.VALUE,
+                                    EAV_BE_INTEGER_SET_VALUES.IS_CLOSED,
+                                    EAV_BE_INTEGER_SET_VALUES.IS_LAST);
                     break;
                 }
                 case DATE:
@@ -98,8 +97,10 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                                     EAV_BE_DATE_SET_VALUES.SET_ID,
                                     EAV_BE_DATE_SET_VALUES.BATCH_ID,
                                     EAV_BE_DATE_SET_VALUES.INDEX_,
-                                    EAV_BE_DATE_SET_VALUES.REP_DATE,
-                                    EAV_BE_DATE_SET_VALUES.VALUE);
+                                    EAV_BE_DATE_SET_VALUES.REPORT_DATE,
+                                    EAV_BE_DATE_SET_VALUES.VALUE,
+                                    EAV_BE_DATE_SET_VALUES.IS_CLOSED,
+                                    EAV_BE_DATE_SET_VALUES.IS_LAST);
                     break;
                 }
                 case STRING:
@@ -110,8 +111,10 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                                     EAV_BE_STRING_SET_VALUES.SET_ID,
                                     EAV_BE_STRING_SET_VALUES.BATCH_ID,
                                     EAV_BE_STRING_SET_VALUES.INDEX_,
-                                    EAV_BE_STRING_SET_VALUES.REP_DATE,
-                                    EAV_BE_STRING_SET_VALUES.VALUE);
+                                    EAV_BE_STRING_SET_VALUES.REPORT_DATE,
+                                    EAV_BE_STRING_SET_VALUES.VALUE,
+                                    EAV_BE_STRING_SET_VALUES.IS_CLOSED,
+                                    EAV_BE_STRING_SET_VALUES.IS_LAST);
                     break;
                 }
                 case BOOLEAN:
@@ -122,8 +125,10 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                                     EAV_BE_BOOLEAN_SET_VALUES.SET_ID,
                                     EAV_BE_BOOLEAN_SET_VALUES.BATCH_ID,
                                     EAV_BE_BOOLEAN_SET_VALUES.INDEX_,
-                                    EAV_BE_BOOLEAN_SET_VALUES.REP_DATE,
-                                    EAV_BE_BOOLEAN_SET_VALUES.VALUE);
+                                    EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE,
+                                    EAV_BE_BOOLEAN_SET_VALUES.VALUE,
+                                    EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED,
+                                    EAV_BE_BOOLEAN_SET_VALUES.IS_LAST);
                     break;
                 }
                 case DOUBLE:
@@ -134,8 +139,10 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                                     EAV_BE_DOUBLE_SET_VALUES.SET_ID,
                                     EAV_BE_DOUBLE_SET_VALUES.BATCH_ID,
                                     EAV_BE_DOUBLE_SET_VALUES.INDEX_,
-                                    EAV_BE_DOUBLE_SET_VALUES.REP_DATE,
-                                    EAV_BE_DOUBLE_SET_VALUES.VALUE);
+                                    EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE,
+                                    EAV_BE_DOUBLE_SET_VALUES.VALUE,
+                                    EAV_BE_DOUBLE_SET_VALUES.IS_CLOSED,
+                                    EAV_BE_DOUBLE_SET_VALUES.IS_LAST);
                     break;
                 }
                 default:
@@ -152,7 +159,9 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                         batchValueChild.getBatch().getId(),
                         batchValueChild.getIndex(),
                         batchValueChild.getRepDate(),
-                        batchValueChild.getValue()
+                        batchValueChild.getValue(),
+                        false,
+                        true
                 };
                 insert = insert.values(Arrays.asList(insertArgs));
             }

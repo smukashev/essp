@@ -62,9 +62,9 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
                         EAV_BE_INTEGER_VALUES.BATCH_ID,
                         EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID,
                         EAV_BE_INTEGER_VALUES.INDEX_,
-                        EAV_BE_INTEGER_VALUES.OPEN_DATE,
-                        EAV_BE_INTEGER_VALUES.CLOSE_DATE,
+                        EAV_BE_INTEGER_VALUES.REPORT_DATE,
                         EAV_BE_INTEGER_VALUES.VALUE,
+                        EAV_BE_INTEGER_VALUES.IS_CLOSED,
                         EAV_BE_INTEGER_VALUES.IS_LAST);
                 break;
             }
@@ -75,9 +75,9 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
                         EAV_BE_DATE_VALUES.BATCH_ID,
                         EAV_BE_DATE_VALUES.ATTRIBUTE_ID,
                         EAV_BE_DATE_VALUES.INDEX_,
-                        EAV_BE_DATE_VALUES.OPEN_DATE,
-                        EAV_BE_DATE_VALUES.CLOSE_DATE,
+                        EAV_BE_DATE_VALUES.REPORT_DATE,
                         EAV_BE_DATE_VALUES.VALUE,
+                        EAV_BE_DATE_VALUES.IS_CLOSED,
                         EAV_BE_DATE_VALUES.IS_LAST);
                 break;
             }
@@ -88,9 +88,9 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
                         EAV_BE_STRING_VALUES.BATCH_ID,
                         EAV_BE_STRING_VALUES.ATTRIBUTE_ID,
                         EAV_BE_STRING_VALUES.INDEX_,
-                        EAV_BE_STRING_VALUES.OPEN_DATE,
-                        EAV_BE_STRING_VALUES.CLOSE_DATE,
+                        EAV_BE_STRING_VALUES.REPORT_DATE,
                         EAV_BE_STRING_VALUES.VALUE,
+                        EAV_BE_STRING_VALUES.IS_CLOSED,
                         EAV_BE_STRING_VALUES.IS_LAST);
                 break;
             }
@@ -101,9 +101,9 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
                         EAV_BE_BOOLEAN_VALUES.BATCH_ID,
                         EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID,
                         EAV_BE_BOOLEAN_VALUES.INDEX_,
-                        EAV_BE_BOOLEAN_VALUES.OPEN_DATE,
-                        EAV_BE_BOOLEAN_VALUES.CLOSE_DATE,
+                        EAV_BE_BOOLEAN_VALUES.REPORT_DATE,
                         EAV_BE_BOOLEAN_VALUES.VALUE,
+                        EAV_BE_BOOLEAN_VALUES.IS_CLOSED,
                         EAV_BE_BOOLEAN_VALUES.IS_LAST);
                 break;
             }
@@ -114,9 +114,9 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
                         EAV_BE_DOUBLE_VALUES.BATCH_ID,
                         EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID,
                         EAV_BE_DOUBLE_VALUES.INDEX_,
-                        EAV_BE_DOUBLE_VALUES.OPEN_DATE,
-                        EAV_BE_DOUBLE_VALUES.CLOSE_DATE,
+                        EAV_BE_DOUBLE_VALUES.REPORT_DATE,
                         EAV_BE_DOUBLE_VALUES.VALUE,
+                        EAV_BE_DOUBLE_VALUES.IS_CLOSED,
                         EAV_BE_DOUBLE_VALUES.IS_LAST);
                 break;
             }
@@ -138,8 +138,8 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
                     metaAttribute.getId(),
                     batchValue.getIndex(),
                     batchValue.getRepDate(),
-                    Configuration.historyMaxDate,
                     batchValue.getValue(),
+                    false,
                     true
             };
             insert = insert.values(Arrays.asList(insertArgs));
@@ -152,81 +152,120 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
     @Override
     public long save(IBaseEntity baseEntity, String attribute, DataTypes dataType)
     {
-        MetaClass meta = baseEntity.getMeta();
-        IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
-        IBaseValue batchValue = baseEntity.getBaseValue(attribute);
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
 
-        Insert insert;
-        switch(dataType)
+    private long save(DataTypes dataType, long baseEntityId, long batchId, long metaAttributeId, long index,
+                      Date reportDate, Object value, boolean closed, boolean last)
+    {
+        switch (dataType)
         {
-            case INTEGER: {
-                insert = context
-                        .insertInto(EAV_BE_INTEGER_VALUES)
-                        .set(EAV_BE_INTEGER_VALUES.ENTITY_ID, baseEntity.getId())
-                        .set(EAV_BE_INTEGER_VALUES.BATCH_ID, batchValue.getBatch().getId())
-                        .set(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID, metaAttribute.getId())
-                        .set(EAV_BE_INTEGER_VALUES.INDEX_, batchValue.getIndex())
-                        .set(EAV_BE_INTEGER_VALUES.OPEN_DATE, batchValue.getRepDate())
-                        .set(EAV_BE_INTEGER_VALUES.CLOSE_DATE, Configuration.historyMaxDate)
-                        .set(EAV_BE_INTEGER_VALUES.VALUE, (Integer) batchValue.getValue())
-                        .set(EAV_BE_INTEGER_VALUES.IS_LAST, true);
-                break;
-            }
-            case DATE: {
-                insert = context
-                        .insertInto(EAV_BE_DATE_VALUES)
-                        .set(EAV_BE_DATE_VALUES.ENTITY_ID, baseEntity.getId())
-                        .set(EAV_BE_DATE_VALUES.BATCH_ID, batchValue.getBatch().getId())
-                        .set(EAV_BE_DATE_VALUES.ATTRIBUTE_ID, metaAttribute.getId())
-                        .set(EAV_BE_DATE_VALUES.INDEX_, batchValue.getIndex())
-                        .set(EAV_BE_DATE_VALUES.OPEN_DATE, batchValue.getRepDate())
-                        .set(EAV_BE_DATE_VALUES.CLOSE_DATE, Configuration.historyMaxDate)
-                        .set(EAV_BE_DATE_VALUES.VALUE, DateUtils.convert((Date)batchValue.getValue()))
-                        .set(EAV_BE_DATE_VALUES.IS_LAST, true);
-                break;
-            }
-            case STRING: {
-                insert = context
-                        .insertInto(EAV_BE_STRING_VALUES)
-                        .set(EAV_BE_STRING_VALUES.ENTITY_ID, baseEntity.getId())
-                        .set(EAV_BE_STRING_VALUES.BATCH_ID, batchValue.getBatch().getId())
-                        .set(EAV_BE_STRING_VALUES.ATTRIBUTE_ID, metaAttribute.getId())
-                        .set(EAV_BE_STRING_VALUES.INDEX_, batchValue.getIndex())
-                        .set(EAV_BE_STRING_VALUES.OPEN_DATE, batchValue.getRepDate())
-                        .set(EAV_BE_STRING_VALUES.CLOSE_DATE, Configuration.historyMaxDate)
-                        .set(EAV_BE_STRING_VALUES.VALUE, (String)batchValue.getValue())
-                        .set(EAV_BE_STRING_VALUES.IS_LAST, true);
-                break;
-            }
-            case BOOLEAN: {
-                insert = context
-                        .insertInto(EAV_BE_BOOLEAN_VALUES)
-                        .set(EAV_BE_BOOLEAN_VALUES.ENTITY_ID, baseEntity.getId())
-                        .set(EAV_BE_BOOLEAN_VALUES.BATCH_ID, batchValue.getBatch().getId())
-                        .set(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID, metaAttribute.getId())
-                        .set(EAV_BE_BOOLEAN_VALUES.INDEX_, batchValue.getIndex())
-                        .set(EAV_BE_BOOLEAN_VALUES.OPEN_DATE, batchValue.getRepDate())
-                        .set(EAV_BE_BOOLEAN_VALUES.CLOSE_DATE, Configuration.historyMaxDate)
-                        .set(EAV_BE_BOOLEAN_VALUES.VALUE, (Boolean)batchValue.getValue())
-                        .set(EAV_BE_BOOLEAN_VALUES.IS_LAST, true);
-                break;
-            }
-            case DOUBLE: {
-                insert = context
-                        .insertInto(EAV_BE_DOUBLE_VALUES)
-                        .set(EAV_BE_DOUBLE_VALUES.ENTITY_ID, baseEntity.getId())
-                        .set(EAV_BE_DOUBLE_VALUES.BATCH_ID, batchValue.getBatch().getId())
-                        .set(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID, metaAttribute.getId())
-                        .set(EAV_BE_DOUBLE_VALUES.INDEX_, batchValue.getIndex())
-                        .set(EAV_BE_DOUBLE_VALUES.OPEN_DATE, batchValue.getRepDate())
-                        .set(EAV_BE_DOUBLE_VALUES.CLOSE_DATE, Configuration.historyMaxDate)
-                        .set(EAV_BE_DOUBLE_VALUES.VALUE, (Double)batchValue.getValue())
-                        .set(EAV_BE_DOUBLE_VALUES.IS_LAST, true);
-                break;
-            }
+            case INTEGER:
+                return saveIntegerValue(baseEntityId, batchId, metaAttributeId, index,
+                        reportDate, (Integer)value, closed, last);
+            case DATE:
+                return saveDateValue(baseEntityId, batchId, metaAttributeId, index,
+                        reportDate, (Date)value, closed, last);
+            case STRING:
+                return saveStringValue(baseEntityId, batchId, metaAttributeId, index,
+                        reportDate, (String)value, closed, last);
+            case BOOLEAN:
+                return saveBooleanValue(baseEntityId, batchId, metaAttributeId, index,
+                        reportDate, (Boolean)value, closed, last);
+            case DOUBLE:
+                return saveDoubleValue(baseEntityId, batchId, metaAttributeId, index,
+                        reportDate, (Double)value, closed, last);
             default:
-                throw new IllegalArgumentException("Unknown type.");
+                throw new IllegalArgumentException("Unknown data type.");
         }
+    }
+
+
+    private long saveIntegerValue(long baseEntityId, long batchId, long metaAttributeId, long index,
+                      Date reportDate, Integer value, boolean closed, boolean last)
+    {
+        Insert insert = context
+                        .insertInto(EAV_BE_INTEGER_VALUES)
+                        .set(EAV_BE_INTEGER_VALUES.ENTITY_ID, baseEntityId)
+                        .set(EAV_BE_INTEGER_VALUES.BATCH_ID, batchId)
+                        .set(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID, metaAttributeId)
+                        .set(EAV_BE_INTEGER_VALUES.INDEX_, index)
+                        .set(EAV_BE_INTEGER_VALUES.REPORT_DATE, DateUtils.convert(reportDate))
+                        .set(EAV_BE_INTEGER_VALUES.VALUE, value)
+                        .set(EAV_BE_INTEGER_VALUES.IS_CLOSED, closed)
+                        .set(EAV_BE_INTEGER_VALUES.IS_LAST, last);
+
+        logger.debug(insert.toString());
+        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+    }
+
+    private long saveDateValue(long baseEntityId, long batchId, long metaAttributeId, long index,
+                                  Date reportDate, Date value, boolean closed, boolean last)
+    {
+        Insert insert = context
+                .insertInto(EAV_BE_DATE_VALUES)
+                .set(EAV_BE_DATE_VALUES.ENTITY_ID, baseEntityId)
+                .set(EAV_BE_DATE_VALUES.BATCH_ID, batchId)
+                .set(EAV_BE_DATE_VALUES.ATTRIBUTE_ID, metaAttributeId)
+                .set(EAV_BE_DATE_VALUES.INDEX_, index)
+                .set(EAV_BE_DATE_VALUES.REPORT_DATE, DateUtils.convert(reportDate))
+                .set(EAV_BE_DATE_VALUES.VALUE, DateUtils.convert(value))
+                .set(EAV_BE_DATE_VALUES.IS_CLOSED, closed)
+                .set(EAV_BE_DATE_VALUES.IS_LAST, last);
+
+        logger.debug(insert.toString());
+        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+    }
+
+    private long saveStringValue(long baseEntityId, long batchId, long metaAttributeId, long index,
+                                 Date reportDate, String value, boolean closed, boolean last)
+    {
+        Insert insert = context
+                .insertInto(EAV_BE_STRING_VALUES)
+                .set(EAV_BE_STRING_VALUES.ENTITY_ID, baseEntityId)
+                .set(EAV_BE_STRING_VALUES.BATCH_ID, batchId)
+                .set(EAV_BE_STRING_VALUES.ATTRIBUTE_ID, metaAttributeId)
+                .set(EAV_BE_STRING_VALUES.INDEX_, index)
+                .set(EAV_BE_STRING_VALUES.REPORT_DATE, DateUtils.convert(reportDate))
+                .set(EAV_BE_STRING_VALUES.VALUE, value)
+                .set(EAV_BE_STRING_VALUES.IS_CLOSED, closed)
+                .set(EAV_BE_STRING_VALUES.IS_LAST, last);
+
+        logger.debug(insert.toString());
+        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+    }
+
+    private long saveBooleanValue(long baseEntityId, long batchId, long metaAttributeId, long index,
+                               Date reportDate, Boolean value, boolean closed, boolean last)
+    {
+        Insert insert = context
+                .insertInto(EAV_BE_BOOLEAN_VALUES)
+                .set(EAV_BE_BOOLEAN_VALUES.ENTITY_ID, baseEntityId)
+                .set(EAV_BE_BOOLEAN_VALUES.BATCH_ID, batchId)
+                .set(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID, metaAttributeId)
+                .set(EAV_BE_BOOLEAN_VALUES.INDEX_, index)
+                .set(EAV_BE_BOOLEAN_VALUES.REPORT_DATE, DateUtils.convert(reportDate))
+                .set(EAV_BE_BOOLEAN_VALUES.VALUE, value)
+                .set(EAV_BE_BOOLEAN_VALUES.IS_CLOSED, closed)
+                .set(EAV_BE_BOOLEAN_VALUES.IS_LAST, last);
+
+        logger.debug(insert.toString());
+        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+    }
+
+    private long saveDoubleValue(long baseEntityId, long batchId, long metaAttributeId, long index,
+                                  Date reportDate, Double value, boolean closed, boolean last)
+    {
+        Insert insert = context
+                .insertInto(EAV_BE_DOUBLE_VALUES)
+                .set(EAV_BE_DOUBLE_VALUES.ENTITY_ID, baseEntityId)
+                .set(EAV_BE_DOUBLE_VALUES.BATCH_ID, batchId)
+                .set(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID, metaAttributeId)
+                .set(EAV_BE_DOUBLE_VALUES.INDEX_, index)
+                .set(EAV_BE_DOUBLE_VALUES.REPORT_DATE, DateUtils.convert(reportDate))
+                .set(EAV_BE_DOUBLE_VALUES.VALUE, value)
+                .set(EAV_BE_DOUBLE_VALUES.IS_CLOSED, closed)
+                .set(EAV_BE_DOUBLE_VALUES.IS_LAST, last);
 
         logger.debug(insert.toString());
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -252,66 +291,274 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
                         baseEntityLoaded.getId(), attribute, baseValueForSave.getRepDate()));
             }
 
-            boolean previousClosed = isPreviousClosed(baseEntityForSave.getId(), metaAttribute.getId(),
-                    baseValueForSave.getRepDate(), baseValueForSave.getValue(), dataType);
-            if (previousClosed)
-            {
-                rollbackClosedHistory(baseEntityForSave.getId(), metaAttribute.getId(),
-                        baseValueForSave.getRepDate(), dataType);
-            }
-            else
-            {
-                long baseValueId = save(baseEntityForSave, attribute, dataType);
-                baseValueForSave.setId(baseValueId);
-            }
-            return;
+            // TODO:
+            long baseValueId = save(dataType, baseEntityForSave.getId(), baseValueForSave.getBatch().getId(),
+                    metaAttribute.getId(), baseValueForSave.getIndex(),
+                    baseValueForSave.getRepDate(), baseValueForSave.getValue(), false, true);
+            baseValueForSave.setId(baseValueId);
         }
         else
         {
-            if (baseValueForSave != null)
+
+
+            int compare = DateUtils.compareBeginningOfTheDay(baseValueForSave.getRepDate(), baseValueLoaded.getRepDate());
+            switch(compare)
             {
-                if (dataType.equals(DataTypes.DATE))
+                case 1:
                 {
-                    java.util.Date comparingDate = (java.util.Date)baseValueForSave.getValue();
-                    java.util.Date anotherDate = (java.util.Date)baseValueLoaded.getValue();
-                    if (DateUtils.compareBeginningOfTheDay(comparingDate, anotherDate) == 0)
+                    long baseValueId = save(dataType, baseEntityForSave.getId(), baseValueForSave.getBatch().getId(),
+                            metaAttribute.getId(), baseValueForSave.getIndex(), baseValueForSave.getRepDate(),
+                            baseValueForSave.getValue(), baseValueForSave.isClosed(), baseValueForSave.isLast());
+                    baseValueForSave.setId(baseValueId);
+
+                    if (baseValueLoaded.isLast())
                     {
-                        return;
+                        Map<String, Object> fields = new HashMap<String, Object>();
+                        fields.put("is_last", false);
+
+                        Map<String, Object> conditions = new HashMap<String, Object>();
+                        conditions.put("id", baseValueLoaded.getId());
+
+                        updateByCondition(dataType, fields, conditions);
                     }
+                    break;
                 }
-                else
+                case 0:
+                    Map<String, Object> fields = new HashMap<String, Object>();
+                    fields.put("batch_id", baseValueForSave.getBatch().getId());
+                    fields.put("index_", baseValueForSave.getIndex());
+                    if (baseValueForSave.isClosed())
+                    {
+                        fields.put("is_closed", true);
+                    }
+                    else
+                    {
+                        fields.put("value", baseValueForSave.getValue());
+                    }
+
+                    Map<String, Object> conditions = new HashMap<String, Object>();
+                    conditions.put("id", baseValueLoaded.getId());
+
+                    updateByCondition(dataType, fields, conditions);
+
+                    break;
+                case -1:
                 {
-                    if (baseValueForSave.getValue().equals(baseValueLoaded.getValue()))
-                    {
-                        return;
-                    }
+                    long baseValueId = save(dataType, baseEntityForSave.getId(), baseValueForSave.getBatch().getId(),
+                            metaAttribute.getId(), baseValueForSave.getIndex(),
+                            baseValueForSave.getRepDate(), baseValueForSave.getValue(), false, false);
+                    baseValueForSave.setId(baseValueId);
+                    break;
                 }
+                default:
+                    throw new RuntimeException("Method Comparable<T>.compareTo(T o) " +
+                            "can not return a value other than -1, 0, 1.");
             }
+        }
+    }
+
+    private int updateByCondition(DataTypes dataType, Map<String, Object> fields, Map<String, Object> conditions)
+    {
+        switch (dataType)
+        {
+            case INTEGER:
+                return updateIntegerValueByCondition(fields, conditions);
+            case DATE:
+                return updateDateValueByCondition(fields, conditions);
+            /*case STRING:
+                return saveStringValue(baseEntityId, batchId, metaAttributeId, index,
+                        reportDate, (String)value, closed, last);
+            case BOOLEAN:
+                return saveBooleanValue(baseEntityId, batchId, metaAttributeId, index,
+                        reportDate, (Boolean)value, closed, last);
+            case DOUBLE:
+                return saveDoubleValue(baseEntityId, batchId, metaAttributeId, index,
+                        reportDate, (Double)value, closed, last);*/
+            default:
+                throw new IllegalArgumentException("Unknown data type.");
+        }
+    }
+
+    private int updateIntegerValueByCondition(Map<String, Object> fields,
+                                              Map<String, Object> conditions)
+    {
+        if (fields.size() == 0)
+        {
+            throw new IllegalArgumentException("To implement the changes to the record must have at least one field.");
         }
 
-        int compare = DateUtils.compareBeginningOfTheDay(baseValueLoaded.getRepDate(),
-                baseValueForSave == null ? baseEntityForSave.getReportDate() : baseValueForSave.getRepDate());
-        if (compare == 1)
+        Table tableOfIntegerValues = EAV_BE_INTEGER_VALUES.as("v");
+        UpdateSetStep updateSetStep = context.update(tableOfIntegerValues);
+
+        UpdateSetMoreStep updateSetMoreStep = null;
+        if (fields.containsKey("batch_id"))
         {
-            throw new UnsupportedOperationException("Updating a simple attribute value for " +
-                    "the earlier period is not implemented.");
+            updateSetMoreStep = updateSetMoreStep == null ?
+                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.BATCH_ID),
+                            fields.get("batch_id")) :
+                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.BATCH_ID),
+                            fields.get("batch_id"));
         }
-        else
+        if (fields.containsKey("index_"))
         {
-            if (compare == -1)
-            {
-                if (baseValueForSave != null)
-                {
-                    long baseValueId = save(baseEntityForSave, attribute, dataType);
-                    baseValueForSave.setId(baseValueId);
-                }
-                closeHistory(baseValueLoaded.getId(), baseEntityForSave.getReportDate(), dataType);
-            }
-            else
-            {
-                update(baseValueLoaded, baseValueForSave, dataType);
-            }
+            updateSetMoreStep = updateSetMoreStep == null ?
+                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.BATCH_ID),
+                            fields.get("index_")) :
+                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.BATCH_ID),
+                            fields.get("index_"));
         }
+        if (fields.containsKey("value"))
+        {
+            updateSetMoreStep = updateSetMoreStep == null ?
+                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.VALUE),
+                            fields.get("value")) :
+                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.VALUE),
+                            fields.get("value"));
+        }
+        if (fields.containsKey("is_closed"))
+        {
+            updateSetMoreStep = updateSetMoreStep == null ?
+                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.IS_CLOSED),
+                            fields.get("is_closed")) :
+                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.IS_CLOSED),
+                            fields.get("is_closed"));
+        }
+        if (fields.containsKey("is_last"))
+        {
+            updateSetMoreStep = updateSetMoreStep == null ?
+                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.IS_LAST),
+                            fields.get("is_last")) :
+                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.IS_LAST),
+                            fields.get("is_last"));
+        }
+
+        UpdateConditionStep updateConditionStep = null;
+        if (conditions.containsKey("id"))
+        {
+            updateConditionStep = updateConditionStep == null ?
+                    updateSetMoreStep.where(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.ID)
+                            .equal(conditions.get("id"))) :
+                    updateConditionStep.and(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.ID)
+                            .equal(conditions.get("id")));
+        }
+        if (conditions.containsKey("entity_id"))
+        {
+            updateConditionStep = updateConditionStep == null ?
+                    updateSetMoreStep.where(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.ENTITY_ID)
+                            .equal(conditions.get("entity_id"))) :
+                    updateConditionStep.and(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.ENTITY_ID)
+                            .equal(conditions.get("entity_id")));
+        }
+        if (conditions.containsKey("attribute_id"))
+        {
+            updateConditionStep = updateConditionStep == null ?
+                    updateSetMoreStep.where(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID)
+                            .equal(conditions.get("attribute_id"))) :
+                    updateConditionStep.and(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID)
+                            .equal(conditions.get("attribute_id")));
+        }
+        if (conditions.containsKey("report_date"))
+        {
+            updateConditionStep = updateConditionStep == null ?
+                    updateSetMoreStep.where(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.REPORT_DATE)
+                            .equal(DateUtils.convert((Date)conditions.get("report_date")))) :
+                    updateConditionStep.and(tableOfIntegerValues.field(EAV_BE_INTEGER_VALUES.REPORT_DATE)
+                            .equal(DateUtils.convert((Date) conditions.get("report_date"))));
+        }
+
+        logger.debug(updateConditionStep.toString());
+        return updateWithStats(updateConditionStep.getSQL(), updateConditionStep.getBindValues().toArray());
+    }
+
+    private int updateDateValueByCondition(Map<String, Object> fields,
+                                           Map<String, Object> conditions)
+    {
+        if (fields.size() == 0)
+        {
+            throw new IllegalArgumentException("To implement the changes to the record must have at least one field.");
+        }
+
+        Table tableOfIntegerValues = EAV_BE_DATE_VALUES.as("v");
+        UpdateSetStep updateSetStep = context.update(tableOfIntegerValues);
+
+        UpdateSetMoreStep updateSetMoreStep = null;
+        if (fields.containsKey("batch_id"))
+        {
+            updateSetMoreStep = updateSetMoreStep == null ?
+                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.BATCH_ID),
+                            fields.get("batch_id")) :
+                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.BATCH_ID),
+                            fields.get("batch_id"));
+        }
+        if (fields.containsKey("index_"))
+        {
+            updateSetMoreStep = updateSetMoreStep == null ?
+                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.BATCH_ID),
+                            fields.get("index_")) :
+                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.BATCH_ID),
+                            fields.get("index_"));
+        }
+        if (fields.containsKey("value"))
+        {
+            updateSetMoreStep = updateSetMoreStep == null ?
+                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.VALUE),
+                            DateUtils.convert((Date)fields.get("value"))) :
+                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.VALUE),
+                            DateUtils.convert((Date)fields.get("value")));
+        }
+        if (fields.containsKey("is_closed"))
+        {
+            updateSetMoreStep = updateSetMoreStep == null ?
+                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.IS_CLOSED),
+                            fields.get("is_closed")) :
+                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.IS_CLOSED),
+                            fields.get("is_closed"));
+        }
+        if (fields.containsKey("is_last"))
+        {
+            updateSetMoreStep = updateSetMoreStep == null ?
+                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.IS_LAST),
+                            fields.get("is_last")) :
+                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.IS_LAST),
+                            fields.get("is_last"));
+        }
+
+        UpdateConditionStep updateConditionStep = null;
+        if (conditions.containsKey("id"))
+        {
+            updateConditionStep = updateConditionStep == null ?
+                    updateSetMoreStep.where(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.ID)
+                            .equal(conditions.get("id"))) :
+                    updateConditionStep.and(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.ID)
+                            .equal(conditions.get("id")));
+        }
+        if (conditions.containsKey("entity_id"))
+        {
+            updateConditionStep = updateConditionStep == null ?
+                    updateSetMoreStep.where(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.ENTITY_ID)
+                            .equal(conditions.get("entity_id"))) :
+                    updateConditionStep.and(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.ENTITY_ID)
+                            .equal(conditions.get("entity_id")));
+        }
+        if (conditions.containsKey("attribute_id"))
+        {
+            updateConditionStep = updateConditionStep == null ?
+                    updateSetMoreStep.where(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.ATTRIBUTE_ID)
+                            .equal(conditions.get("attribute_id"))) :
+                    updateConditionStep.and(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.ATTRIBUTE_ID)
+                            .equal(conditions.get("attribute_id")));
+        }
+        if (conditions.containsKey("report_date"))
+        {
+            updateConditionStep = updateConditionStep == null ?
+                    updateSetMoreStep.where(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.REPORT_DATE)
+                            .equal(DateUtils.convert((Date)conditions.get("report_date")))) :
+                    updateConditionStep.and(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.REPORT_DATE)
+                            .equal(DateUtils.convert((Date) conditions.get("report_date"))));
+        }
+
+        logger.debug(updateConditionStep.toString());
+        return updateWithStats(updateConditionStep.getSQL(), updateConditionStep.getBindValues().toArray());
     }
 
     @Override
@@ -387,7 +634,7 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
     }
 
-    private void closeHistory(long baseValueId, Date reportDate, DataTypes dataType)
+    /*private void closeHistory(long baseValueId, Date reportDate, DataTypes dataType)
     {
         Update update;
         switch(dataType)
@@ -396,7 +643,7 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
                 update = context
                         .update(EAV_BE_INTEGER_VALUES)
                         .set(EAV_BE_INTEGER_VALUES.IS_LAST, false)
-                        .set(EAV_BE_INTEGER_VALUES.CLOSE_DATE, DateUtils.convert(reportDate))
+                        .set(EAV_BE_INTEGER_VALUES.REPORT_DATE, DateUtils.convert(reportDate))
                         .where(EAV_BE_INTEGER_VALUES.ID.eq(baseValueId));
                 break;
             }
@@ -404,7 +651,7 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
                 update = context
                         .update(EAV_BE_DATE_VALUES)
                         .set(EAV_BE_DATE_VALUES.IS_LAST, false)
-                        .set(EAV_BE_DATE_VALUES.CLOSE_DATE, DateUtils.convert(reportDate))
+                        .set(EAV_BE_DATE_VALUES.REPORT_DATE, DateUtils.convert(reportDate))
                         .where(EAV_BE_DATE_VALUES.ID.eq(baseValueId));
                 break;
             }
@@ -420,7 +667,7 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
                 update = context
                         .update(EAV_BE_STRING_VALUES)
                         .set(EAV_BE_BOOLEAN_VALUES.IS_LAST, false)
-                        .set(EAV_BE_BOOLEAN_VALUES.CLOSE_DATE, DateUtils.convert(reportDate))
+                        .set(EAV_BE_BOOLEAN_VALUES.REPORT_DATE, DateUtils.convert(reportDate))
                         .where(EAV_BE_BOOLEAN_VALUES.ID.eq(baseValueId));
                 break;
             }
@@ -428,7 +675,7 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
                 update = context
                         .update(EAV_BE_DOUBLE_VALUES)
                         .set(EAV_BE_DOUBLE_VALUES.IS_LAST, false)
-                        .set(EAV_BE_DOUBLE_VALUES.CLOSE_DATE, DateUtils.convert(reportDate))
+                        .set(EAV_BE_DOUBLE_VALUES.REPORT_DATE, DateUtils.convert(reportDate))
                         .where(EAV_BE_DOUBLE_VALUES.ID.eq(baseValueId));
                 break;
             }
@@ -438,9 +685,9 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
 
         logger.debug(update.toString());
         updateWithStats(update.getSQL(), update.getBindValues().toArray());
-    }
+    }*/
 
-    private void rollbackClosedHistory(long baseEntityId, long metaAttributeId, Date reportDate, DataTypes dataType)
+    /*private void rollbackClosedHistory(long baseEntityId, long metaAttributeId, Date reportDate, DataTypes dataType)
     {
 
         Update update = null;
@@ -450,40 +697,40 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
                 update = context
                         .update(EAV_BE_INTEGER_VALUES)
                         .set(EAV_BE_INTEGER_VALUES.IS_LAST, true)
-                        .set(EAV_BE_INTEGER_VALUES.CLOSE_DATE, Configuration.historyMaxDate)
+                        .set(EAV_BE_INTEGER_VALUES.REPORT_DATE, Configuration.historyMaxDate)
                         .where(EAV_BE_INTEGER_VALUES.ENTITY_ID.eq(baseEntityId))
                         .and(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq(metaAttributeId))
-                        .and(EAV_BE_INTEGER_VALUES.CLOSE_DATE.eq(DateUtils.convert(reportDate)));
+                        .and(EAV_BE_INTEGER_VALUES.REPORT_DATE.eq(DateUtils.convert(reportDate)));
                 break;
             }
             case DATE: {
                 update = context
                         .update(EAV_BE_DATE_VALUES)
                         .set(EAV_BE_DATE_VALUES.IS_LAST, false)
-                        .set(EAV_BE_DATE_VALUES.CLOSE_DATE, Configuration.historyMaxDate)
+                        .set(EAV_BE_DATE_VALUES.REPORT_DATE, Configuration.historyMaxDate)
                         .where(EAV_BE_DATE_VALUES.ENTITY_ID.eq(baseEntityId))
                         .and(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq(metaAttributeId))
-                        .and(EAV_BE_DATE_VALUES.CLOSE_DATE.eq(DateUtils.convert(reportDate)));
+                        .and(EAV_BE_DATE_VALUES.REPORT_DATE.eq(DateUtils.convert(reportDate)));
                 break;
             }
             case STRING: {
                 update = context
                         .update(EAV_BE_STRING_VALUES)
                         .set(EAV_BE_STRING_VALUES.IS_LAST, false)
-                        .set(EAV_BE_STRING_VALUES.CLOSE_DATE, Configuration.historyMaxDate)
+                        .set(EAV_BE_STRING_VALUES.REPORT_DATE, Configuration.historyMaxDate)
                         .where(EAV_BE_STRING_VALUES.ENTITY_ID.eq(baseEntityId))
                         .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(metaAttributeId))
-                        .and(EAV_BE_STRING_VALUES.CLOSE_DATE.eq(DateUtils.convert(reportDate)));
+                        .and(EAV_BE_STRING_VALUES.REPORT_DATE.eq(DateUtils.convert(reportDate)));
                 break;
             }
             case BOOLEAN: {
                 update = context
                         .update(EAV_BE_STRING_VALUES)
                         .set(EAV_BE_BOOLEAN_VALUES.IS_LAST, false)
-                        .set(EAV_BE_BOOLEAN_VALUES.CLOSE_DATE, Configuration.historyMaxDate)
+                        .set(EAV_BE_BOOLEAN_VALUES.REPORT_DATE, Configuration.historyMaxDate)
                         .where(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.eq(baseEntityId))
                         .and(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq(metaAttributeId))
-                        .and(EAV_BE_BOOLEAN_VALUES.CLOSE_DATE.eq(DateUtils.convert(reportDate)));
+                        .and(EAV_BE_BOOLEAN_VALUES.REPORT_DATE.eq(DateUtils.convert(reportDate)));
                 break;
             }
             case DOUBLE: {
@@ -502,11 +749,11 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
 
         logger.debug(update.toString());
         updateWithStats(update.getSQL(), update.getBindValues().toArray());
-    }
+    }*/
 
     private void update(IBaseValue baseValueLoaded, IBaseValue baseValueForSave, DataTypes dataType)
     {
-        long baseValueLoadedId = baseValueLoaded.getId();
+        /*long baseValueLoadedId = baseValueLoaded.getId();
 
         Update update;
         switch(dataType)
@@ -561,10 +808,10 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
         }
 
         logger.debug(update.toString());
-        updateWithStats(update.getSQL(), update.getBindValues().toArray());
+        updateWithStats(update.getSQL(), update.getBindValues().toArray());*/
     }
 
-    private boolean isPreviousClosed(long baseEntityId, long metaAttributeId,
+    /*private boolean isPreviousClosed(long baseEntityId, long metaAttributeId,
                                      Date reportDate, Object value, DataTypes dataType)
     {
         Select select = null;
@@ -632,6 +879,6 @@ public class BeSimpleValueDaoImpl extends JDBCSupport implements IBeSimpleValueD
 
         long count = (Long)rows.get(0).get("history_count");
         return count > 0;
-    }
+    }*/
 
 }

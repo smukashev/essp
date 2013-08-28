@@ -109,16 +109,19 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         return meta;
     }
 
+    @Override
     public Set<Date> getAvailableReportDates() {
         return availableReportDates;
     }
 
+    @Override
     public void setAvailableReportDates(Set<Date> availableReportDates) {
         this.availableReportDates = availableReportDates;
         this.maxReportDate = Collections.max(availableReportDates);
         this.minReportDate = Collections.min(availableReportDates);
     }
 
+    @Override
     public Date getMaxReportDate()
     {
         if (availableReportDates.size() != 0)
@@ -129,6 +132,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         return null;
     }
 
+    @Override
     public Date getMinReportDate()
     {
         if (availableReportDates.size() != 0)

@@ -79,7 +79,8 @@ public class BeSetValueDaoImpl extends JDBCSupport implements IBeSetValueDao {
                     .set(EAV_BE_ENTITY_SET_OF_SETS.SET_ID, baseSet.getId())
                     .set(EAV_BE_ENTITY_SET_OF_SETS.BATCH_ID, baseValue.getBatch().getId())
                     .set(EAV_BE_ENTITY_SET_OF_SETS.INDEX_, baseValue.getIndex())
-                    .set(EAV_BE_ENTITY_SET_OF_SETS.OPEN_DATE, DateUtils.convert(baseEntity.getReportDate()))
+                    .set(EAV_BE_ENTITY_SET_OF_SETS.REPORT_DATE, DateUtils.convert(baseEntity.getReportDate()))
+                    .set(EAV_BE_ENTITY_SET_OF_SETS.IS_CLOSED, false)
                     .set(EAV_BE_ENTITY_SET_OF_SETS.IS_LAST, true);
         }
         else
@@ -93,7 +94,8 @@ public class BeSetValueDaoImpl extends JDBCSupport implements IBeSetValueDao {
                         .set(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID, baseSet.getId())
                         .set(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID, baseValue.getBatch().getId())
                         .set(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_, baseValue.getIndex())
-                        .set(EAV_BE_ENTITY_COMPLEX_SETS.OPEN_DATE, DateUtils.convert(baseEntity.getReportDate()))
+                        .set(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE, DateUtils.convert(baseEntity.getReportDate()))
+                        .set(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED, false)
                         .set(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST, true);
             }
             else
@@ -105,7 +107,8 @@ public class BeSetValueDaoImpl extends JDBCSupport implements IBeSetValueDao {
                         .set(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID, baseSet.getId())
                         .set(EAV_BE_ENTITY_SIMPLE_SETS.BATCH_ID, baseValue.getBatch().getId())
                         .set(EAV_BE_ENTITY_SIMPLE_SETS.INDEX_, baseValue.getIndex())
-                        .set(EAV_BE_ENTITY_SIMPLE_SETS.OPEN_DATE, DateUtils.convert(baseEntity.getReportDate()))
+                        .set(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE, DateUtils.convert(baseEntity.getReportDate()))
+                        .set(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED, false)
                         .set(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST, true);
             }
         }

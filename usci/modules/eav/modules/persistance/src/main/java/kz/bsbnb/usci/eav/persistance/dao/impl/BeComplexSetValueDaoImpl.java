@@ -83,7 +83,7 @@ public class BeComplexSetValueDaoImpl extends JDBCSupport implements IBeComplexS
                             EAV_BE_COMPLEX_SET_VALUES.SET_ID,
                             EAV_BE_COMPLEX_SET_VALUES.BATCH_ID,
                             EAV_BE_COMPLEX_SET_VALUES.INDEX_,
-                            EAV_BE_COMPLEX_SET_VALUES.REP_DATE,
+                            EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE,
                             EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID);
 
             Collection<IBaseValue> baseValues = baseSet.get();

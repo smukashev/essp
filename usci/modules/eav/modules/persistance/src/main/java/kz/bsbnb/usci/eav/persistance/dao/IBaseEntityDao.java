@@ -34,7 +34,11 @@ public interface IBaseEntityDao
 
     public IBaseEntity load(long id);
 
+    public IBaseEntity load(long id, boolean closed);
+
     public BaseEntity load(long id, Date reportDate);
+
+    public BaseEntity load(long id, Date reportDate, boolean closed);
 
     public IBaseEntity prepare(IBaseEntity baseEntity);
 

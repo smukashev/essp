@@ -27,11 +27,13 @@ public class BeStorageDaoImpl implements IBeStorageDao {
     {
         private long id;
         private Date reportDate;
+        private boolean withClosedValues;
 
-        public BaseEntityKey(long id, Date reportDate)
+        public BaseEntityKey(long id, Date reportDate, boolean withClosedValues)
         {
             this.id = id;
             this.reportDate = reportDate;
+            this.withClosedValues = withClosedValues;
         }
 
         public long getId()
@@ -42,6 +44,11 @@ public class BeStorageDaoImpl implements IBeStorageDao {
         public Date getReportDate()
         {
             return reportDate;
+        }
+
+        public boolean isWithClosedValues()
+        {
+            return withClosedValues;
         }
 
     }
@@ -65,18 +72,24 @@ public class BeStorageDaoImpl implements IBeStorageDao {
                         public IBaseEntity load(BaseEntityKey key) throws Exception {
                             if (key.getReportDate() == null)
                             {
-                                return baseEntityDao.load(key.getId());
+                                return baseEntityDao.load(key.getId(), key.isWithClosedValues());
                             }
                             else
                             {
-                                return baseEntityDao.load(key.getId(), key.getReportDate());
+                                return baseEntityDao.load(key.getId(), key.getReportDate(), key.isWithClosedValues());
                             }
                         }
                     });
 
     public IBaseEntity getBaseEntity(long id, Date reportDate)
     {
-        BaseEntityKey key = new BaseEntityKey(id, reportDate);
+        // TODO:
+        return getBaseEntity(id, reportDate, false);
+    }
+
+    public IBaseEntity getBaseEntity(long id, Date reportDate, boolean withClosedValues)
+    {
+        BaseEntityKey key = new BaseEntityKey(id, reportDate, withClosedValues);
         try {
             return cache.get(key);
         } catch (ExecutionException e) {
@@ -86,7 +99,12 @@ public class BeStorageDaoImpl implements IBeStorageDao {
 
     public IBaseEntity getBaseEntity(long id)
     {
-        return getBaseEntity(id, null);
+        return getBaseEntity(id, null, false);
+    }
+
+    public IBaseEntity getBaseEntity(long id, boolean withClosedValues)
+    {
+        return getBaseEntity(id, null, withClosedValues);
     }
 
     public void clean()

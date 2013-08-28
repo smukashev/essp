@@ -292,7 +292,7 @@ public class BaseSet extends BaseContainer implements IBaseSet
 
                         if (event.getSource() instanceof IBaseSet)
                         {
-                            identifier += "." + event.getIdentifier();;
+                            identifier += "." + event.getIdentifier();
                         }
 
                         modifiedObjects.add(identifier);
@@ -307,6 +307,17 @@ public class BaseSet extends BaseContainer implements IBaseSet
     public void removeListeners()
     {
 
+    }
+
+    public BaseSet clone()
+    {
+        try {
+            BaseSet baseSet = (BaseSet)super.clone();
+
+            return baseSet;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("BaseSet class does not implement interface Cloneable.");
+        }
     }
 
 }

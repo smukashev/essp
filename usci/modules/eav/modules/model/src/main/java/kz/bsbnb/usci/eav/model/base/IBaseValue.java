@@ -47,6 +47,14 @@ public interface IBaseValue extends IPersistable, Cloneable
 
     public Date getRepDate();
 
+    public void setLast(boolean last);
+
+    public boolean isLast();
+
+    public void setClosed(boolean closed);
+
+    public boolean isClosed();
+
     public UUID getUuid();
 
 }

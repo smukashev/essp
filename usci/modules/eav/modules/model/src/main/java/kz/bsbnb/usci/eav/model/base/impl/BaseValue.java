@@ -44,6 +44,10 @@ public class BaseValue extends Persistable implements IBaseValue
 
     private Date reportDate;
 
+    private boolean last = false;
+
+    private boolean closed = false;
+
     /**
      * Initializes batch value with a batch information, index and value.
      * @param batch information about the origin of this value.
@@ -72,7 +76,14 @@ public class BaseValue extends Persistable implements IBaseValue
         this.reportDate = new Date(DateUtils.cutOffTime(reportDate));
     }
 
-    public BaseValue(Long id, Batch batch, long index, Date reportDate, Object value)
+    public BaseValue(Batch batch, long index, Date reportDate, Object value, boolean closed, boolean last)
+    {
+        this(batch, index, reportDate, value);
+        this.closed = closed;
+        this.last = last;
+    }
+
+    public BaseValue(long id, Batch batch, long index, Date reportDate, Object value)
     {
         super(id);
 
@@ -88,6 +99,14 @@ public class BaseValue extends Persistable implements IBaseValue
         this.index = index;
         this.value = value;
         this.reportDate = new Date(DateUtils.cutOffTime(reportDate));
+    }
+
+    public BaseValue(long id, Batch batch, long index, Date reportDate, Object value, boolean closed, boolean last)
+    {
+        this(id, batch, index, reportDate, value);
+        this.closed = closed;
+        this.last = last;
+
     }
 
     public BaseValue(Batch batch, long index, Object value)
@@ -139,6 +158,30 @@ public class BaseValue extends Persistable implements IBaseValue
 
     public UUID getUuid() {
         return uuid;
+    }
+
+    @Override
+    public void setLast(boolean last)
+    {
+        this.last = last;
+    }
+
+    @Override
+    public boolean isLast()
+    {
+        return last;
+    }
+
+    @Override
+    public void setClosed(boolean closed)
+    {
+        this.closed = closed;
+    }
+
+    @Override
+    public boolean isClosed()
+    {
+        return closed;
     }
 
     @Override

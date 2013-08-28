@@ -9,7 +9,11 @@ import java.util.Date;
  */
 public interface IBeStorageDao {
 
+    public IBaseEntity getBaseEntity(long id, Date reportDate, boolean withClosedValues);
+
     public IBaseEntity getBaseEntity(long id, Date reportDate);
+
+    public IBaseEntity getBaseEntity(long id, boolean withClosedValues);
 
     public IBaseEntity getBaseEntity(long id);
 
