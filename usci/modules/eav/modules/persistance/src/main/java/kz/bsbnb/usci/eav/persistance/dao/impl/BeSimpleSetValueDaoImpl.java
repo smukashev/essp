@@ -67,7 +67,7 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                 insert = insert.values(Arrays.asList(insertArgs));
             }
             logger.debug(insert.toString());
-            batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
+            updateWithStats(insert.getSQL(), insert.getBindValues().toArray());
         }
         else
         {
@@ -166,7 +166,7 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                 insert = insert.values(Arrays.asList(insertArgs));
             }
             logger.debug(insert.toString());
-            batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
+            updateWithStats(insert.getSQL(), insert.getBindValues().toArray());
         }
 
         return setId;
@@ -241,7 +241,7 @@ public class BeSimpleSetValueDaoImpl extends JDBCSupport implements IBeSimpleSet
                     throw new IllegalArgumentException("Unknown type.");
             }
             logger.debug(delete.toString());
-            batchUpdateWithStats(delete.getSQL(), delete.getBindValues());
+            updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
             beSetValueDao.remove(baseSet);
         }

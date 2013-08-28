@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 /**
  *
  */
+@Aspect
 @Component
 @Scope(value = "singleton")
 public class BeStorageDaoImpl implements IBeStorageDao {
@@ -110,6 +111,13 @@ public class BeStorageDaoImpl implements IBeStorageDao {
     public void clean()
     {
         cache.asMap().clear();
+    }
+
+    @AfterReturning("execution(* kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLBaseEntityDaoImpl.*(..)) && " +
+            "args(baseEntity)")
+    public void refresh(IBaseEntity baseEntity)
+    {
+        System.out.println("IT IS WORKING");
     }
 
 }

@@ -327,6 +327,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         }
     }
 
+    @Override
+    public IMetaAttribute getMetaAttribute(String attribute)
+    {
+        return meta.getMetaAttribute(attribute);
+    }
+
     /**
      * Set of simple key names that are actually set in entity
      *

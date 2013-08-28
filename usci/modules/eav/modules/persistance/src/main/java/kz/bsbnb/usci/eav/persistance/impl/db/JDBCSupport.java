@@ -86,35 +86,19 @@ public class JDBCSupport {
     }
 
     protected int updateWithStats(String sql, Object... args) {
-        long t = 0;
-
-        if(sqlStats != null)
-            t = System.nanoTime();
-
-        int count = jdbcTemplate.update(sql, args);
-
-        if(sqlStats != null)
-            sqlStats.put(sql, (System.nanoTime() - t) / 1000);
-
-        return count;
-    }
-
-    protected int batchUpdateWithStats(String sql, List<Object> batchArgs)
-    {
         double t1 = 0;
         if(sqlStats != null)
             t1 = System.nanoTime();
 
-        int counts = jdbcTemplate.update(sql, batchArgs.toArray());
+        int count = jdbcTemplate.update(sql, args);
 
         double t2 = System.nanoTime() - t1;
-
         if(sqlStats != null)
         {
             sqlStats.put(sql, t2 / 1000);
         }
 
-        return counts;
+        return count;
     }
 
     protected List<Map<String, Object>> queryForListWithStats(String sql, Object... args)

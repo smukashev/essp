@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.model.base;
 
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
 import java.util.Date;
@@ -9,6 +10,8 @@ import java.util.Set;
  * @author a.motov
  */
 public interface IBaseEntity extends IBaseContainer {
+
+    public IMetaAttribute getMetaAttribute(String attribute);
 
     public IBaseValue getBaseValue(String attribute);
 

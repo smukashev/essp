@@ -77,7 +77,7 @@ public class BeComplexValueDaoImpl extends JDBCSupport implements IBeComplexValu
         }
 
         logger.debug(insert.toString());
-        batchUpdateWithStats(insert.getSQL(), insert.getBindValues());
+        updateWithStats(insert.getSQL(), insert.getBindValues().toArray());
     }
 
     @Override

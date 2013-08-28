@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 
 import java.util.Set;
