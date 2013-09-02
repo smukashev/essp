@@ -349,6 +349,51 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             }
         }
 
+        if (metaSet.isComplex()) {
+            HashMap<String, String> keyFilter = metaSet.getArrayKeyFilter();
+
+            DeleteConditionStep deleteFilter =
+                    context.delete(EAV_M_SET_KEY_FILTER).where(EAV_M_SET_KEY_FILTER.SET_ID.eq(id));
+
+            long t = 0;
+            if(sqlStats != null)
+            {
+                t = System.nanoTime();
+            }
+
+            jdbcTemplate.update(deleteFilter.getSQL(), deleteFilter.getBindValues().toArray());
+
+            if(sqlStats != null)
+            {
+                sqlStats.put(deleteFilter.getSQL(), (System.nanoTime() - t) / 1000000);
+            }
+
+            for (String attrName : keyFilter.keySet()) {
+                InsertOnDuplicateStep insertFilter = context.
+                        insertInto(EAV_M_SET_KEY_FILTER,
+                                EAV_M_SET_KEY_FILTER.SET_ID,
+                                EAV_M_SET_KEY_FILTER.ATTR_NAME,
+                                EAV_M_SET_KEY_FILTER.VALUE).values(
+                                    id,
+                                    attrName,
+                                    keyFilter.get(attrName)
+                                );
+
+                t = 0;
+                if(sqlStats != null)
+                {
+                    t = System.nanoTime();
+                }
+
+                id = insertWithId(insertFilter.getSQL(), insertFilter.getBindValues().toArray());
+
+                if(sqlStats != null)
+                {
+                    sqlStats.put(insertFilter.getSQL(), (System.nanoTime() - t) / 1000000);
+                }
+            }
+        }
+
         return id;
     }
 
@@ -447,23 +492,90 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             IMetaAttribute metaAttribute = meta.getMetaAttribute(typeName);
 
-            if(meta.getMemberType(typeName).isComplex())
-            {
-                update = context.update(EAV_M_COMPLEX_ATTRIBUTES
-                ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_KEY, metaAttribute.isKey()
-                ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE, metaAttribute.isNullable()
-                ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId())
-                ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
-                ).and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
-            }
-            else
-            {
-                update = context.update(EAV_M_SIMPLE_ATTRIBUTES
-                ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_KEY, metaAttribute.isKey()
-                ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE, metaAttribute.isNullable()
-                ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId())
-                ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
-                ).and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
+            if (meta.getMemberType(typeName).isSet()) {
+                if(meta.getMemberType(typeName).isComplex())
+                {
+                    update = context.update(EAV_M_COMPLEX_SET
+                    ).set(EAV_M_COMPLEX_SET.IS_KEY, metaAttribute.isKey()
+                    ).set(EAV_M_COMPLEX_SET.IS_NULLABLE, metaAttribute.isNullable()
+                    ).where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(dbMeta.getId())
+                    ).and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_M_COMPLEX_SET.NAME.eq(typeName));
+
+                    MetaSet metaSet = (MetaSet)meta.getMemberType(typeName);
+                    long id = ((MetaSet)dbMeta.getMemberType(typeName)).getId();
+
+                    HashMap<String, String> keyFilter = metaSet.getArrayKeyFilter();
+
+                    DeleteConditionStep deleteFilter =
+                            context.delete(EAV_M_SET_KEY_FILTER).where(EAV_M_SET_KEY_FILTER.SET_ID.eq(id));
+
+                    long t = 0;
+                    if(sqlStats != null)
+                    {
+                        t = System.nanoTime();
+                    }
+
+                    jdbcTemplate.update(deleteFilter.getSQL(), deleteFilter.getBindValues().toArray());
+
+                    if(sqlStats != null)
+                    {
+                        sqlStats.put(deleteFilter.getSQL(), (System.nanoTime() - t) / 1000000);
+                    }
+
+                    for (String attrName : keyFilter.keySet()) {
+                        InsertOnDuplicateStep insertFilter = context.
+                                insertInto(EAV_M_SET_KEY_FILTER,
+                                        EAV_M_SET_KEY_FILTER.SET_ID,
+                                        EAV_M_SET_KEY_FILTER.ATTR_NAME,
+                                        EAV_M_SET_KEY_FILTER.VALUE).values(
+                                id,
+                                attrName,
+                                keyFilter.get(attrName)
+                        );
+
+                        t = 0;
+                        if(sqlStats != null)
+                        {
+                            t = System.nanoTime();
+                        }
+
+                        id = insertWithId(insertFilter.getSQL(), insertFilter.getBindValues().toArray());
+
+                        if(sqlStats != null)
+                        {
+                            sqlStats.put(insertFilter.getSQL(), (System.nanoTime() - t) / 1000000);
+                        }
+                    }
+                }
+                else
+                {
+                    update = context.update(EAV_M_SIMPLE_SET
+                    ).set(EAV_M_SIMPLE_SET.IS_KEY, metaAttribute.isKey()
+                    ).set(EAV_M_SIMPLE_SET.IS_NULLABLE, metaAttribute.isNullable()
+                    ).where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(dbMeta.getId())
+                    ).and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_M_SIMPLE_SET.NAME.eq(typeName));
+                }
+            } else {
+                if(meta.getMemberType(typeName).isComplex())
+                {
+                    update = context.update(EAV_M_COMPLEX_ATTRIBUTES
+                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_KEY, metaAttribute.isKey()
+                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE, metaAttribute.isNullable()
+                    ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId())
+                    ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
+                }
+                else
+                {
+                    update = context.update(EAV_M_SIMPLE_ATTRIBUTES
+                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_KEY, metaAttribute.isKey()
+                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE, metaAttribute.isNullable()
+                    ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId())
+                    ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
+                }
             }
 
             logger.debug(update.toString());
@@ -708,6 +820,29 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             metaSet.setArrayKeyType(ComplexKeyTypes.valueOf((String) row.get("array_key_type")));
             metaSet.setImmutable((Boolean)row.get("is_immutable"));
             metaSet.setReference((Boolean)row.get("is_reference"));
+
+            SelectForUpdateStep selectFilters = context.select(
+                    EAV_M_SET_KEY_FILTER.ATTR_NAME,
+                    EAV_M_SET_KEY_FILTER.VALUE).from(EAV_M_SET_KEY_FILTER).
+                    where(EAV_M_SET_KEY_FILTER.SET_ID.eq(metaSet.getId()));
+
+            if(sqlStats != null)
+            {
+                t = System.nanoTime();
+            }
+            List<Map<String, Object>> filterRows = jdbcTemplate.queryForList(selectFilters.getSQL(),
+                    selectFilters.getBindValues().toArray());
+            if(sqlStats != null)
+            {
+                sqlStats.put(selectFilters.getSQL(), (System.nanoTime() - t) / 1000000);
+            }
+
+            for (Map<String, Object> filterRow : filterRows) {
+                if (filterRow.get("attr_name") != null) {
+                    metaSet.addArrayKeyFilter((String) filterRow.get("attr_name"),
+                        (String) filterRow.get("value"));
+                }
+            }
 
             metaAttribute.setMetaType(metaSet);
 

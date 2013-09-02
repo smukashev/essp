@@ -135,6 +135,19 @@
       </index>
     </table>
 
+    <table name="eav_m_set_key_filter">
+      <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
+      <column name="set_id" primaryKey="false" required="false" type="BIGINT" size="10" autoIncrement="false"/>
+      <column name="attr_name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
+      <column name="value" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
+      <index>
+        <index-column name="set_id"/>
+      </index>
+    </table>
+
     <table name="eav_meta_object">
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
       <unique>

@@ -33,4 +33,7 @@ public interface IBaseEntity extends IBaseContainer {
 
     public void remove(String attribute);
 
+    public Object getEl(String path);
+
+    public IBaseValue safeGetValue(String name);
 }

@@ -3,9 +3,12 @@ package kz.bsbnb.usci.cli.app;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcher;
@@ -71,11 +74,10 @@ public class CLI
         while(crParser.hasMore() && (i++ < count)) {
             entity = crParser.getCurrentBaseEntity();
 
-            //System.out.println(entity);
+            System.out.println(entity);
 
-            // TODO: Fix this block
-            //long id = baseEntityDao.save(entity);
-            //System.out.println("Saved with id: " + id);
+            long id = baseEntityDao.save(entity).getId();
+            System.out.println("Saved with id: " + id);
 
             crParser.parseNextPackage();
         }
@@ -167,20 +169,66 @@ public class CLI
         }
     }
 
+    public void addMetaClassKeyFilter(String className, String attrName, String subName, String value) {
+        MetaClass meta = metaClassRepository.getMetaClass(className);
+
+        if (meta == null) {
+            System.out.println("No such meta class with name: " + className);
+        } else {
+            IMetaType attr = meta.getMemberType(attrName);
+
+            if (attr != null) {
+                if (attr.isSet() && attr.isComplex()) {
+                    MetaSet set = (MetaSet)attr;
+
+                    set.addArrayKeyFilter(subName, value);
+
+                    metaClassRepository.saveMetaClass(meta);
+                } else {
+                    System.out.println("Attribute: " + attrName + " is not a complex set");
+                }
+            } else {
+                System.out.println("No such attribute: " + attrName);
+            }
+        }
+    }
+
+    public void addMetaClassKeyFilter(long id, String attrName, String subName, String value) {
+        MetaClass meta = metaClassRepository.getMetaClass(id);
+
+        if (meta == null) {
+            System.out.println("No such meta class with id: " + id);
+        } else {
+            IMetaType attr = meta.getMemberType(attrName);
+
+            if (attr != null) {
+                if (attr.isSet() && attr.isComplex()) {
+                    MetaSet set = (MetaSet)attr;
+
+                    set.addArrayKeyFilter(subName, value);
+
+                    metaClassRepository.saveMetaClass(meta);
+                } else {
+                    System.out.println("Attribute: " + attrName + " is not a complex set");
+                }
+            } else {
+                System.out.println("No such attribute: " + attrName);
+            }
+        }
+    }
+
     public void showEntity(long id) {
-        // TODO: Fix this block
-        /*BaseEntity entity = baseEntityDao.load(id);
+        IBaseEntity entity = baseEntityDao.load(id);
 
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
         } else {
             System.out.println(entity.toString());
-        }*/
+        }
     }
 
     public void showEntityAttr(String path, long id) {
-        // TODO: Fix this block
-        /*BaseEntity entity = baseEntityDao.load(id);
+        IBaseEntity entity = baseEntityDao.load(id);
 
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
@@ -192,12 +240,11 @@ public class CLI
             } else {
                 System.out.println("No such attribute with path: " + path);
             }
-        }*/
+        }
     }
 
     public void showEntitySQ(long id) {
-        // TODO: Fix this block
-        /*BaseEntity entity = baseEntityDao.load(id);
+        IBaseEntity entity = baseEntityDao.load(id);
 
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
@@ -209,7 +256,7 @@ public class CLI
             } else {
                 System.out.println("Error generating SQL.");
             }
-        }*/
+        }
     }
 
     public void commandXSD() throws FileNotFoundException
@@ -262,6 +309,19 @@ public class CLI
                     }
                 } else {
                     System.out.println("Argument needed: <key> <id, name> <id or name> <attributeName>");
+                }
+            } else if (args.get(0).equals("fkey")) {
+                if (args.size() > 5) {
+                    if (args.get(1).equals("id")) {
+                        addMetaClassKeyFilter(Long.parseLong(args.get(2)), args.get(3), args.get(4), args.get(5));
+                    } else if (args.get(1).equals("name")) {
+                        addMetaClassKeyFilter(args.get(2), args.get(3), args.get(4), args.get(5));
+                    } else {
+                        System.out.println("No such metaClass identification method: " + args.get(1));
+                    }
+                } else {
+                    System.out.println("Argument needed: <key> <id, name> <id or name> <attributeName> " +
+                            "<subAttributeName> <filterValue>");
                 }
             } else {
                 System.out.println("No such operation: " + args.get(0));

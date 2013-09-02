@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.impl.searcher;
 
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
@@ -58,7 +59,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         }
     }
 
-    public SelectConditionStep generateSQL(BaseEntity entity, String entityName)
+    public SelectConditionStep generateSQL(IBaseEntity entity, String entityName)
     {
         MetaClass meta = entity.getMeta();
 
