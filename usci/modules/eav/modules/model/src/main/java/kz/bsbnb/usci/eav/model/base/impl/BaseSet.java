@@ -271,11 +271,6 @@ public class BaseSet extends BaseContainer implements IBaseSet
         return true;
     }
 
-    public Set<String> getModifiedAttributes()
-    {
-        return modifiedObjects;
-    }
-
     public void setListeners()
     {
         if (meta.isComplex())
@@ -284,22 +279,27 @@ public class BaseSet extends BaseContainer implements IBaseSet
             {
                 IBaseValue baseValue = data.get(key);
                 IBaseContainer baseContainer = (IBaseContainer)baseValue.getValue();
-                baseContainer.addListener(new ValueChangeListener(key) {
+                baseContainer.addListener(new ValueChangeListener(this, key) {
 
                     @Override
                     public void valueChange(ValueChangeEvent event) {
-                        String identifier = this.getParentIdentifier();
+                        String identifier = this.getIdentifier();
 
-                        if (event.getSource() instanceof IBaseSet)
+                        IBaseContainer source = event.getSource();
+                        if (source instanceof IBaseSet)
                         {
                             identifier += "." + event.getIdentifier();
                         }
 
-                        modifiedObjects.add(identifier);
+                        IBaseContainer target = this.getTarget();
+                        if (target instanceof BaseContainer)
+                        {
+                            ((BaseContainer)target).addModifiedIdentifier(identifier);
+                        }
                         fireValueChange(identifier);
                     }
                 });
-                baseContainer.setListeners();
+                baseContainer.setListening(true);
             }
         }
     }

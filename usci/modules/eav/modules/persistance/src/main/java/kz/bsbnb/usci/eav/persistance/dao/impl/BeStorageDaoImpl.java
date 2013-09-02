@@ -6,8 +6,13 @@ import com.google.common.cache.LoadingCache;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeStorageDao;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -23,6 +28,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Scope(value = "singleton")
 public class BeStorageDaoImpl implements IBeStorageDao {
+
+    private final Logger logger = LoggerFactory.getLogger(BeStorageDaoImpl.class);
 
     private class BaseEntityKey
     {
@@ -113,11 +120,23 @@ public class BeStorageDaoImpl implements IBeStorageDao {
         cache.asMap().clear();
     }
 
-    @AfterReturning("execution(* kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLBaseEntityDaoImpl.*(..)) && " +
-            "args(baseEntity)")
-    public void refresh(IBaseEntity baseEntity)
+    @AfterReturning(pointcut = "execution(* kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLBaseEntityDaoImpl.saveOrUpdate(..))",
+                    returning = "baseEntity")
+    public void refresh(JoinPoint joinPoint, IBaseEntity baseEntity)
     {
-        System.out.println("IT IS WORKING");
+        logger.error("*******************************************************************************");
+        logger.error("Join point kind : " + joinPoint.getKind());
+        logger.error("Signature declaring type : "+ joinPoint.getSignature().getDeclaringTypeName());
+        logger.error("Signature name : " + joinPoint.getSignature().getName());
+        logger.error("Argument count : " + joinPoint.getArgs().length);
+        logger.error("Target class : "+ joinPoint.getTarget().getClass().getName());
+        logger.error("This class : " + joinPoint.getThis().getClass().getName());
+    }
+
+    @Around("execution(* kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLBaseEntityDaoImpl.update(..))")
+    public Object advice(ProceedingJoinPoint pjp) throws Throwable
+    {
+        return pjp.proceed();
     }
 
 }

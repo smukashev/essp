@@ -1,9 +1,9 @@
 package kz.bsbnb.usci.eav.test.model.metadata.impl;
 
-import kz.bsbnb.usci.eav.test.GenericTestCase;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.repository.impl.MetaClassRepositoryImpl;
+import kz.bsbnb.usci.eav.test.GenericTestCase;
 import kz.bsbnb.usci.eav.test.postgresql.dao.PostgreSQLMetaClassDaoImplTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;

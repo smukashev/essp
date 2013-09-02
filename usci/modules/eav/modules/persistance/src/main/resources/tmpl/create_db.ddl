@@ -346,7 +346,7 @@
       <foreign-key foreignTable="eav_be_entities" name="eav_fk_005_01">
         <reference local="entity_id" foreign="id"/>
       </foreign-key>
-      <foreign-key foreignTable="eav_m_simple_attributes" name="eav_fk_005_02">
+      <foreign-key foreignTable="eav_m_complex_attributes" name="eav_fk_005_02">
         <reference local="attribute_id" foreign="id"/>
       </foreign-key>
       <index name="eav_ind_005_00">

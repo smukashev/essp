@@ -8,7 +8,10 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBeSetValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeSimpleSetValueDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.DeleteConditionStep;
+import org.jooq.InsertValuesStep2;
+import org.jooq.InsertValuesStep7;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +22,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_DOUBLE_SET_VALUES;
 
 /**
  *

@@ -45,16 +45,18 @@ public interface IBaseContainer extends IBaseObject
 
     public void removeListener(IValueChangeListener listener);
 
+    public void setListening(boolean listening);
+
+    public boolean isListening();
+
     public void put(String name, IBaseValue value);
 
     public Collection<IBaseValue> get();
 
     public IMetaType getMemberType(String name);
 
-    public void setListeners();
+    public void clearModifiedIdentifiers();
 
-    public void removeListeners();
-
-    public Set<String> getModifiedAttributes();
+    public Set<String> getModifiedIdentifiers();
 
 }

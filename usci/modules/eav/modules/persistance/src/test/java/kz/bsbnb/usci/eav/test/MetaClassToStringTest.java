@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.test;
 
-import kz.bsbnb.usci.eav.factory.IMetaFactory;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
@@ -9,22 +8,12 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
-import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
-import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
-import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 
 /**
  *

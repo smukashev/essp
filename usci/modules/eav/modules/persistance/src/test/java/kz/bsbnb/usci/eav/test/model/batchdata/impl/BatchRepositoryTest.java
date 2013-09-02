@@ -2,9 +2,9 @@ package kz.bsbnb.usci.eav.test.model.batchdata.impl;
 
 import junit.framework.Assert;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.test.GenericTestCase;
-import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
+import kz.bsbnb.usci.eav.repository.IBatchRepository;
+import kz.bsbnb.usci.eav.test.GenericTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;

@@ -12,6 +12,6 @@ public interface IBeSimpleValueDao extends IBeValueDao {
 
     void save(IBaseEntity baseEntity, Set<String> attributes, DataTypes dataType);
 
-    long save(IBaseEntity baseEntity, String attribute, DataTypes dataType);
+    void save(IBaseEntity baseEntity, String attribute, DataTypes dataType);
 
 }

@@ -1,11 +1,13 @@
 package kz.bsbnb.usci.eav.tool.generator.random.xml.impl;
 
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.model.meta.impl.*;
 import kz.bsbnb.usci.eav.tool.generator.random.xml.AbstractXmlGenerator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

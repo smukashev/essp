@@ -13,8 +13,10 @@ import kz.bsbnb.usci.eav.persistance.dao.IBeSetValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeSimpleSetValueDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DateUtils;
-import org.jooq.*;
-import org.jooq.impl.DSL;
+import org.jooq.DSLContext;
+import org.jooq.DeleteConditionStep;
+import org.jooq.Insert;
+import org.jooq.InsertOnDuplicateStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_SETS;
 
 /**
  *
@@ -44,7 +45,7 @@ public class BeSetValueDaoImpl extends JDBCSupport implements IBeSetValueDao {
     private IBeComplexSetValueDao beComplexSetValueDao;
 
     @Override
-    public long save(final IBaseEntity baseEntity, String attribute) {
+    public void save(final IBaseEntity baseEntity, String attribute) {
         MetaClass meta = baseEntity.getMeta();
         IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
         IMetaType metaType = metaAttribute.getMetaType();
@@ -114,7 +115,7 @@ public class BeSetValueDaoImpl extends JDBCSupport implements IBeSetValueDao {
         }
 
         logger.debug(insert.toString());
-        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
     @Override

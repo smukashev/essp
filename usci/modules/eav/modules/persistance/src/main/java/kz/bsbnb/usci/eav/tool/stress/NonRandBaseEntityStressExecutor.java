@@ -14,13 +14,11 @@ import kz.bsbnb.usci.eav.tool.generator.nonrandom.data.BaseEntityGenerator;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.data.MetaClassGenerator;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.helper.TreeGenerator;
 import kz.bsbnb.usci.eav.util.SetUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;

@@ -315,15 +315,20 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                             {
                                 for (IBaseValue baseValue : ((BaseSet)baseValueForSave.getValue()).get())
                                 {
-                                    apply((BaseEntity)baseValue.getValue());
+                                    IBaseEntity baseEntityApplied = apply((BaseEntity)baseValue.getValue());
+                                    baseValue.setValue(baseEntityApplied);
+                                    baseValue.setLast(true);
                                 }
                             }
                         }
                         else
                         {
-                            apply((BaseEntity)baseValueForSave.getValue());
+                            IBaseEntity baseEntityApplied = apply((BaseEntity)baseValueForSave.getValue());
+                            baseValueForSave.setValue(baseEntityApplied);
                         }
                     }
+
+                    baseValueForSave.setLast(true);
                 }
             }
 
@@ -361,7 +366,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 }
             }
 
-            baseEntityLoaded.setListeners();
+            baseEntityLoaded.setListening(true);
 
             Set<String> insertedAttributes = SetUtils.difference(baseEntityForSave.getAttributeNames(),
                     baseEntityLoaded.getAttributeNames());
@@ -476,7 +481,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 }
             }
 
-            baseEntityLoaded.removeListeners();
+            baseEntityLoaded.setListening(false);
 
             return baseEntityLoaded;
         }
@@ -492,14 +497,11 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         else
         {
             IBaseEntity baseEntityLoaded = beStorageDao.getBaseEntity(baseEntity.getId(), true);
-            update(baseEntity, baseEntityLoaded);
-            return baseEntity;
+            return update(baseEntity, baseEntityLoaded);
         }
     }
 
-
     @Override
-    @Transactional
     public IBaseEntity process(IBaseEntity baseEntity)
     {
         baseEntity = prepare(baseEntity);
@@ -512,12 +514,15 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         return baseEntity;
     }
 
-    public IBaseEntity update(final IBaseEntity baseEntityForSave, IBaseEntity baseEntityLoaded)
+    @Transactional
+    public IBaseEntity update(IBaseEntity baseEntityForSave, IBaseEntity baseEntityLoaded)
     {
-        if (baseEntityForSave.getModifiedAttributes().size() == 0)
+        logger.error("Call method update().");
+
+        /*if (baseEntityForSave.getModifiedIdentifiers().size() == 0)
         {
             throw new RuntimeException("The instance of the BaseEntity does not contain changed values.");
-        }
+        }*/
 
         TreeSet<String> modifiedAttributes = new TreeSet<String>(new Comparator<String>() {
             @Override
@@ -525,7 +530,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 return thisString.compareTo(thatString);
             }
         });
-        modifiedAttributes.addAll(baseEntityForSave.getModifiedAttributes());
+        modifiedAttributes.addAll(baseEntityForSave.getModifiedIdentifiers());
 
         Iterator<String> it = modifiedAttributes.iterator();
         while (it.hasNext())

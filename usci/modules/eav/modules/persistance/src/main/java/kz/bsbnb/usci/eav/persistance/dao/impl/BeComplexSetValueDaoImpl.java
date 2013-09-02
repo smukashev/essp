@@ -23,7 +23,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.*;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_SET_VALUES;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_SET_OF_COMPLEX_SETS;
 
 /**
  *
