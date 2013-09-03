@@ -103,8 +103,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         EAV_BE_ENTITY_REPORT_DATES.DOUBLE_VALUES_COUNT,
                         EAV_BE_ENTITY_REPORT_DATES.COMPLEX_VALUES_COUNT,
                         EAV_BE_ENTITY_REPORT_DATES.SIMPLE_SETS_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.COMPLEX_SETS_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.SET_OF_SETS_COUNT)
+                        EAV_BE_ENTITY_REPORT_DATES.COMPLEX_SETS_COUNT)
                 .from(EAV_BE_ENTITIES, EAV_BE_ENTITY_REPORT_DATES)
                 .where(EAV_BE_ENTITIES.ID.equal(id))
                 .and(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.equal(EAV_BE_ENTITIES.ID))
@@ -186,11 +185,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             if ((Long)row.get(EAV_BE_ENTITY_REPORT_DATES.COMPLEX_SETS_COUNT.getName()) != 0)
             {
                 loadEntityComplexSets(baseEntity, withClosedValues);
-            }
-
-            if ((Long)row.get(EAV_BE_ENTITY_REPORT_DATES.SET_OF_SETS_COUNT.getName()) != 0)
-            {
-                loadEntitySetOfSets(baseEntity, withClosedValues);
             }
 
             return baseEntity;
@@ -517,12 +511,10 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     @Transactional
     public IBaseEntity update(IBaseEntity baseEntityForSave, IBaseEntity baseEntityLoaded)
     {
-        logger.error("Call method update().");
-
-        /*if (baseEntityForSave.getModifiedIdentifiers().size() == 0)
+        if (baseEntityForSave.getModifiedIdentifiers().size() == 0)
         {
-            throw new RuntimeException("The instance of the BaseEntity does not contain changed values.");
-        }*/
+            return baseEntityForSave;
+        }
 
         TreeSet<String> modifiedAttributes = new TreeSet<String>(new Comparator<String>() {
             @Override
@@ -930,8 +922,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 .set(EAV_BE_ENTITY_REPORT_DATES.DOUBLE_VALUES_COUNT, doubleValuesCount)
                 .set(EAV_BE_ENTITY_REPORT_DATES.COMPLEX_VALUES_COUNT, complexValuesCount)
                 .set(EAV_BE_ENTITY_REPORT_DATES.SIMPLE_SETS_COUNT, simpleSetsCount)
-                .set(EAV_BE_ENTITY_REPORT_DATES.COMPLEX_SETS_COUNT, complexSetsCount)
-                .set(EAV_BE_ENTITY_REPORT_DATES.SET_OF_SETS_COUNT, setOfSetsCount);
+                .set(EAV_BE_ENTITY_REPORT_DATES.COMPLEX_SETS_COUNT, complexSetsCount);
 
         logger.debug(insert.toString());
         updateWithStats(insert.getSQL(), insert.getBindValues().toArray());
@@ -960,7 +951,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 .set(EAV_BE_ENTITY_REPORT_DATES.COMPLEX_VALUES_COUNT, complexValuesCount)
                 .set(EAV_BE_ENTITY_REPORT_DATES.SIMPLE_SETS_COUNT, simpleSetsCount)
                 .set(EAV_BE_ENTITY_REPORT_DATES.COMPLEX_SETS_COUNT, complexSetsCount)
-                .set(EAV_BE_ENTITY_REPORT_DATES.SET_OF_SETS_COUNT, setOfSetsCount)
                 .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.equal(baseEntityId))
                 .and(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.equal(DateUtils.convert(reportDate)));
 
@@ -1830,112 +1820,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             long batchId = (Long)row.get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName());
             long index = (Long)row.get(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_.getName());
             Date reportDate = (Date) row.get(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE.getName());
-
-            IMetaType metaType = baseEntity.getMemberType(attribute);
-            IBaseSet baseSet = new BaseSet(setId, ((MetaSet)metaType).getMemberType());
-
-            if (metaType.isComplex())
-            {
-                loadComplexSetValues(baseSet, withClosedValues);
-            }
-            else
-            {
-                loadSimpleSetValues(baseSet, withClosedValues);
-            }
-
-            Batch batch = batchRepository.getBatch(batchId);
-            baseEntity.put(attribute, new BaseValue(baseValueId, batch, index, reportDate, baseSet));
-        }
-    }
-
-    private void loadEntitySetOfSets(BaseEntity baseEntity, boolean withClosedValues)
-    {
-        Table tableOfComplexSets = EAV_M_SET_OF_SETS.as("ss");
-        Table tableOfEntityComplexSets = EAV_BE_ENTITY_SET_OF_SETS.as("ess");
-        Select select = null;
-
-        if (baseEntity.getReportDate().equals(baseEntity.getMaxReportDate()))
-        {
-            select = context
-                    .select(tableOfComplexSets.field(EAV_M_SET_OF_SETS.NAME),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.ID),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.BATCH_ID),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.INDEX_),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.REPORT_DATE),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.SET_ID),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.IS_CLOSED),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.IS_LAST))
-                    .from(tableOfEntityComplexSets)
-                    .join(tableOfComplexSets)
-                    .on(tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.ATTRIBUTE_ID)
-                            .eq(tableOfComplexSets.field(EAV_M_SET_OF_SETS.ID)))
-                    .where(tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.ENTITY_ID).equal(baseEntity.getId()))
-                    .and(withClosedValues ?
-                            (tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.IS_LAST).equal(true)
-                                    .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.IS_CLOSED).equal(false)))
-                                    .or(tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.REPORT_DATE)
-                                            .equal(DateUtils.convert(baseEntity.getReportDate()))
-                                            .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.IS_CLOSED).equal(true))) :
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.IS_LAST).equal(true)
-                                    .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.IS_CLOSED).equal(false)));
-        }
-        else
-        {
-            Table tableNumbering = context
-                    .select(DSL.rank().over()
-                            .partitionBy(tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.ATTRIBUTE_ID))
-                            .orderBy(tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.REPORT_DATE)).as("num_pp"),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.ID),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.ATTRIBUTE_ID),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.BATCH_ID),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.INDEX_),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.REPORT_DATE),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.SET_ID),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.IS_CLOSED),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.IS_LAST))
-                    .from(tableOfEntityComplexSets)
-                    .where(tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.ENTITY_ID).eq(baseEntity.getId()))
-                    .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_SET_OF_SETS.REPORT_DATE)
-                            .lessOrEqual(DateUtils.convert(baseEntity.getReportDate())))
-                    .asTable("essn");
-
-            select = context
-                    .select(tableOfComplexSets.field(EAV_M_SET_OF_SETS.NAME),
-                            tableNumbering.field(EAV_BE_ENTITY_SET_OF_SETS.ID),
-                            tableNumbering.field(EAV_BE_ENTITY_SET_OF_SETS.BATCH_ID),
-                            tableNumbering.field(EAV_BE_ENTITY_SET_OF_SETS.INDEX_),
-                            tableNumbering.field(EAV_BE_ENTITY_SET_OF_SETS.REPORT_DATE),
-                            tableNumbering.field(EAV_BE_ENTITY_SET_OF_SETS.SET_ID),
-                            tableNumbering.field(EAV_BE_ENTITY_SET_OF_SETS.IS_CLOSED),
-                            tableNumbering.field(EAV_BE_ENTITY_SET_OF_SETS.IS_LAST))
-                    .from(tableNumbering)
-                    .join(tableOfComplexSets)
-                    .on(tableNumbering.field(EAV_BE_ENTITY_SET_OF_SETS.ATTRIBUTE_ID)
-                            .eq(tableOfComplexSets.field(EAV_M_SET_OF_SETS.ID)))
-                    .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
-                    .and(withClosedValues ?
-                            tableNumbering.field(EAV_BE_ENTITY_SET_OF_SETS.IS_CLOSED).equal(false)
-                                    .or(tableNumbering.field(EAV_BE_ENTITY_SET_OF_SETS.REPORT_DATE)
-                                            .equal(DateUtils.convert(baseEntity.getReportDate()))
-                                            .and(tableNumbering.field(EAV_BE_ENTITY_SET_OF_SETS.IS_CLOSED).equal(true))) :
-                            tableNumbering.field(EAV_BE_ENTITY_SET_OF_SETS.IS_CLOSED).equal(false));
-        }
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        Iterator<Map<String, Object>> it = rows.iterator();
-        while (it.hasNext())
-        {
-            Map<String, Object> row = it.next();
-
-            String attribute = (String)row.get(EAV_M_SET_OF_SETS.NAME.getName());
-            long setId = (Long)row.get(EAV_BE_ENTITY_SET_OF_SETS.SET_ID.getName());
-
-            long baseValueId = (Long)row.get(EAV_BE_ENTITY_SET_OF_SETS.ID.getName());
-            long batchId = (Long)row.get(EAV_BE_ENTITY_SET_OF_SETS.BATCH_ID.getName());
-            long index = (Long)row.get(EAV_BE_ENTITY_SET_OF_SETS.INDEX_.getName());
-            Date reportDate = (Date) row.get(EAV_BE_ENTITY_SET_OF_SETS.REPORT_DATE.getName());
 
             IMetaType metaType = baseEntity.getMemberType(attribute);
             IBaseSet baseSet = new BaseSet(setId, ((MetaSet)metaType).getMemberType());

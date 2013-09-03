@@ -72,7 +72,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      */
     public BaseEntity(MetaClass meta, Date reportDate)
     {
-        this.reportDate = reportDate;
+        Date newReportDate = (Date)reportDate.clone();
+        DateUtils.toBeginningOfTheDay(newReportDate);
+
+        this.reportDate = newReportDate;
         this.meta = meta;
     }
 
@@ -406,8 +409,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     }
 
     public void setReportDate(Date reportDate) {
-        this.reportDate = reportDate;
-        this.availableReportDates.add(reportDate);
+        Date newReportDate = (Date)reportDate.clone();
+        DateUtils.toBeginningOfTheDay(newReportDate);
+
+        this.reportDate = newReportDate;
+        this.availableReportDates.add(newReportDate);
     }
 
     @Override
