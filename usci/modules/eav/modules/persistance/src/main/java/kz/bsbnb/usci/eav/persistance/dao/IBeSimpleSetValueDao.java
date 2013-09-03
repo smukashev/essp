@@ -7,10 +7,10 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 /**
  *
  */
-public interface IBeSimpleSetValueDao {
+public interface IBeSimpleSetValueDao extends IBeSetValueDao {
 
-    public long save(IBaseValue baseValue, MetaSet metaSet);
+    //public long save(IBaseValue baseValue, MetaSet metaSet);
 
-    public void remove(BaseSet baseSet);
+    //public void remove(BaseSet baseSet);
 
 }

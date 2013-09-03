@@ -796,7 +796,8 @@
     </table>
     <table name="eav_be_sets">
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>
-      <column name="temp" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="level" primaryKey="false" required="false" type="BIGINT" size="19" autoIncrement="false"/>
+      <column name="is_last" primaryKey="false" required="true" type="BIT" size="1" autoIncrement="false" description="Признак последнего уровня в иерархии"/>
     </table>
     <table name="eav_be_string_set_values">
       <column name="id" primaryKey="true" required="true" type="BIGINT" size="10" autoIncrement="true"/>

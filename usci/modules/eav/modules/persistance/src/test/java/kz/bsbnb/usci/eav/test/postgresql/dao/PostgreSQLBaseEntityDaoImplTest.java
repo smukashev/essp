@@ -542,7 +542,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         long countCreate = entityCreate.getAttributeCount();
         long countLoad = entityLoad.getAttributeCount();
         assertEquals(countCreate, countLoad);
-    }
+    }*/
 
     @Test
     public void saveBaseValueWithComplexSet() throws Exception {
@@ -553,10 +553,10 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         long metaId = postgreSQLMetaClassDaoImpl.save(metaCreate);
         MetaClass metaLoad = postgreSQLMetaClassDaoImpl.load(metaId);
 
-        Batch batch = batchRepository.addBatch(new Batch(new Date(System.currentTimeMillis())));
-        BaseEntity entityCreate = new BaseEntity(metaLoad, batch.getRepDate());
+        // 1 january 2013
+        Batch batch = batchRepository.addBatch(new Batch(new Date(new Long("1356976800000"))));
 
-        Random random = new Random();
+        BaseEntity entityCreated = new BaseEntity(metaLoad, batch.getRepDate());
 
         BaseSet baseSetForComplex = new BaseSet(((MetaSet)metaLoad.getMemberType("complex_set")).getMemberType());
 
@@ -567,15 +567,15 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         baseSetForComplex.put(new BaseValue(batch, 1L, baseEntityForArrayFirst));
         baseSetForComplex.put(new BaseValue(batch, 1L, baseEntityForArraySecond));
 
-        entityCreate.put("complex_set", new BaseValue(batch, 1L, baseSetForComplex));
+        entityCreated.put("complex_set", new BaseValue(batch, 1L, baseSetForComplex));
 
-        long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
-        BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
+        BaseEntity entityProcessed = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entityCreated.clone());
+        BaseEntity entityLoaded = (BaseEntity)postgreSQLBaseEntityDaoImpl.load(entityProcessed.getId());
 
-        long countCreate = entityCreate.getAttributeCount();
-        long countLoad = entityLoad.getAttributeCount();
+        long countCreate = entityCreated.getAttributeCount();
+        long countLoad = entityLoaded.getAttributeCount();
         assertEquals(countCreate, countLoad);
-    }*/
+    }
 
     @Test
     public void updateBaseEntityWithDateValues() throws Exception {

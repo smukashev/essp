@@ -3,6 +3,7 @@ package kz.bsbnb.usci.eav.model.meta.impl;
 import kz.bsbnb.usci.eav.model.base.ContainerTypes;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
+import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
@@ -10,7 +11,7 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 
 import java.util.HashMap;
 
-public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
+public class MetaSet  extends Persistable implements IMetaType, IMetaSet
 {
     IMetaType metaType;
 

@@ -52,7 +52,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     @Autowired
     IBeComplexValueDao beComplexValueDao;
     @Autowired
-    IBeSetValueDao beSetValueDao;
+    IBeComplexSetValueDao beComplexSetValueDao;
     @Autowired
     IBeStorageDao beStorageDao;
 
@@ -728,18 +728,18 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         if (simpleSets.size() != 0)
         {
-            beSetValueDao.save(baseEntity, simpleSets);
+            //beSetValueDao.save(baseEntity, simpleSets);
         }
 
         if (complexSets.size() != 0)
         {
-            beSetValueDao.save(baseEntity, complexSets);
+            beComplexSetValueDao.save(baseEntity, complexSets);
         }
 
-        if (setOfSets.size() != 0)
+        /*if (setOfSets.size() != 0)
         {
             beSetValueDao.save(baseEntity, setOfSets);
-        }
+        }*/
 
         insertReportDate(
                 baseEntity.getId(),
@@ -780,7 +780,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     IBaseValue baseValue = baseEntity.getBaseValue(attribute);
                     Set<BaseEntity> baseEntitiesForRemove = collectComplexSetValues((BaseSet)baseValue.getValue());
 
-                    beSetValueDao.remove(baseEntity, attribute);
+                    //beSetValueDao.remove(baseEntity, attribute);
 
                     Iterator<BaseEntity> baseEntityForRemoveIt = baseEntitiesForRemove.iterator();
                     while (baseEntityForRemoveIt.hasNext())
