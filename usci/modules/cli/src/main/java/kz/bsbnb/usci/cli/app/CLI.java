@@ -73,12 +73,11 @@ public class CLI
 
         BaseEntity entity;
         int i = 0;
-        while(crParser.hasMore() && (i++ < count)) {
+        while(crParser.hasMore() && (((i++) - offset) < count)) {
             entity = crParser.getCurrentBaseEntity();
 
-            System.out.println(entity);
-
             if (i > offset) {
+                System.out.println(entity);
                 long id = baseEntityDao.process(entity).getId();
                 System.out.println("Saved with id: " + id);
             }
@@ -263,6 +262,21 @@ public class CLI
         }
     }
 
+    public void execEntitySQ(long id) {
+        IBaseEntity entity = baseEntityDao.load(id);
+
+        if (entity == null) {
+            System.out.println("No such entity with id: " + id);
+        } else {
+            //SelectConditionStep where = searcher.generateSQL(entity, null);
+            ArrayList<Long> array = searcher.findAll((BaseEntity)entity);
+
+            for (Long ids : array) {
+                System.out.println(ids.toString());
+            }
+        }
+    }
+
     public void commandXSD() throws FileNotFoundException
     {
         if (args.size() > 1) {
@@ -350,6 +364,12 @@ public class CLI
                 } else if (args.get(1).equals("sq")) {
                     if (args.size() > 2) {
                         showEntitySQ(Long.parseLong(args.get(2)));
+                    } else {
+                        System.out.println("Argument needed: <show> <sq> <id> <attributePath>");
+                    }
+                } else if (args.get(1).equals("eq")) {
+                    if (args.size() > 2) {
+                        execEntitySQ(Long.parseLong(args.get(2)));
                     } else {
                         System.out.println("Argument needed: <show> <sq> <id> <attributePath>");
                     }

@@ -50,11 +50,11 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
     {
         try
         {
-            return findAll(entity).get(0);
+            long id = findAll(entity).get(0);
+            return id;
         }
         catch (Exception e)
         {
-            logger.debug("No entities found");
             return null;
         }
     }

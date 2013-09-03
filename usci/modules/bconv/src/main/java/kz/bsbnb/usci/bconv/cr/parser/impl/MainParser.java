@@ -48,6 +48,7 @@ public class MainParser extends BatchParser {
     
     public void parse(InputStream in, Batch batch) throws SAXException, IOException, XMLStreamException
     {
+        index = 1;
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         xmlReader = inputFactory.createXMLEventReader(in);
         this.batch = batch;
