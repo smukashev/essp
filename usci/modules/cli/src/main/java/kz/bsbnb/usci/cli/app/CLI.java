@@ -58,7 +58,9 @@ public class CLI
     @Autowired
     private BasicBaseEntitySearcher searcher;
 
-    public void processCRBatch(String fname, int count) throws SAXException, IOException, XMLStreamException
+    private InputStream inputStream = null;
+
+    public void processCRBatch(String fname, int count, int offset) throws SAXException, IOException, XMLStreamException
     {
         File inFile = new File(fname);
 
@@ -76,8 +78,10 @@ public class CLI
 
             System.out.println(entity);
 
-            long id = baseEntityDao.save(entity).getId();
-            System.out.println("Saved with id: " + id);
+            if (i > offset) {
+                long id = baseEntityDao.process(entity).getId();
+                System.out.println("Saved with id: " + id);
+            }
 
             crParser.parseNextPackage();
         }
@@ -280,10 +284,10 @@ public class CLI
 
     public void commandCRBatch() throws IOException, SAXException, XMLStreamException
     {
-        if (args.size() > 1) {
-            processCRBatch(args.get(0), Integer.parseInt(args.get(1)));
+        if (args.size() > 2) {
+            processCRBatch(args.get(0), Integer.parseInt(args.get(1)), Integer.parseInt(args.get(2)));
         } else {
-            System.out.println("Argument needed: <fileName> <count>");
+            System.out.println("Argument needed: <fileName> <count> <offset>");
         }
     }
 
@@ -386,7 +390,13 @@ public class CLI
         System.out.println("Waiting for commands.");
         System.out.print("> ");
 
-        Scanner in = new Scanner(System.in);
+        Scanner in;
+
+        if (inputStream == null) {
+            in = new Scanner(System.in);
+        } else {
+            in = new Scanner(inputStream);
+        }
 
         String line;
 
@@ -402,6 +412,10 @@ public class CLI
                     args.add(st.nextToken().trim());
                 }
             } else {
+                continue;
+            }
+
+            if (command.startsWith("#")) {
                 continue;
             }
 
@@ -438,5 +452,15 @@ public class CLI
 
             System.out.print("> ");
         }
+    }
+
+    public InputStream getInputStream()
+    {
+        return inputStream;
+    }
+
+    public void setInputStream(InputStream in)
+    {
+        this.inputStream = in;
     }
 }
