@@ -33,9 +33,9 @@ public class SubjectOrganizationHeadParser extends BatchParser {
             throws SAXException {
         if(localName.equals("head")) {
         } else if(localName.equals("names")) {
-            subjectOrganizationHeadNamesParser.parse(xmlReader, batch);
+            subjectOrganizationHeadNamesParser.parse(xmlReader, batch, index);
         } else if(localName.equals("docs")) {
-            subjectOrganizationHeadDocsParser.parse(xmlReader, batch);
+            subjectOrganizationHeadDocsParser.parse(xmlReader, batch, index);
         } else {
             throw new UnknownTagException(localName);
         }

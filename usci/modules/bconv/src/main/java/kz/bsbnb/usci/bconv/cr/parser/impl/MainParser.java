@@ -77,7 +77,7 @@ public class MainParser extends BatchParser {
     }
 
     @Override
-    public void parse(XMLEventReader xmlReader, Batch batch) throws SAXException
+    public void parse(XMLEventReader xmlReader, Batch batch, long index) throws SAXException
     {
         this.xmlReader = xmlReader;
         this.batch = batch;
@@ -111,7 +111,7 @@ public class MainParser extends BatchParser {
     public void parseNextPackage() throws SAXException
     {
         System.out.println("Package #" + index++);
-        packageParser.parse(xmlReader, batch);
+        packageParser.parse(xmlReader, batch, index);
         if (packageParser.hasMore()) {
             currentBaseEntity = packageParser.getCurrentBaseEntity();
             hasMore = true;
@@ -123,12 +123,12 @@ public class MainParser extends BatchParser {
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("batch")) {
         } else if(localName.equals("info")) {
-            infoParser.parse(xmlReader, batch);
+            infoParser.parse(xmlReader, batch, index);
         } else if(localName.equals("packages")) {
             parseNextPackage();
             return true;
         } else if(localName.equals("portfolio_data")) {
-            portfolioDataParser.parse(xmlReader, batch);
+            portfolioDataParser.parse(xmlReader, batch, index);
         } else {
             throw new UnknownTagException(localName);
         }

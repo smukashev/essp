@@ -53,12 +53,12 @@ public class CreditParser extends BatchParser {
         try {
             if(localName.equals("credit")) {
             } else if(localName.equals("contract")) {
-                creditContractParser.parse(xmlReader, batch);
+                creditContractParser.parse(xmlReader, batch, index);
                 BaseEntity creditContract = creditContractParser.getCurrentBaseEntity();
-                currentBaseEntity.put("contract", new BaseValue(batch, 0, creditContract));
+                currentBaseEntity.put("contract", new BaseValue(batch, index, creditContract));
             } else if(localName.equals("currency")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("currency", new BaseValue(batch, 0, event.asCharacters().getData()));
+                currentBaseEntity.put("currency", new BaseValue(batch, index, event.asCharacters().getData()));
             } else if(localName.equals("interest_rate_yearly")) {
                 event = (XMLEvent) xmlReader.next();
                 currentBaseEntity.put("interest_rate_yearly", new BaseValue(batch, 0,
@@ -100,9 +100,9 @@ public class CreditParser extends BatchParser {
                         new Boolean(event.asCharacters().getData())
                 ));
             } else if(localName.equals("creditor_branch")) {
-                creditorBranchParser.parse(xmlReader, batch);
+                creditorBranchParser.parse(xmlReader, batch, index);
                 BaseEntity creditorBranch = creditorBranchParser.getCurrentBaseEntity();
-                currentBaseEntity.put("creditor_branch", new BaseValue(batch, 0, creditorBranch));
+                currentBaseEntity.put("creditor_branch", new BaseValue(batch, index, creditorBranch));
             } else if(localName.equals("portfolio")) {
                 if(!stack.pop().equals("portfolio")) {}
                     //portfolio = new Portfolio();

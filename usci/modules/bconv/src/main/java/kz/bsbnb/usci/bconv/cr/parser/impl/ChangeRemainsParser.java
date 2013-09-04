@@ -42,18 +42,18 @@ public class ChangeRemainsParser extends BatchParser {
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("remains")) {
         } else if(localName.equals("debt")) {
-            changeRemainsDebtParser.parse(xmlReader, batch);
+            changeRemainsDebtParser.parse(xmlReader, batch, index);
         } else if(localName.equals("interest")) {
-            changeRemainsInterestParser.parse(xmlReader, batch);
+            changeRemainsInterestParser.parse(xmlReader, batch, index);
         } else if(localName.equals("discount")) {
-            changeRemainsDiscountParser.parse(xmlReader, batch);
+            changeRemainsDiscountParser.parse(xmlReader, batch, index);
         } else if(localName.equals("correction")) {
-            changeRemainsCorrectionParser.parse(xmlReader, batch);
+            changeRemainsCorrectionParser.parse(xmlReader, batch, index);
         } else if(localName.equals("discounted_value")) {
             //ctRemainsTypeDiscountedValue = new CtRemainsTypeDiscountedValue();
         } else if(localName.equals("value")) {
         } else if(localName.equals("limit")) {
-            changeRemainsLimitParser.parse(xmlReader, batch);
+            changeRemainsLimitParser.parse(xmlReader, batch, index);
         } else {
             throw new UnknownTagException(localName);
         }

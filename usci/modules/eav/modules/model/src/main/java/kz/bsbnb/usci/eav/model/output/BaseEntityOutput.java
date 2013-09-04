@@ -50,7 +50,7 @@ public class BaseEntityOutput
                 }
             }
 
-            str += "\n" + prefix + memberName + ": " + " ( " + valueToString + " )";
+            str += "\n" + prefix + memberName + ": " + value.getIndex() + " : " + " ( " + valueToString + " )";
         }
 
         return str;

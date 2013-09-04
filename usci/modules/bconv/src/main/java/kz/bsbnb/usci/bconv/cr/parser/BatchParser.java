@@ -44,6 +44,8 @@ public abstract class BatchParser {
 
     protected boolean hasMore = false;
 
+    protected long index;
+
     @Autowired
     protected IMetaClassRepository metaClassRepository;
     
@@ -57,11 +59,12 @@ public abstract class BatchParser {
         return c;
     }
 
-    public void parse(XMLEventReader xmlReader, Batch batch) throws SAXException
+    public void parse(XMLEventReader xmlReader, Batch batch, long index) throws SAXException
     {
         this.batch = batch;
         init();
         this.xmlReader = xmlReader;
+        this.index = index;
 
         while(xmlReader.hasNext()) {
             XMLEvent event = (XMLEvent) xmlReader.next();
