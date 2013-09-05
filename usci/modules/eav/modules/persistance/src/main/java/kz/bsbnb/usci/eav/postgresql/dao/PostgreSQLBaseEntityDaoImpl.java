@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.TransactionUsageException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
@@ -306,64 +307,39 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             java.util.Date reportDate = baseEntityForSave.getReportDate();
             java.util.Date maxReportDate = getMaxReportDate(baseEntityForSave.getId(), reportDate);
 
-            IBaseEntity baseEntityLoaded = null;
             if (maxReportDate == null)
             {
+                Set<java.util.Date> availableReportDates =
+                        getAvailableReportDates(baseEntityForSave.getId());
+                availableReportDates.add(reportDate);
 
+                baseEntityForSave.setAvailableReportDates(availableReportDates);
+                return applyWithoutComparison(baseEntityForSave);
             }
             else
             {
-                baseEntityLoaded = ((BaseEntity)beStorageDao
+                IBaseEntity baseEntityLoaded = ((BaseEntity)beStorageDao
                         .getBaseEntity(baseEntityForSave.getId(), maxReportDate, true)).clone();
+                return applyWithComparison(baseEntityForSave, baseEntityLoaded);
             }
+        }
+    }
 
-            baseEntityLoaded.setReportDate(reportDate);
+    private IBaseEntity applyWithoutComparison(final IBaseEntity baseEntity)
+    {
+        boolean maxReportDate = baseEntity.isMaxReportDate();
+        for (String attribute: baseEntity.getIdentifiers())
+        {
+            boolean last = maxReportDate ? true : !presentInFuture(baseEntity, attribute);
 
-            BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
-            // TODO: Remove cast IBaseEntity to BaseEntity
-            if (!comparator.compare((BaseEntity)baseEntityForSave, (BaseEntity)baseEntityLoaded))
+            IMetaType metaType = baseEntity.getMemberType(attribute);
+            IBaseValue baseValueForSave = baseEntity.getBaseValue(attribute);
+            if (baseValueForSave.getValue() == null)
             {
-                long baseEntitySearchedId = search(baseEntityForSave);
-                if (baseEntitySearchedId > 0 && baseEntityLoaded.getId() != baseEntitySearchedId)
-                {
-                    throw new RuntimeException("Found a violation of uniqueness. " +
-                            "The saving process can not be continued.");
-                }
+                baseEntity.remove(attribute);
             }
-
-            baseEntityLoaded.setListening(true);
-
-            Set<String> insertedAttributes = SetUtils.difference(baseEntityForSave.getIdentifiers(),
-                    baseEntityLoaded.getIdentifiers());
-            for (String insertedAttribute: insertedAttributes)
+            else
             {
-                baseEntityLoaded.put(insertedAttribute, baseEntityForSave.getBaseValue(insertedAttribute));
-            }
-
-            Set<String> otherAttributes = SetUtils.difference(baseEntityForSave.getIdentifiers(),
-                    insertedAttributes);
-
-            for (String attribute: otherAttributes)
-            {
-                IMetaType metaType = baseEntityLoaded.getMemberType(attribute);
-                IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
-                IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
-
-                int compare = DateUtils.compareBeginningOfTheDay(baseValueForSave.getRepDate(),
-                        baseValueLoaded.getRepDate());
-                baseValueForSave.setLast(compare == -1 ? false : baseValueLoaded.isLast());
-
-                if (baseValueForSave.getValue() == null)
-                {
-                    if (!baseValueLoaded.isClosed())
-                    {
-                        IBaseValue baseValue = new BaseValue(baseValueForSave.getBatch(), baseValueForSave.getIndex(),
-                                baseValueForSave.getRepDate(), baseValueLoaded.getValue(), true, baseValueForSave.isLast());
-                        baseEntityLoaded.put(attribute, baseValue);
-                    }
-                    continue;
-                }
-
                 if (metaType.isComplex())
                 {
                     if (metaType.isSet())
@@ -374,9 +350,89 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         }
                         else
                         {
-                            IBaseSet baseSet = apply((IBaseSet)baseValueForSave.getValue(),
-                                    (IBaseSet)baseValueLoaded.getValue());
-                            baseValueLoaded.setValue(baseSet);
+                            for (IBaseValue baseValue : ((BaseSet)baseValueForSave.getValue()).get())
+                            {
+                                IBaseEntity baseEntityApplied = apply((BaseEntity)baseValue.getValue());
+                                baseValue.setValue(baseEntityApplied);
+                                baseValue.setLast(last);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        IBaseEntity baseEntityApplied = apply((BaseEntity)baseValueForSave.getValue());
+                        baseValueForSave.setValue(baseEntityApplied);
+                    }
+                }
+
+                baseValueForSave.setLast(last);
+            }
+        }
+
+        return baseEntity;
+    }
+
+    private IBaseEntity applyWithComparison(final IBaseEntity baseEntityForSave, IBaseEntity baseEntityLoaded)
+    {
+        baseEntityLoaded.setReportDate(baseEntityForSave.getReportDate());
+
+        BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
+        // TODO: Remove cast IBaseEntity to BaseEntity
+        if (!comparator.compare((BaseEntity)baseEntityForSave, (BaseEntity)baseEntityLoaded))
+        {
+            long baseEntitySearchedId = search(baseEntityForSave);
+            if (baseEntitySearchedId > 0 && baseEntityLoaded.getId() != baseEntitySearchedId)
+            {
+                throw new RuntimeException("Found a violation of uniqueness. " +
+                        "The saving process can not be continued.");
+            }
+        }
+
+        baseEntityLoaded.setListening(true);
+
+        Set<String> insertedAttributes = SetUtils.difference(baseEntityForSave.getIdentifiers(),
+                baseEntityLoaded.getIdentifiers());
+        for (String attribute : insertedAttributes)
+        {
+            IBaseValue baseValue = ((BaseValue)baseEntityForSave.getBaseValue(attribute)).clone();
+            baseValue.setLast(baseEntityLoaded.isMaxReportDate()? true : !presentInFuture(baseEntityForSave, attribute));
+
+            baseEntityLoaded.put(attribute, baseValue);
+        }
+
+        Set<String> otherAttributes = SetUtils.difference(baseEntityForSave.getIdentifiers(),
+                insertedAttributes);
+
+        for (String attribute: otherAttributes)
+        {
+            IMetaType metaType = baseEntityLoaded.getMemberType(attribute);
+            IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
+            IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
+
+            boolean last = baseEntityLoaded.isMaxReportDate() ? true : baseValueLoaded.isLast();
+
+            if (baseValueForSave.getValue() == null)
+            {
+                IBaseValue baseValue = new BaseValue(baseValueForSave.getBatch(), baseValueForSave.getIndex(),
+                        baseValueForSave.getRepDate(), baseValueLoaded.getValue(), true, last);
+                baseEntityLoaded.put(attribute, baseValue);
+                continue;
+            }
+
+            if (metaType.isComplex())
+            {
+                if (metaType.isSet())
+                {
+                    if (metaType.isSetOfSets())
+                    {
+                        throw new UnsupportedOperationException("Not implemented yet.");
+                    }
+                    else
+                    {
+                        IBaseSet baseSet = apply((IBaseSet)baseValueForSave.getValue(),
+                                (IBaseSet)baseValueLoaded.getValue());
+                        baseValueLoaded.setValue(baseSet);
+                        baseValueLoaded.setValue(last);
 
                             /*List<Long> forSaveIds = new ArrayList<Long>();
                             IBaseSet baseSetForSave = (IBaseSet)baseValueForSave.getValue();
@@ -417,94 +473,52 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
                                 baseValueLoaded.setValue(baseSetCloned);
                             }*/
-                        }
-                    }
-                    else
-                    {
-                        long forSaveId = ((BaseEntity)baseValueForSave.getValue()).getId();
-                        long loadedId = ((BaseEntity)baseValueLoaded.getValue()).getId();
-
-                        if (forSaveId != loadedId)
-                        {
-                            IBaseValue baseValue = ((BaseValue)baseValueForSave).clone();
-                            IBaseEntity baseEntity = apply((BaseEntity)baseValue.getValue());
-                            baseValue.setValue(baseEntity);
-
-                            baseEntityLoaded.put(attribute, baseValue);
-                        }
-                        else
-                        {
-
-                            IBaseEntity baseEntity = apply(((BaseEntity)baseValueForSave.getValue()).clone());
-                            baseValueLoaded.setValue(baseEntity);
-                        }
                     }
                 }
                 else
                 {
-                    if (metaType.isSet())
+                    long forSaveId = ((BaseEntity)baseValueForSave.getValue()).getId();
+                    long loadedId = ((BaseEntity)baseValueLoaded.getValue()).getId();
+
+                    if (forSaveId != loadedId)
                     {
-                        throw new UnsupportedOperationException("Not yet implemented.");
+                        IBaseValue baseValue = ((BaseValue)baseValueForSave).clone();
+                        IBaseEntity baseEntity = apply((BaseEntity)baseValue.getValue());
+                        baseValue.setValue(baseEntity);
+                        baseValue.setLast(last);
+
+                        baseEntityLoaded.put(attribute, baseValue);
                     }
                     else
                     {
-                        if (!baseValueForSave.getValue().equals(baseValueLoaded.getValue()))
-                        {
-                            IBaseValue baseValue = ((BaseValue)baseValueForSave).clone();
-                            baseEntityLoaded.put(attribute, baseValue);
-                        }
+
+                        IBaseEntity baseEntity = apply(((BaseEntity)baseValueForSave.getValue()).clone());
+                        baseValueLoaded.setValue(baseEntity);
                     }
                 }
-            }
-
-            baseEntityLoaded.setListening(false);
-
-            return baseEntityLoaded;
-        }
-    }
-
-    private IBaseEntity applyWithoutComparison(final IBaseEntity baseEntityForSave)
-    {
-        for (String attribute: baseEntityForSave.getIdentifiers())
-        {
-            IMetaType metaType = baseEntityForSave.getMemberType(attribute);
-            IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
-            if (baseValueForSave.getValue() == null)
-            {
-                baseEntityForSave.remove(attribute);
             }
             else
             {
-                if (metaType.isComplex())
+                if (metaType.isSet())
                 {
-                    if (metaType.isSet())
+                    throw new UnsupportedOperationException("Not yet implemented.");
+                }
+                else
+                {
+                    if (!baseValueForSave.getValue().equals(baseValueLoaded.getValue()))
                     {
-                        if (metaType.isSetOfSets())
-                        {
-                            throw new UnsupportedOperationException("Not implemented yet.");
-                        }
-                        else
-                        {
-                            for (IBaseValue baseValue : ((BaseSet)baseValueForSave.getValue()).get())
-                            {
-                                IBaseEntity baseEntityApplied = apply((BaseEntity)baseValue.getValue());
-                                baseValue.setValue(baseEntityApplied);
-                                baseValue.setLast(true);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        IBaseEntity baseEntityApplied = apply((BaseEntity)baseValueForSave.getValue());
-                        baseValueForSave.setValue(baseEntityApplied);
+                        IBaseValue baseValue = ((BaseValue)baseValueForSave).clone();
+                        baseValue.setLast(last);
+
+                        baseEntityLoaded.put(attribute, baseValue);
                     }
                 }
-
-                baseValueForSave.setLast(true);
             }
         }
 
-        return baseEntityForSave;
+        baseEntityLoaded.setListening(false);
+
+        return baseEntityLoaded;
     }
 
     public IBaseSet apply(IBaseSet baseSetForSave, IBaseSet baseSetLoaded)
@@ -590,6 +604,49 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             }
         }
         return baseSetLoaded;
+    }
+
+    private boolean presentInFuture(IBaseEntity baseEntity, String attribute)
+    {
+        boolean presentInFuture = false;
+        IMetaType metaType = baseEntity.getMemberType(attribute);
+        if (metaType.isSet())
+        {
+            // TODO: Write code that implements this situation
+        }
+        else
+        {
+            if (metaType.isComplex())
+            {
+                // TODO: Write code that implements this situation
+            }
+            else
+            {
+                IMetaValue metaValue = (IMetaValue)metaType;
+                switch (metaValue.getTypeCode())
+                {
+                    case INTEGER:
+                        presentInFuture = beIntegerValueDao.presentInFuture(baseEntity, attribute);
+                        break;
+                    case DATE:
+                        presentInFuture = beDateValueDao.presentInFuture(baseEntity, attribute);
+                        break;
+                    case STRING:
+                        presentInFuture = beStringValueDao.presentInFuture(baseEntity, attribute);
+                        break;
+                    case BOOLEAN:
+                        presentInFuture = beBooleanValueDao.presentInFuture(baseEntity, attribute);
+                        break;
+                    case DOUBLE:
+                        presentInFuture = beDoubleValueDao.presentInFuture(baseEntity, attribute);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown data type.");
+                }
+
+            }
+        }
+        return presentInFuture;
     }
 
     @Override
@@ -678,7 +735,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             {
                 if (metaType.isSet())
                 {
-                    throw new UnsupportedOperationException("Not yet implemented.");
+                    //throw new UnsupportedOperationException("Not yet implemented.");
                 }
                 else
                 {
@@ -689,7 +746,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             {
                 if (metaType.isSet())
                 {
-                    throw new UnsupportedOperationException("Not yet implemented.");
+                    //throw new UnsupportedOperationException("Not yet implemented.");
                 }
                 else
                 {

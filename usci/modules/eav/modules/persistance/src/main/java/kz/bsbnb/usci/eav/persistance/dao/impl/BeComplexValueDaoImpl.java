@@ -169,6 +169,11 @@ public class BeComplexValueDaoImpl extends JDBCSupport implements IBeComplexValu
         return baseValueForSave;
     }
 
+    @Override
+    public boolean presentInFuture(IBaseEntity baseEntity, String attribute) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     private int updateByCondition(Map<String, Object> fields,
                                               Map<String, Object> conditions)
     {

@@ -17,6 +17,8 @@ public interface IBeValueDao {
 
     public IBaseValue update(IBaseEntity baseEntityLoaded, IBaseEntity baseEntityForSave, String attribute);
 
+    public boolean presentInFuture(IBaseEntity baseEntity, String attribute);
+
     void remove(IBaseEntity baseEntity, String attribute);
 
 }

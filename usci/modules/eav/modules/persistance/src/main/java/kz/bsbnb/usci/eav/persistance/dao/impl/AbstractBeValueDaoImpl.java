@@ -150,6 +150,13 @@ public abstract class AbstractBeValueDaoImpl extends JDBCSupport implements IBeV
     }
 
     @Override
+    public boolean presentInFuture(IBaseEntity baseEntity, String attribute)
+    {
+        IMetaAttribute metaAttribute = baseEntity.getMetaAttribute(attribute);
+        return presentInFuture(baseEntity.getId(), metaAttribute.getId(), baseEntity.getReportDate());
+    }
+
+    @Override
     public void remove(IBaseEntity baseEntity, String attribute) {
         throw new UnsupportedOperationException("Not yet implemented.");
     }
@@ -159,6 +166,8 @@ public abstract class AbstractBeValueDaoImpl extends JDBCSupport implements IBeV
 
     protected abstract int updateByCondition(Map<String, Object> fields,
                                              Map<String, Object> conditions);
+
+    protected abstract boolean presentInFuture(long entityId, long attributeId, Date reportDate);
 
 }
 

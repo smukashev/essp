@@ -77,6 +77,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
         this.reportDate = newReportDate;
         this.meta = meta;
+        this.availableReportDates.add(newReportDate);
     }
 
     public BaseEntity(long id, MetaClass meta, Date reportDate, Set<Date> availableReportDates)
@@ -117,30 +118,66 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     @Override
     public void setAvailableReportDates(Set<Date> availableReportDates) {
         this.availableReportDates = availableReportDates;
-        this.maxReportDate = Collections.max(availableReportDates);
-        this.minReportDate = Collections.min(availableReportDates);
+        this.maxReportDate = null;
+        this.minReportDate = null;
     }
 
     @Override
     public Date getMaxReportDate()
     {
-        if (availableReportDates.size() != 0)
+        if (maxReportDate == null)
         {
-            maxReportDate = Collections.max(availableReportDates);
-            return maxReportDate;
+            if (availableReportDates.size() != 0)
+            {
+                maxReportDate = Collections.max(availableReportDates);
+            }
         }
-        return null;
+        return maxReportDate;
     }
 
     @Override
     public Date getMinReportDate()
     {
-        if (availableReportDates.size() != 0)
+        if (minReportDate == null)
         {
-            minReportDate = Collections.min(availableReportDates);
-            return minReportDate;
+            if (availableReportDates.size() != 0)
+            {
+                minReportDate = Collections.min(availableReportDates);
+            }
         }
-        return null;
+        return minReportDate;
+    }
+
+    @Override
+    public boolean isMaxReportDate()
+    {
+        if (this.reportDate == null)
+        {
+            throw new IllegalStateException("The report date can not be equal to null.");
+        }
+
+        Date maxReportDate = getMaxReportDate();
+        if (maxReportDate == null)
+        {
+            throw new IllegalStateException("The maximum report date can not be equal to null.");
+        }
+        return DateUtils.compareBeginningOfTheDay(reportDate, maxReportDate) == 0;
+    }
+
+    @Override
+    public boolean isMinReportDate()
+    {
+        if (this.reportDate == null)
+        {
+            throw new IllegalStateException("The report date can not be equal to null.");
+        }
+
+        Date minReportDate = getMinReportDate();
+        if (minReportDate == null)
+        {
+            throw new IllegalStateException("The minimum report date can not be equal to null.");
+        }
+        return DateUtils.compareBeginningOfTheDay(reportDate, minReportDate) == 0;
     }
 
     /**
@@ -411,6 +448,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
         this.reportDate = newReportDate;
         this.availableReportDates.add(newReportDate);
+
+        this.minReportDate = null;
+        this.maxReportDate = null;
     }
 
     @Override

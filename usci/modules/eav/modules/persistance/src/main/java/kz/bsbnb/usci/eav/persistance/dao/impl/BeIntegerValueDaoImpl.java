@@ -137,4 +137,9 @@ public class BeIntegerValueDaoImpl extends AbstractBeValueDaoImpl implements IBe
         return updateWithStats(updateConditionStep.getSQL(), updateConditionStep.getBindValues().toArray());
     }
 
+    @Override
+    public boolean presentInFuture(long entityId, long attributeId, Date reportDate) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 }

@@ -3,12 +3,14 @@ package kz.bsbnb.usci.eav.persistance.dao.impl;
 import kz.bsbnb.usci.eav.persistance.dao.IBeBooleanValueDao;
 import kz.bsbnb.usci.eav.util.DateUtils;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_BOOLEAN_VALUES;
@@ -45,7 +47,7 @@ public class BeBooleanValueDaoImpl extends AbstractBeValueDaoImpl implements IBe
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
-    @SuppressWarnings({"ConstantConditions", "unchecked"})
+    @SuppressWarnings({"constantconditions", "unchecked"})
     @Override
     protected int updateByCondition(Map<String, Object> fields, Map<String, Object> conditions)
     {
@@ -135,6 +137,26 @@ public class BeBooleanValueDaoImpl extends AbstractBeValueDaoImpl implements IBe
 
         logger.debug(updateConditionStep.toString());
         return updateWithStats(updateConditionStep.getSQL(), updateConditionStep.getBindValues().toArray());
+    }
+
+    @SuppressWarnings({"constantconditions", "unchecked"})
+    @Override
+    public boolean presentInFuture(long entityId, long attributeId, Date reportDate) {
+
+        Table table = EAV_BE_BOOLEAN_VALUES.as("v");
+        Select select = context
+                .select(DSL.count().as("values_count"))
+                .from(table)
+                .where(table.field(EAV_BE_BOOLEAN_VALUES.ENTITY_ID).equal(entityId))
+                .and(table.field(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID).equal(attributeId))
+                .and(table.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE).greaterThan(DateUtils.convert(reportDate)));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        long valuesCount = (Long)rows.get(0).get("values_count");
+
+        return valuesCount != 0;
     }
 
 }

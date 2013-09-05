@@ -32,4 +32,9 @@ public interface IBaseEntity extends IBaseContainer {
     public Object getEl(String path);
 
     public IBaseValue safeGetValue(String name);
+
+    public boolean isMaxReportDate();
+
+    public boolean isMinReportDate();
+
 }

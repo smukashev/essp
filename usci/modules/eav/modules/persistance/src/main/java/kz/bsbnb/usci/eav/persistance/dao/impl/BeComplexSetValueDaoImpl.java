@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.persistance.dao.IBeComplexSetValueDao;
 import kz.bsbnb.usci.eav.util.DateUtils;
 import org.jooq.*;
@@ -75,4 +76,8 @@ public class BeComplexSetValueDaoImpl extends AbstractBeSetValueDaoImpl implemen
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
+    @Override
+    public boolean presentInFuture(IBaseEntity baseEntity, String attribute) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }
