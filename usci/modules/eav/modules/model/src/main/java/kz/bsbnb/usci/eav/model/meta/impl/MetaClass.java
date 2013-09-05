@@ -5,13 +5,14 @@ import java.util.*;
 
 import kz.bsbnb.usci.eav.model.base.ContainerTypes;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 
-public class MetaClass extends Persistable implements IMetaType, IMetaContainer
+public class MetaClass extends Persistable implements IMetaType, IMetaClass
 {
 	/**
 	 * Name of the meta. Used as a key value for database search if <code>id</code> is 0

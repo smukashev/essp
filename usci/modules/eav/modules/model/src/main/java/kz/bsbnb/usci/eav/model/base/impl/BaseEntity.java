@@ -195,16 +195,13 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         {
             IMetaType metaType = meta.getMemberType(attribute);
 
-            if(metaType == null)
+            if (metaType == null)
+            {
                 throw new IllegalArgumentException(String.format("Instance of MetaClass with class name {0} " +
                         "does not contain attribute {1}.", meta.getClassName(), attribute));
+            }
 
-            IBaseValue baseValue = values.get(attribute);
-
-            if(baseValue == null)
-                return null;
-
-            return baseValue;
+            return values.get(attribute);
         }
     }
 
@@ -395,7 +392,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      * Names of all attributes that are actually set in entity
      * @return - set of needed attributes
      */
-    public Set<String> getAttributeNames() {
+    public Set<String> getIdentifiers() {
         return values.keySet();
     }
 
@@ -480,7 +477,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     public IBaseValue safeGetValue(String name)
     {
-        if (this.getAttributeNames().contains(name))
+        if (this.getIdentifiers().contains(name))
         {
             return getBaseValue(name);
         }

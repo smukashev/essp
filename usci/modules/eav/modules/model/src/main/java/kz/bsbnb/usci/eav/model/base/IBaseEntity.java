@@ -13,8 +13,6 @@ public interface IBaseEntity extends IBaseContainer {
 
     public IMetaAttribute getMetaAttribute(String attribute);
 
-    public IBaseValue getBaseValue(String attribute);
-
     public Date getReportDate();
 
     public void setReportDate(Date reportDate);
@@ -28,8 +26,6 @@ public interface IBaseEntity extends IBaseContainer {
     public void setAvailableReportDates(Set<Date> availableReportDates);
 
     public MetaClass getMeta();
-
-    public Set<String> getAttributeNames();
 
     public void remove(String attribute);
 
