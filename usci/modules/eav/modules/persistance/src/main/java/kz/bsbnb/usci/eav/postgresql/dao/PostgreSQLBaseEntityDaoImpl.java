@@ -409,12 +409,11 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
             IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
 
-            boolean last = baseEntityLoaded.isMaxReportDate() ? true : baseValueLoaded.isLast();
-
             if (baseValueForSave.getValue() == null)
             {
                 IBaseValue baseValue = new BaseValue(baseValueForSave.getBatch(), baseValueForSave.getIndex(),
-                        baseValueForSave.getRepDate(), baseValueLoaded.getValue(), true, last);
+                        baseValueForSave.getRepDate(), baseValueLoaded.getValue(), true,
+                        baseEntityLoaded.isMaxReportDate() ? true : baseValueLoaded.isLast());
                 baseEntityLoaded.put(attribute, baseValue);
                 continue;
             }
@@ -432,7 +431,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         IBaseSet baseSet = apply((IBaseSet)baseValueForSave.getValue(),
                                 (IBaseSet)baseValueLoaded.getValue());
                         baseValueLoaded.setValue(baseSet);
-                        baseValueLoaded.setValue(last);
 
                             /*List<Long> forSaveIds = new ArrayList<Long>();
                             IBaseSet baseSetForSave = (IBaseSet)baseValueForSave.getValue();
@@ -485,7 +483,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         IBaseValue baseValue = ((BaseValue)baseValueForSave).clone();
                         IBaseEntity baseEntity = apply((BaseEntity)baseValue.getValue());
                         baseValue.setValue(baseEntity);
-                        baseValue.setLast(last);
+                        baseValue.setLast(baseEntityLoaded.isMaxReportDate() ? true : baseValueLoaded.isLast());
 
                         baseEntityLoaded.put(attribute, baseValue);
                     }
@@ -508,7 +506,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     if (!baseValueForSave.getValue().equals(baseValueLoaded.getValue()))
                     {
                         IBaseValue baseValue = ((BaseValue)baseValueForSave).clone();
-                        baseValue.setLast(last);
+                        baseValue.setLast(baseEntityLoaded.isMaxReportDate() ? true : baseValueLoaded.isLast());
 
                         baseEntityLoaded.put(attribute, baseValue);
                     }
