@@ -35,7 +35,7 @@ public abstract class AbstractBeValueDaoImpl extends JDBCSupport implements IBeV
         IMetaAttribute metaAttribute = baseEntity.getMetaAttribute(attribute);
         IBaseValue baseValue = baseEntity.getBaseValue(attribute);
 
-        long baseValueId = save(baseEntity.getId(), baseValue.getBatch().getId(), metaAttribute.getId(), baseValue.getId(),
+        long baseValueId = save(baseEntity.getId(), baseValue.getBatch().getId(), metaAttribute.getId(), baseValue.getIndex(),
                 baseValue.getRepDate(), baseValue.getValue(), baseValue.isClosed(), baseValue.isLast());
         baseValue.setId(baseValueId);
 
