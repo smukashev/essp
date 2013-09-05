@@ -74,15 +74,18 @@ public class CLI
         BaseEntity entity;
         int i = 0;
         while(crParser.hasMore() && (((i++) - offset) < count)) {
-            entity = crParser.getCurrentBaseEntity();
-
             if (i > offset) {
+                entity = crParser.getCurrentBaseEntity();
                 System.out.println(entity);
                 long id = baseEntityDao.process(entity).getId();
                 System.out.println("Saved with id: " + id);
             }
 
-            crParser.parseNextPackage();
+            if (i >= offset) {
+                crParser.parseNextPackage();
+            } else {
+                crParser.skipNextPackage();
+            }
         }
 
     }

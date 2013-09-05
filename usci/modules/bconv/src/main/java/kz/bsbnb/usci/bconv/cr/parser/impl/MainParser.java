@@ -120,6 +120,29 @@ public class MainParser extends BatchParser {
         }
     }
 
+    public void skipNextPackage() throws SAXException
+    {
+        System.out.println("Package #" + index++ + " skipped.");
+
+        while(xmlReader.hasNext()) {
+            XMLEvent event = (XMLEvent) xmlReader.next();
+            currentBaseEntity = null;
+
+            if(event.isEndElement()) {
+                EndElement endElement = event.asEndElement();
+                String localName = endElement.getName().getLocalPart();
+
+                if(localName.equals("packages")) {
+                    hasMore = false;
+                    return;
+                } else if(localName.equals("package")) {
+                    hasMore = true;
+                    return;
+                }
+            }
+        }
+    }
+
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("batch")) {
         } else if(localName.equals("info")) {
