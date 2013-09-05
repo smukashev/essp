@@ -49,11 +49,15 @@ public interface IBaseContainer extends IBaseObject
 
     public boolean isListening();
 
-    public void put(String name, IBaseValue value);
+    public Set<String> getIdentifiers();
+
+    public void put(String identifier, IBaseValue value);
 
     public Collection<IBaseValue> get();
 
-    public IMetaType getMemberType(String name);
+    public IBaseValue getBaseValue(String identifier);
+
+    public IMetaType getMemberType(String identifier);
 
     public void clearModifiedIdentifiers();
 

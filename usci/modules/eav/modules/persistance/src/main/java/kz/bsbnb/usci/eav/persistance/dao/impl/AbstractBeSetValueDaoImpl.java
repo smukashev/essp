@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_SET_VALUES;
@@ -26,10 +28,9 @@ import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_SETS;
 /**
  *
  */
-@Repository
 public abstract class AbstractBeSetValueDaoImpl extends JDBCSupport implements IBeSetValueDao {
 
-    private final Logger logger = LoggerFactory.getLogger(BeSimpleSetValueDaoImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(AbstractBeSetValueDaoImpl.class);
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -41,7 +42,7 @@ public abstract class AbstractBeSetValueDaoImpl extends JDBCSupport implements I
     public static final long INITIAL_LEVEL = 1;
 
     @Override
-    public void save(final IBaseEntity baseEntity, String attribute) {
+    public IBaseValue save(final IBaseEntity baseEntity, String attribute) {
         IMetaAttribute metaAttribute = baseEntity.getMetaAttribute(attribute);
         if (metaAttribute.getId() < 1)
         {
@@ -65,15 +66,18 @@ public abstract class AbstractBeSetValueDaoImpl extends JDBCSupport implements I
         baseValue.setId(baseValueId);
         baseValue.setValue(baseSet);
 
-        //return baseValue;
+        return baseValue;
     }
 
     @Override
-    public void save(final IBaseEntity baseEntity, Set<String> attributes) {
+    public Map<String, IBaseValue> save(final IBaseEntity baseEntity, Set<String> attributes) {
+        Map<String, IBaseValue> values = new HashMap<String, IBaseValue>();
         for (String attribute: attributes)
         {
-            save(baseEntity, attribute);
+            IBaseValue baseValue = save(baseEntity, attribute);
+            values.put(attribute, baseValue);
         }
+        return values;
     }
 
     protected IBaseSet save(IBaseSet baseSet, IMetaSet metaSet, long level)
@@ -105,7 +109,7 @@ public abstract class AbstractBeSetValueDaoImpl extends JDBCSupport implements I
             for (IBaseValue childBaseValue : baseSet.get())
             {
 
-                Object value = null;
+                Object value;
                 if (metaType.isComplex())
                 {
                     IBaseEntity baseEntity = baseEntityDao.saveOrUpdate((IBaseEntity)childBaseValue.getValue());
@@ -150,8 +154,96 @@ public abstract class AbstractBeSetValueDaoImpl extends JDBCSupport implements I
 
 
     @Override
-    public void update(IBaseEntity baseEntityLoaded, IBaseEntity baseEntityForSave, String attribute) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+    public IBaseValue update(IBaseEntity baseEntityLoaded, IBaseEntity baseEntityForSave, String attribute)
+    {
+        IMetaAttribute metaAttribute = baseEntityForSave.getMetaAttribute(attribute);
+        IMetaType metaType = metaAttribute.getMetaType();
+
+        if (metaType.isSetOfSets())
+        {
+            throw new UnsupportedOperationException("Not yet implemented.");
+        }
+
+        IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
+        IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
+
+        if (baseValueLoaded == null)
+        {
+            if (baseValueForSave == null)
+            {
+                logger.warn(String.format("An attempt was made to remove a missing value for the " +
+                        "attribute {0} of BaseEntity instance with identifier {1}.", baseEntityLoaded.getId(), attribute));
+            }
+            else
+            {
+                //TODO: Check this attribute in the future, if exist then isLast = false
+                IBaseSet baseSet = save((IBaseSet)baseValueForSave.getValue(), (IMetaSet)metaType, INITIAL_LEVEL);
+
+                long baseValueId = save(baseEntityForSave.getId(), metaAttribute.getId(), baseSet.getId(),
+                        baseValueForSave.getBatch().getId(), baseValueForSave.getIndex(),
+                        baseValueForSave.getRepDate(), false, true);
+
+                baseValueForSave.setId(baseValueId);
+                baseValueForSave.setValue(baseSet);
+            }
+        }
+        else
+        {
+
+
+            int compare = DateUtils.compareBeginningOfTheDay(baseValueForSave.getRepDate(), baseValueLoaded.getRepDate());
+            switch(compare)
+            {
+                case 1:
+                {
+                    /*long baseValueId = save(baseEntityForSave.getId(), baseValueForSave.getBatch().getId(),
+                            metaAttribute.getId(), baseValueForSave.getIndex(), baseValueForSave.getRepDate(),
+                            baseValueForSave.getValue(), baseValueForSave.isClosed(), baseValueForSave.isLast());
+                    baseValueForSave.setId(baseValueId);
+
+                    if (baseValueLoaded.isLast())
+                    {
+                        Map<String, Object> fields = new HashMap<String, Object>();
+                        fields.put("is_last", false);
+
+                        Map<String, Object> conditions = new HashMap<String, Object>();
+                        conditions.put("id", baseValueLoaded.getId());
+
+                        updateByCondition(dataType, fields, conditions);
+                    }*/
+                    break;
+                }
+                case 0:
+                    /*Map<String, Object> fields = new HashMap<String, Object>();
+                    fields.put("batch_id", baseValueForSave.getBatch().getId());
+                    fields.put("index_", baseValueForSave.getIndex());
+                    fields.put("value", baseValueForSave.getValue());
+                    if (baseValueForSave.isClosed())
+                    {
+                        fields.put("is_closed", true);
+                    }
+
+                    Map<String, Object> conditions = new HashMap<String, Object>();
+                    conditions.put("id", baseValueLoaded.getId());
+
+                    updateByCondition(dataType, fields, conditions);*/
+
+                    break;
+                case -1:
+                {
+                    /*long baseValueId = save(dataType, baseEntityForSave.getId(), baseValueForSave.getBatch().getId(),
+                            metaAttribute.getId(), baseValueForSave.getIndex(),
+                            baseValueForSave.getRepDate(), baseValueForSave.getValue(), baseValueForSave.isClosed(), false);
+                    baseValueForSave.setId(baseValueId);*/
+                    break;
+                }
+                default:
+                    throw new RuntimeException("Method Comparable<T>.compareTo(T o) " +
+                            "can not return a value other than -1, 0, 1.");
+            }
+        }
+
+        return baseValueForSave;
     }
 
     @Override

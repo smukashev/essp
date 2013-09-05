@@ -756,7 +756,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         assertEquals("Incorrect number of attribute values in the updated BaseEntity,",
                 4, entityLoaded.getAttributeCount());
 
-        Set<String> attributeNames = entityLoaded.getAttributeNames();
+        Set<String> attributeNames = entityLoaded.getIdentifiers();
 
         assertFalse("Attribute value designed to remove is not removed.",
                 attributeNames.contains("inner_meta_class_first"));

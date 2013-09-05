@@ -9,6 +9,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.IMetaValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
@@ -48,13 +49,24 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     @Autowired
     IMetaClassRepository metaClassRepository;
     @Autowired
-    IBeSimpleValueDao beSimpleValueDao;
+    IBeStorageDao beStorageDao;
+
+    @Autowired
+    IBeIntegerValueDao beIntegerValueDao;
+    @Autowired
+    IBeDateValueDao beDateValueDao;
+    @Autowired
+    IBeStringValueDao beStringValueDao;
+    @Autowired
+    IBeBooleanValueDao beBooleanValueDao;
+    @Autowired
+    IBeDoubleValueDao beDoubleValueDao;
+
     @Autowired
     IBeComplexValueDao beComplexValueDao;
     @Autowired
     IBeComplexSetValueDao beComplexSetValueDao;
-    @Autowired
-    IBeStorageDao beStorageDao;
+
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -287,46 +299,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     {
         if (baseEntityForSave.getId() < 1 || !baseEntityForSave.getMeta().isSearchable())
         {
-            for (String attribute: baseEntityForSave.getAttributeNames())
-            {
-                IMetaType metaType = baseEntityForSave.getMemberType(attribute);
-                IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
-                if (baseValueForSave.getValue() == null)
-                {
-                    baseEntityForSave.remove(attribute);
-                }
-                else
-                {
-                    if (metaType.isComplex())
-                    {
-                        if (metaType.isSet())
-                        {
-                            if (metaType.isSetOfSets())
-                            {
-                                throw new UnsupportedOperationException("Not implemented yet.");
-                            }
-                            else
-                            {
-                                for (IBaseValue baseValue : ((BaseSet)baseValueForSave.getValue()).get())
-                                {
-                                    IBaseEntity baseEntityApplied = apply((BaseEntity)baseValue.getValue());
-                                    baseValue.setValue(baseEntityApplied);
-                                    baseValue.setLast(true);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            IBaseEntity baseEntityApplied = apply((BaseEntity)baseValueForSave.getValue());
-                            baseValueForSave.setValue(baseEntityApplied);
-                        }
-                    }
-
-                    baseValueForSave.setLast(true);
-                }
-            }
-
-            return baseEntityForSave;
+            return applyWithoutComparison(baseEntityForSave);
         }
         else
         {
@@ -336,9 +309,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             IBaseEntity baseEntityLoaded = null;
             if (maxReportDate == null)
             {
-                java.util.Date minReportDate = getMinReportDate(baseEntityForSave.getId());
-                baseEntityLoaded = ((BaseEntity)beStorageDao
-                        .getBaseEntity(baseEntityForSave.getId(), minReportDate, true)).clone();
+
             }
             else
             {
@@ -362,14 +333,14 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
             baseEntityLoaded.setListening(true);
 
-            Set<String> insertedAttributes = SetUtils.difference(baseEntityForSave.getAttributeNames(),
-                    baseEntityLoaded.getAttributeNames());
+            Set<String> insertedAttributes = SetUtils.difference(baseEntityForSave.getIdentifiers(),
+                    baseEntityLoaded.getIdentifiers());
             for (String insertedAttribute: insertedAttributes)
             {
                 baseEntityLoaded.put(insertedAttribute, baseEntityForSave.getBaseValue(insertedAttribute));
             }
 
-            Set<String> otherAttributes = SetUtils.difference(baseEntityForSave.getAttributeNames(),
+            Set<String> otherAttributes = SetUtils.difference(baseEntityForSave.getIdentifiers(),
                     insertedAttributes);
 
             for (String attribute: otherAttributes)
@@ -403,7 +374,11 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         }
                         else
                         {
-                            List<Long> forSaveIds = new ArrayList<Long>();
+                            IBaseSet baseSet = apply((IBaseSet)baseValueForSave.getValue(),
+                                    (IBaseSet)baseValueLoaded.getValue());
+                            baseValueLoaded.setValue(baseSet);
+
+                            /*List<Long> forSaveIds = new ArrayList<Long>();
                             IBaseSet baseSetForSave = (IBaseSet)baseValueForSave.getValue();
                             for (IBaseValue baseValue : baseSetForSave.get())
                             {
@@ -441,7 +416,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                                 }
 
                                 baseValueLoaded.setValue(baseSetCloned);
-                            }
+                            }*/
                         }
                     }
                     else
@@ -467,10 +442,17 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 }
                 else
                 {
-                    if (!baseValueForSave.getValue().equals(baseValueLoaded.getValue()))
+                    if (metaType.isSet())
                     {
-                        IBaseValue baseValue = ((BaseValue)baseValueForSave).clone();
-                        baseEntityLoaded.put(attribute, baseValue);
+                        throw new UnsupportedOperationException("Not yet implemented.");
+                    }
+                    else
+                    {
+                        if (!baseValueForSave.getValue().equals(baseValueLoaded.getValue()))
+                        {
+                            IBaseValue baseValue = ((BaseValue)baseValueForSave).clone();
+                            baseEntityLoaded.put(attribute, baseValue);
+                        }
                     }
                 }
             }
@@ -481,7 +463,137 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
+    private IBaseEntity applyWithoutComparison(final IBaseEntity baseEntityForSave)
+    {
+        for (String attribute: baseEntityForSave.getIdentifiers())
+        {
+            IMetaType metaType = baseEntityForSave.getMemberType(attribute);
+            IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
+            if (baseValueForSave.getValue() == null)
+            {
+                baseEntityForSave.remove(attribute);
+            }
+            else
+            {
+                if (metaType.isComplex())
+                {
+                    if (metaType.isSet())
+                    {
+                        if (metaType.isSetOfSets())
+                        {
+                            throw new UnsupportedOperationException("Not implemented yet.");
+                        }
+                        else
+                        {
+                            for (IBaseValue baseValue : ((BaseSet)baseValueForSave.getValue()).get())
+                            {
+                                IBaseEntity baseEntityApplied = apply((BaseEntity)baseValue.getValue());
+                                baseValue.setValue(baseEntityApplied);
+                                baseValue.setLast(true);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        IBaseEntity baseEntityApplied = apply((BaseEntity)baseValueForSave.getValue());
+                        baseValueForSave.setValue(baseEntityApplied);
+                    }
+                }
+
+                baseValueForSave.setLast(true);
+            }
+        }
+
+        return baseEntityForSave;
+    }
+
+    public IBaseSet apply(IBaseSet baseSetForSave, IBaseSet baseSetLoaded)
+    {
+        IMetaType metaTypeLoaded = baseSetLoaded.getMemberType();
+        IMetaType metaTypeForSave = baseSetForSave.getMemberType();
+        if (!metaTypeLoaded.equals(metaTypeForSave))
+        {
+            throw new IllegalArgumentException("Applying can not be executed on set with different metadata.");
+        }
+
+        if (metaTypeLoaded.isSet())
+        {
+            throw new UnsupportedOperationException("Not yet implemented.");
+        }
+        else
+        {
+            if (metaTypeLoaded.isComplex())
+            {
+                Set<String> identifiersForSave = new HashSet<String>();
+                Set<String> identifiersLoaded = new HashSet<String>();
+                for (String identifierForSave : baseSetForSave.getIdentifiers())
+                {
+                    boolean find = false;
+
+                    IBaseValue baseValueForSave = baseSetForSave.getBaseValue(identifierForSave);
+                    for (String identifierLoaded : baseSetLoaded.getIdentifiers())
+                    {
+                        IBaseValue baseValueLoaded = baseSetLoaded.getBaseValue(identifierLoaded);
+                        if (identifiersLoaded.contains(identifierLoaded))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            IBaseEntity baseEntityLoaded = (IBaseEntity) baseValueLoaded.getValue();
+                            IBaseEntity baseEntityForSave = (IBaseEntity) baseValueForSave.getValue();
+
+                            long baseEntityLoadedId = baseEntityLoaded.getId();
+                            long baseEntityForSaveId = baseEntityForSave.getId();
+
+                            if (baseEntityLoadedId >= 1 && baseEntityForSaveId >= 1 && baseEntityLoadedId == baseEntityForSaveId)
+                            {
+                                IBaseEntity baseEntity = apply(((BaseEntity)baseValueForSave.getValue()).clone());
+                                baseValueLoaded.setValue(baseEntity);
+
+                                identifiersLoaded.add(identifierLoaded);
+                                break;
+                            }
+                        }
+                    }
+
+                    if (find)
+                    {
+                        identifiersForSave.add(identifierForSave);
+                    }
+                }
+
+                for (String identifier: SetUtils.difference(baseSetLoaded.getIdentifiers(), identifiersLoaded))
+                {
+                    IBaseValue baseValue = baseSetLoaded.getBaseValue(identifier);
+                    baseValue.setClosed(true);
+                    baseValue.setLast(false);
+                }
+
+                for (String identifier: SetUtils.difference(baseSetForSave.getIdentifiers(), identifiersForSave))
+                {
+                    IBaseValue baseValue = ((BaseValue)baseSetForSave.getBaseValue(identifier)).clone();
+                    baseValue.setLast(true);
+
+                    if (metaTypeLoaded.isComplex())
+                    {
+                        IBaseEntity baseEntity = apply((BaseEntity)baseValue.getValue());
+                        baseValue.setValue(baseEntity);
+                    }
+
+                    baseSetLoaded.put(baseValue);
+                }
+            }
+            else
+            {
+                throw new UnsupportedOperationException("Not yet implemented.");
+            }
+        }
+        return baseSetLoaded;
+    }
+
     @Override
+    @Transactional
     public IBaseEntity saveOrUpdate(IBaseEntity baseEntity)
     {
         if (baseEntity.getId() == 0)
@@ -496,6 +608,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     }
 
     @Override
+    @Transactional
     public IBaseEntity process(IBaseEntity baseEntity)
     {
         baseEntity = prepare(baseEntity);
@@ -565,7 +678,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             {
                 if (metaType.isSet())
                 {
-
+                    throw new UnsupportedOperationException("Not yet implemented.");
                 }
                 else
                 {
@@ -576,11 +689,51 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             {
                 if (metaType.isSet())
                 {
-
+                    throw new UnsupportedOperationException("Not yet implemented.");
                 }
                 else
                 {
-                    beSimpleValueDao.update(parentBaseEntityLoaded, parentBaseEntityForSave, childAttribute);
+                    IMetaValue metaValue =  (IMetaValue)metaType;
+                    switch(metaValue.getTypeCode())
+                    {
+                        case INTEGER:
+                        {
+                            IBaseValue baseValue = beIntegerValueDao
+                                    .update(parentBaseEntityLoaded, parentBaseEntityForSave, childAttribute);
+                            baseEntityForSave.put(childAttribute, baseValue);
+                            break;
+                        }
+                        case DATE:
+                        {
+                            IBaseValue baseValue = beDateValueDao
+                                    .update(parentBaseEntityLoaded, parentBaseEntityForSave, childAttribute);
+                            baseEntityForSave.put(childAttribute, baseValue);
+                            break;
+                        }
+                        case STRING:
+                        {
+                            IBaseValue baseValue = beStringValueDao
+                                    .update(parentBaseEntityLoaded, parentBaseEntityForSave, childAttribute);
+                            baseEntityForSave.put(childAttribute, baseValue);
+                            break;
+                        }
+                        case BOOLEAN:
+                        {
+                            IBaseValue baseValue = beBooleanValueDao
+                                    .update(parentBaseEntityLoaded, parentBaseEntityForSave, childAttribute);
+                            baseEntityForSave.put(childAttribute, baseValue);
+                            break;
+                        }
+                        case DOUBLE:
+                        {
+                            IBaseValue baseValue = beDoubleValueDao
+                                    .update(parentBaseEntityLoaded, parentBaseEntityForSave, childAttribute);
+                            baseEntityForSave.put(childAttribute, baseValue);
+                            break;
+                        }
+                        default:
+                            throw new IllegalArgumentException("Unknown data type.");
+                    }
                 }
             }
         }
@@ -618,7 +771,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         long baseEntityId = insertBaseEntity(baseEntity);
         baseEntity.setId(baseEntityId);
 
-        Set<String> attributes = baseEntity.getAttributeNames();
+        Set<String> attributes = baseEntity.getIdentifiers();
 
         Set<String> integerValues = new HashSet<String>();
         Set<String> dateValues = new HashSet<String>();
@@ -628,7 +781,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         Set<String> complexValues = new HashSet<String>();
         Set<String> simpleSets = new HashSet<String>();
         Set<String> complexSets = new HashSet<String>();
-        Set<String> setOfSets = new HashSet<String>();
 
         Iterator<String> it = attributes.iterator();
         while (it.hasNext())
@@ -638,20 +790,13 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             IMetaType metaType = baseEntity.getMemberType(attribute);
             if (metaType.isSet())
             {
-                if (metaType.isSetOfSets())
+                if (metaType.isComplex())
                 {
-                    setOfSets.add(attribute);
+                    complexSets.add(attribute);
                 }
                 else
                 {
-                    if (metaType.isComplex())
-                    {
-                        complexSets.add(attribute);
-                    }
-                    else
-                    {
-                        simpleSets.add(attribute);
-                    }
+                    simpleSets.add(attribute);
                 }
             }
             else
@@ -690,27 +835,47 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         if (integerValues.size() != 0)
         {
-            beSimpleValueDao.save(baseEntity, integerValues, DataTypes.INTEGER);
+            for (String integerValue: integerValues)
+            {
+                IBaseValue baseValue = beIntegerValueDao.save(baseEntity, integerValue);
+                baseEntity.put(integerValue, baseValue);
+            }
         }
 
         if (dateValues.size() != 0)
         {
-            beSimpleValueDao.save(baseEntity, dateValues, DataTypes.DATE);
+            for (String dateValue: dateValues)
+            {
+                IBaseValue baseValue = beDateValueDao.save(baseEntity, dateValue);
+                baseEntity.put(dateValue, baseValue);
+            }
         }
 
         if (stringValues.size() != 0)
         {
-            beSimpleValueDao.save(baseEntity, stringValues, DataTypes.STRING);
+            for (String stringValue : stringValues)
+            {
+                IBaseValue baseValue = beStringValueDao.save(baseEntity, stringValue);
+                baseEntity.put(stringValue, baseValue);
+            }
         }
 
         if (booleanValues.size() != 0)
         {
-            beSimpleValueDao.save(baseEntity, booleanValues, DataTypes.BOOLEAN);
+            for (String booleanValue : booleanValues)
+            {
+                IBaseValue baseValue = beBooleanValueDao.save(baseEntity, booleanValue);
+                baseEntity.put(booleanValue, baseValue);
+            }
         }
 
         if (doubleValues.size() != 0)
         {
-            beSimpleValueDao.save(baseEntity, doubleValues, DataTypes.DOUBLE);
+            for (String doubleValue : doubleValues)
+            {
+                IBaseValue baseValue = beDoubleValueDao.save(baseEntity, doubleValue);
+                baseEntity.put(doubleValue, baseValue);
+            }
         }
 
         if (complexValues.size() != 0)
@@ -728,11 +893,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             beComplexSetValueDao.save(baseEntity, complexSets);
         }
 
-        /*if (setOfSets.size() != 0)
-        {
-            beSetValueDao.save(baseEntity, setOfSets);
-        }*/
-
         insertReportDate(
                 baseEntity.getId(),
                 baseEntity.getReportDate(),
@@ -743,8 +903,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 doubleValues.size(),
                 complexValues.size(),
                 simpleSets.size(),
-                complexSets.size(),
-                setOfSets.size());
+                complexSets.size());
 
         return baseEntity;
     }
@@ -761,7 +920,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             MetaClass metaClass = baseEntity.getMeta();
 
-            Set<String> attributes = baseEntity.getAttributeNames();
+            Set<String> attributes = baseEntity.getIdentifiers();
             Iterator<String> attributeIt = attributes.iterator();
             while (attributeIt.hasNext())
             {
@@ -789,7 +948,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     }
                     else
                     {
-                        beSimpleValueDao.remove(baseEntity, attribute);
+                        //beSimpleValueDao.remove(baseEntity, attribute);
                     }
                 }
             }
@@ -860,8 +1019,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         Select select = context
                 .select(DSL.min(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE).as("min_report_date"))
                 .from(EAV_BE_ENTITY_REPORT_DATES)
-                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId))
-                .limit(1);
+                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -875,8 +1033,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 .select(DSL.max(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE).as("min_report_date"))
                 .from(EAV_BE_ENTITY_REPORT_DATES)
                 .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId))
-                .and(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.lessOrEqual(DateUtils.convert(reportDate)))
-                .limit(1);
+                .and(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.lessOrEqual(DateUtils.convert(reportDate)));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -889,8 +1046,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         Select select = context
                 .select(DSL.max(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE).as("max_report_date"))
                 .from(EAV_BE_ENTITY_REPORT_DATES)
-                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId))
-                .limit(1);
+                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -908,8 +1064,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             long doubleValuesCount,
             long complexValuesCount,
             long simpleSetsCount,
-            long complexSetsCount,
-            long setOfSetsCount)
+            long complexSetsCount)
     {
         Insert insert = context
                 .insertInto(EAV_BE_ENTITY_REPORT_DATES)
@@ -970,7 +1125,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         long complexSetsCount = 0;
         long setOfSetsCount = 0;
 
-        for (String attribute: baseEntity.getAttributeNames())
+        for (String attribute: baseEntity.getIdentifiers())
         {
             IMetaType metaType = baseEntity.getMemberType(attribute);
             if (metaType.isSet())
@@ -1035,7 +1190,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             insertReportDate(baseEntity.getId(), baseEntity.getReportDate(), integerValuesCount, dateValuesCount,
                     stringValuesCount, booleanValuesCount, doubleValuesCount, complexValuesCount, simpleSetsCount,
-                    complexSetsCount, setOfSetsCount);
+                    complexSetsCount);
         }
     }
 
@@ -2116,7 +2271,9 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     .select(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID,
                             EAV_BE_COMPLEX_SET_VALUES.BATCH_ID,
                             EAV_BE_COMPLEX_SET_VALUES.INDEX_,
-                            EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE)
+                            EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE,
+                            EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED,
+                            EAV_BE_COMPLEX_SET_VALUES.IS_LAST)
                     .from(EAV_BE_COMPLEX_SET_VALUES)
                     .where(EAV_BE_COMPLEX_SET_VALUES.SET_ID.equal((long) baseSet.getId()));
 
@@ -2131,8 +2288,14 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID.getName()));
                 IBaseEntity baseEntity = beStorageDao.getBaseEntity(
                         (Long) row.get(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID.getName()), withClosedValues);
-                baseSet.put(new BaseValue(batch, (Long)row.get(EAV_BE_COMPLEX_SET_VALUES.INDEX_.getName()),
-                        (Date) row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()), baseEntity));
+                baseSet.put(
+                        new BaseValue(
+                                batch,
+                                (Long)row.get(EAV_BE_COMPLEX_SET_VALUES.INDEX_.getName()),
+                                (Date)row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()),
+                                baseEntity,
+                                (Boolean)row.get(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED.getName()),
+                                (Boolean)row.get(EAV_BE_COMPLEX_SET_VALUES.IS_LAST.getName())));
             }
         }
     }
