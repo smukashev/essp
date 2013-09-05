@@ -81,7 +81,7 @@ public class CREntityReader<T> extends CommonReader<T> {
 
         try
         {
-            crParser.parse(xmlEventReader, batch);
+            crParser.parse(xmlEventReader, batch, 0);
         } catch (SAXException e)
         {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
