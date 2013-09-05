@@ -422,55 +422,62 @@ public class CLI
 
         Exception lastException = null;
 
-        while (!(line = in.nextLine()).equals("quit")) {
-            StringTokenizer st = new StringTokenizer(line);
-            if (st.hasMoreTokens()) {
-                command = st.nextToken().trim();
+        while(true) {
+            while (!(line = in.nextLine()).equals("quit")) {
+                StringTokenizer st = new StringTokenizer(line);
+                if (st.hasMoreTokens()) {
+                    command = st.nextToken().trim();
 
-                args.clear();
-                while(st.hasMoreTokens()) {
-                    args.add(st.nextToken().trim());
-                }
-            } else {
-                continue;
-            }
-
-            if (command.startsWith("#")) {
-                continue;
-            }
-
-            try {
-                if (command.equals("test")) {
-                    commandTest();
-                } else if (command.equals("clear")) {
-                    storage.clear();
-                } else if (command.equals("init")) {
-                    storage.initialize();
-                } else if (command.equals("tc")) {
-                    storage.tableCounts();
-                } else if (command.equals("le")) {
-                    if (lastException != null) {
-                        lastException.printStackTrace();
-                    } else {
-                        System.out.println("No errors.");
+                    args.clear();
+                    while(st.hasMoreTokens()) {
+                        args.add(st.nextToken().trim());
                     }
-                } else if (command.equals("xsd")) {
-                    commandXSD();
-                } else if (command.equals("crbatch")) {
-                    commandCRBatch();
-                } else if (command.equals("meta")) {
-                    commandMeta();
-                } else if (command.equals("entity")) {
-                    commandEntity();
                 } else {
-                    System.out.println("No such command: " + command);
+                    continue;
                 }
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
-                lastException = e;
-            }
 
-            System.out.print("> ");
+                if (command.startsWith("#")) {
+                    continue;
+                }
+
+                try {
+                    if (command.equals("test")) {
+                        commandTest();
+                    } else if (command.equals("clear")) {
+                        storage.clear();
+                    } else if (command.equals("init")) {
+                        storage.initialize();
+                    } else if (command.equals("tc")) {
+                        storage.tableCounts();
+                    } else if (command.equals("le")) {
+                        if (lastException != null) {
+                            lastException.printStackTrace();
+                        } else {
+                            System.out.println("No errors.");
+                        }
+                    } else if (command.equals("xsd")) {
+                        commandXSD();
+                    } else if (command.equals("crbatch")) {
+                        commandCRBatch();
+                    } else if (command.equals("meta")) {
+                        commandMeta();
+                    } else if (command.equals("entity")) {
+                        commandEntity();
+                    } else {
+                        System.out.println("No such command: " + command);
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error: " + e.getMessage());
+                    lastException = e;
+                }
+
+                System.out.print("> ");
+            }
+            if (inputStream == null) break;
+            else {
+                in = new Scanner(System.in);
+                System.out.println("Done. Awaiting commands from cli.");
+            }
         }
     }
 

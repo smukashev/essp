@@ -196,4 +196,16 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaSet
     public void addArrayKeyFilter(String attributeName, String value) {
         arrayKeyFilter.put(attributeName, value);
     }
+
+    public void recursiveSet(MetaClass subMeta) {
+        if (metaType.isSet()) {
+            ((MetaSet)metaType).recursiveSet(subMeta);
+        } else if (metaType.isComplex()) {
+            if (((MetaClass)metaType).getClassName().equals(subMeta.getClassName())) {
+                metaType = subMeta;
+            } else {
+                ((MetaClass)metaType).recursiveSet(subMeta);
+            }
+        }
+    }
 }

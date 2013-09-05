@@ -15,11 +15,13 @@ meta key name doc1 no
 # Create filter
 meta fkey name person docs doc_type 11
 
-meta show id 38
-meta show id 1
+meta show name ct_package
+
+#meta show id 38
+#meta show id 1
 
 # Load CR batch file 99999 entries beginning from 0
 #crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 99999 0
-crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 2 90
+#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 2 90
 
 quit

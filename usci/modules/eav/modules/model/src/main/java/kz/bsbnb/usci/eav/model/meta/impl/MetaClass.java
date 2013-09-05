@@ -465,4 +465,24 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
     {
         reference = value;
     }
+
+    public void recursiveSet(MetaClass subMeta) {
+        for (String memberName : members.keySet())
+        {
+            IMetaAttribute attribute = members.get(memberName);
+            IMetaType type = attribute.getMetaType();
+
+            if (type.isComplex()) {
+                if (type.isSet()) {
+                    ((MetaSet)type).recursiveSet(subMeta);
+                } else {
+                    if (subMeta.getClassName().equals(((MetaClass)type).getClassName())) {
+                        attribute.setMetaType(subMeta);
+                    } else {
+                        ((MetaClass)type).recursiveSet(subMeta);
+                    }
+                }
+            }
+        }
+    }
 }
