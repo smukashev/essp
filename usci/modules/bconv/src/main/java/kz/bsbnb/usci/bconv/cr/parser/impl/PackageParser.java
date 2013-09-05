@@ -70,9 +70,9 @@ public class PackageParser extends BatchParser {
             } else {
                 throw new UnknownValException(localName, attributes.getValue("operation_type"));
             } */
-            currentBaseEntity.put("operation_type", new BaseValue(batch, 0,
+            currentBaseEntity.put("operation_type", new BaseValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("operation_type")).getValue()));
-            currentBaseEntity.put("no", new BaseValue(batch, 0,
+            currentBaseEntity.put("no", new BaseValue(batch, index,
                     new Double(event.asStartElement().getAttributeByName(new QName("no")).getValue())));
         } else if(localName.equals("primary_contract")) {
             primaryContractParser.parse(xmlReader, batch, index);
@@ -83,7 +83,7 @@ public class PackageParser extends BatchParser {
             //attributes.getValue("credit_type")
             creditParser.parse(xmlReader, batch, index);
             BaseEntity credit = creditParser.getCurrentBaseEntity();
-            credit.put("credit_type", new BaseValue(batch, 0,
+            credit.put("credit_type", new BaseValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("credit_type")).getValue()));
             //System.out.println(credit.toString());
             currentBaseEntity.put("credit", new BaseValue(batch, index, credit));

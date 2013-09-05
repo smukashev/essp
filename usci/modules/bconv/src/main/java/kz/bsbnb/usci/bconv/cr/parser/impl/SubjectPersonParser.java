@@ -60,12 +60,12 @@ public class SubjectPersonParser extends BatchParser {
         if(localName.equals("person")) {
         } else if(localName.equals("country")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("country", new BaseValue(batch, 0,
+            currentBaseEntity.put("country", new BaseValue(batch, index,
                     event.asCharacters().getData()
                 ));
         } else if(localName.equals("offshore")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("offshore", new BaseValue(batch, 0,
+            currentBaseEntity.put("offshore", new BaseValue(batch, index,
                     event.asCharacters().getData()
                 ));
         } else if(localName.equals("bank_relations")) {
@@ -87,16 +87,16 @@ public class SubjectPersonParser extends BatchParser {
             } */
             currentAddress = new BaseEntity(metaClassRepository.getMetaClass("address"), new Date());
 
-            currentAddress.put("type", new BaseValue(batch, 0,
+            currentAddress.put("type", new BaseValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("type")).getValue()));
         } else if(localName.equals("region")) {
             event = (XMLEvent) xmlReader.next();
-            currentAddress.put("region", new BaseValue(batch, 0,
+            currentAddress.put("region", new BaseValue(batch, index,
                     event.asCharacters().getData()
                 ));
         } else if(localName.equals("details")) {
             event = (XMLEvent) xmlReader.next();
-            currentAddress.put("details", new BaseValue(batch, 0,
+            currentAddress.put("details", new BaseValue(batch, index,
                     event.asCharacters().getData()
                 ));
         } else if(localName.equals("contacts")) {
@@ -106,14 +106,14 @@ public class SubjectPersonParser extends BatchParser {
             //ctContact.setContactType(attributes.getValue("contact_type"));
             currentContact = new BaseEntity(metaClassRepository.getMetaClass("contact"), new Date());
 
-            currentContact.put("contact_type", new BaseValue(batch, 0,
+            currentContact.put("contact_type", new BaseValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("contact_type")).getValue()));
 
             BaseSet contactDetails = new BaseSet(new MetaValue(DataTypes.STRING));
 
             event = (XMLEvent) xmlReader.next();
             contactDetails.put(new BaseValue(batch, index, event.asCharacters().getData()));
-            currentContact.put("st_contact_details", new BaseValue(batch, 0,
+            currentContact.put("st_contact_details", new BaseValue(batch, index,
                     contactDetails
                 ));
 
@@ -135,21 +135,21 @@ public class SubjectPersonParser extends BatchParser {
             } */
             currentName = new BaseEntity(metaClassRepository.getMetaClass("name"), new Date());
 
-            currentName.put("lang", new BaseValue(batch, 0,
+            currentName.put("lang", new BaseValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("lang")).getValue()));
         } else if(localName.equals("firstname")) {
             event = (XMLEvent) xmlReader.next();
-            currentName.put("firstname", new BaseValue(batch, 0,
+            currentName.put("firstname", new BaseValue(batch, index,
                     event.asCharacters().getData()
                 ));
         } else if(localName.equals("lastname")) {
             event = (XMLEvent) xmlReader.next();
-            currentName.put("lastname", new BaseValue(batch, 0,
+            currentName.put("lastname", new BaseValue(batch, index,
                     event.asCharacters().getData()
                 ));
         } else if(localName.equals("middlename")) {
             event = (XMLEvent) xmlReader.next();
-            currentName.put("middlename", new BaseValue(batch, 0,
+            currentName.put("middlename", new BaseValue(batch, index,
                     event.asCharacters().getData()
                 ));
         } else if(localName.equals("docs")) {

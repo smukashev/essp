@@ -61,42 +61,42 @@ public class CreditParser extends BatchParser {
                 currentBaseEntity.put("currency", new BaseValue(batch, index, event.asCharacters().getData()));
             } else if(localName.equals("interest_rate_yearly")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("interest_rate_yearly", new BaseValue(batch, 0,
+                currentBaseEntity.put("interest_rate_yearly", new BaseValue(batch, index,
                         new Double(event.asCharacters().getData())
                     ));
             } else if(localName.equals("contract_maturity_date")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("contract_maturity_date", new BaseValue(batch, 0,
+                currentBaseEntity.put("contract_maturity_date", new BaseValue(batch, index,
                         dateFormat.parse(event.asCharacters().getData())
                     ));
             } else if(localName.equals("actual_issue_date")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("actual_issue_date", new BaseValue(batch, 0,
+                currentBaseEntity.put("actual_issue_date", new BaseValue(batch, index,
                         dateFormat.parse(event.asCharacters().getData())
                     ));
             } else if(localName.equals("credit_purpose")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("credit_purpose", new BaseValue(batch, 0,
+                currentBaseEntity.put("credit_purpose", new BaseValue(batch, index,
                         event.asCharacters().getData()
                     ));
             } else if(localName.equals("credit_object")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("credit_object", new BaseValue(batch, 0,
+                currentBaseEntity.put("credit_object", new BaseValue(batch, index,
                         event.asCharacters().getData()
                     ));
             } else if(localName.equals("amount")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("amount", new BaseValue(batch, 0,
+                currentBaseEntity.put("amount", new BaseValue(batch, index,
                         new Double(event.asCharacters().getData())
                     ));
             } else if(localName.equals("finance_source")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("finance_source", new BaseValue(batch, 0,
+                currentBaseEntity.put("finance_source", new BaseValue(batch, index,
                         event.asCharacters().getData()
                     ));
             } else if(localName.equals("has_currency_earn")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("has_currency_earn", new BaseValue(batch, 0,
+                currentBaseEntity.put("has_currency_earn", new BaseValue(batch, index,
                         new Boolean(event.asCharacters().getData())
                 ));
             } else if(localName.equals("creditor_branch")) {

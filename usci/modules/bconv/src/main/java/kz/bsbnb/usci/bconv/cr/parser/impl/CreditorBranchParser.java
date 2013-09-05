@@ -46,7 +46,7 @@ public class CreditorBranchParser extends BatchParser {
             //currentDoc.setDocType(attributes.getValue("doc_type"));
             currentDoc = new BaseEntity(metaClassRepository.getMetaClass("doc"), new Date());
 
-            currentDoc.put("doc_type", new BaseValue(batch, 0,
+            currentDoc.put("doc_type", new BaseValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
         } else if(localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
