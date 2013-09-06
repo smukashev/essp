@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.porltet.entity_portlet;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
