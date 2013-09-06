@@ -3,7 +3,6 @@ package kz.bsbnb.usci.eav.tool.stress;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -12,13 +11,13 @@ import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.tool.generator.random.data.impl.BaseEntityGenerator;
 import kz.bsbnb.usci.eav.tool.generator.random.data.impl.MetaClassGenerator;
+import kz.bsbnb.usci.eav.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.sql.*;
+import java.sql.Timestamp;
 import java.util.*;
-import java.util.Date;
 
 
 public class RandBaseEntityStressExecutor {
@@ -113,13 +112,15 @@ public class RandBaseEntityStressExecutor {
                 stats.put("_BASE_ENTITY_GENERATION", t2);
 
                 t1 = System.nanoTime();
-                long baseEntityId = baseEntityDao.save(baseEntityCreate);
+                // TODO: Fix this block
+                //long baseEntityId = baseEntityDao.save(baseEntityCreate);
                 t2 = (System.nanoTime() - t1) / 1000;
 
                 stats.put("_BASE_ENTITY_SAVE", t2);
 
                 t1 = System.nanoTime();
-                BaseEntity baseEntityLoad = baseEntityDao.load(baseEntityId);
+                // TODO: Fix this block
+                //BaseEntity baseEntityLoad = baseEntityDao.load(baseEntityId);
                 t2 = (System.nanoTime() - t1) / 1000;
 
                 stats.put("_BASE_ENTITY_LOAD", t2);

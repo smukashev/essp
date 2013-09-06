@@ -4,14 +4,8 @@
  */
 package kz.bsbnb.usci.eav.test.model;
 
-import static org.junit.Assert.*;
-
-import java.util.Date;
-import java.util.Set;
-import java.util.TreeSet;
-
+import kz.bsbnb.usci.eav.factory.IMetaFactory;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
@@ -20,13 +14,11 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.factory.IMetaFactory;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.test.GenericTestCase;
 import org.junit.Test;
-
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +26,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -240,7 +239,7 @@ public class BaseEntityTest extends GenericTestCase{
 
 
         //Set<IBaseValue> setBase = new TreeSet<IBaseValue>();
-        assertEquals(5,((Set<IBaseValue>)instance.get()).size());
+        assertEquals(5,instance.get().size());
     }
 
     @Test
@@ -517,4 +516,26 @@ public class BaseEntityTest extends GenericTestCase{
             fail("Gives Boolean with illegal type");
         }
     }*/
+
+    @Test
+    public void testClone() {
+        Set<Date> availableReportDates = new HashSet<Date>() {{
+            // 1 january 2013
+            add(new Date(new Long("1356976800000")));
+            // 1 february 2013
+            add(new Date(new Long("1359655200000")));
+        }};
+
+        BaseEntity baseEntity = new BaseEntity(1, new MetaClass("meta_class"),
+                new Date(new Long("1356976800000")), availableReportDates);
+        BaseEntity baseEntityCloned = baseEntity.clone();
+
+        // 1 march 2013
+        baseEntity.getReportDate().setTime(new Long("1359655200000"));
+        baseEntity.getAvailableReportDates().iterator().next().setTime(new Long("1362074400000"));
+
+        assertFalse(baseEntity.getAvailableReportDates().equals(baseEntityCloned.getAvailableReportDates()));
+        assertFalse(baseEntity.getReportDate().equals(baseEntityCloned.getReportDate()));
+    }
+
 }

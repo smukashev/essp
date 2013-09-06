@@ -2,11 +2,14 @@ package kz.bsbnb.usci.eav.tool.generator.random.data.impl;
 
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.model.meta.impl.*;
-import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.eav.tool.generator.random.data.AbstractDataGenerator;
+import kz.bsbnb.usci.eav.util.SetUtils;
 
 import java.util.*;
 

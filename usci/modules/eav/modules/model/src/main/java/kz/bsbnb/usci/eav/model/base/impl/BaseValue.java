@@ -2,8 +2,8 @@ package kz.bsbnb.usci.eav.model.base.impl;
 
 
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DateUtils;
@@ -42,7 +42,11 @@ public class BaseValue extends Persistable implements IBaseValue
      */
     private Object value;
 
-    private Date repDate;
+    private Date reportDate;
+
+    private boolean last = false;
+
+    private boolean closed = false;
 
     /**
      * Initializes batch value with a batch information, index and value.
@@ -51,11 +55,11 @@ public class BaseValue extends Persistable implements IBaseValue
      * @param value the value. May be is null.
      * @throws IllegalArgumentException if <code>Batch</code> is null or <code>Batch</code> has no id
      */
-    public BaseValue(Batch batch, long index, Date repDate, Object value)
+    public BaseValue(Batch batch, long index, Date reportDate, Object value)
     {
-        if (repDate == null)
+        if (reportDate == null)
             throw new IllegalArgumentException
-                    ("repDate is null. Initialization of the BaseValue ​​is not possible.");
+                    ("reportDate is null. Initialization of the BaseValue ​​is not possible.");
 
         if (batch == null)
             throw new IllegalArgumentException
@@ -69,10 +73,17 @@ public class BaseValue extends Persistable implements IBaseValue
         this.batch = batch;
         this.index = index;
         this.value = value;
-        this.repDate = new Date(DateUtils.cutOffTime(repDate));
+        this.reportDate = new Date(DateUtils.cutOffTime(reportDate));
     }
 
-    public BaseValue(Long id, Batch batch, long index, Date repDate, Object value)
+    public BaseValue(Batch batch, long index, Date reportDate, Object value, boolean closed, boolean last)
+    {
+        this(batch, index, reportDate, value);
+        this.closed = closed;
+        this.last = last;
+    }
+
+    public BaseValue(long id, Batch batch, long index, Date reportDate, Object value)
     {
         super(id);
 
@@ -87,7 +98,15 @@ public class BaseValue extends Persistable implements IBaseValue
         this.batch = batch;
         this.index = index;
         this.value = value;
-        this.repDate = new Date(DateUtils.cutOffTime(repDate));
+        this.reportDate = new Date(DateUtils.cutOffTime(reportDate));
+    }
+
+    public BaseValue(long id, Batch batch, long index, Date reportDate, Object value, boolean closed, boolean last)
+    {
+        this(id, batch, index, reportDate, value);
+        this.closed = closed;
+        this.last = last;
+
     }
 
     public BaseValue(Batch batch, long index, Object value)
@@ -104,7 +123,7 @@ public class BaseValue extends Persistable implements IBaseValue
         this.batch = batch;
         this.index = index;
         this.value = value;
-        this.repDate = batch.getRepDate();
+        this.reportDate = batch.getRepDate();
     }
 
     @Override
@@ -142,6 +161,30 @@ public class BaseValue extends Persistable implements IBaseValue
     }
 
     @Override
+    public void setLast(boolean last)
+    {
+        this.last = last;
+    }
+
+    @Override
+    public boolean isLast()
+    {
+        return last;
+    }
+
+    @Override
+    public void setClosed(boolean closed)
+    {
+        this.closed = closed;
+    }
+
+    @Override
+    public boolean isClosed()
+    {
+        return closed;
+    }
+
+    @Override
     public boolean equals(Object obj)
     {
         if (obj == this)
@@ -158,7 +201,7 @@ public class BaseValue extends Persistable implements IBaseValue
 
             boolean res = index == that.index && batch.equals(that.batch) &&
                     !(value != null ? !value.equals(that.value) : that.value != null) &&
-                    repDate.equals(that.repDate);
+                    reportDate.equals(that.reportDate);
 
             logger.debug("Values: " + this.value + ", " + that.value);
             logger.debug("BaseValue Equals main expression: " + res);
@@ -166,7 +209,7 @@ public class BaseValue extends Persistable implements IBaseValue
             logger.debug("batch.equals(that.batch): " + (batch.equals(that.batch)));
             logger.debug("!(value != null ? !value.equals(that.value) : that.value != null): " +
                     !(value != null ? !value.equals(that.value) : that.value != null));
-            logger.debug("repDate.equals(that.repDate): " + (repDate.equals(that.repDate)));
+            logger.debug("reportDate.equals(that.reportDate): " + (reportDate.equals(that.reportDate)));
 
             return res;
 
@@ -175,12 +218,12 @@ public class BaseValue extends Persistable implements IBaseValue
 
     public Date getRepDate()
     {
-        return repDate;
+        return reportDate;
     }
 
     public void setRepDate(Date repDate)
     {
-        this.repDate = repDate;
+        this.reportDate = repDate;
     }
 
     @Override
@@ -190,7 +233,7 @@ public class BaseValue extends Persistable implements IBaseValue
         result = 31 * result + (int) (index ^ (index >>> 32));
         result = 31 * result + batch.hashCode();
         result = 31 * result + (value != null ? value.hashCode() : 0);
-        result = 31 * result + repDate.hashCode();
+        result = 31 * result + reportDate.hashCode();
         return result;
     }
 
@@ -222,5 +265,33 @@ public class BaseValue extends Persistable implements IBaseValue
         }
 
         return false;
+    }
+
+    @Override
+    public BaseValue clone()
+    {
+        BaseValue baseValue = null;
+        try
+        {
+            baseValue = (BaseValue)super.clone();
+            baseValue.setRepDate((Date)reportDate.clone());
+
+            if (value != null)
+            {
+                if (value instanceof BaseEntity)
+                {
+                    baseValue.setValue(((BaseEntity)value).clone());
+                }
+                if (value instanceof java.util.Date)
+                {
+                    baseValue.setValue(((java.util.Date)value).clone());
+                }
+            }
+        }
+        catch(CloneNotSupportedException ex)
+        {
+            throw new RuntimeException("BaseValue class does not implement interface Cloneable.");
+        }
+        return baseValue;
     }
 }

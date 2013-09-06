@@ -2,13 +2,13 @@ package kz.bsbnb.usci.eav.test.comporator;
 
 import junit.framework.Assert;
 import kz.bsbnb.usci.eav.comparator.IBaseEntityComparator;
+import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;

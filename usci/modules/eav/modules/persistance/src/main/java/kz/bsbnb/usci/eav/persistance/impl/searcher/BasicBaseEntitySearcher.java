@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.impl.searcher;
 
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
@@ -12,11 +13,8 @@ import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DateUtils;
-import org.jooq.Condition;
-import org.jooq.SelectConditionStep;
-import org.jooq.SelectJoinStep;
-import org.jooq.impl.Executor;
-import org.jooq.impl.Factory;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +38,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
-    private Executor sqlGenerator;
+    private DSLContext context;
 
     @Override
     public String getClassName() {
@@ -61,13 +59,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         }
     }
 
-    private SelectConditionStep generateSQL(BaseEntity entity, String entityName)
+    public SelectConditionStep generateSQL(IBaseEntity entity, String entityName)
     {
         MetaClass meta = entity.getMeta();
 
         String the_name = (entityName == null ? "root" : "e_" + entityName);
 
-        SelectJoinStep joins = sqlGenerator.select(EAV_BE_ENTITIES.as(the_name).ID).from(EAV_BE_ENTITIES.as(the_name));
+        SelectJoinStep joins = context.select(EAV_BE_ENTITIES.as(the_name).ID).from(EAV_BE_ENTITIES.as(the_name));
 
         if (meta == null)
         {
@@ -94,7 +92,8 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
             if(value == null)
             {
-                throw new IllegalArgumentException("Key attribute " + name + " can't be null");
+                //throw new IllegalArgumentException("Key attribute " + name + " can't be null");
+                logger.warn("Key is null! So Skipped.");
             }
 
             if (!type.isSet())
@@ -153,12 +152,16 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                             on(EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_ENTITY_SIMPLE_SETS.as(name).ENTITY_ID).
                                     and(EAV_BE_ENTITY_SIMPLE_SETS.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
                 }
-                /*else
+                else
                 {
-                    joins = joins.leftOuterJoin(EAV_BE_COMPLEX_VALUES.as(name)).
-                            on(EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_ID).
-                                    and(EAV_BE_COMPLEX_VALUES.as(name).ATTRIBUTE_ID.equal(attribute.getId())));
-                }*/
+                    joins = joins.join(EAV_BE_ENTITY_COMPLEX_SETS.as("s_" + name)).
+                            on(EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as("s_" + name).ENTITY_ID).
+                                    and(EAV_BE_ENTITY_COMPLEX_SETS.as("s_" + name).ATTRIBUTE_ID.equal(attribute.getId())))
+                            .join(EAV_BE_COMPLEX_SET_VALUES.as(name)).on(
+                                    EAV_BE_ENTITY_COMPLEX_SETS.as("s_" + name).SET_ID.
+                                            equal(EAV_BE_COMPLEX_SET_VALUES.as(name).SET_ID)
+                            );
+                }
             }
         }
 
@@ -285,7 +288,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
                     if (condition == null)
                     {
-                        condition = Factory.exists(innerSQL);
+                        condition = DSL.exists(innerSQL);
                     }
                     else
                     {
@@ -313,7 +316,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                             {
                                 Boolean actualBooleanValue = (Boolean)actSetElementValue.getValue();
 
-                                SelectConditionStep innerSQL = sqlGenerator.select(
+                                SelectConditionStep innerSQL = context.select(
                                         EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID
                                 ).from(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values"))
                                         .where(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").SET_ID.equal(
@@ -333,13 +336,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                             {
                                 if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                 {
-                                    condition = sqlGenerator.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
+                                    condition = context.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
                                         count()).from(outerBooleanSQL).asField(name + "_values_c").eq(actual_set_value.get().
                                         size());
                                 }
                                 else
                                 {
-                                    condition = sqlGenerator.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
+                                    condition = context.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
                                             count()).from(outerBooleanSQL).asField(name + "_values_c").ge(0);
                                 }
                             }
@@ -349,13 +352,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                 {
                                     if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                     {
-                                        condition = condition.and(sqlGenerator.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.and(context.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerBooleanSQL).asField(name + "_values_c").eq(actual_set_value.get().
                                                 size()));
                                     }
                                     else
                                     {
-                                        condition = condition.and(sqlGenerator.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.and(context.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerBooleanSQL).asField(name + "_values_c").ge(0));
                                     }
                                 }
@@ -363,13 +366,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                 {
                                     if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                     {
-                                        condition = condition.or(sqlGenerator.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.or(context.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerBooleanSQL).asField(name + "_values_c").eq(actual_set_value.get().
                                                 size()));
                                     }
                                     else
                                     {
-                                        condition = condition.or(sqlGenerator.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.or(context.select(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerBooleanSQL).asField(name + "_values_c").ge(0));
                                     }
                                 }
@@ -385,7 +388,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                 java.sql.Date actualDateValue = DateUtils.convert((java.util.Date)actDateElementValue.
                                         getValue());
 
-                                SelectConditionStep innerSQL = sqlGenerator.select(
+                                SelectConditionStep innerSQL = context.select(
                                         EAV_BE_DATE_SET_VALUES.as(name + "_values").ID
                                 ).from(EAV_BE_DATE_SET_VALUES.as(name + "_values"))
                                         .where(EAV_BE_DATE_SET_VALUES.as(name + "_values").SET_ID.equal(
@@ -405,13 +408,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                             {
                                 if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                 {
-                                    condition = sqlGenerator.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
+                                    condition = context.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
                                             count()).from(outerDateSQL).asField(name + "_values_c").eq(actual_date_value.get().
                                             size());
                                 }
                                 else
                                 {
-                                    condition = sqlGenerator.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
+                                    condition = context.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
                                             count()).from(outerDateSQL).asField(name + "_values_c").ge(0);
                                 }
                             }
@@ -421,13 +424,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                 {
                                     if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                     {
-                                        condition = condition.and(sqlGenerator.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.and(context.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerDateSQL).asField(name + "_values_c").eq(actual_date_value.get().
                                                 size()));
                                     }
                                     else
                                     {
-                                        condition = condition.and(sqlGenerator.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.and(context.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerDateSQL).asField(name + "_values_c").ge(0));
                                     }
                                 }
@@ -435,13 +438,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                 {
                                     if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                     {
-                                        condition = condition.or(sqlGenerator.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.or(context.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerDateSQL).asField(name + "_values_c").eq(actual_date_value.get().
                                                 size()));
                                     }
                                     else
                                     {
-                                        condition = condition.or(sqlGenerator.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.or(context.select(EAV_BE_DATE_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerDateSQL).asField(name + "_values_c").ge(0));
                                     }
                                 }
@@ -458,7 +461,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                 Double actualDoubleValue =(Double)actDoubleElementValue.
                                         getValue();
 
-                                SelectConditionStep innerSQL = sqlGenerator.select(
+                                SelectConditionStep innerSQL = context.select(
                                         EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID
                                 ).from(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values"))
                                         .where(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").SET_ID.equal(
@@ -478,13 +481,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                             {
                                 if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                 {
-                                    condition = sqlGenerator.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
+                                    condition = context.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
                                             count()).from(outerDoubleSQL).asField(name + "_values_c").eq(actual_double_value.get().
                                             size());
                                 }
                                 else
                                 {
-                                    condition = sqlGenerator.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
+                                    condition = context.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
                                             count()).from(outerDoubleSQL).asField(name + "_values_c").ge(0);
                                 }
                             }
@@ -494,13 +497,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                 {
                                     if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                     {
-                                        condition = condition.and(sqlGenerator.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.and(context.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerDoubleSQL).asField(name + "_values_c").eq(actual_double_value.get().
                                                 size()));
                                     }
                                     else
                                     {
-                                        condition = condition.and(sqlGenerator.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.and(context.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerDoubleSQL).asField(name + "_values_c").ge(0));
                                     }
                                 }
@@ -508,13 +511,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                 {
                                     if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                     {
-                                        condition = condition.or(sqlGenerator.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.or(context.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerDoubleSQL).asField(name + "_values_c").eq(actual_double_value.get().
                                                 size()));
                                     }
                                     else
                                     {
-                                        condition = condition.or(sqlGenerator.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.or(context.select(EAV_BE_DOUBLE_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerDoubleSQL).asField(name + "_values_c").ge(0));
                                     }
                                 }
@@ -531,7 +534,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                 Long actualIntegerValue = ((Integer)actIntegerElementValue.
                                         getValue()).longValue();
 
-                                SelectConditionStep innerSQL = sqlGenerator.select(
+                                SelectConditionStep innerSQL = context.select(
                                         EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID
                                 ).from(EAV_BE_INTEGER_SET_VALUES.as(name + "_values"))
                                         .where(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").SET_ID.equal(
@@ -551,13 +554,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                             {
                                 if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                 {
-                                    condition = sqlGenerator.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
+                                    condition = context.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
                                             count()).from(outerIntegerSQL).asField(name + "_values_c").eq(actual_integer_value.get().
                                             size());
                                 }
                                 else
                                 {
-                                    condition = sqlGenerator.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
+                                    condition = context.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
                                             count()).from(outerIntegerSQL).asField(name + "_values_c").ge(0);
                                 }
                             }
@@ -567,13 +570,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                 {
                                     if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                     {
-                                        condition = condition.and(sqlGenerator.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.and(context.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerIntegerSQL).asField(name + "_values_c").eq(actual_integer_value.get().
                                                 size()));
                                     }
                                     else
                                     {
-                                        condition = condition.and(sqlGenerator.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.and(context.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerIntegerSQL).asField(name + "_values_c").ge(0));
                                     }
                                 }
@@ -581,13 +584,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                 {
                                     if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                     {
-                                        condition = condition.or(sqlGenerator.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.or(context.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerIntegerSQL).asField(name + "_values_c").eq(actual_integer_value.get().
                                                 size()));
                                     }
                                     else
                                     {
-                                        condition = condition.or(sqlGenerator.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.or(context.select(EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerIntegerSQL).asField(name + "_values_c").ge(0));
                                     }
                                 }
@@ -604,7 +607,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                 String actualStringValue = (String)actStringElementValue.
                                         getValue();
 
-                                SelectConditionStep innerSQL = sqlGenerator.select(
+                                SelectConditionStep innerSQL = context.select(
                                         EAV_BE_STRING_SET_VALUES.as(name + "_values").ID
                                 ).from(EAV_BE_STRING_SET_VALUES.as(name + "_values"))
                                         .where(EAV_BE_STRING_SET_VALUES.as(name + "_values").SET_ID.equal(
@@ -624,13 +627,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                             {
                                 if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                 {
-                                    condition = sqlGenerator.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
+                                    condition = context.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
                                             count()).from(outerStringSQL).asField(name + "_values_c").eq(actual_string_value.get().
                                             size());
                                 }
                                 else
                                 {
-                                    condition = sqlGenerator.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
+                                    condition = context.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
                                             count()).from(outerStringSQL).asField(name + "_values_c").ge(0);
                                 }
                             }
@@ -640,13 +643,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                 {
                                     if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                     {
-                                        condition = condition.and(sqlGenerator.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.and(context.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerStringSQL).asField(name + "_values_c").eq(actual_string_value.get().
                                                 size()));
                                     }
                                     else
                                     {
-                                        condition = condition.and(sqlGenerator.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.and(context.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerStringSQL).asField(name + "_values_c").ge(0));
                                     }
                                 }
@@ -654,13 +657,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                                 {
                                     if (simple_value.getArrayKeyType() == ComplexKeyTypes.ALL)
                                     {
-                                        condition = condition.or(sqlGenerator.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.or(context.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerStringSQL).asField(name + "_values_c").eq(actual_string_value.get().
                                                 size()));
                                     }
                                     else
                                     {
-                                        condition = condition.or(sqlGenerator.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
+                                        condition = condition.or(context.select(EAV_BE_STRING_SET_VALUES.as(name + "_values").ID.
                                                 count()).from(outerStringSQL).asField(name + "_values_c").ge(0));
                                     }
                                 }
@@ -692,21 +695,23 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                         }
                     }
 
-                    MetaClass simple_value = (MetaClass)type;
+                    MetaClass simple_value = (MetaClass)(((MetaSet)type).getMemberType());
 
+                    Table<Record> nested = outerComplexSQL.asTable(name + "_values");
 
                     if (condition == null)
                     {
                         if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
                         {
-                            condition = sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
-                                    count()).from(outerComplexSQL).asField(name + "_values_c").eq(actual_set_value.get().
-                                    size());
+                            condition = DSL.val(actual_set_value.get().size()).eq(
+                                    context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
+                                    count()).from(nested));
                         }
                         else
                         {
-                            condition = sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
-                                    count()).from(outerComplexSQL).asField(name + "_values_c").ge(0);
+                            condition = DSL.val(actual_set_value.get().size()).le(
+                                    context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
+                                            count()).from(nested));
                         }
                     }
                     else
@@ -715,32 +720,34 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                         {
                             if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
                             {
-                                condition = condition.and(sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
-                                        count()).from(outerComplexSQL).asField(name + "_values_c").eq(actual_set_value.get().
-                                        size()));
+                                condition = condition.and(DSL.val(actual_set_value.get().size()).eq(
+                                        context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
+                                                count()).from(nested)));
                             }
                             else
                             {
-                                condition = condition.and(sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
-                                        count()).from(outerComplexSQL).asField(name + "_values_c").ge(0));
+                                condition = condition.and(DSL.val(actual_set_value.get().size()).le(
+                                        context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
+                                                count()).from(nested)));
                             }
                         }
                         else
                         {
                             if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
                             {
-                                condition = condition.or(sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
-                                        count()).from(outerComplexSQL).asField(name + "_values_c").eq(actual_set_value.get().
-                                        size()));
+                                condition = condition.or(DSL.val(actual_set_value.get().size()).eq(
+                                        context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
+                                                count()).from(nested)));
                             }
                             else
                             {
-                                condition = condition.or(sqlGenerator.select(EAV_BE_COMPLEX_SET_VALUES.as(name + "_values").ID.
-                                        count()).from(outerComplexSQL).asField(name + "_values_c").ge(0));
+                                condition = condition.or(DSL.val(actual_set_value.get().size()).le(
+                                        context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
+                                                count()).from(nested)));
                             }
                         }
                     }
-                    break;
+                    //break;
                 }
             }
         }

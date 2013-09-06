@@ -14,13 +14,11 @@ import kz.bsbnb.usci.eav.tool.generator.nonrandom.data.BaseEntityGenerator;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.data.MetaClassGenerator;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.helper.TreeGenerator;
 import kz.bsbnb.usci.eav.util.SetUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -129,13 +127,15 @@ public class NonRandBaseEntityStressExecutor {
                 stats.put("_BASE_ENTITY_GENERATION", t2);
 
                 t1 = System.nanoTime();
-                long baseEntityId = baseEntityDao.save(baseEntityCreate);
+                // TODO: Fix this block
+                //long baseEntityId = baseEntityDao.save(baseEntityCreate);
                 t2 = (System.nanoTime() - t1) / 1000000;
 
                 stats.put("_BASE_ENTITY_SAVE", t2);
 
                 t1 = System.nanoTime();
-                BaseEntity baseEntityLoad = baseEntityDao.load(baseEntityId);
+                // TODO: Fix this block
+                //BaseEntity baseEntityLoad = baseEntityDao.load(baseEntityId);
                 t2 = (System.nanoTime() - t1) / 1000000;
 
                 stats.put("_BASE_ENTITY_LOAD", t2);

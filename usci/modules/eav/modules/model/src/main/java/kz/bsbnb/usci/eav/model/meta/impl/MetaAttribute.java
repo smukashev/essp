@@ -84,4 +84,52 @@ public class MetaAttribute extends Persistable implements IMetaAttribute
     {
         this.metaType = metaType;
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        MetaAttribute that = (MetaAttribute) o;
+
+        if (isKey != that.isKey) return false;
+        if (isNullable != that.isNullable) return false;
+        //if (!metaType.equals(that.metaType)) return false;
+
+        if (metaType.isSet() && metaType.isComplex()) {
+            MetaSet thisSet = (MetaSet)metaType;
+            MetaSet thatSet = (MetaSet)(that.getMetaType());
+
+            boolean eqSet = true;
+
+            if (thisSet.getArrayKeyFilter().size() != thatSet.getArrayKeyFilter().size()) {
+                eqSet = false;
+            } else {
+                for (String attrName : thisSet.getArrayKeyFilter().keySet()) {
+                    String value = thatSet.getArrayKeyFilter().get(attrName);
+
+                    if (value == null || !value.equals(thisSet.getArrayKeyFilter().get(attrName))) {
+                        eqSet = false;
+                        break;
+                    }
+                }
+            }
+
+            return eqSet;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + metaType.hashCode();
+        result = 31 * result + (isKey ? 1 : 0);
+        result = 31 * result + (isNullable ? 1 : 0);
+        return result;
+    }
 }

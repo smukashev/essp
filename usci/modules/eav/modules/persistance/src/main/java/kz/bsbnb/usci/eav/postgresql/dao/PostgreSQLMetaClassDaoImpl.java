@@ -13,11 +13,7 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.SetUtils;
-import org.jooq.DeleteConditionStep;
-import org.jooq.InsertOnDuplicateStep;
-import org.jooq.SelectForUpdateStep;
-import org.jooq.UpdateConditionStep;
-import org.jooq.impl.Executor;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +22,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
@@ -42,14 +35,14 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
-    private Executor sqlGenerator;
+    private DSLContext context;
 
     private void loadAllClasses(List<MetaClass> metaClassList){
         SelectForUpdateStep select;
 
 
 
-                select = sqlGenerator.select(
+                select = context.select(
                         EAV_M_CLASSES.IS_DISABLED,
                         EAV_M_CLASSES.BEGIN_DATE,
                         EAV_M_CLASSES.ID,
@@ -103,7 +96,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             if(beginDateStrict)
             {
-                select = sqlGenerator.select(
+                select = context.select(
                         EAV_M_CLASSES.IS_DISABLED,
                         EAV_M_CLASSES.BEGIN_DATE,
                         EAV_M_CLASSES.ID,
@@ -122,7 +115,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             }
             else
             {
-                select = sqlGenerator.select(
+                select = context.select(
                         EAV_M_CLASSES.IS_DISABLED,
                         EAV_M_CLASSES.BEGIN_DATE,
                         EAV_M_CLASSES.ID,
@@ -143,7 +136,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
         else
         {
-            select = sqlGenerator.select(
+            select = context.select(
                     EAV_M_CLASSES.IS_DISABLED,
                     EAV_M_CLASSES.BEGIN_DATE,
                     EAV_M_CLASSES.ID,
@@ -187,7 +180,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     {
         try
         {
-            InsertOnDuplicateStep insert = sqlGenerator.insertInto(
+            InsertOnDuplicateStep insert = context.insertInto(
                     EAV_M_CLASSES,
                     EAV_M_CLASSES.NAME,
                     EAV_M_CLASSES.COMPLEX_KEY_TYPE,
@@ -229,7 +222,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             throw new IllegalArgumentException("MetaClass must have id to be updated");
         }
 
-        UpdateConditionStep update = sqlGenerator.update(EAV_M_CLASSES
+        UpdateConditionStep update = context.update(EAV_M_CLASSES
             ).set(EAV_M_CLASSES.NAME, metaClass.getClassName()
             ).set(EAV_M_CLASSES.COMPLEX_KEY_TYPE, metaClass.getComplexKeyType().toString()
             ).set(EAV_M_CLASSES.BEGIN_DATE, metaClass.getBeginDate()
@@ -266,7 +259,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         if(metaSet.getMemberType().isSet())
         {
-            insert = sqlGenerator.insertInto(
+            insert = context.insertInto(
                     EAV_M_SET_OF_SETS,
                     EAV_M_SET_OF_SETS.CONTAINING_ID,
                     EAV_M_SET_OF_SETS.CONTAINER_TYPE,
@@ -305,7 +298,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             {
                 long innerId = save((MetaClass)metaSet.getMemberType());
 
-                insert = sqlGenerator.insertInto(
+                insert = context.insertInto(
                         EAV_M_COMPLEX_SET,
                         EAV_M_COMPLEX_SET.CONTAINING_ID,
                         EAV_M_COMPLEX_SET.CONTAINER_TYPE,
@@ -322,7 +315,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             }
             else
             {
-                insert = sqlGenerator.insertInto(
+                insert = context.insertInto(
                         EAV_M_SIMPLE_SET,
                         EAV_M_SIMPLE_SET.CONTAINING_ID,
                         EAV_M_SIMPLE_SET.CONTAINER_TYPE,
@@ -356,6 +349,51 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             }
         }
 
+        if (metaSet.isComplex()) {
+            HashMap<String, String> keyFilter = metaSet.getArrayKeyFilter();
+
+            DeleteConditionStep deleteFilter =
+                    context.delete(EAV_M_SET_KEY_FILTER).where(EAV_M_SET_KEY_FILTER.SET_ID.eq(id));
+
+            long t = 0;
+            if(sqlStats != null)
+            {
+                t = System.nanoTime();
+            }
+
+            jdbcTemplate.update(deleteFilter.getSQL(), deleteFilter.getBindValues().toArray());
+
+            if(sqlStats != null)
+            {
+                sqlStats.put(deleteFilter.getSQL(), (System.nanoTime() - t) / 1000000);
+            }
+
+            for (String attrName : keyFilter.keySet()) {
+                InsertOnDuplicateStep insertFilter = context.
+                        insertInto(EAV_M_SET_KEY_FILTER,
+                                EAV_M_SET_KEY_FILTER.SET_ID,
+                                EAV_M_SET_KEY_FILTER.ATTR_NAME,
+                                EAV_M_SET_KEY_FILTER.VALUE).values(
+                                    id,
+                                    attrName,
+                                    keyFilter.get(attrName)
+                                );
+
+                t = 0;
+                if(sqlStats != null)
+                {
+                    t = System.nanoTime();
+                }
+
+                id = insertWithId(insertFilter.getSQL(), insertFilter.getBindValues().toArray());
+
+                if(sqlStats != null)
+                {
+                    sqlStats.put(insertFilter.getSQL(), (System.nanoTime() - t) / 1000000);
+                }
+            }
+        }
+
         return id;
     }
 
@@ -374,7 +412,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             long innerId = save((MetaClass)type);
 
-            insert = sqlGenerator.insertInto(
+            insert = context.insertInto(
                     EAV_M_COMPLEX_ATTRIBUTES,
                     EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID,
                     EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE,
@@ -387,7 +425,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
         else
         {
-            insert = sqlGenerator.insertInto(
+            insert = context.insertInto(
                     EAV_M_SIMPLE_ATTRIBUTES,
                     EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID,
                     EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE,
@@ -441,6 +479,120 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
     }
 
+    private void updateAttributes(Set<String> updateNames, MetaClass meta, MetaClass dbMeta)
+    {
+        if(dbMeta.getId() < 1)
+        {
+            throw new IllegalArgumentException("MetaClass must have an id filled before attributes update in DB");
+        }
+
+        UpdateConditionStep update;
+
+        for(String typeName : updateNames)
+        {
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(typeName);
+
+            if (meta.getMemberType(typeName).isSet()) {
+                if(meta.getMemberType(typeName).isComplex())
+                {
+                    update = context.update(EAV_M_COMPLEX_SET
+                    ).set(EAV_M_COMPLEX_SET.IS_KEY, metaAttribute.isKey()
+                    ).set(EAV_M_COMPLEX_SET.IS_NULLABLE, metaAttribute.isNullable()
+                    ).where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(dbMeta.getId())
+                    ).and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_M_COMPLEX_SET.NAME.eq(typeName));
+
+                    MetaSet metaSet = (MetaSet)meta.getMemberType(typeName);
+                    long id = ((MetaSet)dbMeta.getMemberType(typeName)).getId();
+
+                    HashMap<String, String> keyFilter = metaSet.getArrayKeyFilter();
+
+                    DeleteConditionStep deleteFilter =
+                            context.delete(EAV_M_SET_KEY_FILTER).where(EAV_M_SET_KEY_FILTER.SET_ID.eq(id));
+
+                    long t = 0;
+                    if(sqlStats != null)
+                    {
+                        t = System.nanoTime();
+                    }
+
+                    jdbcTemplate.update(deleteFilter.getSQL(), deleteFilter.getBindValues().toArray());
+
+                    if(sqlStats != null)
+                    {
+                        sqlStats.put(deleteFilter.getSQL(), (System.nanoTime() - t) / 1000000);
+                    }
+
+                    for (String attrName : keyFilter.keySet()) {
+                        InsertOnDuplicateStep insertFilter = context.
+                                insertInto(EAV_M_SET_KEY_FILTER,
+                                        EAV_M_SET_KEY_FILTER.SET_ID,
+                                        EAV_M_SET_KEY_FILTER.ATTR_NAME,
+                                        EAV_M_SET_KEY_FILTER.VALUE).values(
+                                id,
+                                attrName,
+                                keyFilter.get(attrName)
+                        );
+
+                        t = 0;
+                        if(sqlStats != null)
+                        {
+                            t = System.nanoTime();
+                        }
+
+                        id = insertWithId(insertFilter.getSQL(), insertFilter.getBindValues().toArray());
+
+                        if(sqlStats != null)
+                        {
+                            sqlStats.put(insertFilter.getSQL(), (System.nanoTime() - t) / 1000000);
+                        }
+                    }
+                }
+                else
+                {
+                    update = context.update(EAV_M_SIMPLE_SET
+                    ).set(EAV_M_SIMPLE_SET.IS_KEY, metaAttribute.isKey()
+                    ).set(EAV_M_SIMPLE_SET.IS_NULLABLE, metaAttribute.isNullable()
+                    ).where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(dbMeta.getId())
+                    ).and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_M_SIMPLE_SET.NAME.eq(typeName));
+                }
+            } else {
+                if(meta.getMemberType(typeName).isComplex())
+                {
+                    update = context.update(EAV_M_COMPLEX_ATTRIBUTES
+                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_KEY, metaAttribute.isKey()
+                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE, metaAttribute.isNullable()
+                    ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId())
+                    ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
+                }
+                else
+                {
+                    update = context.update(EAV_M_SIMPLE_ATTRIBUTES
+                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_KEY, metaAttribute.isKey()
+                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE, metaAttribute.isNullable()
+                    ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId())
+                    ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
+                }
+            }
+
+            logger.debug(update.toString());
+
+            long t = 0;
+            if(sqlStats != null)
+            {
+                t = System.nanoTime();
+            }
+            jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
+            if(sqlStats != null)
+            {
+                sqlStats.put(update.getSQL(), (System.nanoTime() - t) / 1000000);
+            }
+        }
+    }
+
     private void deleteAttributes(Set<String> deleteNames, MetaClass meta)
     {
         DeleteConditionStep delete;
@@ -454,14 +606,14 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             if(meta.getMemberType(typeName).isComplex())
             {
-                delete = sqlGenerator.delete(EAV_M_COMPLEX_ATTRIBUTES
+                delete = context.delete(EAV_M_COMPLEX_ATTRIBUTES
                     ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
                     ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
                     ).and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
             }
             else
             {
-                delete = sqlGenerator.delete(EAV_M_SIMPLE_ATTRIBUTES
+                delete = context.delete(EAV_M_SIMPLE_ATTRIBUTES
                     ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
                     ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
                     ).and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
@@ -484,7 +636,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
     void loadSimpleAttributes(IMetaContainer meta)
     {
-        SelectForUpdateStep select = sqlGenerator.select(
+        SelectForUpdateStep select = context.select(
                 EAV_M_SIMPLE_ATTRIBUTES.ID,
                 EAV_M_SIMPLE_ATTRIBUTES.NAME,
                 EAV_M_SIMPLE_ATTRIBUTES.TYPE_CODE,
@@ -526,7 +678,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
     void loadSimpleArrays(IMetaContainer meta)
     {
-        SelectForUpdateStep select = sqlGenerator.select(
+        SelectForUpdateStep select = context.select(
                 EAV_M_SIMPLE_SET.ID,
                 EAV_M_SIMPLE_SET.NAME,
                 EAV_M_SIMPLE_SET.CONTAINER_TYPE,
@@ -580,7 +732,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
     void loadComplexAttributes(IMetaContainer meta)
     {
-        SelectForUpdateStep select = sqlGenerator.select(
+        SelectForUpdateStep select = context.select(
                 EAV_M_COMPLEX_ATTRIBUTES.ID,
                 EAV_M_COMPLEX_ATTRIBUTES.IS_KEY,
                 EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE,
@@ -625,7 +777,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
     void loadComplexArrays(IMetaContainer meta)
     {
-        SelectForUpdateStep select = sqlGenerator.select(
+        SelectForUpdateStep select = context.select(
                 EAV_M_COMPLEX_SET.ID,
                 EAV_M_COMPLEX_SET.IS_NULLABLE,
                 EAV_M_COMPLEX_SET.IS_KEY,
@@ -669,6 +821,29 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             metaSet.setImmutable((Boolean)row.get("is_immutable"));
             metaSet.setReference((Boolean)row.get("is_reference"));
 
+            SelectForUpdateStep selectFilters = context.select(
+                    EAV_M_SET_KEY_FILTER.ATTR_NAME,
+                    EAV_M_SET_KEY_FILTER.VALUE).from(EAV_M_SET_KEY_FILTER).
+                    where(EAV_M_SET_KEY_FILTER.SET_ID.eq(metaSet.getId()));
+
+            if(sqlStats != null)
+            {
+                t = System.nanoTime();
+            }
+            List<Map<String, Object>> filterRows = jdbcTemplate.queryForList(selectFilters.getSQL(),
+                    selectFilters.getBindValues().toArray());
+            if(sqlStats != null)
+            {
+                sqlStats.put(selectFilters.getSQL(), (System.nanoTime() - t) / 1000000);
+            }
+
+            for (Map<String, Object> filterRow : filterRows) {
+                if (filterRow.get("attr_name") != null) {
+                    metaSet.addArrayKeyFilter((String) filterRow.get("attr_name"),
+                        (String) filterRow.get("value"));
+                }
+            }
+
             metaAttribute.setMetaType(metaSet);
 
             meta.setMetaAttribute((String) row.get("name"), metaAttribute);
@@ -677,7 +852,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
     void loadArrayArrays(IMetaContainer meta)
     {
-        SelectForUpdateStep select = sqlGenerator.select(
+        SelectForUpdateStep select = context.select(
                 EAV_M_SET_OF_SETS.ID,
                 EAV_M_SET_OF_SETS.NAME,
                 EAV_M_SET_OF_SETS.IS_NULLABLE,
@@ -779,17 +954,25 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	    Set<String> deleteNames = SetUtils.difference(oldNames, newNames);
 	    Set<String> addNames = SetUtils.difference(newNames, oldNames);
 
-        for (String name : updateNames)
+        Iterator<String> i = updateNames.iterator();
+        while (i.hasNext())
         {
+            String name = i.next();
             if(!meta.getMemberType(name).equals(dbMeta.getMemberType(name)))
             {
                 deleteNames.add(name);
                 addNames.add(name);
+                i.remove();
+            } else {
+                if(meta.getMetaAttribute(name).equals(dbMeta.getMetaAttribute(name))) {
+                    i.remove();
+                }
             }
         }
 
         deleteAttributes(deleteNames, dbMeta);
         insertAttributes(addNames, meta);
+        updateAttributes(updateNames, meta, dbMeta);
 
 	    return dbMeta.getId();
 	}
@@ -830,7 +1013,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
     private void removeAllAttributes(long id, int type)
     {
-        DeleteConditionStep delete = sqlGenerator.delete(EAV_M_SIMPLE_ATTRIBUTES
+        DeleteConditionStep delete = context.delete(EAV_M_SIMPLE_ATTRIBUTES
             ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(id)
         ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(type));
 
@@ -847,7 +1030,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
         }
 
-        delete = sqlGenerator.delete(EAV_M_COMPLEX_ATTRIBUTES
+        delete = context.delete(EAV_M_COMPLEX_ATTRIBUTES
             ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(id)
             ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(type));
 
@@ -900,7 +1083,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         removeAllAttributes(metaClass.getId(), ContainerTypes.CLASS);
 
         //delete class
-        DeleteConditionStep delete = sqlGenerator.delete(EAV_M_CLASSES).where(EAV_M_CLASSES.ID.eq(metaClass.getId()));
+        DeleteConditionStep delete = context.delete(EAV_M_CLASSES).where(EAV_M_CLASSES.ID.eq(metaClass.getId()));
 
         logger.debug(delete.toString());
 
@@ -916,14 +1099,14 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	}
 
     @SuppressWarnings("UnusedDeclaration")
-    public Executor getSqlGenerator()
+    public DSLContext getDSLContext()
     {
-        return sqlGenerator;
+        return context;
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    public void setSqlGenerator(Executor sqlGenerator)
+    public void setDSLContext(DSLContext context)
     {
-        this.sqlGenerator = sqlGenerator;
+        this.context = context;
     }
 }

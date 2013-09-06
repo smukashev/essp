@@ -400,7 +400,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
 
     public String toString(String prefix)
     {
-        String str = "metaClass;";
+        String str = className + ":metaClass(" + getId() + ");";
 
         String[] names;
 
@@ -413,7 +413,11 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
             IMetaAttribute attribute = members.get(memberName);
             IMetaType type = attribute.getMetaType();
 
-            str += "\n" + prefix + memberName + ": " + type.toString(prefix + "\t");
+            String key = "";
+
+            if (attribute.isKey()) key = "*";
+
+            str += "\n" + prefix + memberName + "(" + attribute.getId() + ")" + key + ": " + type.toString(prefix + "\t");
         }
 
         return str;

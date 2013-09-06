@@ -3,10 +3,7 @@ package kz.bsbnb.usci.receiver.helper.impl;
 import kz.bsbnb.usci.receiver.helper.IHelper;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * @author k.tulbassiyev

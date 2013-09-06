@@ -9,7 +9,7 @@ import java.util.EventObject;
 /**
  * @author a.motov
  */
-public interface IBaseObject extends IPersistable, Serializable {
+public interface IBaseObject extends IPersistable, Serializable, Cloneable {
 
     public class Event extends EventObject
     {
@@ -18,9 +18,9 @@ public interface IBaseObject extends IPersistable, Serializable {
             super(source);
         }
 
-        public IBaseObject getBaseObject()
+        public IBaseObject getSource()
         {
-            return (IBaseObject) getSource();
+            return (IBaseObject) super.getSource();
         }
     }
 

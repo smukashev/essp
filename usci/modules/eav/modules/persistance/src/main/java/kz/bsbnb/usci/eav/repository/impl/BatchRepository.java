@@ -1,8 +1,8 @@
 package kz.bsbnb.usci.eav.repository.impl;
 
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
+import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

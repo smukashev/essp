@@ -2,9 +2,9 @@ package kz.bsbnb.usci.eav.test.model.batchdata.impl;
 
 import junit.framework.Assert;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.test.GenericTestCase;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
+import kz.bsbnb.usci.eav.test.GenericTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 
 import java.sql.Date;
 

@@ -14,7 +14,7 @@ import java.util.UUID;
  *
  * @author a.motov
  */
-public interface IBaseValue extends IPersistable
+public interface IBaseValue extends IPersistable, Cloneable
 {
     /**
      * Returns the <code>Batch</code> that contains information about the origin of this value.
@@ -46,6 +46,14 @@ public interface IBaseValue extends IPersistable
     public void setValue(Object value);
 
     public Date getRepDate();
+
+    public void setLast(boolean last);
+
+    public boolean isLast();
+
+    public void setClosed(boolean closed);
+
+    public boolean isClosed();
 
     public UUID getUuid();
 

@@ -25,6 +25,7 @@ public final class DataJob extends AbstractDataJob {
 
     @Override
     public void run() {
+        System.out.println("Data Job Started.");
         entityService = (IEntityService) rmiProxyFactoryBean.getObject();
 
         while(true) {
@@ -103,7 +104,7 @@ public final class DataJob extends AbstractDataJob {
         while(iterator.hasNext()) {
             BaseEntity entity = iterator.next();
 
-            if(isInProcess(entity)) {
+            if(!isInProcess(entity)) {
                 iterator.remove();
                 return entity;
             }

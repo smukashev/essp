@@ -12,5 +12,5 @@ public interface IMetaClassRepository
     public MetaClass getMetaClass(String className);
     public MetaClass getMetaClass(long id);
     public List<MetaClass> getMetaClasses();
-
+    public void saveMetaClass(MetaClass meta);
 }

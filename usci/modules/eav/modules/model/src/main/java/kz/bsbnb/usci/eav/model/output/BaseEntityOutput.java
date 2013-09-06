@@ -17,7 +17,7 @@ public class BaseEntityOutput
 
     public static String toString(BaseEntity entity, String prefix)
     {
-        String str = "baseEntity;";
+        String str = "baseEntity(" + entity.getId() + ");";
         MetaClass meta = entity.getMeta();
 
         for (String memberName : meta.getMemberNames())

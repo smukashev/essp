@@ -7,12 +7,10 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
-
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.data.AttributeTree;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.data.BaseEntityGenerator;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.data.MetaClassGenerator;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.helper.TreeGenerator;
-
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.w3c.dom.Document;
@@ -84,8 +82,9 @@ public class GenerateInsertXml {
             for (MetaClass aData : data) {
                 BaseEntity baseEntity = baseEntityGenerator.generateBaseEntity(batch, aData, ++index);
                 entities.add(baseEntity);
-                Long id = baseEntityDao.save(baseEntity);
-                BaseEntity bb = baseEntityDao.load(id);
+                // TODO: Fix this block
+                //Long id = baseEntityDao.save(baseEntity);
+                //BaseEntity bb = baseEntityDao.load(id);
             }
 
             Document document = baseEntityXmlGenerator.getGeneratedDocument(entities);

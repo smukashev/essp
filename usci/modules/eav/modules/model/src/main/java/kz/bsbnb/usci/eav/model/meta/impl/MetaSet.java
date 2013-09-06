@@ -8,6 +8,8 @@ import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 
+import java.util.HashMap;
+
 public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
 {
     IMetaType metaType;
@@ -35,6 +37,8 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
      * @see ComplexKeyTypes
      */
     ComplexKeyTypes arrayKeyType = ComplexKeyTypes.ALL;
+
+    HashMap<String, String> arrayKeyFilter = new HashMap<String, String>();
 
     public ComplexKeyTypes getArrayKeyType()
     {
@@ -129,18 +133,32 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
     {
         if(isComplex()) {
             if (isSetOfSets()) {
-                return "metaSet, complex, setOfSets";
+                return "metaSet(" + getId() + "), complex, setOfSets";
             }
             else {
-                return "metaSet, " + metaType.toString(prefix);
+                String str = "metaSet(" + getId() + ")[";
+
+                boolean first = true;
+                for (String attrName : arrayKeyFilter.keySet()) {
+                    if (!first) {
+                        str += ", " + attrName + ":" + arrayKeyFilter.get(attrName);
+                    } else {
+                        str += attrName + ":" + arrayKeyFilter.get(attrName);
+                        first = false;
+                    }
+                }
+
+                str += "], " + metaType.toString(prefix);
+
+                return str;
             }
         }
         else {
             if (isSetOfSets()) {
-                return "metaSet, simple, setOfSets";
+                return "metaSet(" + getId() + "), simple, setOfSets";
             }
             else {
-                return "metaSet, " + metaType.toString(prefix);
+                return "metaSet(" + getId() + "), " + metaType.toString(prefix);
             }
         }
     }
@@ -167,5 +185,14 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaContainer
     public void setReference(boolean value)
     {
         reference = value;
+    }
+
+    public HashMap<String, String> getArrayKeyFilter()
+    {
+        return arrayKeyFilter;
+    }
+
+    public void addArrayKeyFilter(String attributeName, String value) {
+        arrayKeyFilter.put(attributeName, value);
     }
 }

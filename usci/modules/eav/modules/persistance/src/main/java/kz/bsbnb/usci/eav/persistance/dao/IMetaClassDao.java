@@ -4,7 +4,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Set;
 
 public interface IMetaClassDao extends IDao<MetaClass>
 {

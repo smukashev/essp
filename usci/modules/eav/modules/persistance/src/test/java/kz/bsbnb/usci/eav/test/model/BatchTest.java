@@ -1,8 +1,8 @@
 package kz.bsbnb.usci.eav.test.model;
 
 import junit.framework.Assert;
-import kz.bsbnb.usci.eav.test.GenericTestCase;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.test.GenericTestCase;
 import org.junit.Test;
 
 import java.sql.Timestamp;

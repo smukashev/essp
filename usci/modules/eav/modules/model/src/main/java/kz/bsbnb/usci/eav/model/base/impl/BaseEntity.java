@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -8,14 +9,12 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
-import kz.bsbnb.usci.eav.model.persistable.impl.BaseObject;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DateUtils;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -26,53 +25,24 @@ import java.util.*;
  * @see MetaClass
  * @see DataTypes
  */
-public class BaseEntity extends BaseObject implements IBaseContainer
+public class BaseEntity extends BaseContainer implements IBaseEntity
 {
 
-    public abstract class AbstractAttributeChangeListener implements AttributeChangeListener
-    {
-        String parentAttribute;
-
-        public AbstractAttributeChangeListener(String parentAttribute)
-        {
-            this.parentAttribute = parentAttribute;
-        }
-
-        public abstract void attributeChange(AttributeChangeEvent event);
-
-        public String getParentAttribute()
-        {
-            return parentAttribute;
-        }
-    }
-
     Logger logger = LoggerFactory.getLogger(BaseEntity.class);
-
-    private static final Method ATTRIBUTE_CHANGE_METHOD;
-    static
-    {
-        try
-        {
-            ATTRIBUTE_CHANGE_METHOD = AttributeChangeListener.class
-                    .getDeclaredMethod("attributeChange", new Class[] {  AttributeChangeEvent.class });
-        }
-        catch (NoSuchMethodException ex)
-        {
-            throw new java.lang.RuntimeException("Internal error, key change method not found.");
-        }
-    }
 
     /**
      * Reporting date on which instance of BaseEntity was loaded.
      */
     private Date reportDate;
 
+    private Date maxReportDate;
+
+    private Date minReportDate;
+
     /**
      * The list of available reporting dates for this instance BaseEntity.
      */
     private Set<Date> availableReportDates = new HashSet<Date>();
-
-    private Set<String> modifiedObjects = new HashSet<String>();
 
     /**
      * Holds data about entity structure
@@ -83,8 +53,9 @@ public class BaseEntity extends BaseObject implements IBaseContainer
     /**
      * Holds attributes values
      */
-    private HashMap<String, IBaseValue> values =
-            new HashMap<String, IBaseValue>();
+    private HashMap<String, IBaseValue> values = new HashMap<String, IBaseValue>();
+
+    private Set<String> validationErrors = new HashSet<String>();
 
     /**
      * Initializes entity.
@@ -93,8 +64,6 @@ public class BaseEntity extends BaseObject implements IBaseContainer
     {
 
     }
-
-    private Set<String> validationErrors = new HashSet<String>();
 
     /**
      * Initializes entity with a class name.
@@ -137,59 +106,130 @@ public class BaseEntity extends BaseObject implements IBaseContainer
         return meta;
     }
 
+    @Override
     public Set<Date> getAvailableReportDates() {
         return availableReportDates;
+    }
+
+    @Override
+    public void setAvailableReportDates(Set<Date> availableReportDates) {
+        this.availableReportDates = availableReportDates;
+        this.maxReportDate = Collections.max(availableReportDates);
+        this.minReportDate = Collections.min(availableReportDates);
+    }
+
+    @Override
+    public Date getMaxReportDate()
+    {
+        if (availableReportDates.size() != 0)
+        {
+            maxReportDate = Collections.max(availableReportDates);
+            return maxReportDate;
+        }
+        return null;
+    }
+
+    @Override
+    public Date getMinReportDate()
+    {
+        if (availableReportDates.size() != 0)
+        {
+            minReportDate = Collections.min(availableReportDates);
+            return minReportDate;
+        }
+        return null;
     }
 
     /**
      * Retrieves key titled <code>name</code>. Attribute must have type of <code>DataTypes.DATE</code>
      *
-     * @param name key name. Must exist in entity meta
+     * @param attribute key name. Must exist in entity meta
      * @return key value, null if value is not set
      * @throws IllegalArgumentException if key name does not exist in entity meta,
      * 	                                or key has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    public IBaseValue getBaseValue(String name)
+    @Override
+    public IBaseValue getBaseValue(String attribute)
     {
-        IMetaType type = meta.getMemberType(name);
+        if (attribute.contains("."))
+        {
+            int index = attribute.indexOf(".");
+            String parentAttribute = attribute.substring(0, index);
+            String childAttribute = attribute.substring(index, attribute.length() - 1);
 
-        if(type == null)
-            throw new IllegalArgumentException("Type: " + name +
-                    ", not found in class: " + meta.getClassName());
+            IMetaType metaType = meta.getMemberType(parentAttribute);
+            if (metaType == null)
+            {
+                throw new IllegalArgumentException(String.format("Instance of MetaClass with class name {0} " +
+                        "does not contain attribute {1}.", meta.getClassName(), parentAttribute));
+            }
 
-        IBaseValue batchValue = values.get(name);
+            if (metaType.isComplex() && !metaType.isSet())
+            {
+                IBaseValue baseValue = values.get(parentAttribute);
+                if (baseValue == null)
+                {
+                    return null;
+                }
 
-        if(batchValue == null)
-            return null;
+                IBaseEntity baseEntity = (IBaseEntity)baseValue.getValue();
+                if (baseEntity == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return baseEntity.getBaseValue(childAttribute);
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+        {
+            IMetaType metaType = meta.getMemberType(attribute);
 
-        return batchValue;
+            if(metaType == null)
+                throw new IllegalArgumentException(String.format("Instance of MetaClass with class name {0} " +
+                        "does not contain attribute {1}.", meta.getClassName(), attribute));
+
+            IBaseValue baseValue = values.get(attribute);
+
+            if(baseValue == null)
+                return null;
+
+            return baseValue;
+        }
     }
 
     /**
      * Retrieves key titled <code>name</code>.
      *
-     * @param name name key name. Must exist in entity meta
-     * @param value new value of the key
+     * @param attribute name key name. Must exist in entity meta
+     * @param baseValue new value of the key
      * @throws IllegalArgumentException if key name does not exist in entity meta,
      * 	                                or key has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
+    //TODO: Add exception on metaClass mismatch
     @Override
-    public void put(final String name, IBaseValue value)
+    public void put(final String attribute, IBaseValue baseValue)
     {
-        IMetaType type = meta.getMemberType(name);
+        IMetaType type = meta.getMemberType(attribute);
 
         if(type == null)
-            throw new IllegalArgumentException("Type: " + name +
+            throw new IllegalArgumentException("Type: " + attribute +
                     ", not found in class: " + meta.getClassName());
 
-        if (value == null)
+        if (baseValue == null)
             throw new IllegalArgumentException("Value not be equal to null.");
 
-        if (value.getValue() != null)
+        if (baseValue.getValue() != null)
         {
-            Class<?> valueClass = value.getValue().getClass();
+            Class<?> valueClass = baseValue.getValue().getClass();
             Class<?> expValueClass;
 
             if (type.isComplex())
@@ -210,12 +250,12 @@ public class BaseEntity extends BaseObject implements IBaseContainer
                     if (type.isSet())
                     {
                         expValueClass = BaseSet.class;
-                        valueClass = value.getValue().getClass();
+                        valueClass = baseValue.getValue().getClass();
                     }
                     else
                     {
                         expValueClass = metaValue.getTypeCode().getDataTypeClass();
-                        valueClass = ((MetaValue)(((BaseSet)value.getValue()).getMemberType())).getTypeCode().
+                        valueClass = ((MetaValue)(((BaseSet)baseValue.getValue()).getMemberType())).getTypeCode().
                                 getDataTypeClass();
                     }
 
@@ -234,34 +274,76 @@ public class BaseEntity extends BaseObject implements IBaseContainer
                         valueClass);
         }
 
-        if (values.containsKey(name))
+        boolean listening = isListening();
+        if (listening)
         {
-            if (value.getValue() == null || !value.equals(values.get(name)))
+            if (values.containsKey(attribute))
             {
-                fireAttributeChange(name);
+                IBaseValue existingBaseValue = values.get(attribute);
+                if (existingBaseValue.getValue() == null)
+                {
+                    removeListeners(attribute);
+                }
+
+                values.put(attribute, baseValue);
+
+                if (baseValue.getValue() != null)
+                {
+                    setListeners(attribute);
+                }
+                fireValueChange(attribute);
+            }
+            else
+            {
+                values.put(attribute, baseValue);
+                fireValueChange(attribute);
             }
         }
         else
         {
-            fireAttributeChange(name);
+            values.put(attribute, baseValue);
         }
-
-        values.put(name, value);
     }
 
     public void remove(String name) {
+        fireValueChange(name);
         values.remove(name);
     }
 
     @Override
-    public Set<IBaseValue> get() {
-        List<IBaseValue> list = new ArrayList<IBaseValue>(values.values());
-        return (new HashSet<IBaseValue>(list));
+    public Collection<IBaseValue> get() {
+        return values.values();
     }
 
     @Override
     public IMetaType getMemberType(String name) {
-        return meta.getMemberType(name);
+        if (name.contains("."))
+        {
+            int index = name.indexOf(".");
+            String parentIdentifier = name.substring(0, index);
+
+            IMetaType metaType = meta.getMemberType(parentIdentifier);
+            if (metaType.isComplex() && !metaType.isSet())
+            {
+                MetaClass childMeta = (MetaClass)metaType;
+                String childIdentifier = name.substring(index, name.length() - 1);
+                return childMeta.getMemberType(childIdentifier);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+        {
+            return meta.getMemberType(name);
+        }
+    }
+
+    @Override
+    public IMetaAttribute getMetaAttribute(String attribute)
+    {
+        return meta.getMetaAttribute(attribute);
     }
 
     /**
@@ -509,98 +591,148 @@ public class BaseEntity extends BaseObject implements IBaseContainer
     }
 
     @Override
-    public void addListener(AttributeChangeListener listener)
+    protected void setListeners()
     {
-        addListener(AttributeChangeEvent.class, listener, ATTRIBUTE_CHANGE_METHOD);
-    }
-
-    @Override
-    public void removeListener(AttributeChangeListener listener)
-    {
-        removeListener(AttributeChangeEvent.class, listener, ATTRIBUTE_CHANGE_METHOD);
-    }
-
-    protected void fireAttributeChange(String attribute)
-    {
-        fireEvent(new IBaseContainer.AttributeChangeEvent(this, attribute));
-    }
-
-    public void clearModifiedObjects()
-    {
-        this.modifiedObjects.clear();
-    }
-
-    public Set<String> getModifiedObjects()
-    {
-        return this.modifiedObjects;
-    }
-
-    public void setListeners()
-    {
-        this.addListener(new AttributeChangeListener() {
+        this.addListener(new IValueChangeListener() {
             @Override
-            public void attributeChange(AttributeChangeEvent event) {
-                modifiedObjects.add(event.getAttribute());
+            public void valueChange(ValueChangeEvent event) {
+                addModifiedIdentifier(event.getIdentifier());
             }
         });
 
-        for (String key : values.keySet())
+        for (String attribute : values.keySet())
         {
-            IMetaType metaType = meta.getMemberType(key);
-            if (!metaType.isSet() && metaType.isComplex())
+            setListeners(attribute);
+        }
+    }
+
+    private void setListeners(String attribute)
+    {
+        IMetaType metaType = meta.getMemberType(attribute);
+        if (metaType.isComplex())
+        {
+            IBaseValue baseValue = values.get(attribute);
+            if (baseValue.getValue() != null)
             {
-                IBaseValue baseValue = values.get(key);
-                BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
+                if (metaType.isSet())
+                {
+                    BaseSet baseSet = (BaseSet)baseValue.getValue();
+                    baseSet.addListener(new ValueChangeListener(this, attribute) {
 
-                baseEntity.addListener(new AbstractAttributeChangeListener(key) {
+                        @Override
+                        public void valueChange(ValueChangeEvent event) {
+                            String identifier = this.getIdentifier();
 
-                    @Override
-                    public void attributeChange(AttributeChangeEvent event) {
-                        String childAttribute = event.getAttribute();
-                        String parentAttribute = getParentAttribute();
-                        String attribute = parentAttribute + "." + childAttribute;
+                            IBaseContainer target = this.getTarget();
+                            if (target instanceof BaseContainer)
+                            {
+                                ((BaseContainer)target).addModifiedIdentifier(identifier);
+                            }
 
-                        modifiedObjects.add(attribute);
-                        fireAttributeChange(attribute);
-                    }
-                });
+                            fireValueChange(identifier);
+                        }
+                    });
+                    baseSet.setListening(true);
+                }
+                else
+                {
 
-                baseEntity.setListeners();
+                    BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
+                    baseEntity.addListener(new ValueChangeListener(this, attribute) {
+
+                        @Override
+                        public void valueChange(ValueChangeEvent event) {
+                            String childIdentifier = event.getIdentifier();
+                            String parentIdentifier = this.getIdentifier();
+                            String identifier = parentIdentifier + "." + childIdentifier;
+
+                            IBaseContainer target = this.getTarget();
+                            if (target instanceof BaseContainer)
+                            {
+                                ((BaseContainer)target).addModifiedIdentifier(identifier);
+                            }
+
+                            fireValueChange(identifier);
+                        }
+                    });
+
+                    baseEntity.setListening(true);
+                }
             }
         }
     }
 
     public void removeListeners()
     {
-        List<AttributeChangeListener> parentListeners =
-                (List<AttributeChangeListener>)this.getListeners(AttributeChangeEvent.class);
-        final Iterator<AttributeChangeListener> parentIt = parentListeners.iterator();
+        List<IValueChangeListener> parentListeners =
+                (List<IValueChangeListener>)this.getListeners(ValueChangeEvent.class);
+        final Iterator<IValueChangeListener> parentIt = parentListeners.iterator();
         while (parentIt.hasNext())
         {
-            final AttributeChangeListener listener = parentIt.next();
+            final IValueChangeListener listener = parentIt.next();
             this.removeListener(listener);
         }
 
-        for (String key : values.keySet())
+        for (String attribute : values.keySet())
         {
-            IMetaType metaType = meta.getMemberType(key);
-            if (!metaType.isSet() && metaType.isComplex())
-            {
-                IBaseValue baseValue = values.get(key);
-                BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
+            removeListeners(attribute);
+        }
+    }
 
-                List<AttributeChangeListener> childListeners =
-                        (List<AttributeChangeListener>)baseEntity.getListeners(AttributeChangeEvent.class);
-                final Iterator<AttributeChangeListener> childIt = childListeners.iterator();
-                while (childIt.hasNext())
-                {
-                    final AttributeChangeListener listener = childIt.next();
-                    baseEntity.removeListener(listener);
-                }
+    public void removeListeners(String attribute)
+    {
+        IMetaType metaType = meta.getMemberType(attribute);
+        if (!metaType.isSet() && metaType.isComplex())
+        {
+            IBaseValue baseValue = values.get(attribute);
+            BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
+
+            List<IValueChangeListener> childListeners =
+                    (List<IValueChangeListener>)baseEntity.getListeners(ValueChangeEvent.class);
+            final Iterator<IValueChangeListener> childIt = childListeners.iterator();
+            while (childIt.hasNext())
+            {
+                final IValueChangeListener listener = childIt.next();
+                baseEntity.removeListener(listener);
             }
         }
     }
 
+    @Override
+    public BaseEntity clone()
+    {
+        BaseEntity baseEntity = null;
+        try
+        {
+            baseEntity = (BaseEntity)super.clone();
+            baseEntity.setReportDate((Date)reportDate.clone());
 
+            HashSet<Date> availableReportDatesCloned = new HashSet<Date>();
+            Iterator<Date> availableReportDatesIt = availableReportDates.iterator();
+            while(availableReportDatesIt.hasNext())
+            {
+                availableReportDatesCloned.add((Date)availableReportDatesIt.next().clone());
+            }
+            baseEntity.setAvailableReportDates(availableReportDatesCloned);
+
+            HashMap<String, IBaseValue> valuesCloned = new HashMap<String, IBaseValue>();
+            Iterator<String> attributesIt = values.keySet().iterator();
+            while(attributesIt.hasNext())
+            {
+                String attribute = attributesIt.next();
+
+                IBaseValue baseValue = values.get(attribute);
+                IBaseValue baseValueCloned = (IBaseValue)((BaseValue)baseValue).clone();
+                valuesCloned.put(attribute, baseValueCloned);
+            }
+            baseEntity.setAvailableReportDates(availableReportDatesCloned);
+
+        }
+        catch(CloneNotSupportedException ex)
+        {
+            throw new RuntimeException("BaseEntity class does not implement interface Cloneable.");
+        }
+        return baseEntity;
+    }
 
 }

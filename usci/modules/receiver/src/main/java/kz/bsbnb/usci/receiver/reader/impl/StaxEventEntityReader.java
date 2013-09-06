@@ -56,6 +56,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     @PostConstruct
     public void init() {
+        logger.info("Reader init.");
         batchService = serviceRepository.getBatchService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
         couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
@@ -79,12 +80,14 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         } else if(localName.equals("entities")) {
             logger.info("entities");
         } else if(localName.equals("entity")) {
+            logger.info("entity");
             currentContainer = metaFactoryService.getBaseEntity(
                     startElement.getAttributeByName(new QName("class")).getValue());
 
             statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
                     Global.CONTRACT_STATUS_PROCESSING, null, new Date()));
         } else {
+            logger.info("other: " + localName);
             IMetaType metaType = currentContainer.getMemberType(localName);
 
             if(metaType.isSet()) {
@@ -114,6 +117,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     @Override
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException {
+        logger.info("Read called");
         while(xmlEventReader.hasNext()) {
             XMLEvent event = (XMLEvent) xmlEventReader.next();
 
@@ -128,7 +132,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 EndElement endElement = event.asEndElement();
                 String localName = endElement.getName().getLocalPart();
 
-                endElement(localName);
+                if(endElement(localName)) return (T) currentContainer;
             } else if(event.isEndDocument()) {
                 logger.info("end document");
                 statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
@@ -146,20 +150,19 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         return null;
     }
 
-    public T endElement(String localName) {
+    public boolean endElement(String localName) {
         if(localName.equals("batch")) {
             logger.info("batch");
         } else if(localName.equals("entities")) {
             logger.info("entities");
+            currentContainer = null;
+            return true;
         } else if(localName.equals("entity")) {
             statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
                     Global.CONTRACT_STATUS_COMPLETED, null, new Date()));
 
-            T entity = (T) currentContainer;
-            currentContainer = null;
             index++;
-
-            return entity;
+            return true;
         } else {
             IMetaType metaType;
 
@@ -177,6 +180,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             }
         }
 
-        return null;
+        return false;
     }
 }

@@ -1,8 +1,8 @@
 package kz.bsbnb.usci.eav.repository.impl;
 
-import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -35,7 +35,7 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository
     public MetaClass getMetaClass(long id) {
 
         MetaClass metaClass = storage.load(id);
-        cache.put(metaClass.getClassName(),metaClass);
+        cache.put(metaClass.getClassName(), metaClass);
 
         return metaClass;
 
@@ -46,4 +46,10 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository
         return storage.loadAll();
     }
 
+    @Override
+    public void saveMetaClass(MetaClass meta)
+    {
+        storage.save(meta);
+        cache.put(meta.getClassName(), meta);
+    }
 }

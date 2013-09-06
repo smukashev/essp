@@ -4,52 +4,59 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.persistable.IBaseObject;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Set;
 
 /**
  * @author k.tulbassiyev
  */
-public interface IBaseContainer extends Serializable
+public interface IBaseContainer extends IBaseObject
 {
 
-    public class AttributeChangeEvent extends IBaseObject.Event
+    public class ValueChangeEvent extends IBaseObject.Event
     {
-        private String attribute;
+        private String identifier;
 
-        public AttributeChangeEvent(IBaseObject source, String attribute)
+        public ValueChangeEvent(IBaseContainer source, String identifier)
         {
             super(source);
-            this.attribute = attribute;
+            this.identifier = identifier;
         }
 
-        public IBaseContainer getBaseContainer()
+        public IBaseContainer getSource()
         {
-            return (IBaseContainer)getBaseObject();
+            return (IBaseContainer)super.getSource();
         }
 
-        public String getAttribute()
+        public String getIdentifier()
         {
-            return attribute;
+            return identifier;
         }
     }
 
-    public interface AttributeChangeListener
+    public interface IValueChangeListener
     {
 
-        public void attributeChange(AttributeChangeEvent event);
+        public void valueChange(ValueChangeEvent event);
 
     }
 
-    public void addListener(AttributeChangeListener listener);
+    public void addListener(IValueChangeListener listener);
 
-    public void removeListener(AttributeChangeListener listener);
+    public void removeListener(IValueChangeListener listener);
+
+    public void setListening(boolean listening);
+
+    public boolean isListening();
 
     public void put(String name, IBaseValue value);
 
-    public Set<IBaseValue> get();
+    public Collection<IBaseValue> get();
 
     public IMetaType getMemberType(String name);
 
-    //public IBaseContainer copy();
+    public void clearModifiedIdentifiers();
+
+    public Set<String> getModifiedIdentifiers();
 
 }
