@@ -48,35 +48,35 @@ public class GetJsonEntity {
         BaseSetJson baseSetJson = new BaseSetJson(metaSet.getMemberType());
 
 
-        if (metaTypeChild.isSet()) {
-
-            if (metaTypeChild.isComplex()) {
-                MetaSet metaSetChild = (MetaSet)metaTypeChild;
-                for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++) {
-                    BaseSet baseSetChild = generateBaseSet(batch, metaSetChild, index);
-                    baseSet.put(new BaseValue(batch, index, batch.getRepDate(), baseSetChild));
-                }
-            } else {
-                MetaSet metaSetChild = (MetaSet)metaTypeChild;
-                for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++) {
-                    BaseSet baseSetChild = generateBaseSet(batch, metaSetChild, index);
-                    baseSet.put(new BaseValue(batch, index, batch.getRepDate(), baseSetChild));
-                }
-            }
-        } else {
-            if (metaSet.isComplex()) {
-                logger.debug("Generating values for complex set.");
-                for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++) {
-                    BaseEntity baseEntity = generateBaseEntity(batch, (MetaClass) metaTypeChild, index);
-                    baseSet.put(new BaseValue(batch, index, batch.getRepDate(), baseEntity));
-                }
-            } else {
-
-                for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++)
-                    baseSet.put(new BaseValue(batch, index, batch.getRepDate(),
-                            getCastObject(metaSet.getTypeCode())));
-            }
-        }
+//        if (metaTypeChild.isSet()) {
+//
+//            if (metaTypeChild.isComplex()) {
+//                MetaSet metaSetChild = (MetaSet)metaTypeChild;
+//                for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++) {
+//                    BaseSet baseSetChild = generateBaseSet(batch, metaSetChild, index);
+//                    baseSet.put(new BaseValue(batch, index, batch.getRepDate(), baseSetChild));
+//                }
+//            } else {
+//                MetaSet metaSetChild = (MetaSet)metaTypeChild;
+//                for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++) {
+//                    BaseSet baseSetChild = generateBaseSet(batch, metaSetChild, index);
+//                    baseSet.put(new BaseValue(batch, index, batch.getRepDate(), baseSetChild));
+//                }
+//            }
+//        } else {
+//            if (metaSet.isComplex()) {
+//                logger.debug("Generating values for complex set.");
+//                for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++) {
+//                    BaseEntity baseEntity = generateBaseEntity(batch, (MetaClass) metaTypeChild, index);
+//                    baseSet.put(new BaseValue(batch, index, batch.getRepDate(), baseEntity));
+//                }
+//            } else {
+//
+//                for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++)
+//                    baseSet.put(new BaseValue(batch, index, batch.getRepDate(),
+//                            getCastObject(metaSet.getTypeCode())));
+//            }
+//        }
 
 
         return  baseSetJson;
