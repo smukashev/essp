@@ -24,6 +24,8 @@ import org.xml.sax.SAXException;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -33,6 +35,8 @@ public class CLI
 {
     private String command;
     private ArrayList<String> args = new ArrayList<String>();
+
+    private static SimpleDateFormat sdfout = new SimpleDateFormat("dd.MM.yyyy");
 
     @Autowired
     private IStorage storage;
@@ -60,14 +64,16 @@ public class CLI
 
     private InputStream inputStream = null;
 
-    public void processCRBatch(String fname, int count, int offset) throws SAXException, IOException, XMLStreamException
+    public void processCRBatch(String fname, int count, int offset, Date repDate) throws SAXException, IOException, XMLStreamException
     {
         File inFile = new File(fname);
 
         InputStream in = null;
         in = new FileInputStream(inFile);
 
-        Batch batch = batchRepository.addBatch(new Batch(new Date((new java.util.Date()).getTime())));
+        System.out.println("Processing batch with rep date: " + repDate);
+
+        Batch batch = batchRepository.addBatch(new Batch(repDate));
 
         crParser.parse(in, batch);
 
@@ -299,10 +305,16 @@ public class CLI
         }
     }
 
-    public void commandCRBatch() throws IOException, SAXException, XMLStreamException
+    public void commandCRBatch() throws IOException, SAXException, XMLStreamException, ParseException
     {
         if (args.size() > 2) {
-            processCRBatch(args.get(0), Integer.parseInt(args.get(1)), Integer.parseInt(args.get(2)));
+            if (args.size() > 3) {
+                processCRBatch(args.get(0), Integer.parseInt(args.get(1)), Integer.parseInt(args.get(2)),
+                    new Date(sdfout.parse(args.get(3)).getTime()));
+            } else {
+                processCRBatch(args.get(0), Integer.parseInt(args.get(1)), Integer.parseInt(args.get(2)),
+                        new Date((new java.util.Date()).getTime()));
+            }
         } else {
             System.out.println("Argument needed: <fileName> <count> <offset>");
         }
