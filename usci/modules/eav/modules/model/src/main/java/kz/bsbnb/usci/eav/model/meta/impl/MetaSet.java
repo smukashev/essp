@@ -9,6 +9,7 @@ import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MetaSet  extends Persistable implements IMetaType, IMetaSet
@@ -39,7 +40,7 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaSet
      */
     ComplexKeyTypes arrayKeyType = ComplexKeyTypes.ALL;
 
-    HashMap<String, String> arrayKeyFilter = new HashMap<String, String>();
+    HashMap<String, ArrayList<String>> arrayKeyFilter = new HashMap<String, ArrayList<String>>();
 
     public ComplexKeyTypes getArrayKeyType()
     {
@@ -188,13 +189,22 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaSet
         reference = value;
     }
 
-    public HashMap<String, String> getArrayKeyFilter()
+    public HashMap<String, ArrayList<String>> getArrayKeyFilter()
     {
         return arrayKeyFilter;
     }
 
     public void addArrayKeyFilter(String attributeName, String value) {
-        arrayKeyFilter.put(attributeName, value);
+        ArrayList<String> valHolder = arrayKeyFilter.get(attributeName);
+        if (valHolder != null) {
+            valHolder.add(value);
+        } else {
+            valHolder = new ArrayList<String>();
+
+            valHolder.add(value);
+
+            arrayKeyFilter.put(attributeName, valHolder);
+        }
     }
 
     public void recursiveSet(MetaClass subMeta) {

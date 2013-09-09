@@ -350,7 +350,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
 
         if (metaSet.isComplex()) {
-            HashMap<String, String> keyFilter = metaSet.getArrayKeyFilter();
+            HashMap<String, ArrayList<String>> keyFilter = metaSet.getArrayKeyFilter();
 
             DeleteConditionStep deleteFilter =
                     context.delete(EAV_M_SET_KEY_FILTER).where(EAV_M_SET_KEY_FILTER.SET_ID.eq(id));
@@ -369,27 +369,30 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             }
 
             for (String attrName : keyFilter.keySet()) {
-                InsertOnDuplicateStep insertFilter = context.
-                        insertInto(EAV_M_SET_KEY_FILTER,
-                                EAV_M_SET_KEY_FILTER.SET_ID,
-                                EAV_M_SET_KEY_FILTER.ATTR_NAME,
-                                EAV_M_SET_KEY_FILTER.VALUE).values(
-                                    id,
-                                    attrName,
-                                    keyFilter.get(attrName)
-                                );
 
-                t = 0;
-                if(sqlStats != null)
-                {
-                    t = System.nanoTime();
-                }
+                for (String val : keyFilter.get(attrName)) {
+                    InsertOnDuplicateStep insertFilter = context.
+                            insertInto(EAV_M_SET_KEY_FILTER,
+                                    EAV_M_SET_KEY_FILTER.SET_ID,
+                                    EAV_M_SET_KEY_FILTER.ATTR_NAME,
+                                    EAV_M_SET_KEY_FILTER.VALUE).values(
+                                        id,
+                                        attrName,
+                                        val
+                                    );
 
-                id = insertWithId(insertFilter.getSQL(), insertFilter.getBindValues().toArray());
+                    t = 0;
+                    if(sqlStats != null)
+                    {
+                        t = System.nanoTime();
+                    }
 
-                if(sqlStats != null)
-                {
-                    sqlStats.put(insertFilter.getSQL(), (System.nanoTime() - t) / 1000000);
+                    insertWithId(insertFilter.getSQL(), insertFilter.getBindValues().toArray());
+
+                    if(sqlStats != null)
+                    {
+                        sqlStats.put(insertFilter.getSQL(), (System.nanoTime() - t) / 1000000);
+                    }
                 }
             }
         }
@@ -505,7 +508,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     MetaSet metaSet = (MetaSet)meta.getMemberType(typeName);
                     long id = ((MetaSet)dbMeta.getMemberType(typeName)).getId();
 
-                    HashMap<String, String> keyFilter = metaSet.getArrayKeyFilter();
+                    HashMap<String, ArrayList<String>> keyFilter = metaSet.getArrayKeyFilter();
 
                     DeleteConditionStep deleteFilter =
                             context.delete(EAV_M_SET_KEY_FILTER).where(EAV_M_SET_KEY_FILTER.SET_ID.eq(id));
@@ -524,27 +527,29 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     }
 
                     for (String attrName : keyFilter.keySet()) {
-                        InsertOnDuplicateStep insertFilter = context.
-                                insertInto(EAV_M_SET_KEY_FILTER,
-                                        EAV_M_SET_KEY_FILTER.SET_ID,
-                                        EAV_M_SET_KEY_FILTER.ATTR_NAME,
-                                        EAV_M_SET_KEY_FILTER.VALUE).values(
-                                id,
-                                attrName,
-                                keyFilter.get(attrName)
-                        );
+                        for(String val : keyFilter.get(attrName)) {
+                            InsertOnDuplicateStep insertFilter = context.
+                                    insertInto(EAV_M_SET_KEY_FILTER,
+                                            EAV_M_SET_KEY_FILTER.SET_ID,
+                                            EAV_M_SET_KEY_FILTER.ATTR_NAME,
+                                            EAV_M_SET_KEY_FILTER.VALUE).values(
+                                    id,
+                                    attrName,
+                                    val
+                            );
 
-                        t = 0;
-                        if(sqlStats != null)
-                        {
-                            t = System.nanoTime();
-                        }
+                            t = 0;
+                            if(sqlStats != null)
+                            {
+                                t = System.nanoTime();
+                            }
 
-                        id = insertWithId(insertFilter.getSQL(), insertFilter.getBindValues().toArray());
+                            insertWithId(insertFilter.getSQL(), insertFilter.getBindValues().toArray());
 
-                        if(sqlStats != null)
-                        {
-                            sqlStats.put(insertFilter.getSQL(), (System.nanoTime() - t) / 1000000);
+                            if(sqlStats != null)
+                            {
+                                sqlStats.put(insertFilter.getSQL(), (System.nanoTime() - t) / 1000000);
+                            }
                         }
                     }
                 }

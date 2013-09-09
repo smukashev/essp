@@ -14,6 +14,7 @@ meta key name doc1 no
 
 # Create filter
 meta fkey name person docs doc_type 11
+meta fkey name person docs doc_type 15
 
 meta show name ct_package
 

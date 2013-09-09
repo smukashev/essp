@@ -15,7 +15,12 @@ import kz.bsbnb.usci.eav.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 
 /**
  * Implements EAV entity object. 
@@ -29,6 +34,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 {
 
     Logger logger = LoggerFactory.getLogger(BaseEntity.class);
+
+    protected DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
      * Reporting date on which instance of BaseEntity was loaded.
@@ -778,4 +785,58 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         return baseEntity;
     }
 
+    public boolean applyKeyFilter(HashMap<String, ArrayList<String>> arrayKeyFilter) throws ParseException
+    {
+        for (String attrName : arrayKeyFilter.keySet()) {
+            IMetaType type = meta.getMemberType(attrName);
+
+            IBaseValue value = safeGetValue(attrName);
+
+            if(value == null) {
+                throw new IllegalArgumentException("Key attribute " + attrName + " can't be null, " +
+                        "it is used in array filter");
+            }
+
+            if (testValueOnString(type, value, arrayKeyFilter.get(attrName))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean testValueOnString(IMetaType type, IBaseValue value, ArrayList<String> filter) throws ParseException
+    {
+        MetaValue simple_value = (MetaValue)type;
+
+        for (String strValue : filter) {
+            switch (simple_value.getTypeCode())
+            {
+                case BOOLEAN:
+                    Boolean actual_boolean_value = (Boolean)value.getValue();
+                    if (actual_boolean_value == Boolean.parseBoolean(strValue)) return true;
+                    break;
+                case DATE:
+                    java.sql.Date actual_date_value = DateUtils.convert((java.util.Date)value.getValue());
+                    if (actual_date_value == dateFormat.parse(strValue)) return true;
+                    break;
+                case DOUBLE:
+                    Double actual_double_value = (Double)value.getValue();
+                    if (actual_double_value == Double.parseDouble(strValue)) return true;
+                    break;
+                case INTEGER:
+                    Integer actual_integer_value = (Integer)value.getValue();
+                    if (actual_integer_value == Integer.parseInt(strValue)) return true;
+                    break;
+                case STRING:
+                    String actual_string_value = (String)value.getValue();
+                    if (actual_string_value.equals(strValue)) return true;
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown data type: " + simple_value.getTypeCode());
+            }
+        }
+
+        return false;
+    }
 }

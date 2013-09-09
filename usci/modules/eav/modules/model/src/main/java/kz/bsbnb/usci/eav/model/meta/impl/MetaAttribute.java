@@ -102,22 +102,19 @@ public class MetaAttribute extends Persistable implements IMetaAttribute
             MetaSet thisSet = (MetaSet)metaType;
             MetaSet thatSet = (MetaSet)(that.getMetaType());
 
-            boolean eqSet = true;
-
             if (thisSet.getArrayKeyFilter().size() != thatSet.getArrayKeyFilter().size()) {
-                eqSet = false;
+                return false;
             } else {
                 for (String attrName : thisSet.getArrayKeyFilter().keySet()) {
-                    String value = thatSet.getArrayKeyFilter().get(attrName);
-
-                    if (value == null || !value.equals(thisSet.getArrayKeyFilter().get(attrName))) {
-                        eqSet = false;
-                        break;
+                    for(String value : thatSet.getArrayKeyFilter().get(attrName)) {
+                        if (value == null || !value.equals(thisSet.getArrayKeyFilter().get(attrName))) {
+                            return false;
+                        }
                     }
                 }
             }
 
-            return eqSet;
+            return true;
         }
 
         return true;

@@ -4,6 +4,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.Date;
+import java.text.ParseException;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
@@ -615,7 +617,8 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
     }
 
     private Condition generateComplexArrayCondition(Condition condition, String name, IMetaType type, IBaseValue value,
-                                                    boolean and) {
+                                                    boolean and) throws ParseException
+    {
         SelectConditionStep outerComplexSQL = null;
 
         BaseSet actual_set_value = (BaseSet)value.getValue();
@@ -645,13 +648,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         {
             if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
             {
-                condition = DSL.val(actual_set_value.get().size()).eq(
+                condition = DSL.val(actual_set_value.sizeWithFilter(simple_set.getArrayKeyFilter())).greaterOrEqual(
                         context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
                                 count()).from(nested));
             }
             else
             {
-                condition = DSL.val(actual_set_value.get().size()).le(
+                condition = DSL.val(0).le(
                         context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
                                 count()).from(nested));
             }
@@ -662,13 +665,14 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
             {
                 if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
                 {
-                    condition = condition.and(DSL.val(actual_set_value.get().size()).eq(
+                    condition = condition.and(DSL.val(actual_set_value.sizeWithFilter(simple_set.getArrayKeyFilter())).
+                            greaterOrEqual(
                             context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
                                     count()).from(nested)));
                 }
                 else
                 {
-                    condition = condition.and(DSL.val(actual_set_value.get().size()).le(
+                    condition = condition.and(DSL.val(0).le(
                             context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
                                     count()).from(nested)));
                 }
@@ -677,13 +681,14 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
             {
                 if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
                 {
-                    condition = condition.or(DSL.val(actual_set_value.get().size()).eq(
+                    condition = condition.or(DSL.val(actual_set_value.sizeWithFilter(simple_set.getArrayKeyFilter())).
+                            greaterOrEqual(
                             context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
                                     count()).from(nested)));
                 }
                 else
                 {
-                    condition = condition.or(DSL.val(actual_set_value.get().size()).le(
+                    condition = condition.or(DSL.val(0).le(
                             context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
                                     count()).from(nested)));
                 }
@@ -693,7 +698,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         return condition;
     }
 
-    public SelectConditionStep generateSQL(IBaseEntity entity, String entityName, HashMap<String, String> arrayKeyFilter)
+    public SelectConditionStep generateSQL(IBaseEntity entity, String entityName, HashMap<String, ArrayList<String>> arrayKeyFilter)
     {
         MetaClass meta = entity.getMeta();
 
@@ -787,15 +792,21 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                 if (!type.isComplex()) {
                     condition = generateSimpleArrayCondition(condition, name, type, value, and);
                 } else {
-                    condition = generateComplexArrayCondition(condition, name, type, value, and);
+                    try
+                    {
+                        condition = generateComplexArrayCondition(condition, name, type, value, and);
+                    } catch (ParseException e)
+                    {
+                        throw new IllegalArgumentException("Error in array key filter: " + e.getMessage());
+                    }
                 }
             }
         }
 
         if (arrayKeyFilter != null && arrayKeyFilter.size() > 0) {
             int filterNumber = 1;
+            Condition innerCondition = null;
             for (String attrName : arrayKeyFilter.keySet()) {
-                IMetaAttribute attribute = meta.getMetaAttribute(attrName);
                 IMetaType type = meta.getMemberType(attrName);
 
                 IBaseValue value = entity.safeGetValue(attrName);
@@ -805,7 +816,17 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                             "it is used in array filter");
                 }
 
-                condition = generateSimpleConditions(condition, attrName + filterNumber++, type, value, true);
+                BaseValue bv = ((BaseValue)value).clone();
+                for (String val : arrayKeyFilter.get(attrName)) {
+                    bv.setValue(val);
+
+                    innerCondition = generateSimpleConditions(innerCondition, attrName + filterNumber, type, bv, false);
+                }
+                filterNumber++;
+            }
+
+            if (innerCondition != null) {
+                condition = condition.and(innerCondition);
             }
         }
 

@@ -4,11 +4,13 @@ import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DateUtils;
 
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -336,4 +338,21 @@ public class BaseSet extends BaseContainer implements IBaseSet
         }
     }
 
+    public int sizeWithFilter(HashMap<String, ArrayList<String>> arrayKeyFilter) throws ParseException
+    {
+        if (arrayKeyFilter == null) return values.size();
+
+        int counter = 0;
+        if (metaType.isComplex() && !metaType.isSet()) {
+            for (String name : values.keySet()) {
+                BaseEntity value = (BaseEntity)values.get(name).getValue();
+
+                if (value.applyKeyFilter(arrayKeyFilter)) {
+                    counter++;
+                }
+            }
+        }
+
+        return counter;
+    }
 }

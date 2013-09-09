@@ -1,6 +1,8 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import kz.bsbnb.usci.eav.model.base.ContainerTypes;
@@ -28,7 +30,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
     private boolean immutable = false;
 
     private boolean reference = false;
-	
+
 	/**
 	 * Holds type values. Keys of hash are type names.
 	 */
@@ -401,7 +403,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
 
     public String toString(String prefix)
     {
-        String str = className + ":metaClass(" + getId() + ");";
+        String str = className + ":metaClass(" + getId() + "_" + searchable +  ");";
 
         String[] names;
 
