@@ -492,6 +492,7 @@ public class CLI
             else {
                 in = new Scanner(System.in);
                 System.out.println("Done. Awaiting commands from cli.");
+                inputStream = null;
             }
         }
     }
