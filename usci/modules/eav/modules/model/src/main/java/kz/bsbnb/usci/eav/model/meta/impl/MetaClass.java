@@ -398,7 +398,20 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
     }
 
     public boolean isSearchable() {
-        return searchable;
+        //return searchable;
+        //TODO:fix this, searcheble flag is not set if attribute is changed outside
+
+        Iterator<IMetaAttribute> it = members.values().iterator();
+        while (it.hasNext())
+        {
+            IMetaAttribute metaAttribute = it.next();
+            if (metaAttribute.isKey())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public String toString(String prefix)
