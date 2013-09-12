@@ -2,6 +2,7 @@ package kz.bsbnb.usci.receiver.monitor;
 
 import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
+import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
@@ -30,6 +31,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.*;
@@ -68,7 +70,6 @@ public class ZipFilesMonitor{
 
         CouchbaseClient client = clientFactory.getCouchbaseClient();
 
-        System.out.println(clientFactory);
 
         Batch batch = new Batch(new java.sql.Date(new java.util.Date().getTime()));
         long batchId = batchService.save(batch);
@@ -104,6 +105,21 @@ public class ZipFilesMonitor{
             client.shutdown();
         }
 
+    }
+
+    public byte[] InputStreamToByte(InputStream in) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        int nRead;
+        byte[] data = new byte[16384];
+
+        while ((nRead = in.read(data,0,data.length)) != -1){
+            buffer.write(data,0,nRead);
+        }
+
+        buffer.flush();
+
+        return buffer.toByteArray();
     }
 
     public void readFiles(String filename){
@@ -154,7 +170,10 @@ public class ZipFilesMonitor{
             System.out.println(batchInfo.getSize());
             System.out.println(batchInfo.getRepDate());
 
-            saveData(batchInfo,filename,new byte[12]);
+
+
+
+            saveData(batchInfo,filename,InputStreamToByte(inData));
 
 
         }catch(IOException e){
