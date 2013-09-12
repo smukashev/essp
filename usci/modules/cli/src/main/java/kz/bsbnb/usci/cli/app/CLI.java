@@ -24,6 +24,8 @@ import org.xml.sax.SAXException;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -33,6 +35,8 @@ public class CLI
 {
     private String command;
     private ArrayList<String> args = new ArrayList<String>();
+
+    private static SimpleDateFormat sdfout = new SimpleDateFormat("dd.MM.yyyy");
 
     @Autowired
     private IStorage storage;
@@ -58,28 +62,36 @@ public class CLI
     @Autowired
     private BasicBaseEntitySearcher searcher;
 
-    public void processCRBatch(String fname, int count) throws SAXException, IOException, XMLStreamException
+    private InputStream inputStream = null;
+
+    public void processCRBatch(String fname, int count, int offset, Date repDate) throws SAXException, IOException, XMLStreamException
     {
         File inFile = new File(fname);
 
         InputStream in = null;
         in = new FileInputStream(inFile);
 
-        Batch batch = batchRepository.addBatch(new Batch(new Date((new java.util.Date()).getTime())));
+        System.out.println("Processing batch with rep date: " + repDate);
+
+        Batch batch = batchRepository.addBatch(new Batch(repDate));
 
         crParser.parse(in, batch);
 
         BaseEntity entity;
         int i = 0;
-        while(crParser.hasMore() && (i++ < count)) {
-            entity = crParser.getCurrentBaseEntity();
+        while(crParser.hasMore() && (((i++) - offset) < count)) {
+            if (i > offset) {
+                entity = crParser.getCurrentBaseEntity();
+                System.out.println(entity);
+                long id = baseEntityDao.process(entity).getId();
+                System.out.println("Saved with id: " + id);
+            }
 
-            System.out.println(entity);
-
-            long id = baseEntityDao.save(entity).getId();
-            System.out.println("Saved with id: " + id);
-
-            crParser.parseNextPackage();
+            if (i >= offset) {
+                crParser.parseNextPackage();
+            } else {
+                crParser.skipNextPackage();
+            }
         }
 
     }
@@ -259,6 +271,21 @@ public class CLI
         }
     }
 
+    public void execEntitySQ(long id) {
+        IBaseEntity entity = baseEntityDao.load(id);
+
+        if (entity == null) {
+            System.out.println("No such entity with id: " + id);
+        } else {
+            //SelectConditionStep where = searcher.generateSQL(entity, null);
+            ArrayList<Long> array = searcher.findAll((BaseEntity)entity);
+
+            for (Long ids : array) {
+                System.out.println(ids.toString());
+            }
+        }
+    }
+
     public void commandXSD() throws FileNotFoundException
     {
         if (args.size() > 1) {
@@ -278,12 +305,18 @@ public class CLI
         }
     }
 
-    public void commandCRBatch() throws IOException, SAXException, XMLStreamException
+    public void commandCRBatch() throws IOException, SAXException, XMLStreamException, ParseException
     {
-        if (args.size() > 1) {
-            processCRBatch(args.get(0), Integer.parseInt(args.get(1)));
+        if (args.size() > 2) {
+            if (args.size() > 3) {
+                processCRBatch(args.get(0), Integer.parseInt(args.get(1)), Integer.parseInt(args.get(2)),
+                    new Date(sdfout.parse(args.get(3)).getTime()));
+            } else {
+                processCRBatch(args.get(0), Integer.parseInt(args.get(1)), Integer.parseInt(args.get(2)),
+                        new Date((new java.util.Date()).getTime()));
+            }
         } else {
-            System.out.println("Argument needed: <fileName> <count>");
+            System.out.println("Argument needed: <fileName> <count> <offset>");
         }
     }
 
@@ -349,6 +382,12 @@ public class CLI
                     } else {
                         System.out.println("Argument needed: <show> <sq> <id> <attributePath>");
                     }
+                } else if (args.get(1).equals("eq")) {
+                    if (args.size() > 2) {
+                        execEntitySQ(Long.parseLong(args.get(2)));
+                    } else {
+                        System.out.println("Argument needed: <show> <sq> <id> <attributePath>");
+                    }
                 } else {
                     System.out.println("No such entity identification method: " + args.get(1));
                 }
@@ -386,57 +425,85 @@ public class CLI
         System.out.println("Waiting for commands.");
         System.out.print("> ");
 
-        Scanner in = new Scanner(System.in);
+        Scanner in;
+
+        if (inputStream == null) {
+            in = new Scanner(System.in);
+        } else {
+            in = new Scanner(inputStream);
+        }
 
         String line;
 
         Exception lastException = null;
 
-        while (!(line = in.nextLine()).equals("quit")) {
-            StringTokenizer st = new StringTokenizer(line);
-            if (st.hasMoreTokens()) {
-                command = st.nextToken().trim();
+        while(true) {
+            while (!(line = in.nextLine()).equals("quit")) {
+                StringTokenizer st = new StringTokenizer(line);
+                if (st.hasMoreTokens()) {
+                    command = st.nextToken().trim();
 
-                args.clear();
-                while(st.hasMoreTokens()) {
-                    args.add(st.nextToken().trim());
-                }
-            } else {
-                continue;
-            }
-
-            try {
-                if (command.equals("test")) {
-                    commandTest();
-                } else if (command.equals("clear")) {
-                    storage.clear();
-                } else if (command.equals("init")) {
-                    storage.initialize();
-                } else if (command.equals("tc")) {
-                    storage.tableCounts();
-                } else if (command.equals("le")) {
-                    if (lastException != null) {
-                        lastException.printStackTrace();
-                    } else {
-                        System.out.println("No errors.");
+                    args.clear();
+                    while(st.hasMoreTokens()) {
+                        args.add(st.nextToken().trim());
                     }
-                } else if (command.equals("xsd")) {
-                    commandXSD();
-                } else if (command.equals("crbatch")) {
-                    commandCRBatch();
-                } else if (command.equals("meta")) {
-                    commandMeta();
-                } else if (command.equals("entity")) {
-                    commandEntity();
                 } else {
-                    System.out.println("No such command: " + command);
+                    continue;
                 }
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
-                lastException = e;
-            }
 
-            System.out.print("> ");
+                if (command.startsWith("#")) {
+                    continue;
+                }
+
+                try {
+                    if (command.equals("test")) {
+                        commandTest();
+                    } else if (command.equals("clear")) {
+                        storage.clear();
+                    } else if (command.equals("init")) {
+                        storage.initialize();
+                    } else if (command.equals("tc")) {
+                        storage.tableCounts();
+                    } else if (command.equals("le")) {
+                        if (lastException != null) {
+                            lastException.printStackTrace();
+                        } else {
+                            System.out.println("No errors.");
+                        }
+                    } else if (command.equals("xsd")) {
+                        commandXSD();
+                    } else if (command.equals("crbatch")) {
+                        commandCRBatch();
+                    } else if (command.equals("meta")) {
+                        commandMeta();
+                    } else if (command.equals("entity")) {
+                        commandEntity();
+                    } else {
+                        System.out.println("No such command: " + command);
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error: " + e.getMessage());
+                    lastException = e;
+                }
+
+                System.out.print("> ");
+            }
+            if (inputStream == null) break;
+            else {
+                in = new Scanner(System.in);
+                System.out.println("Done. Awaiting commands from cli.");
+                inputStream = null;
+            }
         }
+    }
+
+    public InputStream getInputStream()
+    {
+        return inputStream;
+    }
+
+    public void setInputStream(InputStream in)
+    {
+        this.inputStream = in;
     }
 }

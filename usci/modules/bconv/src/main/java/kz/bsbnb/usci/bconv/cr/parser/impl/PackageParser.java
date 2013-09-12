@@ -70,42 +70,42 @@ public class PackageParser extends BatchParser {
             } else {
                 throw new UnknownValException(localName, attributes.getValue("operation_type"));
             } */
-            currentBaseEntity.put("operation_type", new BaseValue(batch, 0,
+            currentBaseEntity.put("operation_type", new BaseValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("operation_type")).getValue()));
-            currentBaseEntity.put("no", new BaseValue(batch, 0,
+            currentBaseEntity.put("no", new BaseValue(batch, index,
                     new Double(event.asStartElement().getAttributeByName(new QName("no")).getValue())));
         } else if(localName.equals("primary_contract")) {
-            primaryContractParser.parse(xmlReader, batch);
+            primaryContractParser.parse(xmlReader, batch, index);
             BaseEntity primaryContract = primaryContractParser.getCurrentBaseEntity();
 
-            currentBaseEntity.put("primary_contract", new BaseValue(batch, 0, primaryContract));
+            currentBaseEntity.put("primary_contract", new BaseValue(batch, index, primaryContract));
         } else if(localName.equals("credit")) {
             //attributes.getValue("credit_type")
-            creditParser.parse(xmlReader, batch);
+            creditParser.parse(xmlReader, batch, index);
             BaseEntity credit = creditParser.getCurrentBaseEntity();
-            credit.put("credit_type", new BaseValue(batch, 0,
+            credit.put("credit_type", new BaseValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("credit_type")).getValue()));
             //System.out.println(credit.toString());
-            currentBaseEntity.put("credit", new BaseValue(batch, 0, credit));
+            currentBaseEntity.put("credit", new BaseValue(batch, index, credit));
         } else if(localName.equals("subjects")) {
             BaseEntity subjects = new BaseEntity(metaClassRepository.getMetaClass("subject"), new Date());
 
             while(true) {
-                subjectsParser.parse(xmlReader, batch);
+                subjectsParser.parse(xmlReader, batch, index);
                 if (subjectsParser.hasMore()) {
                     BaseEntity subject = subjectsParser.getCurrentBaseEntity();
                     subjects.put(subject.getMeta().getClassName(),
-                            new BaseValue(batch, 0, subject));
+                            new BaseValue(batch, index, subject));
                 } else {
                     break;
                 }
             }
 
-            currentBaseEntity.put("subjects", new BaseValue(batch, 0, subjects));
+            currentBaseEntity.put("subjects", new BaseValue(batch, index, subjects));
         } else if(localName.equals("pledges")) {
-            pledgesParser.parse(xmlReader, batch);
+            pledgesParser.parse(xmlReader, batch, index);
         } else if(localName.equals("change")) {
-            changeParser.parse(xmlReader, batch);
+            changeParser.parse(xmlReader, batch, index);
         } else {
             throw new UnknownTagException(localName);
         }

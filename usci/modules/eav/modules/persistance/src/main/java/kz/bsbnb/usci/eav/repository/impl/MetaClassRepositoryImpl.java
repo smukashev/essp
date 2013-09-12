@@ -47,9 +47,14 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository
     }
 
     @Override
-    public void saveMetaClass(MetaClass meta)
+    synchronized public void saveMetaClass(MetaClass meta)
     {
         storage.save(meta);
+
+        for (String name : cache.keySet()) {
+            cache.get(name).recursiveSet(meta);
+        }
+
         cache.put(meta.getClassName(), meta);
     }
 }

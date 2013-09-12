@@ -15,7 +15,12 @@ import kz.bsbnb.usci.eav.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 
 /**
  * Implements EAV entity object. 
@@ -29,6 +34,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 {
 
     Logger logger = LoggerFactory.getLogger(BaseEntity.class);
+
+    protected DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
      * Reporting date on which instance of BaseEntity was loaded.
@@ -72,8 +79,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      */
     public BaseEntity(MetaClass meta, Date reportDate)
     {
-        this.reportDate = reportDate;
+        Date newReportDate = (Date)reportDate.clone();
+        DateUtils.toBeginningOfTheDay(newReportDate);
+
+        this.reportDate = newReportDate;
         this.meta = meta;
+        this.availableReportDates.add(newReportDate);
     }
 
     public BaseEntity(long id, MetaClass meta, Date reportDate, Set<Date> availableReportDates)
@@ -114,30 +125,66 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     @Override
     public void setAvailableReportDates(Set<Date> availableReportDates) {
         this.availableReportDates = availableReportDates;
-        this.maxReportDate = Collections.max(availableReportDates);
-        this.minReportDate = Collections.min(availableReportDates);
+        this.maxReportDate = null;
+        this.minReportDate = null;
     }
 
     @Override
     public Date getMaxReportDate()
     {
-        if (availableReportDates.size() != 0)
+        if (maxReportDate == null)
         {
-            maxReportDate = Collections.max(availableReportDates);
-            return maxReportDate;
+            if (availableReportDates.size() != 0)
+            {
+                maxReportDate = Collections.max(availableReportDates);
+            }
         }
-        return null;
+        return maxReportDate;
     }
 
     @Override
     public Date getMinReportDate()
     {
-        if (availableReportDates.size() != 0)
+        if (minReportDate == null)
         {
-            minReportDate = Collections.min(availableReportDates);
-            return minReportDate;
+            if (availableReportDates.size() != 0)
+            {
+                minReportDate = Collections.min(availableReportDates);
+            }
         }
-        return null;
+        return minReportDate;
+    }
+
+    @Override
+    public boolean isMaxReportDate()
+    {
+        if (this.reportDate == null)
+        {
+            throw new IllegalStateException("The report date can not be equal to null.");
+        }
+
+        Date maxReportDate = getMaxReportDate();
+        if (maxReportDate == null)
+        {
+            throw new IllegalStateException("The maximum report date can not be equal to null.");
+        }
+        return DateUtils.compareBeginningOfTheDay(reportDate, maxReportDate) == 0;
+    }
+
+    @Override
+    public boolean isMinReportDate()
+    {
+        if (this.reportDate == null)
+        {
+            throw new IllegalStateException("The report date can not be equal to null.");
+        }
+
+        Date minReportDate = getMinReportDate();
+        if (minReportDate == null)
+        {
+            throw new IllegalStateException("The minimum report date can not be equal to null.");
+        }
+        return DateUtils.compareBeginningOfTheDay(reportDate, minReportDate) == 0;
     }
 
     /**
@@ -192,16 +239,13 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         {
             IMetaType metaType = meta.getMemberType(attribute);
 
-            if(metaType == null)
+            if (metaType == null)
+            {
                 throw new IllegalArgumentException(String.format("Instance of MetaClass with class name {0} " +
                         "does not contain attribute {1}.", meta.getClassName(), attribute));
+            }
 
-            IBaseValue baseValue = values.get(attribute);
-
-            if(baseValue == null)
-                return null;
-
-            return baseValue;
+            return values.get(attribute);
         }
     }
 
@@ -392,7 +436,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      * Names of all attributes that are actually set in entity
      * @return - set of needed attributes
      */
-    public Set<String> getAttributeNames() {
+    public Set<String> getIdentifiers() {
         return values.keySet();
     }
 
@@ -406,8 +450,14 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     }
 
     public void setReportDate(Date reportDate) {
-        this.reportDate = reportDate;
-        this.availableReportDates.add(reportDate);
+        Date newReportDate = (Date)reportDate.clone();
+        DateUtils.toBeginningOfTheDay(newReportDate);
+
+        this.reportDate = newReportDate;
+        this.availableReportDates.add(newReportDate);
+
+        this.minReportDate = null;
+        this.maxReportDate = null;
     }
 
     @Override
@@ -474,7 +524,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     public IBaseValue safeGetValue(String name)
     {
-        if (this.getAttributeNames().contains(name))
+        if (this.getIdentifiers().contains(name))
         {
             return getBaseValue(name);
         }
@@ -735,4 +785,58 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         return baseEntity;
     }
 
+    public boolean applyKeyFilter(HashMap<String, ArrayList<String>> arrayKeyFilter) throws ParseException
+    {
+        for (String attrName : arrayKeyFilter.keySet()) {
+            IMetaType type = meta.getMemberType(attrName);
+
+            IBaseValue value = safeGetValue(attrName);
+
+            if(value == null) {
+                throw new IllegalArgumentException("Key attribute " + attrName + " can't be null, " +
+                        "it is used in array filter");
+            }
+
+            if (testValueOnString(type, value, arrayKeyFilter.get(attrName))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean testValueOnString(IMetaType type, IBaseValue value, ArrayList<String> filter) throws ParseException
+    {
+        MetaValue simple_value = (MetaValue)type;
+
+        for (String strValue : filter) {
+            switch (simple_value.getTypeCode())
+            {
+                case BOOLEAN:
+                    Boolean actual_boolean_value = (Boolean)value.getValue();
+                    if (actual_boolean_value == Boolean.parseBoolean(strValue)) return true;
+                    break;
+                case DATE:
+                    java.sql.Date actual_date_value = DateUtils.convert((java.util.Date)value.getValue());
+                    if (actual_date_value == dateFormat.parse(strValue)) return true;
+                    break;
+                case DOUBLE:
+                    Double actual_double_value = (Double)value.getValue();
+                    if (actual_double_value == Double.parseDouble(strValue)) return true;
+                    break;
+                case INTEGER:
+                    Integer actual_integer_value = (Integer)value.getValue();
+                    if (actual_integer_value == Integer.parseInt(strValue)) return true;
+                    break;
+                case STRING:
+                    String actual_string_value = (String)value.getValue();
+                    if (actual_string_value.equals(strValue)) return true;
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown data type: " + simple_value.getTypeCode());
+            }
+        }
+
+        return false;
+    }
 }

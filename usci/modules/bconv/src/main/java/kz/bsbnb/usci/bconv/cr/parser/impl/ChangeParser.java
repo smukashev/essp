@@ -37,11 +37,11 @@ public class ChangeParser extends BatchParser {
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("change")) {
         } else if(localName.equals("turnover")) {
-            changeTurnoverParser.parse(xmlReader, batch);
+            changeTurnoverParser.parse(xmlReader, batch, index);
         } else if(localName.equals("remains")) {
-            changeRemainsParser.parse(xmlReader, batch);
+            changeRemainsParser.parse(xmlReader, batch, index);
         } else if(localName.equals("credit_flow")) {
-            changeCreditFlowParser.parse(xmlReader, batch);
+            changeCreditFlowParser.parse(xmlReader, batch, index);
         } else if(localName.equals("maturity_date")) {
         } else if(localName.equals("prolongation_date")) {
         } else {

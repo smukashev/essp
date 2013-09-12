@@ -48,6 +48,7 @@ public class MainParser extends BatchParser {
     
     public void parse(InputStream in, Batch batch) throws SAXException, IOException, XMLStreamException
     {
+        index = 1;
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         xmlReader = inputFactory.createXMLEventReader(in);
         this.batch = batch;
@@ -76,7 +77,7 @@ public class MainParser extends BatchParser {
     }
 
     @Override
-    public void parse(XMLEventReader xmlReader, Batch batch) throws SAXException
+    public void parse(XMLEventReader xmlReader, Batch batch, long index) throws SAXException
     {
         this.xmlReader = xmlReader;
         this.batch = batch;
@@ -110,7 +111,7 @@ public class MainParser extends BatchParser {
     public void parseNextPackage() throws SAXException
     {
         System.out.println("Package #" + index++);
-        packageParser.parse(xmlReader, batch);
+        packageParser.parse(xmlReader, batch, index);
         if (packageParser.hasMore()) {
             currentBaseEntity = packageParser.getCurrentBaseEntity();
             hasMore = true;
@@ -119,15 +120,38 @@ public class MainParser extends BatchParser {
         }
     }
 
+    public void skipNextPackage() throws SAXException
+    {
+        System.out.println("Package #" + index++ + " skipped.");
+
+        while(xmlReader.hasNext()) {
+            XMLEvent event = (XMLEvent) xmlReader.next();
+            currentBaseEntity = null;
+
+            if(event.isEndElement()) {
+                EndElement endElement = event.asEndElement();
+                String localName = endElement.getName().getLocalPart();
+
+                if(localName.equals("packages")) {
+                    hasMore = false;
+                    return;
+                } else if(localName.equals("package")) {
+                    hasMore = true;
+                    return;
+                }
+            }
+        }
+    }
+
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("batch")) {
         } else if(localName.equals("info")) {
-            infoParser.parse(xmlReader, batch);
+            infoParser.parse(xmlReader, batch, index);
         } else if(localName.equals("packages")) {
             parseNextPackage();
             return true;
         } else if(localName.equals("portfolio_data")) {
-            portfolioDataParser.parse(xmlReader, batch);
+            portfolioDataParser.parse(xmlReader, batch, index);
         } else {
             throw new UnknownTagException(localName);
         }

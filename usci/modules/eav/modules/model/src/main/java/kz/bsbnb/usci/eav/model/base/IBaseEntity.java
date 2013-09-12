@@ -13,8 +13,6 @@ public interface IBaseEntity extends IBaseContainer {
 
     public IMetaAttribute getMetaAttribute(String attribute);
 
-    public IBaseValue getBaseValue(String attribute);
-
     public Date getReportDate();
 
     public void setReportDate(Date reportDate);
@@ -29,11 +27,14 @@ public interface IBaseEntity extends IBaseContainer {
 
     public MetaClass getMeta();
 
-    public Set<String> getAttributeNames();
-
     public void remove(String attribute);
 
     public Object getEl(String path);
 
     public IBaseValue safeGetValue(String name);
+
+    public boolean isMaxReportDate();
+
+    public boolean isMinReportDate();
+
 }

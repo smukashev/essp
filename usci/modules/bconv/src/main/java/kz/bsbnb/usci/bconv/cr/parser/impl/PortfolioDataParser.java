@@ -32,9 +32,9 @@ public class PortfolioDataParser extends BatchParser {
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("portfolio_data")) {
         } else if(localName.equals("portfolio_flow")) {
-            portfolioFlowParser.parse(xmlReader, batch);
+            portfolioFlowParser.parse(xmlReader, batch, index);
         } else if(localName.equals("portfolio_flow_msfo")) {
-            portfolioFlowMsfoParser.parse(xmlReader, batch);
+            portfolioFlowMsfoParser.parse(xmlReader, batch, index);
         } else {
             throw new UnknownTagException(localName);
         }

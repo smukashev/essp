@@ -37,7 +37,7 @@ public class CreditorBranchParser extends BatchParser {
         if(localName.equals("creditor_branch")) {
         } else if(localName.equals("code")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("code", new BaseValue(batch, 0, event.asCharacters().getData()));
+            currentBaseEntity.put("code", new BaseValue(batch, index, event.asCharacters().getData()));
         } else if(localName.equals("docs")) {
             //ctCreditorDocs = new CtCreditor.Docs();
             currentDocSet = new BaseSet(metaClassRepository.getMetaClass("doc"));
@@ -46,14 +46,14 @@ public class CreditorBranchParser extends BatchParser {
             //currentDoc.setDocType(attributes.getValue("doc_type"));
             currentDoc = new BaseEntity(metaClassRepository.getMetaClass("doc"), new Date());
 
-            currentDoc.put("doc_type", new BaseValue(batch, 0,
+            currentDoc.put("doc_type", new BaseValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
         } else if(localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("name", new BaseValue(batch, 0, event.asCharacters().getData()));
+            currentDoc.put("name", new BaseValue(batch, index, event.asCharacters().getData()));
         } else if(localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("no", new BaseValue(batch, 0, event.asCharacters().getData()));
+            currentDoc.put("no", new BaseValue(batch, index, event.asCharacters().getData()));
         } else {
             throw new UnknownTagException(localName);
         }
@@ -71,10 +71,10 @@ public class CreditorBranchParser extends BatchParser {
             //ctCreditor.setCode(contents.toString());
         } else if(localName.equals("docs")) {
             //ctCreditor.setDocs(ctCreditorDocs);
-            currentBaseEntity.put("docs", new BaseValue(batch, 0, currentDocSet));
+            currentBaseEntity.put("docs", new BaseValue(batch, index, currentDocSet));
         } else if(localName.equals("doc")) {
             //ctCreditorDocs.getDoc().add(currentDoc);
-            currentDocSet.put(new BaseValue(batch, 0, currentDoc));
+            currentDocSet.put(new BaseValue(batch, index, currentDoc));
         } else if(localName.equals("name")) {
             //currentDoc.setName(contents.toString());
         } else if(localName.equals("no")) {

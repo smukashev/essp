@@ -1,13 +1,16 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DateUtils;
 
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -22,26 +25,26 @@ public class BaseSet extends BaseContainer implements IBaseSet
      * Holds data about entity structure
      * @see kz.bsbnb.usci.eav.model.meta.impl.MetaClass
      */
-    private IMetaType meta;
+    private IMetaType metaType;
 
-    private Map<String, IBaseValue> data = new HashMap<String, IBaseValue>();
+    private Map<String, IBaseValue> values = new HashMap<String, IBaseValue>();
 
     private Set<String> modifiedObjects = new HashSet<String>();
 
     /**
      * Initializes entity with a class name.
      *
-     * @param meta MetaClass of the entity..
+     * @param metaType MetaClass of the entity..
      */
-    public BaseSet(IMetaType meta)
+    public BaseSet(IMetaType metaType)
     {
-        this.meta = meta;
+        this.metaType = metaType;
     }
 
-    public BaseSet(long id, IMetaType meta)
+    public BaseSet(long id, IMetaType metaType)
     {
         super(id);
-        this.meta = meta;
+        this.metaType = metaType;
     }
 
     public UUID getUuid() {
@@ -51,12 +54,17 @@ public class BaseSet extends BaseContainer implements IBaseSet
     @Override
     public IMetaType getMemberType(String name)
     {
-        return meta;
+        return metaType;
     }
 
     public IMetaType getMemberType()
     {
-        return meta;
+        return metaType;
+    }
+
+    public Set<String> getIdentifiers()
+    {
+        return values.keySet();
     }
 
     @Override
@@ -67,7 +75,7 @@ public class BaseSet extends BaseContainer implements IBaseSet
             UUID uuid = UUID.randomUUID();
             put(uuid.toString(), value);
         }
-        data.put(name, value);
+        values.put(name, value);
     }
 
     public BaseSet put(IBaseValue value)
@@ -78,15 +86,25 @@ public class BaseSet extends BaseContainer implements IBaseSet
         return this;
     }
 
+    public void remove(String identifier) {
+        fireValueChange(identifier);
+        values.remove(identifier);
+    }
+
     @Override
     public Collection<IBaseValue> get()
     {
-        return data.values();
+        return values.values();
+    }
+
+    public IBaseValue getBaseValue(String identifier)
+    {
+        return values.get(identifier);
     }
 
     public int getElementCount()
     {
-        return data.size();
+        return values.size();
     }
 
     @Override
@@ -95,7 +113,7 @@ public class BaseSet extends BaseContainer implements IBaseSet
         String str = "[";
         boolean first = true;
 
-        for (IBaseValue value : data.values()) {
+        for (IBaseValue value : values.values()) {
             if (first) {
                 str += value.getValue().toString();
                 first = false;
@@ -111,12 +129,12 @@ public class BaseSet extends BaseContainer implements IBaseSet
 
     public Object getElSimple(String filter)
     {
-        if (meta.isComplex() || meta.isSet())
+        if (metaType.isComplex() || metaType.isSet())
         {
             throw new IllegalArgumentException("Get simple attribute method called for complex attribute or array");
         }
 
-        for (IBaseValue value : data.values())
+        for (IBaseValue value : values.values())
         {
             Object innerValue = value.getValue();
             if (innerValue == null)
@@ -124,7 +142,7 @@ public class BaseSet extends BaseContainer implements IBaseSet
                 continue;
             }
 
-            if (((BaseValue)value).equalsToString(filter, ((MetaValue)meta).getTypeCode()))
+            if (((BaseValue)value).equalsToString(filter, ((MetaValue)metaType).getTypeCode()))
                 return innerValue;
         }
 
@@ -133,7 +151,7 @@ public class BaseSet extends BaseContainer implements IBaseSet
 
     public Object getElComplex(String filter)
     {
-        if (!meta.isComplex() || meta.isSet())
+        if (!metaType.isComplex() || metaType.isSet())
         {
             throw new IllegalArgumentException("Get complex attribute method called for simple attribute or array");
         }
@@ -158,7 +176,7 @@ public class BaseSet extends BaseContainer implements IBaseSet
             params.put(fieldName, fieldValue);
         }
 
-        for (IBaseValue value : data.values())
+        for (IBaseValue value : values.values())
         {
             Object innerValue = value.getValue();
             if (innerValue == null)
@@ -175,7 +193,7 @@ public class BaseSet extends BaseContainer implements IBaseSet
 
     public Object getEl(String filter)
     {
-        if (meta.isComplex())
+        if (metaType.isComplex())
             return getElComplex(filter);
         return getElSimple(filter);
     }
@@ -273,11 +291,11 @@ public class BaseSet extends BaseContainer implements IBaseSet
 
     public void setListeners()
     {
-        if (meta.isComplex())
+        if (metaType.isComplex())
         {
-            for (String key: data.keySet())
+            for (String key: values.keySet())
             {
-                IBaseValue baseValue = data.get(key);
+                IBaseValue baseValue = values.get(key);
                 IBaseContainer baseContainer = (IBaseContainer)baseValue.getValue();
                 baseContainer.addListener(new ValueChangeListener(this, key) {
 
@@ -320,4 +338,21 @@ public class BaseSet extends BaseContainer implements IBaseSet
         }
     }
 
+    public int sizeWithFilter(HashMap<String, ArrayList<String>> arrayKeyFilter) throws ParseException
+    {
+        if (arrayKeyFilter == null) return values.size();
+
+        int counter = 0;
+        if (metaType.isComplex() && !metaType.isSet()) {
+            for (String name : values.keySet()) {
+                BaseEntity value = (BaseEntity)values.get(name).getValue();
+
+                if (value.applyKeyFilter(arrayKeyFilter)) {
+                    counter++;
+                }
+            }
+        }
+
+        return counter;
+    }
 }

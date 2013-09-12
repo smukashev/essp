@@ -1,17 +1,20 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import kz.bsbnb.usci.eav.model.base.ContainerTypes;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 
-public class MetaClass extends Persistable implements IMetaType, IMetaContainer
+public class MetaClass extends Persistable implements IMetaType, IMetaClass
 {
 	/**
 	 * Name of the meta. Used as a key value for database search if <code>id</code> is 0
@@ -27,7 +30,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
     private boolean immutable = false;
 
     private boolean reference = false;
-	
+
 	/**
 	 * Holds type values. Keys of hash are type names.
 	 */
@@ -395,12 +398,25 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
     }
 
     public boolean isSearchable() {
-        return searchable;
+        //return searchable;
+        //TODO:fix this, searcheble flag is not set if attribute is changed outside
+
+        Iterator<IMetaAttribute> it = members.values().iterator();
+        while (it.hasNext())
+        {
+            IMetaAttribute metaAttribute = it.next();
+            if (metaAttribute.isKey())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public String toString(String prefix)
     {
-        String str = className + ":metaClass(" + getId() + ");";
+        String str = className + ":metaClass(" + getId() + "_" + searchable +  ");";
 
         String[] names;
 
@@ -464,5 +480,25 @@ public class MetaClass extends Persistable implements IMetaType, IMetaContainer
     public void setReference(boolean value)
     {
         reference = value;
+    }
+
+    public void recursiveSet(MetaClass subMeta) {
+        for (String memberName : members.keySet())
+        {
+            IMetaAttribute attribute = members.get(memberName);
+            IMetaType type = attribute.getMetaType();
+
+            if (type.isComplex()) {
+                if (type.isSet()) {
+                    ((MetaSet)type).recursiveSet(subMeta);
+                } else {
+                    if (subMeta.getClassName().equals(((MetaClass)type).getClassName())) {
+                        attribute.setMetaType(subMeta);
+                    } else {
+                        ((MetaClass)type).recursiveSet(subMeta);
+                    }
+                }
+            }
+        }
     }
 }

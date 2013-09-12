@@ -38,16 +38,16 @@ public class SubjectPersonDocsParser extends BatchParser {
         } else if(localName.equals("doc")) {
             //ctDoc = new CtDoc();
             //ctDoc.setDocType(attributes.getValue("doc_type"));
-            currentBaseEntity.put("doc_type", new BaseValue(batch, 0,
+            currentBaseEntity.put("doc_type", new BaseValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
         } else if(localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("name", new BaseValue(batch, 0,
+            currentBaseEntity.put("name", new BaseValue(batch, index,
                     event.asCharacters().getData()
                 ));
         } else if(localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("no", new BaseValue(batch, 0,
+            currentBaseEntity.put("no", new BaseValue(batch, index,
                     event.asCharacters().getData()
                 ));
         } else {
