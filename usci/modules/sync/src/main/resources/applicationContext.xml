@@ -32,11 +32,11 @@
     <import resource="classpath:database/dataSource.xml" />
     <import resource="classpath:database/hibernate.xml" />
 
-    <tx:annotation-driven transaction-manager="transactionManager"/>
+        <tx:annotation-driven transaction-manager="transactionManager"/>
 
-    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-        <property name="sessionFactory" ref="sessionFactory"/>
-    </bean>
+        <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+            <property name="sessionFactory" ref="sessionFactory"/>
+        </bean>
 
     <context:component-scan base-package="kz.bsbnb.usci.sync.service.impl" />
 
