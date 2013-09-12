@@ -25,9 +25,18 @@ public class Batch extends Persistable
 
     private Date repDate;
 
+    private Long userId;
+
     /**
      * Initializes batch with the default values.
      */
+
+    public Batch(Date repDate,Long userId){
+        super();
+        this.repDate = repDate;
+        this.userId = userId;
+    }
+
     public Batch(Date repDate)
     {
         super();
@@ -54,6 +63,14 @@ public class Batch extends Persistable
     public Timestamp getReceiptDate()
     {
         return receiptDate;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     @Override

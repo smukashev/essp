@@ -15,13 +15,15 @@
 
     <context:annotation-config/>
 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>classpath:properties/dataSource.properties</value>
-            </list>
-        </property>
-    </bean>
+    <import resource="applicationContextEAVPersistanse.xml"></import>
+
+    <!--<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
+        <!--<property name="locations">-->
+            <!--<list>-->
+                <!--<value>classpath:properties/dataSource.properties</value>-->
+            <!--</list>-->
+        <!--</property>-->
+    <!--</bean>-->
 
     <bean id="log4jInitializer" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="staticMethod" value="org.springframework.util.Log4jConfigurer.initLogging"/>
@@ -32,7 +34,7 @@
         </property>
     </bean>
 
-    <import resource="classpath:database/dataSource.xml" />
+    <!--<import resource="classpath:database/dataSource.xml" />-->
     <import resource="classpath:database/hibernate.xml" />
 
     <tx:annotation-driven transaction-manager="transactionManager"/>
@@ -47,6 +49,10 @@
     <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
         <property name="transactionManager" ref="transactionManager" />
     </bean>
+
+    <!--<bean id="monitor" class="kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor">-->
+
+    <!--</bean>-->
 
     <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
         <property name="jobRepository" ref="jobRepository" />
@@ -81,11 +87,11 @@
         <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IMetaFactoryService"/>
     </bean>
 
-    <bean id="context" class="org.jooq.impl.DSL" factory-method="using">
-        <constructor-arg name="dialect">
-            <value type="org.jooq.SQLDialect">POSTGRES</value>
-        </constructor-arg>
-        <!-- <constructor-arg index="0" value="${jooq.executor.constructor.args.first}"/> -->
-    </bean>
+    <!--<bean id="context" class="org.jooq.impl.DSL" factory-method="using">-->
+        <!--<constructor-arg name="dialect">-->
+            <!--<value type="org.jooq.SQLDialect">POSTGRES</value>-->
+        <!--</constructor-arg>-->
+        <!--&lt;!&ndash; <constructor-arg index="0" value="${jooq.executor.constructor.args.first}"/> &ndash;&gt;-->
+    <!--</bean>-->
 
 </beans>

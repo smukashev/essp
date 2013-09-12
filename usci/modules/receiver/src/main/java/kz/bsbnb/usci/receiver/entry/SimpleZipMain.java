@@ -27,12 +27,13 @@ public class SimpleZipMain {
         IBatchService batchService = serviceFactory.getBatchService();
 
         ICouchbaseClientFactory couchbaseClientFactory = ctx.getBean(ICouchbaseClientFactory.class);
-        CouchbaseClient client = couchbaseClientFactory.getCouchbaseClient();
+        System.out.println(couchbaseClientFactory);
+//        CouchbaseClient client = couchbaseClientFactory.getCouchbaseClient();
 
         StatusSingleton statusSingleton = ctx.getBean(StatusSingleton.class);
 
-        ZipFilesMonitor monitor = new ZipFilesMonitor();
-        monitor.monitor(Paths.get("/home/abukabayev/workspace/testZip/pathfolder"));
+        ZipFilesMonitor monitor = ctx.getBean(ZipFilesMonitor.class);
+        monitor.monitor(Paths.get("/home/aybek/test"));
 
     }
 }
