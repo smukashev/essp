@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.IMetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 
 /**
@@ -9,7 +10,7 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
  * @author a.tkachenko
  * @version 1.1, 17.01.2013
  */
-public class MetaValue implements IMetaType
+public class MetaValue implements IMetaValue
 {
 	/**
 	 * Attributes type's code

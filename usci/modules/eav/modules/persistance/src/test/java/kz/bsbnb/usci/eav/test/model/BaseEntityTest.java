@@ -197,7 +197,7 @@ public class BaseEntityTest extends GenericTestCase{
         set.add("testDate");
         set.add("testInteger");
 
-        assertEquals(set,instance.getAttributeNames());
+        assertEquals(set,instance.getIdentifiers());
         assertEquals(2,instance.getAttributeCount());
 
         set.remove("testInteger");

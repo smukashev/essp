@@ -2,26 +2,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
-		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+    <import resource="applicationContextEAVPersistanse.xml"></import>
 
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
     <context:component-scan base-package="kz.bsbnb.usci.core.service.impl" />
 
     <context:annotation-config/>
-
-    <!-- Add this tag to enable annotations transactions -->
-    <tx:annotation-driven transaction-manager="txManager"/>
-
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>classpath:properties/dataSource.properties</value>
-            </list>
-        </property>
-    </bean>
 
     <bean id="log4jInitializer" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="staticMethod" value="org.springframework.util.Log4jConfigurer.initLogging"/>
@@ -31,23 +20,6 @@
             </list>
         </property>
     </bean>
-
-    <!-- spring transaction manager -->
-    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
-
-    <!-- datasource to the database -->
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="${ds.driver}"/>
-        <property name="url" value="${ds.url}"/>
-        <property name="username" value="${ds.user}"/>
-        <property name="password" value="${ds.password}"/>
-        <property name="initialSize" value="${ds.pool.initialSize}"/>
-        <property name="maxActive" value="${ds.pool.maxActive}"/>
-    </bean>
-
-    <bean id="batchReporsitory" class="kz.bsbnb.usci.eav.repository.impl.BatchRepository"/>
 
     <!-- services -->
     <bean id="entityRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
@@ -69,13 +41,6 @@
         <property name="service" ref="metaFactoryServiceImpl"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IMetaFactoryService"/>
         <property name="registryPort" value="1099"/>
-    </bean>
-
-    <bean id="context" class="org.jooq.impl.DSL" factory-method="using">
-        <constructor-arg name="dialect">
-            <value type="org.jooq.SQLDialect">${jooq.executor.constructor.args.first}</value>
-        </constructor-arg>
-        <!-- <constructor-arg index="0" value="${jooq.executor.constructor.args.first}"/> -->
     </bean>
 
 </beans>

@@ -61,15 +61,15 @@ public class SubjectOrganizationParser extends BatchParser {
             //ctContact = new CtContact();
             //ctContact.setContactType(attributes.getValue("contact_type"));
         } else if(localName.equals("names")) {
-            subjectOrganizationNamesParser.parse(xmlReader, batch);
+            subjectOrganizationNamesParser.parse(xmlReader, batch, index);
         } else if(localName.equals("head")) {
-            subjectOrganizationHeadParser.parse(xmlReader, batch);
+            subjectOrganizationHeadParser.parse(xmlReader, batch, index);
         } else if(localName.equals("legal_form")) {
         } else if(localName.equals("enterprise_type")) {
         } else if(localName.equals("econ_trade")) {
         } else if(localName.equals("is_se")) {
         } else if(localName.equals("docs")) {
-            subjectOrganizationDocsParser.parse(xmlReader, batch);
+            subjectOrganizationDocsParser.parse(xmlReader, batch, index);
         } else {
             throw new UnknownTagException(localName);
         }

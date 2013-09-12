@@ -35,7 +35,7 @@ public class BeComplexValueDaoImpl extends JDBCSupport implements IBeComplexValu
     private IBaseEntityDao baseEntityDao;
 
     @Override
-    public void save(IBaseEntity baseEntity, String attribute)
+    public IBaseValue save(IBaseEntity baseEntity, String attribute)
     {
         IMetaAttribute metaAttribute = baseEntity.getMetaAttribute(attribute);
         IBaseValue baseValue = baseEntity.getBaseValue(attribute);
@@ -52,16 +52,19 @@ public class BeComplexValueDaoImpl extends JDBCSupport implements IBeComplexValu
                 metaAttribute.getId(), baseValue.getIndex(), baseValue.getRepDate(),
                 childBaseEntity.getId(), baseValue.isClosed(), baseValue.isLast());
         baseValue.setId(baseValueId);
+
+        return baseValue;
     }
 
     @Override
-    public void save(IBaseEntity baseEntity, Set<String> attributes) {
-        Iterator<String> it = attributes.iterator();
-        while (it.hasNext())
+    public Map<String, IBaseValue> save(IBaseEntity baseEntity, Set<String> attributes) {
+        Map<String, IBaseValue> values = new HashMap<String, IBaseValue>();
+        for (String attribute: attributes)
         {
-            String attribute = it.next();
-            save(baseEntity, attribute);
+            IBaseValue baseValue = save(baseEntity, attribute);
+            values.put(attribute, baseValue);
         }
+        return values;
     }
 
     private long save(long baseEntityId, long batchId, long metaAttributeId, long index,
@@ -83,7 +86,7 @@ public class BeComplexValueDaoImpl extends JDBCSupport implements IBeComplexValu
     }
 
     @Override
-    public void update(IBaseEntity baseEntityLoaded, IBaseEntity baseEntityForSave, String attribute)
+    public IBaseValue update(IBaseEntity baseEntityLoaded, IBaseEntity baseEntityForSave, String attribute)
     {
         MetaClass metaClass = baseEntityLoaded.getMeta();
         IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
@@ -162,6 +165,13 @@ public class BeComplexValueDaoImpl extends JDBCSupport implements IBeComplexValu
                             "can not return a value other than -1, 0, 1.");
             }
         }
+
+        return baseValueForSave;
+    }
+
+    @Override
+    public boolean presentInFuture(IBaseEntity baseEntity, String attribute) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     private int updateByCondition(Map<String, Object> fields,
