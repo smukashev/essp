@@ -78,14 +78,14 @@ public class MainPortlet extends MVCPortlet {
     @Override
     public void doView(RenderRequest renderRequest,
                        RenderResponse renderResponse) throws IOException, PortletException {
-       try{
+       //try{
 
            List<BaseEntity>  baseEntityList = metaFactoryService.getBaseEntities();
            System.out.println(baseEntityList.size());
         renderRequest.setAttribute("entityList", baseEntityList);
-       }catch (Exception e){
+       /*}catch (Exception e){
            e.printStackTrace();
-       }
+       }*/
         super.doView(renderRequest, renderResponse);
     }
 
