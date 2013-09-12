@@ -11,9 +11,9 @@
 
     <properties>
         <liferay.version>6.1.1</liferay.version>
-        <liferay.auto.deploy.dir>/home/abukabayev/liferay/liferay-portal-tomcat/deploy</liferay.auto.deploy.dir>
-        <liferay.app.server.deploy.dir>/home/abukabayev/liferay/liferay-portal-tomcat/deploy</liferay.app.server.deploy.dir>
-        <liferay.app.server.portal.dir>/home/abukabayev/liferay/liferay-portal-tomcat/deploy</liferay.app.server.portal.dir>
+        <liferay.auto.deploy.dir>/home/rauan/portal/liferay-portal-tomcat/deploy</liferay.auto.deploy.dir>
+        <liferay.app.server.deploy.dir>/home/rauan/portal/liferay-portal-tomcat/deploy</liferay.app.server.deploy.dir>
+        <liferay.app.server.portal.dir>/home/rauan/portal/liferay-portal-tomcat/deploy</liferay.app.server.portal.dir>
         <couchbase.client.version>1.1.4</couchbase.client.version>
     </properties>
 
