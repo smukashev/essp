@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MetaSet  extends Persistable implements IMetaType, IMetaSet
 {
@@ -217,5 +218,21 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaSet
                 ((MetaClass)metaType).recursiveSet(subMeta);
             }
         }
+    }
+
+    public List<String> getAllPaths(MetaClass subMeta, String path) {
+        ArrayList<String> paths = new ArrayList<String>();
+
+        if (metaType.isSet()) {
+            paths.addAll(((MetaSet)metaType).getAllPaths(subMeta, path));
+        } else if (metaType.isComplex()) {
+            if (((MetaClass)metaType).getClassName().equals(subMeta.getClassName())) {
+                paths.add(path);
+            } else {
+                paths.addAll(((MetaClass)metaType).getAllPaths(subMeta, path));
+            }
+        }
+
+        return paths;
     }
 }

@@ -501,4 +501,33 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
             }
         }
     }
+
+    public List<String> getAllPaths(MetaClass subMeta) {
+        return getAllPaths(subMeta, null);
+    }
+
+    public List<String> getAllPaths(MetaClass subMeta, String path) {
+        ArrayList<String> paths = new ArrayList<String>();
+
+        for (String memberName : members.keySet())
+        {
+            IMetaAttribute attribute = members.get(memberName);
+            IMetaType type = attribute.getMetaType();
+
+            if (type.isComplex()) {
+                if (type.isSet()) {
+                    paths.addAll(((MetaSet)type).getAllPaths(subMeta, (path == null ? "" : (path + ".")) + memberName));
+                } else {
+                    if (subMeta.getClassName().equals(((MetaClass)type).getClassName())) {
+                        paths.add((path == null ? "" : (path + ".")) + memberName);
+                    } else {
+                        paths.addAll(((MetaClass)type).getAllPaths(subMeta,
+                                (path == null ? "" : (path + ".")) + memberName));
+                    }
+                }
+            }
+        }
+
+        return paths;
+    }
 }

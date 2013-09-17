@@ -2,6 +2,7 @@ package kz.bsbnb.usci.cli.app;
 
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
+import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -27,6 +28,7 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -61,6 +63,8 @@ public class CLI
 
     @Autowired
     private BasicBaseEntitySearcher searcher;
+
+    private BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
 
     private InputStream inputStream = null;
 
@@ -164,6 +168,25 @@ public class CLI
         }
     }
 
+    public void showMetaClassPaths(long id, String subMetaName) {
+        MetaClass meta = metaClassRepository.getMetaClass(id);
+        MetaClass subMeta = metaClassRepository.getMetaClass(subMetaName);
+
+        if (meta == null) {
+            System.out.println("No such meta class with id: " + id);
+        } else {
+            if (subMeta == null) {
+                System.out.println("No such meta class with name: " + subMetaName);
+            }
+
+            List<String> paths = meta.getAllPaths(subMeta);
+
+            for (String path : paths) {
+                System.out.println(path);
+            }
+        }
+    }
+
     public void toggleMetaClassKey(String className, String attrName) {
         MetaClass meta = metaClassRepository.getMetaClass(className);
 
@@ -177,6 +200,25 @@ public class CLI
                 metaClassRepository.saveMetaClass(meta);
             } else {
                 System.out.println("No such attribute: " + attrName);
+            }
+        }
+    }
+
+    public void showMetaClassPaths(String className, String subMetaName) {
+        MetaClass meta = metaClassRepository.getMetaClass(className);
+        MetaClass subMeta = metaClassRepository.getMetaClass(subMetaName);
+
+        if (meta == null) {
+            System.out.println("No such meta class with name: " + className);
+        } else {
+            if (subMeta == null) {
+                System.out.println("No such meta class with name: " + subMetaName);
+            }
+
+            List<String> paths = meta.getAllPaths(subMeta);
+
+            for (String path : paths) {
+                System.out.println(path);
             }
         }
     }
@@ -251,6 +293,23 @@ public class CLI
                 System.out.println(value.toString());
             } else {
                 System.out.println("No such attribute with path: " + path);
+            }
+        }
+    }
+
+    public void showEntityInter(long id1, long id2) {
+        IBaseEntity entity1 = baseEntityDao.load(id1);
+        IBaseEntity entity2 = baseEntityDao.load(id2);
+
+        if (entity1 == null) {
+            System.out.println("No such entity with id: " + id1);
+        } else if (entity2 == null) {
+            System.out.println("No such entity with id: " + id2);
+        } else {
+            List<String> inter = comparator.intersect((BaseEntity)entity1, (BaseEntity)entity2);
+
+            for (String str : inter) {
+                System.out.println(str);
             }
         }
     }
@@ -343,6 +402,18 @@ public class CLI
                 } else {
                     System.out.println("Argument needed: <key> <id, name> <id or name> <attributeName>");
                 }
+            } else if (args.get(0).equals("paths")) {
+                if (args.size() > 3) {
+                    if (args.get(1).equals("id")) {
+                        showMetaClassPaths(Long.parseLong(args.get(2)), args.get(3));
+                    } else if (args.get(1).equals("name")) {
+                        showMetaClassPaths(args.get(2), args.get(3));
+                    } else {
+                        System.out.println("No such metaClass identification method: " + args.get(1));
+                    }
+                } else {
+                    System.out.println("Argument needed: <paths> <id, name> <id or name> <attributeName>");
+                }
             } else if (args.get(0).equals("fkey")) {
                 if (args.size() > 5) {
                     if (args.get(1).equals("id")) {
@@ -353,14 +424,15 @@ public class CLI
                         System.out.println("No such metaClass identification method: " + args.get(1));
                     }
                 } else {
-                    System.out.println("Argument needed: <key> <id, name> <id or name> <attributeName> " +
+                    System.out.println("Argument needed: <fkey> <id, name> <id or name> <attributeName> " +
                             "<subAttributeName> <filterValue>");
                 }
             } else {
                 System.out.println("No such operation: " + args.get(0));
             }
         } else {
-            System.out.println("Argument needed: <show, key> <id, name> <id or name> [attributeName]");
+            System.out.println("Argument needed: <show, key, paths> <id, name> <id or name> " +
+                    "[attributeName, subClassName]");
         }
     }
 
@@ -375,6 +447,12 @@ public class CLI
                         showEntityAttr(args.get(3), Long.parseLong(args.get(2)));
                     } else {
                         System.out.println("Argument needed: <show> <attr> <id> <attributePath>");
+                    }
+                } else if (args.get(1).equals("inter")) {
+                    if (args.size() > 3) {
+                        showEntityInter(Long.parseLong(args.get(2)), Long.parseLong(args.get(3)));
+                    } else {
+                        System.out.println("Argument needed: <show> <inter> <id1> <id2>");
                     }
                 } else if (args.get(1).equals("sq")) {
                     if (args.size() > 2) {
@@ -395,7 +473,7 @@ public class CLI
                 System.out.println("No such operation: " + args.get(0));
             }
         } else {
-            System.out.println("Argument needed: <show> <id, attr, sq> <id> [attributePath]");
+            System.out.println("Argument needed: <show> <id, attr, sq, inter> <id> [attributePath, id2]");
         }
     }
 

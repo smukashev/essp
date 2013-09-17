@@ -11,8 +11,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import org.apache.log4j.Logger;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author k.tulbassiyev
@@ -104,6 +103,10 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
             return false;
         }
 
+        if (!c1.getMeta().isSearchable() || !c2.getMeta().isSearchable()) {
+            return false;
+        }
+
         MetaClass meta = c1.getMeta();
 
         boolean result = (meta.getComplexKeyType() == ComplexKeyTypes.ALL);
@@ -151,5 +154,48 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
         logger.debug("Result is: " + result);
 
         return result;
+    }
+
+    public List<String> intersect(BaseEntity c1, BaseEntity c2) throws IllegalStateException
+    {
+        ArrayList<String> paths = new ArrayList<String>();
+
+        MetaClass meta = c1.getMeta();
+
+        Set<String> names = meta.getMemberNames();
+
+        for(String name : names)
+        {
+            IMetaAttribute attribute = meta.getMetaAttribute(name);
+            IMetaType type = meta.getMemberType(name);
+
+            logger.debug("Testing attribute: " + name);
+
+            if (type.isComplex() && !type.isSet()) {
+                IBaseValue value1 = c1.safeGetValue(name);
+                if (value1 != null) {
+                    BaseEntity entity1 = (BaseEntity)(value1.getValue());
+
+                    List<String> subClasses = c2.getMeta().getAllPaths((MetaClass)type);
+
+                    Iterator<String> i = subClasses.iterator();
+
+                    while(i.hasNext()) {
+                        String path = i.next();
+
+                        BaseEntity entity2 = (BaseEntity)c2.getEl(path);
+
+                        if (entity1 == null || entity2 == null || !compare(entity1, entity2)) {
+                            i.remove();
+                        }
+                    }
+
+                    paths.addAll(subClasses);
+                    paths.addAll(intersect(entity1, c2));
+                }
+            }
+        }
+
+        return paths;
     }
 }
