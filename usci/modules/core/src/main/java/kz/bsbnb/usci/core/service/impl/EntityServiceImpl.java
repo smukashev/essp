@@ -42,10 +42,8 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Override
     public void save(BaseEntity baseEntity) {
-        //System.out.println(baseEntity.toString());
-
         long t1 = System.currentTimeMillis();
-        baseEntityDao.save(baseEntity);
+        baseEntityDao.process(baseEntity);
         long t2 = System.currentTimeMillis() - t1;
 
         System.out.println("[core][save]                :           " + t2);
@@ -53,11 +51,9 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Override
     public BaseEntity search(BaseEntity baseEntity) {
-        // TODO: Fix this block
-        throw new UnsupportedOperationException("Not yet implemented.");
-        //ArrayList<Long> result = searcher.findAll(baseEntity) ;
+        ArrayList<Long> result = searcher.findAll(baseEntity);
 
-        //return baseEntityDao.load(result.get(0));
+        return (BaseEntity)baseEntityDao.load(result.get(0));
     }
 
     @Override
@@ -65,13 +61,11 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
 
         Long id = metaClassDao.save(baseEntityLoad.getMeta());
-         baseEntityDao.saveOrUpdate(baseEntityLoad);
+        baseEntityDao.saveOrUpdate(baseEntityLoad);
     }
 
     @Override
     public BaseEntity load(long id) {
-        // TODO: Fix this block
-        throw new UnsupportedOperationException("Not yet implemented.");
-        //return baseEntityDao.load(id);
+        return (BaseEntity)baseEntityDao.load(id);
     }
 }
