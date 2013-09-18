@@ -63,6 +63,36 @@
         });
     }
 
+    function ajaxGetMeta2(metaid)
+    {
+        var obj = {};
+        var container = document.getElementById('formSend');
+        var inputs = container.getElementsByTagName('input');
+        for (var index = 0; index < inputs.length; ++index) {
+            if (inputs[index].name!=""){
+                obj[inputs[index].name] = inputs[index].value;}
+        }
+//        alert(JSON.stringify(obj));
+        metaId = metaid;
+        $.ajax({
+            type: "POST",
+            url: "<%=getDataURL%>" ,
+            data: {"metaId":metaId,"json":"makeTree","obj":JSON.stringify(obj)},
+            success: function(data){
+                if (data=="error"){
+                    alert("Key attribute is wrong");
+                }
+                else{
+                    document.getElementById("formSend").style.display="none";
+                    var str = jQuery.parseJSON(data);
+                    document.getElementById("treeName").innerHTML="<p>BaseEntity:</p>";
+                    JSONeditor.start('tree','jform',str,false);
+                }
+            }
+        });
+    }
+
+
     function getKeyAttributes(metaid)
     {
         metaId = metaid;
@@ -81,6 +111,26 @@
             }
         });
     }
+
+    function sendKeyAttributes(metaid)
+    {
+        metaId = metaid;
+        $.ajax({
+            type: "POST",
+            url: "<%=getDataURL%>" ,
+            data: {"metaId":metaId,"json":"getAttributes"},
+            success: function(data){
+
+
+                var str = jQuery.parseJSON(data);
+                console.log(str);
+//
+//                JSONeditor.start('tree','jform',str,false);
+
+            }
+        });
+    }
+
 
     function sendJson(json){
         $.ajax({
@@ -245,6 +295,12 @@
                                 </label>
                                 <div id="inForm">
                                 </div>
+
+                                <button type="button" onclick='javascript:addAttribute()'>Add Entity</button>
+                                <button type="button" onclick='javascript:addAttribute()'>Add 22222Set</button>
+                                <button type="button" onclick='javascript:addAttribute()'>Add Complex</button>
+                                <button type="button" onclick='javascript:addAttribute()'>Add attribute</button>
+
                                 <button type="button" onclick='javascript:addAttribute()'>Add attribute</button>
                                 <button type="button" onclick='javascript:doAddEntity()'>Save</button>
                             </form>
