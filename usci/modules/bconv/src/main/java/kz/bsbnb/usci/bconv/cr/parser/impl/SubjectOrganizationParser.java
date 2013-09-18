@@ -5,6 +5,7 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownValException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.util.ParserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -19,6 +20,7 @@ import javax.xml.stream.events.XMLEvent;
  * @author k.tulbassiyev
  */
 @Component
+@Scope("prototype")
 public class SubjectOrganizationParser extends BatchParser {
     @Autowired
     private SubjectOrganizationNamesParser subjectOrganizationNamesParser;

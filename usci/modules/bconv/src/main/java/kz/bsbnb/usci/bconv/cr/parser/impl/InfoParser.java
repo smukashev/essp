@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.logging.Logger;
 
+import org.springframework.context.annotation.Scope;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -21,6 +22,7 @@ import javax.xml.stream.events.XMLEvent;
  *
  * @author k.tulbassiyev
  */
+@Scope("prototype")
 public class InfoParser extends BatchParser {
     private static final Logger logger
             = Logger.getLogger(InfoParser.class.getName());

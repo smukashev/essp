@@ -7,8 +7,6 @@
 
     <import resource="applicationContextEAVPersistanse.xml"></import>
 
-    <import resource="applicationContextEAVPersistanse.xml"></import>
-
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
     <context:component-scan base-package="kz.bsbnb.usci.core.service.impl" />
 

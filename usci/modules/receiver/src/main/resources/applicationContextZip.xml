@@ -53,6 +53,11 @@
 
     <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
         <property name="jobRepository" ref="jobRepository" />
+        <property name="taskExecutor">
+            <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor">
+                <property name="concurrencyLimit" value="3" />
+            </bean>
+        </property>
     </bean>
 
     <batch:job id="batchJob">
@@ -60,7 +65,7 @@
             <batch:tasklet>
                 <batch:chunk reader="staxEventEntityReader"
                              writer="rmiEventEntityWriter"
-                             processor="entityProcessor" commit-interval="1"/>
+                             processor="entityProcessor" commit-interval="10"/>
             </batch:tasklet>
         </batch:step>
         <batch:listeners>
@@ -73,7 +78,7 @@
             <batch:tasklet>
                 <batch:chunk reader="CREntityReader"
                              writer="rmiEventEntityWriter"
-                             processor="entityProcessor" commit-interval="1"/>
+                             processor="entityProcessor" commit-interval="10"/>
             </batch:tasklet>
         </batch:step>
         <batch:listeners>

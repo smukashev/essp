@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.sync.job.AbstractDataJob;
 import org.apache.log4j.Logger;
@@ -17,8 +18,8 @@ public final class DataJob extends AbstractDataJob {
     @Qualifier(value = "remoteEntityService")
     private RmiProxyFactoryBean rmiProxyFactoryBean;
 
-    /*@Autowired
-    private BasicBaseEntitySearcherPool basicBaseEntitySearcherPool;*/
+    @Autowired
+    BasicBaseEntityComparator comparator;
 
     private IEntityService entityService;
     private final Logger logger = Logger.getLogger(DataJob.class);
@@ -41,6 +42,8 @@ public final class DataJob extends AbstractDataJob {
                     Thread.sleep(SLEEP_TIME_NORMAL);
                 }
 
+                System.out.println("Entities in process: " + entitiesInProcess.size());
+
                 if(skip_count > SKIP_TIME_MAX)
                     Thread.sleep(SLEEP_TIME_LONG);
 
@@ -48,7 +51,12 @@ public final class DataJob extends AbstractDataJob {
                 if(entitiesInProcess.size() != processingJobs.size())
                     throw new IllegalStateException("CRITICAL: EntitiesInProcess != ProcessJobs");
 
-            } catch(Exception e) {
+            }
+            catch(NullPointerException ne) {
+                ne.printStackTrace();
+                System.exit(11);
+            }
+            catch(Exception e) {
                 e.printStackTrace();
             }
         }
@@ -122,7 +130,8 @@ public final class DataJob extends AbstractDataJob {
     }
 
     private boolean hasCrossLine(BaseEntity entity1, BaseEntity entity2) {
-        // todo: implement
+        if (comparator.intersect(entity1, entity2).size() > 0)
+            return true;
         return false;
     }
 }

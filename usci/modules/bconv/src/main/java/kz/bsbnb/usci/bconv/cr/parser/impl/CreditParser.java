@@ -12,6 +12,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -28,6 +29,7 @@ import javax.xml.stream.events.XMLEvent;
  * @author k.tulbassiyev
  */
 @Component
+@Scope("prototype")
 public class CreditParser extends BatchParser {
     private Stack stack = new Stack();
 

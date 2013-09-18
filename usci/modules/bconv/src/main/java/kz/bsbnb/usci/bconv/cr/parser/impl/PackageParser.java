@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -30,6 +31,7 @@ import java.util.Date;
  * @author k.tulbassiyev
  */
 @Component
+@Scope("prototype")
 public class PackageParser extends BatchParser {
     @Autowired
     private PrimaryContractParser primaryContractParser;

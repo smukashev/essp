@@ -2,7 +2,6 @@ package kz.bsbnb.usci.receiver.monitor;
 
 import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
@@ -25,9 +24,6 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -42,7 +38,6 @@ import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -216,9 +211,11 @@ public class ZipFilesMonitor{
                     String fileName = event.context().toString();
                     System.out.println("File Created:" + fileName);
 
+                    Thread.sleep(1000);
+
                     readFiles(path+"/"+fileName);
 
-
+                    System.out.println("File sent to parser:" + fileName);
 
                 }
             }

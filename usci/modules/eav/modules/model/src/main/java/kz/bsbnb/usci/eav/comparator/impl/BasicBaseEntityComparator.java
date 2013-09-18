@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+//TODO: Add array key filter support
+
 @Component
 public class BasicBaseEntityComparator implements IBaseEntityComparator
 {
@@ -185,6 +187,10 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
                 if (!innerSet.getMemberType().isSet()) {
                     BaseSet set2 = (BaseSet)c2.getEl(path);
 
+                    if (set2 == null) {
+                        continue;
+                    }
+
                     for (String identifier : set2.getIdentifiers()) {
                         IBaseValue value2 = set2.getBaseValue(identifier);
                         if (value2 != null) {
@@ -239,6 +245,10 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
                     IBaseValue value1 = c1.safeGetValue(name);
                     if (value1 != null) {
                         BaseSet bSet = (BaseSet)value1.getValue();
+
+                        if (bSet == null) {
+                            continue;
+                        }
 
                         for (IBaseValue value11 : bSet.get()) {
                             if (value1 != null) {

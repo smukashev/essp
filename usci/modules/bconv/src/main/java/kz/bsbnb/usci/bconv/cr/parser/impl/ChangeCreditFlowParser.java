@@ -4,6 +4,7 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import java.math.BigDecimal;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -18,6 +19,7 @@ import javax.xml.stream.events.XMLEvent;
  * @author k.tulbassiyev
  */
 @Component
+@Scope("prototype")
 public class ChangeCreditFlowParser extends BatchParser {
     public ChangeCreditFlowParser() {
         super();

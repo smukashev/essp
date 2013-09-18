@@ -2,6 +2,7 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -16,6 +17,7 @@ import javax.xml.stream.events.XMLEvent;
  * @author k.tulbassiyev
  */
 @Component
+@Scope("prototype")
 public class ChangeRemainsLimitParser extends BatchParser {
     public ChangeRemainsLimitParser() {
         super();

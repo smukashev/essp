@@ -850,7 +850,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
         SelectConditionStep where = generateSQL(entity, null);
 
-        System.out.println("Gen sql: " + where.getSQL(true));
+        //System.out.println("Gen sql: " + where.getSQL(true));
 
         List<Map<String, Object>> rows = queryForListWithStats(where.getSQL(), where.getBindValues().toArray());
 

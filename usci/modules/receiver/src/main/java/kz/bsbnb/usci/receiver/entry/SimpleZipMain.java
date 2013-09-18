@@ -18,6 +18,7 @@ import java.text.ParseException;
 /**
  * @author abukabayev
  */
+//16:06:25
 public class SimpleZipMain {
     public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException, ParseException, InterruptedException {
 
@@ -33,7 +34,7 @@ public class SimpleZipMain {
         StatusSingleton statusSingleton = ctx.getBean(StatusSingleton.class);
 
         ZipFilesMonitor monitor = ctx.getBean(ZipFilesMonitor.class);
-        monitor.monitor(Paths.get("/home/rauan/input"));
+        monitor.monitor(Paths.get("/home/a.tkachenko/input"));
 
     }
 }

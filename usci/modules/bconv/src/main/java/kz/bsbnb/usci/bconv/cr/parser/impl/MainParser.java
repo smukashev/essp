@@ -8,6 +8,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
 import kz.bsbnb.usci.eav.model.json.StatusJModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -32,6 +33,7 @@ import java.util.logging.Logger;
  * @author k.tulbassiyev
  */
 @Component
+@Scope("prototype")
 public class MainParser extends BatchParser {
     private InfoParser infoParser = new InfoParser();
 
