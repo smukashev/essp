@@ -33,7 +33,7 @@ public class SimpleZipMain {
         StatusSingleton statusSingleton = ctx.getBean(StatusSingleton.class);
 
         ZipFilesMonitor monitor = ctx.getBean(ZipFilesMonitor.class);
-        monitor.monitor(Paths.get("/home/aybek/test"));
+        monitor.monitor(Paths.get("/home/rauan/input"));
 
     }
 }

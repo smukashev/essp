@@ -13,6 +13,9 @@ import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.receiver.singleton.StatusSingleton;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import net.spy.memcached.internal.OperationFuture;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -31,6 +34,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,14 +42,18 @@ import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
  * @author abukabayev
  */
-@Component
+
 public class ZipFilesMonitor{
+    private final Logger logger = LoggerFactory.getLogger(ZipFilesMonitor.class);
+
     @Autowired
     private ICouchbaseClientFactory clientFactory;
 
@@ -58,14 +66,17 @@ public class ZipFilesMonitor{
     @Autowired
     private JobLauncher jobLauncher;
 
-    @Autowired
-    @Qualifier(value = "batchJob")
-    private Job batchJob;
+    private Map<String,Job> jobs;
 
     private static Gson gson = new Gson();
 
+    public static final int ZIP_BUFFER_SIZE = 1024;
 
-    public void saveData(BatchInfo batchInfo,String filename,byte[] bytes){
+    public ZipFilesMonitor(Map<String, Job> jobs) {
+        this.jobs = jobs;
+    }
+
+    public void saveData(BatchInfo batchInfo, String filename, byte[] bytes){
         IBatchService batchService = serviceFactory.getBatchService();
 
         CouchbaseClient client = clientFactory.getCouchbaseClient();
@@ -92,7 +103,17 @@ public class ZipFilesMonitor{
             JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
             jobParametersBuilder.addParameter("batchId", new JobParameter(batchId));
 
-            jobLauncher.run(batchJob, jobParametersBuilder.toJobParameters());
+            Job job = jobs.get(batchInfo.getBatchType());
+
+            if (job != null) {
+                jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+            } else {
+                logger.error("Unknown batch file type: " + batchInfo.getBatchType() + " in batch with id: " + batchId);
+
+                statusSingleton.addBatchStatus(batchId,
+                        new BatchStatusJModel(Global.BATCH_STATUS_ERROR, "Unknown batch file type: " +
+                                batchInfo.getBatchType(), new Date()));
+            }
         } catch (JobExecutionAlreadyRunningException e) {
             e.printStackTrace();
         } catch (JobRestartException e) {
@@ -107,7 +128,7 @@ public class ZipFilesMonitor{
 
     }
 
-    public byte[] InputStreamToByte(InputStream in) throws IOException {
+    public byte[] inputStreamToByte(InputStream in) throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
         int nRead;
@@ -129,10 +150,8 @@ public class ZipFilesMonitor{
             ZipFile zipFile = new ZipFile(filename);
 
             ZipEntry manifestEntry = zipFile.getEntry("manifest.xml");
-            ZipEntry dataEntry = zipFile.getEntry("data.xml");
 
             InputStream inManifest = zipFile.getInputStream(manifestEntry);
-            InputStream inData = zipFile.getInputStream(dataEntry);
 
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
@@ -171,9 +190,11 @@ public class ZipFilesMonitor{
             System.out.println(batchInfo.getRepDate());
 
 
+            ZipEntry dataEntry = zipFile.getEntry(batchInfo.getBatchName());
+            InputStream inData = zipFile.getInputStream(dataEntry);
 
 
-            saveData(batchInfo,filename,InputStreamToByte(inData));
+            saveData(batchInfo,filename,inputStreamToByte(inData));
 
 
         }catch(IOException e){
@@ -206,4 +227,39 @@ public class ZipFilesMonitor{
         } while (valid);
 
     }
+    public byte[] extract(byte[] zippedBytes) throws IOException {
+        ByteArrayInputStream bais = null;
+        ZipArchiveInputStream zis = null;
+
+        try {
+            bais = new ByteArrayInputStream(zippedBytes);
+            zis = new ZipArchiveInputStream(bais);
+
+            while (zis.getNextZipEntry() != null) {
+                ByteArrayOutputStream baos = null;
+                try {
+                    int size;
+                    byte[] buffer = new byte[ZIP_BUFFER_SIZE];
+
+                    baos = new ByteArrayOutputStream();
+
+                    while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
+                        baos.write(buffer, 0, size);
+                    }
+                    return baos.toByteArray();
+                } finally {
+                    if (baos != null) {
+                        baos.flush();
+                        baos.close();
+                    }
+                }
+            }
+        } finally {
+            if (zis != null) {
+                zis.close();
+            }
+        }
+        throw new IOException("ZIP file does not contain any files.");
+    }
+
 }
