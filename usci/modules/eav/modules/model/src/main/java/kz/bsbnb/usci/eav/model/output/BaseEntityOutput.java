@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 
 public class BaseEntityOutput
 {
@@ -57,6 +58,143 @@ public class BaseEntityOutput
 
         return str;
     }
+
+    /*
+   *   converting baseEntity object to Java code
+   *
+   *  */
+    public static String toJava(BaseEntity entity, String prefix, int counter)
+    {
+        MetaClass meta = entity.getMeta();
+        String str = " ";
+        // creates new entity object
+
+        if ( counter == 0){
+            str += "\n BaseEntity "+meta.getClassName() +
+                    "Entity = new BaseEntity(meta"+meta.getClassName().toString().substring(0, 1).toUpperCase()
+                    + meta.getClassName().toString().substring(1)+"Holder, reportDate);";
+        }else {
+            str += "\n BaseEntity "+meta.getClassName() +
+                    "Entity"+ counter +" = new BaseEntity(meta"+meta.getClassName().toString().substring(0, 1).toUpperCase()
+                    + meta.getClassName().toString().substring(1)+"Holder, reportDate);";
+        }
+
+        for (String memberName : meta.getMemberNames())
+        {
+            IMetaAttribute attribute = meta.getMetaAttribute(memberName);
+            IMetaType type = attribute.getMetaType();
+            IBaseValue value = entity.getBaseValue(memberName);
+
+            String valueToString = "";
+
+            if (value != null && value.getValue() != null)
+            {
+                if(type.isComplex()) //  set or  entity
+                {
+                    if (!type.isSet()) //  not a set
+                    {
+                        if(type.isComplex()) // puts entity value
+                        {
+                            str +=toJava((BaseEntity)value.getValue(), prefix,0)  +"\n "+ meta.getClassName()+ "Entity.put( \""+memberName+
+                                    "\" , new BaseValue(batch, "+value.getIndex()+" ,"+memberName.toString()+"Entity));";
+                        }
+                    }
+                    else // if a set
+                    {
+                        if (type.isSetOfSets()) //if set in a set
+                        {
+                            valueToString = toJava((BaseEntity)value.getValue(), prefix,0 );
+                        }
+                        if (type.isSet())//creates new set object
+                        {
+                            str += "\n BaseSet "+meta.getClassName() +
+                                    "Set = new BaseSet(((MetaSet)( "+meta.getClassName().toString()
+                                    +"Entity.getMemberType(\""+memberName+"\"))).getMemberType());"+complexJavaSet((BaseSet)value.getValue(), prefix , (MetaSet)type,meta.getClassName());
+                            if (type.isSet()){
+
+                                str += "\n "+ meta.getClassName()+ "Entity.put( \""+memberName+
+                                        "\" , new BaseValue(batch, "+value.getIndex()+" ,"+meta.getClassName()+"Set));";
+                            }
+                        }
+                    }
+                }
+                else  // if not an array or entity
+                {
+                    String var = value.getValue().toString();
+
+                    if(type.toString("").contains(DataTypes.STRING.toString()))
+                    {
+                        var = "\""+value.getValue()+"\"";
+                    }
+                    if (type.isSet())//creates new set object
+                    {
+                        str += "\n BaseSet "+meta.getClassName() +
+                                "Set = new BaseSet(((MetaSet)( "+meta.getClassName().toString()
+                                +"Entity.getMemberType(\""+memberName+"\"))).getMemberType());"+ complexJavaSet((BaseSet)value.getValue(), prefix , (MetaSet)type,meta.getClassName());
+                        if (type.isSet()){
+
+                            str += "\n "+ meta.getClassName()+ "Entity.put( \""+memberName+
+                                    "\" , new BaseValue(batch, "+value.getIndex()+" ,"+meta.getClassName()+"Set));";
+
+                        }
+                    }
+                    else //puts simple values
+                    {
+                        valueToString ="\n "+ meta.getClassName()+ "Entity.put( \""+memberName+
+                                "\" , new BaseValue(batch, "+value.getIndex()+" ,"+var+"));";
+                    }
+                }
+            }
+            str += "" + prefix  +  valueToString ;
+        }
+        return str;
+    }
+
+    private static String complexJavaSet(BaseSet set, String prefix, MetaSet metaSet,String memberName)
+    {
+        String str = " ";
+        int counter = 0;
+        for (IBaseValue value : set.get())
+        {
+            if (metaSet.isSet())
+            {
+                if (metaSet.isSetOfSets())
+                {
+                    str += complexJavaSet((BaseSet)value.getValue(), prefix , (MetaSet)metaSet.getMemberType(),memberName);
+                }
+                else if (metaSet.isComplex())//if an entity
+                {
+                    str +=  toJava((BaseEntity)value.getValue(), prefix,counter );
+                }
+                else
+                {
+                    str +="\n "+ memberName+"Set.put(new BaseValue(batch,"+value.getIndex()+","+value.getValue().toString()+"));";
+                }
+            }
+            if (metaSet.isComplex())
+            {
+                if (counter == 0){
+                    str +="\n "+ memberName+"Set.put(new BaseValue(batch,"+value.getIndex()+","+memberName.subSequence(0,memberName.length()-1)+"Entity"+"));";
+                }
+                else
+                {
+                    str +="\n "+ memberName+"Set.put(new BaseValue(batch,"+value.getIndex()+","+memberName.subSequence(0,memberName.length()-1)+"Entity"+ counter +"));";
+                }
+
+            }
+            counter++;
+        }
+        return str;
+    }
+
+    public static String getJavaFunction(String fName, BaseEntity entity) {
+        String str  = "protected BaseEntity " + fName + "(Batch batch)\n{\n java.util.Date reportDate = new java.util.Date();\n";
+        str += toJava(entity, "", 0);
+        str += "\n\n return "+entity.getMeta().getClassName()+ "Entity;\n";
+        str += "}";
+        return str;
+    }
+
 
     private static String complexSet(BaseSet set, String prefix, MetaSet metaSet)
     {

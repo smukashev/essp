@@ -441,6 +441,8 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
         return str;
     }
 
+
+
     @Override
     public int hashCode()
     {

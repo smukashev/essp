@@ -540,6 +540,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         return BaseEntityOutput.toString(this);
     }
 
+    public String toJava(String fName)
+    {
+        return BaseEntityOutput.getJavaFunction(fName,this);
+    }
+
+
     @Override
     public int hashCode()
     {
