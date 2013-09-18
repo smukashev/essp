@@ -70,9 +70,9 @@ public class BaseEntityOutput
         // creates new entity object
 
         if ( counter == 0){
-            str += "\n BaseEntity "+meta.getClassName() +
-                    "Entity = new BaseEntity(meta"+meta.getClassName().toString().substring(0, 1).toUpperCase()
-                    + meta.getClassName().toString().substring(1)+"Holder, reportDate);";
+            str += "\n BaseEntity " + meta.getClassName() +
+                    "Entity = new BaseEntity(meta" + meta.getClassName().toString().substring(0, 1).toUpperCase()
+                    + meta.getClassName().toString().substring(1) + "Holder, reportDate);";
         }else {
             str += "\n BaseEntity "+meta.getClassName() +
                     "Entity"+ counter +" = new BaseEntity(meta"+meta.getClassName().toString().substring(0, 1).toUpperCase()
@@ -140,8 +140,15 @@ public class BaseEntityOutput
                     }
                     else //puts simple values
                     {
-                        valueToString ="\n "+ meta.getClassName()+ "Entity.put( \""+memberName+
-                                "\" , new BaseValue(batch, "+value.getIndex()+" ,"+var+"));";
+                        if ( counter == 0){
+                            valueToString ="\n "+ meta.getClassName()+ "Entity.put( \""+memberName+
+                                            "\" , new BaseValue(batch, "+value.getIndex()+" ,"+var+"));";
+                        }else{
+
+                            valueToString ="\n "+ meta.getClassName()+ "Entity"+counter+".put( \""+memberName+
+                                    "\" , new BaseValue(batch, "+value.getIndex()+" ,"+var+"));";
+                        }
+
                     }
                 }
             }

@@ -442,6 +442,66 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
     }
 
 
+    /*
+    *   generating Meta Class into Java code
+    *
+    *  */
+    public String toJava(String prefix)
+    {
+        String str = " ";
+
+        String[] names;
+
+        names = (String[]) members.keySet().toArray(new String[members.keySet().size()]);
+
+        Arrays.sort(names);
+
+        // creates Holder object of Meta Class
+        str += prefix + "meta"+className.toString().substring(0, 1).toUpperCase()
+                + className.toString().substring(1) + "Holder = new MetaClass( \"" + className + "\" );";
+
+        for (String memberName : names)
+        {
+            IMetaAttribute attribute = members.get(memberName);
+            IMetaType type = attribute.getMetaType();
+            if (type.isComplex()) // entity or set
+            {
+                if(!type.isSet()) // not set
+                {
+                    str +="\n" + type.toJava(prefix)+"\n " + prefix + "meta" + className.toString().substring(0, 1).toUpperCase()
+                            + className.toString().substring(1) + "Holder.setMetaAttribute(\"" + memberName + "\" " +
+                            " , new MetaAttribute( " + attribute.isKey() + "," + attribute.isNullable() + " , " + "meta"
+                            + memberName.toString().substring(0, 1).toUpperCase()
+                            + memberName.toString().substring(1) + "Holder));" ;
+                }
+                else // set
+                {
+                    str += type.toJava(prefix)+"\n " + prefix + "meta"+className.toString().substring(0, 1).toUpperCase()
+                            + className.toString().substring(1) + "Holder.setMetaAttribute(\"" + memberName + "\" " +
+                            ", new MetaAttribute( new MetaSet( " + "meta" + memberName.toString().substring(0, 1).toUpperCase()
+                            + memberName.toString().substring(1) + "Holder)));" ;
+                }
+            }
+            else // simple value
+            {
+                str += "\n " + prefix + "meta" + className.toString().substring(0, 1).toUpperCase()
+                        + className.toString().substring(1) + "Holder.setMetaAttribute(\"" + memberName + "\" " +
+                        ", new MetaAttribute( " + attribute.isKey() + " , " + attribute.isNullable() + " , " + type.toJava(prefix) + "));";
+            }
+        }
+        return str;
+    }
+
+    public String getJavaFunction(String fName) {
+        String str  = "protected MetaClass " + fName + "()\n{\n";
+        str += toJava("  ");
+        str += "\n\n   return meta"+className.toString().substring(0, 1).toUpperCase()
+                + className.toString().substring(1) + "Holder;\n";
+        str += "}";
+        return str;
+    }
+
+
 
     @Override
     public int hashCode()

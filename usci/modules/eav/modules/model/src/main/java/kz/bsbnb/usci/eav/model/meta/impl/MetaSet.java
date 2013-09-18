@@ -167,6 +167,31 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaSet
     }
 
     @Override
+    public String toJava(String prefix) {
+        if(isComplex()) {
+            if (isSetOfSets()) {
+                return "\n  metaSet(" + getId() + "), complex, setOfSets";
+            }
+            else {
+                String str =  "\n ";
+
+
+                str += " " + metaType.toJava(prefix);
+
+                return str;
+            }
+        }
+        else {
+            if (isSetOfSets()) {
+                return "+new MetaSet("+metaType.toJava(prefix);
+            }
+            else {
+                return " new MetaSet(" + metaType.toJava(prefix)+")";
+            }
+        }
+    }
+
+    @Override
     public boolean isImmutable()
     {
         return immutable;
