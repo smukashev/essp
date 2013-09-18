@@ -4,7 +4,7 @@ clear
 init
 
 # Convert xsd to MetaClass ct_package
-xsd convert ./modules/cli/src/main/resources/credit-registry.xsd ct_package
+xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_package
 
 #meta show name ct_package
 
@@ -22,9 +22,9 @@ meta show name ct_package
 #meta show id 1
 
 # Load CR batch file 99999 entries beginning from 0
-#crbatch ./modules/cli/src/main/resources/test_batch.xml 99999 0
+#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 99999 0
 
-#crbatch ./modules/cli/src/main/resources/test_batch.xml 2 90 01.02.2013
-crbatch ./modules/cli/src/main/resources/test_batch.xml 2 90
+#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 2 90 01.02.2013
+crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 3 90
 
 quit

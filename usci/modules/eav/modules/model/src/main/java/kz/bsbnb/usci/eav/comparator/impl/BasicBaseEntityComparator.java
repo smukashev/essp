@@ -188,7 +188,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
                         if (value2 != null) {
                             BaseEntity entity2 = (BaseEntity)value2.getValue();
 
-                            if (entity1 == null || entity2 == null || !compare(entity1, entity2)) {
+                            if (entity1 != null && entity2 != null && compare(entity1, entity2)) {
                                 paths.add(path + "[" + identifier + "]");
                             }
                         }

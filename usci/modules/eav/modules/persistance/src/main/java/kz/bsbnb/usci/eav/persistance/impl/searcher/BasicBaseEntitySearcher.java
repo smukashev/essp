@@ -648,7 +648,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         {
             if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
             {
-                condition = DSL.val(actual_set_value.sizeWithFilter(simple_set.getArrayKeyFilter())).greaterOrEqual(
+                condition = DSL.val(actual_set_value.sizeWithFilter(simple_set.getArrayKeyFilter())).lessOrEqual(
                         context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
                                 count()).from(nested));
             }
@@ -666,7 +666,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                 if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
                 {
                     condition = condition.and(DSL.val(actual_set_value.sizeWithFilter(simple_set.getArrayKeyFilter())).
-                            greaterOrEqual(
+                            lessOrEqual(
                             context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
                                     count()).from(nested)));
                 }
@@ -682,7 +682,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                 if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
                 {
                     condition = condition.or(DSL.val(actual_set_value.sizeWithFilter(simple_set.getArrayKeyFilter())).
-                            greaterOrEqual(
+                            lessOrEqual(
                             context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
                                     count()).from(nested)));
                 }
@@ -849,6 +849,8 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         ArrayList<Long> result = new ArrayList<Long>();
 
         SelectConditionStep where = generateSQL(entity, null);
+
+        System.out.println("Gen sql: " + where.getSQL(true));
 
         List<Map<String, Object>> rows = queryForListWithStats(where.getSQL(), where.getBindValues().toArray());
 
