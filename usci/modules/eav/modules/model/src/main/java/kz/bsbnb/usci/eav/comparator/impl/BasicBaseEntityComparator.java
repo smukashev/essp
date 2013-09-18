@@ -13,9 +13,6 @@ import org.apache.log4j.Logger;
 
 import java.util.*;
 
-/**
- * @author k.tulbassiyev
- */
 public class BasicBaseEntityComparator implements IBaseEntityComparator
 {
     Logger logger = Logger.getLogger(BasicBaseEntityComparator.class);
