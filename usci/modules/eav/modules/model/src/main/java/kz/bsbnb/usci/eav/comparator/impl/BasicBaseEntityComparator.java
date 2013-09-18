@@ -156,6 +156,57 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
         return result;
     }
 
+    public List<String> findBaseEntity(BaseEntity entity1, BaseEntity c2, MetaClass type) {
+        ArrayList<String> paths = new ArrayList<String>();
+
+        List<String> subClasses = c2.getMeta().getAllPaths(type);
+
+        Iterator<String> i = subClasses.iterator();
+
+        while(i.hasNext()) {
+            String path = i.next();
+
+            //System.out.println("Path: " + path);
+
+            IMetaType innerMetaType = c2.getMeta().getEl(path);
+
+            if (!innerMetaType.isSet()) {
+                //System.out.println("Is not set");
+                BaseEntity entity2 = (BaseEntity)c2.getEl(path);
+
+                if (entity1 != null && entity2 != null && compare(entity1, entity2)) {
+                    paths.add(path);
+                    //System.out.println("Is equal");
+                }
+                paths.addAll(intersect(entity1, c2));
+            } else {
+                //System.out.println("Is set");
+                MetaSet innerSet = (MetaSet)innerMetaType;
+
+                if (!innerSet.getMemberType().isSet()) {
+                    BaseSet set2 = (BaseSet)c2.getEl(path);
+
+                    for (String identifier : set2.getIdentifiers()) {
+                        IBaseValue value2 = set2.getBaseValue(identifier);
+                        if (value2 != null) {
+                            BaseEntity entity2 = (BaseEntity)value2.getValue();
+
+                            if (entity1 == null || entity2 == null || !compare(entity1, entity2)) {
+                                paths.add(path + "[" + identifier + "]");
+                            }
+                        }
+                    }
+
+                    paths.addAll(intersect(entity1, c2));
+                } else {
+                    throw new IllegalStateException("Unimplemented");
+                }
+            }
+        }
+
+        return paths;
+    }
+
     public List<String> intersect(BaseEntity c1, BaseEntity c2) throws IllegalStateException
     {
         ArrayList<String> paths = new ArrayList<String>();
@@ -171,27 +222,35 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
 
             logger.debug("Testing attribute: " + name);
 
-            if (type.isComplex() && !type.isSet()) {
+            if (!type.isComplex()) {
+                continue;
+            }
+
+            if (!type.isSet()) {
                 IBaseValue value1 = c1.safeGetValue(name);
                 if (value1 != null) {
                     BaseEntity entity1 = (BaseEntity)(value1.getValue());
 
-                    List<String> subClasses = c2.getMeta().getAllPaths((MetaClass)type);
+                    paths.addAll(findBaseEntity(entity1, c2, (MetaClass)type));
+                }
+            } else {
+                MetaSet set = (MetaSet)type;
 
-                    Iterator<String> i = subClasses.iterator();
+                if (!set.getMemberType().isSet()) {
+                    IBaseValue value1 = c1.safeGetValue(name);
+                    if (value1 != null) {
+                        BaseSet bSet = (BaseSet)value1.getValue();
 
-                    while(i.hasNext()) {
-                        String path = i.next();
+                        for (IBaseValue value11 : bSet.get()) {
+                            if (value1 != null) {
+                                BaseEntity entity1 = (BaseEntity)(value11.getValue());
 
-                        BaseEntity entity2 = (BaseEntity)c2.getEl(path);
-
-                        if (entity1 == null || entity2 == null || !compare(entity1, entity2)) {
-                            i.remove();
+                                paths.addAll(findBaseEntity(entity1, c2, (MetaClass)(set.getMemberType())));
+                            }
                         }
                     }
-
-                    paths.addAll(subClasses);
-                    paths.addAll(intersect(entity1, c2));
+                } else {
+                    throw new IllegalStateException("Unimplemented");
                 }
             }
         }

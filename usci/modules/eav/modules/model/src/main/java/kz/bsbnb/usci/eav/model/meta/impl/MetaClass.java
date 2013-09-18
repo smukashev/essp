@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import kz.bsbnb.usci.eav.model.base.ContainerTypes;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
@@ -529,5 +531,49 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
         }
 
         return paths;
+    }
+
+    public IMetaType getEl(String path)
+    {
+        StringTokenizer tokenizer = new StringTokenizer(path, ".");
+
+        MetaClass meta = this;
+        IMetaType valueOut = null;
+
+        while (tokenizer.hasMoreTokens())
+        {
+            String token = tokenizer.nextToken();
+
+            IMetaAttribute attribute = meta.getMetaAttribute(token);
+
+            if (attribute == null)
+                return null;
+
+            IMetaType type = attribute.getMetaType();
+
+            valueOut = type;
+
+            if (type.isSet())
+            {
+                while(type.isSet()) {
+                    valueOut = type;
+                    type = ((MetaSet)type).getMemberType();
+                }
+            }
+
+            if (valueOut.isComplex())
+            {
+                if (!valueOut.isSet()) {
+                    meta = (MetaClass)valueOut;
+                }
+            } else {
+                if (tokenizer.hasMoreTokens())
+                {
+                    throw new IllegalArgumentException("Path can't have intermediate simple values");
+                }
+            }
+        }
+
+        return valueOut;
     }
 }

@@ -560,7 +560,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         while (tokenizer.hasMoreTokens())
         {
             String token = tokenizer.nextToken();
-            String arrayIndexes = "";
+            String arrayIndexes = null;
 
             if (token.contains("["))
             {
@@ -585,8 +585,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
             if (type.isSet())
             {
-                valueOut = ((BaseSet)valueOut).getEl(arrayIndexes);
-                type = ((MetaSet)type).getMemberType();
+                if (arrayIndexes != null) {
+                    valueOut = ((BaseSet)valueOut).getEl(arrayIndexes);
+                    type = ((MetaSet)type).getMemberType();
+                } else {
+                    return valueOut;
+                }
             }
 
             if (type.isComplex())
