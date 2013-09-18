@@ -10,9 +10,11 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+@Component
 public class BasicBaseEntityComparator implements IBaseEntityComparator
 {
     Logger logger = Logger.getLogger(BasicBaseEntityComparator.class);
