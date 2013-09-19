@@ -42,8 +42,6 @@ public final class DataJob extends AbstractDataJob {
                     Thread.sleep(SLEEP_TIME_NORMAL);
                 }
 
-                System.out.println("Entities in process: " + entitiesInProcess.size());
-
                 if(skip_count > SKIP_TIME_MAX)
                     Thread.sleep(SLEEP_TIME_LONG);
 

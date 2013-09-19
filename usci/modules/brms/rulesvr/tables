@@ -1,6 +1,27 @@
+-- Table: packages
+
+DROP TABLE rule_package_versions;
+DROP TABLE rules;
+DROP TABLE package_versions;
+DROP TABLE packages;
+
+CREATE TABLE packages
+(
+  name character varying,
+  repdate date,
+  id serial NOT NULL,
+  description character varying,
+  CONSTRAINT pk_packages PRIMARY KEY (id),
+  CONSTRAINT unique_name UNIQUE (name)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE packages
+  OWNER TO postgres;
 -- Table: package_versions
 
--- DROP TABLE package_versions;
+
 
 CREATE TABLE package_versions
 (
@@ -18,29 +39,27 @@ WITH (
 ALTER TABLE package_versions
   OWNER TO postgres;
 
+-- Table: rules
 
 
--- Table: packages
 
--- DROP TABLE packages;
-
-CREATE TABLE packages
+CREATE TABLE rules
 (
-  name character varying,
-  repdate date,
   id serial NOT NULL,
-  CONSTRAINT pk_packages PRIMARY KEY (id)
+  rule character varying,
+  title character varying,
+  CONSTRAINT rules_pkey PRIMARY KEY (id)
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE packages
+ALTER TABLE rules
   OWNER TO postgres;
 
 
 -- Table: rule_package_versions
 
--- DROP TABLE rule_package_versions;
+
 
 CREATE TABLE rule_package_versions
 (
@@ -62,19 +81,3 @@ ALTER TABLE rule_package_versions
   OWNER TO postgres;
 
 
--- Table: rules
-
--- DROP TABLE rules;
-
-CREATE TABLE rules
-(
-  id serial NOT NULL,
-  rule character varying,
-  title character varying,
-  CONSTRAINT rules_pkey PRIMARY KEY (id)
-)
-WITH (
-  OIDS=FALSE
-);
-ALTER TABLE rules
-  OWNER TO postgres;

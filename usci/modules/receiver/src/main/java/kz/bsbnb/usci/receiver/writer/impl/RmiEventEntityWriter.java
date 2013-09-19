@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.receiver.writer.impl;
 
+import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.receiver.writer.IWriter;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import org.apache.log4j.Logger;
@@ -10,6 +12,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -25,15 +28,33 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
     private IEntityService entityService;
     private Logger logger = Logger.getLogger(RmiEventEntityWriter.class);
 
+    @Autowired
+    private RulesSingleton rulesSingleton;
+
     @PostConstruct
     public void init() {
         logger.info("Writer init");
+        rulesSingleton.reloadCache();
         entityService = (IEntityService) rmiProxyFactoryBean.getObject();
     }
 
     @Override
     public void write(List items) throws Exception {
         logger.info("Writer write: " + items.size());
+
+        Iterator<Object> iter = items.iterator();
+
+        while(iter.hasNext()) {
+            BaseEntity entity = (BaseEntity)iter.next();
+            rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());
+
+            if (entity.getValidationErrors().size() > 0) {
+                for (String errorMsg : entity.getValidationErrors()) {
+                    System.out.println("Error: " + errorMsg);
+                }
+            }
+        }
+
         entityService.process(items);
     }
 }

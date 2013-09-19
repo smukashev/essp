@@ -216,6 +216,7 @@ public class MainPortlet extends MVCPortlet {
 
               System.out.println("########### ID:");
               System.out.println(entityId);
+              System.out.println(Long.parseLong(entityId, 10));
               System.out.println(versionDate);
               Date date = new SimpleDateFormat("MM/dd/yyyy").parse(versionDate);
 

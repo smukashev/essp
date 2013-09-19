@@ -9,7 +9,6 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
 		http://drools.org/schema/drools-spring http://anonsvn.jboss.org/repos/labs/labs/jbossrules/trunk/drools-container/drools-spring/src/main/resources/org/drools/container/spring/drools-spring.xsd">
 
-    <context:component-scan base-package="kz.bsbnb.usci.brms.rulesvr.service.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.brms.rulesingleton" />
 
     <context:annotation-config/>
@@ -22,4 +21,28 @@
             </list>
         </property>
     </bean>
+
+    <drools:kbase id="kbase">
+        <drools:resources>
+            <!--<drools:resource source="classpath:drl/test.drl"/>-->
+        </drools:resources>
+    </drools:kbase>
+
+    <!--<bean id="ruleSingleton" class="kz.bsbnb.usci.rules.RulesSingleton">-->
+    <!--<property name="kbase" ref="kbase"></property>-->
+    <!--</bean>-->
+
+    <bean id="remoteRuleBatchService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1097/batchService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulesvr.service.IBatchService"/>
+    </bean>
+    <bean id="remoteRuleBatchVersionService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1097/batchVersionService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService"/>
+    </bean>
+    <bean id="remoteRuleService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1097/ruleService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulesvr.service.IRuleService"/>
+    </bean>
+
 </beans>

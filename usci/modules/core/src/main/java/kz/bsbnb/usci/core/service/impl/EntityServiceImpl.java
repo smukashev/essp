@@ -66,6 +66,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Override
     public BaseEntity load(long id) {
+        System.out.println("Load with id: " + id);
         return (BaseEntity)baseEntityDao.load(id);
     }
 }
