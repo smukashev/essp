@@ -12,9 +12,8 @@ import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
 import java.util.*;
-
-//TODO: Add array key filter support
 
 @Component
 public class BasicBaseEntityComparator implements IBaseEntityComparator
@@ -44,6 +43,22 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
         return res;
     }
 
+    private boolean filterPass(BaseEntity entity, MetaSet parentMeta) {
+        HashMap<String, ArrayList<String>> arrayKeyFilter = parentMeta.getArrayKeyFilter();
+
+        if (arrayKeyFilter == null || arrayKeyFilter.size() < 1) {
+            return true;
+        }
+
+        try
+        {
+            return entity.applyKeyFilter(arrayKeyFilter);
+        } catch (ParseException e)
+        {
+            return false;
+        }
+    }
+
     private boolean compareSet(IMetaType type, IBaseValue value1, IBaseValue value2)
     {
         BaseSet set1 = (BaseSet)value1.getValue();
@@ -71,19 +86,22 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
             {
                 boolean found = false;
 
-                for(IBaseValue v2 : ar2)
-                {
-                    if (compare((BaseEntity)v1.getValue(), (BaseEntity)v2.getValue()))
+                if (v1.getValue() != null && filterPass((BaseEntity)v1.getValue(), (MetaSet)type)) {
+                    for(IBaseValue v2 : ar2)
                     {
-                        found = true;
-                        break;
+                        if (compare((BaseEntity)v1.getValue(), (BaseEntity)v2.getValue()))
+                        {
+                            found = true;
+                            break;
+                        }
                     }
-                }
 
-                if(((MetaSet)type).getArrayKeyType() == ComplexKeyTypes.ALL)
-                    res = res && found;
-                else
-                    res = res || found;
+
+                    if(((MetaSet)type).getArrayKeyType() == ComplexKeyTypes.ALL)
+                        res = res && found;
+                    else
+                        res = res || found;
+                }
             }
         }
 
