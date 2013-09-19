@@ -47,7 +47,6 @@ public class CREntityReader<T> extends CommonReader<T> {
     private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
     private IBaseContainer currentContainer;
     private Batch batch;
-    private Long index = 1L, level = 0L;
 
     private IBatchService batchService;
     private IMetaFactoryService metaFactoryService;
@@ -95,7 +94,7 @@ public class CREntityReader<T> extends CommonReader<T> {
         T entity = (T)crParser.getCurrentBaseEntity();
 
         if (crParser.hasMore()) {
-            statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
+            statusSingleton.addContractStatus(batchId, new ContractStatusJModel(crParser.getIndex(),
                     Global.CONTRACT_STATUS_PROCESSING, null, new Date()));
             try
             {
@@ -106,7 +105,7 @@ public class CREntityReader<T> extends CommonReader<T> {
                 return null;
             }
 
-            statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
+            statusSingleton.addContractStatus(batchId, new ContractStatusJModel(crParser.getIndex(),
                     Global.CONTRACT_STATUS_COMPLETED, null, new Date()));
 
             return entity;

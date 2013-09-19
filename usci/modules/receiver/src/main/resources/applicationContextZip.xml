@@ -90,16 +90,19 @@
 
     <!-- remote services -->
     <bean id="remoteEntityService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="refreshStubOnConnectFailure" value="true"/>
         <property name="serviceUrl" value="rmi://127.0.0.1:1098/entityService"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IEntityService"/>
     </bean>
 
     <bean id="remoteBatchService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="refreshStubOnConnectFailure" value="true"/>
         <property name="serviceUrl" value="rmi://127.0.0.1:1098/batchService"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IBatchService"/>
     </bean>
 
     <bean id="remoteMetaFactoryService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="refreshStubOnConnectFailure" value="true"/>
         <property name="serviceUrl" value="rmi://127.0.0.1:1098/metaFactoryService"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IMetaFactoryService"/>
     </bean>

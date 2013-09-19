@@ -2,6 +2,9 @@ package kz.bsbnb.usci.receiver.writer.impl;
 
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
+import kz.bsbnb.usci.receiver.common.Global;
+import kz.bsbnb.usci.receiver.singleton.StatusSingleton;
 import kz.bsbnb.usci.receiver.writer.IWriter;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import org.apache.log4j.Logger;
@@ -12,6 +15,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,6 +34,9 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
     @Autowired
     private RulesSingleton rulesSingleton;
+
+    @Autowired
+    protected StatusSingleton statusSingleton;
 
     @PostConstruct
     public void init() {
@@ -50,6 +57,9 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
             if (entity.getValidationErrors().size() > 0) {
                 for (String errorMsg : entity.getValidationErrors()) {
+                    //statusSingleton.addContractStatus(entity.get, new ContractStatusJModel(index,
+                      //      Global.CONTRACT_STATUS_PROCESSING, null, new Date()));
+
                     System.out.println("Error: " + errorMsg);
                 }
             }

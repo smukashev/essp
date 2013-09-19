@@ -9,10 +9,10 @@
 	<version>0.0.1-SNAPSHOT</version>
 
     <properties>
-        <liferay.version>6.1.1</liferay.version>
-        <liferay.auto.deploy.dir>war</liferay.auto.deploy.dir>
-        <liferay.app.server.deploy.dir>war</liferay.app.server.deploy.dir>
-        <liferay.app.server.portal.dir>war</liferay.app.server.portal.dir>
+        <liferay.version>6.1.2</liferay.version>
+        <liferay.auto.deploy.dir>/home/a.tkachenko/software/liferay/deploy</liferay.auto.deploy.dir>
+        <liferay.app.server.deploy.dir>/home/a.tkachenko/software/liferay/deploy</liferay.app.server.deploy.dir>
+        <liferay.app.server.portal.dir>/home/a.tkachenko/software/liferay/deploy</liferay.app.server.portal.dir>
         <com.google.gson.version>2.2.4</com.google.gson.version>
         <couchbase.client.version>1.1.4</couchbase.client.version>
     </properties>

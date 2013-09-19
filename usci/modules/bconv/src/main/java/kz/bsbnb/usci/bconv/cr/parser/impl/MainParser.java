@@ -47,7 +47,12 @@ public class MainParser extends BatchParser {
 
     private static final Logger logger
             = Logger.getLogger(MainParser.class.getName());
-    
+
+    public long getIndex()
+    {
+        return index;
+    }
+
     public void parse(InputStream in, Batch batch) throws SAXException, IOException, XMLStreamException
     {
         index = 1;
