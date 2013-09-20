@@ -27,8 +27,8 @@ public class BatchStatusList extends MVCPortlet {
 	public void init() throws PortletException {
 		viewJSP = getInitParameter("view-template");
 		
-		//System.setProperty("viewmode", "production");
-        System.setProperty("viewmode", "development");
+		System.setProperty("viewmode", "production");
+        //System.setProperty("viewmode", "development");
 
 		ArrayList<URI> nodes = new ArrayList<URI>();
 	    nodes.add(URI.create("http://127.0.0.1:8091/pools"));
@@ -47,10 +47,19 @@ public class BatchStatusList extends MVCPortlet {
 		View view = couchbaseClient.getView("batch", "batch_statuses");
 		Query query = new Query();
 		query.setLimit(20);
+        query.setGroup(true);
+        query.setGroupLevel(1);
 		
 		ViewResponse response = couchbaseClient.query(view, query);
 		renderRequest.setAttribute("batch-status-result", response);
 			
 		getPortletContext().getRequestDispatcher(viewJSP).include(renderRequest, renderResponse);
 	}
+
+    @Override
+    public void destroy()
+    {
+        couchbaseClient.shutdown();
+        super.destroy();
+    }
 }

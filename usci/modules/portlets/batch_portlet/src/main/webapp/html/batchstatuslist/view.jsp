@@ -5,6 +5,7 @@
 <%@ page import="com.couchbase.client.protocol.views.ViewRowNoDocs" %>
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="kz.bsbnb.usci.eav.model.json.BatchFullJModel" %>
+<%@ page import="com.couchbase.client.protocol.views.ViewRowReduced" %>
 
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
@@ -29,7 +30,7 @@
 	if(viewResponse != null) {	
 		for(ViewRow row : viewResponse) {
 			line += "<tr>";
-			ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) row;	
+            ViewRowReduced viewRowNoDocs = (ViewRowReduced) row;
 			
 			List list = gson.fromJson(viewRowNoDocs.getValue(), ArrayList.class);
 			

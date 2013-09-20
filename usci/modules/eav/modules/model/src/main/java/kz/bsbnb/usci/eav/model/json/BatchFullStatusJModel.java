@@ -7,13 +7,14 @@ import java.util.Date;
  *
  * @author k.tulbassiyev
  */
-public class BatchLightJModel {
+public class BatchFullStatusJModel
+{
     private Long id;
-    private String type = "batch";
     private String fileName;
     private Date received;
+    private BatchStatusArrayJModel status;
 
-    public BatchLightJModel(Long id, String fileName, Date received) {
+    public BatchFullStatusJModel(Long id, String fileName, Date received) {
         this.id = id;
         this.fileName = fileName;
         this.received = received;
@@ -41,5 +42,15 @@ public class BatchLightJModel {
 
     public void setReceived(Date received) {
         this.received = received;
+    }
+
+    public BatchStatusArrayJModel getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(BatchStatusArrayJModel status)
+    {
+        this.status = status;
     }
 }

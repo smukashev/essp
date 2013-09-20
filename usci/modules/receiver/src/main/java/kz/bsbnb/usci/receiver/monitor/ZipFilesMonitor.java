@@ -49,8 +49,8 @@ import java.util.zip.ZipFile;
 public class ZipFilesMonitor{
     private final Logger logger = LoggerFactory.getLogger(ZipFilesMonitor.class);
 
-    @Autowired
-    private ICouchbaseClientFactory clientFactory;
+    //@Autowired
+    //private ICouchbaseClientFactory clientFactory;
 
     @Autowired
     private IServiceRepository serviceFactory;
@@ -63,7 +63,7 @@ public class ZipFilesMonitor{
 
     private Map<String,Job> jobs;
 
-    private static Gson gson = new Gson();
+    //private static Gson gson = new Gson();
 
     public static final int ZIP_BUFFER_SIZE = 1024;
 
@@ -74,25 +74,13 @@ public class ZipFilesMonitor{
     public void saveData(BatchInfo batchInfo, String filename, byte[] bytes){
         IBatchService batchService = serviceFactory.getBatchService();
 
-        CouchbaseClient client = clientFactory.getCouchbaseClient();
-
-
         Batch batch = new Batch(new java.sql.Date(new java.util.Date().getTime()));
         long batchId = batchService.save(batch);
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date());
-        statusSingleton.startBatch(batchId);
+        statusSingleton.startBatch(batchId, batchFullJModel, batchInfo);
         statusSingleton.addBatchStatus(batchId,
                 new BatchStatusJModel(Global.BATCH_STATUS_PROCESSING, null, new Date()));
-
-        OperationFuture<Boolean> result = client.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
-
-        while(true) if(result.isDone()) break; // must be completed
-
-        OperationFuture<Boolean> result1 = client.set("manifest:" + batchId, 0, gson.toJson(batchInfo));
-
-        while(true) if(result1.isDone()) break; // must be completed
-
 
         try {
             JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
@@ -117,10 +105,7 @@ public class ZipFilesMonitor{
             e.printStackTrace();
         } catch (JobParametersInvalidException e) {
             e.printStackTrace();
-        } finally {
-            client.shutdown();
         }
-
     }
 
     public byte[] inputStreamToByte(InputStream in) throws IOException {

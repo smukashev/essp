@@ -1,22 +1,23 @@
 package kz.bsbnb.usci;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
+import com.couchbase.client.CouchbaseClient;
+import com.couchbase.client.protocol.views.*;
+import com.google.gson.Gson;
+import com.liferay.portal.util.PortalUtil;
+import com.liferay.util.bridges.mvc.MVCPortlet;
+import kz.bsbnb.usci.eav.model.json.BatchFullStatusJModel;
+import kz.bsbnb.usci.eav.model.json.ContractStatusArrayJModel;
+import org.apache.log4j.Logger;
 
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.servlet.http.HttpServletRequest;
-
-import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
-
-import org.apache.log4j.Logger;
-
-import com.couchbase.client.CouchbaseClient;
-import com.google.gson.Gson;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.util.bridges.mvc.MVCPortlet;
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Portlet implementation class BatchViewPortlet
@@ -32,8 +33,8 @@ public class BatchViewPortlet extends MVCPortlet {
 	public void init() throws PortletException {
 		viewJSP = getInitParameter("view-template");
 		
-		//System.setProperty("viewmode", "production");
-        System.setProperty("viewmode", "development");
+		System.setProperty("viewmode", "production");
+        //System.setProperty("viewmode", "development");
 		
 		ArrayList<URI> nodes = new ArrayList<URI>();
 	    nodes.add(URI.create("http://127.0.0.1:8091/pools"));
@@ -55,14 +56,68 @@ public class BatchViewPortlet extends MVCPortlet {
 		String batchId = httpReq.getParameter("batchId");
 		
 		if(batchId != null) {
-			Object value = couchbaseClient.get("batch:" + batchId);	
+			//Object value = couchbaseClient.get("batch:" + batchId);
+            View view = couchbaseClient.getView("batch", "batch");
+            Query query = new Query();
+            query.setGroup(true);
+            query.setGroupLevel(1);
+            query.setKey("\"" + batchId + "\"");
+
+            ViewResponse response = couchbaseClient.query(view, query);
+
+            Iterator<ViewRow> rows = response.iterator();
+
+            if(rows.hasNext()) {
+                ViewRowReduced viewRowNoDocs = (ViewRowReduced) rows.next();
+
+                System.out.println("==================");
+                System.out.println(viewRowNoDocs.getValue());
+                System.out.println("==================");
+
+                BatchFullStatusJModel batchFullStatusJModel =
+                    gson.fromJson(viewRowNoDocs.getValue(), BatchFullStatusJModel.class);
 			
-			if(value != null) {
-				BatchFullJModel batch = gson.fromJson(value.toString(), BatchFullJModel.class);
-				renderRequest.setAttribute("batch", batch);
+
+				renderRequest.setAttribute("batch", batchFullStatusJModel);
 			}
+
+            //ContractStatusArrayJModel
+
+            view = couchbaseClient.getView("batch", "contract_status");
+            query = new Query();
+            query.setDescending(true);
+            query.setRangeStart("\"" + batchId + "_0\"");
+            query.setRangeEnd("\"" + batchId + "_9\"");
+
+
+            response = couchbaseClient.query(view, query);
+
+            rows = response.iterator();
+
+            ArrayList<ContractStatusArrayJModel> csList = new ArrayList<ContractStatusArrayJModel>();
+            while(rows.hasNext()) {
+                ViewRow viewRowNoDocs = rows.next();
+
+                System.out.println("==================");
+                System.out.println(viewRowNoDocs.getValue());
+                System.out.println("==================");
+
+                ContractStatusArrayJModel batchFullStatusJModel =
+                        gson.fromJson(viewRowNoDocs.getValue(), ContractStatusArrayJModel.class);
+
+                csList.add(batchFullStatusJModel);
+            }
+
+            renderRequest.setAttribute("cStats", csList);
 		}
 		
 		getPortletContext().getRequestDispatcher(viewJSP).include(renderRequest, renderResponse);
 	}
+
+    @Override
+    public void destroy()
+    {
+        couchbaseClient.shutdown();
+        super.destroy();
+    }
 }

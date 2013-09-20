@@ -6,9 +6,10 @@ import java.util.List;
 /**
  * @author k.tulbassiyev
  */
-public class StatusJModel {
+public class BatchStatusArrayJModel
+{
+    private String type = "batch_status";
     private List<BatchStatusJModel> batchStatuses = new ArrayList<BatchStatusJModel>();
-    private List<ContractStatusJModel> contractStatuses = new ArrayList<ContractStatusJModel>();
 
     public List<BatchStatusJModel> getBatchStatuses() {
         return batchStatuses;
@@ -18,19 +19,10 @@ public class StatusJModel {
         this.batchStatuses = batchStatuses;
     }
 
-    public List<ContractStatusJModel> getContractStatuses() {
-        return contractStatuses;
-    }
-
-    public void setContractStatuses(List<ContractStatusJModel> contractStatuses) {
-        this.contractStatuses = contractStatuses;
-    }
-
     @Override
     public String toString() {
-        return "StatusJModel{" +
+        return "ContractStatusArrayJModel{" +
                 "batchStatuses=" + batchStatuses +
-                ", contractStatuses=" + contractStatuses +
                 '}';
     }
 }

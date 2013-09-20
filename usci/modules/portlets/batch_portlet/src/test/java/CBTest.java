@@ -5,12 +5,14 @@ import com.google.gson.Gson;
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+@Ignore
 public class CBTest
 {
     private CouchbaseClient client;

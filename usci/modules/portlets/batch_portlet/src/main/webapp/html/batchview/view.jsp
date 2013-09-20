@@ -1,12 +1,12 @@
-<%@page import="kz.bsbnb.usci.eav.model.json.ContractStatusJModel"%>
-<%@page import="kz.bsbnb.usci.eav.model.json.BatchStatusJModel"%>
-<%@page import="kz.bsbnb.usci.eav.model.json.BatchFullJModel"%>
+<%@ page import="kz.bsbnb.usci.eav.model.json.*" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <portlet:defineObjects />
 
 <%
-	BatchFullJModel batch = (BatchFullJModel) request.getAttribute("batch");
+    BatchFullStatusJModel batch = (BatchFullStatusJModel) request.getAttribute("batch");
+    ArrayList<ContractStatusArrayJModel> cStats = (ArrayList<ContractStatusArrayJModel>)request.getAttribute("cStats");
 	
 	if(batch != null) {
 %>
@@ -40,10 +40,19 @@
 			<td>
 				<ol>		
 				<%
-					for(ContractStatusJModel cStatus : batch.getStatus().getContractStatuses()) {
-						out.println("<li>" + cStatus.getReceived() + " : " + cStatus.getIndex() + " : " + 
-																				cStatus.getProtocol() + "</li>");	
-					}
+
+					if (cStats != null) {
+                        if (cStats.size() > 0) {
+                            for(ContractStatusArrayJModel cStatus : cStats) {
+                                for (ContractStatusJModel csajm : cStatus.getContractStatuses()) {
+                                    out.println("<li>" + csajm.getReceived() + " : " + csajm.getIndex() + " : " +
+                                            csajm.getProtocol() + "</li>");
+                                }
+                            }
+                        } else {
+                            out.println("<li>No records</li>");
+                        }
+                    }
 				%>
 				</ol>
 			</td>

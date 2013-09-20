@@ -102,9 +102,9 @@ public class RulesSingleton
                 remoteRuleService == null ||
                 remoteRuleBatchVersionService == null) {
             logger.warn("RuleServer services are null, using local cache only");
-            System.out.println("%%%%%%%%%%%%%%%%% no services wiered");
+            //System.out.println("%%%%%%%%%%%%%%%%% no services wiered");
         } else {
-            System.out.println("%%%%%%%%%%%%%%%%% filling cache");
+            //System.out.println("%%%%%%%%%%%%%%%%% filling cache");
             fillPackagesCache();
         }
     }
@@ -174,7 +174,7 @@ public class RulesSingleton
                 }
 
                 logger.debug(packages);
-                System.out.println("%%%%%%%%%%%%%%%%% packages:" + packages);
+                //System.out.println("%%%%%%%%%%%%%%%%% packages:" + packages);
                 try {
                     setRules(packages);
                 } catch (Exception e) {
@@ -232,7 +232,7 @@ public class RulesSingleton
 
     synchronized public void update(Long versionId, Date date, String packageName)
     {
-        System.out.println("%%%%%%%%%%%%%%%%% Update called!!!");
+        //System.out.println("%%%%%%%%%%%%%%%%% Update called!!!");
         rulePackageErrors.clear();
 
         BatchVersion curVersion = new BatchVersion();
@@ -254,7 +254,7 @@ public class RulesSingleton
         }
 
         logger.debug(packages);
-        System.out.println("%%%%%%%%%%%%%%%%% packages:" + packages);
+        //System.out.println("%%%%%%%%%%%%%%%%% packages:" + packages);
         try {
             setRules(packages);
         } catch (Exception e) {

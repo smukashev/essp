@@ -5,15 +5,10 @@ import com.google.gson.Gson;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
+import kz.bsbnb.usci.eav.model.json.ContractStatusArrayJModel;
 import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
-import kz.bsbnb.usci.eav.model.json.StatusJModel;
-import kz.bsbnb.usci.eav.model.meta.IMetaType;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
@@ -27,12 +22,8 @@ import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
 import javax.annotation.PostConstruct;
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.io.ByteArrayInputStream;
 import java.util.Date;
 import java.util.Stack;
@@ -65,7 +56,28 @@ public class CREntityReader<T> extends CommonReader<T> {
         batchService = serviceRepository.getBatchService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
         couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
-        batchFullJModel = gson.fromJson(couchbaseClient.get("batch:" + batchId).toString(), BatchFullJModel.class);
+
+        int counter = 100;
+        Object obj = null;
+
+        while(counter-- > 0 && (obj = couchbaseClient.get("batch:" + batchId)) == null) {
+            try
+            {
+                Thread.sleep(100);
+            } catch (InterruptedException e)
+            {
+                break;
+            }
+        }
+
+        if (obj == null) {
+            statusSingleton.addBatchStatus(batchId,
+                    new BatchStatusJModel(Global.BATCH_STATUS_ERROR, "Can't load batch from couchbase!", new Date()));
+
+            throw new IllegalStateException("Can't load batch from couchbase!");
+        }
+
+        batchFullJModel = gson.fromJson(obj.toString(), BatchFullJModel.class);
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(batchFullJModel.getContent());
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -93,8 +105,10 @@ public class CREntityReader<T> extends CommonReader<T> {
 
         T entity = (T)crParser.getCurrentBaseEntity();
 
+        long index = crParser.getIndex() - 1;
+
         if (crParser.hasMore()) {
-            statusSingleton.addContractStatus(batchId, new ContractStatusJModel(crParser.getIndex(),
+            statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
                     Global.CONTRACT_STATUS_PROCESSING, null, new Date()));
             try
             {
@@ -105,7 +119,7 @@ public class CREntityReader<T> extends CommonReader<T> {
                 return null;
             }
 
-            statusSingleton.addContractStatus(batchId, new ContractStatusJModel(crParser.getIndex(),
+            statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
                     Global.CONTRACT_STATUS_COMPLETED, null, new Date()));
 
             return entity;
@@ -114,8 +128,9 @@ public class CREntityReader<T> extends CommonReader<T> {
         statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
                 Global.BATCH_STATUS_COMPLETED, null, new Date()));
 
-        StatusJModel statusJModel = statusSingleton.endBatch(batchId);
-        batchFullJModel.setStatus(statusJModel);
+        //ContractStatusArrayJModel statusJModel = statusSingleton.endBatch(batchId);
+        statusSingleton.endBatch(batchId);
+        //batchFullJModel.setStatus(statusJModel);
 
         couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
 

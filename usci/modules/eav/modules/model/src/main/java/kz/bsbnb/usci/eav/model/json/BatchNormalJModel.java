@@ -9,11 +9,12 @@ import java.util.Date;
  */
 public class BatchNormalJModel {
     private Long id;
+    private String type = "batch";
     private String fileName;
-    private StatusJModel status;
+    private ContractStatusArrayJModel status;
     private Date received;
 
-    public BatchNormalJModel(Long id, String fileName, StatusJModel status, Date received) {
+    public BatchNormalJModel(Long id, String fileName, ContractStatusArrayJModel status, Date received) {
         this.id = id;
         this.fileName = fileName;
         this.status = status;
@@ -36,11 +37,11 @@ public class BatchNormalJModel {
         this.fileName = fileName;
     }
 
-    public StatusJModel getStatus() {
+    public ContractStatusArrayJModel getStatus() {
         return status;
     }
 
-    public void setStatus(StatusJModel status) {
+    public void setStatus(ContractStatusArrayJModel status) {
         this.status = status;
     }
 
