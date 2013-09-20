@@ -86,8 +86,8 @@ public class BatchViewPortlet extends MVCPortlet {
             view = couchbaseClient.getView("batch", "contract_status");
             query = new Query();
             query.setDescending(true);
-            query.setRangeStart("\"" + batchId + "_0\"");
-            query.setRangeEnd("\"" + batchId + "_9\"");
+            query.setRangeEnd("\"" + batchId + "_0\"");
+            query.setRangeStart("\"" + batchId + "_9\"");
 
 
             response = couchbaseClient.query(view, query);
