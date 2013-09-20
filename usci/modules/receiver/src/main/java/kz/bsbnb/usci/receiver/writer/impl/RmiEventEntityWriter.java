@@ -57,11 +57,15 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
             if (entity.getValidationErrors().size() > 0) {
                 for (String errorMsg : entity.getValidationErrors()) {
-                    //statusSingleton.addContractStatus(entity.get, new ContractStatusJModel(index,
-                      //      Global.CONTRACT_STATUS_PROCESSING, null, new Date()));
+                    //TODO: check for error with Index
+                    statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(entity.getBatchIndex() - 1,
+                            Global.CONTRACT_STATUS_ERROR, errorMsg, new Date()));
 
-                    System.out.println("Error: " + errorMsg);
+                    //System.out.println("Error: " + errorMsg);
                 }
+
+                //TODO: fix
+                //iter.remove();
             }
         }
 

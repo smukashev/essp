@@ -115,6 +115,8 @@ public class CREntityReader<T> extends CommonReader<T> {
                 crParser.parseNextPackage();
             } catch (SAXException e)
             {
+                statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
+                        Global.CONTRACT_STATUS_ERROR, "Can't parse", new Date()));
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 return null;
             }

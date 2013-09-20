@@ -849,4 +849,20 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
         return false;
     }
+
+    public long getBatchId() {
+        for (IBaseValue v :values.values()) {
+            return v.getBatch().getId();
+        }
+
+        return 0;
+    }
+
+    public long getBatchIndex() {
+        for (IBaseValue v :values.values()) {
+            return v.getIndex();
+        }
+
+        return 0;
+    }
 }
