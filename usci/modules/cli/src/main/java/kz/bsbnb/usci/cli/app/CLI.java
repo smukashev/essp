@@ -8,8 +8,11 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcher;
@@ -379,9 +382,39 @@ public class CLI
         }
     }
 
+    private void createMetaClass(String metaName) {
+        MetaClass meta = new MetaClass(metaName);
+
+        metaClassRepository.saveMetaClass(meta);
+    }
+
+    public void addAttributeToMeta(String metaName, String attrName, String type, String className) {
+        MetaClass meta = metaClassRepository.getMetaClass(metaName);
+
+        if (type.equals("MetaClass")) {
+            MetaClass toAdd = metaClassRepository.getMetaClass(className);
+
+            meta.setMetaAttribute(attrName, new MetaAttribute(false, false, toAdd));
+        } else {
+            MetaValue value = new MetaValue(DataTypes.valueOf(type));
+
+            meta.setMetaAttribute(attrName, new MetaAttribute(false, false, value));
+        }
+
+        metaClassRepository.saveMetaClass(meta);
+    }
+
+    public void removeAttributeFromMeta(String metaName, String attrName) {
+        MetaClass meta = metaClassRepository.getMetaClass(metaName);
+
+        meta.removeMemberType(attrName);
+
+        metaClassRepository.saveMetaClass(meta);
+    }
+
     public void commandMeta()
     {
-        if (args.size() > 2) {
+        if (args.size() > 1) {
             if (args.get(0).equals("show")) {
                 if (args.get(1).equals("id")) {
                     showMetaClass(Long.parseLong(args.get(2)));
@@ -390,6 +423,20 @@ public class CLI
                 } else {
                     System.out.println("No such metaClass identification method: " + args.get(1));
                 }
+            } else if (args.get(0).equals("add")) {
+                if (args.size() > 4) {
+                    addAttributeToMeta(args.get(1), args.get(2), args.get(3), args.get(4));
+                } else {
+                    addAttributeToMeta(args.get(1), args.get(2), args.get(3), null);
+                }
+            } else if (args.get(0).equals("remove")) {
+                if (args.size() > 2) {
+                    removeAttributeFromMeta(args.get(1), args.get(2));
+                }
+            } else if (args.get(0).equals("create")) {
+                createMetaClass(args.get(1));
+            } else if (args.get(0).equals("delete")) {
+                System.out.println("Unimplemented stub in cli");
             } else if (args.get(0).equals("key")) {
                 if (args.size() > 3) {
                     if (args.get(1).equals("id")) {
@@ -431,7 +478,7 @@ public class CLI
                 System.out.println("No such operation: " + args.get(0));
             }
         } else {
-            System.out.println("Argument needed: <show, key, paths> <id, name> <id or name> " +
+            System.out.println("Argument needed: <show, key, paths, create> <id, name, className> <id or name> " +
                     "[attributeName, subClassName]");
         }
     }
