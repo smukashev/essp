@@ -13,4 +13,5 @@ public interface IMetaClassRepository
     public MetaClass getMetaClass(long id);
     public List<MetaClass> getMetaClasses();
     public void saveMetaClass(MetaClass meta);
+    public void resetCache();
 }

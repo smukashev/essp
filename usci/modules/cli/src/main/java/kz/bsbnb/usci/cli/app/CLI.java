@@ -595,6 +595,8 @@ public class CLI
                         commandTest();
                     } else if (command.equals("clear")) {
                         storage.clear();
+                    } else if (command.equals("rc")) {
+                        metaClassRepository.resetCache();
                     } else if (command.equals("init")) {
                         storage.initialize();
                     } else if (command.equals("tc")) {

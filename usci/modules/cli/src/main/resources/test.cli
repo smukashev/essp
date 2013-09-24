@@ -9,8 +9,8 @@ xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_portfol
 xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_msfo
 
 meta create ct_portfolio_data
-meta add ct_portfolio_data portfolio_flow MetaClass ct_portfolio_flow_base
-meta add ct_portfolio_data portfolio_flow_msfo MetaClass ct_portfolio_flow_msfo
+meta add ct_portfolio_data portfolio_flow MetaClass ct_portfolio_flow_base true
+meta add ct_portfolio_data portfolio_flow_msfo MetaClass ct_portfolio_flow_msfo true
 
 #meta show name ct_package
 
@@ -26,12 +26,6 @@ meta fkey name person docs doc_type 15
 
 #meta show id 38
 #meta show id 1
-
-# Load CR batch file 99999 entries beginning from 0
-#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 99999 0
-
-#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 2 90 01.02.2013
-#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 3 90
 
 #Create REFs
 
@@ -50,6 +44,8 @@ meta add ref_subject_type name_kz STRING
 meta add ref_subject_type kind_id INTEGER
 #OPEN_DATE
 #CLOSE_DATE
+
+meta key name ref_subject_type code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -75,7 +71,7 @@ meta add ref_balance_account seventh_sign STRING
 meta remove detail balance_account
 meta add detail balance_account MetaClass ref_balance_account
 
-
+meta key name ref_balance_account no_
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -97,6 +93,8 @@ meta add organization bank_relations MetaClass ref_bank_relation true
 
 meta remove person bank_relations
 meta add person bank_relations MetaClass ref_bank_relation true
+
+meta key name ref_bank_relation code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -122,6 +120,8 @@ meta add ref_classification comment_kz STRING
 
 meta remove credit_flow classification
 meta add credit_flow classification MetaClass ref_classification
+
+meta key name ref_classification code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -146,6 +146,8 @@ meta add organization country MetaClass ref_country
 
 meta remove person country
 meta add person country MetaClass ref_country
+
+meta key name ref_country code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -161,6 +163,21 @@ meta add ref_creditor name STRING
 meta add ref_creditor short_name STRING
 meta add ref_creditor code INTEGER
 #shutdown_date
+
+meta create ref_creditor_branch
+
+#change_date
+#id
+# -- ??? main_office_id
+meta add ref_creditor_branch main_office MetaClass ref_creditor
+#meta add ref_creditor_branch subject_type MetaClass ref_subject_type
+meta add ref_creditor_branch name STRING
+meta add ref_creditor_branch short_name STRING
+meta add ref_creditor_branch code INTEGER
+#shutdown_date
+
+meta key name ref_creditor code
+meta key name ref_creditor_branch code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -174,6 +191,8 @@ meta add ref_credit_object name_kz INTEGER
 
 meta remove credit credit_object
 meta add credit credit_object MetaClass ref_credit_object
+
+meta key name ref_credit_object code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -187,6 +206,8 @@ meta add ref_credit_purpose name_kz INTEGER
 
 meta remove credit credit_purpose
 meta add credit credit_purpose MetaClass ref_credit_purpose
+
+meta key name ref_credit_purpose code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -206,41 +227,10 @@ meta add ref_currency rating DOUBLE
 #CLOSE_DATE
 #IS_LAST
 
-meta remove correction value_currency
-meta add correction value_currency MetaClass ref_currency
-
-meta remove current value_currency
-meta add current value_currency MetaClass ref_currency
-
-meta remove pastdue value_currency
-meta add pastdue value_currency MetaClass ref_currency
-
-meta remove write_off value_currency
-meta add write_off value_currency MetaClass ref_currency
-
-meta remove discount value_currency
-meta add discount value_currency MetaClass ref_currency
-
-meta remove current1 value_currency
-meta add current1 value_currency MetaClass ref_currency
-
-meta remove pastdue1 value_currency
-meta add pastdue1 value_currency MetaClass ref_currency
-
-meta remove write_off1 value_currency
-meta add write_off1 value_currency MetaClass ref_currency
-
-meta remove limit value_currency
-meta add limit value_currency MetaClass ref_currency
-
-meta remove debt amount_currency
-meta add debt amount_currency MetaClass ref_currency
-
-meta remove interest amount_currency
-meta add interest amount_currency MetaClass ref_currency
-
 meta remove credit currency
 meta add credit currency MetaClass ref_currency
+
+meta key name ref_currency code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -254,6 +244,8 @@ meta add ref_econ_trade name_kz INTEGER
 
 meta remove organization econ_trade
 meta add organization econ_trade MetaClass ref_econ_trade
+
+meta key name ref_econ_trade code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -274,6 +266,8 @@ meta add ref_enterprise_type is_se BOOLEAN
 
 meta remove organization enterprise_type
 meta add organization enterprise_type MetaClass ref_enterprise_type
+
+meta key name ref_enterprise_type code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -287,6 +281,8 @@ meta add ref_finance_source name_kz INTEGER
 
 meta remove credit finance_source
 meta add credit finance_source MetaClass ref_finance_source
+
+meta key name ref_finance_source code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -307,6 +303,8 @@ meta add ref_legal_form short_name_kz STRING
 
 meta remove organization legal_form
 meta add organization legal_form MetaClass ref_legal_form
+
+meta key name ref_legal_form code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -329,6 +327,8 @@ meta add organization offshore MetaClass ref_offshore
 
 meta remove person offshore
 meta add person offshore MetaClass ref_offshore
+
+meta key name ref_offshore code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -349,6 +349,8 @@ meta add ref_pledge_type is_liquid_invest BOOLEAN
 
 meta remove pledge pledge_type
 meta add pledge pledge_type MetaClass ref_pledge_type
+
+meta key name ref_pledge_type code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -377,6 +379,8 @@ meta add ct_portfolio_flow_base portfolio MetaClass ref_portfolio
 
 meta remove ct_portfolio_flow_msfo portfolio
 meta add ct_portfolio_flow_msfo portfolio MetaClass ref_portfolio
+
+meta key name ref_portfolio code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -393,6 +397,8 @@ meta add address1 region MetaClass ref_region
 
 meta remove address region
 meta add address region MetaClass ref_region
+
+meta key name ref_region code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -414,6 +420,8 @@ meta add contact1 contact_type MetaClass ref_contact_type
 
 meta remove contact contact_type
 meta add contact contact_type MetaClass ref_contact_type
+
+meta key name ref_contact_type code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -433,6 +441,8 @@ meta add ref_credit_type name_kz STRING
 
 meta remove credit credit_type
 meta add credit credit_type MetaClass ref_credit_type
+
+meta key name ref_credit_type code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -470,6 +480,8 @@ meta add doc2 doc_type MetaClass ref_doc_type
 
 meta remove doc1 doc_type
 meta add doc1 doc_type MetaClass ref_doc_type
+
+meta key name ref_doc_type code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -484,6 +496,16 @@ meta add ref_shared name_ru STRING
 meta add ref_shared name_kz STRING
 meta add ref_shared type_ INTEGER
 meta add ref_shared note STRING
+
+meta key name ref_shared code
 #---------------------------------------------------------------------------------------------
+
+rc
+
+# Load CR batch file 99999 entries beginning from 0
+crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 99999 0
+
+#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 2 90 01.02.2013
+#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 3 90
 
 quit

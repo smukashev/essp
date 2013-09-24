@@ -85,8 +85,14 @@ public class PackageParser extends BatchParser {
             //attributes.getValue("credit_type")
             creditParser.parse(xmlReader, batch, index);
             BaseEntity credit = creditParser.getCurrentBaseEntity();
+
+            BaseEntity creditType = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_type"), new Date());
+
+            creditType.put("code", new BaseValue(batch, index,
+                    new Integer(event.asStartElement().getAttributeByName(new QName("credit_type")).getValue())));
+
             credit.put("credit_type", new BaseValue(batch, index,
-                    event.asStartElement().getAttributeByName(new QName("credit_type")).getValue()));
+                    creditType));
             //System.out.println(credit.toString());
             currentBaseEntity.put("credit", new BaseValue(batch, index, credit));
         } else if(localName.equals("subjects")) {
