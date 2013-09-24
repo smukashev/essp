@@ -5,6 +5,12 @@ init
 
 # Convert xsd to MetaClass ct_package
 xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_package
+xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_base
+xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_msfo
+
+meta create ct_portfolio_data
+meta add ct_portfolio_data portfolio_flow MetaClass ct_portfolio_flow_base
+meta add ct_portfolio_data portfolio_flow_msfo MetaClass ct_portfolio_flow_msfo
 
 #meta show name ct_package
 
@@ -16,7 +22,7 @@ meta key name doc1 no
 meta fkey name person docs doc_type 11
 meta fkey name person docs doc_type 15
 
-meta show name ct_package
+#meta show name ct_package
 
 #meta show id 38
 #meta show id 1
@@ -65,6 +71,11 @@ meta add ref_balance_account first_fourth_signs STRING
 meta add ref_balance_account fifth_sign STRING
 meta add ref_balance_account sixth_sign STRING
 meta add ref_balance_account seventh_sign STRING
+
+meta remove detail balance_account
+meta add detail balance_account MetaClass ref_balance_account
+
+
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -360,6 +371,12 @@ meta add portfolio portfolio MetaClass ref_portfolio
 
 meta remove portfolio portfolio_msfo
 meta add portfolio portfolio_msfo MetaClass ref_portfolio
+
+meta remove ct_portfolio_flow_base portfolio
+meta add ct_portfolio_flow_base portfolio MetaClass ref_portfolio
+
+meta remove ct_portfolio_flow_msfo portfolio
+meta add ct_portfolio_flow_msfo portfolio MetaClass ref_portfolio
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
