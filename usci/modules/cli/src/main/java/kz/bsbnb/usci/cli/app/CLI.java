@@ -388,17 +388,25 @@ public class CLI
         metaClassRepository.saveMetaClass(meta);
     }
 
-    public void addAttributeToMeta(String metaName, String attrName, String type, String className) {
+    public void addAttributeToMeta(String metaName, String attrName, String type, String className, boolean arrayFlag) {
         MetaClass meta = metaClassRepository.getMetaClass(metaName);
 
         if (type.equals("MetaClass")) {
             MetaClass toAdd = metaClassRepository.getMetaClass(className);
 
-            meta.setMetaAttribute(attrName, new MetaAttribute(false, false, toAdd));
+            if (!arrayFlag) {
+                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, toAdd));
+            } else {
+                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, new MetaSet(toAdd)));
+            }
         } else {
             MetaValue value = new MetaValue(DataTypes.valueOf(type));
 
-            meta.setMetaAttribute(attrName, new MetaAttribute(false, false, value));
+            if (!arrayFlag) {
+                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, value));
+            } else {
+                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, new MetaSet(value)));
+            }
         }
 
         metaClassRepository.saveMetaClass(meta);
@@ -425,9 +433,11 @@ public class CLI
                 }
             } else if (args.get(0).equals("add")) {
                 if (args.size() > 4) {
-                    addAttributeToMeta(args.get(1), args.get(2), args.get(3), args.get(4));
+                    addAttributeToMeta(args.get(1), args.get(2), args.get(3), args.get(4),
+                            args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false);
                 } else {
-                    addAttributeToMeta(args.get(1), args.get(2), args.get(3), null);
+                    addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
+                            args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false);
                 }
             } else if (args.get(0).equals("remove")) {
                 if (args.size() > 2) {
@@ -610,12 +620,14 @@ public class CLI
                     System.out.println("Error: " + e.getMessage());
                     lastException = e;
                 }
-
-                System.out.print("> ");
+                if (inputStream == null) {
+                    System.out.print("> ");
+                }
             }
             if (inputStream == null) break;
             else {
                 in = new Scanner(System.in);
+                System.out.println();
                 System.out.println("Done. Awaiting commands from cli.");
                 inputStream = null;
             }
