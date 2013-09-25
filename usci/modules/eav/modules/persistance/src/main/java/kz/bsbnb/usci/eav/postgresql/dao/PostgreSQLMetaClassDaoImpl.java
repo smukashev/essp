@@ -21,6 +21,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -65,13 +66,13 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             MetaClass metaClass = new MetaClass();
 
-                metaClass.setDisabled((Boolean)row.get("is_disabled"));
+                metaClass.setDisabled(((BigDecimal)row.get("is_disabled")).longValue() == 1);
                 metaClass.setBeginDate((Timestamp)row.get("begin_date"));
-                metaClass.setId((Long)row.get("id"));
+                metaClass.setId(((BigDecimal)row.get("id")).longValue());
                 metaClass.setClassName((String)row.get("name"));
                 metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
-                metaClass.setImmutable((Boolean)row.get("is_immutable"));
-                metaClass.setReference((Boolean)row.get("is_reference"));
+                metaClass.setImmutable(((BigDecimal)row.get("is_immutable")).longValue() == 1);
+                metaClass.setReference(((BigDecimal)row.get("is_reference")).longValue() == 1);
                 loadAttributes(metaClass);
             metaClassList.add(metaClass);
         }
@@ -164,13 +165,13 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         Map<String, Object> row = rows.get(0);
 
         if(row != null) {
-            metaClass.setDisabled((Boolean)row.get("is_disabled"));
+            metaClass.setDisabled(((BigDecimal)row.get("is_disabled")).longValue() == 1);
             metaClass.setBeginDate((Timestamp)row.get("begin_date"));
-            metaClass.setId((Long)row.get("id"));
+            metaClass.setId(((BigDecimal)row.get("id")).longValue());
             metaClass.setClassName((String)row.get("name"));
             metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
-            metaClass.setImmutable((Boolean)row.get("is_immutable"));
-            metaClass.setReference((Boolean)row.get("is_reference"));
+            metaClass.setImmutable(((BigDecimal)row.get("is_immutable")).longValue() == 1);
+            metaClass.setReference(((BigDecimal)row.get("is_reference")).longValue() == 1);
         } else {
             logger.error("Can't load metaClass, empty data set.");
         }
@@ -226,7 +227,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             ).set(EAV_M_CLASSES.NAME, metaClass.getClassName()
             ).set(EAV_M_CLASSES.COMPLEX_KEY_TYPE, metaClass.getComplexKeyType().toString()
             ).set(EAV_M_CLASSES.BEGIN_DATE, metaClass.getBeginDate()
-            ).set(EAV_M_CLASSES.IS_DISABLED, metaClass.isDisabled()
+            ).set(EAV_M_CLASSES.IS_DISABLED, metaClass.isDisabled() ? 1 : 0
             ).set(EAV_M_CLASSES.IS_REFERENCE, metaClass.isReference()
             ).set(EAV_M_CLASSES.IS_IMMUTABLE, metaClass.isImmutable()
             ).where(EAV_M_CLASSES.ID.eq(metaClass.getId()));
@@ -298,38 +299,31 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             {
                 long innerId = save((MetaClass)metaSet.getMemberType());
 
-                insert = context.insertInto(
-                        EAV_M_COMPLEX_SET,
-                        EAV_M_COMPLEX_SET.CONTAINING_ID,
-                        EAV_M_COMPLEX_SET.CONTAINER_TYPE,
-                        EAV_M_COMPLEX_SET.NAME,
-                        EAV_M_COMPLEX_SET.IS_KEY,
-                        EAV_M_COMPLEX_SET.IS_NULLABLE,
-                        EAV_M_COMPLEX_SET.CLASS_ID,
-                        EAV_M_COMPLEX_SET.ARRAY_KEY_TYPE,
-                        EAV_M_COMPLEX_SET.IS_IMMUTABLE,
-                        EAV_M_COMPLEX_SET.IS_REFERENCE
-                    ).values(parentId, parentType, attributeName, metaAttribute.isKey(), metaAttribute.isNullable(),
-                        innerId, metaSet.getArrayKeyType().toString(),
-                        metaSet.isImmutable(), metaSet.isReference());
+                insert = context
+                        .insertInto(EAV_M_COMPLEX_SET)
+                        .set(EAV_M_COMPLEX_SET.CONTAINING_ID, parentId)
+                        .set(EAV_M_COMPLEX_SET.CONTAINER_TYPE, parentType)
+                        .set(EAV_M_COMPLEX_SET.NAME, attributeName)
+                        .set(EAV_M_COMPLEX_SET.IS_KEY, metaAttribute.isKey())
+                        .set(EAV_M_COMPLEX_SET.IS_NULLABLE, metaAttribute.isNullable())
+                        .set(EAV_M_COMPLEX_SET.CLASS_ID, innerId)
+                        .set(EAV_M_COMPLEX_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
+                        .set(EAV_M_COMPLEX_SET.IS_IMMUTABLE, metaSet.isImmutable())
+                        .set(EAV_M_COMPLEX_SET.IS_REFERENCE, metaSet.isReference());
             }
             else
             {
-                insert = context.insertInto(
-                        EAV_M_SIMPLE_SET,
-                        EAV_M_SIMPLE_SET.CONTAINING_ID,
-                        EAV_M_SIMPLE_SET.CONTAINER_TYPE,
-                        EAV_M_SIMPLE_SET.NAME,
-                        EAV_M_SIMPLE_SET.TYPE_CODE,
-                        EAV_M_SIMPLE_SET.IS_KEY,
-                        EAV_M_SIMPLE_SET.IS_NULLABLE,
-                        EAV_M_SIMPLE_SET.ARRAY_KEY_TYPE,
-                        EAV_M_SIMPLE_SET.IS_IMMUTABLE,
-                        EAV_M_SIMPLE_SET.IS_REFERENCE
-                    ).values(parentId, parentType, attributeName, metaSet.getTypeCode().toString(),
-                        metaAttribute.isKey(), metaAttribute.isNullable(),
-                        metaSet.getArrayKeyType().toString(),
-                        metaSet.isImmutable(), metaSet.isReference());
+                insert = context
+                        .insertInto(EAV_M_SIMPLE_SET)
+                        .set(EAV_M_SIMPLE_SET.CONTAINING_ID, parentId)
+                        .set(EAV_M_SIMPLE_SET.CONTAINER_TYPE, parentType)
+                        .set(EAV_M_SIMPLE_SET.NAME, attributeName)
+                        .set(EAV_M_SIMPLE_SET.TYPE_CODE, metaSet.getTypeCode().toString())
+                        .set(EAV_M_SIMPLE_SET.IS_KEY, metaAttribute.isKey())
+                        .set(EAV_M_SIMPLE_SET.IS_NULLABLE, metaAttribute.isNullable())
+                        .set(EAV_M_SIMPLE_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
+                        .set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, metaSet.isImmutable())
+                        .set(EAV_M_SIMPLE_SET.IS_REFERENCE, metaSet.isReference());
             }
 
             logger.debug(insert.toString());
@@ -671,9 +665,9 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         for (Map<String, Object> row : rows) {
             MetaAttribute metaAttirubute = new MetaAttribute(
-                    ((Long)row.get("id")).longValue(),
-                    (Boolean)row.get("is_key"),
-                    (Boolean)row.get("is_nullable"));
+                    ((BigDecimal)row.get("id")).longValue(),
+                    ((BigDecimal)row.get("is_key")).longValue() == 1,
+                    ((BigDecimal)row.get("is_nullable")).longValue() == 1);
 
             metaAttirubute.setMetaType(new MetaValue(DataTypes.valueOf((String) row.get("type_code"))));
 
@@ -715,17 +709,17 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         for (Map<String, Object> row : rows) {
 
             MetaAttribute metaAttribute = new MetaAttribute(
-                    ((Long)row.get("id")).longValue(),
-                    (Boolean)row.get("is_key"),
-                    (Boolean)row.get("is_nullable"));
+                    ((BigDecimal)row.get("id")).longValue(),
+                    ((BigDecimal)row.get("is_key")).longValue() == 1,
+                    ((BigDecimal)row.get("is_nullable")).longValue() == 1);
 
 
             MetaSet metaSet = new MetaSet(new MetaValue(DataTypes.valueOf((String) row.get("type_code"))));
-            metaSet.setId(((Long)row.get("id")).longValue());
+            metaSet.setId(((BigDecimal)row.get("id")).longValue());
 
             metaSet.setArrayKeyType(ComplexKeyTypes.valueOf((String) row.get("array_key_type")));
-            metaSet.setImmutable((Boolean)row.get("is_immutable"));
-            metaSet.setReference((Boolean)row.get("is_reference"));
+            metaSet.setImmutable(((BigDecimal)row.get("is_immutable")).longValue() == 1);
+            metaSet.setReference(((BigDecimal)row.get("is_reference")).longValue() == 1);
 
             metaAttribute.setMetaType(metaSet);
 
@@ -767,12 +761,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
 
         for (Map<String, Object> row : rows) {
-            MetaClass metaClass = load((Long)row.get("class_id"));
+            MetaClass metaClass = load(((BigDecimal)row.get("class_id")).longValue());
 
             MetaAttribute metaAttribute = new MetaAttribute(
-                    ((Long)row.get("id")).longValue(),
-                    (Boolean)row.get("is_key"),
-                    (Boolean)row.get("is_nullable"));
+                    ((BigDecimal)row.get("id")).longValue(),
+                    ((BigDecimal)row.get("is_key")).longValue() == 1,
+                    ((BigDecimal)row.get("is_nullable")).longValue() == 1);
 
             metaAttribute.setMetaType(metaClass);
 
@@ -813,18 +807,18 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
 
         for (Map<String, Object> row : rows) {
-            MetaClass metaClass = load((Long)row.get("class_id"));
+            MetaClass metaClass = load(((BigDecimal)row.get("class_id")).longValue());
 
             MetaAttribute metaAttribute = new MetaAttribute(
-                    ((Long)row.get("id")).longValue(),
-                    (Boolean)row.get("is_key"),
-                    (Boolean)row.get("is_nullable"));
+                    ((BigDecimal)row.get("id")).longValue(),
+                    ((BigDecimal)row.get("is_key")).longValue() == 1,
+                    ((BigDecimal)row.get("is_nullable")).longValue() == 1);
 
             MetaSet metaSet = new MetaSet(metaClass);
-            metaSet.setId(((Long)row.get("id")).longValue());
+            metaSet.setId(((BigDecimal)row.get("id")).longValue());
             metaSet.setArrayKeyType(ComplexKeyTypes.valueOf((String) row.get("array_key_type")));
-            metaSet.setImmutable((Boolean)row.get("is_immutable"));
-            metaSet.setReference((Boolean)row.get("is_reference"));
+            metaSet.setImmutable(((BigDecimal)row.get("is_immutable")).longValue() == 1);
+            metaSet.setReference(((BigDecimal)row.get("is_reference")).longValue() == 1);
 
             SelectForUpdateStep selectFilters = context.select(
                     EAV_M_SET_KEY_FILTER.ATTR_NAME,
@@ -887,18 +881,18 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         for (Map<String, Object> row : rows) {
 
             MetaAttribute metaAttribute = new MetaAttribute(
-                    ((Long)row.get("id")).longValue(),
-                    (Boolean)row.get("is_key"),
-                    (Boolean)row.get("is_nullable"));
+                    ((BigDecimal)row.get("id")).longValue(),
+                    ((BigDecimal)row.get("is_key")).longValue() == 1,
+                    ((BigDecimal)row.get("is_nullable")).longValue() == 1);
 
 
 
             MetaSet metaSet = new MetaSet();
 
-            metaSet.setId(((Long)row.get("id")).longValue());
+            metaSet.setId(((BigDecimal)row.get("id")).longValue());
             metaSet.setArrayKeyType(ComplexKeyTypes.valueOf((String) row.get("array_key_type")));
-            metaSet.setImmutable((Boolean)row.get("is_immutable"));
-            metaSet.setReference((Boolean)row.get("is_reference"));
+            metaSet.setImmutable(((BigDecimal)row.get("is_immutable")).longValue() == 1);
+            metaSet.setReference(((BigDecimal)row.get("is_reference")).longValue() == 1);
 
             loadSimpleArrays(metaSet);
             loadComplexArrays(metaSet);

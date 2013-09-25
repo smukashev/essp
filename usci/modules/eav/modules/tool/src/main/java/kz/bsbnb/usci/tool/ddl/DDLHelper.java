@@ -43,7 +43,7 @@ public class DDLHelper
         }
         else
         {
-            platform.createTables(targetModel, true, false);
+            platform.createModel(targetModel, false, true);
         }
     }
 
@@ -52,7 +52,7 @@ public class DDLHelper
     {
         Platform platform = PlatformFactory.createNewPlatformInstance(dataSource);
 
-        platform.dropTables(targetModel, true);
+        platform.dropModel(targetModel, true);
     }
 
     public static void main(String[] args)
@@ -87,7 +87,7 @@ public class DDLHelper
 
             DDLHelper.changeDatabase(source,
                     DDLHelper.readDatabaseFromXML(args[1]),
-                    true);
+                    false);
         }
     }
 }

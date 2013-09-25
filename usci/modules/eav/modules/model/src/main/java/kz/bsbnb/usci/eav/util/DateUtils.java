@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.util;
 
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -60,6 +61,14 @@ public class DateUtils
 
     public static java.sql.Date convert(java.util.Date date) {
         return date == null ? null : new java.sql.Date(date.getTime());
+    }
+
+    public static java.util.Date convert(Timestamp timestamp) {
+        return timestamp == null ? null : new java.util.Date(timestamp.getTime());
+    }
+
+    public static java.sql.Date convertToSQLDate(Timestamp timestamp) {
+        return timestamp == null ? null : new java.sql.Date(timestamp.getTime());
     }
 
 }

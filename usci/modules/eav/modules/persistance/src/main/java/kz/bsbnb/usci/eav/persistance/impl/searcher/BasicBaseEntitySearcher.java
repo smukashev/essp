@@ -469,8 +469,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
                 for (IBaseValue actIntegerElementValue : actual_integer_value.get())
                 {
-                    Long actualIntegerValue = ((Integer)actIntegerElementValue.
-                            getValue()).longValue();
+                    Integer actualIntegerValue = (Integer)actIntegerElementValue.getValue();
 
                     SelectConditionStep innerSQL = context.select(
                             EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
 
@@ -128,9 +129,9 @@ public class BeStringValueDaoImpl extends AbstractBeValueDaoImpl implements IBeS
         {
             updateConditionStep = updateConditionStep == null ?
                     updateSetMoreStep.where(tableOfValues.field(EAV_BE_STRING_VALUES.REPORT_DATE)
-                            .equal(DateUtils.convert((Date) conditions.get("report_date")))) :
+                            .equal(DateUtils.convert((Timestamp) conditions.get("report_date")))) :
                     updateConditionStep.and(tableOfValues.field(EAV_BE_STRING_VALUES.REPORT_DATE)
-                            .equal(DateUtils.convert((Date) conditions.get("report_date"))));
+                            .equal(DateUtils.convert((Timestamp) conditions.get("report_date"))));
         }
 
         logger.debug(updateConditionStep.toString());

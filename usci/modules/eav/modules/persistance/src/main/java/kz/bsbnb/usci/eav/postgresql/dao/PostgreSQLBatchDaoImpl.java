@@ -3,6 +3,7 @@ package kz.bsbnb.usci.eav.postgresql.dao;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
+import kz.bsbnb.usci.tool.jooq.OracleLongConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
@@ -126,11 +129,11 @@ public class PostgreSQLBatchDaoImpl extends JDBCSupport implements IBatchDao
 
         if(row != null)
         {
-            batch.setId((Long)row.get("id"));
+            batch.setId(((BigDecimal)row.get("id")).longValue());
             logger.debug("CLASS: " + row.get("receipt_date").getClass());
             batch.setReceiptDate((Timestamp)row.get("receipt_date"));
             logger.debug("CLASS: " + row.get("rep_date").getClass());
-            batch.setRepDate((Date) row.get("rep_date"));
+            batch.setRepDate(new Date(((Timestamp) row.get("rep_date")).getTime()));
         }
         else
         {

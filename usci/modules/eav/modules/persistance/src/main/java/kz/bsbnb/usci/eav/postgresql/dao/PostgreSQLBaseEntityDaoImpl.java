@@ -30,7 +30,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.TransactionUsageException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.Comparator;
 
@@ -157,45 +159,45 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         "Reporting date should be in the range of available reporting dates.");
             }
 
-            MetaClass meta = metaClassRepository.getMetaClass((Long)row.get(EAV_BE_ENTITIES.CLASS_ID.getName()));
+            MetaClass meta = metaClassRepository.getMetaClass(((BigDecimal)row.get(EAV_BE_ENTITIES.CLASS_ID.getName())).longValue());
             BaseEntity baseEntity = new BaseEntity(id, meta, reportDate, availableReportDates);
 
-            if ((Long)row.get(EAV_BE_ENTITY_REPORT_DATES.INTEGER_VALUES_COUNT.getName()) != 0)
+            if (((BigDecimal)row.get(EAV_BE_ENTITY_REPORT_DATES.INTEGER_VALUES_COUNT.getName())).longValue() != 0)
             {
                 loadIntegerValues(baseEntity, withClosedValues);
             }
 
-            if ((Long)row.get(EAV_BE_ENTITY_REPORT_DATES.DATE_VALUES_COUNT.getName()) != 0)
+            if (((BigDecimal)row.get(EAV_BE_ENTITY_REPORT_DATES.DATE_VALUES_COUNT.getName())).longValue() != 0)
             {
                 loadDateValues(baseEntity, withClosedValues);
             }
 
-            if ((Long)row.get(EAV_BE_ENTITY_REPORT_DATES.STRING_VALUES_COUNT.getName()) != 0)
+            if (((BigDecimal)row.get(EAV_BE_ENTITY_REPORT_DATES.STRING_VALUES_COUNT.getName())).longValue() != 0)
             {
                 loadStringValues(baseEntity, withClosedValues);
             }
 
-            if ((Long)row.get(EAV_BE_ENTITY_REPORT_DATES.BOOLEAN_VALUES_COUNT.getName()) != 0)
+            if (((BigDecimal)row.get(EAV_BE_ENTITY_REPORT_DATES.BOOLEAN_VALUES_COUNT.getName())).longValue() != 0)
             {
                 loadBooleanValues(baseEntity, withClosedValues);
             }
 
-            if ((Long)row.get(EAV_BE_ENTITY_REPORT_DATES.DOUBLE_VALUES_COUNT.getName()) != 0)
+            if (((BigDecimal)row.get(EAV_BE_ENTITY_REPORT_DATES.DOUBLE_VALUES_COUNT.getName())).longValue() != 0)
             {
                 loadDoubleValues(baseEntity, withClosedValues);
             }
 
-            if ((Long)row.get(EAV_BE_ENTITY_REPORT_DATES.COMPLEX_VALUES_COUNT.getName()) != 0)
+            if (((BigDecimal)row.get(EAV_BE_ENTITY_REPORT_DATES.COMPLEX_VALUES_COUNT.getName())).longValue() != 0)
             {
                 loadComplexValues(baseEntity, withClosedValues);
             }
 
-            if ((Long)row.get(EAV_BE_ENTITY_REPORT_DATES.SIMPLE_SETS_COUNT.getName()) != 0)
+            if (((BigDecimal)row.get(EAV_BE_ENTITY_REPORT_DATES.SIMPLE_SETS_COUNT.getName())).longValue() != 0)
             {
                 loadEntitySimpleSets(baseEntity, withClosedValues);
             }
 
-            if ((Long)row.get(EAV_BE_ENTITY_REPORT_DATES.COMPLEX_SETS_COUNT.getName()) != 0)
+            if (((BigDecimal)row.get(EAV_BE_ENTITY_REPORT_DATES.COMPLEX_SETS_COUNT.getName())).longValue() != 0)
             {
                 loadEntityComplexSets(baseEntity, withClosedValues);
             }
@@ -236,7 +238,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         List<Long> baseEntityIds = new ArrayList<Long>();
         for (Map<String, Object> row: rows)
         {
-            baseEntityIds.add((Long)row.get(EAV_BE_ENTITIES.ID.getName()));
+            baseEntityIds.add(((BigDecimal)row.get(EAV_BE_ENTITIES.ID.getName())).longValue());
         }
 
         return baseEntityIds;
@@ -1032,7 +1034,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         logger.debug(select.toString());
         rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        long complexValuesCount = (Long)rows.get(0).get("VALUE_COUNT");
+        long complexValuesCount = ((BigDecimal)rows.get(0).get("VALUE_COUNT")).longValue();
 
         select = context
                 .select(DSL.count().as("VALUE_COUNT"))
@@ -1042,7 +1044,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         logger.debug(select.toString());
         rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        long complexSetValuesCount = (Long)rows.get(0).get("VALUE_COUNT");
+        long complexSetValuesCount = ((BigDecimal)rows.get(0).get("VALUE_COUNT")).longValue();
 
         return complexValuesCount != 0 || complexSetValuesCount != 0;
     }
@@ -1063,7 +1065,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         while (it.hasNext())
         {
             Map<String, Object> row = it.next();
-            reportDates.add(DateUtils.convert((Date)row.get(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.getName())));
+            reportDates.add(DateUtils.convert((Timestamp)row.get(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.getName())));
         }
 
         return reportDates;
@@ -1079,7 +1081,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        return DateUtils.convert((Date)rows.get(0).get("min_report_date"));
+        return DateUtils.convert((Timestamp)rows.get(0).get("min_report_date"));
     }
 
     public java.util.Date getMaxReportDate(long baseEntityId, java.util.Date reportDate)
@@ -1093,7 +1095,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        return DateUtils.convert((Date)rows.get(0).get("min_report_date"));
+        return DateUtils.convert((Timestamp)rows.get(0).get("min_report_date"));
     }
 
     public java.util.Date getMaxReportDate(long baseEntityId)
@@ -1106,7 +1108,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        return DateUtils.convert((Date)rows.get(0).get("max_report_date"));
+        return DateUtils.convert((Timestamp)rows.get(0).get("max_report_date"));
     }
 
     private void insertReportDate(
@@ -1356,13 +1358,13 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             baseEntity.put(
                     (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
-                            (Long) row.get(EAV_BE_INTEGER_VALUES.ID.getName()),
-                            batchRepository.getBatch((Long)row.get(EAV_BE_INTEGER_VALUES.BATCH_ID.getName())),
-                            (Long) row.get(EAV_BE_INTEGER_VALUES.INDEX_.getName()),
-                            (java.sql.Date) row.get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName()),
+                            ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.ID.getName())).longValue(),
+                            batchRepository.getBatch(((BigDecimal)row.get(EAV_BE_INTEGER_VALUES.BATCH_ID.getName())).longValue()),
+                            ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.INDEX_.getName())).longValue(),
+                            DateUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName())),
                             row.get(EAV_BE_INTEGER_VALUES.VALUE.getName()),
-                            (Boolean)row.get(EAV_BE_INTEGER_VALUES.IS_CLOSED.getName()),
-                            (Boolean)row.get(EAV_BE_INTEGER_VALUES.IS_LAST.getName())));
+                            ((BigDecimal)row.get(EAV_BE_INTEGER_VALUES.IS_CLOSED.getName())).longValue() == 1,
+                            ((BigDecimal)row.get(EAV_BE_INTEGER_VALUES.IS_LAST.getName())).longValue() == 1));
         }
     }
 
@@ -1449,13 +1451,13 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             baseEntity.put(
                     (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
-                            (Long) row.get(EAV_BE_DATE_VALUES.ID.getName()),
-                            batchRepository.getBatch((Long)row.get(EAV_BE_DATE_VALUES.BATCH_ID.getName())),
-                            (Long) row.get(EAV_BE_DATE_VALUES.INDEX_.getName()),
-                            (java.sql.Date) row.get(EAV_BE_DATE_VALUES.REPORT_DATE.getName()),
-                            DateUtils.convert((java.sql.Date) row.get(EAV_BE_DATE_VALUES.VALUE.getName())),
-                            (Boolean)row.get(EAV_BE_DATE_VALUES.IS_CLOSED.getName()),
-                            (Boolean)row.get(EAV_BE_DATE_VALUES.IS_LAST.getName())));
+                            ((BigDecimal) row.get(EAV_BE_DATE_VALUES.ID.getName())).longValue(),
+                            batchRepository.getBatch(((BigDecimal)row.get(EAV_BE_DATE_VALUES.BATCH_ID.getName())).longValue()),
+                            ((BigDecimal) row.get(EAV_BE_DATE_VALUES.INDEX_.getName())).longValue(),
+                            DateUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_DATE_VALUES.REPORT_DATE.getName())),
+                            DateUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_DATE_VALUES.VALUE.getName())),
+                            ((BigDecimal)row.get(EAV_BE_DATE_VALUES.IS_CLOSED.getName())).longValue() == 1,
+                            ((BigDecimal)row.get(EAV_BE_DATE_VALUES.IS_LAST.getName())).longValue() == 1));
         }
     }
 
@@ -1542,13 +1544,13 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             baseEntity.put(
                     (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
-                            (Long) row.get(EAV_BE_BOOLEAN_VALUES.ID.getName()),
-                            batchRepository.getBatch((Long)row.get(EAV_BE_BOOLEAN_VALUES.BATCH_ID.getName())),
-                            (Long) row.get(EAV_BE_BOOLEAN_VALUES.INDEX_.getName()),
-                            (java.sql.Date) row.get(EAV_BE_BOOLEAN_VALUES.REPORT_DATE.getName()),
+                            ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.ID.getName())).longValue(),
+                            batchRepository.getBatch(((BigDecimal)row.get(EAV_BE_BOOLEAN_VALUES.BATCH_ID.getName())).longValue()),
+                            ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.INDEX_.getName())).longValue(),
+                            DateUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_BOOLEAN_VALUES.REPORT_DATE.getName())),
                             row.get(EAV_BE_BOOLEAN_VALUES.VALUE.getName()),
-                            (Boolean)row.get(EAV_BE_BOOLEAN_VALUES.IS_CLOSED.getName()),
-                            (Boolean)row.get(EAV_BE_BOOLEAN_VALUES.IS_LAST.getName())));
+                            ((BigDecimal)row.get(EAV_BE_BOOLEAN_VALUES.IS_CLOSED.getName())).longValue() == 1,
+                            ((BigDecimal)row.get(EAV_BE_BOOLEAN_VALUES.IS_LAST.getName())).longValue() == 1));
         }
     }
 
@@ -1635,13 +1637,13 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             baseEntity.put(
                     (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
-                            (Long) row.get(EAV_BE_STRING_VALUES.ID.getName()),
-                            batchRepository.getBatch((Long)row.get(EAV_BE_STRING_VALUES.BATCH_ID.getName())),
-                            (Long) row.get(EAV_BE_STRING_VALUES.INDEX_.getName()),
-                            (java.sql.Date) row.get(EAV_BE_STRING_VALUES.REPORT_DATE.getName()),
+                            ((BigDecimal) row.get(EAV_BE_STRING_VALUES.ID.getName())).longValue(),
+                            batchRepository.getBatch(((BigDecimal)row.get(EAV_BE_STRING_VALUES.BATCH_ID.getName())).longValue()),
+                            ((BigDecimal) row.get(EAV_BE_STRING_VALUES.INDEX_.getName())).longValue(),
+                            DateUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_STRING_VALUES.REPORT_DATE.getName())),
                             row.get(EAV_BE_STRING_VALUES.VALUE.getName()),
-                            (Boolean)row.get(EAV_BE_STRING_VALUES.IS_CLOSED.getName()),
-                            (Boolean)row.get(EAV_BE_STRING_VALUES.IS_LAST.getName())));
+                            ((BigDecimal)row.get(EAV_BE_STRING_VALUES.IS_CLOSED.getName())).longValue() == 1,
+                            ((BigDecimal)row.get(EAV_BE_STRING_VALUES.IS_LAST.getName())).longValue() == 1));
         }
     }
 
@@ -1728,13 +1730,13 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             baseEntity.put(
                     (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
-                            (Long) row.get(EAV_BE_DOUBLE_VALUES.ID.getName()),
-                            batchRepository.getBatch((Long)row.get(EAV_BE_DOUBLE_VALUES.BATCH_ID.getName())),
-                            (Long) row.get(EAV_BE_DOUBLE_VALUES.INDEX_.getName()),
-                            (java.sql.Date) row.get(EAV_BE_DOUBLE_VALUES.REPORT_DATE.getName()),
-                            row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName()),
-                            (Boolean)row.get(EAV_BE_DOUBLE_VALUES.IS_CLOSED.getName()),
-                            (Boolean)row.get(EAV_BE_DOUBLE_VALUES.IS_LAST.getName())));
+                            ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.ID.getName())).longValue(),
+                            batchRepository.getBatch(((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.BATCH_ID.getName())).longValue()),
+                            ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.INDEX_.getName())).longValue(),
+                            DateUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_DOUBLE_VALUES.REPORT_DATE.getName())),
+                            ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue(),
+                            ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.IS_CLOSED.getName())).longValue() == 1,
+                            ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.IS_LAST.getName())).longValue() == 1));
         }
     }
 
@@ -1819,20 +1821,20 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             Map<String, Object> row = it.next();
 
-            Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_COMPLEX_VALUES.BATCH_ID.getName()));
-            long entityValueId = (Long)row.get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName());
+            Batch batch = batchRepository.getBatch(((BigDecimal)row.get(EAV_BE_COMPLEX_VALUES.BATCH_ID.getName())).longValue());
+            long entityValueId = ((BigDecimal)row.get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
             IBaseEntity childBaseEntity = beStorageDao.getBaseEntity(entityValueId, withClosedValues);
 
             baseEntity.put(
                     (String) row.get(EAV_M_COMPLEX_ATTRIBUTES.NAME.getName()),
                     new BaseValue(
-                            (Long) row.get(EAV_BE_COMPLEX_VALUES.ID.getName()),
+                            ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue(),
                             batch,
-                            (Long) row.get(EAV_BE_COMPLEX_VALUES.INDEX_.getName()),
-                            (Date) row.get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()),
+                            ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.INDEX_.getName())).longValue(),
+                            DateUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName())),
                             childBaseEntity,
-                            (Boolean)row.get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName()),
-                            (Boolean)row.get(EAV_BE_COMPLEX_VALUES.IS_LAST.getName())));
+                            ((BigDecimal)row.get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName())).longValue() == 1,
+                            ((BigDecimal)row.get(EAV_BE_COMPLEX_VALUES.IS_LAST.getName())).longValue() == 1));
         }
     }
 
@@ -1918,12 +1920,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             Map<String, Object> row = it.next();
 
             String attribute = (String)row.get(EAV_M_SIMPLE_SET.NAME.getName());
-            long setId = (Long)row.get(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID.getName());
+            long setId = ((BigDecimal)row.get(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID.getName())).longValue();
 
-            long baseValueId = (Long)row.get(EAV_BE_ENTITY_SIMPLE_SETS.ID.getName());
-            long batchId = (Long)row.get(EAV_BE_ENTITY_SIMPLE_SETS.BATCH_ID.getName());
-            long index = (Long)row.get(EAV_BE_ENTITY_SIMPLE_SETS.INDEX_.getName());
-            Date reportDate = (Date) row.get(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE.getName());
+            long baseValueId = ((BigDecimal)row.get(EAV_BE_ENTITY_SIMPLE_SETS.ID.getName())).longValue();
+            long batchId = ((BigDecimal)row.get(EAV_BE_ENTITY_SIMPLE_SETS.BATCH_ID.getName())).longValue();
+            long index = ((BigDecimal)row.get(EAV_BE_ENTITY_SIMPLE_SETS.INDEX_.getName())).longValue();
+            Date reportDate = DateUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE.getName()));
 
             IMetaType metaType = baseEntity.getMemberType(attribute);
             IBaseSet baseSet = new BaseSet(setId, ((MetaSet)metaType).getMemberType());
@@ -2024,12 +2026,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             Map<String, Object> row = it.next();
 
             String attribute = (String)row.get(EAV_M_COMPLEX_SET.NAME.getName());
-            long setId = (Long)row.get(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.getName());
+            long setId = ((BigDecimal)row.get(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.getName())).longValue();
 
-            long baseValueId = (Long)row.get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName());
-            long batchId = (Long)row.get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName());
-            long index = (Long)row.get(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_.getName());
-            Date reportDate = (Date) row.get(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE.getName());
+            long baseValueId = ((BigDecimal)row.get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();
+            long batchId = ((BigDecimal)row.get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue();
+            long index = ((BigDecimal)row.get(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_.getName())).longValue();
+            Date reportDate = DateUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE.getName()));
 
             IMetaType metaType = baseEntity.getMemberType(attribute);
             IBaseSet baseSet = new BaseSet(setId, ((MetaSet)metaType).getMemberType());
@@ -2066,7 +2068,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             Map<String, Object> row = it.next();
             IMetaType metaType = baseSet.getMemberType();
-            BaseSet baseSetChild = new BaseSet((Long)row.get(EAV_BE_SETS.ID.getName()), ((MetaSet)metaType).getMemberType());
+            BaseSet baseSetChild = new BaseSet(((BigDecimal)row.get(EAV_BE_SETS.ID.getName())).longValue(), ((MetaSet)metaType).getMemberType());
 
             if (metaType.isComplex())
             {
@@ -2077,9 +2079,9 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 loadSimpleSetValues(baseSetChild, withClosedValues);
             }
 
-            Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_SET_OF_SIMPLE_SETS.BATCH_ID.getName()));
-            baseSet.put(new BaseValue(batch, (Long)row.get(EAV_BE_SET_OF_SIMPLE_SETS.INDEX_.getName()),
-                    (Date) row.get(EAV_BE_SET_OF_SIMPLE_SETS.REPORT_DATE.getName()), baseSetChild));
+            Batch batch = batchRepository.getBatch(((BigDecimal)row.get(EAV_BE_SET_OF_SIMPLE_SETS.BATCH_ID.getName())).longValue());
+            baseSet.put(new BaseValue(batch, ((BigDecimal)row.get(EAV_BE_SET_OF_SIMPLE_SETS.INDEX_.getName())).longValue(),
+                    DateUtils.convertToSQLDate((Timestamp)  row.get(EAV_BE_SET_OF_SIMPLE_SETS.REPORT_DATE.getName())), baseSetChild));
         }
     }
 
@@ -2102,7 +2104,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             Map<String, Object> row = it.next();
             IMetaType metaType = baseSet.getMemberType();
-            BaseSet baseSetChild = new BaseSet((Long)row.get(EAV_BE_SETS.ID.getName()), ((MetaSet)metaType).getMemberType());
+            BaseSet baseSetChild = new BaseSet(((BigDecimal)row.get(EAV_BE_SETS.ID.getName())).longValue(), ((MetaSet)metaType).getMemberType());
 
             if (metaType.isComplex())
             {
@@ -2114,9 +2116,9 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             }
 
 
-            Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_SET_OF_COMPLEX_SETS.BATCH_ID.getName()));
-            baseSet.put(new BaseValue(batch, (Long)row.get(EAV_BE_SET_OF_COMPLEX_SETS.INDEX_.getName()),
-                    (Date) row.get(EAV_BE_SET_OF_COMPLEX_SETS.REPORT_DATE.getName()), baseSetChild));
+            Batch batch = batchRepository.getBatch(((BigDecimal)row.get(EAV_BE_SET_OF_COMPLEX_SETS.BATCH_ID.getName())).longValue());
+            baseSet.put(new BaseValue(batch, ((BigDecimal)row.get(EAV_BE_SET_OF_COMPLEX_SETS.INDEX_.getName())).longValue(),
+                    DateUtils.convertToSQLDate((Timestamp)  row.get(EAV_BE_SET_OF_COMPLEX_SETS.REPORT_DATE.getName())), baseSetChild));
         }
     }
 
@@ -2187,12 +2189,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             Map<String, Object> rowValue = it.next();
 
-            Batch batch = batchRepository.getBatch((Long)rowValue.get(EAV_BE_INTEGER_SET_VALUES.BATCH_ID.getName()));
+            Batch batch = batchRepository.getBatch(((BigDecimal)rowValue.get(EAV_BE_INTEGER_SET_VALUES.BATCH_ID.getName())).longValue());
             baseSet.put(
                     new BaseValue(
                             batch,
-                            (Long)rowValue.get(EAV_BE_INTEGER_SET_VALUES.INDEX_.getName()),
-                            (Date) rowValue.get(EAV_BE_INTEGER_SET_VALUES.REPORT_DATE.getName()),
+                            ((BigDecimal)rowValue.get(EAV_BE_INTEGER_SET_VALUES.INDEX_.getName())).longValue(),
+                            DateUtils.convertToSQLDate((Timestamp)  rowValue.get(EAV_BE_INTEGER_SET_VALUES.REPORT_DATE.getName())),
                             rowValue.get(EAV_BE_INTEGER_SET_VALUES.VALUE.getName())));
         }
     }
@@ -2215,12 +2217,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             Map<String, Object> rowValue = it.next();
 
-            Batch batch = batchRepository.getBatch((Long)rowValue.get(EAV_BE_DATE_SET_VALUES.BATCH_ID.getName()));
+            Batch batch = batchRepository.getBatch(((BigDecimal)rowValue.get(EAV_BE_DATE_SET_VALUES.BATCH_ID.getName())).longValue());
             baseSet.put(
                     new BaseValue(
                             batch,
-                            (Long)rowValue.get(EAV_BE_DATE_SET_VALUES.INDEX_.getName()),
-                            (Date) rowValue.get(EAV_BE_DATE_SET_VALUES.REPORT_DATE.getName()),
+                            ((BigDecimal)rowValue.get(EAV_BE_DATE_SET_VALUES.INDEX_.getName())).longValue(),
+                            DateUtils.convertToSQLDate((Timestamp)  rowValue.get(EAV_BE_DATE_SET_VALUES.REPORT_DATE.getName())),
                             rowValue.get(EAV_BE_DATE_SET_VALUES.VALUE.getName())));
         }
     }
@@ -2243,12 +2245,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             Map<String, Object> rowValue = it.next();
 
-            Batch batch = batchRepository.getBatch((Long)rowValue.get(EAV_BE_STRING_SET_VALUES.BATCH_ID.getName()));
+            Batch batch = batchRepository.getBatch(((BigDecimal)rowValue.get(EAV_BE_STRING_SET_VALUES.BATCH_ID.getName())).longValue());
             baseSet.put(
                     new BaseValue(
                             batch,
-                            (Long)rowValue.get(EAV_BE_STRING_SET_VALUES.INDEX_.getName()),
-                            (Date) rowValue.get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()),
+                            ((BigDecimal)rowValue.get(EAV_BE_STRING_SET_VALUES.INDEX_.getName())).longValue(),
+                            DateUtils.convertToSQLDate((Timestamp)  rowValue.get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName())),
                             rowValue.get(EAV_BE_STRING_SET_VALUES.VALUE.getName())));
         }
     }
@@ -2271,12 +2273,12 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             Map<String, Object> rowValue = it.next();
 
-            Batch batch = batchRepository.getBatch((Long)rowValue.get(EAV_BE_BOOLEAN_SET_VALUES.BATCH_ID.getName()));
+            Batch batch = batchRepository.getBatch(((BigDecimal)rowValue.get(EAV_BE_BOOLEAN_SET_VALUES.BATCH_ID.getName())).longValue());
             baseSet.put(
                     new BaseValue(
                             batch,
-                            (Long)rowValue.get(EAV_BE_BOOLEAN_SET_VALUES.INDEX_.getName()),
-                            (Date) rowValue.get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()),
+                            ((BigDecimal)rowValue.get(EAV_BE_BOOLEAN_SET_VALUES.INDEX_.getName())).longValue(),
+                            DateUtils.convertToSQLDate((Timestamp)  rowValue.get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName())),
                             rowValue.get(EAV_BE_BOOLEAN_SET_VALUES.VALUE.getName())));
         }
     }
@@ -2299,13 +2301,13 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             Map<String, Object> rowValue = it.next();
 
-            Batch batch = batchRepository.getBatch((Long)rowValue.get(EAV_BE_DOUBLE_SET_VALUES.BATCH_ID.getName()));
+            Batch batch = batchRepository.getBatch(((BigDecimal)rowValue.get(EAV_BE_DOUBLE_SET_VALUES.BATCH_ID.getName())).longValue());
             baseSet.put(
                     new BaseValue(
                             batch,
-                            (Long)rowValue.get(EAV_BE_DOUBLE_SET_VALUES.INDEX_.getName()),
-                            (Date) rowValue.get(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE.getName()),
-                            rowValue.get(EAV_BE_DOUBLE_SET_VALUES.VALUE.getName())));
+                            ((BigDecimal)rowValue.get(EAV_BE_DOUBLE_SET_VALUES.INDEX_.getName())).longValue(),
+                            DateUtils.convertToSQLDate((Timestamp)  rowValue.get(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE.getName())),
+                            ((BigDecimal)rowValue.get(EAV_BE_DOUBLE_SET_VALUES.VALUE.getName())).doubleValue()));
         }
     }
 
@@ -2330,7 +2332,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                             EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED,
                             EAV_BE_COMPLEX_SET_VALUES.IS_LAST)
                     .from(EAV_BE_COMPLEX_SET_VALUES)
-                    .where(EAV_BE_COMPLEX_SET_VALUES.SET_ID.equal((long) baseSet.getId()));
+                    .where(EAV_BE_COMPLEX_SET_VALUES.SET_ID.equal(baseSet.getId()));
 
             logger.debug(select.toString());
             List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -2340,17 +2342,17 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             {
                 Map<String, Object> row = it.next();
 
-                Batch batch = batchRepository.getBatch((Long)row.get(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID.getName()));
+                Batch batch = batchRepository.getBatch(((BigDecimal)row.get(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID.getName())).longValue());
                 IBaseEntity baseEntity = beStorageDao.getBaseEntity(
-                        (Long) row.get(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID.getName()), withClosedValues);
+                        ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID.getName())).longValue(), withClosedValues);
                 baseSet.put(
                         new BaseValue(
                                 batch,
-                                (Long)row.get(EAV_BE_COMPLEX_SET_VALUES.INDEX_.getName()),
-                                (Date)row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()),
+                                ((BigDecimal)row.get(EAV_BE_COMPLEX_SET_VALUES.INDEX_.getName())).longValue(),
+                                DateUtils.convertToSQLDate((Timestamp)row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName())),
                                 baseEntity,
-                                (Boolean)row.get(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED.getName()),
-                                (Boolean)row.get(EAV_BE_COMPLEX_SET_VALUES.IS_LAST.getName())));
+                                ((BigDecimal)row.get(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED.getName())).longValue() == 1,
+                                ((BigDecimal)row.get(EAV_BE_COMPLEX_SET_VALUES.IS_LAST.getName())).longValue() == 1));
             }
         }
     }

@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-@ActiveProfiles({"postgres"})
+@ActiveProfiles({"oracle"})
 public class BaseEntityTest extends GenericTestCase{
     private final Logger logger = LoggerFactory.getLogger(BaseEntityTest.class);
 

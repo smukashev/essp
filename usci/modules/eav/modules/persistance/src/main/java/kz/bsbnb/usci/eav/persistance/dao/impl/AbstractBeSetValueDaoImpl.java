@@ -136,7 +136,7 @@ public abstract class AbstractBeSetValueDaoImpl extends JDBCSupport implements I
     {
         Insert insert = context
                 .insertInto(EAV_BE_SETS)
-                .set(EAV_BE_SETS.LEVEL, level)
+                .set(EAV_BE_SETS.LEVEL_, level)
                 .set(EAV_BE_SETS.IS_LAST, last);
 
         logger.debug(insert.toString());
