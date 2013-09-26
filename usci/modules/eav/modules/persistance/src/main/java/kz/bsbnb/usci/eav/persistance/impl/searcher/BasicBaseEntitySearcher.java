@@ -51,7 +51,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         List<Long> ids = findAll(entity);
 
         if (ids.size() > 1) {
-            throw new RuntimeException("Found more than one instance of BaseEntity. Needed one.");
+            //throw new RuntimeException("Found more than one instance of BaseEntity. Needed one.");
         }
 
         return ids.size() == 1 ? ids.get(0) : null;
@@ -136,6 +136,10 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
     private Condition generateSimpleConditions(Condition condition, String name, IMetaType type, IBaseValue value,
                                                boolean and) {
+
+        if (type instanceof MetaClass)
+            throw new IllegalStateException("Can't convert class: " + ((MetaClass) type).getClassName() + " to simple value");
+
         MetaValue simple_value = (MetaValue)type;
 
         switch (simple_value.getTypeCode())
@@ -648,8 +652,8 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
             {
                 condition = DSL.val(actual_set_value.sizeWithFilter(simple_set.getArrayKeyFilter())).lessOrEqual(
                         context.select(nested.field("inner_id").
-                                count()).from(nested).where(((Field<Long>)nested.field("inner_id")).
-                                    equal(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_VALUE_ID)));
+                                count()).from(nested).where(((Field<Long>) nested.field("inner_id")).
+                                equal(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_VALUE_ID)));
             }
             else
             {
@@ -749,10 +753,10 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
         if (entityName != null) {
             where = joins.where(
-                (EAV_BE_ENTITIES.as(the_name).CLASS_ID.equal(meta.getId()))//.and(
-                        //EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(entityName).ENTITY_VALUE_ID)
+                    (EAV_BE_ENTITIES.as(the_name).CLASS_ID.equal(meta.getId()))//.and(
+                    //EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(entityName).ENTITY_VALUE_ID)
                     //)
-                );
+            );
         } else {
             where = joins.where(EAV_BE_ENTITIES.as(the_name).CLASS_ID.equal(meta.getId()));
         }
@@ -774,7 +778,9 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
             IBaseValue value = entity.safeGetValue(name);
 
             if(value == null) {
-                throw new IllegalArgumentException("Key attribute " + name + " can't be null");
+                //System.out.println("Entity: " + entity.toString());
+                throw new IllegalArgumentException("Key attribute " + name + " can't be null. MetaClass: " +
+                        entity.getMeta().getClassName());
             }
 
             boolean and = (meta.getComplexKeyType() == ComplexKeyTypes.ALL);
@@ -849,7 +855,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
         SelectConditionStep where = generateSQL(entity, null);
 
-        System.out.println("Gen sql: " + where.toString());
+        //System.out.println("Gen sql: " + where.toString());
 
         List<Map<String, Object>> rows = queryForListWithStats(where.getSQL(), where.getBindValues().toArray());
 

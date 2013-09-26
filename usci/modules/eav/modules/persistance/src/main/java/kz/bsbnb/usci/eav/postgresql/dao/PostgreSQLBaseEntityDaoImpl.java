@@ -1361,7 +1361,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                             batchRepository.getBatch(((BigDecimal)row.get(EAV_BE_INTEGER_VALUES.BATCH_ID.getName())).longValue()),
                             ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.INDEX_.getName())).longValue(),
                             DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName())),
-                            row.get(EAV_BE_INTEGER_VALUES.VALUE.getName()),
+                            ((BigDecimal)row.get(EAV_BE_INTEGER_VALUES.VALUE.getName())).intValue(),
                             ((BigDecimal)row.get(EAV_BE_INTEGER_VALUES.IS_CLOSED.getName())).longValue() == 1,
                             ((BigDecimal)row.get(EAV_BE_INTEGER_VALUES.IS_LAST.getName())).longValue() == 1));
         }
@@ -1547,7 +1547,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                             batchRepository.getBatch(((BigDecimal)row.get(EAV_BE_BOOLEAN_VALUES.BATCH_ID.getName())).longValue()),
                             ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.INDEX_.getName())).longValue(),
                             DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_BOOLEAN_VALUES.REPORT_DATE.getName())),
-                            row.get(EAV_BE_BOOLEAN_VALUES.VALUE.getName()),
+                            DataUtils.convert((Byte)row.get(EAV_BE_BOOLEAN_VALUES.VALUE.getName())),
                             ((BigDecimal)row.get(EAV_BE_BOOLEAN_VALUES.IS_CLOSED.getName())).longValue() == 1,
                             ((BigDecimal)row.get(EAV_BE_BOOLEAN_VALUES.IS_LAST.getName())).longValue() == 1));
         }
@@ -2194,7 +2194,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                             batch,
                             ((BigDecimal)rowValue.get(EAV_BE_INTEGER_SET_VALUES.INDEX_.getName())).longValue(),
                             DataUtils.convertToSQLDate((Timestamp) rowValue.get(EAV_BE_INTEGER_SET_VALUES.REPORT_DATE.getName())),
-                            rowValue.get(EAV_BE_INTEGER_SET_VALUES.VALUE.getName())));
+                            ((BigDecimal)rowValue.get(EAV_BE_INTEGER_SET_VALUES.VALUE.getName())).intValue()));
         }
     }
 
@@ -2278,7 +2278,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                             batch,
                             ((BigDecimal)rowValue.get(EAV_BE_BOOLEAN_SET_VALUES.INDEX_.getName())).longValue(),
                             DataUtils.convertToSQLDate((Timestamp) rowValue.get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName())),
-                            rowValue.get(EAV_BE_BOOLEAN_SET_VALUES.VALUE.getName())));
+                            DataUtils.convert((Byte)rowValue.get(EAV_BE_BOOLEAN_SET_VALUES.VALUE.getName()))));
         }
     }
 

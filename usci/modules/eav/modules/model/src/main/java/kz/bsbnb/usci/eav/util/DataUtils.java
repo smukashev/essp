@@ -84,4 +84,9 @@ public class DataUtils
     public static Byte convert(boolean b) {
         return b ? Byte.valueOf("1") : 0;
     }
+
+    public static boolean convert(Byte value) {
+        return value == null ? null : value == Byte.valueOf("1") ? true : false;
+    }
+
 }
