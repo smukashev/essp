@@ -78,7 +78,7 @@
     <table name="eav_m_classes">
       <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
       <column name="complex_key_type" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
-      <column name="begin_date" primaryKey="false" required="true" type="TIMESTAMP" size="35,6" autoIncrement="false"/>
+      <column name="begin_date" primaryKey="false" required="true" type="DATE" autoIncrement="false"/>
       <column name="is_disabled" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
       <column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
       <column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
@@ -229,9 +229,9 @@
     <!-- EAV_BATCHES -->
     <table name="eav_batches">
       <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-      <column name="receipt_date" primaryKey="false" required="true" type="TIMESTAMP" size="35,6" autoIncrement="false"/>
-      <column name="begin_date" primaryKey="false" required="false" type="TIMESTAMP" size="35,6" autoIncrement="false"/>
-      <column name="end_date" primaryKey="false" required="false" type="TIMESTAMP" size="35,6" autoIncrement="false"/>
+      <column name="receipt_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+      <column name="begin_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
+      <column name="end_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
       <column name="rep_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
     </table>
     <!-- EAV_BE_BOOLEAN_SET_VALUES -->

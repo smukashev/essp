@@ -395,12 +395,12 @@
                                             <converter>kz.bsbnb.usci.tool.jooq.OracleIntegerConverter</converter>
                                         </customType>
                                         <customType>
-                                            <name>java.sql.Timestamp</name>
-                                            <converter>kz.bsbnb.usci.tool.jooq.OracleTimestampConverter</converter>
-                                        </customType>
-                                        <customType>
                                             <name>java.lang.Double</name>
                                             <converter>kz.bsbnb.usci.tool.jooq.OracleDoubleConverter</converter>
+                                        </customType>
+                                        <customType>
+                                            <name>java.sql.Timestamp</name>
+                                            <converter>kz.bsbnb.usci.tool.jooq.OracleTimestampConverter</converter>
                                         </customType>
                                     </customTypes>
                                     <forcedTypes>
@@ -417,12 +417,12 @@
                                             <expressions>(.*\.CONTAINER_TYPE)|(.*INTEGER.*\.VALUE)</expressions>
                                         </forcedType>
                                         <forcedType>
-                                            <name>java.sql.Timestamp</name>
-                                            <expressions>.*\.BEGIN_DATE</expressions>
-                                        </forcedType>
-                                        <forcedType>
                                             <name>java.lang.Double</name>
                                             <expressions>(.*DOUBLE.*\.VALUE)</expressions>
+                                        </forcedType>
+                                        <forcedType>
+                                            <name>java.sql.Timestamp</name>
+                                            <expressions>.*\.RECEIPT_DATE</expressions>
                                         </forcedType>
                                     </forcedTypes>
                                 </database>

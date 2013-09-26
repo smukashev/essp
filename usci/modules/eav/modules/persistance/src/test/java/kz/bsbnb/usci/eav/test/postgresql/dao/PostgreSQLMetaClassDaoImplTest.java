@@ -24,6 +24,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Date;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -234,26 +235,18 @@ public class PostgreSQLMetaClassDaoImplTest extends GenericTestCase
     public void beginDateMetaClass() throws Exception {
         logger.debug("Create multiple meta test");
 
-        MetaClass metaCreate = new MetaClass("testClass");
-
+        MetaClass metaCreate = new MetaClass("testClass", new Date(new Long("1356976800000")));
         metaCreate.setMetaAttribute("testInteger",
                 new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
 
-        Thread.sleep(200);
-
-        MetaClass metaCreateNextDisabled = new MetaClass("testClass");
-
+        MetaClass metaCreateNextDisabled = new MetaClass("testClass", new Date(new Long("1359655200000")));
         metaCreateNextDisabled.setMetaAttribute("testInteger",
                 new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
         metaCreateNextDisabled.setMetaAttribute("testInteger1",
                 new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
-
         metaCreateNextDisabled.setDisabled(true);
 
-        Thread.sleep(200);
-
-        MetaClass metaCreateNext = new MetaClass("testClass");
-
+        MetaClass metaCreateNext = new MetaClass("testClass", new Date(new Long("1362074400000")));
         metaCreateNext.setMetaAttribute("testInteger",
                 new MetaAttribute(false, false, new MetaValue(DataTypes.INTEGER)));
         metaCreateNext.setMetaAttribute("testInteger2",
@@ -263,9 +256,8 @@ public class PostgreSQLMetaClassDaoImplTest extends GenericTestCase
         postgreSQLMetaClassDaoImpl.save(metaCreateNext);
         postgreSQLMetaClassDaoImpl.save(metaCreateNextDisabled);
 
-        Thread.sleep(200);
-
-        MetaClass loadedMetaCreateNext = postgreSQLMetaClassDaoImpl.load(metaCreateNext.getClassName());
+        MetaClass loadedMetaCreateNext = postgreSQLMetaClassDaoImpl.load(metaCreateNext.getClassName(),
+                new Date(new Long("1362074500000")));
 
         assertTrue(metaCreateNext.equals(loadedMetaCreateNext));
 

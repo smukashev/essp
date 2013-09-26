@@ -12,6 +12,7 @@ import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import org.jooq.*;
 import org.slf4j.Logger;
@@ -67,7 +68,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             MetaClass metaClass = new MetaClass();
 
                 metaClass.setDisabled(((BigDecimal)row.get("is_disabled")).longValue() == 1);
-                metaClass.setBeginDate((Timestamp)row.get("begin_date"));
+                metaClass.setBeginDate(DataUtils.convert((Timestamp)row.get("begin_date")));
                 metaClass.setId(((BigDecimal)row.get("id")).longValue());
                 metaClass.setClassName((String)row.get("name"));
                 metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
@@ -109,10 +110,10 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     where(
                             EAV_M_CLASSES.NAME.equal(metaClass.getClassName())
                     ).and(
-                        EAV_M_CLASSES.BEGIN_DATE.eq(metaClass.getBeginDate())
-                    ).and(
-                        EAV_M_CLASSES.IS_DISABLED.equal(false)
-                    ).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
+                        EAV_M_CLASSES.BEGIN_DATE.eq(DataUtils.convert(metaClass.getBeginDate()))
+                ).and(
+                        EAV_M_CLASSES.IS_DISABLED.equal(DataUtils.convert(false))
+                ).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
             }
             else
             {
@@ -128,10 +129,10 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     where(
                         EAV_M_CLASSES.NAME.equal(metaClass.getClassName())
                     ).and(
-                        EAV_M_CLASSES.BEGIN_DATE.le(metaClass.getBeginDate())
-                    ).and(
-                        EAV_M_CLASSES.IS_DISABLED.equal(false)
-                    ).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
+                        EAV_M_CLASSES.BEGIN_DATE.le(DataUtils.convert(metaClass.getBeginDate()))
+                ).and(
+                        EAV_M_CLASSES.IS_DISABLED.equal(DataUtils.convert(false))
+                ).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
             }
 
         }
@@ -166,7 +167,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
         if(row != null) {
             metaClass.setDisabled(((BigDecimal)row.get("is_disabled")).longValue() == 1);
-            metaClass.setBeginDate((Timestamp)row.get("begin_date"));
+            metaClass.setBeginDate(DataUtils.convert((Timestamp)row.get("begin_date")));
             metaClass.setId(((BigDecimal)row.get("id")).longValue());
             metaClass.setClassName((String)row.get("name"));
             metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
@@ -191,10 +192,10 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     EAV_M_CLASSES.IS_REFERENCE
                 ).values(metaClass.getClassName(),
                     metaClass.getComplexKeyType().toString(),
-                    metaClass.getBeginDate(),
-                    metaClass.isDisabled(),
-                    metaClass.isImmutable(),
-                    metaClass.isReference());
+                    DataUtils.convert(metaClass.getBeginDate()),
+                    DataUtils.convert(metaClass.isDisabled()),
+                    DataUtils.convert(metaClass.isImmutable()),
+                    DataUtils.convert(metaClass.isReference()));
 
             logger.debug(insert.toString());
             long metaId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -226,10 +227,10 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         UpdateConditionStep update = context.update(EAV_M_CLASSES
             ).set(EAV_M_CLASSES.NAME, metaClass.getClassName()
             ).set(EAV_M_CLASSES.COMPLEX_KEY_TYPE, metaClass.getComplexKeyType().toString()
-            ).set(EAV_M_CLASSES.BEGIN_DATE, metaClass.getBeginDate()
-            ).set(EAV_M_CLASSES.IS_DISABLED, metaClass.isDisabled() ? 1 : 0
-            ).set(EAV_M_CLASSES.IS_REFERENCE, metaClass.isReference()
-            ).set(EAV_M_CLASSES.IS_IMMUTABLE, metaClass.isImmutable()
+            ).set(EAV_M_CLASSES.BEGIN_DATE, DataUtils.convert(metaClass.getBeginDate())
+            ).set(EAV_M_CLASSES.IS_DISABLED, DataUtils.convert(metaClass.isDisabled())
+            ).set(EAV_M_CLASSES.IS_REFERENCE, DataUtils.convert(metaClass.isReference())
+            ).set(EAV_M_CLASSES.IS_IMMUTABLE, DataUtils.convert(metaClass.isImmutable())
             ).where(EAV_M_CLASSES.ID.eq(metaClass.getId()));
 
         logger.debug(update.toString());
@@ -271,9 +272,9 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     EAV_M_SET_OF_SETS.IS_IMMUTABLE,
                     EAV_M_SET_OF_SETS.IS_REFERENCE
                 ).values(parentId, parentType, attributeName,
-                    metaAttribute.isKey(), metaAttribute.isNullable(),
+                    DataUtils.convert(metaAttribute.isKey()), DataUtils.convert(metaAttribute.isNullable()),
                     metaSet.getArrayKeyType().toString(),
-                    metaSet.isImmutable(), metaSet.isReference());
+                    DataUtils.convert(metaSet.isImmutable()), DataUtils.convert(metaSet.isReference()));
 
             logger.debug(insert.toString());
 
@@ -304,12 +305,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                         .set(EAV_M_COMPLEX_SET.CONTAINING_ID, parentId)
                         .set(EAV_M_COMPLEX_SET.CONTAINER_TYPE, parentType)
                         .set(EAV_M_COMPLEX_SET.NAME, attributeName)
-                        .set(EAV_M_COMPLEX_SET.IS_KEY, metaAttribute.isKey())
-                        .set(EAV_M_COMPLEX_SET.IS_NULLABLE, metaAttribute.isNullable())
+                        .set(EAV_M_COMPLEX_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
+                        .set(EAV_M_COMPLEX_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
                         .set(EAV_M_COMPLEX_SET.CLASS_ID, innerId)
                         .set(EAV_M_COMPLEX_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
-                        .set(EAV_M_COMPLEX_SET.IS_IMMUTABLE, metaSet.isImmutable())
-                        .set(EAV_M_COMPLEX_SET.IS_REFERENCE, metaSet.isReference());
+                        .set(EAV_M_COMPLEX_SET.IS_IMMUTABLE, DataUtils.convert(metaSet.isImmutable()))
+                        .set(EAV_M_COMPLEX_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()));
             }
             else
             {
@@ -319,11 +320,11 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                         .set(EAV_M_SIMPLE_SET.CONTAINER_TYPE, parentType)
                         .set(EAV_M_SIMPLE_SET.NAME, attributeName)
                         .set(EAV_M_SIMPLE_SET.TYPE_CODE, metaSet.getTypeCode().toString())
-                        .set(EAV_M_SIMPLE_SET.IS_KEY, metaAttribute.isKey())
-                        .set(EAV_M_SIMPLE_SET.IS_NULLABLE, metaAttribute.isNullable())
+                        .set(EAV_M_SIMPLE_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
+                        .set(EAV_M_SIMPLE_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
                         .set(EAV_M_SIMPLE_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
-                        .set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, metaSet.isImmutable())
-                        .set(EAV_M_SIMPLE_SET.IS_REFERENCE, metaSet.isReference());
+                        .set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, DataUtils.convert(metaSet.isImmutable()))
+                        .set(EAV_M_SIMPLE_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()));
             }
 
             logger.debug(insert.toString());
@@ -417,7 +418,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     EAV_M_COMPLEX_ATTRIBUTES.IS_KEY,
                     EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE,
                     EAV_M_COMPLEX_ATTRIBUTES.CLASS_ID
-                ).values(parentId, parentType, attributeName, metaAttribute.isKey(), metaAttribute.isNullable(),
+                ).values(parentId, parentType, attributeName,
+                    DataUtils.convert(metaAttribute.isKey()), DataUtils.convert(metaAttribute.isNullable()),
                     innerId);
         }
         else
@@ -431,7 +433,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     EAV_M_SIMPLE_ATTRIBUTES.IS_KEY,
                     EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE
                 ).values(parentId, parentType, attributeName, ((MetaValue)type).getTypeCode().toString(),
-                    metaAttribute.isKey(), metaAttribute.isNullable());
+                    DataUtils.convert(metaAttribute.isKey()), DataUtils.convert(metaAttribute.isNullable()));
         }
 
         logger.debug(insert.toString());
@@ -493,8 +495,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 if(meta.getMemberType(typeName).isComplex())
                 {
                     update = context.update(EAV_M_COMPLEX_SET
-                    ).set(EAV_M_COMPLEX_SET.IS_KEY, metaAttribute.isKey()
-                    ).set(EAV_M_COMPLEX_SET.IS_NULLABLE, metaAttribute.isNullable()
+                    ).set(EAV_M_COMPLEX_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey())
+                    ).set(EAV_M_COMPLEX_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
                     ).where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(dbMeta.getId())
                     ).and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
                     ).and(EAV_M_COMPLEX_SET.NAME.eq(typeName));
@@ -550,8 +552,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 else
                 {
                     update = context.update(EAV_M_SIMPLE_SET
-                    ).set(EAV_M_SIMPLE_SET.IS_KEY, metaAttribute.isKey()
-                    ).set(EAV_M_SIMPLE_SET.IS_NULLABLE, metaAttribute.isNullable()
+                    ).set(EAV_M_SIMPLE_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey())
+                    ).set(EAV_M_SIMPLE_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
                     ).where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(dbMeta.getId())
                     ).and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
                     ).and(EAV_M_SIMPLE_SET.NAME.eq(typeName));
@@ -560,8 +562,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 if(meta.getMemberType(typeName).isComplex())
                 {
                     update = context.update(EAV_M_COMPLEX_ATTRIBUTES
-                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_KEY, metaAttribute.isKey()
-                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE, metaAttribute.isNullable()
+                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_KEY, DataUtils.convert(metaAttribute.isKey())
+                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
                     ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId())
                     ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
                     ).and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
@@ -569,8 +571,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 else
                 {
                     update = context.update(EAV_M_SIMPLE_ATTRIBUTES
-                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_KEY, metaAttribute.isKey()
-                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE, metaAttribute.isNullable()
+                    ).set(EAV_M_SIMPLE_ATTRIBUTES.IS_KEY, DataUtils.convert(metaAttribute.isKey())
+                    ).set(EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
                     ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId())
                     ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
                     ).and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
@@ -987,7 +989,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 	}
 
     @Override
-    public MetaClass load(String className, Timestamp beginDate) {
+    public MetaClass load(String className, Date beginDate) {
         MetaClass meta = new MetaClass(className, beginDate);
 
         loadClass(meta, false);

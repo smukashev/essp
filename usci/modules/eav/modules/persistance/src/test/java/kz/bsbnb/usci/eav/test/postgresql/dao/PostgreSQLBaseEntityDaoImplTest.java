@@ -21,7 +21,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLBaseEntityDaoImpl;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.test.GenericTestCase;
-import kz.bsbnb.usci.eav.util.DateUtils;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -139,9 +139,9 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
                 parentEntityApplied.getBaseValue("child_meta_class").getBatch());
         assertFalse("", parentEntitySaved.getBaseValue("child_meta_class").getIndex() ==
                 parentEntityApplied.getBaseValue("child_meta_class").getIndex());
-        assertFalse("", DateUtils.compareBeginningOfTheDay(
-                (Date)parentEntitySaved.getBaseValue("child_meta_class").getRepDate(),
-                (Date)parentEntityApplied.getBaseValue("child_meta_class").getRepDate()) == 0);
+        assertFalse("", DataUtils.compareBeginningOfTheDay(
+                parentEntitySaved.getBaseValue("child_meta_class").getRepDate(),
+                parentEntityApplied.getBaseValue("child_meta_class").getRepDate()) == 0);
     }
 
     /*@Test
@@ -208,7 +208,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
                 parentEntityApplied.getBaseValue("child_meta_class").getBatch());
         assertTrue("", parentEntitySaved.getBaseValue("child_meta_class").getIndex() ==
                 parentEntityApplied.getBaseValue("child_meta_class").getIndex());
-        assertTrue("", DateUtils.compareBeginningOfTheDay(
+        assertTrue("", DataUtils.compareBeginningOfTheDay(
                 (Date)parentEntitySaved.getBaseValue("child_meta_class").getRepDate(),
                 (Date)parentEntityApplied.getBaseValue("child_meta_class").getRepDate()) == 0);
     }
@@ -354,11 +354,11 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
         // date values
         entityCreated.put("date_first",
-                new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 1)));
+                new BaseValue(batch, 1L, DataUtils.nowPlus(Calendar.DATE, 1)));
         entityCreated.put("date_second",
-                new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 2)));
+                new BaseValue(batch, 1L, DataUtils.nowPlus(Calendar.DATE, 2)));
         entityCreated.put("date_third",
-                new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 3)));
+                new BaseValue(batch, 1L, DataUtils.nowPlus(Calendar.DATE, 3)));
 
         // double values
         entityCreated.put("double_first",
@@ -402,9 +402,9 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
         // date array values
         BaseSet baseSetForDate = new BaseSet(((MetaSet)metaLoad.getMemberType("date_set")).getMemberType());
-        baseSetForDate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 3)));
-        baseSetForDate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 5)));
-        baseSetForDate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 7)));
+        baseSetForDate.put(new BaseValue(batch, 1L, DataUtils.nowPlus(Calendar.DATE, 3)));
+        baseSetForDate.put(new BaseValue(batch, 1L, DataUtils.nowPlus(Calendar.DATE, 5)));
+        baseSetForDate.put(new BaseValue(batch, 1L, DataUtils.nowPlus(Calendar.DATE, 7)));
 
         entityCreated.put("date_set", new BaseValue(batch, 1L, baseSetForDate));
 
@@ -461,7 +461,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
                                 String.format("Not properly saved or loaded value with type %s.", DataTypes.DATE),
                                 (valueCreate == null && valueLoad == null) ||
                                         (valueCreate != null && valueLoad != null
-                                                && (DateUtils.compareBeginningOfTheDay((java.util.Date)valueCreate, (java.util.Date)valueLoad) == 0)));
+                                                && (DataUtils.compareBeginningOfTheDay((java.util.Date) valueCreate, (java.util.Date) valueLoad) == 0)));
                     } else {
                         assertTrue(
                                 String.format("Not properly saved or loaded value with type %s.", dataType),
@@ -498,9 +498,9 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         MetaSet metaSetChild = (MetaSet)metaSetParent.getMemberType();
 
         BaseSet baseSetChildCreate = new BaseSet(metaSetChild);
-        baseSetChildCreate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 10)));
-        baseSetChildCreate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 20)));
-        baseSetChildCreate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 30)));
+        baseSetChildCreate.put(new BaseValue(batch, 1L, DataUtils.nowPlus(Calendar.DATE, 10)));
+        baseSetChildCreate.put(new BaseValue(batch, 1L, DataUtils.nowPlus(Calendar.DATE, 20)));
+        baseSetChildCreate.put(new BaseValue(batch, 1L, DataUtils.nowPlus(Calendar.DATE, 30)));
 
         BaseSet baseSetParentCreate = new BaseSet(metaSetParent);
         baseSetParentCreate.put(new BaseValue(batch, 1L, baseSetChildCreate));
@@ -530,9 +530,9 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         Random random = new Random();
 
         BaseSet baseSetForDate = new BaseSet(((MetaSet)metaLoad.getMemberType("date_set")).getMemberType());
-        baseSetForDate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 3)));
-        baseSetForDate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 5)));
-        baseSetForDate.put(new BaseValue(batch, 1L, DateUtils.nowPlus(Calendar.DATE, 7)));
+        baseSetForDate.put(new BaseValue(batch, 1L, DataUtils.nowPlus(Calendar.DATE, 3)));
+        baseSetForDate.put(new BaseValue(batch, 1L, DataUtils.nowPlus(Calendar.DATE, 5)));
+        baseSetForDate.put(new BaseValue(batch, 1L, DataUtils.nowPlus(Calendar.DATE, 7)));
 
         entityCreate.put("date_set", new BaseValue(batch, 1L, baseSetForDate));
 
@@ -611,11 +611,11 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityFirstForSave.put("uuid",
                 new BaseValue(batchFirst, 1L, uuid.toString()));
         entityFirstForSave.put("date_first",
-                new BaseValue(batchFirst, 1L, DateUtils.nowPlus(Calendar.DATE, 1)));
+                new BaseValue(batchFirst, 1L, DataUtils.nowPlus(Calendar.DATE, 1)));
         entityFirstForSave.put("date_second",
-                new BaseValue(batchFirst, 1L, DateUtils.nowPlus(Calendar.DATE, 2)));
+                new BaseValue(batchFirst, 1L, DataUtils.nowPlus(Calendar.DATE, 2)));
         entityFirstForSave.put("date_third",
-                new BaseValue(batchFirst, 1L, DateUtils.nowPlus(Calendar.DATE, 3)));
+                new BaseValue(batchFirst, 1L, DataUtils.nowPlus(Calendar.DATE, 3)));
 
         BaseEntity entityFirstSaved = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entityFirstForSave.clone());
 
@@ -637,9 +637,9 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entitySecondForUpdate.put("date_first",
                 new BaseValue(batchSecond, 2L, null));
         entitySecondForUpdate.put("date_second",
-                new BaseValue(batchSecond, 2L, DateUtils.nowPlus(Calendar.DATE, 4)));
+                new BaseValue(batchSecond, 2L, DataUtils.nowPlus(Calendar.DATE, 4)));
         entitySecondForUpdate.put("date_fourth",
-                new BaseValue(batchSecond, 2L, DateUtils.nowPlus(Calendar.DATE, 5)));
+                new BaseValue(batchSecond, 2L, DataUtils.nowPlus(Calendar.DATE, 5)));
 
         BaseEntity entitySecondUpdated = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entitySecondForUpdate.clone());
 
@@ -658,11 +658,11 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         assertTrue("During the processing second batch the field ID has not been changed,",
                 baseValueSecondAfterSecondBatch.getId() != baseValueSecondAfterFirstBatch.getId());
         assertTrue("During the processing second batch the field VALUE has not been changed.",
-                DateUtils.compareBeginningOfTheDay(
+                DataUtils.compareBeginningOfTheDay(
                         (java.util.Date) baseValueSecondAfterSecondBatch.getValue(),
-                        DateUtils.nowPlus(Calendar.DATE, 4)) == 0);
+                        DataUtils.nowPlus(Calendar.DATE, 4)) == 0);
         assertTrue("During the processing second batch the field REP_DATE has not been changed.",
-                DateUtils.compareBeginningOfTheDay(
+                DataUtils.compareBeginningOfTheDay(
                         baseValueSecondAfterSecondBatch.getRepDate(),
                         batchSecond.getRepDate()) == 0);
 
@@ -677,7 +677,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityThirdForUpdate.put("date_first",
                 new BaseValue(batchThird, 3L, entityFirstForSave.getBaseValue("date_first").getValue()));
         entitySecondForUpdate.put("date_second",
-                new BaseValue(batchThird, 3L, DateUtils.nowPlus(Calendar.DATE, 6)));
+                new BaseValue(batchThird, 3L, DataUtils.nowPlus(Calendar.DATE, 6)));
 
         BaseEntity entityThirdUpdated = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entityThirdForUpdate.clone());
 

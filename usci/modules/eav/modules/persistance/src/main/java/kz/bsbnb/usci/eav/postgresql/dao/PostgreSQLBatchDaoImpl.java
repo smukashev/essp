@@ -3,6 +3,7 @@ package kz.bsbnb.usci.eav.postgresql.dao;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.tool.jooq.OracleLongConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +51,8 @@ public class PostgreSQLBatchDaoImpl extends JDBCSupport implements IBatchDao
         public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
             PreparedStatement ps = con.prepareStatement(
                     INSERT_BATCH_SQL, new String[] {"id"});
-            ps.setTimestamp(1, batch.getReceiptDate());
-            ps.setDate(2, batch.getRepDate());
+            ps.setTimestamp(1, DataUtils.convertToTimestamp(batch.getReceiptDate()));
+            ps.setDate(2, DataUtils.convert(batch.getRepDate()));
 
             logger.debug(ps.toString());
 
@@ -130,10 +131,8 @@ public class PostgreSQLBatchDaoImpl extends JDBCSupport implements IBatchDao
         if(row != null)
         {
             batch.setId(((BigDecimal)row.get("id")).longValue());
-            logger.debug("CLASS: " + row.get("receipt_date").getClass());
-            batch.setReceiptDate((Timestamp)row.get("receipt_date"));
-            logger.debug("CLASS: " + row.get("rep_date").getClass());
-            batch.setRepDate(new Date(((Timestamp) row.get("rep_date")).getTime()));
+            batch.setReceiptDate(DataUtils.convert((Timestamp)row.get("receipt_date")));
+            batch.setRepDate(DataUtils.convert((Timestamp) row.get("rep_date")));
         }
         else
         {

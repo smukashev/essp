@@ -1,12 +1,11 @@
 package kz.bsbnb.usci.eav.model;
 
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
-import kz.bsbnb.usci.eav.util.DateUtils;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Date;
-import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * General information about the batch, such as:
@@ -21,7 +20,7 @@ public class Batch extends Persistable
     /**
      * Date and time of receipt of the batch.
      */
-    private Timestamp receiptDate = new Timestamp(java.util.Calendar.getInstance().getTimeInMillis());
+    private Date receiptDate;
 
     private Date repDate;
 
@@ -31,17 +30,32 @@ public class Batch extends Persistable
      * Initializes batch with the default values.
      */
 
-    public Batch(Date repDate,Long userId){
+    public Batch(Date reportDate, Long userId){
         super();
-        this.repDate = repDate;
+
+        Date newReportDate = (Date)reportDate.clone();
+        DataUtils.toBeginningOfTheDay(newReportDate);
+
+        Date newReceiptDate = new Date();
+        DataUtils.toBeginningOfTheSecond(newReceiptDate);
+
+        this.repDate = newReportDate;
+        this.receiptDate = newReceiptDate;
         this.userId = userId;
     }
 
-    public Batch(Date repDate)
+    public Batch(Date reportDate)
     {
         super();
 
-        this.repDate = repDate;
+        Date newReportDate = (Date)reportDate.clone();
+        DataUtils.toBeginningOfTheDay(newReportDate);
+
+        Date newReceiptDate = new Date();
+        DataUtils.toBeginningOfTheSecond(newReceiptDate);
+
+        this.repDate = newReportDate;
+        this.receiptDate = newReceiptDate;
     }
 
     /**
@@ -49,18 +63,27 @@ public class Batch extends Persistable
      *
      * @param receiptDate the date and time of receipt of the batch.
      */
-    public Batch(Timestamp receiptDate, Date repDate)
+    public Batch(Date receiptDate, Date reportDate)
     {
-        this.receiptDate = receiptDate;
-        this.repDate = new Date(DateUtils.cutOffTime(repDate));
+        Date newReportDate = (Date)reportDate.clone();
+        DataUtils.toBeginningOfTheDay(newReportDate);
+
+        Date newReceiptDate = (Date)receiptDate.clone();
+        DataUtils.toBeginningOfTheSecond(newReceiptDate);
+
+        this.repDate = newReportDate;
+        this.receiptDate = newReceiptDate;
     }
 
-    public void setReceiptDate(Timestamp receiptDate)
+    public void setReceiptDate(Date receiptDate)
     {
-        this.receiptDate = receiptDate;
+        Date newReceiptDate = (Date)receiptDate.clone();
+        DataUtils.toBeginningOfTheSecond(newReceiptDate);
+
+        this.receiptDate = newReceiptDate;
     }
 
-    public Timestamp getReceiptDate()
+    public Date getReceiptDate()
     {
         return receiptDate;
     }
@@ -99,8 +122,11 @@ public class Batch extends Persistable
         return repDate;
     }
 
-    public void setRepDate(Date repDate)
+    public void setRepDate(Date reportDate)
     {
-        this.repDate = repDate;
+        Date newReportDate = (Date)reportDate.clone();
+        DataUtils.toBeginningOfTheDay(newReportDate);
+
+        this.repDate = newReportDate;
     }
 }

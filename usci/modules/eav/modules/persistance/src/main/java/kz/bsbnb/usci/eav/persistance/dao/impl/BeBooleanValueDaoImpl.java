@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
 import kz.bsbnb.usci.eav.persistance.dao.IBeBooleanValueDao;
-import kz.bsbnb.usci.eav.util.DateUtils;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -39,10 +39,10 @@ public class BeBooleanValueDaoImpl extends AbstractBeValueDaoImpl implements IBe
                 .set(EAV_BE_BOOLEAN_VALUES.BATCH_ID, batchId)
                 .set(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID, metaAttributeId)
                 .set(EAV_BE_BOOLEAN_VALUES.INDEX_, index)
-                .set(EAV_BE_BOOLEAN_VALUES.REPORT_DATE, DateUtils.convert(reportDate))
-                .set(EAV_BE_BOOLEAN_VALUES.VALUE, (Boolean)value)
-                .set(EAV_BE_BOOLEAN_VALUES.IS_CLOSED, closed)
-                .set(EAV_BE_BOOLEAN_VALUES.IS_LAST, last);
+                .set(EAV_BE_BOOLEAN_VALUES.REPORT_DATE, DataUtils.convert(reportDate))
+                .set(EAV_BE_BOOLEAN_VALUES.VALUE, DataUtils.convert((Boolean)value))
+                .set(EAV_BE_BOOLEAN_VALUES.IS_CLOSED, DataUtils.convert(closed))
+                .set(EAV_BE_BOOLEAN_VALUES.IS_LAST, DataUtils.convert(last));
 
         logger.debug(insert.toString());
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -131,9 +131,9 @@ public class BeBooleanValueDaoImpl extends AbstractBeValueDaoImpl implements IBe
         {
             updateConditionStep = updateConditionStep == null ?
                     updateSetMoreStep.where(tableOfValues.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE)
-                            .equal(DateUtils.convert((Timestamp) conditions.get("report_date")))) :
+                            .equal(DataUtils.convert((Date) conditions.get("report_date")))) :
                     updateConditionStep.and(tableOfValues.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE)
-                            .equal(DateUtils.convert((Timestamp) conditions.get("report_date"))));
+                            .equal(DataUtils.convert((Date) conditions.get("report_date"))));
         }
 
         logger.debug(updateConditionStep.toString());
@@ -150,7 +150,7 @@ public class BeBooleanValueDaoImpl extends AbstractBeValueDaoImpl implements IBe
                 .from(table)
                 .where(table.field(EAV_BE_BOOLEAN_VALUES.ENTITY_ID).equal(entityId))
                 .and(table.field(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID).equal(attributeId))
-                .and(table.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE).greaterThan(DateUtils.convert(reportDate)));
+                .and(table.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE).greaterThan(DataUtils.convert(reportDate)));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

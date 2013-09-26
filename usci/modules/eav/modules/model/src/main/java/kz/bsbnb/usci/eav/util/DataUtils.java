@@ -8,7 +8,7 @@ import java.util.TimeZone;
 /**
  * @author a.motov
  */
-public class DateUtils
+public class DataUtils
 {
     public static final long MILLISECONDS_PER_DAY = 24L * 60 * 60 * 1000;
 
@@ -44,6 +44,12 @@ public class DateUtils
         date.setTime(((oldTime + timeZoneOffset) / MILLISECONDS_PER_DAY) * MILLISECONDS_PER_DAY - timeZoneOffset);
     }
 
+    public static void toBeginningOfTheSecond(final Date date)
+    {
+        final long oldTime = date.getTime();
+        date.setTime(oldTime - oldTime % 1000);
+    }
+
     public static long cutOffTime(final java.sql.Date date)
     {
         Calendar cal = Calendar.getInstance();
@@ -71,4 +77,11 @@ public class DateUtils
         return timestamp == null ? null : new java.sql.Date(timestamp.getTime());
     }
 
+    public static Timestamp convertToTimestamp(java.util.Date date) {
+        return date == null ? null : new Timestamp(date.getTime());
+    }
+
+    public static Byte convert(boolean b) {
+        return b ? Byte.valueOf("1") : 0;
+    }
 }
