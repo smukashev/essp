@@ -13,7 +13,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
-import kz.bsbnb.usci.eav.util.DateUtils;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.ParseException;
 import java.util.*;
@@ -47,15 +48,13 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
     @Override
     public Long findSingle(BaseEntity entity)
     {
-        try
-        {
-            long id = findAll(entity).get(0);
-            return id;
+        List<Long> ids = findAll(entity);
+
+        if (ids.size() > 1) {
+            throw new RuntimeException("Found more than one instance of BaseEntity. Needed one.");
         }
-        catch (Exception e)
-        {
-            return null;
-        }
+
+        return ids.size() == 1 ? ids.get(0) : null;
     }
 
     public SelectConditionStep generateSQL(IBaseEntity entity, String entityName) {
@@ -145,18 +144,18 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                 Boolean actual_boolean_value = (Boolean)value.getValue();
                 if (condition == null)
                 {
-                    condition = EAV_BE_BOOLEAN_VALUES.as(name).VALUE.equal(actual_boolean_value);
+                    condition = EAV_BE_BOOLEAN_VALUES.as(name).VALUE.equal(DataUtils.convert(actual_boolean_value));
                 }
                 else
                 {
                     if (and)
-                        condition = condition.and(EAV_BE_BOOLEAN_VALUES.as(name).VALUE.equal(actual_boolean_value));
+                        condition = condition.and(EAV_BE_BOOLEAN_VALUES.as(name).VALUE.equal(DataUtils.convert(actual_boolean_value)));
                     else
-                        condition = condition.or(EAV_BE_BOOLEAN_VALUES.as(name).VALUE.equal(actual_boolean_value));
+                        condition = condition.or(EAV_BE_BOOLEAN_VALUES.as(name).VALUE.equal(DataUtils.convert(actual_boolean_value)));
                 }
                 break;
             case DATE:
-                Date actual_date_value = DateUtils.convert((java.util.Date)value.getValue());
+                Date actual_date_value = DataUtils.convert((java.util.Date) value.getValue());
                 if (condition == null)
                 {
                     condition = EAV_BE_DATE_VALUES.as(name).VALUE.equal(actual_date_value);
@@ -259,7 +258,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                     ).from(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values"))
                             .where(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").SET_ID.equal(
                                     EAV_BE_ENTITY_SIMPLE_SETS.as(name).SET_ID
-                            )).and(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").VALUE.equal(actualBooleanValue));
+                            )).and(EAV_BE_BOOLEAN_SET_VALUES.as(name + "_values").VALUE.equal(DataUtils.convert(actualBooleanValue)));
 
                     if (outerBooleanSQL == null) {
                         outerBooleanSQL = innerSQL;
@@ -323,7 +322,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
                 for (IBaseValue actDateElementValue : actual_date_value.get())
                 {
-                    java.sql.Date actualDateValue = DateUtils.convert((java.util.Date)actDateElementValue.
+                    java.sql.Date actualDateValue = DataUtils.convert((java.util.Date) actDateElementValue.
                             getValue());
 
                     SelectConditionStep innerSQL = context.select(
@@ -469,8 +468,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
                 for (IBaseValue actIntegerElementValue : actual_integer_value.get())
                 {
-                    Long actualIntegerValue = ((Integer)actIntegerElementValue.
-                            getValue()).longValue();
+                    Integer actualIntegerValue = (Integer)actIntegerElementValue.getValue();
 
                     SelectConditionStep innerSQL = context.select(
                             EAV_BE_INTEGER_SET_VALUES.as(name + "_values").ID
@@ -649,8 +647,9 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
             if (simple_value.getComplexKeyType() == ComplexKeyTypes.ALL)
             {
                 condition = DSL.val(actual_set_value.sizeWithFilter(simple_set.getArrayKeyFilter())).lessOrEqual(
-                        context.select(nested.field(EAV_BE_COMPLEX_SET_VALUES.ID.getName()).
-                                count()).from(nested));
+                        context.select(nested.field("inner_id").
+                                count()).from(nested).where(((Field<Long>)nested.field("inner_id")).
+                                    equal(EAV_BE_COMPLEX_VALUES.as(name).ENTITY_VALUE_ID)));
             }
             else
             {
@@ -704,7 +703,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
         String the_name = (entityName == null ? "root" : "e_" + entityName);
 
-        SelectJoinStep joins = context.select(EAV_BE_ENTITIES.as(the_name).ID).from(EAV_BE_ENTITIES.as(the_name));
+        SelectJoinStep joins = context.select(EAV_BE_ENTITIES.as(the_name).ID.as("inner_id")).from(EAV_BE_ENTITIES.as(the_name));
 
         if (meta == null) {
             throw new IllegalArgumentException("MetaData can't be null");
@@ -750,9 +749,9 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
         if (entityName != null) {
             where = joins.where(
-                (EAV_BE_ENTITIES.as(the_name).CLASS_ID.equal(meta.getId())).and(
-                        EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(entityName).ENTITY_VALUE_ID)
-                    )
+                (EAV_BE_ENTITIES.as(the_name).CLASS_ID.equal(meta.getId()))//.and(
+                        //EAV_BE_ENTITIES.as(the_name).ID.equal(EAV_BE_COMPLEX_VALUES.as(entityName).ENTITY_VALUE_ID)
+                    //)
                 );
         } else {
             where = joins.where(EAV_BE_ENTITIES.as(the_name).CLASS_ID.equal(meta.getId()));
@@ -850,7 +849,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
         SelectConditionStep where = generateSQL(entity, null);
 
-        //System.out.println("Gen sql: " + where.getSQL(true));
+        System.out.println("Gen sql: " + where.toString());
 
         List<Map<String, Object>> rows = queryForListWithStats(where.getSQL(), where.getBindValues().toArray());
 
@@ -858,7 +857,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         {
             //BaseEntity resultEntity = new BaseEntity(meta, reportDate);
 
-            result.add((Long)row.get(EAV_BE_ENTITIES.ID.getName()));
+            result.add(((BigDecimal)row.get("inner_id")).longValue());
         }
 
         logger.debug("Result size: " + result.size());

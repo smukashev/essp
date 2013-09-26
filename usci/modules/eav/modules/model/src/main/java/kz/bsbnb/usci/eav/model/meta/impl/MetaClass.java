@@ -15,6 +15,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.util.DataUtils;
 
 public class MetaClass extends Persistable implements IMetaType, IMetaClass
 {
@@ -23,7 +24,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
 	 */
     private String className;
 
-    private Timestamp beginDate = new Timestamp(java.util.Calendar.getInstance().getTimeInMillis());
+    private Date beginDate;
 
     private boolean disabled = false;
 
@@ -54,6 +55,9 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
     public MetaClass()
     {
         super();
+
+        this.beginDate = new Date();
+        DataUtils.toBeginningOfTheDay(beginDate);
     }
 
     public MetaClass(MetaClass meta)
@@ -70,9 +74,11 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
 	public MetaClass(String className)
     {
 		this.className = className;
+        this.beginDate = new Date();
+        DataUtils.toBeginningOfTheDay(beginDate);
 	}
 
-    public MetaClass(String className, Timestamp beginDate)
+    public MetaClass(String className, Date beginDate)
     {
         this.className = className;
         this.beginDate = beginDate;
@@ -191,14 +197,17 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
 		this.searchProcedureName = searchProcedureName;
 	}
 
-    public Timestamp getBeginDate()
+    public Date getBeginDate()
     {
         return beginDate;
     }
 
-    public void setBeginDate(Timestamp beginDate)
+    public void setBeginDate(Date beginDate)
     {
-        this.beginDate = beginDate;
+        Date newBeginDate = (Date)beginDate.clone();
+        DataUtils.toBeginningOfTheDay(newBeginDate);
+
+        this.beginDate = newBeginDate;
     }
 
     public boolean isDisabled()

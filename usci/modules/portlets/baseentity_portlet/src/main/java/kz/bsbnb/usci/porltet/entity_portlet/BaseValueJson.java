@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.porltet.entity_portlet;
 
-import kz.bsbnb.usci.eav.util.DateUtils;
+import kz.bsbnb.usci.eav.util.DataUtils;
 
 import java.sql.Date;
 
@@ -37,7 +37,7 @@ public class BaseValueJson{
         this.batch = batch;
         this.index = index;
         this.value = value;
-        this.repDate = new Date(DateUtils.cutOffTime(repDate));
+        this.repDate = new Date(DataUtils.cutOffTime(repDate));
     }
 
     public BatchJson getBatch() {

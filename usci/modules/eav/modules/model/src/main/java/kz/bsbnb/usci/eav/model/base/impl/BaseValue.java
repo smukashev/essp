@@ -2,15 +2,14 @@ package kz.bsbnb.usci.eav.model.base.impl;
 
 
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.util.DateUtils;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -73,7 +72,11 @@ public class BaseValue extends Persistable implements IBaseValue
         this.batch = batch;
         this.index = index;
         this.value = value;
-        this.reportDate = new Date(DateUtils.cutOffTime(reportDate));
+
+        Date newReportDate = (Date)reportDate.clone();
+        DataUtils.toBeginningOfTheDay(newReportDate);
+
+        this.reportDate = newReportDate;
     }
 
     public BaseValue(Batch batch, long index, Date reportDate, Object value, boolean closed, boolean last)
@@ -98,7 +101,11 @@ public class BaseValue extends Persistable implements IBaseValue
         this.batch = batch;
         this.index = index;
         this.value = value;
-        this.reportDate = new Date(DateUtils.cutOffTime(reportDate));
+
+        Date newReportDate = (Date)reportDate.clone();
+        DataUtils.toBeginningOfTheDay(newReportDate);
+
+        this.reportDate = newReportDate;
     }
 
     public BaseValue(long id, Batch batch, long index, Date reportDate, Object value, boolean closed, boolean last)
@@ -216,14 +223,18 @@ public class BaseValue extends Persistable implements IBaseValue
         }
     }
 
+    @Override
     public Date getRepDate()
     {
         return reportDate;
     }
 
-    public void setRepDate(Date repDate)
+    public void setRepDate(Date reportDate)
     {
-        this.reportDate = repDate;
+        Date newReportDate = (Date)reportDate.clone();
+        DataUtils.toBeginningOfTheDay(newReportDate);
+
+        this.reportDate = newReportDate;
     }
 
     @Override

@@ -2,7 +2,7 @@ package kz.bsbnb.usci.eav.persistance.dao.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.persistance.dao.IBeComplexSetValueDao;
-import kz.bsbnb.usci.eav.util.DateUtils;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +36,9 @@ public class BeComplexSetValueDaoImpl extends AbstractBeSetValueDaoImpl implemen
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID, baseSetId)
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID, batchId)
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_, index)
-                .set(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE, DateUtils.convert(reportDate))
-                .set(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED, closed)
-                .set(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST, last);
+                .set(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE, DataUtils.convert(reportDate))
+                .set(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED, DataUtils.convert(closed))
+                .set(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST, DataUtils.convert(last));
 
         logger.debug(insert.toString());
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -52,9 +52,9 @@ public class BeComplexSetValueDaoImpl extends AbstractBeSetValueDaoImpl implemen
                 .set(EAV_BE_SET_OF_COMPLEX_SETS.CHILD_SET_ID, childSetId)
                 .set(EAV_BE_SET_OF_COMPLEX_SETS.BATCH_ID, batchId)
                 .set(EAV_BE_SET_OF_COMPLEX_SETS.INDEX_, index)
-                .set(EAV_BE_SET_OF_COMPLEX_SETS.REPORT_DATE, DateUtils.convert(reportDate))
-                .set(EAV_BE_SET_OF_COMPLEX_SETS.IS_CLOSED, closed)
-                .set(EAV_BE_SET_OF_COMPLEX_SETS.IS_LAST, last);
+                .set(EAV_BE_SET_OF_COMPLEX_SETS.REPORT_DATE, DataUtils.convert(reportDate))
+                .set(EAV_BE_SET_OF_COMPLEX_SETS.IS_CLOSED, DataUtils.convert(closed))
+                .set(EAV_BE_SET_OF_COMPLEX_SETS.IS_LAST, DataUtils.convert(last));
 
         logger.debug(insert.toString());
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -67,10 +67,10 @@ public class BeComplexSetValueDaoImpl extends AbstractBeSetValueDaoImpl implemen
                 .set(EAV_BE_COMPLEX_SET_VALUES.SET_ID, setId)
                 .set(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID, batchId)
                 .set(EAV_BE_COMPLEX_SET_VALUES.INDEX_, index)
-                .set(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE, DateUtils.convert(reportDate))
+                .set(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE, DataUtils.convert(reportDate))
                 .set(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID, (Long)value)
-                .set(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED, closed)
-                .set(EAV_BE_COMPLEX_SET_VALUES.IS_LAST, last);
+                .set(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED, DataUtils.convert(closed))
+                .set(EAV_BE_COMPLEX_SET_VALUES.IS_LAST, DataUtils.convert(last));
 
         logger.debug(insert.toString());
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
