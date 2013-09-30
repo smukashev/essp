@@ -10,14 +10,12 @@ import java.util.ArrayList;
 //import com.bsbnb.creditregistry.ejb.api.maintenance.PortalUserBeanRemoteBusiness;
 //import com.bsbnb.creditregistry.ejb.api.maintenance.ProtocolBeanRemoteBusiness;
 import com.bsbnb.creditregistry.portlets.protocol.PortletEnvironmentFacade;
-import kz.bsbnb.usci.core.service.InputFileBeanRemoteBusiness;
-import kz.bsbnb.usci.core.service.InputInfoBeanRemoteBusiness;
-import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
-import kz.bsbnb.usci.core.service.ProtocolBeanRemoteBusiness;
+import kz.bsbnb.usci.core.service.*;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputFile;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.cr.model.Protocol;
+import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +25,10 @@ import java.util.Map;
  * @author Aidar.Myrzahanov
  */
 public class BeanDataProvider implements DataProvider {
+    private RmiProxyFactoryBean protocolBeanRemoteBusinessFactoryBean;
+    private RmiProxyFactoryBean inputInfoBeanRemoteBusinessFactoryBean;
+    private RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean;
+    private RmiProxyFactoryBean inputFileBeanRemoteBusinessFactoryBean;
 
     private ProtocolBeanRemoteBusiness protocolBusiness;
     private InputInfoBeanRemoteBusiness inputInfoBusiness;
@@ -34,6 +36,43 @@ public class BeanDataProvider implements DataProvider {
     private InputFileBeanRemoteBusiness inputFileBusiness;
 
     public BeanDataProvider() {
+        initializeBeans();
+    }
+
+    private void initializeBeans() {
+        protocolBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+        protocolBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/protocolBeanRemoteBusiness");
+        protocolBeanRemoteBusinessFactoryBean.setServiceInterface(ProtocolBeanRemoteBusiness.class);
+
+        protocolBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+        protocolBusiness = (ProtocolBeanRemoteBusiness) protocolBeanRemoteBusinessFactoryBean.getObject();
+
+        //////////////////////////////
+
+        inputInfoBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+        inputInfoBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/inputInfoBeanRemoteBusiness");
+        inputInfoBeanRemoteBusinessFactoryBean.setServiceInterface(InputInfoBeanRemoteBusiness.class);
+
+        protocolBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+        inputInfoBusiness = (InputInfoBeanRemoteBusiness) inputInfoBeanRemoteBusinessFactoryBean.getObject();
+
+        //////////////////////////////
+
+        portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
+        portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
+
+        portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+        portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+
+        //////////////////////////////
+
+        inputFileBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+        inputFileBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/inputFileBeanRemoteBusiness");
+        inputFileBeanRemoteBusinessFactoryBean.setServiceInterface(InputFileBeanRemoteBusiness.class);
+
+        inputFileBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+        inputFileBusiness = (InputFileBeanRemoteBusiness) inputFileBeanRemoteBusinessFactoryBean.getObject();
     }
 
     public List<Creditor> getCreditorsList() {
