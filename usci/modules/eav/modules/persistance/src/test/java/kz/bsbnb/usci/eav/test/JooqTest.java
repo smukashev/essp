@@ -4,6 +4,7 @@ import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -12,6 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  *
  */
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
 public class JooqTest {
@@ -25,14 +27,10 @@ public class JooqTest {
                .from(DSL.tableByName("BOOK"))
                .join(DSL.tableByName("AUTHOR")).on(DSL.fieldByName("BOOK", "AUTHOR_ID").equal(DSL.fieldByName("AUTHOR", "ID")))
                .where(DSL.fieldByName("BOOK", "PUBLISHED_IN").equal(1948));
-       System.out.println("SELECT_SQL: " + query.getSQL());
-       System.out.println("SELECT_SQL_BINDS: " + query.getBindValues());
 
        query = context.update(DSL.tableByName("EAV_BE_DATE_VALUES"))
                .set(DSL.fieldByName("EAV", "EAV_BE_DATE_VALUES", "BATCH_ID"), 1L)
                .set(DSL.fieldByName("EAV_BE_DATE_VALUES", "INDEX"), 1000L)
                .where(DSL.fieldByName("EAV_BE_DATE_VALUES", "ID").equal(5000));
-       System.out.println("UPDATE_SQL: " + query.getSQL());
-       System.out.println("UPDATE_SQL_BINDS: " + query.getBindValues());
    }
 }

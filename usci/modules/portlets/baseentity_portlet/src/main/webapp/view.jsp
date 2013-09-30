@@ -245,6 +245,12 @@
                                 </label>
                                 <div id="inForm">
                                 </div>
+
+                                <button type="button" onclick='javascript:addAttribute()'>Add Entity</button>
+                                <button type="button" onclick='javascript:addAttribute()'>Add Set</button>
+                                <button type="button" onclick='javascript:addAttribute()'>Add Complex</button>
+                                <button type="button" onclick='javascript:addAttribute()'>Add attribute</button>
+
                                 <button type="button" onclick='javascript:addAttribute()'>Add attribute</button>
                                 <button type="button" onclick='javascript:doAddEntity()'>Save</button>
                             </form>

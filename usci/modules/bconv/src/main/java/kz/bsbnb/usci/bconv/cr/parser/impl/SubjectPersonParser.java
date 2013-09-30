@@ -9,6 +9,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -25,6 +26,7 @@ import java.util.Date;
  * @author k.tulbassiyev
  */
 @Component
+@Scope("prototype")
 public class SubjectPersonParser extends BatchParser {
     @Autowired
     private SubjectPersonDocsParser subjectPersonDocsParser;
@@ -50,7 +52,7 @@ public class SubjectPersonParser extends BatchParser {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("person"), new Date());
         names = new BaseSet(metaClassRepository.getMetaClass("name"));
         addresses = new BaseSet(metaClassRepository.getMetaClass("address"));
-        bankRelations = new BaseSet(new MetaValue(DataTypes.STRING));
+        bankRelations = new BaseSet(metaClassRepository.getMetaClass("ref_bank_relation"));
         contacts = new BaseSet(metaClassRepository.getMetaClass("contact"));
     }
     
@@ -60,9 +62,11 @@ public class SubjectPersonParser extends BatchParser {
         if(localName.equals("person")) {
         } else if(localName.equals("country")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("country", new BaseValue(batch, index,
-                    event.asCharacters().getData()
-                ));
+            BaseEntity country = new BaseEntity(metaClassRepository.getMetaClass("ref_country"), new Date());
+
+            country.put("code_numeric", new BaseValue(batch, index, new Integer(event.asCharacters().getData())));
+
+            currentBaseEntity.put("country", new BaseValue(batch, index, country));
         } else if(localName.equals("offshore")) {
             event = (XMLEvent) xmlReader.next();
             currentBaseEntity.put("offshore", new BaseValue(batch, index,
@@ -72,7 +76,11 @@ public class SubjectPersonParser extends BatchParser {
             //bankRelations = new CtEntity.BankRelations();
         } else if(localName.equals("bank_relation")) {
             event = (XMLEvent) xmlReader.next();
-            bankRelations.put(new BaseValue(batch, index, event.asCharacters().getData()));
+            BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"), new Date());
+
+            bankRelation.put("code", new BaseValue(batch, index, new Integer(event.asCharacters().getData())));
+
+            bankRelations.put(new BaseValue(batch, index, bankRelation));
         } else if(localName.equals("addresses")) {
             //addresses = new CtEntity.Addresses();
         } else if(localName.equals("address")) {
@@ -91,8 +99,12 @@ public class SubjectPersonParser extends BatchParser {
                     event.asStartElement().getAttributeByName(new QName("type")).getValue()));
         } else if(localName.equals("region")) {
             event = (XMLEvent) xmlReader.next();
+            BaseEntity region = new BaseEntity(metaClassRepository.getMetaClass("ref_region"), new Date());
+
+            region.put("code", new BaseValue(batch, index, new Integer(event.asCharacters().getData())));
+
             currentAddress.put("region", new BaseValue(batch, index,
-                    event.asCharacters().getData()
+                    region
                 ));
         } else if(localName.equals("details")) {
             event = (XMLEvent) xmlReader.next();
@@ -106,8 +118,12 @@ public class SubjectPersonParser extends BatchParser {
             //ctContact.setContactType(attributes.getValue("contact_type"));
             currentContact = new BaseEntity(metaClassRepository.getMetaClass("contact"), new Date());
 
-            currentContact.put("contact_type", new BaseValue(batch, index,
-                    event.asStartElement().getAttributeByName(new QName("contact_type")).getValue()));
+            BaseEntity contactType = new BaseEntity(metaClassRepository.getMetaClass("ref_contact_type"), new Date());
+
+            contactType.put("code", new BaseValue(batch, index,
+                    new Integer(event.asStartElement().getAttributeByName(new QName("contact_type")).getValue())));
+
+            currentContact.put("contact_type", new BaseValue(batch, index, contactType));
 
             BaseSet contactDetails = new BaseSet(new MetaValue(DataTypes.STRING));
 

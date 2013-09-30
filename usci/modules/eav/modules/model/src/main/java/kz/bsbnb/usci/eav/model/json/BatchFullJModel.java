@@ -9,9 +9,9 @@ import java.util.Date;
  */
 public class BatchFullJModel {
     private Long id;
+    private String type = "batch";
     private String fileName;
     private byte[] content;
-    private StatusJModel status;
     private Date received;
 
     public BatchFullJModel(Long id, String fileName, byte[] content, Date received) {
@@ -43,14 +43,6 @@ public class BatchFullJModel {
 
     public void setContent(byte[] content) {
         this.content = content;
-    }
-
-    public StatusJModel getStatus() {
-        return status;
-    }
-
-    public void setStatus(StatusJModel status) {
-        this.status = status;
     }
 
     public Date getReceived() {

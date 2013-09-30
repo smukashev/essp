@@ -34,7 +34,7 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
 
         DDLHelper.changeDatabase(jdbcTemplate.getDataSource(),
                 DDLHelper.readDatabaseFromXML(dbConfigFileUrl.getFile()),
-                true);
+                false);
 	}
 
 	@Override

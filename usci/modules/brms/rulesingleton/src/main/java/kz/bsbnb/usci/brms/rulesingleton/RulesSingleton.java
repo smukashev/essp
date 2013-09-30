@@ -81,12 +81,12 @@ public class RulesSingleton
 
     private ArrayList<RulePackageError> rulePackageErrors = new ArrayList<RulePackageError>();
 
-    @Autowired(required = false)
-    private IBatchService remoteBatchService;
-    @Autowired(required = false)
+    @Autowired//(required = false)
+    private IBatchService remoteRuleBatchService;
+    @Autowired//(required = false)
     private IRuleService remoteRuleService;
-    @Autowired(required = false)
-    private IBatchVersionService remoteBatchVersionService;
+    @Autowired//(required = false)
+    private IBatchVersionService remoteRuleBatchVersionService;
 
     public StatelessKnowledgeSession getSession()
     {
@@ -98,13 +98,13 @@ public class RulesSingleton
     }
 
     public void reloadCache() {
-        if (remoteBatchService == null ||
+        if (remoteRuleBatchService == null ||
                 remoteRuleService == null ||
-                remoteBatchVersionService == null) {
+                remoteRuleBatchVersionService == null) {
             logger.warn("RuleServer services are null, using local cache only");
-            System.out.println("%%%%%%%%%%%%%%%%% no services wiered");
+            //System.out.println("%%%%%%%%%%%%%%%%% no services wiered");
         } else {
-            System.out.println("%%%%%%%%%%%%%%%%% filling cache");
+            //System.out.println("%%%%%%%%%%%%%%%%% filling cache");
             fillPackagesCache();
         }
     }
@@ -144,7 +144,7 @@ public class RulesSingleton
     }
 
     synchronized public void fillPackagesCache() {
-        List<Batch> allBatches = remoteBatchService.getAllBatches();
+        List<Batch> allBatches = remoteRuleBatchService.getAllBatches();
 
         rulePackageErrors.clear();
         ruleCache.clear();
@@ -154,7 +154,7 @@ public class RulesSingleton
                 throw new IllegalArgumentException("Null package recieved from service " + curBatch);
             }
 
-            List<BatchVersion> versions = remoteBatchVersionService.getBatchVersions(curBatch);
+            List<BatchVersion> versions = remoteRuleBatchVersionService.getBatchVersions(curBatch);
 
             ArrayList<RuleCasheEntry> ruleCasheEntries = new ArrayList<RuleCasheEntry>();
 
@@ -174,7 +174,7 @@ public class RulesSingleton
                 }
 
                 logger.debug(packages);
-                System.out.println("%%%%%%%%%%%%%%%%% packages:" + packages);
+                //System.out.println("%%%%%%%%%%%%%%%%% packages:" + packages);
                 try {
                     setRules(packages);
                 } catch (Exception e) {
@@ -232,7 +232,7 @@ public class RulesSingleton
 
     synchronized public void update(Long versionId, Date date, String packageName)
     {
-        System.out.println("%%%%%%%%%%%%%%%%% Update called!!!");
+        //System.out.println("%%%%%%%%%%%%%%%%% Update called!!!");
         rulePackageErrors.clear();
 
         BatchVersion curVersion = new BatchVersion();
@@ -254,7 +254,7 @@ public class RulesSingleton
         }
 
         logger.debug(packages);
-        System.out.println("%%%%%%%%%%%%%%%%% packages:" + packages);
+        //System.out.println("%%%%%%%%%%%%%%%%% packages:" + packages);
         try {
             setRules(packages);
         } catch (Exception e) {

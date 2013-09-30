@@ -9,6 +9,7 @@ import java.util.Date;
  */
 public class BatchLightJModel {
     private Long id;
+    private String type = "batch";
     private String fileName;
     private Date received;
 

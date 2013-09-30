@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MetaSet  extends Persistable implements IMetaType, IMetaSet
 {
@@ -166,6 +167,31 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaSet
     }
 
     @Override
+    public String toJava(String prefix) {
+        if(isComplex()) {
+            if (isSetOfSets()) {
+                return "\n  metaSet(" + getId() + "), complex, setOfSets";
+            }
+            else {
+                String str =  "\n ";
+
+
+                str += " " + metaType.toJava(prefix);
+
+                return str;
+            }
+        }
+        else {
+            if (isSetOfSets()) {
+                return "+new MetaSet("+metaType.toJava(prefix);
+            }
+            else {
+                return " new MetaSet(" + metaType.toJava(prefix)+")";
+            }
+        }
+    }
+
+    @Override
     public boolean isImmutable()
     {
         return immutable;
@@ -217,5 +243,21 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaSet
                 ((MetaClass)metaType).recursiveSet(subMeta);
             }
         }
+    }
+
+    public List<String> getAllPaths(MetaClass subMeta, String path) {
+        ArrayList<String> paths = new ArrayList<String>();
+
+        if (metaType.isSet()) {
+            paths.addAll(((MetaSet)metaType).getAllPaths(subMeta, path));
+        } else if (metaType.isComplex()) {
+            if (((MetaClass)metaType).getClassName().equals(subMeta.getClassName())) {
+                paths.add(path);
+            } else {
+                paths.addAll(((MetaClass)metaType).getAllPaths(subMeta, path));
+            }
+        }
+
+        return paths;
     }
 }

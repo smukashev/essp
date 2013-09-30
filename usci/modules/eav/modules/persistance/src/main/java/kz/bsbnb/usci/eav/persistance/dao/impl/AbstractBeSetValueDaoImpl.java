@@ -9,20 +9,18 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeSetValueDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
-import kz.bsbnb.usci.eav.util.DateUtils;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Insert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_SET_VALUES;
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_SETS;
 
 /**
@@ -136,8 +134,8 @@ public abstract class AbstractBeSetValueDaoImpl extends JDBCSupport implements I
     {
         Insert insert = context
                 .insertInto(EAV_BE_SETS)
-                .set(EAV_BE_SETS.LEVEL, level)
-                .set(EAV_BE_SETS.IS_LAST, last);
+                .set(EAV_BE_SETS.LEVEL_, level)
+                .set(EAV_BE_SETS.IS_LAST, DataUtils.convert(last));
 
         logger.debug(insert.toString());
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -191,7 +189,7 @@ public abstract class AbstractBeSetValueDaoImpl extends JDBCSupport implements I
         {
 
 
-            int compare = DateUtils.compareBeginningOfTheDay(baseValueForSave.getRepDate(), baseValueLoaded.getRepDate());
+            int compare = DataUtils.compareBeginningOfTheDay(baseValueForSave.getRepDate(), baseValueLoaded.getRepDate());
             switch(compare)
             {
                 case 1:

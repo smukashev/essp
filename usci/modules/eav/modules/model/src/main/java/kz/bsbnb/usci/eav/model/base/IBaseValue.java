@@ -4,7 +4,7 @@ package kz.bsbnb.usci.eav.model.base;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.UUID;
 
 /**

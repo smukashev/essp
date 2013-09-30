@@ -12,6 +12,8 @@ public interface IMetaType extends Serializable
 
     public String toString(String prefix);
 
+    public String toJava(String prefix);
+
     public boolean isImmutable();
 
     public boolean isReference();

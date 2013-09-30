@@ -11,7 +11,7 @@ import java.rmi.RMISecurityManager;
  * @author k.tulbassiyev
  */
 public class RmiServiceMain {
-    private static Logger logger = Logger.getLogger(SimpleMain.class);
+    private static Logger logger = Logger.getLogger(RmiServiceMain.class);
 
     public static void main(String args[]) {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextRmi.xml");

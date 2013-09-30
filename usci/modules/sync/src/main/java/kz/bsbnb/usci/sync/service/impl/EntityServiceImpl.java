@@ -39,6 +39,7 @@ public class EntityServiceImpl implements IEntityService {
 
     @Override
     public BaseEntity load(long id) {
+        System.out.println("Load with id: " + id);
         return remoteEntityService.load(id);
     }
 

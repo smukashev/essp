@@ -5,6 +5,12 @@ init
 
 # Convert xsd to MetaClass ct_package
 xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_package
+xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_base
+xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_msfo
+
+meta create ct_portfolio_data
+meta add ct_portfolio_data portfolio_flow MetaClass ct_portfolio_flow_base true
+meta add ct_portfolio_data portfolio_flow_msfo MetaClass ct_portfolio_flow_msfo true
 
 #meta show name ct_package
 
@@ -13,18 +19,493 @@ meta key name person docs
 meta key name doc1 no
 
 # Create filter
-meta fkey name person docs doc_type 11
-meta fkey name person docs doc_type 15
+#meta fkey name person docs doc_type 11
+#meta fkey name person docs doc_type 15
 
-meta show name ct_package
+#meta show name ct_package
 
 #meta show id 38
 #meta show id 1
 
+#Create REFs
+
+#=============================================================================================
+#= Справочник "Тип субъекта"                                                                 =
+#=============================================================================================
+meta create ref_subject_type
+
+#IS_LAST
+meta add ref_subject_type report_period_duration_months INTEGER
+#ID
+#PARENT_ID
+meta add ref_subject_type code INTEGER
+meta add ref_subject_type name_ru STRING
+meta add ref_subject_type name_kz STRING
+meta add ref_subject_type kind_id INTEGER
+#OPEN_DATE
+#CLOSE_DATE
+
+meta key name ref_subject_type code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Номера балансовых счетов"                                                     =
+#=============================================================================================
+meta create ref_balance_account
+
+meta add ref_balance_account is_in_balance BOOLEAN
+#ID
+#PARENT_ID
+meta add ref_balance_account no_ STRING
+meta add ref_balance_account name_ru STRING
+meta add ref_balance_account name_kz STRING
+#OPEN_DATE
+#CLOSE_DATE
+#IS_LAST
+meta add ref_balance_account display_no INTEGER
+meta add ref_balance_account first_fourth_signs STRING
+meta add ref_balance_account fifth_sign STRING
+meta add ref_balance_account sixth_sign STRING
+meta add ref_balance_account seventh_sign STRING
+
+meta remove detail balance_account
+meta add detail balance_account MetaClass ref_balance_account
+
+meta key name ref_balance_account no_
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Признак связанности с банком (небанковской организацией) особыми отношениями" =
+#=============================================================================================
+meta create ref_bank_relation
+
+meta add ref_bank_relation code INTEGER
+meta add ref_bank_relation name_ru STRING
+meta add ref_bank_relation name_kz STRING
+#IS_LAST
+#ID
+#PARENT_ID
+#OPEN_DATE
+#CLOSE_DATE
+
+meta remove organization bank_relations
+meta add organization bank_relations MetaClass ref_bank_relation true
+
+meta remove person bank_relations
+meta add person bank_relations MetaClass ref_bank_relation true
+
+meta key name ref_bank_relation code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Классификационные категории"                                                  =
+#=============================================================================================
+meta create ref_classification
+
+#PARENT_ID
+meta add ref_classification code INTEGER
+meta add ref_classification name_ru STRING
+meta add ref_classification name_kz STRING
+meta add ref_classification is_input_value BOOLEAN
+meta add ref_classification value_ DOUBLE
+#OPEN_DATE
+#CLOSE_DATE
+#IS_LAST
+meta add ref_classification provision_debt DOUBLE
+meta add ref_classification provision_portfolio_min DOUBLE
+meta add ref_classification provision_portfolio_max DOUBLE
+meta add ref_classification comment_ru STRING
+meta add ref_classification comment_kz STRING
+#ID
+
+meta remove credit_flow classification
+meta add credit_flow classification MetaClass ref_classification
+
+meta key name ref_classification code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Страны"                                                                       =
+#=============================================================================================
+meta create ref_country
+
+#IS_LAST
+#ID
+#PARENT_ID
+meta add ref_country code STRING
+meta add ref_country code_numeric INTEGER
+meta add ref_country name_ru STRING
+meta add ref_country name_kz STRING
+meta add ref_country short_name_ru STRING
+meta add ref_country short_name_kz STRING
+#OPEN_DATE
+#CLOSE_DATE
+
+meta remove organization country
+meta add organization country MetaClass ref_country
+
+meta remove person country
+meta add person country MetaClass ref_country
+
+meta key name ref_country code_numeric
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "БВУ/НО"                                                                       =
+#=============================================================================================
+meta create ref_creditor
+
+#change_date
+#id
+# -- ??? main_office_id
+meta add ref_creditor subject_type MetaClass ref_subject_type
+meta add ref_creditor name STRING
+meta add ref_creditor short_name STRING
+meta add ref_creditor code INTEGER
+#shutdown_date
+
+meta create ref_creditor_branch
+
+#change_date
+#id
+# -- ??? main_office_id
+meta add ref_creditor_branch main_office MetaClass ref_creditor
+#meta add ref_creditor_branch subject_type MetaClass ref_subject_type
+meta add ref_creditor_branch name STRING
+meta add ref_creditor_branch short_name STRING
+meta add ref_creditor_branch code INTEGER
+#shutdown_date
+
+meta key name ref_creditor code
+meta key name ref_creditor_branch code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Объект кредитования"                                                          =
+#=============================================================================================
+meta create ref_credit_object
+
+meta add ref_credit_object code INTEGER
+meta add ref_credit_object name_ru INTEGER
+meta add ref_credit_object name_kz INTEGER
+
+meta remove credit credit_object
+meta add credit credit_object MetaClass ref_credit_object
+
+meta key name ref_credit_object code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Цель кредитования"                                                            =
+#=============================================================================================
+meta create ref_credit_purpose
+
+meta add ref_credit_purpose code INTEGER
+meta add ref_credit_purpose name_ru INTEGER
+meta add ref_credit_purpose name_kz INTEGER
+
+meta remove credit credit_purpose
+meta add credit credit_purpose MetaClass ref_credit_purpose
+
+meta key name ref_credit_purpose code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Вид валюты"                                                                   =
+#=============================================================================================
+meta create ref_currency
+
+meta add ref_currency is_convertible BOOLEAN
+#ID
+#PARENT_ID
+meta add ref_currency code STRING
+meta add ref_currency name_ru STRING
+meta add ref_currency name_kz STRING
+meta add ref_currency short_name STRING
+meta add ref_currency rating DOUBLE
+#OPEN_DATE
+#CLOSE_DATE
+#IS_LAST
+
+meta remove credit currency
+meta add credit currency MetaClass ref_currency
+
+meta key name ref_currency code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Отрасли экономики"                                                            =
+#=============================================================================================
+meta create ref_econ_trade
+
+meta add ref_econ_trade code INTEGER
+meta add ref_econ_trade name_ru INTEGER
+meta add ref_econ_trade name_kz INTEGER
+
+meta remove organization econ_trade
+meta add organization econ_trade MetaClass ref_econ_trade
+
+meta key name ref_econ_trade code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Субъект частного предпринимательства"                                         =
+#=============================================================================================
+meta create ref_enterprise_type
+
+meta add ref_enterprise_type is_organization BOOLEAN
+#ID
+#PARENT_ID
+meta add ref_enterprise_type code STRING
+meta add ref_enterprise_type name_ru STRING
+meta add ref_enterprise_type name_kz STRING
+#OPEN_DATE
+#CLOSE_DATE
+#IS_LAST
+meta add ref_enterprise_type is_se BOOLEAN
+
+meta remove organization enterprise_type
+meta add organization enterprise_type MetaClass ref_enterprise_type
+
+meta key name ref_enterprise_type code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Источник финансирования"                                                      =
+#=============================================================================================
+meta create ref_finance_source
+
+meta add ref_finance_source code INTEGER
+meta add ref_finance_source name_ru INTEGER
+meta add ref_finance_source name_kz INTEGER
+
+meta remove credit finance_source
+meta add credit finance_source MetaClass ref_finance_source
+
+meta key name ref_finance_source code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Организационно-правовая форма"                                                =
+#=============================================================================================
+meta create ref_legal_form
+
+#IS_LAST
+#ID
+#PARENT_ID
+meta add ref_legal_form code INTEGER
+meta add ref_legal_form name_ru STRING
+meta add ref_legal_form name_kz STRING
+meta add ref_legal_form short_name_ru STRING
+meta add ref_legal_form short_name_kz STRING
+#OPEN_DATE
+#CLOSE_DATE
+
+meta remove organization legal_form
+meta add organization legal_form MetaClass ref_legal_form
+
+meta key name ref_legal_form code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Оффшорные зоны"                                                               =
+#=============================================================================================
+meta create ref_offshore
+
+#IS_LAST
+#ID
+#PARENT_ID
+meta add ref_offshore country MetaClass ref_country
+meta add ref_offshore code INTEGER
+meta add ref_offshore name_ru STRING
+meta add ref_offshore name_kz STRING
+#OPEN_DATE
+#CLOSE_DATE
+
+meta remove organization offshore
+meta add organization offshore MetaClass ref_offshore
+
+meta remove person offshore
+meta add person offshore MetaClass ref_offshore
+
+meta key name ref_offshore code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Вид обеспечения"                                                              =
+#=============================================================================================
+meta create ref_pledge_type
+
+#IS_LAST
+#ID
+#PARENT_ID
+meta add ref_pledge_type code INTEGER
+meta add ref_pledge_type name_ru STRING
+meta add ref_pledge_type name_kz STRING
+#OPEN_DATE
+#CLOSE_DATE
+meta add ref_pledge_type is_liquid_all BOOLEAN
+meta add ref_pledge_type is_liquid_invest BOOLEAN
+
+meta remove pledge pledge_type
+meta add pledge pledge_type MetaClass ref_pledge_type
+
+meta key name ref_pledge_type code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Наименование однородного портфеля"                                            =
+#=============================================================================================
+meta create ref_portfolio
+
+#IS_LAST
+meta add ref_portfolio creditor MetaClass creditor
+#ID
+#PARENT_ID
+meta add ref_portfolio code STRING
+meta add ref_portfolio name_ru STRING
+meta add ref_portfolio name_kz STRING
+#OPEN_DATE
+#CLOSE_DATE
+
+meta remove portfolio portfolio
+meta add portfolio portfolio MetaClass ref_portfolio
+
+meta remove portfolio portfolio_msfo
+meta add portfolio portfolio_msfo MetaClass ref_portfolio
+
+meta remove ct_portfolio_flow_base portfolio
+meta add ct_portfolio_flow_base portfolio MetaClass ref_portfolio
+
+meta remove ct_portfolio_flow_msfo portfolio
+meta add ct_portfolio_flow_msfo portfolio MetaClass ref_portfolio
+
+meta key name ref_portfolio code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Области"                                                                      =
+#=============================================================================================
+meta create ref_region
+
+meta add ref_region code INTEGER
+meta add ref_region name_ru INTEGER
+meta add ref_region name_kz INTEGER
+
+meta remove address1 region
+meta add address1 region MetaClass ref_region
+
+meta remove address region
+meta add address region MetaClass ref_region
+
+meta key name ref_region code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Вид связи"                                                                    =
+#=============================================================================================
+meta create ref_contact_type
+
+#IS_LAST
+#ID
+#PARENT_ID
+meta add ref_contact_type code INTEGER
+meta add ref_contact_type name_ru STRING
+meta add ref_contact_type name_kz STRING
+#OPEN_DATE
+#CLOSE_DATE
+
+meta remove contact1 contact_type
+meta add contact1 contact_type MetaClass ref_contact_type
+
+meta remove contact contact_type
+meta add contact contact_type MetaClass ref_contact_type
+
+meta key name ref_contact_type code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Виды займов и условных обязательств"                                          =
+#=============================================================================================
+meta create ref_credit_type
+
+#IS_LAST
+#ID
+#PARENT_ID
+meta add ref_credit_type kind_id INTEGER
+meta add ref_credit_type code INTEGER
+meta add ref_credit_type name_ru STRING
+meta add ref_credit_type name_kz STRING
+#OPEN_DATE
+#CLOSE_DATE
+
+meta remove credit credit_type
+meta add credit credit_type MetaClass ref_credit_type
+
+meta key name ref_credit_type code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Справочник "Вид идентификационных документов"                                             =
+#=============================================================================================
+meta create ref_doc_type
+
+meta add ref_doc_type weight INTEGER
+#ID
+#PARENT_ID
+meta add ref_doc_type code INTEGER
+meta add ref_doc_type name_ru STRING
+meta add ref_doc_type name_kz STRING
+#OPEN_DATE
+#CLOSE_DATE
+meta add ref_doc_type is_identification BOOLEAN
+meta add ref_doc_type sign_count INTEGER
+#IS_LAST
+meta add ref_doc_type is_person_doc BOOLEAN
+meta add ref_doc_type is_organization_doc BOOLEAN
+meta add ref_doc_type short_name_ru STRING
+meta add ref_doc_type short_name_kz STRING
+
+meta remove doc doc_type
+meta add doc doc_type MetaClass ref_doc_type
+
+meta remove doc4 doc_type
+meta add doc4 doc_type MetaClass ref_doc_type
+
+meta remove doc3 doc_type
+meta add doc3 doc_type MetaClass ref_doc_type
+
+meta remove doc2 doc_type
+meta add doc2 doc_type MetaClass ref_doc_type
+
+meta remove doc1 doc_type
+meta add doc1 doc_type MetaClass ref_doc_type
+
+meta key name ref_doc_type code
+#---------------------------------------------------------------------------------------------
+
+#=============================================================================================
+#= Shared                                                                                    =
+#=============================================================================================
+meta create ref_shared STRING
+
+meta add ref_shared order_num INTEGER
+#ID
+meta add ref_shared code INTEGER
+meta add ref_shared name_ru STRING
+meta add ref_shared name_kz STRING
+meta add ref_shared type_ INTEGER
+meta add ref_shared note STRING
+
+meta key name ref_shared code
+#---------------------------------------------------------------------------------------------
+
+rc
+
 # Load CR batch file 99999 entries beginning from 0
-#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 99999 0
+crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 99999 0
 
 #crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 2 90 01.02.2013
-crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 2 90
+#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 3 90
 
 quit

@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import kz.bsbnb.usci.eav.model.base.ContainerTypes;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
@@ -13,6 +15,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.util.DataUtils;
 
 public class MetaClass extends Persistable implements IMetaType, IMetaClass
 {
@@ -21,7 +24,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
 	 */
     private String className;
 
-    private Timestamp beginDate = new Timestamp(java.util.Calendar.getInstance().getTimeInMillis());
+    private Date beginDate;
 
     private boolean disabled = false;
 
@@ -52,6 +55,9 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
     public MetaClass()
     {
         super();
+
+        this.beginDate = new Date();
+        DataUtils.toBeginningOfTheDay(beginDate);
     }
 
     public MetaClass(MetaClass meta)
@@ -68,9 +74,11 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
 	public MetaClass(String className)
     {
 		this.className = className;
+        this.beginDate = new Date();
+        DataUtils.toBeginningOfTheDay(beginDate);
 	}
 
-    public MetaClass(String className, Timestamp beginDate)
+    public MetaClass(String className, Date beginDate)
     {
         this.className = className;
         this.beginDate = beginDate;
@@ -189,14 +197,17 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
 		this.searchProcedureName = searchProcedureName;
 	}
 
-    public Timestamp getBeginDate()
+    public Date getBeginDate()
     {
         return beginDate;
     }
 
-    public void setBeginDate(Timestamp beginDate)
+    public void setBeginDate(Date beginDate)
     {
-        this.beginDate = beginDate;
+        Date newBeginDate = (Date)beginDate.clone();
+        DataUtils.toBeginningOfTheDay(newBeginDate);
+
+        this.beginDate = newBeginDate;
     }
 
     public boolean isDisabled()
@@ -439,6 +450,68 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
         return str;
     }
 
+
+    /*
+    *   generating Meta Class into Java code
+    *
+    *  */
+    public String toJava(String prefix)
+    {
+        String str = " ";
+
+        String[] names;
+
+        names = (String[]) members.keySet().toArray(new String[members.keySet().size()]);
+
+        Arrays.sort(names);
+
+        // creates Holder object of Meta Class
+        str += prefix + "meta"+className.toString().substring(0, 1).toUpperCase()
+                + className.toString().substring(1) + "Holder = new MetaClass( \"" + className + "\" );";
+
+        for (String memberName : names)
+        {
+            IMetaAttribute attribute = members.get(memberName);
+            IMetaType type = attribute.getMetaType();
+            if (type.isComplex()) // entity or set
+            {
+                if(!type.isSet()) // not set
+                {
+                    str +="\n" + type.toJava(prefix)+"\n " + prefix + "meta" + className.toString().substring(0, 1).toUpperCase()
+                            + className.toString().substring(1) + "Holder.setMetaAttribute(\"" + memberName + "\" " +
+                            " , new MetaAttribute( " + attribute.isKey() + "," + attribute.isNullable() + " , " + "meta"
+                            + memberName.toString().substring(0, 1).toUpperCase()
+                            + memberName.toString().substring(1) + "Holder));" ;
+                }
+                else // set
+                {
+                    str += type.toJava(prefix)+"\n " + prefix + "meta"+className.toString().substring(0, 1).toUpperCase()
+                            + className.toString().substring(1) + "Holder.setMetaAttribute(\"" + memberName + "\" " +
+                            ", new MetaAttribute( new MetaSet( " + "meta" + memberName.toString().substring(0, 1).toUpperCase()
+                            + memberName.toString().substring(1) + "Holder)));" ;
+                }
+            }
+            else // simple value
+            {
+                str += "\n " + prefix + "meta" + className.toString().substring(0, 1).toUpperCase()
+                        + className.toString().substring(1) + "Holder.setMetaAttribute(\"" + memberName + "\" " +
+                        ", new MetaAttribute( " + attribute.isKey() + " , " + attribute.isNullable() + " , " + type.toJava(prefix) + "));";
+            }
+        }
+        return str;
+    }
+
+    public String getJavaFunction(String fName) {
+        String str  = "protected MetaClass " + fName + "()\n{\n";
+        str += toJava("  ");
+        str += "\n\n   return meta"+className.toString().substring(0, 1).toUpperCase()
+                + className.toString().substring(1) + "Holder;\n";
+        str += "}";
+        return str;
+    }
+
+
+
     @Override
     public int hashCode()
     {
@@ -500,5 +573,78 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
                 }
             }
         }
+    }
+
+    public List<String> getAllPaths(MetaClass subMeta) {
+        return getAllPaths(subMeta, null);
+    }
+
+    public List<String> getAllPaths(MetaClass subMeta, String path) {
+        ArrayList<String> paths = new ArrayList<String>();
+
+        for (String memberName : members.keySet())
+        {
+            IMetaAttribute attribute = members.get(memberName);
+            IMetaType type = attribute.getMetaType();
+
+            if (type.isComplex()) {
+                if (type.isSet()) {
+                    paths.addAll(((MetaSet)type).getAllPaths(subMeta, (path == null ? "" : (path + ".")) + memberName));
+                } else {
+                    if (subMeta.getClassName().equals(((MetaClass)type).getClassName())) {
+                        paths.add((path == null ? "" : (path + ".")) + memberName);
+                    } else {
+                        paths.addAll(((MetaClass)type).getAllPaths(subMeta,
+                                (path == null ? "" : (path + ".")) + memberName));
+                    }
+                }
+            }
+        }
+
+        return paths;
+    }
+
+    public IMetaType getEl(String path)
+    {
+        StringTokenizer tokenizer = new StringTokenizer(path, ".");
+
+        MetaClass meta = this;
+        IMetaType valueOut = null;
+
+        while (tokenizer.hasMoreTokens())
+        {
+            String token = tokenizer.nextToken();
+
+            IMetaAttribute attribute = meta.getMetaAttribute(token);
+
+            if (attribute == null)
+                return null;
+
+            IMetaType type = attribute.getMetaType();
+
+            valueOut = type;
+
+            if (type.isSet())
+            {
+                while(type.isSet()) {
+                    valueOut = type;
+                    type = ((MetaSet)type).getMemberType();
+                }
+            }
+
+            if (valueOut.isComplex())
+            {
+                if (!valueOut.isSet()) {
+                    meta = (MetaClass)valueOut;
+                }
+            } else {
+                if (tokenizer.hasMoreTokens())
+                {
+                    throw new IllegalArgumentException("Path can't have intermediate simple values");
+                }
+            }
+        }
+
+        return valueOut;
     }
 }

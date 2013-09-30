@@ -10,13 +10,12 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.Set;
+import java.text.ParseException;
+import java.util.*;
 
-/**
- * @author k.tulbassiyev
- */
+@Component
 public class BasicBaseEntityComparator implements IBaseEntityComparator
 {
     Logger logger = Logger.getLogger(BasicBaseEntityComparator.class);
@@ -42,6 +41,22 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
             logger.debug("Different: " + value1.getValue() + ", " + value2.getValue());
 
         return res;
+    }
+
+    private boolean filterPass(BaseEntity entity, MetaSet parentMeta) {
+        HashMap<String, ArrayList<String>> arrayKeyFilter = parentMeta.getArrayKeyFilter();
+
+        if (arrayKeyFilter == null || arrayKeyFilter.size() < 1) {
+            return true;
+        }
+
+        try
+        {
+            return entity.applyKeyFilter(arrayKeyFilter);
+        } catch (ParseException e)
+        {
+            return false;
+        }
     }
 
     private boolean compareSet(IMetaType type, IBaseValue value1, IBaseValue value2)
@@ -71,19 +86,22 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
             {
                 boolean found = false;
 
-                for(IBaseValue v2 : ar2)
-                {
-                    if (compare((BaseEntity)v1.getValue(), (BaseEntity)v2.getValue()))
+                if (v1.getValue() != null && filterPass((BaseEntity)v1.getValue(), (MetaSet)type)) {
+                    for(IBaseValue v2 : ar2)
                     {
-                        found = true;
-                        break;
+                        if (compare((BaseEntity)v1.getValue(), (BaseEntity)v2.getValue()))
+                        {
+                            found = true;
+                            break;
+                        }
                     }
-                }
 
-                if(((MetaSet)type).getArrayKeyType() == ComplexKeyTypes.ALL)
-                    res = res && found;
-                else
-                    res = res || found;
+
+                    if(((MetaSet)type).getArrayKeyType() == ComplexKeyTypes.ALL)
+                        res = res && found;
+                    else
+                        res = res || found;
+                }
             }
         }
 
@@ -101,6 +119,10 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
         if(!c1.getMeta().equals(c2.getMeta()))
         {
             logger.debug("Classes are different: " + c1.getMeta().getClassName() + ", " + c2.getMeta().getClassName());
+            return false;
+        }
+
+        if (!c1.getMeta().isSearchable() || !c2.getMeta().isSearchable()) {
             return false;
         }
 
@@ -151,5 +173,115 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
         logger.debug("Result is: " + result);
 
         return result;
+    }
+
+    public List<String> findBaseEntity(BaseEntity entity1, BaseEntity c2, MetaClass type) {
+        ArrayList<String> paths = new ArrayList<String>();
+
+        List<String> subClasses = c2.getMeta().getAllPaths(type);
+
+        Iterator<String> i = subClasses.iterator();
+
+        while(i.hasNext()) {
+            String path = i.next();
+
+            //System.out.println("Path: " + path);
+
+            IMetaType innerMetaType = c2.getMeta().getEl(path);
+
+            if (!innerMetaType.isSet()) {
+                //System.out.println("Is not set");
+                BaseEntity entity2 = (BaseEntity)c2.getEl(path);
+
+                if (entity1 != null && entity2 != null && compare(entity1, entity2)) {
+                    paths.add(path);
+                    //System.out.println("Is equal");
+                }
+                paths.addAll(intersect(entity1, c2));
+            } else {
+                //System.out.println("Is set");
+                MetaSet innerSet = (MetaSet)innerMetaType;
+
+                if (!innerSet.getMemberType().isSet()) {
+                    BaseSet set2 = (BaseSet)c2.getEl(path);
+
+                    if (set2 == null) {
+                        continue;
+                    }
+
+                    for (String identifier : set2.getIdentifiers()) {
+                        IBaseValue value2 = set2.getBaseValue(identifier);
+                        if (value2 != null) {
+                            BaseEntity entity2 = (BaseEntity)value2.getValue();
+
+                            if (entity1 != null && entity2 != null && compare(entity1, entity2)) {
+                                paths.add(path + "[" + identifier + "]");
+                            }
+                        }
+                    }
+
+                    paths.addAll(intersect(entity1, c2));
+                } else {
+                    throw new IllegalStateException("Unimplemented");
+                }
+            }
+        }
+
+        return paths;
+    }
+
+    public List<String> intersect(BaseEntity c1, BaseEntity c2) throws IllegalStateException
+    {
+        ArrayList<String> paths = new ArrayList<String>();
+
+        MetaClass meta = c1.getMeta();
+
+        Set<String> names = meta.getMemberNames();
+
+        for(String name : names)
+        {
+            IMetaAttribute attribute = meta.getMetaAttribute(name);
+            IMetaType type = meta.getMemberType(name);
+
+            logger.debug("Testing attribute: " + name);
+
+            if (!type.isComplex()) {
+                continue;
+            }
+
+            if (!type.isSet()) {
+                IBaseValue value1 = c1.safeGetValue(name);
+                if (value1 != null) {
+                    BaseEntity entity1 = (BaseEntity)(value1.getValue());
+
+                    paths.addAll(findBaseEntity(entity1, c2, (MetaClass)type));
+                }
+            } else {
+                MetaSet set = (MetaSet)type;
+
+                if (!set.getMemberType().isSet()) {
+                    IBaseValue value1 = c1.safeGetValue(name);
+                    if (value1 != null) {
+                        BaseSet bSet = (BaseSet)value1.getValue();
+
+                        if (bSet == null) {
+                            continue;
+                        }
+
+                        for (IBaseValue value11 : bSet.get()) {
+                            if (value1 != null) {
+                                BaseEntity entity1 = (BaseEntity)(value11.getValue());
+
+                                paths.addAll(findBaseEntity(entity1, c2, (MetaClass)(set.getMemberType())));
+                            }
+                        }
+                    }
+                } else {
+                    throw new IllegalStateException("Unimplemented");
+                }
+            }
+        }
+
+        return paths;
     }
 }

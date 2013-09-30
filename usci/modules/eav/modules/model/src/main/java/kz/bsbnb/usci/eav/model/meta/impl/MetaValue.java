@@ -96,6 +96,11 @@ public class MetaValue implements IMetaValue
     }
 
     @Override
+    public String toJava(String prefix) {
+        return "new MetaValue(DataTypes." + typeCode+")";
+    }
+
+    @Override
     public boolean isImmutable()
     {
         return immutable;

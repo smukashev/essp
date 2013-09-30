@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -30,6 +31,7 @@ import java.util.Date;
  * @author k.tulbassiyev
  */
 @Component
+@Scope("prototype")
 public class PackageParser extends BatchParser {
     @Autowired
     private PrimaryContractParser primaryContractParser;
@@ -83,8 +85,14 @@ public class PackageParser extends BatchParser {
             //attributes.getValue("credit_type")
             creditParser.parse(xmlReader, batch, index);
             BaseEntity credit = creditParser.getCurrentBaseEntity();
+
+            BaseEntity creditType = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_type"), new Date());
+
+            creditType.put("code", new BaseValue(batch, index,
+                    new Integer(event.asStartElement().getAttributeByName(new QName("credit_type")).getValue())));
+
             credit.put("credit_type", new BaseValue(batch, index,
-                    event.asStartElement().getAttributeByName(new QName("credit_type")).getValue()));
+                    creditType));
             //System.out.println(credit.toString());
             currentBaseEntity.put("credit", new BaseValue(batch, index, credit));
         } else if(localName.equals("subjects")) {

@@ -12,6 +12,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -28,6 +29,7 @@ import javax.xml.stream.events.XMLEvent;
  * @author k.tulbassiyev
  */
 @Component
+@Scope("prototype")
 public class CreditParser extends BatchParser {
     private Stack stack = new Stack();
 
@@ -58,7 +60,11 @@ public class CreditParser extends BatchParser {
                 currentBaseEntity.put("contract", new BaseValue(batch, index, creditContract));
             } else if(localName.equals("currency")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("currency", new BaseValue(batch, index, event.asCharacters().getData()));
+                BaseEntity currency = new BaseEntity(metaClassRepository.getMetaClass("ref_currency"), new Date());
+
+                currency.put("code", new BaseValue(batch, index, event.asCharacters().getData()));
+
+                currentBaseEntity.put("currency", new BaseValue(batch, index, currency));
             } else if(localName.equals("interest_rate_yearly")) {
                 event = (XMLEvent) xmlReader.next();
                 currentBaseEntity.put("interest_rate_yearly", new BaseValue(batch, index,
@@ -76,13 +82,21 @@ public class CreditParser extends BatchParser {
                     ));
             } else if(localName.equals("credit_purpose")) {
                 event = (XMLEvent) xmlReader.next();
+                BaseEntity creditPurpose = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_purpose"), new Date());
+
+                creditPurpose.put("code", new BaseValue(batch, index, new Integer(event.asCharacters().getData())));
+
                 currentBaseEntity.put("credit_purpose", new BaseValue(batch, index,
-                        event.asCharacters().getData()
+                        creditPurpose
                     ));
             } else if(localName.equals("credit_object")) {
                 event = (XMLEvent) xmlReader.next();
+                BaseEntity creditObject = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_object"), new Date());
+
+                creditObject.put("code", new BaseValue(batch, index, new Integer(event.asCharacters().getData())));
+
                 currentBaseEntity.put("credit_object", new BaseValue(batch, index,
-                        event.asCharacters().getData()
+                        creditObject
                     ));
             } else if(localName.equals("amount")) {
                 event = (XMLEvent) xmlReader.next();
@@ -91,8 +105,12 @@ public class CreditParser extends BatchParser {
                     ));
             } else if(localName.equals("finance_source")) {
                 event = (XMLEvent) xmlReader.next();
+                BaseEntity financeSource = new BaseEntity(metaClassRepository.getMetaClass("ref_finance_source"), new Date());
+
+                financeSource.put("code", new BaseValue(batch, index, new Integer(event.asCharacters().getData())));
+
                 currentBaseEntity.put("finance_source", new BaseValue(batch, index,
-                        event.asCharacters().getData()
+                        financeSource
                     ));
             } else if(localName.equals("has_currency_earn")) {
                 event = (XMLEvent) xmlReader.next();

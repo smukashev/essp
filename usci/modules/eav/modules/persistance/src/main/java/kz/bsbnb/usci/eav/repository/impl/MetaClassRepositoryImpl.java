@@ -57,4 +57,9 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository
 
         cache.put(meta.getClassName(), meta);
     }
+
+    @Override
+    synchronized public void resetCache() {
+        cache.clear();
+    }
 }

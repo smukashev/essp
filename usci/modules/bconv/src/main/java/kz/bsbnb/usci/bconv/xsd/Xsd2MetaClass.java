@@ -83,7 +83,7 @@ public class Xsd2MetaClass
             throw new IllegalArgumentException("No such class: " + metaClassName);
         }
 
-        return (MetaClass)processComplexType("ct_package", ct, 1, "");
+        return (MetaClass)processComplexType(metaClassName, ct, 1, "");
     }
 
     private IMetaType processComplexType(String name, XSComplexType ct, int maxOccurs, String prefix)

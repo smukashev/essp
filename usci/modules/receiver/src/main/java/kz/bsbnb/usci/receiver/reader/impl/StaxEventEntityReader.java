@@ -7,8 +7,8 @@ import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
+import kz.bsbnb.usci.eav.model.json.ContractStatusArrayJModel;
 import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
-import kz.bsbnb.usci.eav.model.json.StatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -135,11 +135,11 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 if(endElement(localName)) return (T) currentContainer;
             } else if(event.isEndDocument()) {
                 logger.info("end document");
-                statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
-                        Global.BATCH_STATUS_COMPLETED, null, new Date()));
+                //statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
+                  //      Global.BATCH_STATUS_COMPLETED, null, new Date()));
 
-                StatusJModel statusJModel = statusSingleton.endBatch(batchId);
-                batchFullJModel.setStatus(statusJModel);
+                //ContractStatusArrayJModel statusJModel = statusSingleton.endBatch(batchId);
+                //batchFullJModel.setStatus(statusJModel);
 
                 couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
             } else {

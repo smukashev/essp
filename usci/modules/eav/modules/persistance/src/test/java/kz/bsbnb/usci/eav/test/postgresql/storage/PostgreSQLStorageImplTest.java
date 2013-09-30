@@ -19,7 +19,7 @@ import static org.junit.Assert.fail;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-@ActiveProfiles({"postgres"})
+@ActiveProfiles({"oracle"})
 public class PostgreSQLStorageImplTest {
 	
 	@Autowired

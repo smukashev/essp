@@ -4,6 +4,7 @@ import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -20,6 +21,7 @@ import java.util.Date;
  * @author k.tulbassiyev
  */
 @Component
+@Scope("prototype")
 public class SubjectPersonDocsParser extends BatchParser {
     public SubjectPersonDocsParser() {
         super();
@@ -38,8 +40,13 @@ public class SubjectPersonDocsParser extends BatchParser {
         } else if(localName.equals("doc")) {
             //ctDoc = new CtDoc();
             //ctDoc.setDocType(attributes.getValue("doc_type"));
+            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), new Date());
+
+            docType.put("code", new BaseValue(batch, index,
+                    new Integer(event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())));
+
             currentBaseEntity.put("doc_type", new BaseValue(batch, index,
-                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
+                    docType));
         } else if(localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
             currentBaseEntity.put("name", new BaseValue(batch, index,
