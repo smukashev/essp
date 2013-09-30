@@ -19,10 +19,11 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import javax.portlet.*;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 
 /**
  * @author abukabayev
@@ -245,10 +246,10 @@ public class MainPortlet extends MVCPortlet {
             for (String attr : metaClass.getAttributeNames()){
                 BaseValueJson baseValueJson = new BaseValueJson();
                 batchJson.setId(baseEntity2.getBaseValue(attr).getBatch().getId());
-                batchJson.setRepDate(baseEntity2.getBaseValue(attr).getBatch().getRepDate());
-                batchJson.setReceiptDate(baseEntity2.getBaseValue(attr).getBatch().getReceiptDate());
+                batchJson.setRepDate((java.sql.Date) baseEntity2.getBaseValue(attr).getBatch().getRepDate());
+                batchJson.setReceiptDate((Timestamp) baseEntity2.getBaseValue(attr).getBatch().getReceiptDate());
                 baseValueJson.setBatch(batchJson);
-                baseValueJson.setRepDate(baseEntity2.getBaseValue(attr).getRepDate());
+                baseValueJson.setRepDate((java.sql.Date) baseEntity2.getBaseValue(attr).getRepDate());
                 baseValueJson.setValue(baseEntity2.getBaseValue(attr).getValue());
                 baseEntityJson.put(metaClass, attr, baseValueJson);
             }

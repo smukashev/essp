@@ -8,6 +8,9 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+
 /**
  * @author abukabayev
  */
@@ -23,7 +26,7 @@ public class GetJsonEntity {
             if(metaType.isComplex()) {
                 if(metaType.isSet()) {
                     BaseSetJson baseSet = getBaseSet((MetaSet) metaType);
-                    entity.put(metaClass,name, new BaseValueJson(getBatch(baseValue.getBatch()), baseValue.getIndex(), baseValue.getRepDate(), baseSet));
+                    entity.put(metaClass,name, new BaseValueJson(getBatch(baseValue.getBatch()), baseValue.getIndex(), (Date) baseValue.getRepDate(), baseSet));
                 } else {
 //                    BaseEntity tmpEntity = generateBaseEntity(batch, ((MetaClass) metaType), index);
 //                    entity.put(name, new BaseValue(batch, index, batch.getRepDate(), tmpEntity));
@@ -34,7 +37,7 @@ public class GetJsonEntity {
 //                    entity.put(name, new BaseValue(batch, index, batch.getRepDate(), baseSet));
                 } else {
                     MetaValue metaValue = (MetaValue) metaType;
-                    entity.put(metaClass, name, new BaseValueJson(getBatch(baseValue.getBatch()), baseValue.getIndex(), baseValue.getRepDate(), baseValue.getValue()));
+                    entity.put(metaClass, name, new BaseValueJson(getBatch(baseValue.getBatch()), baseValue.getIndex(), (Date) baseValue.getRepDate(), baseValue.getValue()));
                 }
             }
         }
@@ -85,8 +88,8 @@ public class GetJsonEntity {
     public BatchJson getBatch(Batch batch){
        BatchJson batchJson = new BatchJson();
         batchJson.setId(batch.getId());
-        batchJson.setReceiptDate(batch.getReceiptDate());
-        batchJson.setRepDate(batch.getRepDate());
+        batchJson.setReceiptDate((Timestamp) batch.getReceiptDate());
+        batchJson.setRepDate((Date) batch.getRepDate());
        return batchJson;
     }
 }
