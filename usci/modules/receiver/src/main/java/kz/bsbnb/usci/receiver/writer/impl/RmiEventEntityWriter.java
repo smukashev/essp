@@ -15,6 +15,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +52,8 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
         Iterator<Object> iter = items.iterator();
 
+        ArrayList<BaseEntity> entitiesToSave = new ArrayList<BaseEntity>(items.size());
+
         while(iter.hasNext()) {
             BaseEntity entity = (BaseEntity)iter.next();
             rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());
@@ -63,12 +66,15 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
                     //System.out.println("Error: " + errorMsg);
                 }
+                if (entity.getValidationErrors().size() == 0) {
+                    entitiesToSave.add(entity);
+                }
 
                 //TODO: fix
                 //iter.remove();
             }
         }
 
-        entityService.process(items);
+        entityService.process(entitiesToSave);
     }
 }
