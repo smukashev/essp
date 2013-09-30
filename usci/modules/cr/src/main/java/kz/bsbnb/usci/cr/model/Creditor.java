@@ -23,6 +23,8 @@ public class Creditor implements Serializable {
 
     private List<Creditor> branchList;
 
+    private SubjectType subjectType;
+
     public Creditor() {
     }
     public long getId() {
@@ -162,5 +164,19 @@ public class Creditor implements Serializable {
     @Override
     public int hashCode() {
         return (int)id;
+    }
+
+    /**
+     * @return the subjectType
+     */
+    public SubjectType getSubjectType() {
+        return subjectType;
+    }
+
+    /**
+     * @param subjectType the subjectType to set
+     */
+    public void setSubjectType(SubjectType subjectType) {
+        this.subjectType = subjectType;
     }
 }

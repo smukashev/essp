@@ -1,0 +1,13 @@
+@import "../reindeer/styles.css";
+.wordwrap-table .v-table-cell-wrapper {
+    /* Do not specify any margins, paddings or borders here */
+    white-space: normal;
+    overflow: hidden;
+}
+.v-table tr .v-table-cell-content .v-button-caption{
+ color:blue; /* color of the link on unselected rows */
+}
+
+.v-table tr.v-selected .v-table-cell-content .v-button-caption{
+ color:white; /* color of the link on selected rows */
+}
