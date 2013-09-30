@@ -24,6 +24,7 @@
         <module>baseentity_portlet</module>
         <module>vaadin-messagebox</module>
         <module>vaadin-filterable-selector</module>
+        <module>credit-registry-administration-portlet</module>
     </modules>
 
     <distributionManagement>
