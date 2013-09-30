@@ -22,6 +22,8 @@
         <module>drools_portlet</module>
         <module>batch_portlet</module>
         <module>baseentity_portlet</module>
+        <module>vaadin-messagebox</module>
+        <module>vaadin-filterable-selector</module>
     </modules>
 
     <distributionManagement>

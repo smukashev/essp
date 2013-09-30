@@ -46,7 +46,7 @@
                             for(ContractStatusArrayJModel cStatus : cStats) {
                                 for (ContractStatusJModel csajm : cStatus.getContractStatuses()) {
                                     out.println("<li>" + csajm.getReceived() + " : " + csajm.getIndex() + " : " +
-                                            csajm.getProtocol() + "</li>");
+                                            csajm.getProtocol() + " : " + csajm.getDescription() + "</li>");
                                 }
                             }
                         } else {
