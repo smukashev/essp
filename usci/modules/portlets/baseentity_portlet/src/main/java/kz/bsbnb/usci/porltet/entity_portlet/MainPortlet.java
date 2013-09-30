@@ -86,6 +86,8 @@ public class MainPortlet extends MVCPortlet {
        /*}catch (Exception e){
            e.printStackTrace();
        }*/
+
+
         super.doView(renderRequest, renderResponse);
     }
 

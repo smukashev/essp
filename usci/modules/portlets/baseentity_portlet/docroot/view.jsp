@@ -34,6 +34,8 @@
 //        JSONeditor.start('tree','jform',"",false);
 //    });
 
+
+
     function ajaxGetMeta(metaid)
     {
         var obj = {};
@@ -52,6 +54,7 @@
             success: function(data){
                 if (data=="error"){
                     alert("Key attribute is wrong");
+                    alert("Something is defenetely wrong and it must be fixed as soon as possible");
                 }
                 else{
                 document.getElementById("formSend").style.display="none";
@@ -207,6 +210,7 @@
                     alert("Successfully added !");
                     location.reload();
 //                    document.getElementById("formSend").style.display="none";
+                    document.getElementById("formSend").style.display="none";
 //                    var str = jQuery.parseJSON(data);
 //                    document.getElementById("treeName").innerHTML="<p>BaseEntity:</p>";
 //                    JSONeditor.start('tree','jform',str,false);
@@ -221,6 +225,12 @@
         dd = dd + "<label><span>Attr_"+count+" name:</span><input type='text' name='name_"+count+"'></label><label><span>Attr_"+count+" value:</span><input type='text' name='value_"+count+"'></label>";
         dd = dd + "<label><span>Type:</span><select name='type_"+count+"'><option>STRING</option><option>BOOLEAN</option><option>DATE '01/01/1990'</option><option>INTEGER</option><option>DOUBLE</option></select></label>";
         dd = dd + "<label><span>isKey:</span><input type='checkbox' name='check_"+count+"' value='key'></label>";
+        document.getElementById('inForm').innerHTML=dd;
+    }
+
+    function addAttribute(){
+        count++;
+        var dd = document.getElementById('inForm').innerHTML;
         document.getElementById('inForm').innerHTML=dd;
     }
 
@@ -249,7 +259,6 @@
                                          </span>
                                          <span class="entry-title" id="metaClassName"> <%= entity.getMeta().getClassName() %> </span>
                                      </a>
-
                                  </li>
                                  <form id="<%=entity.getMeta().getClassName()%>" style="display: none">
                                   <div>
@@ -258,6 +267,7 @@
 
                                     <%if (entity.getMeta().getMetaAttribute(attr).isKey()){%>
                                       <label><span><%=attr%></span>:<input type="text" name="<%=attr%>"> </label>
+
                                      <%}%>
 
                                  <%}%>
@@ -265,7 +275,7 @@
                                     </div>
                                  </form>
                                  <%}}%>
-                               </ul>
+                             </ul>
 
                          </div>
                     </div>
