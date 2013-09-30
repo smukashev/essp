@@ -3,6 +3,12 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownValException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -10,8 +16,10 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.Date;
 
 /**
  *
@@ -39,6 +47,13 @@ public class SubjectOrganizationNamesParser extends BatchParser {
             } else {
                 throw new UnknownValException(localName, attributes.getValue("lang"));
             }*/
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("name1"),new Date());
+            currentBaseEntity.put("lang",new BaseValue(batch,index,
+                    event.asStartElement().getAttributeByName(new QName("lang")).getValue()));
+            event = (XMLEvent) xmlReader.next();
+            BaseSet baseSet = new BaseSet(new MetaValue(DataTypes.STRING));
+            baseSet.put(new BaseValue(batch,index,event.asCharacters().getData()));
+            currentBaseEntity.put("st_string", new BaseValue(batch,index,baseSet));
         } else {
             throw new UnknownTagException(localName);
         }
@@ -51,14 +66,17 @@ public class SubjectOrganizationNamesParser extends BatchParser {
         if(localName.equals("names")) {
             //ctOrganization.setNames(names);
             //xmlReader.setContentHandler(contentHandler);
+            hasMore = false;
             return true;
         } else if(localName.equals("name")) {
             //name.setValue(contents.toString());
             //names.getName().add(name);
+            hasMore = true;
+            return true;
         } else {
             throw new UnknownTagException(localName);
         }
 
-        return false;
+        //return false;
     }
 }

@@ -102,8 +102,10 @@ public class PackageParser extends BatchParser {
                 subjectsParser.parse(xmlReader, batch, index);
                 if (subjectsParser.hasMore()) {
                     BaseEntity subject = subjectsParser.getCurrentBaseEntity();
-                    subjects.put(subject.getMeta().getClassName(),
-                            new BaseValue(batch, index, subject));
+                    if (subject != null) {
+                        subjects.put(subject.getMeta().getClassName(),
+                                new BaseValue(batch, index, subject));
+                    }
                 } else {
                     break;
                 }
@@ -111,9 +113,20 @@ public class PackageParser extends BatchParser {
 
             currentBaseEntity.put("subjects", new BaseValue(batch, index, subjects));
         } else if(localName.equals("pledges")) {
-            pledgesParser.parse(xmlReader, batch, index);
+            //pledgesParser.parse(xmlReader, batch, index);
+
+            BaseSet pledges = new BaseSet(metaClassRepository.getMetaClass("pledge"));
+            while(true){
+               pledgesParser.parse(xmlReader,batch,index);
+               if(pledgesParser.hasMore()){
+                  pledges.put(new BaseValue(batch,index,pledgesParser.getCurrentBaseEntity()));
+               } else break;
+            }
+            currentBaseEntity.put("pledges",new BaseValue(batch,index,pledges));
+
         } else if(localName.equals("change")) {
             changeParser.parse(xmlReader, batch, index);
+            currentBaseEntity.put("change",new BaseValue(batch,index,changeParser.getCurrentBaseEntity()));
         } else {
             throw new UnknownTagException(localName);
         }

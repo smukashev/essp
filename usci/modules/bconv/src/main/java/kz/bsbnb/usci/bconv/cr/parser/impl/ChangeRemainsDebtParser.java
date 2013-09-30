@@ -2,9 +2,13 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.Date;
+
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownValException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -27,7 +31,19 @@ public class ChangeRemainsDebtParser extends BatchParser {
     public ChangeRemainsDebtParser() {
         super();
     }
-    
+
+    private BaseEntity fieldCurrent;
+    private BaseEntity fieldPastDue;
+    private BaseEntity fieldWriteOf;
+
+    @Override
+    public void init() {
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("debt1"),new Date());
+        fieldCurrent = new BaseEntity(metaClassRepository.getMetaClass("current"),new Date());
+        fieldPastDue = new BaseEntity(metaClassRepository.getMetaClass("pastdue"),new Date());
+        fieldWriteOf = new BaseEntity(metaClassRepository.getMetaClass("write_off"),new Date());
+    }
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("debt")) {
@@ -41,11 +57,56 @@ public class ChangeRemainsDebtParser extends BatchParser {
             //ctRemainsTypeDebtWriteOff = new CtRemainsTypeDebtWriteOff();
             debtWay = localName;
         } else if(localName.equals("value")) {
+            event = (XMLEvent) xmlReader.next();
+            BaseValue baseValue = new BaseValue(batch,index,new Double(event.asCharacters().getData()));
+            if(debtWay.equals("current")){
+                fieldCurrent.put("value",baseValue);
+            }else if(debtWay.equals("pastdue")){
+                fieldPastDue.put("value",baseValue);
+            }else if(debtWay.equals("write_off")){
+                fieldWriteOf.put("value",baseValue);
+            }
         } else if(localName.equals("value_currency")) {
+            event = (XMLEvent) xmlReader.next();
+            BaseValue baseValue = new BaseValue(batch,index,new Double(event.asCharacters().getData()));
+            if(debtWay.equals("current")){
+                fieldCurrent.put("value_currency",baseValue);
+            }else if(debtWay.equals("pastdue")){
+                fieldPastDue.put("value_currency",baseValue);
+            }else if(debtWay.equals("write_off")){
+                fieldWriteOf.put("value_currency",baseValue);
+            }
         } else if(localName.equals("balance_account")) {
+            event = (XMLEvent) xmlReader.next();
+            BaseValue baseValue = new BaseValue(batch,index,new String(event.asCharacters().getData()));
+            if(debtWay.equals("current")){
+                fieldCurrent.put("balance_account",baseValue);
+            }else if(debtWay.equals("pastdue")){
+                fieldPastDue.put("balance_account",baseValue);
+            }else if(debtWay.equals("write_off")){
+                fieldWriteOf.put("balance_account",baseValue);
+            }
         } else if(localName.equals("open_date")) {
+            event = (XMLEvent) xmlReader.next();
+            try{
+            fieldPastDue.put("open_date",new BaseValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
+            }catch(ParseException e){
+                System.out.println(e.getMessage());
+            }
         } else if(localName.equals("close_date")) {
+            event = (XMLEvent) xmlReader.next();
+            try {
+                fieldPastDue.put("close_date",new BaseValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
+            } catch (ParseException e) {
+                System.out.println(e.getMessage());
+            }
         } else if(localName.equals("date")) {
+            event = (XMLEvent) xmlReader.next();
+            try {
+                fieldWriteOf.put("date",new BaseValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
+            } catch (ParseException e) {
+                System.out.println(e.getMessage());
+            }
         } else {
             throw new UnknownTagException(localName);
         }
@@ -79,10 +140,13 @@ public class ChangeRemainsDebtParser extends BatchParser {
             } else if(localName.equals("value_currency")) {
                 if(debtWay.equals("current")) {
                     //ctRemainsTypeCurrent.setValueCurrency(new BigDecimal(contents.toString()));
+                    currentBaseEntity.put("current",new BaseValue(batch,index,fieldCurrent));
                 } else if(debtWay.equals("pastdue")) {
                     //ctRemainsTypePastdue.setValueCurrency(new BigDecimal(contents.toString()));
+                    currentBaseEntity.put("pastdue",new BaseValue(batch,index,fieldPastDue));
                 } else if(debtWay.equals("write_off")) {
                     //ctRemainsTypeDebtWriteOff.setValueCurrency(new BigDecimal(contents.toString()));
+                    currentBaseEntity.put("write_off",new BaseValue(batch,index,fieldWriteOf));
                 } else {
                     //throw new UnknownValException(localName, contents.toString());
                 }

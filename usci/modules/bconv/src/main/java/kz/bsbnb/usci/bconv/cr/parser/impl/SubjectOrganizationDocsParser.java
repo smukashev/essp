@@ -1,10 +1,13 @@
 package kz.bsbnb.usci.bconv.cr.parser.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -12,6 +15,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
@@ -25,13 +29,26 @@ public class SubjectOrganizationDocsParser extends BatchParser {
     public SubjectOrganizationDocsParser() {
         super();
     }
-    
+
+    @Override
+    public void init() {
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("doc3"),new Date());
+    }
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("docs")) {
         } else if(localName.equals("doc")) {
             //ctDoc = new CtDoc();
             //ctDoc.setDocType(attributes.getValue("doc_type"));
+            //my code
+
+            BaseEntity organizationDoc = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),new Date());
+            organizationDoc.put("code",new BaseValue(batch,index,
+                    new Integer(event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())));
+
+            currentBaseEntity.put("doc_type",new BaseValue(batch,index,organizationDoc));
+
         } else if(localName.equals("name")) {
         } else if(localName.equals("no")) {
         } else {
@@ -58,9 +75,12 @@ public class SubjectOrganizationDocsParser extends BatchParser {
             
             ctOrganization.setDocs(docs);*/
             //xmlReader.setContentHandler(contentHandler);
+            hasMore = false;
             return true;
         } else if(localName.equals("doc")) {
             //docs.getDoc().add(ctDoc);
+            hasMore = true;
+            return true;
         } else if(localName.equals("name")) {
             /*if(ctDoc.getDocType().equals(DocTypes.OTHER.getCode()))
                 ctDoc.setName(contents.toString());*/

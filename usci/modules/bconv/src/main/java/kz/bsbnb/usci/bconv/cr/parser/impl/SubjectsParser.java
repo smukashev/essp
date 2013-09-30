@@ -48,6 +48,7 @@ public class SubjectsParser extends BatchParser {
             currentBaseEntity = subjectPersonParser.getCurrentBaseEntity();
         } else if(localName.equals("organization")) {
             subjectOrganizationParser.parse(xmlReader, batch, index);
+            currentBaseEntity = subjectOrganizationParser.getCurrentBaseEntity();
         } else if(localName.equals("creditor")) {
             subjectCreditorParser.parse(xmlReader, batch, index);
         } else {

@@ -2,9 +2,13 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.Date;
+
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownValException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -27,7 +31,19 @@ public class ChangeRemainsInterestParser extends BatchParser {
     public ChangeRemainsInterestParser() {
         super();
     }
-    
+
+    private BaseEntity fieldCurrent;
+    private BaseEntity fieldPastDue;
+    private BaseEntity fieldWriteOf;
+
+    @Override
+    public void init() {
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("interest1"),new Date());
+        fieldCurrent = new BaseEntity(metaClassRepository.getMetaClass("current"),new Date());
+        fieldPastDue = new BaseEntity(metaClassRepository.getMetaClass("pastdue"),new Date());
+        fieldWriteOf = new BaseEntity(metaClassRepository.getMetaClass("write_off"),new Date());
+    }
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("interest")) {
@@ -41,11 +57,56 @@ public class ChangeRemainsInterestParser extends BatchParser {
             //ctRemainsTypeInterestWriteOff = new CtRemainsTypeInterestWriteOff();
             interestWay = localName;
         } else if(localName.equals("value")) {
+            event = (XMLEvent) xmlReader.next();
+            BaseValue baseValue = new BaseValue(batch,index,new Double(event.asCharacters().getData()));
+            if(interestWay.equals("current")){
+                fieldCurrent.put("value",baseValue);
+            }else if(interestWay.equals("pastdue")){
+                fieldPastDue.put("value",baseValue);
+            }else if(interestWay.equals("write_off")){
+                fieldWriteOf.put("value",baseValue);
+            }
         } else if(localName.equals("value_currency")) {
+            event = (XMLEvent) xmlReader.next();
+            BaseValue baseValue = new BaseValue(batch,index,new Double(event.asCharacters().getData()));
+            if(interestWay.equals("current")){
+                fieldCurrent.put("value_currency",baseValue);
+            }else if(interestWay.equals("pastdue")){
+                fieldPastDue.put("value_currency",baseValue);
+            }else if(interestWay.equals("write_off")){
+                fieldWriteOf.put("value_currency",baseValue);
+            }
         } else if(localName.equals("balance_account")) {
+            event = (XMLEvent) xmlReader.next();
+            BaseValue baseValue = new BaseValue(batch,index,new String(event.asCharacters().getData()));
+            if(interestWay.equals("current")){
+                fieldCurrent.put("balance_account",baseValue);
+            }else if(interestWay.equals("pastdue")){
+                fieldPastDue.put("balance_account",baseValue);
+            }else if(interestWay.equals("write_off")){
+                fieldWriteOf.put("balance_account",baseValue);
+            }
         } else if(localName.equals("open_date")) {
+            event = (XMLEvent) xmlReader.next();
+            try{
+                fieldPastDue.put("open_date",new BaseValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
+            }catch(ParseException e){
+                System.out.println(e.getMessage());
+            }
         } else if(localName.equals("close_date")) {
+            event = (XMLEvent) xmlReader.next();
+            try {
+                fieldPastDue.put("close_date",new BaseValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
+            } catch (ParseException e) {
+                System.out.println(e.getMessage());
+            }
         } else if(localName.equals("date")) {
+            event = (XMLEvent) xmlReader.next();
+            try {
+                fieldWriteOf.put("date",new BaseValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
+            } catch (ParseException e) {
+                System.out.println(e.getMessage());
+            }
         } else {
             throw new UnknownTagException(localName);
         }
@@ -62,10 +123,13 @@ public class ChangeRemainsInterestParser extends BatchParser {
                 return true;
             } else if(localName.equals("current")) {
                 //interest.setCurrent(ctRemainsTypeCurrent);
+                currentBaseEntity.put("current",new BaseValue(batch,index,fieldCurrent));
             } else if(localName.equals("pastdue")) {
                 //interest.setPastdue(ctRemainsTypePastdue);
+                currentBaseEntity.put("pastdue",new BaseValue(batch,index,fieldPastDue));
             } else if(localName.equals("write_off")) {
                 //interest.setWriteOff(ctRemainsTypeInterestWriteOff);
+                currentBaseEntity.put("write_off",new BaseValue(batch,index,fieldWriteOf));
             } else if(localName.equals("value")) {
                 if(interestWay.equals("current")) {
                     //ctRemainsTypeCurrent.setValue(new BigDecimal(contents.toString()));

@@ -3,6 +3,8 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownValException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -12,6 +14,7 @@ import org.xml.sax.XMLReader;
 
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.Date;
 
 /**
  *
@@ -39,9 +42,19 @@ public class SubjectOrganizationHeadNamesParser extends BatchParser {
             } else {
                 throw new UnknownValException(localName, attributes.getValue("lang"));
             } */
+            //my code
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("name2"),new Date());
+
+
         } else if(localName.equals("firstname")) {
+             event = (XMLEvent) xmlReader.next();
+             currentBaseEntity.put("firstname", new BaseValue(batch,index,  event.asCharacters().getData()));
         } else if(localName.equals("lastname")) {
+            event = (XMLEvent) xmlReader.next();
+            currentBaseEntity.put("lastname", new BaseValue(batch,index,  event.asCharacters().getData()));
         } else if(localName.equals("middlename")) {
+            event = (XMLEvent) xmlReader.next();
+            currentBaseEntity.put("middlename", new BaseValue(batch,index,  event.asCharacters().getData()));
         } else {
             throw new UnknownTagException(localName);
         }
@@ -54,8 +67,11 @@ public class SubjectOrganizationHeadNamesParser extends BatchParser {
         if(localName.equals("names")) {
             //ctPersonHead.setNames(names);
             //xmlReader.setContentHandler(contentHandler);
+            hasMore = false;
             return true;
         } else if(localName.equals("name")) {
+            hasMore = true;
+            return true;
             //names.getName().add(name);
         } else if(localName.equals("firstname")) {
             //name.setFirstname(contents.toString());

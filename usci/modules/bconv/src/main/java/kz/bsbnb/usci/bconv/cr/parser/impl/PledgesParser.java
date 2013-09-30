@@ -2,6 +2,8 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -9,9 +11,11 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  *
@@ -23,17 +27,29 @@ public class PledgesParser extends BatchParser {
     public PledgesParser() {
         super();
     }
-    
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("pledges")) {
         } else if(localName.equals("pledge")) {
             //ctPledge = new CtPledge();
+
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("pledge"), new Date());
+
+
         } else if(localName.equals("pledge_type")) {
+            event = (XMLEvent) xmlReader.next();
+            BaseEntity pledgeType = new BaseEntity(metaClassRepository.getMetaClass("ref_pledge_type"),new Date());
+            pledgeType.put("code",new BaseValue(batch,index,new Integer(event.asCharacters().getData())));
+            currentBaseEntity.put("pledge_type",new BaseValue(batch,index,pledgeType));
         } else if(localName.equals("contract")) {
             //ctContractBase = new CtContractBase();
         } else if(localName.equals("no")) {
+            event = (XMLEvent) xmlReader.next();
+            currentBaseEntity.put("contract",new BaseValue(batch,index,event.asCharacters().getData()));
         } else if(localName.equals("value")) {
+            event = (XMLEvent) xmlReader.next();
+            currentBaseEntity.put("value",new BaseValue(batch,index,new Double(event.asCharacters().getData())));
         } else {
             throw new UnknownTagException(localName);
         }
@@ -46,9 +62,12 @@ public class PledgesParser extends BatchParser {
         if(localName.equals("pledges")) {
             //currentPackage.setPledges(pledges);
             //xmlReader.setContentHandler(contentHandler);
+            hasMore = false;
             return true;
         } else if(localName.equals("pledge")) {
             //pledges.getPledge().add(ctPledge);
+            hasMore = true;
+            return true;
         } else if(localName.equals("pledge_type")) {
             //ctPledge.setPledgeType(contents.toString());
         } else if(localName.equals("contract")) {

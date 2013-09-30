@@ -1,8 +1,12 @@
 package kz.bsbnb.usci.bconv.cr.parser.impl;
 
 import java.math.BigDecimal;
+import java.util.Date;
+
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -39,23 +43,39 @@ public class ChangeRemainsParser extends BatchParser {
     public ChangeRemainsParser() {
         super();
     }
-    
+
+    @Override
+    public void init() {
+        currentBaseEntity= new BaseEntity(metaClassRepository.getMetaClass("remains"),new Date());
+    }
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("remains")) {
         } else if(localName.equals("debt")) {
             changeRemainsDebtParser.parse(xmlReader, batch, index);
+            currentBaseEntity.put("debt",new BaseValue(batch,index,changeRemainsDebtParser.getCurrentBaseEntity()));
         } else if(localName.equals("interest")) {
             changeRemainsInterestParser.parse(xmlReader, batch, index);
+            currentBaseEntity.put("interest", new BaseValue(batch,index,
+                    changeRemainsInterestParser.getCurrentBaseEntity()));
         } else if(localName.equals("discount")) {
             changeRemainsDiscountParser.parse(xmlReader, batch, index);
+            currentBaseEntity.put("discount",new BaseValue(batch,index,
+                    changeRemainsDiscountParser.getCurrentBaseEntity()));
         } else if(localName.equals("correction")) {
             changeRemainsCorrectionParser.parse(xmlReader, batch, index);
+            currentBaseEntity.put("discount",new BaseValue(batch,index,
+                    changeRemainsCorrectionParser.getCurrentBaseEntity()));
         } else if(localName.equals("discounted_value")) {
             //ctRemainsTypeDiscountedValue = new CtRemainsTypeDiscountedValue();
+            event = (XMLEvent) xmlReader.next();
+            currentBaseEntity.put("discounted_value",new BaseValue(batch, index,
+                    new Double(event.asCharacters().getData())));
         } else if(localName.equals("value")) {
         } else if(localName.equals("limit")) {
             changeRemainsLimitParser.parse(xmlReader, batch, index);
+            currentBaseEntity.put("limit",new BaseValue(batch,index,changeRemainsLimitParser.getCurrentBaseEntity()));
         } else {
             throw new UnknownTagException(localName);
         }
