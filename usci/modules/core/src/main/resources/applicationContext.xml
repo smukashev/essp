@@ -43,4 +43,18 @@
         <property name="registryPort" value="1099"/>
     </bean>
 
+    <bean id="portalUserBeanRemoteBusiness" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="portalUserBeanRemoteBusiness"/>
+        <property name="service" ref="portalUserBeanRemoteBusinessImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
+    <bean id="remoteCreditorBusiness" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="remoteCreditorBusiness"/>
+        <property name="service" ref="remoteCreditorBusinessImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.RemoteCreditorBusiness"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
 </beans>

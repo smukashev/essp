@@ -1,14 +1,12 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
-import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.util.DateUtils;
+import kz.bsbnb.usci.eav.util.DataUtils;
 
 import java.text.ParseException;
 import java.util.*;
@@ -268,8 +266,8 @@ public class BaseSet extends BaseContainer implements IBaseSet
 
                     if (date)
                     {
-                        DateUtils.toBeginningOfTheDay((Date)thisObject);
-                        DateUtils.toBeginningOfTheDay((Date)thatObject);
+                        DataUtils.toBeginningOfTheDay((Date) thisObject);
+                        DataUtils.toBeginningOfTheDay((Date) thatObject);
                     }
 
                     if (thisObject.equals(thatObject))

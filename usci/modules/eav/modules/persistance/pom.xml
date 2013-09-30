@@ -24,11 +24,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>9.1-901.jdbc4</version>
-        </dependency>
-        <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
             <version>1.4</version>
@@ -54,6 +49,11 @@
             <version>1.1</version>
         </dependency>
         <dependency>
+            <groupId>kz.bsbnb.usci.eav</groupId>
+            <artifactId>tool</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>14.0.1</version>
@@ -77,36 +77,6 @@
                     </includes>
                 </configuration>
             </plugin>-->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-
-                <dependencies>
-                    <dependency>
-                        <groupId>kz.bsbnb.usci.eav</groupId>
-                        <artifactId>tool</artifactId>
-                        <version>0.0.1-SNAPSHOT</version>
-                    </dependency>
-                </dependencies>
-
-                <configuration>
-                    <mainClass>kz.bsbnb.usci.tool.ddl.DDLHelper</mainClass>
-                    <arguments>
-                        <argument>apply</argument>
-                        <argument>${basedir}/src/main/resources/tmpl/create_db.ddl</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
@@ -180,6 +150,13 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <version>9.1-901.jdbc4</version>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -242,6 +219,50 @@
                                     <includes>.*</includes>
                                     <excludes></excludes>
                                     <inputSchema>${jooq.db.schema}</inputSchema>
+                                    <customTypes>
+                                        <!--<customType>
+                                            <name>java.lang.Long</name>
+                                            <converter>kz.bsbnb.usci.tool.jooq.OracleLongConverter</converter>
+                                        </customType>-->
+                                        <!--<customType>
+                                            <name>java.lang.Boolean</name>
+                                            <converter>kz.bsbnb.usci.tool.jooq.OracleBooleanConverter</converter>
+                                        </customType>-->
+                                        <customType>
+                                            <name>java.lang.Integer</name>
+                                            <converter>kz.bsbnb.usci.tool.jooq.OracleIntegerConverter</converter>
+                                        </customType>
+                                        <!--<customType>
+                                            <name>java.sql.Timestamp</name>
+                                            <converter>kz.bsbnb.usci.tool.jooq.OracleTimestampConverter</converter>
+                                        </customType>-->
+                                        <customType>
+                                            <name>java.lang.Double</name>
+                                            <converter>kz.bsbnb.usci.tool.jooq.OracleDoubleConverter</converter>
+                                        </customType>
+                                    </customTypes>
+                                    <forcedTypes>
+                                        <!--<forcedType>
+                                            <name>java.lang.Long</name>
+                                            <expressions>(.*\..*_id)|(.*\.id)|(.*\..*_count)|(.*\.index_)|(.*\.level_)</expressions>
+                                        </forcedType>-->
+                                        <!--<forcedType>
+                                            <name>java.lang.Boolean</name>
+                                            <expressions>(.*boolean.*\.value)|(.*\.is_closed)|(.*\.is_last)|(.*\.is_key)|(.*\.is_nullable)|(.*\.is_immutable)|(.*\.is_reference)|(.*\.is_disabled)</expressions>
+                                        </forcedType>-->
+                                        <forcedType>
+                                            <name>java.lang.Integer</name>
+                                            <expressions>(.*\.container_type)|(.*integer.*\.value)</expressions>
+                                        </forcedType>
+                                        <!--<forcedType>
+                                            <name>java.sql.Timestamp</name>
+                                            <expressions>.*\.begin_date</expressions>
+                                        </forcedType>-->
+                                        <forcedType>
+                                            <name>java.lang.Double</name>
+                                            <expressions>(.*double.*\.value)</expressions>
+                                        </forcedType>
+                                    </forcedTypes>
                                 </database>
                                 <target>
                                     <packageName>kz.bsbnb.eav.persistance.generated</packageName>
@@ -250,11 +271,54 @@
                             </generator>
                         </configuration>
                     </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.2.1</version>
+
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+
+                        <dependencies>
+                            <dependency>
+                                <groupId>kz.bsbnb.usci.eav</groupId>
+                                <artifactId>tool</artifactId>
+                                <version>0.0.1-SNAPSHOT</version>
+                            </dependency>
+                        </dependencies>
+
+                        <configuration>
+                            <mainClass>kz.bsbnb.usci.tool.ddl.DDLHelper</mainClass>
+                            <arguments>
+                                <argument>apply</argument>
+                                <argument>${basedir}/src/main/resources/tmpl/create_db.ddl</argument>
+                            </arguments>
+                            <systemProperties>
+                                <systemProperty>
+                                    <key>spring.profiles.active</key>
+                                    <value>postgres</value>
+                                </systemProperty>
+                            </systemProperties>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
         <profile>
             <id>oracle</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle</groupId>
+                    <artifactId>ojdbc6</artifactId>
+                    <version>11.2.0.3.0</version>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -288,7 +352,7 @@
                     <plugin>
                         <groupId>org.jooq</groupId>
                         <artifactId>jooq-codegen-maven</artifactId>
-                        <version>3.0.0-RC2</version>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -317,12 +381,92 @@
                                     <includes>.*</includes>
                                     <excludes></excludes>
                                     <inputSchema>${jooq.db.schema}</inputSchema>
+                                    <customTypes>
+                                        <!--<customType>
+                                            <name>java.lang.Long</name>
+                                            <converter>kz.bsbnb.usci.tool.jooq.OracleLongConverter</converter>
+                                        </customType>-->
+                                        <!--<customType>
+                                            <name>java.lang.Boolean</name>
+                                            <converter>kz.bsbnb.usci.tool.jooq.OracleBooleanConverter</converter>
+                                        </customType>-->
+                                        <customType>
+                                            <name>java.lang.Integer</name>
+                                            <converter>kz.bsbnb.usci.tool.jooq.OracleIntegerConverter</converter>
+                                        </customType>
+                                        <customType>
+                                            <name>java.lang.Double</name>
+                                            <converter>kz.bsbnb.usci.tool.jooq.OracleDoubleConverter</converter>
+                                        </customType>
+                                        <customType>
+                                            <name>java.sql.Timestamp</name>
+                                            <converter>kz.bsbnb.usci.tool.jooq.OracleTimestampConverter</converter>
+                                        </customType>
+                                    </customTypes>
+                                    <forcedTypes>
+                                        <!--<forcedType>
+                                            <name>java.lang.Long</name>
+                                            <expressions>(.*\..*_ID)|(.*\.ID)|(.*\..*_COUNT)|(.*\.INDEX_)|(.*\.LEVEL_)</expressions>
+                                        </forcedType>-->
+                                        <!--<forcedType>
+                                            <name>java.lang.Boolean</name>
+                                            <expressions>(.*BOOLEAN.*\.VALUE)|(.*\.IS_CLOSED)|(.*\.IS_LAST)|(.*\.IS_KEY)|(.*\.IS_NULLABLE)|(.*\.IS_IMMUTABLE)|(.*\.IS_REFERENCE)|(.*\.IS_DISABLED)</expressions>
+                                        </forcedType>-->
+                                        <forcedType>
+                                            <name>java.lang.Integer</name>
+                                            <expressions>(.*\.CONTAINER_TYPE)|(.*INTEGER.*\.VALUE)</expressions>
+                                        </forcedType>
+                                        <forcedType>
+                                            <name>java.lang.Double</name>
+                                            <expressions>(.*DOUBLE.*\.VALUE)</expressions>
+                                        </forcedType>
+                                        <forcedType>
+                                            <name>java.sql.Timestamp</name>
+                                            <expressions>.*\.RECEIPT_DATE</expressions>
+                                        </forcedType>
+                                    </forcedTypes>
                                 </database>
                                 <target>
                                     <packageName>kz.bsbnb.eav.persistance.generated</packageName>
                                     <directory>${basedir}/target/generated-sources/jooq</directory>
                                 </target>
                             </generator>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.2.1</version>
+
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+
+                        <dependencies>
+                            <dependency>
+                                <groupId>kz.bsbnb.usci.eav</groupId>
+                                <artifactId>tool</artifactId>
+                                <version>0.0.1-SNAPSHOT</version>
+                            </dependency>
+                        </dependencies>
+
+                        <configuration>
+                            <mainClass>kz.bsbnb.usci.tool.ddl.DDLHelper</mainClass>
+                            <arguments>
+                                <argument>apply</argument>
+                                <argument>${basedir}/src/main/resources/tmpl/create_db.ddl</argument>
+                            </arguments>
+                            <systemProperties>
+                                <systemProperty>
+                                    <key>spring.profiles.active</key>
+                                    <value>oracle</value>
+                                </systemProperty>
+                            </systemProperties>
                         </configuration>
                     </plugin>
                 </plugins>

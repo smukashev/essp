@@ -32,7 +32,7 @@ import java.util.Calendar;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
-@ActiveProfiles({"postgres"})
+@ActiveProfiles({"oracle"})
 public class BasicBaseEntitySearcherTest extends GenericTestCase
 {
 

@@ -10,12 +10,11 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.util.DateUtils;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -80,7 +79,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     public BaseEntity(MetaClass meta, Date reportDate)
     {
         Date newReportDate = (Date)reportDate.clone();
-        DateUtils.toBeginningOfTheDay(newReportDate);
+        DataUtils.toBeginningOfTheDay(newReportDate);
 
         this.reportDate = newReportDate;
         this.meta = meta;
@@ -101,7 +100,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         else
         {
             Date newReportDate = (Date)reportDate.clone();
-            DateUtils.toBeginningOfTheDay(newReportDate);
+            DataUtils.toBeginningOfTheDay(newReportDate);
 
             this.reportDate = newReportDate;
         }
@@ -168,7 +167,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         {
             throw new IllegalStateException("The maximum report date can not be equal to null.");
         }
-        return DateUtils.compareBeginningOfTheDay(reportDate, maxReportDate) == 0;
+        return DataUtils.compareBeginningOfTheDay(reportDate, maxReportDate) == 0;
     }
 
     @Override
@@ -184,7 +183,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         {
             throw new IllegalStateException("The minimum report date can not be equal to null.");
         }
-        return DateUtils.compareBeginningOfTheDay(reportDate, minReportDate) == 0;
+        return DataUtils.compareBeginningOfTheDay(reportDate, minReportDate) == 0;
     }
 
     /**
@@ -451,7 +450,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     public void setReportDate(Date reportDate) {
         Date newReportDate = (Date)reportDate.clone();
-        DateUtils.toBeginningOfTheDay(newReportDate);
+        DataUtils.toBeginningOfTheDay(newReportDate);
 
         this.reportDate = newReportDate;
         this.availableReportDates.add(newReportDate);
@@ -508,8 +507,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                 MetaValue metaValue = (MetaValue)metaType;
                 if (metaValue.getTypeCode().equals(DataTypes.DATE))
                 {
-                    DateUtils.toBeginningOfTheDay((Date)thisObject);
-                    DateUtils.toBeginningOfTheDay((Date)thatObject);
+                    DataUtils.toBeginningOfTheDay((Date) thisObject);
+                    DataUtils.toBeginningOfTheDay((Date) thatObject);
                 }
             }
 
@@ -592,7 +591,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
             if (type.isSet())
             {
                 if (arrayIndexes != null) {
-                    valueOut = ((BaseSet)valueOut).getEl(arrayIndexes);
+                    valueOut = ((BaseSet)valueOut).getEl(arrayIndexes.replaceAll("->", "."));
                     type = ((MetaSet)type).getMemberType();
                 } else {
                     return valueOut;
@@ -618,17 +617,34 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     {
         for (String fieldName : params.keySet())
         {
-            IMetaType mtype = meta.getMemberType(fieldName);
+            String ownFieldName;
+            String innerPath = null;
+            if (fieldName.contains(".")) {
+                ownFieldName = fieldName.substring(0, fieldName.indexOf("."));
+                innerPath = fieldName.substring(fieldName.indexOf(".") + 1);
+            } else {
+                ownFieldName = fieldName;
+            }
+
+            //System.out.println(ownFieldName + " " + innerPath);
+
+
+            IMetaType mtype = meta.getMemberType(ownFieldName);
 
             if (mtype == null)
                 throw new IllegalArgumentException("No such field: " + fieldName);
 
-            if (mtype.isComplex() || mtype.isSet())
-                throw new IllegalArgumentException("Can't handle complex fields or arrays: " + fieldName);
+            if (mtype.isSet())
+                throw new IllegalArgumentException("Can't handle arrays: " + fieldName);
 
-            BaseValue bvalue = (BaseValue)getBaseValue(fieldName);
+            BaseValue bvalue = (BaseValue)getBaseValue(ownFieldName);
 
-            if (!bvalue.equalsToString(params.get(fieldName), ((MetaValue)mtype).getTypeCode()))
+            if (mtype.isComplex()) {
+                bvalue = (BaseValue)((BaseEntity)(bvalue.getValue())).getBaseValue(innerPath);
+                mtype = ((MetaClass)mtype).getMemberType(innerPath);
+            }
+
+            if (!((BaseValue)bvalue).equalsToString(params.get(fieldName), ((MetaValue)mtype).getTypeCode()))
                 return false;
         }
 
@@ -827,7 +843,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                     if (actual_boolean_value == Boolean.parseBoolean(strValue)) return true;
                     break;
                 case DATE:
-                    java.sql.Date actual_date_value = DateUtils.convert((java.util.Date)value.getValue());
+                    java.sql.Date actual_date_value = DataUtils.convert((java.util.Date) value.getValue());
                     if (actual_date_value == dateFormat.parse(strValue)) return true;
                     break;
                 case DOUBLE:

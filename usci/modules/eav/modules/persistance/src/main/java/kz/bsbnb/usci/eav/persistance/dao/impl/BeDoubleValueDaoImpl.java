@@ -1,8 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.persistance.dao.IBeBooleanValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeDoubleValueDao;
-import kz.bsbnb.usci.eav.util.DateUtils;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,10 +36,10 @@ public class BeDoubleValueDaoImpl extends AbstractBeValueDaoImpl implements IBeD
                 .set(EAV_BE_DOUBLE_VALUES.BATCH_ID, batchId)
                 .set(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID, metaAttributeId)
                 .set(EAV_BE_DOUBLE_VALUES.INDEX_, index)
-                .set(EAV_BE_DOUBLE_VALUES.REPORT_DATE, DateUtils.convert(reportDate))
+                .set(EAV_BE_DOUBLE_VALUES.REPORT_DATE, DataUtils.convert(reportDate))
                 .set(EAV_BE_DOUBLE_VALUES.VALUE, (Double)value)
-                .set(EAV_BE_DOUBLE_VALUES.IS_CLOSED, closed)
-                .set(EAV_BE_DOUBLE_VALUES.IS_LAST, last);
+                .set(EAV_BE_DOUBLE_VALUES.IS_CLOSED, DataUtils.convert(closed))
+                .set(EAV_BE_DOUBLE_VALUES.IS_LAST, DataUtils.convert(last));
 
         logger.debug(insert.toString());
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -129,9 +128,9 @@ public class BeDoubleValueDaoImpl extends AbstractBeValueDaoImpl implements IBeD
         {
             updateConditionStep = updateConditionStep == null ?
                     updateSetMoreStep.where(tableOfValues.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE)
-                            .equal(DateUtils.convert((Date) conditions.get("report_date")))) :
+                            .equal(DataUtils.convert((Date) conditions.get("report_date")))) :
                     updateConditionStep.and(tableOfValues.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE)
-                            .equal(DateUtils.convert((Date) conditions.get("report_date"))));
+                            .equal(DataUtils.convert((Date) conditions.get("report_date"))));
         }
 
         logger.debug(updateConditionStep.toString());

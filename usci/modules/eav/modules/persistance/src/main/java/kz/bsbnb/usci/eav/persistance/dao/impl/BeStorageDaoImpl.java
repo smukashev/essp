@@ -124,13 +124,13 @@ public class BeStorageDaoImpl implements IBeStorageDao {
                     returning = "baseEntity")
     public void refresh(JoinPoint joinPoint, IBaseEntity baseEntity)
     {
-        logger.error("*******************************************************************************");
-        logger.error("Join point kind : " + joinPoint.getKind());
-        logger.error("Signature declaring type : "+ joinPoint.getSignature().getDeclaringTypeName());
-        logger.error("Signature name : " + joinPoint.getSignature().getName());
-        logger.error("Argument count : " + joinPoint.getArgs().length);
-        logger.error("Target class : "+ joinPoint.getTarget().getClass().getName());
-        logger.error("This class : " + joinPoint.getThis().getClass().getName());
+        //logger.error("*******************************************************************************");
+        //logger.error("Join point kind : " + joinPoint.getKind());
+        //logger.error("Signature declaring type : "+ joinPoint.getSignature().getDeclaringTypeName());
+        //logger.error("Signature name : " + joinPoint.getSignature().getName());
+        //logger.error("Argument count : " + joinPoint.getArgs().length);
+        //logger.error("Target class : "+ joinPoint.getTarget().getClass().getName());
+        //logger.error("This class : " + joinPoint.getThis().getClass().getName());
     }
 
     @Around("execution(* kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLBaseEntityDaoImpl.update(..))")

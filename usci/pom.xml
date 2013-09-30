@@ -20,6 +20,7 @@
       <module>modules/portlets</module>
       <module>modules/bconv</module>
       <module>modules/cli</module>
+      <module>modules/cr</module>
       <module>modules/parent</module>
   </modules>
 

@@ -1,13 +1,14 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
 import kz.bsbnb.usci.eav.persistance.dao.IBeDateValueDao;
-import kz.bsbnb.usci.eav.util.DateUtils;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
 
@@ -36,10 +37,10 @@ public class BeDateValueDaoImpl extends AbstractBeValueDaoImpl implements IBeDat
                 .set(EAV_BE_DATE_VALUES.BATCH_ID, batchId)
                 .set(EAV_BE_DATE_VALUES.ATTRIBUTE_ID, metaAttributeId)
                 .set(EAV_BE_DATE_VALUES.INDEX_, index)
-                .set(EAV_BE_DATE_VALUES.REPORT_DATE, DateUtils.convert(reportDate))
-                .set(EAV_BE_DATE_VALUES.VALUE, DateUtils.convert((Date)value))
-                .set(EAV_BE_DATE_VALUES.IS_CLOSED, closed)
-                .set(EAV_BE_DATE_VALUES.IS_LAST, last);
+                .set(EAV_BE_DATE_VALUES.REPORT_DATE, DataUtils.convert(reportDate))
+                .set(EAV_BE_DATE_VALUES.VALUE, DataUtils.convert((Date) value))
+                .set(EAV_BE_DATE_VALUES.IS_CLOSED, DataUtils.convert(closed))
+                .set(EAV_BE_DATE_VALUES.IS_LAST, DataUtils.convert(last));
 
         logger.debug(insert.toString());
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -78,9 +79,9 @@ public class BeDateValueDaoImpl extends AbstractBeValueDaoImpl implements IBeDat
         {
             updateSetMoreStep = updateSetMoreStep == null ?
                     updateSetStep.set(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.VALUE),
-                            DateUtils.convert((Date)fields.get("value"))) :
+                            DataUtils.convert((Date) fields.get("value"))) :
                     updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.VALUE),
-                            DateUtils.convert((Date)fields.get("value")));
+                            DataUtils.convert((Date) fields.get("value")));
         }
         if (fields.containsKey("is_closed"))
         {
@@ -128,9 +129,9 @@ public class BeDateValueDaoImpl extends AbstractBeValueDaoImpl implements IBeDat
         {
             updateConditionStep = updateConditionStep == null ?
                     updateSetMoreStep.where(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.REPORT_DATE)
-                            .equal(DateUtils.convert((Date)conditions.get("report_date")))) :
+                            .equal(DataUtils.convert((Date) conditions.get("report_date")))) :
                     updateConditionStep.and(tableOfIntegerValues.field(EAV_BE_DATE_VALUES.REPORT_DATE)
-                            .equal(DateUtils.convert((Date) conditions.get("report_date"))));
+                            .equal(DataUtils.convert((Date) conditions.get("report_date"))));
         }
 
         logger.debug(updateConditionStep.toString());

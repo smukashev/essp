@@ -9,14 +9,6 @@
 
     <context:annotation-config/>
 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>classpath:properties/dataSource.properties</value>
-            </list>
-        </property>
-    </bean>
-
     <bean id="log4jInitializer" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="staticMethod" value="org.springframework.util.Log4jConfigurer.initLogging"/>
         <property name="arguments">
@@ -26,13 +18,36 @@
         </property>
     </bean>
 
-    <!-- datasource to the database -->
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="${ds.driver}"/>
-        <property name="url" value="${ds.url}"/>
-        <property name="username" value="${ds.user}"/>
-        <property name="password" value="${ds.password}"/>
-        <property name="initialSize" value="${ds.pool.initialSize}"/>
-        <property name="maxActive" value="${ds.pool.maxActive}"/>
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.user}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="initialSize" value="${jdbc.initialSize}"/>
+        <property name="maxActive" value="${jdbc.maxActive}"/>
     </bean>
+
+    <!-- datasource to the database -->
+    <beans profile="oracle">
+        <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+            <property name="locations">
+                <list>
+                    <value>classpath:properties/profiles/oracle.properties</value>
+                    <value>classpath:properties/main.properties</value>
+                </list>
+            </property>
+        </bean>
+    </beans>
+
+    <beans profile="postgres">
+        <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+            <property name="locations">
+                <list>
+                    <value>classpath:properties/profiles/postgres.properties</value>
+                    <value>classpath:properties/main.properties</value>
+                </list>
+            </property>
+        </bean>
+    </beans>
+
 </beans>
