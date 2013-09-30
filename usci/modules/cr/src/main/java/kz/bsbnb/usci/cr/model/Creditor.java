@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.cr.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  * Сущность для работы со справочником "БВУ/НО"
  * @author alexandr.motov
  */
-public class Creditor {
+public class Creditor implements Serializable {
     private long id;
     private String name;
     private String shortName;

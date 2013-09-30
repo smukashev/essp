@@ -5,6 +5,8 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.PortalUser;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -52,7 +54,18 @@ public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBus
     @Override
     public List<Creditor> getPortalUserCreditorList(long userId)
     {
-        return null;
+        Creditor creditor = new Creditor();
+
+        creditor.setId(1);
+        creditor.setName("Creditor1");
+        creditor.setShortName("C1");
+        creditor.setCode("CODE1");
+
+        ArrayList<Creditor> list = new ArrayList<Creditor>();
+
+        list.add(creditor);
+
+        return list;
     }
 
     /**
