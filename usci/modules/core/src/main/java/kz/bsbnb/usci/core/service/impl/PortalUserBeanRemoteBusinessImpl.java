@@ -83,4 +83,10 @@ public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBus
     {
 
     }
+
+    @Override
+    public List<Creditor> getMainCreditorsInAlphabeticalOrder(long userId)
+    {
+        return null;
+    }
 }

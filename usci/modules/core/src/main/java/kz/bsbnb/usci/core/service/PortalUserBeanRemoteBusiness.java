@@ -12,4 +12,5 @@ public interface PortalUserBeanRemoteBusiness
     public void unsetPortalUserCreditors(long userId, long creditorId);
     public List<Creditor> getPortalUserCreditorList(long userId);
     public void synchronize(List<PortalUser> users);
+    public List<Creditor> getMainCreditorsInAlphabeticalOrder(long userId);
 }
