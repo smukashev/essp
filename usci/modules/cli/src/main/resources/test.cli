@@ -159,10 +159,17 @@ meta create ref_creditor
 #id
 # -- ??? main_office_id
 meta add ref_creditor subject_type MetaClass ref_subject_type
+meta add ref_creditor docs MetaClass doc1 true
 meta add ref_creditor name STRING
 meta add ref_creditor short_name STRING
 meta add ref_creditor code INTEGER
 #shutdown_date
+
+meta add ct_package creditor MetaClass ref_creditor
+
+meta add ct_package account_date DATE
+meta add ct_package report_date DATE
+meta add ct_package actual_credit_count INTEGER
 
 meta create ref_creditor_branch
 
@@ -171,6 +178,7 @@ meta create ref_creditor_branch
 # -- ??? main_office_id
 meta add ref_creditor_branch main_office MetaClass ref_creditor
 #meta add ref_creditor_branch subject_type MetaClass ref_subject_type
+meta add ref_creditor_branch docs MetaClass doc1 true
 meta add ref_creditor_branch name STRING
 meta add ref_creditor_branch short_name STRING
 meta add ref_creditor_branch code INTEGER
@@ -500,12 +508,14 @@ meta add ref_shared note STRING
 meta key name ref_shared code
 #---------------------------------------------------------------------------------------------
 
+
+
 rc
 
 # Load CR batch file 99999 entries beginning from 0
-crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 99999 0
+#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 99999 0
 
 #crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 2 90 01.02.2013
-#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 3 90
+crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 3 90
 
 quit
