@@ -574,14 +574,14 @@ public class CLI
 
         while(true) {
 
-             args.clear(); args.add("c:/1.xml"); args.add("2"); args.add("0");
+             /*args.clear(); args.add("c:/1.xml"); args.add("2"); args.add("0");
              try{
                 commandCRBatch();
                  if(1==1) break;
              } catch(Exception e){
                  //System.out.println(e.getMessage());
                  e.printStackTrace();
-             }
+             }*/
 
             while (!(line = in.nextLine()).equals("quit")) {
                 StringTokenizer st = new StringTokenizer(line);

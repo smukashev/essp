@@ -184,8 +184,8 @@ meta add ref_creditor_branch short_name STRING
 meta add ref_creditor_branch code INTEGER
 #shutdown_date
 
-meta key name ref_creditor docs
-meta key name ref_creditor_branch docs
+meta key name ref_creditor code
+meta key name ref_creditor_branch code
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
