@@ -309,6 +309,21 @@ public class CLI
         }
     }
 
+    public void readEntityFromXML(String fileName) {
+        try {
+            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository);
+            BaseEntity entity;
+            while((entity = reader.read()) != null) {
+                long id = baseEntityDao.process(entity).getId();
+                System.out.println("Saved with id: " + id);
+            }
+        } catch (FileNotFoundException e)
+        {
+            System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
+        }
+
+    }
+
     public void showEntityAttr(String path, long id) {
         IBaseEntity entity = baseEntityDao.load(id);
 
@@ -539,7 +554,7 @@ public class CLI
 
     public void commandEntity()
     {
-        if (args.size() > 2) {
+        if (args.size() > 1) {
             if (args.get(0).equals("show")) {
                 if (args.get(1).equals("id")) {
                     showEntity(Long.parseLong(args.get(2)));
@@ -582,11 +597,17 @@ public class CLI
                 } else {
                     System.out.println("Argument needed: <xml> <id> <fileName>");
                 }
+            } else if(args.get(0).equals("read")) {
+                if (args.size() > 1) {
+                    readEntityFromXML(args.get(1));
+                } else {
+                    System.out.println("Argument needed: <read> <fileName>");
+                }
             } else {
                 System.out.println("No such operation: " + args.get(0));
             }
         } else {
-            System.out.println("Argument needed: <show> <id, attr, sq, inter> <id> [attributePath, id2]");
+            System.out.println("Argument needed: <show, read> <id, attr, sq, inter> <id> [attributePath, id2]");
         }
     }
 
