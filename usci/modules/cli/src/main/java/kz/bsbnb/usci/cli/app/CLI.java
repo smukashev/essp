@@ -19,10 +19,12 @@ import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLStreamException;
@@ -281,6 +283,29 @@ public class CLI
             System.out.println("No such entity with id: " + id);
         } else {
             System.out.println(entity.toString());
+        }
+    }
+
+    public void dumpEntityToXML(String ids, String fileName) {
+        StringTokenizer st = new StringTokenizer(ids, ",");
+        ArrayList<BaseEntity> entities = new ArrayList<BaseEntity>();
+
+        while (st.hasMoreTokens()) {
+            long id = Long.parseLong(st.nextToken());
+            IBaseEntity entity = baseEntityDao.load(id);
+            if (entity != null) {
+                entities.add((BaseEntity)entity);
+            }
+        }
+
+        if (entities.size() == 0) {
+            System.out.println("No entities found with ids: " + ids);
+        } else {
+            BaseEntityXmlGenerator baseEntityXmlGenerator = new BaseEntityXmlGenerator();
+
+            Document document = baseEntityXmlGenerator.getGeneratedDocument(entities);
+
+            baseEntityXmlGenerator.writeToXml(document, fileName);
         }
     }
 
@@ -550,6 +575,12 @@ public class CLI
                     }
                 } else {
                     System.out.println("No such entity identification method: " + args.get(1));
+                }
+            } else if(args.get(0).equals("xml")) {
+                if (args.size() > 2) {
+                    dumpEntityToXML(args.get(1), args.get(2));
+                } else {
+                    System.out.println("Argument needed: <xml> <id> <fileName>");
                 }
             } else {
                 System.out.println("No such operation: " + args.get(0));
