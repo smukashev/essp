@@ -348,6 +348,25 @@ public class CLI
         }
     }
 
+    public void execEntityByMetaId(String name) {
+        MetaClass meta = metaClassRepository.getMetaClass(name);
+
+        if (meta == null) {
+            System.out.println("No such metaClass: " + name);
+            return;
+        }
+
+        List<BaseEntity> entities = baseEntityDao.getEntityByMetaclass(meta);
+
+        if (entities.size() == 0) {
+            System.out.println("No such entities with class: " + name);
+        } else {
+            for (BaseEntity ids : entities) {
+                System.out.println(ids.toString());
+            }
+        }
+    }
+
     public void commandXSD() throws FileNotFoundException
     {
         if (args.size() > 1) {
@@ -522,6 +541,12 @@ public class CLI
                         execEntitySQ(Long.parseLong(args.get(2)));
                     } else {
                         System.out.println("Argument needed: <show> <sq> <id> <attributePath>");
+                    }
+                } else if (args.get(1).equals("bymeta")) {
+                    if (args.size() > 2) {
+                        execEntityByMetaId(args.get(2));
+                    } else {
+                        System.out.println("Argument needed: <show> <bymeta> <metaName>");
                     }
                 } else {
                     System.out.println("No such entity identification method: " + args.get(1));

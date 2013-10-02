@@ -2392,4 +2392,37 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         return entities;
     }
 
+    public List<Long> getEntityIDsByMetaclass(long metaClassId) {
+        ArrayList<Long> entityIds = new ArrayList<Long>();
+
+        Select select = context
+                .select(EAV_BE_ENTITIES.ID)
+                .from(EAV_BE_ENTITIES)
+                .where(EAV_BE_ENTITIES.CLASS_ID.equal(metaClassId));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        Iterator<Map<String, Object>> i = rows.iterator();
+        while(i.hasNext())
+        {
+            Map<String, Object> row = i.next();
+
+            entityIds.add(((BigDecimal)row.get(EAV_BE_ENTITIES.ID.getName())).longValue());
+        }
+
+        return entityIds;
+    }
+
+    public List<BaseEntity> getEntityByMetaclass(MetaClass meta) {
+        List<Long> ids = getEntityIDsByMetaclass(meta.getId());
+
+        ArrayList<BaseEntity> entities = new ArrayList<BaseEntity>();
+
+        for (Long id : ids) {
+            entities.add((BaseEntity)load(id));
+        }
+
+        return entities;
+    }
 }
