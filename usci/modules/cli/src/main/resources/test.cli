@@ -184,8 +184,8 @@ meta add ref_creditor_branch short_name STRING
 meta add ref_creditor_branch code INTEGER
 #shutdown_date
 
-meta key name ref_creditor code
-meta key name ref_creditor_branch code
+meta key name ref_creditor docs
+meta key name ref_creditor_branch docs
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
@@ -388,6 +388,12 @@ meta add ct_portfolio_flow_base portfolio MetaClass ref_portfolio
 meta remove ct_portfolio_flow_msfo portfolio
 meta add ct_portfolio_flow_msfo portfolio MetaClass ref_portfolio
 
+meta add ct_portfolio_flow_msfo creditor MetaClass ref_creditor
+
+meta add ct_portfolio_flow_msfo account_date DATE
+meta add ct_portfolio_flow_msfo report_date DATE
+meta add ct_portfolio_flow_msfo actual_credit_count INTEGER
+
 meta key name ref_portfolio code
 #---------------------------------------------------------------------------------------------
 
@@ -518,4 +524,7 @@ rc
 #crbatch ./modules/cli/src/main/resources/test_batch.xml 2 90 01.02.2013
 #crbatch ./modules/cli/src/main/resources/test_batch.xml 3 90
 
-quit
+crbatch ./modules/cli/src/main/resources/test_batch.xml 99999 0
+crbatch C:\Users\bauyrzhan.makhambeto\Documents\Portfolio_flow_20130901.xml 99999 0
+crbatch C:\1.xml 99999 0
+#quit

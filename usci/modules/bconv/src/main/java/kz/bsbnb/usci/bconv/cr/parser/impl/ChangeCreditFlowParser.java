@@ -46,7 +46,7 @@ public class ChangeCreditFlowParser extends BatchParser {
                     new Date()
             );
             event = (XMLEvent) xmlReader.next();
-            classification.put("classification",new BaseValue(batch,index,
+            classification.put("code",new BaseValue(batch,index,
                     new Integer(event.asCharacters().getData()))
             );
             currentBaseEntity.put("classification",new BaseValue(batch,index,classification));
@@ -54,28 +54,28 @@ public class ChangeCreditFlowParser extends BatchParser {
             //ctProvision = new CtProvision();
         } else if(localName.equals("balance_account")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("balance_account",new BaseValue(batch,index,event.asCharacters().getData()));
+            currentProvision.put("balance_account",new BaseValue(batch,index,event.asCharacters().getData()));
         } else if(localName.equals("balance_account_msfo")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("balance_account_msfo",new BaseValue(batch,index,event.asCharacters().getData()));
+            currentProvision.put("balance_account_msfo",new BaseValue(batch,index,event.asCharacters().getData()));
         } else if(localName.equals("balance_account_msfo_over_balance")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("balance_account_msfo_over_balance",
+            currentProvision.put("balance_account_msfo_over_balance",
                     new BaseValue(batch,index,event.asCharacters().getData())
             );
         } else if(localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value",
+            currentProvision.put("value",
                     new BaseValue(batch,index,new Double(event.asCharacters().getData()))
             );
         } else if(localName.equals("value_msfo")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value_msfo",
+            currentProvision.put("value_msfo",
                     new BaseValue(batch,index,new Double(event.asCharacters().getData()))
             );
         } else if(localName.equals("value_msfo_over_balance")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value_msfo_over_balance",
+            currentProvision.put("value_msfo_over_balance",
                     new BaseValue(batch,index,new Double(event.asCharacters().getData()))
             );
         } else {
@@ -95,6 +95,7 @@ public class ChangeCreditFlowParser extends BatchParser {
             //ctCreditFlow.setClassification(contents.toString());
         } else if(localName.equals("provision")) {
             //ctCreditFlow.setProvision(ctProvision);
+            currentBaseEntity.put("provision",new BaseValue(batch,index,currentProvision));
         } else if(localName.equals("balance_account")) {
             //ctProvision.setBalanceAccount(contents.toString());
         } else if(localName.equals("balance_account_msfo")) {

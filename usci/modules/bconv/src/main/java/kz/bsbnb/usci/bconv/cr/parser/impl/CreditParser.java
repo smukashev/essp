@@ -45,10 +45,13 @@ public class CreditParser extends BatchParser {
         super();        
     }
 
+    private BaseEntity currentPortfolio;
+
     @Override
     public void init()
     {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit"), new Date());
+        currentPortfolio = new BaseEntity(metaClassRepository.getMetaClass("portfolio"),new Date());
     }
 
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
@@ -122,9 +125,17 @@ public class CreditParser extends BatchParser {
                 BaseEntity creditorBranch = creditorBranchParser.getCurrentBaseEntity();
                 currentBaseEntity.put("creditor_branch", new BaseValue(batch, index, creditorBranch));
             } else if(localName.equals("portfolio")) {
+                event = (XMLEvent) xmlReader.next();
+                BaseEntity portfolio = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),new Date());
+                currentPortfolio.put("portfolio",new BaseValue(batch,index,event.asCharacters().getData()));
                 if(!stack.pop().equals("portfolio")) {}
                     //portfolio = new Portfolio();
+
             } else if(localName.equals("portfolio_msfo")) {
+                event = (XMLEvent) xmlReader.next();
+                BaseEntity portfolioMSFO = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),new Date());
+                currentPortfolio.put("portfolio_msfo",new BaseValue(batch,index,portfolioMSFO));
+                currentBaseEntity.put("portfolio",new BaseValue(batch,index,currentPortfolio));
             } else {
                 throw new UnknownTagException(localName);
             }

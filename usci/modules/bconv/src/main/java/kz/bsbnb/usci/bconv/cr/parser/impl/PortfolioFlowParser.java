@@ -23,7 +23,7 @@ public class PortfolioFlowParser extends BatchParser {
     public PortfolioFlowParser() {
         super();
     }
-    
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("portfolio_flow")) {

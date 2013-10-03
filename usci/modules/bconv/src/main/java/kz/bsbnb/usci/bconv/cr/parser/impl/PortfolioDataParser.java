@@ -2,6 +2,9 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -12,6 +15,7 @@ import org.xml.sax.XMLReader;
 
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.Date;
 
 /**
  *
@@ -29,7 +33,12 @@ public class PortfolioDataParser extends BatchParser {
     public PortfolioDataParser() {
         super();
     }
-    
+
+    @Override
+    public void init() {
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ct_portfolio_data"),new Date());
+    }
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("portfolio_data")) {
@@ -37,6 +46,10 @@ public class PortfolioDataParser extends BatchParser {
             portfolioFlowParser.parse(xmlReader, batch, index);
         } else if(localName.equals("portfolio_flow_msfo")) {
             portfolioFlowMsfoParser.parse(xmlReader, batch, index);
+            hasMore = portfolioFlowMsfoParser.hasMore();
+            currentBaseEntity = portfolioFlowMsfoParser.getCurrentBaseEntity();
+
+            return true;
         } else {
             throw new UnknownTagException(localName);
         }

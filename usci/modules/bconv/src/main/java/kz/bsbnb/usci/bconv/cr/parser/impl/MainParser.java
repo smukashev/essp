@@ -3,6 +3,9 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -25,7 +28,9 @@ import java.util.logging.Logger;
 @Component
 @Scope("prototype")
 public class MainParser extends BatchParser {
-    private InfoParser infoParser = new InfoParser();
+
+    @Autowired
+    private InfoParser infoParser;
 
     @Autowired
     private PackageParser packageParser;
@@ -42,6 +47,10 @@ public class MainParser extends BatchParser {
     {
         return index;
     }
+
+    String currentTag = "";
+    boolean hasMorePackages = true;
+    boolean hasMorePortfolioData = true;
 
     public void parse(InputStream in, Batch batch) throws SAXException, IOException, XMLStreamException
     {
@@ -107,14 +116,43 @@ public class MainParser extends BatchParser {
 
     public void parseNextPackage() throws SAXException
     {
-        System.out.println("Package #" + index++);
-        packageParser.parse(xmlReader, batch, index);
-        if (packageParser.hasMore()) {
-            currentBaseEntity = packageParser.getCurrentBaseEntity();
-            hasMore = true;
-        } else {
-            hasMore = false;
+        System.out.println("Package #" + index++ + " " + currentTag);
+        if (currentTag.equals("packages")) {
+            packageParser.parse(xmlReader, batch, index);
+            if (packageParser.hasMore()) {
+                currentBaseEntity = packageParser.getCurrentBaseEntity();
+                //my add
+                //currentBaseEntity.put("actual_credit_count",new BaseValue(batch,index,43));
+                currentBaseEntity.put("creditor", new BaseValue(batch,index,infoParser.getCurrentBaseEntity()));
+                currentBaseEntity.put("account_date", infoParser.getAccountDate());
+                currentBaseEntity.put("report_date", infoParser.getReportDate());
+                currentBaseEntity.put("actual_credit_count", infoParser.getActualCreditCount());
+
+                hasMorePackages = true;
+            } else {
+                hasMorePackages = false;
+                if (hasMorePortfolioData) {
+                    parse(xmlReader, batch, index--);
+                }
+            }
+        } else if(currentTag.equals("portfolio_data")) {
+            portfolioDataParser.parse(xmlReader, batch, index);
+            hasMorePortfolioData = portfolioDataParser.hasMore();
+            if (hasMorePortfolioData) {
+                currentBaseEntity = portfolioDataParser.getCurrentBaseEntity();
+
+                currentBaseEntity.put("creditor", new BaseValue(batch,index,infoParser.getCurrentBaseEntity()));
+                currentBaseEntity.put("account_date", infoParser.getAccountDate());
+                currentBaseEntity.put("report_date", infoParser.getReportDate());
+                currentBaseEntity.put("actual_credit_count", infoParser.getActualCreditCount());
+            } else {
+                if (hasMorePackages) {
+                    parse(xmlReader, batch, index--);
+                }
+            }
         }
+
+        hasMore = hasMorePortfolioData || hasMorePackages;
     }
 
     public void skipNextPackage() throws SAXException
@@ -144,11 +182,15 @@ public class MainParser extends BatchParser {
         if(localName.equals("batch")) {
         } else if(localName.equals("info")) {
             infoParser.parse(xmlReader, batch, index);
+            //currentBaseEntity.put("creditor",new BaseValue(batch,index,infoParser.getCurrentBaseEntity()));
         } else if(localName.equals("packages")) {
+            currentTag = localName;
             parseNextPackage();
             return true;
         } else if(localName.equals("portfolio_data")) {
-            portfolioDataParser.parse(xmlReader, batch, index);
+            currentTag = localName;
+            parseNextPackage();
+            return true;
         } else {
             throw new UnknownTagException(localName);
         }
