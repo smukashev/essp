@@ -19,10 +19,12 @@ import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLStreamException;
@@ -284,6 +286,44 @@ public class CLI
         }
     }
 
+    public void dumpEntityToXML(String ids, String fileName) {
+        StringTokenizer st = new StringTokenizer(ids, ",");
+        ArrayList<BaseEntity> entities = new ArrayList<BaseEntity>();
+
+        while (st.hasMoreTokens()) {
+            long id = Long.parseLong(st.nextToken());
+            IBaseEntity entity = baseEntityDao.load(id);
+            if (entity != null) {
+                entities.add((BaseEntity)entity);
+            }
+        }
+
+        if (entities.size() == 0) {
+            System.out.println("No entities found with ids: " + ids);
+        } else {
+            BaseEntityXmlGenerator baseEntityXmlGenerator = new BaseEntityXmlGenerator();
+
+            Document document = baseEntityXmlGenerator.getGeneratedDocument(entities);
+
+            baseEntityXmlGenerator.writeToXml(document, fileName);
+        }
+    }
+
+    public void readEntityFromXML(String fileName) {
+        try {
+            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository);
+            BaseEntity entity;
+            while((entity = reader.read()) != null) {
+                long id = baseEntityDao.process(entity).getId();
+                System.out.println("Saved with id: " + id);
+            }
+        } catch (FileNotFoundException e)
+        {
+            System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
+        }
+
+    }
+
     public void showEntityAttr(String path, long id) {
         IBaseEntity entity = baseEntityDao.load(id);
 
@@ -343,6 +383,25 @@ public class CLI
             ArrayList<Long> array = searcher.findAll((BaseEntity)entity);
 
             for (Long ids : array) {
+                System.out.println(ids.toString());
+            }
+        }
+    }
+
+    public void execEntityByMetaId(String name) {
+        MetaClass meta = metaClassRepository.getMetaClass(name);
+
+        if (meta == null) {
+            System.out.println("No such metaClass: " + name);
+            return;
+        }
+
+        List<BaseEntity> entities = baseEntityDao.getEntityByMetaclass(meta);
+
+        if (entities.size() == 0) {
+            System.out.println("No such entities with class: " + name);
+        } else {
+            for (BaseEntity ids : entities) {
                 System.out.println(ids.toString());
             }
         }
@@ -495,7 +554,7 @@ public class CLI
 
     public void commandEntity()
     {
-        if (args.size() > 2) {
+        if (args.size() > 1) {
             if (args.get(0).equals("show")) {
                 if (args.get(1).equals("id")) {
                     showEntity(Long.parseLong(args.get(2)));
@@ -523,14 +582,32 @@ public class CLI
                     } else {
                         System.out.println("Argument needed: <show> <sq> <id> <attributePath>");
                     }
+                } else if (args.get(1).equals("bymeta")) {
+                    if (args.size() > 2) {
+                        execEntityByMetaId(args.get(2));
+                    } else {
+                        System.out.println("Argument needed: <show> <bymeta> <metaName>");
+                    }
                 } else {
                     System.out.println("No such entity identification method: " + args.get(1));
+                }
+            } else if(args.get(0).equals("xml")) {
+                if (args.size() > 2) {
+                    dumpEntityToXML(args.get(1), args.get(2));
+                } else {
+                    System.out.println("Argument needed: <xml> <id> <fileName>");
+                }
+            } else if(args.get(0).equals("read")) {
+                if (args.size() > 1) {
+                    readEntityFromXML(args.get(1));
+                } else {
+                    System.out.println("Argument needed: <read> <fileName>");
                 }
             } else {
                 System.out.println("No such operation: " + args.get(0));
             }
         } else {
-            System.out.println("Argument needed: <show> <id, attr, sq, inter> <id> [attributePath, id2]");
+            System.out.println("Argument needed: <show, read> <id, attr, sq, inter> <id> [attributePath, id2]");
         }
     }
 

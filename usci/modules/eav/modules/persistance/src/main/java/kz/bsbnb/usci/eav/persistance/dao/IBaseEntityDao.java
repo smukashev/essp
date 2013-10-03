@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav.persistance.dao;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
 import java.util.Date;
 import java.util.List;
@@ -64,4 +65,7 @@ public interface IBaseEntityDao
 
     public void remove(IBaseEntity baseEntity);
 
+    public List<Long> getEntityIDsByMetaclass(long metaClassId);
+
+    public List<BaseEntity> getEntityByMetaclass(MetaClass meta);
 }
