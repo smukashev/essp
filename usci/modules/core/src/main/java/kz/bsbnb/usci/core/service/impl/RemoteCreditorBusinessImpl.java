@@ -32,7 +32,7 @@ public class RemoteCreditorBusinessImpl implements RemoteCreditorBusiness
         for (BaseEntity entity : entities) {
             Creditor creditor = new Creditor();
 
-            creditor.setId(1);
+            creditor.setId(entity.getId());
             BaseValue value = (BaseValue)entity.getBaseValue("name");
             if (value != null)
                 creditor.setName((String)value.getValue());
