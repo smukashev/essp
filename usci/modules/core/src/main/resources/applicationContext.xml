@@ -43,4 +43,39 @@
         <property name="registryPort" value="1099"/>
     </bean>
 
+    <bean id="portalUserBeanRemoteBusiness" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="portalUserBeanRemoteBusiness"/>
+        <property name="service" ref="portalUserBeanRemoteBusinessImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
+    <bean id="remoteCreditorBusiness" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="remoteCreditorBusiness"/>
+        <property name="service" ref="remoteCreditorBusinessImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.RemoteCreditorBusiness"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
+    <bean id="inputFileBeanRemoteBusiness" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="inputFileBeanRemoteBusiness"/>
+        <property name="service" ref="inputFileBeanRemoteBusinessImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.InputFileBeanRemoteBusiness"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
+    <bean id="inputInfoBeanRemoteBusiness" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="inputInfoBeanRemoteBusiness"/>
+        <property name="service" ref="inputInfoBeanRemoteBusinessImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.InputInfoBeanRemoteBusiness"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
+    <bean id="protocolBeanRemoteBusiness" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="protocolBeanRemoteBusiness"/>
+        <property name="service" ref="protocolBeanRemoteBusinessImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.ProtocolBeanRemoteBusiness"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
 </beans>

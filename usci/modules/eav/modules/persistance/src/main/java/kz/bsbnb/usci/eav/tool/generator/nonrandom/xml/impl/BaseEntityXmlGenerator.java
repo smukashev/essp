@@ -1,9 +1,13 @@
 package kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl;
 
 
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.AbstractXmlGenerator;
@@ -43,33 +47,82 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
         for (String name : meta.getMemberNames()) {
             IMetaType metaType = meta.getMemberType(name);
 
-            if(metaType.isComplex() && !metaType.isSet())
-                doComplexValue(entity, metaType, document, element, name);
+            if(metaType.isComplex()) {
+                if (metaType.isSet()) {
+                    BaseValue baseValue = (BaseValue)entity.safeGetValue(name);
+                    doComplexSet(baseValue, document, element, name);
+                } else {
+                    BaseValue baseValue = (BaseValue)entity.safeGetValue(name);
+                    doComplexValue(baseValue, document, element, name);
+                }
+            }
 
-            if(!metaType.isComplex() && !metaType.isSet())
-                doSimpleValue(entity, metaType, document, element, name);
+            if(!metaType.isComplex()) {
+                if (metaType.isSet()) {
+                    BaseValue baseValue = (BaseValue)entity.safeGetValue(name);
+                    doSimpleSet(baseValue, metaType, document, element, name);
+                } else {
+                    BaseValue baseValue = (BaseValue)entity.safeGetValue(name);
+                    doSimpleValue(baseValue, metaType, document, element, name);
+                }
+            }
         }
 
         parentElement.appendChild(element);
     }
 
-    public void doComplexValue(BaseEntity entity, IMetaType metaType, Document document,
+    public void doComplexValue(BaseValue baseValue, Document document,
                                Element parentElement, String name) {
-        BaseEntity memberEntity = (BaseEntity) entity.getBaseValue(name).getValue();
-        processBaseEntity(document, memberEntity, name, false, parentElement);
+        if (baseValue != null) {
+            BaseEntity memberEntity = (BaseEntity)baseValue.getValue();
+            processBaseEntity(document, memberEntity, name, false, parentElement);
+        }
     }
 
-    public void doSimpleValue(BaseEntity entity, IMetaType metaType, Document document,
+    public void doSimpleSet(BaseValue baseValue, IMetaType metaType, Document document,
+                              Element parentElement, String name) {
+        MetaSet metaSet = (MetaSet) metaType;
+        Element childElement = document.createElement(name);
+
+        if (baseValue != null) {
+            BaseSet baseSet = (BaseSet)baseValue.getValue();
+
+            for (IBaseValue value : baseSet.get()) {
+                doSimpleValue((BaseValue)value, metaSet.getMemberType(), document, childElement, "item");
+            }
+
+            parentElement.appendChild(childElement);
+        }
+    }
+
+    public void doComplexSet(BaseValue baseValue, Document document,
+                            Element parentElement, String name) {
+        Element childElement = document.createElement(name);
+
+        if (baseValue != null) {
+            BaseSet baseSet = (BaseSet)baseValue.getValue();
+
+            for (IBaseValue value : baseSet.get()) {
+                doComplexValue((BaseValue)value, document, childElement, "item");
+            }
+
+            parentElement.appendChild(childElement);
+        }
+    }
+
+    public void doSimpleValue(BaseValue baseValue, IMetaType metaType, Document document,
                               Element parentElement, String name) {
         MetaValue metaValue = (MetaValue) metaType;
         Element childElement = document.createElement(name);
-        Object value = entity.getBaseValue(name).getValue();
 
-        childElement.appendChild(document.createTextNode(
-                metaValue.getTypeCode() == DataTypes.DATE ?
-                        new SimpleDateFormat("yyyy-MM-dd").format(value)
-                        : value.toString()));
+        if (baseValue != null) {
+            Object value = baseValue.getValue();
+            childElement.appendChild(document.createTextNode(
+                    metaValue.getTypeCode() == DataTypes.DATE ?
+                            new SimpleDateFormat("yyyy-MM-dd").format(value)
+                            : value.toString()));
 
-        parentElement.appendChild(childElement);
+            parentElement.appendChild(childElement);
+        }
     }
 }

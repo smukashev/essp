@@ -22,6 +22,11 @@
         <module>drools_portlet</module>
         <module>batch_portlet</module>
         <module>baseentity_portlet</module>
+        <module>vaadin-messagebox</module>
+        <module>vaadin-filterable-selector</module>
+        <module>credit-registry-administration-portlet</module>
+        <module>credit-registry-protocol-portlet</module>
+        <module>translit-util</module>
     </modules>
 
     <distributionManagement>

@@ -591,7 +591,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
             if (type.isSet())
             {
                 if (arrayIndexes != null) {
-                    valueOut = ((BaseSet)valueOut).getEl(arrayIndexes);
+                    valueOut = ((BaseSet)valueOut).getEl(arrayIndexes.replaceAll("->", "."));
                     type = ((MetaSet)type).getMemberType();
                 } else {
                     return valueOut;
@@ -617,17 +617,34 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     {
         for (String fieldName : params.keySet())
         {
-            IMetaType mtype = meta.getMemberType(fieldName);
+            String ownFieldName;
+            String innerPath = null;
+            if (fieldName.contains(".")) {
+                ownFieldName = fieldName.substring(0, fieldName.indexOf("."));
+                innerPath = fieldName.substring(fieldName.indexOf(".") + 1);
+            } else {
+                ownFieldName = fieldName;
+            }
+
+            //System.out.println(ownFieldName + " " + innerPath);
+
+
+            IMetaType mtype = meta.getMemberType(ownFieldName);
 
             if (mtype == null)
                 throw new IllegalArgumentException("No such field: " + fieldName);
 
-            if (mtype.isComplex() || mtype.isSet())
-                throw new IllegalArgumentException("Can't handle complex fields or arrays: " + fieldName);
+            if (mtype.isSet())
+                throw new IllegalArgumentException("Can't handle arrays: " + fieldName);
 
-            BaseValue bvalue = (BaseValue)getBaseValue(fieldName);
+            BaseValue bvalue = (BaseValue)getBaseValue(ownFieldName);
 
-            if (!bvalue.equalsToString(params.get(fieldName), ((MetaValue)mtype).getTypeCode()))
+            if (mtype.isComplex()) {
+                bvalue = (BaseValue)((BaseEntity)(bvalue.getValue())).getBaseValue(innerPath);
+                mtype = ((MetaClass)mtype).getMemberType(innerPath);
+            }
+
+            if (!((BaseValue)bvalue).equalsToString(params.get(fieldName), ((MetaValue)mtype).getTypeCode()))
                 return false;
         }
 

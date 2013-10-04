@@ -1,6 +1,29 @@
 <?xml version="1.0"?>
 <!DOCTYPE database SYSTEM "http://db.apache.org/torque/dtd/database">
   <database name="model">
+    <table name="users">
+      <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+      <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+      <column name="screen_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
+      <column name="email" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
+      <column name="first_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
+      <column name="last_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
+      <column name="middle_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
+      <column name="modified_date" primaryKey="false" required="false" type="DATE"/>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
+    </table>
+
+    <table name="creditor_user">
+      <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+      <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+      <column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
+    </table>
+
     <!--<table name="eav_m_array_key_filter">
       <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
       <column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
