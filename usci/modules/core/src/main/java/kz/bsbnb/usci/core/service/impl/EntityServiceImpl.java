@@ -1,14 +1,7 @@
 package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
-import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
-import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -17,10 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * @author k.tulbassiyev
