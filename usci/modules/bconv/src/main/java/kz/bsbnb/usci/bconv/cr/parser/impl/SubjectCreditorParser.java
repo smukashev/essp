@@ -34,7 +34,6 @@ public class SubjectCreditorParser extends BatchParser {
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("creditor"),new Date());
-        docs = new BaseSet(metaClassRepository.getMetaClass("doc4"));
     }
 
     @Override
@@ -45,14 +44,18 @@ public class SubjectCreditorParser extends BatchParser {
             currentBaseEntity.put("code",new BaseValue(batch,index,event.asCharacters().getData()));
         } else if(localName.equals("docs")) {
             //docs = new CtCreditor.Docs();
-
+            docs = new BaseSet(metaClassRepository.getMetaClass("doc4"));
         } else if(localName.equals("doc")) {
              //ctDoc = new CtDoc();
             //ctDoc.setDocType(attributes.getValue("doc_type"));
             currentDoc = new BaseEntity(metaClassRepository.getMetaClass("doc4"),new Date());
-            currentDoc.put("doc_type",new BaseValue(batch,index,
-                    event.asStartElement().getAttributeByName(new QName("doc_type")))
-            );
+            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), new Date());
+            docType.put("code",new BaseValue(batch,index,
+                    new Integer(event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())));
+            currentDoc.put("doc_type",new BaseValue(batch,index,docType));
+            /*currentDoc.put("doc_type",new BaseValue(batch,index,
+                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())
+            );*/
         } else if(localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
             currentDoc.put("name",new BaseValue(batch,index,event.asCharacters().getData()));

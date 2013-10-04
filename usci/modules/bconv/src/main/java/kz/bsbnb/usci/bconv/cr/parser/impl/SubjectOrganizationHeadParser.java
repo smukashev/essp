@@ -38,7 +38,7 @@ public class SubjectOrganizationHeadParser extends BatchParser {
     public void init(){
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("head"),new Date());
     }
-    
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName)
             throws SAXException {

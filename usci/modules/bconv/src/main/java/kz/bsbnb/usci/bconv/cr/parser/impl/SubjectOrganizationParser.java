@@ -53,9 +53,6 @@ public class SubjectOrganizationParser extends BatchParser {
     public void init()
     {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("organization"), new Date());
-        bankRelations = new BaseSet(metaClassRepository.getMetaClass("ref_bank_relation"));
-        addresses = new BaseSet(metaClassRepository.getMetaClass("address1"));
-        contacts = new BaseSet(metaClassRepository.getMetaClass("contact1"));
     }
 
 
@@ -76,6 +73,7 @@ public class SubjectOrganizationParser extends BatchParser {
         } else if(localName.equals("bank_relations")) {
             //bankRelations = new BankRelations();
             //my code
+            bankRelations = new BaseSet(metaClassRepository.getMetaClass("ref_bank_relation"));
         } else if(localName.equals("bank_relation")) {
             //my code
             BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"),new Date());
@@ -84,6 +82,7 @@ public class SubjectOrganizationParser extends BatchParser {
             bankRelations.put(new BaseValue(batch,index,bankRelation));
         } else if(localName.equals("addresses")) {
             //addresses = new Addresses();
+            addresses = new BaseSet(metaClassRepository.getMetaClass("address1"));
 
         } else if(localName.equals("address")) {
             /*ctAddress = new CtAddress();
@@ -109,6 +108,7 @@ public class SubjectOrganizationParser extends BatchParser {
             currentAddress.put("details",new BaseValue(batch,index,event.asCharacters().getData()));
         } else if(localName.equals("contacts")) {
             //contacts = new Contacts();
+            contacts = new BaseSet(metaClassRepository.getMetaClass("contact1"));
 
         } else if(localName.equals("contact")) {
             //ctContact = new CtContact();

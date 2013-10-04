@@ -29,13 +29,9 @@ import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
-import java.util.Date;
+import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.StringTokenizer;
 
 @Component
 public class CLI
@@ -650,18 +646,26 @@ public class CLI
         Exception lastException = null;
 
         while(true) {
-
-             /*args.clear(); args.add("c:/1.xml"); args.add("2"); args.add("0");
+            /*
+             //args.clear(); args.add("c:\\2_portfolio.xml"); args.add("2"); args.add("0");
+            args.clear(); args.add("c:\\1.xml"); args.add("2"); args.add("49");
+            //args.clear(); args.add("C:\\Projects\\usci\\usci\\modules\\cli\\src\\main\\resources\\test_batch.xml"); args.add("2"); args.add("0");
              try{
                 commandCRBatch();
                  if(1==1) break;
              } catch(Exception e){
                  //System.out.println(e.getMessage());
                  e.printStackTrace();
-             }*/
-
-            while (!(line = in.nextLine()).equals("quit")) {
+             }
+             */
+            line = in.nextLine();
+            while (!line.equals("quit")) {
                 StringTokenizer st = new StringTokenizer(line);
+                try {
+                    line = in.nextLine();
+                } catch (NoSuchElementException e) {
+                    break;
+                }
                 if (st.hasMoreTokens()) {
                     command = st.nextToken().trim();
 

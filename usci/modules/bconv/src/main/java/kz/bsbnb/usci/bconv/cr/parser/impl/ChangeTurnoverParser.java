@@ -37,8 +37,6 @@ public class ChangeTurnoverParser extends BatchParser {
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("issue"),new Date());
-        currentInterest = new BaseEntity(metaClassRepository.getMetaClass("interest"), new Date());
-        currentDebt = new BaseEntity(metaClassRepository.getMetaClass("debt"),new Date());
     }
 
     @Override
@@ -47,9 +45,11 @@ public class ChangeTurnoverParser extends BatchParser {
         } else if(localName.equals("issue")) {
             //ctTurnoverTypeBase = new CtTurnoverTypeBase();
         } else if(localName.equals("debt")) {
+            currentDebt = new BaseEntity(metaClassRepository.getMetaClass("debt"),new Date());
             debtFlag = true;
             //ctTurnoverAmount = new CtTurnoverAmount();
         } else if(localName.equals("interest")) {
+            currentInterest = new BaseEntity(metaClassRepository.getMetaClass("interest"), new Date());
             interestFlag = true;
             //ctTurnoverAmount = new CtTurnoverAmount();
         } else if(localName.equals("amount")) {

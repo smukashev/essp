@@ -51,12 +51,6 @@ public class PackageParser extends BatchParser {
     private Logger logger = Logger.getLogger(PackageParser.class);
 
     @Override
-    public void init()
-    {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ct_package"), new Date());
-    }
-
-    @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName)
             throws SAXException {
 
@@ -72,6 +66,7 @@ public class PackageParser extends BatchParser {
             } else {
                 throw new UnknownValException(localName, attributes.getValue("operation_type"));
             } */
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ct_package"), new Date());
             currentBaseEntity.put("operation_type", new BaseValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("operation_type")).getValue()));
             currentBaseEntity.put("no", new BaseValue(batch, index,

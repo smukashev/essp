@@ -200,6 +200,10 @@ public class MainParser extends BatchParser {
 
     public boolean endElement(String localName) throws SAXException {
         if(localName.equals("batch")) {
+            hasMore = false;
+            hasMorePackages = false;
+            hasMorePortfolioData = false;
+            return true;
         } else if(localName.equals("info")) {
         } else if(localName.equals("packages")) {
         } else {

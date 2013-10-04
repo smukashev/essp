@@ -33,7 +33,7 @@ public class CreditContractParser  extends BatchParser {
     {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("contract"), new Date());
     }
-    
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         try {

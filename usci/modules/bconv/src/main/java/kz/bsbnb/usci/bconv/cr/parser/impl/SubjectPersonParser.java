@@ -50,12 +50,8 @@ public class SubjectPersonParser extends BatchParser {
     public void init()
     {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("person"), new Date());
-        names = new BaseSet(metaClassRepository.getMetaClass("name"));
-        addresses = new BaseSet(metaClassRepository.getMetaClass("address"));
-        bankRelations = new BaseSet(metaClassRepository.getMetaClass("ref_bank_relation"));
-        contacts = new BaseSet(metaClassRepository.getMetaClass("contact"));
     }
-    
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName)
             throws SAXException {
@@ -74,6 +70,7 @@ public class SubjectPersonParser extends BatchParser {
                 ));
         } else if(localName.equals("bank_relations")) {
             //bankRelations = new CtEntity.BankRelations();
+            bankRelations = new BaseSet(metaClassRepository.getMetaClass("ref_bank_relation"));
         } else if(localName.equals("bank_relation")) {
             event = (XMLEvent) xmlReader.next();
             BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"), new Date());
@@ -83,6 +80,7 @@ public class SubjectPersonParser extends BatchParser {
             bankRelations.put(new BaseValue(batch, index, bankRelation));
         } else if(localName.equals("addresses")) {
             //addresses = new CtEntity.Addresses();
+            addresses = new BaseSet(metaClassRepository.getMetaClass("address"));
         } else if(localName.equals("address")) {
             /*ctAddress = new CtAddress();
 
@@ -113,6 +111,7 @@ public class SubjectPersonParser extends BatchParser {
                 ));
         } else if(localName.equals("contacts")) {
             //contacts = new Contacts();
+            contacts = new BaseSet(metaClassRepository.getMetaClass("contact"));
         } else if(localName.equals("contact")) {
             //ctContact = new CtContact();
             //ctContact.setContactType(attributes.getValue("contact_type"));
@@ -136,6 +135,7 @@ public class SubjectPersonParser extends BatchParser {
             contacts.put(new BaseValue(batch, index, currentContact));
         } else if(localName.equals("names")) {
             //names = new CtPerson.Names();
+            names = new BaseSet(metaClassRepository.getMetaClass("name"));
         } else if(localName.equals("name")) {
             /*name = new CtPerson.Names.Name();
 

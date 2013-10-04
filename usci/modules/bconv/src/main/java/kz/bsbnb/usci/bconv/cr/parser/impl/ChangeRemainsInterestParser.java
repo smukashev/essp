@@ -39,9 +39,6 @@ public class ChangeRemainsInterestParser extends BatchParser {
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("interest1"),new Date());
-        fieldCurrent = new BaseEntity(metaClassRepository.getMetaClass("current"),new Date());
-        fieldPastDue = new BaseEntity(metaClassRepository.getMetaClass("pastdue"),new Date());
-        fieldWriteOf = new BaseEntity(metaClassRepository.getMetaClass("write_off"),new Date());
     }
 
     @Override
@@ -49,12 +46,15 @@ public class ChangeRemainsInterestParser extends BatchParser {
         if(localName.equals("interest")) {
         } else if(localName.equals("current")) {
             //ctRemainsTypeCurrent = new CtRemainsTypeCurrent();
+            fieldCurrent = new BaseEntity(metaClassRepository.getMetaClass("current"),new Date());
             interestWay = localName;
         } else if(localName.equals("pastdue")) {
             //ctRemainsTypePastdue = new CtRemainsTypePastdue();
+            fieldPastDue = new BaseEntity(metaClassRepository.getMetaClass("pastdue"),new Date());
             interestWay = localName;
         } else if(localName.equals("write_off")) {
             //ctRemainsTypeInterestWriteOff = new CtRemainsTypeInterestWriteOff();
+            fieldWriteOf = new BaseEntity(metaClassRepository.getMetaClass("write_off"),new Date());
             interestWay = localName;
         } else if(localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
