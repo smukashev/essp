@@ -3,6 +3,7 @@ package kz.bsbnb.usci.core.service.impl;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.PortalUser;
+import kz.bsbnb.usci.eav.persistance.dao.IUserDao;
 import kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLUserDaoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ import java.util.List;
 public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBusiness
 {
     @Autowired
-    PostgreSQLUserDaoImpl userDao;
+    IUserDao userDao;
 
     /**
      * Проверяет наличие связи между пользователем портала и БВУ/НО.
@@ -26,7 +27,7 @@ public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBus
     @Override
     public boolean hasPortalUserCreditor(long userId, long creditorId)
     {
-        return false;
+        return userDao.hasPortalUserCreditor(userId, creditorId);
     }
 
     /**
@@ -37,7 +38,7 @@ public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBus
     @Override
     public void setPortalUserCreditors(long userId, long creditorId)
     {
-
+        userDao.setPortalUserCreditors(userId, creditorId);
     }
 
     /**
@@ -48,7 +49,7 @@ public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBus
     @Override
     public void unsetPortalUserCreditors(long userId, long creditorId)
     {
-
+        userDao.unsetPortalUserCreditors(userId, creditorId);
     }
 
     /**
@@ -59,18 +60,7 @@ public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBus
     @Override
     public List<Creditor> getPortalUserCreditorList(long userId)
     {
-        Creditor creditor = new Creditor();
-
-        creditor.setId(1);
-        creditor.setName("Creditor1");
-        creditor.setShortName("C1");
-        creditor.setCode("CODE1");
-
-        ArrayList<Creditor> list = new ArrayList<Creditor>();
-
-        list.add(creditor);
-
-        return list;
+        return userDao.getPortalUserCreditorList(userId);
     }
 
     /**
@@ -86,12 +76,12 @@ public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBus
     @Override
     public void synchronize(List<PortalUser> users)
     {
-
+        userDao.synchronize(users);
     }
 
     @Override
     public List<Creditor> getMainCreditorsInAlphabeticalOrder(long userId)
     {
-        return null;
+        return userDao.getPortalUserCreditorList(userId);
     }
 }
