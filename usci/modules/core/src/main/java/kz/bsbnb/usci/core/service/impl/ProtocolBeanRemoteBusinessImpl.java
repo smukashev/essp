@@ -37,6 +37,9 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         prot.setProtocolType(s);
         prot.setTypeDescription("type desc");
 
+        list.add(prot);
+
+        System.out.println("Protocols count: " + list.size());
 
         return list;
     }

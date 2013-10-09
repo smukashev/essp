@@ -2,12 +2,10 @@ package kz.bsbnb.usci.eav.postgresql.dao;
 
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.PortalUser;
-import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.cr.model.SubjectType;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
-import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IUserDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -17,11 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -43,7 +37,7 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
     private DSLContext context;
 
     @Autowired
-    PostgreSQLBaseEntityDaoImpl baseEntityDao;
+    IBaseEntityDao postgreSQLBaseEntityDaoImpl;
 
     @Override
     public boolean hasPortalUserCreditor(long userId, long creditorId)
@@ -133,9 +127,9 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
             return creditors;
 
         for (Map<String, Object> row : rows){
-            Long id = (Long)row.get(0);
+            Long id = ((BigDecimal)row.get(CREDITOR_USER.CREDITOR_ID.getName())).longValue();
 
-            BaseEntity entity = (BaseEntity)baseEntityDao.load(id);
+            BaseEntity entity = (BaseEntity) postgreSQLBaseEntityDaoImpl.load(id);
 
             Creditor creditor = new Creditor();
 
@@ -143,14 +137,33 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
             BaseValue value = (BaseValue)entity.getBaseValue("name");
             if (value != null)
                 creditor.setName((String)value.getValue());
+            else
+                creditor.setName("none");
 
             value = (BaseValue)entity.getBaseValue("short_name");
             if (value != null)
                 creditor.setShortName((String)value.getValue());
+            else
+                creditor.setShortName("none");
 
             value = (BaseValue)entity.getBaseValue("code");
             if (value != null)
                 creditor.setCode((String)value.getValue());
+            else
+                creditor.setCode("none");
+
+            SubjectType st = new SubjectType();
+            BaseEntity stEntity = (BaseEntity)entity.getBaseValue("subject_type");
+            if (stEntity != null) {
+
+            } else {
+                st.setCode("NONE");
+                st.setNameKz("NONE");
+                st.setNameRu("NONE");
+            }
+
+            creditor.setSubjectType(st);
+
 
             creditors.add(creditor);
         }
