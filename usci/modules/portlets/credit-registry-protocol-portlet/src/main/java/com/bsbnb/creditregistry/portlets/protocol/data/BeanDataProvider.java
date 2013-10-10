@@ -53,8 +53,12 @@ public class BeanDataProvider implements DataProvider {
         inputInfoBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/inputInfoBeanRemoteBusiness");
         inputInfoBeanRemoteBusinessFactoryBean.setServiceInterface(InputInfoBeanRemoteBusiness.class);
 
-        protocolBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+        inputInfoBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         inputInfoBusiness = (InputInfoBeanRemoteBusiness) inputInfoBeanRemoteBusinessFactoryBean.getObject();
+        if (inputInfoBusiness == null)
+        {
+            System.out.println("InputInfoBusiness is null!");
+        }
 
         //////////////////////////////
 
@@ -81,6 +85,7 @@ public class BeanDataProvider implements DataProvider {
 
     public List<ProtocolDisplayBean> getProtocolsByInputInfo(InputInfoDisplayBean inputInfo) {
         List<Protocol> protocols = protocolBusiness.getProtocolsBy_InputInfo(inputInfo.getInputInfo());
+        System.out.println("Protocols count: " + protocols.size());
         List<ProtocolDisplayBean> result = new ArrayList<ProtocolDisplayBean>();
         for (Protocol protocol : protocols) {
             result.add(new ProtocolDisplayBean(protocol));

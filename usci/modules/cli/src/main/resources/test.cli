@@ -4,9 +4,9 @@ clear
 init
 
 # Convert xsd to MetaClass ct_package
-xsd convert ./modules/cli/src/main/resources/credit-registry.xsd ct_package
-xsd convert ./modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_base
-xsd convert ./modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_msfo
+xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_package
+xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_base
+xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_msfo
 
 #meta show name ct_package
 
@@ -515,13 +515,12 @@ meta key name ref_shared code
 rc
 
 # Load CR batch file 99999 entries beginning from 0
-#crbatch ./modules/cli/src/main/resources/test_batch.xml 99999 0
+#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 99999 0
 
-#crbatch ./modules/cli/src/main/resources/test_batch.xml 2 90 01.02.2013
-#crbatch ./modules/cli/src/main/resources/test_batch.xml 3 90
+#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 2 90 01.02.2013
+crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 3 90
 
-
-#crbatch ./modules/cli/src/main/resources/test_batch.xml 50 0
-#crbatch C:\Users\bauyrzhan.makhambeto\Documents\Portfolio_flow_20130901.xml 50 0
-#crbatch C:\1.xml 50 0
+#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 99999 0
+#crbatch C:\Users\bauyrzhan.makhambeto\Documents\Portfolio_flow_20130901.xml 99999 0
+#crbatch C:\1.xml 99999 0
 #quit

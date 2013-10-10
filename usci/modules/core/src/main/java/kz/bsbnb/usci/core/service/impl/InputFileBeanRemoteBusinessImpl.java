@@ -11,6 +11,11 @@ public class InputFileBeanRemoteBusinessImpl implements InputFileBeanRemoteBusin
     @Override
     public InputFile getInputFileByInputInfo(InputInfo inputInfo)
     {
+        InputFile inputFile = new InputFile();
+
+        inputFile.setFilePath("asd/asd");
+        inputFile.setId(1L);
+
         return null;
     }
 }
