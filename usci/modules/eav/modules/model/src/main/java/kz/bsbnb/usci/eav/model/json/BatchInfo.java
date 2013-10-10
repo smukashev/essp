@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.receiver.entry; /**
+package kz.bsbnb.usci.eav.model.json; /**
  * @author abukabayev
  */
 import java.util.Date;

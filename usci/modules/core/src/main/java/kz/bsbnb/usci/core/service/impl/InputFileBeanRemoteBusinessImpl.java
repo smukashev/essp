@@ -13,7 +13,7 @@ public class InputFileBeanRemoteBusinessImpl implements InputFileBeanRemoteBusin
     {
         InputFile inputFile = new InputFile();
 
-        inputFile.setFilePath("asd/asd");
+        inputFile.setFilePath(inputInfo.getFileName());
         inputFile.setId(1L);
 
         return null;

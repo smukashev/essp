@@ -1,17 +1,13 @@
 package kz.bsbnb.usci.receiver.monitor;
 
-import com.couchbase.client.CouchbaseClient;
-import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
 import kz.bsbnb.usci.receiver.common.Global;
-import kz.bsbnb.usci.receiver.entry.BatchInfo;
-import kz.bsbnb.usci.receiver.factory.ICouchbaseClientFactory;
+import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.receiver.singleton.StatusSingleton;
 import kz.bsbnb.usci.sync.service.IBatchService;
-import net.spy.memcached.internal.OperationFuture;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +75,8 @@ public class ZipFilesMonitor{
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date());
         statusSingleton.startBatch(batchId, batchFullJModel, batchInfo);
+        statusSingleton.addBatchStatus(batchId,
+                new BatchStatusJModel(Global.BATCH_STATUS_WAITING, null, new Date()));
         statusSingleton.addBatchStatus(batchId,
                 new BatchStatusJModel(Global.BATCH_STATUS_PROCESSING, null, new Date()));
 

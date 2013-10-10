@@ -10,12 +10,18 @@ public class ContractStatusJModel {
     private String protocol;
     private String description;
     private Date received;
+    private String contractNo;
+    private Date contractDate;
 
-    public ContractStatusJModel(Long index, String protocol, String description, Date received) {
+    public ContractStatusJModel(Long index, String protocol, String description, Date received,
+                                String contractNo, Date contractDate)
+    {
         this.index = index;
         this.protocol = protocol;
         this.description = description;
         this.received = received;
+        this.contractNo = contractNo;
+        this.contractDate = contractDate;
     }
 
     public Long getIndex() {
@@ -48,5 +54,25 @@ public class ContractStatusJModel {
 
     public void setReceived(Date received) {
         this.received = received;
+    }
+
+    public String getContractNo()
+    {
+        return contractNo;
+    }
+
+    public void setContractNo(String contractNo)
+    {
+        this.contractNo = contractNo;
+    }
+
+    public Date getContractDate()
+    {
+        return contractDate;
+    }
+
+    public void setContractDate(Date contractDate)
+    {
+        this.contractDate = contractDate;
     }
 }

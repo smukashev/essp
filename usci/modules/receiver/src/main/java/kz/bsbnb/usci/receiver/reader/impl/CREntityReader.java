@@ -108,21 +108,16 @@ public class CREntityReader<T> extends CommonReader<T> {
         long index = crParser.getIndex() - 1;
 
         if (crParser.hasMore()) {
-            statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
-                    Global.CONTRACT_STATUS_PROCESSING, null, new Date()));
             try
             {
                 crParser.parseNextPackage();
             } catch (SAXException e)
             {
                 statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
-                        Global.CONTRACT_STATUS_ERROR, "Can't parse", new Date()));
+                        Global.CONTRACT_STATUS_ERROR, "Can't parse", new Date(), null, null));
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 return null;
             }
-
-            statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
-                    Global.CONTRACT_STATUS_COMPLETED, null, new Date()));
 
             return entity;
         }

@@ -83,9 +83,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             logger.info("entity");
             currentContainer = metaFactoryService.getBaseEntity(
                     startElement.getAttributeByName(new QName("class")).getValue());
-
-            statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
-                    Global.CONTRACT_STATUS_PROCESSING, null, new Date()));
         } else {
             logger.info("other: " + localName);
             IMetaType metaType = currentContainer.getMemberType(localName);
@@ -158,9 +155,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             currentContainer = null;
             return true;
         } else if(localName.equals("entity")) {
-            statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
-                    Global.CONTRACT_STATUS_COMPLETED, null, new Date()));
-
             index++;
             return true;
         } else {
