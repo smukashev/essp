@@ -185,7 +185,11 @@ public class CLIXMLReader
                 Object o = currentContainer;
                 currentContainer = stack.pop();
 
-                currentContainer.put(localName, new BaseValue(batch, index, o));
+                if (currentContainer.isSet()) {
+                    ((BaseSet)currentContainer).put(new BaseValue(batch, index, o));
+                } else {
+                    currentContainer.put(localName, new BaseValue(batch, index, o));
+                }
                 level--;
             }
         }
