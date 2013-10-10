@@ -456,7 +456,7 @@
       <column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
       <column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
       <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-      <column name="value" primaryKey="false" required="true" type="NUMERIC" size="17,7" autoIncrement="false"/>
+      <column name="value" primaryKey="false" required="true" type="NUMERIC" size="17,3" autoIncrement="false"/>
       <column name="is_closed" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
       <column name="is_last" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches" name="eav_fk_008_00">
@@ -483,7 +483,7 @@
       <column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
       <column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
       <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-      <column name="value" primaryKey="false" required="true" type="NUMERIC" size="17,7" autoIncrement="false"/>
+      <column name="value" primaryKey="false" required="true" type="NUMERIC" size="17,3" autoIncrement="false"/>
       <column name="is_closed" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
       <column name="is_last" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
       <foreign-key foreignTable="eav_batches" name="eav_fk_009_00">

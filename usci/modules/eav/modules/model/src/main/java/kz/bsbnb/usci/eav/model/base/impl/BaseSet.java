@@ -354,4 +354,9 @@ public class BaseSet extends BaseContainer implements IBaseSet
 
         return counter;
     }
+
+    @Override
+    public boolean isSet() {
+        return true;
+    }
 }

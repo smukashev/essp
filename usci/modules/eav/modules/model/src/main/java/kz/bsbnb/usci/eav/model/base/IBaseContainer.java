@@ -63,4 +63,5 @@ public interface IBaseContainer extends IBaseObject
 
     public Set<String> getModifiedIdentifiers();
 
+    public boolean isSet();
 }

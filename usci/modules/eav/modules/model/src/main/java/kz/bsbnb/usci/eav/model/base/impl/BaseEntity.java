@@ -881,4 +881,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
         return 0;
     }
+
+    @Override
+    public boolean isSet() {
+        return false;
+    }
 }

@@ -35,15 +35,14 @@ public class PortfolioDataParser extends BatchParser {
     }
 
     @Override
-    public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ct_portfolio_data"),new Date());
-    }
-
-    @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("portfolio_data")) {
         } else if(localName.equals("portfolio_flow")) {
             portfolioFlowParser.parse(xmlReader, batch, index);
+            hasMore = portfolioFlowMsfoParser.hasMore();
+            currentBaseEntity = portfolioFlowParser.getCurrentBaseEntity();
+
+            return true;
         } else if(localName.equals("portfolio_flow_msfo")) {
             portfolioFlowMsfoParser.parse(xmlReader, batch, index);
             hasMore = portfolioFlowMsfoParser.hasMore();
