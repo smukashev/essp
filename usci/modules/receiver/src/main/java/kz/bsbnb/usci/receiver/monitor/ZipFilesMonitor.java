@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver.monitor;
 
+import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
@@ -34,6 +35,7 @@ import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -71,18 +73,31 @@ public class ZipFilesMonitor{
         IBatchService batchService = serviceFactory.getBatchService();
 
         Batch batch = new Batch(new java.sql.Date(new java.util.Date().getTime()));
+        batch.setUserId(batchInfo.getUserId());
         long batchId = batchService.save(batch);
 
-        BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date());
+        List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
+
+        Long cId;
+
+        if (cList.size() > 0) {
+            cId = cList.get(0).getId();
+        } else {
+            cId = -1L;
+        }
+
+        BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
+                batchInfo.getUserId(), cId);
         statusSingleton.startBatch(batchId, batchFullJModel, batchInfo);
         statusSingleton.addBatchStatus(batchId,
-                new BatchStatusJModel(Global.BATCH_STATUS_WAITING, null, new Date()));
+                new BatchStatusJModel(Global.BATCH_STATUS_WAITING, null, new Date(), batchInfo.getUserId()));
         statusSingleton.addBatchStatus(batchId,
-                new BatchStatusJModel(Global.BATCH_STATUS_PROCESSING, null, new Date()));
+                new BatchStatusJModel(Global.BATCH_STATUS_PROCESSING, null, new Date(), batchInfo.getUserId()));
 
         try {
             JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
             jobParametersBuilder.addParameter("batchId", new JobParameter(batchId));
+            jobParametersBuilder.addParameter("userId", new JobParameter(batchInfo.getUserId()));
 
             Job job = jobs.get(batchInfo.getBatchType());
 
@@ -93,7 +108,7 @@ public class ZipFilesMonitor{
 
                 statusSingleton.addBatchStatus(batchId,
                         new BatchStatusJModel(Global.BATCH_STATUS_ERROR, "Unknown batch file type: " +
-                                batchInfo.getBatchType(), new Date()));
+                                batchInfo.getBatchType(), new Date(), batchInfo.getUserId()));
             }
         } catch (JobExecutionAlreadyRunningException e) {
             e.printStackTrace();

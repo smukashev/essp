@@ -35,7 +35,7 @@ public class PostgreSQLBatchDaoImpl extends JDBCSupport implements IBatchDao
     @PostConstruct
     public void init()
     {
-        INSERT_BATCH_SQL = String.format("INSERT INTO %s (receipt_date, rep_date) VALUES ( ?, ? )", getConfig().getBatchesTableName());
+        INSERT_BATCH_SQL = String.format("INSERT INTO %s (receipt_date, rep_date, user_id) VALUES ( ?, ?, ? )", getConfig().getBatchesTableName());
         DELETE_BATCH_BY_ID_SQL = String.format("DELETE FROM %s WHERE id = ?", getConfig().getBatchesTableName());
         SELECT_BATCH_BY_ID_SQL = String.format("SELECT * FROM %s WHERE id = ?", getConfig().getBatchesTableName());
     }
@@ -53,6 +53,7 @@ public class PostgreSQLBatchDaoImpl extends JDBCSupport implements IBatchDao
                     INSERT_BATCH_SQL, new String[] {"id"});
             ps.setTimestamp(1, DataUtils.convertToTimestamp(batch.getReceiptDate()));
             ps.setDate(2, DataUtils.convert(batch.getRepDate()));
+            ps.setLong(3, batch.getUserId());
 
             logger.debug(ps.toString());
 
@@ -133,6 +134,7 @@ public class PostgreSQLBatchDaoImpl extends JDBCSupport implements IBatchDao
             batch.setId(((BigDecimal)row.get("id")).longValue());
             batch.setReceiptDate(DataUtils.convert((Timestamp)row.get("receipt_date")));
             batch.setRepDate(DataUtils.convert((Timestamp) row.get("rep_date")));
+            batch.setUserId(((BigDecimal)row.get("user_id")).longValue());
         }
         else
         {

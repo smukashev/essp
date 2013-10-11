@@ -153,7 +153,8 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
                 creditor.setCode("none");
 
             SubjectType st = new SubjectType();
-            BaseEntity stEntity = (BaseEntity)entity.getBaseValue("subject_type");
+            BaseValue val = (BaseValue)entity.getBaseValue("subject_type");
+            BaseEntity stEntity = val == null ? null : (BaseEntity)val.getValue();
             if (stEntity != null) {
 
             } else {

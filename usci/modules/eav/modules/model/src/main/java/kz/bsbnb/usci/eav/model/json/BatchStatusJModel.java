@@ -9,11 +9,13 @@ public class BatchStatusJModel {
     private String protocol;
     private String description;
     private Date received;
+    private Long userId;
 
-    public BatchStatusJModel(String protocol, String description, Date received) {
+    public BatchStatusJModel(String protocol, String description, Date received, Long userId) {
         this.protocol = protocol;
         this.description = description;
         this.received = received;
+        this.userId = userId;
     }
 
     public String getProtocol() {
@@ -38,5 +40,15 @@ public class BatchStatusJModel {
 
     public void setReceived(Date received) {
         this.received = received;
+    }
+
+    public Long getUserId()
+    {
+        return userId;
+    }
+
+    public void setUserId(Long userId)
+    {
+        this.userId = userId;
     }
 }

@@ -13,12 +13,17 @@ public class BatchFullJModel {
     private String fileName;
     private byte[] content;
     private Date received;
+    private Long userId;
+    private Long creditorId;
 
-    public BatchFullJModel(Long id, String fileName, byte[] content, Date received) {
+    public BatchFullJModel(Long id, String fileName, byte[] content, Date received, Long userId,
+                           Long creditorId) {
         this.id = id;
         this.fileName = fileName;
         this.content = content;
         this.received = received;
+        this.userId = userId;
+        this.creditorId = creditorId;
     }
 
     public Long getId() {
@@ -51,5 +56,25 @@ public class BatchFullJModel {
 
     public void setReceived(Date received) {
         this.received = received;
+    }
+
+    public Long getUserId()
+    {
+        return userId;
+    }
+
+    public void setUserId(Long userId)
+    {
+        this.userId = userId;
+    }
+
+    public String getType()
+    {
+        return type;
+    }
+
+    public void setType(String type)
+    {
+        this.type = type;
     }
 }

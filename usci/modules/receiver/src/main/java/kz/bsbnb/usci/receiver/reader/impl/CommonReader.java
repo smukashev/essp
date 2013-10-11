@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
+import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.receiver.helper.impl.FileHelper;
@@ -38,6 +39,9 @@ public abstract class CommonReader<T> implements IReader<T> {
 
     @Value("#{jobParameters['batchId']}")
     protected Long batchId;
+
+    @Value("#{jobParameters['userId']}")
+    protected Long userId;
 
     protected XMLEventReader xmlEventReader;
 

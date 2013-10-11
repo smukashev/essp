@@ -72,7 +72,8 @@ public class CREntityReader<T> extends CommonReader<T> {
 
         if (obj == null) {
             statusSingleton.addBatchStatus(batchId,
-                    new BatchStatusJModel(Global.BATCH_STATUS_ERROR, "Can't load batch from couchbase!", new Date()));
+                    new BatchStatusJModel(Global.BATCH_STATUS_ERROR, "Can't load batch from couchbase!", new Date(),
+                            userId));
 
             throw new IllegalStateException("Can't load batch from couchbase!");
         }
@@ -123,7 +124,7 @@ public class CREntityReader<T> extends CommonReader<T> {
         }
 
         statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
-                Global.BATCH_STATUS_COMPLETED, null, new Date()));
+                Global.BATCH_STATUS_COMPLETED, null, new Date(), userId));
 
         //ContractStatusArrayJModel statusJModel = statusSingleton.endBatch(batchId);
         statusSingleton.endBatch(batchId);
