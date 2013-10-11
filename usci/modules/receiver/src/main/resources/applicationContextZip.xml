@@ -107,4 +107,10 @@
         <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IMetaFactoryService"/>
     </bean>
 
+    <bean id="remoteUserService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="refreshStubOnConnectFailure" value="true"/>
+        <property name="serviceUrl" value="rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness"/>
+    </bean>
+
 </beans>

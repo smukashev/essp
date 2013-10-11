@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver.repository.impl;
 
+import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IEntityService;
@@ -28,15 +29,21 @@ public class ServiceRepositoryImpl implements IServiceRepository {
     @Qualifier(value = "remoteMetaFactoryService")
     private RmiProxyFactoryBean metaFactoryRmiService;
 
+    @Autowired
+    @Qualifier(value = "remoteUserService")
+    private RmiProxyFactoryBean remoteUserService;
+
     private IEntityService entityService;
     private IBatchService batchService;
     private IMetaFactoryService metaFactoryService;
+    private PortalUserBeanRemoteBusiness userService;
 
     @PostConstruct
     public void init() {
         entityService = (IEntityService) entityRmiService.getObject();
         batchService = (IBatchService) batchRmiService.getObject();
         metaFactoryService = (IMetaFactoryService) metaFactoryRmiService.getObject();
+        userService = (PortalUserBeanRemoteBusiness) remoteUserService.getObject();
     }
 
     @Override
@@ -54,4 +61,10 @@ public class ServiceRepositoryImpl implements IServiceRepository {
         return metaFactoryService;
     }
 
+    @Override
+    public PortalUserBeanRemoteBusiness getUserService()
+    {
+        return userService;
+    }
 }
+

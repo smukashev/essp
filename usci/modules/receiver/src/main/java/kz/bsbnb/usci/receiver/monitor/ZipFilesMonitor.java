@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver.monitor;
 
+import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
@@ -34,6 +35,7 @@ import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -74,8 +76,18 @@ public class ZipFilesMonitor{
         batch.setUserId(batchInfo.getUserId());
         long batchId = batchService.save(batch);
 
+        List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
+
+        Long cId;
+
+        if (cList.size() > 0) {
+            cId = cList.get(0).getId();
+        } else {
+            cId = -1L;
+        }
+
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
-                batchInfo.getUserId());
+                batchInfo.getUserId(), cId);
         statusSingleton.startBatch(batchId, batchFullJModel, batchInfo);
         statusSingleton.addBatchStatus(batchId,
                 new BatchStatusJModel(Global.BATCH_STATUS_WAITING, null, new Date(), batchInfo.getUserId()));
