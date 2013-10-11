@@ -49,6 +49,7 @@ public final class DataJob extends AbstractDataJob {
                 if(entitiesInProcess.size() != processingJobs.size())
                     throw new IllegalStateException("CRITICAL: EntitiesInProcess != ProcessJobs");
 
+                //logger.debug("Queue size: " + entities.size());
             }
             catch(NullPointerException ne) {
                 ne.printStackTrace();
@@ -94,6 +95,7 @@ public final class DataJob extends AbstractDataJob {
         final ProcessJob processJob = new ProcessJob(entityService, entity);
 
         if(entity != null) {
+            logger.debug("Starting job");
             entitiesInProcess.add(entity);
             processingJobs.add(processJob);
 
@@ -113,6 +115,8 @@ public final class DataJob extends AbstractDataJob {
             if(!isInProcess(entity)) {
                 iterator.remove();
                 return entity;
+            } else {
+                logger.debug("Entity in process.");
             }
         }
 

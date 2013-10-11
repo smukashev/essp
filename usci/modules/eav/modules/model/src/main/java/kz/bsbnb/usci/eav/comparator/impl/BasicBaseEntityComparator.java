@@ -185,21 +185,21 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
         while(i.hasNext()) {
             String path = i.next();
 
-            //System.out.println("Path: " + path);
+            logger.debug("Path: " + path);
 
             IMetaType innerMetaType = c2.getMeta().getEl(path);
 
             if (!innerMetaType.isSet()) {
-                //System.out.println("Is not set");
+                logger.debug("Is not set");
                 BaseEntity entity2 = (BaseEntity)c2.getEl(path);
 
                 if (entity1 != null && entity2 != null && compare(entity1, entity2)) {
                     paths.add(path);
-                    //System.out.println("Is equal");
+                    logger.debug("Is equal");
                 }
                 paths.addAll(intersect(entity1, c2));
             } else {
-                //System.out.println("Is set");
+                logger.debug("Is set");
                 MetaSet innerSet = (MetaSet)innerMetaType;
 
                 if (!innerSet.getMemberType().isSet()) {

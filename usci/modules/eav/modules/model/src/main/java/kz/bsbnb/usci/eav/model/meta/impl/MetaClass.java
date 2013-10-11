@@ -636,6 +636,8 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
             {
                 if (!valueOut.isSet()) {
                     meta = (MetaClass)valueOut;
+                } else {
+                    break;
                 }
             } else {
                 if (tokenizer.hasMoreTokens())

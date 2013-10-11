@@ -3,16 +3,13 @@ package kz.bsbnb.usci.receiver.singleton;
 import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.json.*;
-import kz.bsbnb.usci.receiver.entry.BatchInfo;
+import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.receiver.factory.ICouchbaseClientFactory;
 import net.spy.memcached.internal.OperationFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author k.tulbassiyev
