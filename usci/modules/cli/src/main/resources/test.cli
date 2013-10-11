@@ -4,9 +4,9 @@ clear
 init
 
 # Convert xsd to MetaClass ct_package
-xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_package
-xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_base
-xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_msfo
+xsd convert ./modules/cli/src/main/resources/credit-registry.xsd ct_package
+xsd convert ./modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_base
+xsd convert ./modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_msfo
 
 #meta show name ct_package
 
@@ -58,7 +58,7 @@ meta add ref_balance_account name_kz STRING
 #OPEN_DATE
 #CLOSE_DATE
 #IS_LAST
-meta add ref_balance_account display_no INTEGER
+meta add ref_balance_account display_no STRING
 meta add ref_balance_account first_fourth_signs STRING
 meta add ref_balance_account fifth_sign STRING
 meta add ref_balance_account sixth_sign STRING
@@ -190,8 +190,8 @@ meta key name ref_creditor_branch docs
 meta create ref_credit_object
 
 meta add ref_credit_object code INTEGER
-meta add ref_credit_object name_ru INTEGER
-meta add ref_credit_object name_kz INTEGER
+meta add ref_credit_object name_ru STRING
+meta add ref_credit_object name_kz STRING
 
 meta remove credit credit_object
 meta add credit credit_object MetaClass ref_credit_object
@@ -205,8 +205,8 @@ meta key name ref_credit_object code
 meta create ref_credit_purpose
 
 meta add ref_credit_purpose code INTEGER
-meta add ref_credit_purpose name_ru INTEGER
-meta add ref_credit_purpose name_kz INTEGER
+meta add ref_credit_purpose name_ru STRING
+meta add ref_credit_purpose name_kz STRING
 
 meta remove credit credit_purpose
 meta add credit credit_purpose MetaClass ref_credit_purpose
@@ -226,7 +226,7 @@ meta add ref_currency code STRING
 meta add ref_currency name_ru STRING
 meta add ref_currency name_kz STRING
 meta add ref_currency short_name STRING
-meta add ref_currency rating DOUBLE
+meta add ref_currency rating STRING
 #OPEN_DATE
 #CLOSE_DATE
 #IS_LAST
@@ -243,8 +243,8 @@ meta key name ref_currency code
 meta create ref_econ_trade
 
 meta add ref_econ_trade code INTEGER
-meta add ref_econ_trade name_ru INTEGER
-meta add ref_econ_trade name_kz INTEGER
+meta add ref_econ_trade name_ru STRING
+meta add ref_econ_trade name_kz STRING
 
 meta remove organization econ_trade
 meta add organization econ_trade MetaClass ref_econ_trade
@@ -280,8 +280,8 @@ meta key name ref_enterprise_type code
 meta create ref_finance_source
 
 meta add ref_finance_source code INTEGER
-meta add ref_finance_source name_ru INTEGER
-meta add ref_finance_source name_kz INTEGER
+meta add ref_finance_source name_ru STRING
+meta add ref_finance_source name_kz STRING
 
 meta remove credit finance_source
 meta add credit finance_source MetaClass ref_finance_source
@@ -363,7 +363,7 @@ meta key name ref_pledge_type code
 meta create ref_portfolio
 
 #IS_LAST
-meta add ref_portfolio creditor MetaClass creditor
+meta add ref_portfolio creditor MetaClass ref_creditor
 #ID
 #PARENT_ID
 meta add ref_portfolio code STRING
@@ -399,8 +399,8 @@ meta key name ref_portfolio code
 meta create ref_region
 
 meta add ref_region code INTEGER
-meta add ref_region name_ru INTEGER
-meta add ref_region name_kz INTEGER
+meta add ref_region name_ru STRING
+meta add ref_region name_kz STRING
 
 meta remove address1 region
 meta add address1 region MetaClass ref_region
@@ -501,10 +501,10 @@ meta create ref_shared STRING
 
 meta add ref_shared order_num INTEGER
 #ID
-meta add ref_shared code INTEGER
+meta add ref_shared code STRING
 meta add ref_shared name_ru STRING
 meta add ref_shared name_kz STRING
-meta add ref_shared type_ INTEGER
+meta add ref_shared type_ STRING
 meta add ref_shared note STRING
 
 meta key name ref_shared code
@@ -515,12 +515,36 @@ meta key name ref_shared code
 rc
 
 # Load CR batch file 99999 entries beginning from 0
-#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 99999 0
+#crbatch ./modules/cli/src/main/resources/test_batch.xml 99999 0
 
-#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 2 90 01.02.2013
-crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 3 90
+#crbatch ./modules/cli/src/main/resources/test_batch.xml 2 90 01.02.2013
+#crbatch ./modules/cli/src/main/resources/test_batch.xml 3 90
 
-#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 99999 0
-#crbatch C:\Users\bauyrzhan.makhambeto\Documents\Portfolio_flow_20130901.xml 99999 0
-#crbatch C:\1.xml 99999 0
+entity read  ./modules/cli/src/main/resources/refs/doc1.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_balance_account.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_bank_relation.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_classification.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_contact_type.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_country.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_credit_object.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_credit_purpose.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_credit_type.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_creditor.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_currency.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_doc_type.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_econ_trade.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_enterprise_type.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_finance_source.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_legal_form.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_offshore.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_pledge_type.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_portfolio.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_region.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_shared.xml
+
+
+
+#crbatch ./modules/cli/src/main/resources/test_batch.xml 50 0
+#crbatch C:\Users\bauyrzhan.makhambeto\Documents\Portfolio_flow_20130901.xml 50 0
+#crbatch C:\1.xml 50 0
 #quit
