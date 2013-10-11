@@ -530,6 +530,7 @@ entity read  ./usci/modules/cli/src/main/resources/refs/ref_credit_object.xml
 entity read  ./usci/modules/cli/src/main/resources/refs/ref_credit_purpose.xml
 entity read  ./usci/modules/cli/src/main/resources/refs/ref_credit_type.xml
 entity read  ./usci/modules/cli/src/main/resources/refs/ref_creditor.xml
+entity read  ./usci/modules/cli/src/main/resources/refs/ref_creditor_branch.xml
 entity read  ./usci/modules/cli/src/main/resources/refs/ref_currency.xml
 entity read  ./usci/modules/cli/src/main/resources/refs/ref_doc_type.xml
 entity read  ./usci/modules/cli/src/main/resources/refs/ref_econ_trade.xml
