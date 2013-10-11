@@ -26,6 +26,7 @@
         <module>vaadin-filterable-selector</module>
         <module>credit-registry-administration-portlet</module>
         <module>credit-registry-protocol-portlet</module>
+        <module>credit-registry-upload-portlet</module>
         <module>translit-util</module>
     </modules>
 

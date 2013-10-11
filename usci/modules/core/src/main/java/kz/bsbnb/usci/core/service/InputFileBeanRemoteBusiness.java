@@ -6,4 +6,5 @@ import kz.bsbnb.usci.cr.model.InputInfo;
 public interface InputFileBeanRemoteBusiness
 {
     public InputFile getInputFileByInputInfo(InputInfo inputInfo);
+    public void insertInputFile(InputFile inputFile);
 }

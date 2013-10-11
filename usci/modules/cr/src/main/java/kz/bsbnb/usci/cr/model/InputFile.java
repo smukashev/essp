@@ -41,4 +41,14 @@ public class InputFile implements Serializable {
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
+
+    public InputInfo getInputInfo()
+    {
+        return inputInfo;
+    }
+
+    public void setInputInfo(InputInfo inputInfo)
+    {
+        this.inputInfo = inputInfo;
+    }
 }
