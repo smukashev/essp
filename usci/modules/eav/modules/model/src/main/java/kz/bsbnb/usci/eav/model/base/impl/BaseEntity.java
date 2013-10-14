@@ -886,4 +886,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     public boolean isSet() {
         return false;
     }
+
+    public void setIndex(long index) {
+        for (IBaseValue value : values.values()) {
+            value.setIndex(index);
+        }
+    }
 }

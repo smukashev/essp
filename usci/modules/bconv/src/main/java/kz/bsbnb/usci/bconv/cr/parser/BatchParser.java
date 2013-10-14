@@ -101,4 +101,14 @@ public abstract class BatchParser {
     public boolean hasMore() {
         return hasMore;
     }
+
+    public long getIndex()
+    {
+        return index;
+    }
+
+    public void setIndex(long index)
+    {
+        this.index = index;
+    }
 }

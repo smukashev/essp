@@ -120,6 +120,9 @@ public class CREntityReader<T> extends CommonReader<T> {
                 return null;
             }
 
+            System.out.println("####");
+            System.out.println(entity.toString());
+
             return entity;
         }
 

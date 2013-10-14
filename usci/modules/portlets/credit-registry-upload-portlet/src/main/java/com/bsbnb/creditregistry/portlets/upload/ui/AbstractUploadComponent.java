@@ -32,27 +32,52 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import kz.bsbnb.usci.core.service.*;
 import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.receiver.service.IBatchProcessService;
+import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 /**
  *
  * @author Aidar.Myrzahanov
  */
 public abstract class AbstractUploadComponent extends VerticalLayout {
+    private RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean;
+    private RmiProxyFactoryBean reportBusinessFactoryBean;
+    private RmiProxyFactoryBean batchProcessServiceFactoryBean;
 
     private PortalUserBeanRemoteBusiness portalUserBusiness;
-    private IRemoteSharedBusiness sharedBusiness;
-    private InputInfoBeanRemoteBusiness inputInfoBusiness;
-    private InputFileBeanRemoteBusiness inputFileBusiness;
+    //private IRemoteSharedBusiness sharedBusiness;
+    //private InputInfoBeanRemoteBusiness inputInfoBusiness;
+    //private InputFileBeanRemoteBusiness inputFileBusiness;
     private ReportBeanRemoteBusiness reportBusiness;
+    private IBatchProcessService batchProcessService;
     private Creditor creditor;
     private VerticalLayout statusPanel;
     private Label errorMessageLabel;
-    private static final String UPLOADS_PATH = "D:\\portal_afn\\uploads\\";
+    private static final String UPLOADS_PATH = "/tmp/portal/";
     public static final long MAX_FILE_LENGTH = 5 * (1L << 20);
     private PortletEnvironmentFacade portletEnvironment;
 
     private void initializeBeans() {
-        //TODO: add RMI init code here
+        portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
+        portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
+
+        portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+        portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+
+        reportBusinessFactoryBean = new RmiProxyFactoryBean();
+        reportBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/reportBeanRemoteBusiness");
+        reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
+
+        reportBusinessFactoryBean.afterPropertiesSet();
+        reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
+
+        batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+        batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchProcessService");
+        batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+
+        batchProcessServiceFactoryBean.afterPropertiesSet();
+        batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
     }
 
     public AbstractUploadComponent(PortletEnvironmentFacade portletEnvironment) {
@@ -88,7 +113,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
         if (creditor == null || creditor.getId() <= 0) {
             return null;
         }
-        String creditorsPath = UPLOADS_PATH + creditor.getId() + "\\";
+        String creditorsPath = UPLOADS_PATH + creditor.getId() + "/";
         File creditorsDir = new File(creditorsPath);
         if (!creditorsDir.exists()) {
             if (!creditorsDir.mkdir()) {
@@ -98,10 +123,10 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
         String dirName = (new SimpleDateFormat("yyyy.MM.dd-HH.mm.ss")).format(new Date());
         creditorsPath += dirName;
         int counter = 0;
-        while ((new File(creditorsPath + (counter == 0 ? "" : counter + "") + "\\")).exists()) {
+        while ((new File(creditorsPath + (counter == 0 ? "" : counter + "") + "/")).exists()) {
             counter++;
         }
-        String dirPath = creditorsPath + (counter == 0 ? "" : counter + "") + "\\";
+        String dirPath = creditorsPath + (counter == 0 ? "" : counter + "") + "/";
         File newDirectory = new File(dirPath);
         if (!newDirectory.mkdir()) {
             return null;
@@ -116,7 +141,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
         if (normalFileNameBuilder.length() == 0) {
             normalFileNameBuilder.append("dummyName");
         }
-        normalFileNameBuilder.append("\\");
+        normalFileNameBuilder.append("/");
         String normalFileName;
         if (normalFileNameBuilder.length() > 25) {
             normalFileName = normalFileNameBuilder.substring(normalFileNameBuilder.length() - 20, normalFileNameBuilder.length());
@@ -135,15 +160,17 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
         try {
             String path = saveFileOnDisk(array, fileName);
             log.log(Level.INFO, "Path: {0}", path);
-            Shared webServiceLoadType = sharedBusiness.findByC_T("WS", "input_type");
-            Shared inQueueStatus = sharedBusiness.findByC_T("IN_QUEUE", "input_info_status");
-            InputInfo ii = inputInfoBusiness.insert(portletEnvironment.getUserID(), creditor,
-                    fileName, new Date(), webServiceLoadType, inQueueStatus);
-            log.log(Level.INFO, "Input info ID: {0}", ii.getId());
-            InputFile inputFile = new InputFile();
-            inputFile.setFilePath(path);
-            inputFile.setInputInfo(ii);
-            inputFileBusiness.insertInputFile(inputFile);
+            //Shared webServiceLoadType = sharedBusiness.findByC_T("WS", "input_type");
+            //Shared inQueueStatus = sharedBusiness.findByC_T("IN_QUEUE", "input_info_status");
+            //InputInfo ii = inputInfoBusiness.insert(portletEnvironment.getUserID(), creditor,
+              //      fileName, new Date(), webServiceLoadType, inQueueStatus);
+            //log.log(Level.INFO, "Input info ID: {0}", ii.getId());
+            //InputFile inputFile = new InputFile();
+            //inputFile.setFilePath(path);
+            //inputFile.setInputInfo(ii);
+            //inputFileBusiness.insertInputFile(inputFile);
+            System.out.println("### " + path);
+            batchProcessService.processBatch(path, portletEnvironment.getUserID());
             addStatusMessage(String.format(getResourceString(Localization.UPLOAD_SUCCEDED_MESSAGE.getKey()), fileName), false);
         } catch (IOException ioe) {
             log.log(Level.SEVERE, "Can't save file {0}", fileName);

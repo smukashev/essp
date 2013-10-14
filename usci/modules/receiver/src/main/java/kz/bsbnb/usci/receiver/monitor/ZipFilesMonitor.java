@@ -136,7 +136,11 @@ public class ZipFilesMonitor{
         return buffer.toByteArray();
     }
 
-    public void readFiles(String filename){
+    public void readFiles(String filename) {
+        readFiles(filename, null);
+    }
+
+    public void readFiles(String filename, Long userId) {
         BatchInfo batchInfo = new BatchInfo();
         try{
 
@@ -165,7 +169,13 @@ public class ZipFilesMonitor{
 
             batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent());
             batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent());
-            batchInfo.setUserId(Long.parseLong(document.getElementsByTagName("userid").item(0).getTextContent()));
+
+            batchInfo.setUserId(
+                    userId == null ?
+                    Long.parseLong(document.getElementsByTagName("userid").item(0).getTextContent()) :
+                            userId
+            );
+
             batchInfo.setSize(Long.parseLong(document.getElementsByTagName("size").item(0).getTextContent()));
 
 

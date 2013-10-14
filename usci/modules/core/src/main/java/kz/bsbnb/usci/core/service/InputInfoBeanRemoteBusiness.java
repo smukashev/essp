@@ -11,6 +11,4 @@ public interface InputInfoBeanRemoteBusiness
 {
     public List<InputInfo> getAllInputInfosBy_Creditors_By_RepDateSortedBy_Id_Desc(List<Creditor> creditorsList,
                                                                                    Date reportDate);
-    public InputInfo insert(long userId, Creditor creditor, String fileName, Date date, Shared webServiceLoadType,
-                  Shared inQueueStatus);
 }

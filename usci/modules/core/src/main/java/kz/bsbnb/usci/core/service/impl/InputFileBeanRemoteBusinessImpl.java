@@ -18,10 +18,4 @@ public class InputFileBeanRemoteBusinessImpl implements InputFileBeanRemoteBusin
 
         return null;
     }
-
-    @Override
-    public void insertInputFile(InputFile inputFile)
-    {
-        //TODO: Implement
-    }
 }

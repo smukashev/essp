@@ -65,7 +65,7 @@ batch_status {
         function (doc, meta) {
           if(doc.type == "contract_status") {
             var str = ("000000000000" + doc.index);
-            emit(doc.batchId + "_" + (str.substring(str.length-10)), {index: doc.index, contractStatuses: doc.contractStatuses});
+            emit(doc.batchId + "_" + doc.index + "_" + (str.substring(str.length-10)), {index: doc.index, contractStatuses: doc.contractStatuses});
           }
         }
     }

@@ -4,6 +4,7 @@ import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
@@ -169,7 +170,12 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 Object o = currentContainer;
                 currentContainer = stack.pop();
 
-                currentContainer.put(localName, new BaseValue(batch, index, o));
+                if (currentContainer.isSet()) {
+                    ((BaseSet)currentContainer).put(new BaseValue(batch, index, o));
+                } else {
+                    currentContainer.put(localName, new BaseValue(batch, index, o));
+                }
+
                 level--;
             }
         }

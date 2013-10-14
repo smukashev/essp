@@ -88,7 +88,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
                     prot.setMessageType(s);
 
 
-                    prot.setNote("В обработке с " + csajm.getReceived());
+                    prot.setNote("присвоено " + csajm.getReceived());
                     prot.setPackNo(csajm.getIndex());
                     prot.setPrimaryContractDate(csajm.getContractDate());
                     prot.setProtocolType(s);

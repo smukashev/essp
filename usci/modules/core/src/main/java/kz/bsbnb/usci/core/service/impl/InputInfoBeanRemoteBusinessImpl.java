@@ -140,11 +140,4 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
         return list;
     }
-
-    @Override
-    public InputInfo insert(long userId, Creditor creditor, String fileName, Date date, Shared webServiceLoadType, Shared inQueueStatus)
-    {
-        //TODO: implement
-        return null;
-    }
 }
