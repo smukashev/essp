@@ -115,9 +115,13 @@ public class ReportListLayout extends VerticalLayout {
         displayReportHeader(getReportHeaderString(report.getLocalizedName()));
         ReportComponent reportComponent = new ReportComponent(report, connect);
         String reportName = report.getName();
+        System.out.println("-1");
         if ("BanksWithData".equalsIgnoreCase(reportName)) {
+            System.out.println("0");
             reportComponent.addReportExporter(new BanksWithDataTableReportExporter());
+            System.out.println("00");
             reportComponent.addReportExporter(new JasperReportExporter());
+            System.out.println("000");
         } else if(reportName.contains("Pledge")) {
             reportComponent.addReportExporter(new OutputFormExporter());
             log.log(Level.INFO, "Output form exporter applied");
@@ -134,12 +138,19 @@ public class ReportListLayout extends VerticalLayout {
                 }
             }
         }
+        System.out.println("1");
         reportComponent.setWidth("100%");
+        System.out.println("2");
         reportComponentLayout.removeAllComponents();
+        System.out.println("3");
         reportComponentLayout.addComponent(reportComponent);
+        System.out.println("4");
         reportsTable.setVisible(false);
+        System.out.println("5");
         reportComponentLayout.setVisible(true);
+        System.out.println("6");
         showReportsListButton.setVisible(true);
+        System.out.println("7");
     }
 
     private void displayReportHeader(String displayText) {

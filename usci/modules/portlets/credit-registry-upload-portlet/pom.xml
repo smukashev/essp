@@ -44,7 +44,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>credit-registry-administration-portlet</finalName>
+        <finalName>credit-registry-upload-portlet</finalName>
     </build>
     <dependencies>
         <dependency>

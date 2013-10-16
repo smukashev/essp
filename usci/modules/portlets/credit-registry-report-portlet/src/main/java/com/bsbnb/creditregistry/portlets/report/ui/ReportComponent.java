@@ -42,8 +42,11 @@ public class ReportComponent extends VerticalLayout {
     }
     
     public void addReportExporter(AbstractReportExporter actionComponent) {
+        System.out.println("0-");
         actionComponent.setTargetReportComponent(this);
+        System.out.println("0--");
         actionsLayout.addComponent(actionComponent);
+        System.out.println("0---");
     }
     
     public void clearOutputComponents() {

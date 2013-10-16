@@ -1,5 +1,6 @@
 package com.bsbnb.creditregistry.portlets.report.dm;
 
+import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -31,7 +32,7 @@ import com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil;
  *
  * @author Aidar.Myrzahanov
  */
-public class DatabaseConnect {
+public class DatabaseConnect implements Serializable {
 
     private User user;
 
