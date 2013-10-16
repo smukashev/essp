@@ -87,7 +87,7 @@
             success: function(data){
                 if (data!="error")
                 {
-                    $("#messageBox").removeClass().addClass("success").html("Rule was successfully updated").fadeIn(2000).fadeOut(4000);
+                    $("#messageBox").removeClass().addClass("success").html("Правило было успешно обновлено").fadeIn(2000).fadeOut(4000);
                 } else
                 {
                     $("#messageBox").removeClass().addClass("error").html("Ooops , error").fadeIn(2000).fadeOut(4000);
@@ -116,7 +116,7 @@
                 <%--var div="";--%>
                 <%--jQuery.each(json, function() {--%>
 <%--//                    alert(this.rule);--%>
-                    <%--div="<div><textarea name='"+this.id+"' id='area_"+this.id+"'onchange='javascript:enableButton(this.name)'>"+this.rule+"</textarea><input type='button' value='update' id='button_"+this.id+"' name='"+this.id+"' onclick='javascript:updateRule(this.name)' disabled=true></div>";--%>
+                    <%--div="<div><textarea name='"+this.id+"' id='area_"+this.id+"'onchange='javascript:enableButton(this.name)'>"+this.rule+"</textarea><input type='button' value='Сохранить' id='button_"+this.id+"' name='"+this.id+"' onclick='javascript:updateRule(this.name)' disabled=true></div>";--%>
 
                     <%--$(".rules").append(div);--%>
 
@@ -136,7 +136,7 @@
         packageVersionDate = document.getElementById("datepicker").value;
         jQuery('.rules').html('');
         jQuery('.packageInfo').html('');
-        var divPackageInfo = "<div><label>Package title: </label><span>"+packageName+"</span><br><label>Description: </label><span>"+packageDesc+"</span><br><label>Version: </label><span>"+packageVersionDate+"</span><br><p></p></div>" ;
+        var divPackageInfo = "<div><label>Название пакета: </label><span>"+packageName+"</span><br><label>Описание: </label><span>"+packageDesc+"</span><br><label>Версия: </label><span>"+packageVersionDate+"</span><br><p></p></div>" ;
         $(".packageInfo").append(divPackageInfo);
 
          $.ajax({
@@ -154,7 +154,7 @@
                     jQuery.each(json, function() {
 
 
-                        div="<div><label>Rule title:"+this.title+"</label><br><textarea name='"+this.id+"' id='area_"+this.id+"'onchange='javascript:enableButton(this.name)'>"+this.rule+"</textarea><input type='button' style='display: none' value='update' id='button_"+this.id+"' name='"+this.id+"' onclick='javascript:updateRule(this.name)' disabled=true></div>";
+                        div="<div><label>Наименование правила:"+this.title+"</label><br><textarea name='"+this.id+"' id='area_"+this.id+"'onchange='javascript:enableButton(this.name)'>"+this.rule+"</textarea><input type='button' style='display: none' value='update' id='button_"+this.id+"' name='"+this.id+"' onclick='javascript:updateRule(this.name)' disabled=true></div>";
 
                         $(".rules").append(div);
 
@@ -162,7 +162,7 @@
                     });
                 }else
                 {
-                    $(".rules").append("<span>No results.</span>");
+                    $(".rules").append("<span>Пусто.</span>");
                 }
 
             }
@@ -186,10 +186,10 @@
             success: function(data){
                 if (data!="error")
                 {
-                    $("#messageBox").removeClass().addClass("success").html("Successfully added").fadeIn(2000).fadeOut(4000);
+                    $("#messageBox").removeClass().addClass("success").html("Добавлено успешно").fadeIn(2000).fadeOut(4000);
                 } else
                 {
-                    $("#messageBox").removeClass().addClass("error").html("Ooops , error").fadeIn(2000).fadeOut(4000);
+                    $("#messageBox").removeClass().addClass("error").html("Ошибка").fadeIn(2000).fadeOut(4000);
                 }
             }
         });
@@ -205,10 +205,10 @@
             success: function(data){
                 if (data!="error")
                 {
-                    $("#messageBox").removeClass().addClass("success").html("Successfully saved").fadeIn(2000).fadeOut(4000);
+                    $("#messageBox").removeClass().addClass("success").html("Успешно сохранено").fadeIn(2000).fadeOut(4000);
                 } else
                 {
-                    $("#messageBox").removeClass().addClass("error").html("Ooops , error").fadeIn(2000).fadeOut(4000);
+                    $("#messageBox").removeClass().addClass("error").html("Ошибка").fadeIn(2000).fadeOut(4000);
                 }
             }
         });
@@ -219,7 +219,7 @@
 
     function addNewRule(){
         var div="";
-        div="<label>Rule title: </label><input type='text' id='newRuleTitle'><label>Rule: </label><textarea name='newRuleText' id='area_new'></textarea><button type='button' id='buttonNewSave' onclick='javascript:saveNewRule()'>save</button>";
+        div="<label>Наименование правила: </label><input type='text' id='newRuleTitle'><label>Правило: </label><textarea name='newRuleText' id='area_new'></textarea><button type='button' id='buttonNewSave' onclick='javascript:saveNewRule()'>Сохранить</button>";
         $(".addRuleForm").append(div);
     }
 
@@ -231,7 +231,7 @@
 
         jQuery('.rules').html('');
         jQuery('.packageInfo').html('');
-        var divPackageInfo = "<div><label>Package title: </label><span>"+packageName+"</span><br><label>Description: </label><span>"+packageDesc+"</span><br><label>Version: </label><span>"+packageVersionDate+"</span><br><p></p></div>" ;
+        var divPackageInfo = "<div><label>Наименование пакета: </label><span>"+packageName+"</span><br><label>Описание: </label><span>"+packageDesc+"</span><br><label>Версия: </label><span>"+packageVersionDate+"</span><br><p></p></div>" ;
         $(".packageInfo").append(divPackageInfo);
 
         $.ajax({
@@ -270,10 +270,10 @@
                                 <div class="container">
                                   <div id="stylized" class="myform">
                                     <form id="formGetRules">
-                                        <h1>Get Rules</h1>
-                                        <p>Get rules of selected package and version</p>
+                                        <h1>Получить правила</h1>
+                                        <p>Получить правила выбранного пакета</p>
                                         <label>Name
-                                            <span class="small">Select package name</span>
+                                            <span class="small">Выберите имя пакета</span>
                                         </label>
                                        <select id="selectBatch">
                                             <%
@@ -282,16 +282,16 @@
                                                 <option value="<%=b.getId()%>"><%=b.getName()%></option>
                                             <%}}%>
                                         </select>
-                                        <label>Version
-                                            <span class="small">Select version date</span>
+                                        <label>Версия
+                                            <span class="small">Выберите дату</span>
                                         </label>
                                         <input type="text" id="datepicker" />
                                         <button type="button" onclick="javascript:displayRules2()">Show</button><br><br>
-                                        <label>Entity
-                                            <span class="small">Enter entity id</span>
+                                        <label>Сущность
+                                            <span class="small">id сущности</span>
                                         </label>
                                         <input type="text" id="entity_id" />
-                                        <button type="button" onclick="javascript:runRules()">Run</button><br><br>
+                                        <button type="button" onclick="javascript:runRules()">Запустить</button><br><br>
                                         <div class="spacer"></div>
                                     </form>
 
@@ -302,18 +302,18 @@
                                   <div class="stylized">
 
                                     <form id="formAddPackage">
-                                        <h1>Add package</h1>
-                                        <p>Add new package</p>
+                                        <h1>Добавить пакет</h1>
+                                        <p>Добваить новый пакет</p>
 
                                         <label>Name
-                                            <span class="small">Enter package name</span>
+                                            <span class="small">Наименование</span>
                                         </label>
                                         <input id="packageName" type="text" name="Name">
-                                        <label>Date
-                                            <span class="small">Enter package version date</span>
+                                        <label>Дата
+                                            <span class="small">дата начала действия</span>
                                         </label>
                                         <input type="text" id="datepicker2" />
-                                        <button type="button" onclick="javascript:addPackage()">Add</button>
+                                        <button type="button" onclick="javascript:addPackage()">Добавить</button>
                                         <div class="spacer"></div>
                                     </form>
                                   </div>
@@ -330,7 +330,7 @@
 
                 <div class="lfr-header-row">
                     <div class="toolbar">
-                        <input id="addRuleButton" type="button" value="Add Rule" onclick="javascript:addRule()">
+                        <input id="addRuleButton" type="button" value="Добавить правило" onclick="javascript:addRule()">
                     </div>
                 </div>
                 <div class="aui-form  yui3-widget aui-form-validator aui-form-validator-content">
@@ -345,7 +345,7 @@
                             <div class="addRules" id="addrules_id">
 
                                 <form id="addRuleForm" class="addRuleForm" >
-                                    <label>Select Rule:</label>
+                                    <label>Правило</label>
                                     <select id="selectRule" >
                                     <%
                                         if (ruleList.size()>0){
