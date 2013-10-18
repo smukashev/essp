@@ -57,7 +57,7 @@ public class DatabaseConnect implements Serializable {
     }
 
     public boolean isUserNationalBankEmployee() {
-        try {
+        /*try {
             return ExpandoValueLocalServiceUtil.getData(user.getCompanyId(), User.class.getName(),
                     ExpandoTableConstants.DEFAULT_TABLE_NAME, "isNb", user.getPrimaryKey(), false);
         } catch (PortalException pe) {
@@ -65,7 +65,9 @@ public class DatabaseConnect implements Serializable {
         } catch (SystemException se) {
             log.log(Level.WARNING, "", se);
         }
-        return false;
+        return false;*/
+
+        return true;
     }
     
     public List<User> getCoworkers() {

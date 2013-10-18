@@ -545,7 +545,7 @@ entity read  ./usci/modules/cli/src/main/resources/refs/ref_shared.xml
 
 
 
-#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 50 0
+crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 5 0
 #crbatch C:\Users\bauyrzhan.makhambeto\Documents\Portfolio_flow_20130901.xml 50 0
 #crbatch C:\1.xml 50 0
 #quit

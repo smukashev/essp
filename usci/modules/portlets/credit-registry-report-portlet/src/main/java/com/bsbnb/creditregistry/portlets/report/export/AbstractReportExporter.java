@@ -17,7 +17,7 @@ import java.util.Date;
  */
 public abstract class AbstractReportExporter extends VerticalLayout {
 
-    public static final File REPORT_FILES_FOLDER = new File("C:\\Portal_afn\\generated_reports\\");
+    public static final File REPORT_FILES_FOLDER = new File("/tmp/");
     protected ReportComponent targetReportComponent;
     private ReportLoad load;
     private ReportController controller = new ReportController();

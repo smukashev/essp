@@ -78,7 +78,10 @@ public class CLI
 
         System.out.println("Processing batch with rep date: " + repDate);
 
-        Batch batch = batchRepository.addBatch(new Batch(repDate));
+        Batch b = new Batch(repDate);
+        b.setUserId(0L);
+
+        Batch batch = batchRepository.addBatch(b);
 
         crParser.parse(in, batch);
 

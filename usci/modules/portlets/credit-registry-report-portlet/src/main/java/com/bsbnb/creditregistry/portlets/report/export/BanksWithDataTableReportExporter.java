@@ -144,6 +144,7 @@ public class BanksWithDataTableReportExporter extends TableReportExporter {
             }
             buttonProperty.setValue(changeStatusColumnValue);
         }
+
         table.setVisibleColumns(new String[]{"NAME", "STATUS-NAME", buttonColumnName, "ACTUAL-COUNT", "BEGIN-DATE", "END-DATE"});
         table.setColumnAlignment(buttonColumnName, Table.ALIGN_CENTER);
         table.setColumnWidth("NAME", 200);

@@ -115,42 +115,15 @@ public class ReportListLayout extends VerticalLayout {
         displayReportHeader(getReportHeaderString(report.getLocalizedName()));
         ReportComponent reportComponent = new ReportComponent(report, connect);
         String reportName = report.getName();
-        System.out.println("-1");
-        if ("BanksWithData".equalsIgnoreCase(reportName)) {
-            System.out.println("0");
-            reportComponent.addReportExporter(new BanksWithDataTableReportExporter());
-            System.out.println("00");
-            reportComponent.addReportExporter(new JasperReportExporter());
-            System.out.println("000");
-        } else if(reportName.contains("Pledge")) {
-            reportComponent.addReportExporter(new OutputFormExporter());
-            log.log(Level.INFO, "Output form exporter applied");
-        } else {
-            for (ExportType exportType : report.getExportTypesList()) {
-                if (ExportType.JASPER_XLS.equals(exportType.getName())) {
-                    reportComponent.addReportExporter(new JasperReportExporter());
-                } else if (ExportType.TABLE_VAADIN.equals(exportType.getName())) {
-                    reportComponent.addReportExporter(new TableReportExporter());
-                } else if (ExportType.TEMPLATE_XLS.equals(exportType.getName())) {
-                    reportComponent.addReportExporter(new TemplatedPagedXlsReportExporter());
-                } else {
-                    log.log(Level.WARNING, "Unknown export type: {0}", exportType.getName());
-                }
-            }
-        }
-        System.out.println("1");
+        System.out.println("###");
+        reportComponent.addReportExporter(new BanksWithDataTableReportExporter());
+        //reportComponent.addReportExporter(new JasperReportExporter());
         reportComponent.setWidth("100%");
-        System.out.println("2");
         reportComponentLayout.removeAllComponents();
-        System.out.println("3");
         reportComponentLayout.addComponent(reportComponent);
-        System.out.println("4");
         reportsTable.setVisible(false);
-        System.out.println("5");
         reportComponentLayout.setVisible(true);
-        System.out.println("6");
         showReportsListButton.setVisible(true);
-        System.out.println("7");
     }
 
     private void displayReportHeader(String displayText) {

@@ -108,7 +108,11 @@ public class ReportApplication extends Application {
                         viewType = prefs.getValue("type", "REPORT");
                         String defaultReportDateString = prefs.getValue("defaultreportdate", "");
                         try {
-                            defaultReportDate = DEFAULT_DATE_FORMAT.parse(defaultReportDateString);
+                            if (defaultReportDateString.trim().equals("")) {
+                                defaultReportDate = new Date();
+                            } else {
+                                defaultReportDate = DEFAULT_DATE_FORMAT.parse(defaultReportDateString);
+                            }
                             log.log(Level.INFO, "Parsed default date: {0}", defaultReportDate);
                         } catch (ParseException pe) {
                             log.log(Level.INFO, "Failed to parse date config", pe);
