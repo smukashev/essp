@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="kz.bsbnb.usci.brms.rulesvr.model.impl.Batch" %>
 
@@ -272,7 +273,7 @@
                                     <form id="formGetRules">
                                         <h1>Получить правила</h1>
                                         <p>Получить правила выбранного пакета</p>
-                                        <label>Name
+                                        <label>
                                             <span class="small">Выберите имя пакета</span>
                                         </label>
                                        <select id="selectBatch">
@@ -305,7 +306,7 @@
                                         <h1>Добавить пакет</h1>
                                         <p>Добваить новый пакет</p>
 
-                                        <label>Name
+                                        <label>
                                             <span class="small">Наименование</span>
                                         </label>
                                         <input id="packageName" type="text" name="Name">

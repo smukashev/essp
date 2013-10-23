@@ -55,6 +55,7 @@ public class MainPortlet extends MVCPortlet {
         entityServiceFactoryBean = new RmiProxyFactoryBean();
         entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
         entityServiceFactoryBean.setServiceInterface(IEntityService.class);
+        entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
         entityServiceFactoryBean.afterPropertiesSet();
         entityService = (IEntityService) entityServiceFactoryBean.getObject();
@@ -62,6 +63,7 @@ public class MainPortlet extends MVCPortlet {
         batchServiceFactoryBean = new RmiProxyFactoryBean();
         batchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/batchService");
         batchServiceFactoryBean.setServiceInterface(IBatchService.class);
+        batchServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
         batchServiceFactoryBean.afterPropertiesSet();
         batchService = (IBatchService) batchServiceFactoryBean.getObject();
@@ -69,6 +71,7 @@ public class MainPortlet extends MVCPortlet {
         metaFactoryServiceFactoryBean = new RmiProxyFactoryBean();
         metaFactoryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/metaFactoryService");
         metaFactoryServiceFactoryBean.setServiceInterface(IMetaFactoryService.class);
+        metaFactoryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
         metaFactoryServiceFactoryBean.afterPropertiesSet();
         metaFactoryService = (IMetaFactoryService) metaFactoryServiceFactoryBean.getObject();
@@ -188,7 +191,7 @@ public class MainPortlet extends MVCPortlet {
                 jjson = new JSONObject(keyAttributes);
 
 
-             Long batchId = batchService.save(new Batch(new Timestamp(new java.util.Date().getTime()), new java.sql.Date(new java.util.Date().getTime())));
+             Long batchId = batchService.save(new Batch(new java.util.Date()));
              batch = batchService.load(batchId);
             BaseEntity baseEntity1 = new BaseEntity(metaClass,new Date());
 
@@ -244,10 +247,13 @@ public class MainPortlet extends MVCPortlet {
             baseEntityJson.setReportDate(baseEntity2.getReportDate());
             baseEntityJson.setId(baseEntity2.getId());
             for (String attr : metaClass.getAttributeNames()){
+                if (baseEntity2.getBaseValue(attr) == null)
+                    continue;
+
                 BaseValueJson baseValueJson = new BaseValueJson();
                 batchJson.setId(baseEntity2.getBaseValue(attr).getBatch().getId());
-                batchJson.setRepDate((java.sql.Date) baseEntity2.getBaseValue(attr).getBatch().getRepDate());
-                batchJson.setReceiptDate((Timestamp) baseEntity2.getBaseValue(attr).getBatch().getReceiptDate());
+                batchJson.setRepDate( baseEntity2.getBaseValue(attr).getBatch().getRepDate());
+                batchJson.setReceiptDate(baseEntity2.getBaseValue(attr).getBatch().getReceiptDate());
                 baseValueJson.setBatch(batchJson);
                 baseValueJson.setRepDate((java.sql.Date) baseEntity2.getBaseValue(attr).getRepDate());
                 baseValueJson.setValue(baseEntity2.getBaseValue(attr).getValue());

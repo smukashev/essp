@@ -15,6 +15,14 @@
       </unique>
     </table>
 
+    <table name="cred_app_state">
+      <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+      <column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
+    </table>
+
     <table name="creditor_user">
       <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
       <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>

@@ -2425,4 +2425,55 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         return entities;
     }
+
+    @Override
+    public boolean isApproved(long id) {
+        Select select = context
+                .select(CRED_APP_STATE.ID)
+                .from(CRED_APP_STATE)
+                .where(CRED_APP_STATE.CREDITOR_ID.equal(id));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int batchCount(long id, String className) {
+        /*
+        select cu.creditor_id, count(e.id) from eav_be_entities e
+left join eav_m_classes c on e.class_id = c.id
+left join eav_be_complex_values cval on e.id = cval.entity_value_id
+left join eav_batches b on cval.batch_id = b.id
+left join creditor_user cu on b.user_id = cu.user_id
+where c.name = 'primary_contract' and cu.creditor_id is not null
+group by cu.creditor_id;
+        */
+        Select select = context
+                .select(CREDITOR_USER.CREDITOR_ID, EAV_BE_ENTITIES.ID.count().as("cr_count"))
+                .from(EAV_BE_ENTITIES)
+                .leftOuterJoin(EAV_M_CLASSES).on(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
+                .leftOuterJoin(EAV_BE_COMPLEX_VALUES).on(EAV_BE_ENTITIES.ID.eq(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID))
+                .leftOuterJoin(EAV_BATCHES).on(EAV_BE_COMPLEX_VALUES.BATCH_ID.eq(EAV_BATCHES.ID))
+                .leftOuterJoin(CREDITOR_USER).on(EAV_BATCHES.USER_ID.eq(CREDITOR_USER.USER_ID))
+                .where(EAV_M_CLASSES.NAME.eq("primary_contract"))
+                .and(CREDITOR_USER.CREDITOR_ID.eq(id))
+                .groupBy(CREDITOR_USER.CREDITOR_ID);
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 0)
+        {
+            return ((BigDecimal)rows.get(0).get("cr_count")).intValue();
+        }
+
+        return 0;
+    }
 }

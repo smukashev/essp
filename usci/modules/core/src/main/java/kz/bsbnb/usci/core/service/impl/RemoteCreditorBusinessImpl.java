@@ -56,4 +56,18 @@ public class RemoteCreditorBusinessImpl implements RemoteCreditorBusiness
 
         return creditors;
     }
+
+    @Override
+    public boolean creditorApproved(Creditor cred) {
+        return baseEntityDao.isApproved(cred.getId());
+    }
+
+    @Override
+    public int contractCount(Creditor cred) {
+        int c_count = baseEntityDao.batchCount(cred.getId(), "ct_package");
+
+        System.out.println("### " + cred.getId() + " - " + c_count);
+
+        return c_count;
+    }
 }

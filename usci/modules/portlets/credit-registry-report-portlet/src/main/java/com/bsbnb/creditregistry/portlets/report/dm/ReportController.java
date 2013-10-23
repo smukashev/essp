@@ -20,9 +20,9 @@ public class ReportController {
         Report r = new Report();
 
         r.setName("BanksWithData");
-        r.setNameKz("BanksWithData");
+        r.setNameKz("Организации предоставившие данные");
         r.setId(1L);
-        r.setNameRu("BanksWithData");
+        r.setNameRu("Организации предоставившие данные");
         r.setOrderNumber(1);
         r.setType("REPORTBANK");
 

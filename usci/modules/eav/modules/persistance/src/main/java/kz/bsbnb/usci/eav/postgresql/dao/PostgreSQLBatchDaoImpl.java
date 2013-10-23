@@ -53,7 +53,7 @@ public class PostgreSQLBatchDaoImpl extends JDBCSupport implements IBatchDao
                     INSERT_BATCH_SQL, new String[] {"id"});
             ps.setTimestamp(1, DataUtils.convertToTimestamp(batch.getReceiptDate()));
             ps.setDate(2, DataUtils.convert(batch.getRepDate()));
-            ps.setLong(3, batch.getUserId());
+            ps.setLong(3, batch.getUserId() == null ? 0L : batch.getUserId());
 
             logger.debug(ps.toString());
 

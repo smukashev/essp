@@ -66,7 +66,7 @@ public class BanksWithDataTableReportExporter extends TableReportExporter {
         String buttonCaption = getLocalizedString("CHANGE-STATUS-BUTTON-CAPTION");
         table.addContainerProperty(buttonColumnName, Component.class, null);
 
-        table.addGeneratedColumn("STATUS-NAME", new Table.ColumnGenerator() {
+        /*table.addGeneratedColumn("STATUS-NAME", new Table.ColumnGenerator() {
 
             public Component generateCell(Table source, Object itemId, Object columnId) {
                 Item item = table.getItem(itemId);
@@ -81,7 +81,7 @@ public class BanksWithDataTableReportExporter extends TableReportExporter {
                 }
                 return null;
             }
-        });
+        });*/
         for (Object itemId : table.getItemIds()) {
             Item item = table.getItem(itemId);
             String reportIdString = item.getItemProperty("ID").getValue().toString();
@@ -145,12 +145,12 @@ public class BanksWithDataTableReportExporter extends TableReportExporter {
             buttonProperty.setValue(changeStatusColumnValue);
         }
 
-        table.setVisibleColumns(new String[]{"NAME", "STATUS-NAME", buttonColumnName, "ACTUAL-COUNT", "BEGIN-DATE", "END-DATE"});
+        table.setVisibleColumns(new String[]{"NAME", "STATUS-NAME", buttonColumnName, "ACTUAL-COUNT"});
         table.setColumnAlignment(buttonColumnName, Table.ALIGN_CENTER);
         table.setColumnWidth("NAME", 200);
         table.setColumnWidth("ACTUAL-COUNT", 140);
-        table.setColumnWidth("BEGIN-DATE", 150);
-        table.setColumnWidth("END-DATE", 140);
+        //table.setColumnWidth("BEGIN-DATE", 150);
+        //table.setColumnWidth("END-DATE", 140);
         table.setColumnWidth("STATUS-NAME", 250);
 
         table.setPageLength(Math.min(10, customDataSource.getItemIds().size()));

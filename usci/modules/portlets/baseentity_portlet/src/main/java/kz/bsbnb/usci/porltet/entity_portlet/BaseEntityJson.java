@@ -116,10 +116,10 @@ public class BaseEntityJson {
 
             }
 
-            if(expValueClass == null || !expValueClass.isAssignableFrom(valueClass))
+            /*if(expValueClass == null || !expValueClass.isAssignableFrom(valueClass))
                 throw new IllegalArgumentException("Type mismatch in class: " +
                         meta.getClassName() + ". Needed " + expValueClass + ", got: " +
-                        valueClass);
+                        valueClass);*/
         }
 
         values.put(name, value);

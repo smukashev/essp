@@ -68,4 +68,7 @@ public interface IBaseEntityDao
     public List<Long> getEntityIDsByMetaclass(long metaClassId);
 
     public List<BaseEntity> getEntityByMetaclass(MetaClass meta);
+
+    public boolean isApproved(long id);
+    public int batchCount(long id, String className);
 }

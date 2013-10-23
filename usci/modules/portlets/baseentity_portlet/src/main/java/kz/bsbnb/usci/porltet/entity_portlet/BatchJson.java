@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.porltet.entity_portlet;
 
-import java.sql.Date;
-import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * @author abukabayev
@@ -9,7 +8,7 @@ import java.sql.Timestamp;
 public class BatchJson {
     private Long id;
     private Date repDate;
-    private Timestamp receiptDate;
+    private Date receiptDate;
 
     public BatchJson() {
     }
@@ -30,11 +29,11 @@ public class BatchJson {
         this.repDate = repDate;
     }
 
-    public Timestamp getReceiptDate() {
+    public Date getReceiptDate() {
         return receiptDate;
     }
 
-    public void setReceiptDate(Timestamp receiptDate) {
+    public void setReceiptDate(Date receiptDate) {
         this.receiptDate = receiptDate;
     }
 }

@@ -7,4 +7,6 @@ import java.util.List;
 public interface RemoteCreditorBusiness
 {
     public List<Creditor> findMainOfficeCreditors();
+    public boolean creditorApproved(Creditor cred);
+    public int contractCount(Creditor cred);
 }

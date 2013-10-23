@@ -23,6 +23,9 @@ public class GetJsonEntity {
             IMetaType metaType = metaClass.getMemberType(name);
             BaseValue baseValue = (BaseValue) baseEntity.getBaseValue(name);
 
+            if (baseValue == null)
+                continue;
+
             if(metaType.isComplex()) {
                 if(metaType.isSet()) {
                     BaseSetJson baseSet = getBaseSet((MetaSet) metaType);
@@ -30,6 +33,10 @@ public class GetJsonEntity {
                 } else {
 //                    BaseEntity tmpEntity = generateBaseEntity(batch, ((MetaClass) metaType), index);
 //                    entity.put(name, new BaseValue(batch, index, batch.getRepDate(), tmpEntity));
+                    BaseEntity tmpEntity = (BaseEntity)baseValue.getValue();
+                    entity.put(metaClass, name,
+                            new BaseValueJson(getBatch(baseValue.getBatch()), baseValue.getIndex(), (Date) baseValue.getRepDate(),
+                                    getBaseEntity(tmpEntity.getMeta(), tmpEntity)));
                 }
             } else {
                 if(metaType.isSet()) {
@@ -88,8 +95,8 @@ public class GetJsonEntity {
     public BatchJson getBatch(Batch batch){
        BatchJson batchJson = new BatchJson();
         batchJson.setId(batch.getId());
-        batchJson.setReceiptDate((Timestamp) batch.getReceiptDate());
-        batchJson.setRepDate((Date) batch.getRepDate());
+        batchJson.setReceiptDate(batch.getReceiptDate());
+        batchJson.setRepDate(batch.getRepDate());
        return batchJson;
     }
 }

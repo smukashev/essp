@@ -258,7 +258,7 @@
                             <div id="treeName"></div>
                             <%--<div class="XMLHolder" id="XMLHolder">--%>
                                 <div style="position:relative;left:10px;width:500px;height: 600px;overflow: scroll;" id="tree"></div>
-                                <div style="position:absolute;top:40px;left:850px" id="jform"></div>
+                                <div style="position:absolute;top:40px;left:750px" id="jform"></div>
 
                             <%--</div>--%>
                         </div>
