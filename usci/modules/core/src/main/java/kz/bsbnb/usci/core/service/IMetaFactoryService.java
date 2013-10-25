@@ -3,6 +3,7 @@ package kz.bsbnb.usci.core.service;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
 import java.util.List;
@@ -15,4 +16,9 @@ public interface IMetaFactoryService {
     public BaseEntity getBaseEntity(MetaClass metaClass);
     public BaseSet getBaseSet(IMetaType meta);
     public List<BaseEntity> getBaseEntities();
+    public List<MetaClass> getMetaClasses();
+    public List<MetaClassName> getMetaClassesNames();
+    public MetaClass getMetaClass(String name);
+    public boolean saveMetaClass(MetaClass meta);
+    public boolean delMetaClass(String className);
 }

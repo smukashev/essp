@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
@@ -64,6 +65,37 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
 
         return baseEntityList;
 
+    }
+
+    @Override
+    public List<MetaClass> getMetaClasses()
+    {
+        return metaClassRepository.getMetaClasses();
+    }
+
+    @Override
+    public List<MetaClassName> getMetaClassesNames()
+    {
+        return metaClassRepository.getMetaClassesNames();
+    }
+
+    @Override
+    public MetaClass getMetaClass(String name)
+    {
+        return metaClassRepository.getMetaClass(name);
+    }
+
+    @Override
+    public boolean saveMetaClass(MetaClass meta)
+    {
+        metaClassRepository.saveMetaClass(meta);
+        return true;
+    }
+
+    @Override
+    public boolean delMetaClass(String className)
+    {
+        return metaClassRepository.delMetaClass(className);
     }
 
 }

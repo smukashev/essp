@@ -3,6 +3,7 @@ package kz.bsbnb.usci.sync.service.impl;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,5 +50,36 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     public List<BaseEntity> getBaseEntities() {
         return remoteMetaFactoryService.getBaseEntities();
     }
+
+    @Override
+    public List<MetaClass> getMetaClasses()
+    {
+        return remoteMetaFactoryService.getMetaClasses();
+    }
+
+    @Override
+    public List<MetaClassName> getMetaClassesNames()
+    {
+        return remoteMetaFactoryService.getMetaClassesNames();
+    }
+
+    @Override
+    public MetaClass getMetaClass(String name)
+    {
+        return remoteMetaFactoryService.getMetaClass(name);
+    }
+
+    @Override
+    public boolean saveMetaClass(MetaClass meta)
+    {
+        return remoteMetaFactoryService.saveMetaClass(meta);
+    }
+
+    @Override
+    public boolean delMetaClass(String className)
+    {
+        return remoteMetaFactoryService.delMetaClass(className);
+    }
+
 
 }

@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.repository.impl;
 
+import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
@@ -61,5 +62,24 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository
     @Override
     synchronized public void resetCache() {
         cache.clear();
+    }
+
+    @Override
+    public List<MetaClassName> getMetaClassesNames()
+    {
+        return storage.getMetaClassesNames();
+    }
+
+    @Override
+    public boolean delMetaClass(String className)
+    {
+        MetaClass meta = getMetaClass(className);
+
+        if (meta != null) {
+            storage.remove(meta);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

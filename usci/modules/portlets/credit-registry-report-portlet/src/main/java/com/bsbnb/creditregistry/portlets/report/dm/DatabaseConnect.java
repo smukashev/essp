@@ -196,7 +196,7 @@ public class DatabaseConnect implements Serializable {
     }*/
 
     public boolean approveReport(int reportID, int statusId) {
-        Connection connection = null;
+        /*Connection connection = null;
         CallableStatement statement = null;
         try {
             connection = getConnection();
@@ -212,7 +212,9 @@ public class DatabaseConnect implements Serializable {
         } finally {
             closeResources(null, statement, null, connection);
         }
-        return false;
+        return false;*/
+
+        return true;
     }
 
     public ResultSet runQuery(String sqlQuery) {

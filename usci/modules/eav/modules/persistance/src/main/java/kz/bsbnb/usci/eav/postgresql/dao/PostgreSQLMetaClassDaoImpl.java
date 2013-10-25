@@ -4,6 +4,7 @@ import kz.bsbnb.usci.eav.model.base.ContainerTypes;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -61,7 +62,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
 
         if (rows.size() < 1)
-            throw new IllegalArgumentException("Classes not found.");
+            return;//throw new IllegalArgumentException("Classes not found.");
 
         for (Map<String, Object> row : rows){
 
@@ -1109,5 +1110,35 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
     public void setDSLContext(DSLContext context)
     {
         this.context = context;
+    }
+
+    @Override
+    public List<MetaClassName> getMetaClassesNames()
+    {
+        ArrayList<MetaClassName> metaClassNameList = new ArrayList<MetaClassName>();
+        SelectForUpdateStep select;
+
+        select = context.select(
+                EAV_M_CLASSES.NAME
+        ).from(EAV_M_CLASSES).
+                orderBy(EAV_M_CLASSES.BEGIN_DATE.desc());
+
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+
+        if (rows.size() < 1)
+            throw new IllegalArgumentException("Classes not found.");
+
+        for (Map<String, Object> row : rows){
+
+            MetaClassName metaClassName = new MetaClassName();
+
+            metaClassName.setClassName((String)row.get("name"));
+            metaClassNameList.add(metaClassName);
+        }
+
+        return metaClassNameList;
     }
 }

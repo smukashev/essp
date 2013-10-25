@@ -187,10 +187,10 @@ public class BanksWithDataTableReportExporter extends TableReportExporter {
     private void approveReport(int reportID, int statusId) {
         if (getTargetReportComponent().getConnect().approveReport(reportID, statusId)) {
             log.log(Level.INFO, "Show approval successful message");
-            //MessageBox.Show(getLocalizedString("APPROVED-SUCCESSFULLY-TEXT"), getLocalizedString("APPROVED-SUCCESSFULLY-CAPTION"), getApplication().getMainWindow());
+            MessageBox.Show(getLocalizedString("APPROVED-SUCCESSFULLY-TEXT"), getLocalizedString("APPROVED-SUCCESSFULLY-CAPTION"), getApplication().getMainWindow());
         } else {
             log.log(Level.INFO, "Show approval failed message");
-            //MessageBox.Show(getLocalizedString("APPROVAL-FAILED-TEXT"), getLocalizedString("APPROVAL-FAILED-CAPTION"), getApplication().getMainWindow());
+            MessageBox.Show(getLocalizedString("APPROVAL-FAILED-TEXT"), getLocalizedString("APPROVAL-FAILED-CAPTION"), getApplication().getMainWindow());
         }
         loadTable();
     }

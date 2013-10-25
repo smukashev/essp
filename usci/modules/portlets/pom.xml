@@ -25,9 +25,11 @@
         <module>vaadin-messagebox</module>
         <module>vaadin-filterable-selector</module>
         <module>credit-registry-administration-portlet</module>
+        <module>credit-registry-crosscheck-portlet</module>
         <module>credit-registry-protocol-portlet</module>
         <module>credit-registry-upload-portlet</module>
         <module>credit-registry-report-portlet</module>
+        <module>meta_editor</module>
         <module>translit-util</module>
     </modules>
 

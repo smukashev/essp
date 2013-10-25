@@ -260,6 +260,48 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
         return filteredAttributeNames;
     }
 
+    public Set<String> getSimpleAttributesNames()
+    {
+        Set<String> allAttributeNames = this.members.keySet();
+        Set<String> filteredAttributeNames = new HashSet<String>();
+
+        Iterator it = allAttributeNames.iterator();
+
+        while (it.hasNext())
+        {
+            String attributeName = (String)it.next();
+            IMetaType type = this.getMemberType(attributeName);
+
+            if (!type.isSet() && !type.isComplex())
+            {
+                MetaValue metaValue = (MetaValue)type;
+                filteredAttributeNames.add(attributeName);
+            }
+        }
+        return filteredAttributeNames;
+    }
+
+    public Set<String> getSimpleSetAttributesNames()
+    {
+        Set<String> allAttributeNames = this.members.keySet();
+        Set<String> filteredAttributeNames = new HashSet<String>();
+
+        Iterator it = allAttributeNames.iterator();
+
+        while (it.hasNext())
+        {
+            String attributeName = (String)it.next();
+            IMetaType type = this.getMemberType(attributeName);
+
+            if (type.isSet() && !type.isComplex())
+            {
+                MetaValue metaValue = (MetaValue)type;
+                filteredAttributeNames.add(attributeName);
+            }
+        }
+        return filteredAttributeNames;
+    }
+
     public Set<String> getComplexAttributesNames() {
         Set<String> allAttributeNames = this.members.keySet();
         Set<String> filteredAttributeNames = new HashSet<String>();
@@ -637,7 +679,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
                 if (!valueOut.isSet()) {
                     meta = (MetaClass)valueOut;
                 } else {
-                    break;
+                    meta = (MetaClass)type;
                 }
             } else {
                 if (tokenizer.hasMoreTokens())

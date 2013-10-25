@@ -83,14 +83,6 @@
 		</plugins>
 	</build>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>onejar-maven-plugin.googlecode.com</id>
-            <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
-        </pluginRepository>
-    </pluginRepositories>
-
-
     <parent>
         <groupId>kz.bsbnb.usci</groupId>
         <artifactId>parent</artifactId>
