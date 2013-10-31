@@ -295,7 +295,6 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
 
             if (type.isSet() && !type.isComplex())
             {
-                MetaValue metaValue = (MetaValue)type;
                 filteredAttributeNames.add(attributeName);
             }
         }

@@ -13,7 +13,7 @@ function createMCForm(classId, className, grid, record)
             if(form.isValid()){
                 form.submit({
                     waitMsg:'Идет отправка...',
-                    url: 'item.php',
+                    url: dataUrl,
                     params : {op : "SAVE_CLASS"},
                     actionMethods: {
                         read: 'POST'

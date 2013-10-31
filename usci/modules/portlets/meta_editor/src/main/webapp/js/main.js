@@ -8,8 +8,10 @@ Ext.require([
 var metaTreeView = null;
 var metaTreeViewStore = null;
 var mainMetaEditorPanel = null;
+var currentClassId = null;
 
 function fillMetaClassTree(classId, className) {
+    currentClassId = classId;
     if(metaTreeView == null) {
         createMetaClassTree(classId, className);
     } else {
@@ -50,8 +52,54 @@ function createMetaClassTree(classId, className) {
         }]
     });
 
+    var metaTreeMenu = new Ext.menu.Menu({
+        items: [
+            {
+                id: 'mtm-del',
+                text: 'Удалить'
+            },{
+                id: 'mtm-edit',
+                text: 'Редактировать'
+            },
+            ,{
+                id: 'mtm-add',
+                text: 'Добавить'
+            }
+        ],
+        listeners: {
+            click: function(menu, item, e, eOpts) {
+                var tree = Ext.getCmp('metaTreeView');
+                var selectedNode = tree.getSelectionModel().getLastSelected();
+
+                //alert(item.id + " " + selectedNode.data.id);
+
+                parentNodeId = null;
+                if (selectedNode.parentNode != null) {
+                    parentNodeId = selectedNode.parentNode.data.id;
+                } else {
+                    parentNodeId = currentClassId;
+                }
+
+                switch (item.id) {
+                    case 'mtm-del':
+                        selectedNode.parentNode.removeChild(selectedNode);
+                        break;
+                    case 'mtm-edit':
+                        createMCAttrForm(currentClassId,
+                            parentNodeId, selectedNode.data.id).show();
+                        break;
+                    case 'mtm-add':
+                        createMCAttrForm(currentClassId,
+                            parentNodeId, null).show();
+                        break;
+                }
+            }
+        }
+    });
+
     metaTreeView = Ext.create('Ext.tree.Panel', {
         store: metaTreeViewStore,
+        id: 'metaTreeView',
         viewConfig: {
             plugins: {
                 ptype: 'treeviewdragdrop'
@@ -62,7 +110,13 @@ function createMetaClassTree(classId, className) {
         autoHeight: true,
         //autoScroll: true,
         preventHeader: true,
-        useArrows: true
+        useArrows: true,
+        listeners : {
+            itemcontextmenu: function(view, record, item, index, event, eOpts) {
+                metaTreeMenu.showAt(event.getXY());
+                event.stopEvent();
+            }
+        }
     });
 
     metaclassTreeContainer = Ext.getCmp('metaclassTreeContainer');
@@ -85,6 +139,7 @@ function createMetaClassesListView() {
     });
 
     var metaClassListStore = Ext.create('Ext.data.Store', {
+        id: "metaClassListStore",
         model: 'metaClassListModel',
         remoteGroup: true,
         buffered: true,
@@ -134,7 +189,7 @@ function createMetaClassesListView() {
                     icon: contextPathUrl + '/pics/delete.png',
                     tooltip: 'Удалить',
                     handler: function (grid, rowIndex, colIndex) {
-                        var rec = store.getAt(rowIndex);
+                        var rec = metaClassListStore.getAt(rowIndex);
                         id_field = rec.get('classId');
                         Ext.Ajax.request({
                             url: dataUrl,

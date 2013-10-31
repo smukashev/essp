@@ -43,6 +43,7 @@ public class MainPortlet extends MVCPortlet {
             metaFactoryServiceFactoryBean = new RmiProxyFactoryBean();
             metaFactoryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/metaFactoryService");
             metaFactoryServiceFactoryBean.setServiceInterface(IMetaFactoryService.class);
+            metaFactoryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
             metaFactoryServiceFactoryBean.afterPropertiesSet();
             metaFactoryService = (IMetaFactoryService) metaFactoryServiceFactoryBean.getObject();
@@ -69,7 +70,9 @@ public class MainPortlet extends MVCPortlet {
         LIST_ALL,
         LIST_CLASS,
         SAVE_CLASS,
-        DEL_CLASS
+        DEL_CLASS,
+        SAVE_ATTR,
+        GET_ATTR
     }
 
     @Override
@@ -215,22 +218,171 @@ public class MainPortlet extends MVCPortlet {
                 }
                 break;
             case SAVE_CLASS:
-                String classId = resourceRequest.getParameter("id");
+                String classId = resourceRequest.getParameter("classId");
                 if (classId != null && classId.trim().length() > 0) {
                     String className = resourceRequest.getParameter("className");
-                    MetaClass meta = metaFactoryService.getMetaClass(classId);
+                    MetaClass meta = null;
+                    try {
+                        meta = metaFactoryService.getMetaClass(classId);
+                    } catch (IllegalArgumentException ex) {}
+
 
                     if (meta == null) {
                         meta = new MetaClass(classId);
                     }
 
                     metaFactoryService.saveMetaClass(meta);
+                    writer.write("{\"success\": true, \"data\": {}}");
+                } else {
+                    writer.write("{\"success\": false, \"errorMessage\": \"Не задан класс\"}");
                 }
+                break;
+            case SAVE_ATTR:
+                String attrPath = resourceRequest.getParameter("attrPathPart");
+                if (attrPath != null && attrPath.trim().length() > 0) {
+                    int dotIndex = attrPath.indexOf(".");
+                    String className = "";
+                    String attrName = "";
+                    if (dotIndex < 0) {
+                        className = attrPath;
+                    } else {
+                        className = attrPath.substring(0, dotIndex);
+                        attrName = attrPath.substring(dotIndex + 1);
+                    }
+
+                    MetaClass meta = metaFactoryService.getMetaClass(className);
+                    IMetaType attribute = meta;
+
+                    if (attrName.length() > 0) {
+                        attribute = meta.getEl(attrName);
+                    }
+
+                    if(attribute.isComplex()) {
+                        MetaClass metaParent = (MetaClass)attribute;
+
+                        int attrType = Integer.parseInt(resourceRequest.getParameter("attrType"));
+                        String attrPathCode = resourceRequest.getParameter("attrPathCode");
+
+                        IMetaType typeToAdd = null;
+
+                        switch (attrType) {
+                            case 1:
+                                String attrSimpleType = resourceRequest.getParameter("attrSimpleType");
+                                typeToAdd = new MetaValue(DataTypes.valueOf(attrSimpleType));
+
+                                break;
+                            case 2:
+                                String attrComplexType = resourceRequest.getParameter("attrComplexType");
+                                MetaClass metaOfNewAttr =
+                                        metaFactoryService.getMetaClass(attrComplexType);
+
+                                typeToAdd = metaOfNewAttr;
+
+                                break;
+                            case 3:
+                                attrSimpleType = resourceRequest.getParameter("attrSimpleType");
+                                typeToAdd = new MetaSet(
+                                        new MetaValue(DataTypes.valueOf(attrSimpleType)));
+
+                                break;
+                            case 4:
+                                attrComplexType = resourceRequest.getParameter("attrComplexType");
+                                metaOfNewAttr =
+                                        metaFactoryService.getMetaClass(attrComplexType);
+
+                                typeToAdd = new MetaSet(metaOfNewAttr);
+
+                                break;
+                            default:
+                                break;
+                        }
+
+                        if (typeToAdd != null) {
+                            MetaAttribute attrToAdd = new MetaAttribute(false, false, typeToAdd);
+
+                            metaParent.setMetaAttribute(attrPathCode, attrToAdd);
+                        }
+
+                        metaFactoryService.saveMetaClass(metaParent);
+
+                        writer.write("{\"success\": true, \"data\": {}}");
+                    } else {
+                        writer.write("{\"success\": false, " +
+                                "\"errorMessage\": \"Путь не указывает на класс\"}");
+                    }
+                } else {
+                    writer.write("{\"success\": false, \"errorMessage\": \"Не задан аттрибут\"}");
+                }
+
                 break;
             case DEL_CLASS:
                 classId = resourceRequest.getParameter("id");
                 if (classId != null && classId.trim().length() > 0) {
                     metaFactoryService.delMetaClass(classId);
+                }
+                writer.write("{\"success\": true, \"data\": {}}");
+                break;
+            case GET_ATTR:
+                attrPath = resourceRequest.getParameter("attrPath");
+                if (attrPath != null && attrPath.trim().length() > 0) {
+                    int dotIndex = attrPath.indexOf(".");
+                    String className = "";
+                    String attrName = "";
+                    if (dotIndex < 0) {
+                        className = attrPath;
+                    } else {
+                        className = attrPath.substring(0, dotIndex);
+                        attrName = attrPath.substring(dotIndex + 1);
+                    }
+
+                    MetaClass meta = metaFactoryService.getMetaClass(className);
+                    IMetaType attribute = meta;
+
+                    if (attrName.length() > 0) {
+                        attribute = meta.getEl(attrName);
+                    }
+
+                    if (!attribute.isSet()) {
+                        if (attribute.isComplex()) {
+                            MetaClass value = (MetaClass)attribute;
+                            writer.write("{\"success\": true, \"data\": {");
+
+                            writer.write("\"type\": 2, ");
+                            writer.write("\"complexType\": \"" + value.getClassName() + "\"");
+
+                            writer.write("}}");
+                        } else {
+                            MetaValue value = (MetaValue)attribute;
+
+                            writer.write("{\"success\": true, \"data\": {");
+
+                            writer.write("\"type\": 1, ");
+                            writer.write("\"simpleType\": \"" + value.getTypeCode() + "\"");
+
+                            writer.write("}}");
+                        }
+                    } else {
+                        MetaSet attrMetaSet = (MetaSet)attribute;
+
+                        if (attrMetaSet.getMemberType().isComplex()) {
+                            writer.write("{\"success\": true, \"data\": {");
+
+                            writer.write("\"type\": 4, ");
+                            writer.write("\"complexType\": \"" +
+                                    ((MetaClass)attrMetaSet.getMemberType()).getClassName() + "\"");
+
+                            writer.write("}}");
+                        } else {
+                            writer.write("{\"success\": true, \"data\": {");
+
+                            writer.write("\"type\": 3, ");
+                            writer.write("\"simpleType\": \"" + attrMetaSet.getTypeCode() + "\"");
+
+                            writer.write("}}");
+                        }
+                    }
+                } else {
+                    writer.write("{\"success\": false, \"errorMessage\": \"Не задан аттрибут\"}");
                 }
                 break;
             default:
