@@ -3,7 +3,7 @@ Ext.require([
     'Ext.panel.*'
 ]);
 
-function createMCAttrForm(classId, parentPath, attrPath)
+function createMCAttrForm(classId, parentPath, attrPath, callback)
 {
     var buttonSave = Ext.create('Ext.button.Button', {
         id: "createMCAttrFormOK",
@@ -26,12 +26,26 @@ function createMCAttrForm(classId, parentPath, attrPath)
                         //} else {
                             //record.set('className', response.result.data.id);
                             //record.set('classId', response.result.data.id);
-                            Ext.getCmp('createMCAttrFormWin').destroy();
+                        if(callback != null) {
+                            attrTypeField = Ext.getCmp('createMCAttrFormAttrType');
+                            attrPathPart = Ext.getCmp('attrPathPart');
+                            attrPathCode = Ext.getCmp('attrPathCode');
+                            attrTitle = Ext.getCmp('attrTitle');
+
+                            if(attrTypeField.getValue() == 1 || attrTypeField.getValue() == 3) {
+                                callback(attrPathPart.getValue() + attrPathCode.getValue(),
+                                    attrTitle.getValue(), true);
+                            } else {
+                                callback(attrPathPart.getValue() + attrPathCode.getValue(),
+                                    attrTitle.getValue(), false);
+                            }
+                        }
+                        Ext.getCmp('createMCAttrFormWin').destroy();
                             //record.commit();
                         //}
                     },
                     failure : function(){
-                        Ext.Msg.alert('Внимание', action.result.errorMessage);
+                        Ext.Msg.alert('Внимание', "Произошла ошибка");
                     }
                 });
             }else{
@@ -126,13 +140,19 @@ function createMCAttrForm(classId, parentPath, attrPath)
             readOnly: true
         }, {
             fieldLabel: 'Путь аттрибута',
+            id: 'attrPathPart',
             name: 'attrPathPart',
             value: attrPathPart,
             readOnly: true
         }, {
             fieldLabel: 'Код аттрибута',
+            id: 'attrPathCode',
             name: 'attrPathCode',
             value: attrPathCode
+        }, {
+            fieldLabel: 'Наименование аттрибута',
+            id: 'attrTitle',
+            name: 'attrTitle'
         },{
             fieldLabel: 'Вид аттрибута',
             id: 'createMCAttrFormAttrType',
@@ -221,6 +241,12 @@ function createMCAttrForm(classId, parentPath, attrPath)
                         attrComplexTypeField.setValue(data.data.complexType);
                         attrSimpleTypeField.setDisabled(true);
                     }
+
+                    attrPathCode = Ext.getCmp('attrPathCode');
+                    attrPathCode.setReadOnly(true);
+
+                    attrTitle = Ext.getCmp('attrTitle');
+                    attrTitle.setValue(data.data.title);
                 }
             },
             failure: function(response, opts) {

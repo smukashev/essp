@@ -24,4 +24,6 @@ public interface IMetaAttribute extends IPersistable
     public void setKey(boolean isKey);
     public void setNullable(boolean isNullable);
     public void setMetaType(IMetaType metaType);
+
+    public String getTitle();
 }

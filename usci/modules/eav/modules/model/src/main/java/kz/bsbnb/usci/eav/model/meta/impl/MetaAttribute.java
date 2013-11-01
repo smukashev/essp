@@ -24,6 +24,8 @@ public class MetaAttribute extends Persistable implements IMetaAttribute
      */
     private boolean isNullable = true;
 
+    private String title;
+
     public MetaAttribute(boolean isKey, boolean isNullable)
     {
         this.isKey = isKey;
@@ -128,5 +130,15 @@ public class MetaAttribute extends Persistable implements IMetaAttribute
         result = 31 * result + (isKey ? 1 : 0);
         result = 31 * result + (isNullable ? 1 : 0);
         return result;
+    }
+
+    public String getTitle()
+    {
+        return title;
+    }
+
+    public void setTitle(String title)
+    {
+        this.title = title;
     }
 }

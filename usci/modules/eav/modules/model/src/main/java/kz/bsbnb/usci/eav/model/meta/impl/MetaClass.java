@@ -24,6 +24,8 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
 	 */
     private String className;
 
+    private String classTitle;
+
     private Date beginDate;
 
     private boolean disabled = false;
@@ -689,5 +691,15 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
         }
 
         return valueOut;
+    }
+
+    public String getClassTitle()
+    {
+        return classTitle;
+    }
+
+    public void setClassTitle(String classTitle)
+    {
+        this.classTitle = classTitle;
     }
 }

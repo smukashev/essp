@@ -24,7 +24,7 @@ function createMCForm(classId, className, grid, record)
                             //reloadInfinitGrid(grid);
                             Ext.getCmp('createMCFormWin').destroy();
                         } else {
-                            record.set('className', response.result.data.id);
+                            record.set('className', response.result.data.name);
                             record.set('classId', response.result.data.id);
                             Ext.getCmp('createMCFormWin').destroy();
                             record.commit();

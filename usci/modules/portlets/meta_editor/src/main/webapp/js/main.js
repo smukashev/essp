@@ -82,15 +82,49 @@ function createMetaClassTree(classId, className) {
 
                 switch (item.id) {
                     case 'mtm-del':
-                        selectedNode.parentNode.removeChild(selectedNode);
+                        attrPath = selectedNode.data.id;
+                        attrPathCode = null;
+                        attrPathPart = null;
+
+                        if (attrPath != null) {
+                            pathArray = attrPath.split(".");
+
+                            attrPathCode = pathArray[pathArray.length - 1];
+
+                            attrPathPart = attrPath.substring(0, attrPath.length -(attrPathCode.length + 1));
+                        } else {
+                            attrPathPart = parentPath;
+                        }
+
+                        Ext.Ajax.request({
+                            url: dataUrl,
+                            waitMsg:'Идет удаление...',
+                            params : {op : 'DEL_ATTR', attrPathPart: attrPathPart,
+                                attrPathCode: attrPathCode},
+                            actionMethods: {
+                                read: 'POST'
+                            },
+                            success: function(response, opts) {
+                                selectedNode.parentNode.removeChild(selectedNode);
+                            },
+                            failure: function(response, opts) {
+                                data = JSON.parse(response.responseText);
+                                alert("Произошла ошибка: " + data.errorMessage);
+                            }
+                        });
+
                         break;
                     case 'mtm-edit':
                         createMCAttrForm(currentClassId,
-                            parentNodeId, selectedNode.data.id).show();
+                            parentNodeId, selectedNode.data.id, null).show();
                         break;
                     case 'mtm-add':
                         createMCAttrForm(currentClassId,
-                            parentNodeId, null).show();
+                            parentNodeId, null,
+                            function (id, text, leaf) {
+                                var newNode = {id: id, text: text, leaf: leaf};
+                                selectedNode.appendChild(newNode);
+                            }).show();
                         break;
                 }
             }
