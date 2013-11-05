@@ -33,13 +33,70 @@ Ext.onReady(function() {
         remoteSort: true
     });
 
+    Ext.define('entityModel', {
+        extend: 'Ext.data.Model',
+        fields: [
+            {name: 'title',     type: 'string'},
+            {name: 'code',     type: 'string'},
+            {name: 'value',     type: 'string'}
+        ]
+    });
+
+    var entityStore = Ext.create('Ext.data.TreeStore', {
+        model: 'entityModel',
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op : 'LIST_ENTITY'}
+        },
+        folderSort: true
+    });
+
     var buttonShow = Ext.create('Ext.button.Button', {
         id: "entityEditorShowBtn",
         text: 'Просмотр',
         handler : function (){
             entityId = Ext.getCmp("entityId");
-            alert(currentClassId + " - " + entityId.getValue());
+
+            entityStore.load({
+                params: {
+                    op : 'LIST_ENTITY',
+                    entityId: entityId.getValue()
+                },
+                callback: function(records, operation, success) {
+                    if (!success) {
+                        Ext.MessageBox.alert('Ошибка', 'Не возможно получить данные: ' + operation.error);
+                    }
+                }
+            });
         }
+    });
+
+    var entityGrid = Ext.create('Ext.tree.Panel', {
+        //collapsible: true,
+        preventHeader: true,
+        useArrows: true,
+        rootVisible: false,
+        store: entityStore,
+        multiSelect: true,
+        singleExpand: true,
+        columns: [{
+            xtype: 'treecolumn',
+            text: 'Наименование',
+            flex: 2,
+            sortable: true,
+            dataIndex: 'title'
+        },{
+            text: 'Код',
+            flex: 1,
+            dataIndex: 'code',
+            sortable: true
+        },{
+            text: 'Значение',
+            flex: 1,
+            dataIndex: 'value',
+            sortable: true
+        }]
     });
 
     mainEntityEditorPanel = Ext.create('Ext.panel.Panel', {
@@ -58,7 +115,7 @@ Ext.onReady(function() {
                 region: 'center',
                 preventHeader: true,
                 autoScroll:true,
-                html: "asdasdasd"
+                items: [entityGrid]
             }],
         dockedItems: [
             {

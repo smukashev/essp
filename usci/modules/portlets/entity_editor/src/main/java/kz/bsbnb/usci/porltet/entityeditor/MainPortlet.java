@@ -2,6 +2,9 @@ package kz.bsbnb.usci.porltet.entityeditor;
 
 import com.google.gson.Gson;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
@@ -11,6 +14,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.porltet.entityeditor.model.json.MetaClassList;
 import kz.bsbnb.usci.porltet.entityeditor.model.json.MetaClassListEntry;
+import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
@@ -21,8 +25,10 @@ import java.util.*;
 
 public class MainPortlet extends MVCPortlet {
     private RmiProxyFactoryBean metaFactoryServiceFactoryBean;
+    private RmiProxyFactoryBean entityServiceFactoryBean;
 
     private IMetaFactoryService metaFactoryService;
+    private IEntityService entityService;
 
     public void connectToServices() {
         try {
@@ -33,8 +39,16 @@ public class MainPortlet extends MVCPortlet {
 
             metaFactoryServiceFactoryBean.afterPropertiesSet();
             metaFactoryService = (IMetaFactoryService) metaFactoryServiceFactoryBean.getObject();
+
+            entityServiceFactoryBean = new RmiProxyFactoryBean();
+            entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
+            entityServiceFactoryBean.setServiceInterface(IEntityService.class);
+            entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+            entityServiceFactoryBean.afterPropertiesSet();
+            entityService = (IEntityService) entityServiceFactoryBean.getObject();
         } catch (Exception e) {
-            System.out.println("Can't initialise services: " + e.getMessage());
+            System.out.println("Can\"t initialise services: " + e.getMessage());
         }
     }
 
@@ -53,7 +67,83 @@ public class MainPortlet extends MVCPortlet {
     }
 
     enum OperationTypes {
-        LIST_CLASSES
+        LIST_CLASSES,
+        LIST_ENTITY
+    }
+
+    private String entityToJson(BaseEntity entity, String title, String code) {
+        MetaClass meta = entity.getMeta();
+
+        if (title == null) {
+            title = code;
+        }
+
+        String str = "{";
+
+        str += "\"title\": \"" + title + "\",";
+        str += "\"code\": \"" + code + "\",";
+        str += "\"value\": \"" + meta.getClassTitle() + "\",";
+        str += "\"iconCls\":\"folder\",";
+        str += "\"children\":[";
+
+        boolean first = true;
+
+        for (String innerClassesNames : meta.getComplexAttributesNames()) {
+            String attrTitle = innerClassesNames;
+            if (meta.getMetaAttribute(innerClassesNames).getTitle() != null &&
+                    meta.getMetaAttribute(innerClassesNames).getTitle().trim().length() > 0)
+                attrTitle = meta.getMetaAttribute(innerClassesNames).getTitle();
+
+            IBaseValue value = entity.getBaseValue(innerClassesNames);
+
+            if (value != null && value.getValue() != null) {
+                if (!first) {
+                    str += ",";
+                } else {
+                    first = false;
+                }
+
+                str +=  entityToJson((BaseEntity)(value.getValue()), attrTitle, innerClassesNames);
+            }
+
+        }
+
+        for (String innerClassesNames : meta.getSimpleAttributesNames()) {
+            String attrTitle = innerClassesNames;
+            if (meta.getMetaAttribute(innerClassesNames).getTitle() != null &&
+                    meta.getMetaAttribute(innerClassesNames).getTitle().trim().length() > 0)
+                attrTitle = meta.getMetaAttribute(innerClassesNames).getTitle();
+
+            IBaseValue value = entity.getBaseValue(innerClassesNames);
+
+            if (value != null && value.getValue() != null) {
+                if (!first) {
+                    str += ",";
+                } else {
+                    first = false;
+                }
+
+                str +=  "{" +
+                "\"title\":\"" + attrTitle + "\",\n" +
+                "\"code\":\"" + innerClassesNames + "\",\n" +
+                "\"value\":\"" + value.getValue() + "\",\n" +
+                "\"leaf\":true,\n" +
+                "\"iconCls\":\"file\"\n" +
+                "}";
+            }
+        }
+
+//        str +=  "{" +
+//                "\"title\":\"item1\",\n" +
+//                "\"code\":\"item1_code\",\n" +
+//                "\"value\":\"12\",\n" +
+//                "\"leaf\":true,\n" +
+//                "\"iconCls\":\"file\"\n" +
+//                "}";
+
+        str += "]}";
+
+        return str;
     }
 
     @Override
@@ -95,6 +185,17 @@ public class MainPortlet extends MVCPortlet {
 
                     writer.write(gson.toJson(classesListJson));
 
+                    break;
+                case LIST_ENTITY:
+                    String entityId = resourceRequest.getParameter("entityId");
+                    if (entityId != null && entityId.trim().length() > 0) {
+                        BaseEntity entity = entityService.load(Integer.parseInt(entityId));
+
+                        writer.write("{\"text\":\".\",\"children\": [\n" +
+                                entityToJson(entity, entity.getMeta().getClassTitle(),
+                                        entity.getMeta().getClassName()) +
+                                "]}");
+                    }
                     break;
                 default:
                     break;
