@@ -93,7 +93,7 @@ Ext.onReady(function() {
             sortable: true
         },{
             text: 'Значение',
-            flex: 1,
+            flex: 4,
             dataIndex: 'value',
             sortable: true
         }]

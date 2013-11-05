@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.MetaClassName;
@@ -16,11 +17,13 @@ import kz.bsbnb.usci.porltet.entityeditor.model.json.MetaClassList;
 import kz.bsbnb.usci.porltet.entityeditor.model.json.MetaClassListEntry;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import org.hibernate.type.MetaType;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MainPortlet extends MVCPortlet {
@@ -71,6 +74,12 @@ public class MainPortlet extends MVCPortlet {
         LIST_ENTITY
     }
 
+    private String testNull(String str) {
+        if (str == null)
+            return "";
+        return str;
+    }
+
     private String entityToJson(BaseEntity entity, String title, String code) {
         MetaClass meta = entity.getMeta();
 
@@ -82,7 +91,7 @@ public class MainPortlet extends MVCPortlet {
 
         str += "\"title\": \"" + title + "\",";
         str += "\"code\": \"" + code + "\",";
-        str += "\"value\": \"" + meta.getClassTitle() + "\",";
+        str += "\"value\": \"" + testNull(meta.getClassTitle()) + "\",";
         str += "\"iconCls\":\"folder\",";
         str += "\"children\":[";
 
@@ -108,6 +117,25 @@ public class MainPortlet extends MVCPortlet {
 
         }
 
+        for (String innerClassesNames : meta.getComplexArrayAttributesNames()) {
+            String attrTitle = innerClassesNames;
+            if (meta.getMetaAttribute(innerClassesNames).getTitle() != null &&
+                    meta.getMetaAttribute(innerClassesNames).getTitle().trim().length() > 0)
+                attrTitle = meta.getMetaAttribute(innerClassesNames).getTitle();
+
+            IBaseValue value = entity.getBaseValue(innerClassesNames);
+
+            if (value != null && value.getValue() != null) {
+                if (!first) {
+                    str += ",";
+                } else {
+                    first = false;
+                }
+
+                str +=  setToJson((BaseSet) (value.getValue()), attrTitle, innerClassesNames);
+            }
+        }
+
         for (String innerClassesNames : meta.getSimpleAttributesNames()) {
             String attrTitle = innerClassesNames;
             if (meta.getMetaAttribute(innerClassesNames).getTitle() != null &&
@@ -123,23 +151,107 @@ public class MainPortlet extends MVCPortlet {
                     first = false;
                 }
 
-                str +=  "{" +
-                "\"title\":\"" + attrTitle + "\",\n" +
-                "\"code\":\"" + innerClassesNames + "\",\n" +
-                "\"value\":\"" + value.getValue() + "\",\n" +
-                "\"leaf\":true,\n" +
-                "\"iconCls\":\"file\"\n" +
-                "}";
+                if(((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() != DataTypes.DATE) {
+                    str +=  "{" +
+                    "\"title\":\"" + attrTitle + "\",\n" +
+                    "\"code\":\"" + innerClassesNames + "\",\n" +
+                    "\"value\":\"" + testNull(value.getValue().toString()) + "\",\n" +
+                    "\"leaf\":true,\n" +
+                    "\"iconCls\":\"file\"\n" +
+                    "}";
+                } else {
+                    Object dtVal = value.getValue();
+                    String dtStr = "";
+                    if (dtVal != null) {
+                        dtStr = new SimpleDateFormat("dd.MM.yyyy").format(dtVal);
+                    }
+
+                    str +=  "{" +
+                            "\"title\":\"" + attrTitle + "\",\n" +
+                            "\"code\":\"" + innerClassesNames + "\",\n" +
+                            "\"value\":\"" + dtStr + "\",\n" +
+                            "\"leaf\":true,\n" +
+                            "\"iconCls\":\"file\"\n" +
+                            "}";
+                }
             }
         }
 
-//        str +=  "{" +
-//                "\"title\":\"item1\",\n" +
-//                "\"code\":\"item1_code\",\n" +
-//                "\"value\":\"12\",\n" +
-//                "\"leaf\":true,\n" +
-//                "\"iconCls\":\"file\"\n" +
-//                "}";
+        str += "]}";
+
+        return str;
+    }
+
+    private String setToJson(BaseSet set, String title, String code) {
+        IMetaType type = set.getMemberType();
+
+        if (title == null) {
+            title = code;
+        }
+
+        String str = "{";
+
+        str += "\"title\": \"" + title + "\",";
+        str += "\"code\": \"" + code + "\",";
+        str += "\"value\": \"" + set.get().size() + "\",";
+        str += "\"iconCls\":\"folder\",";
+        str += "\"children\":[";
+
+        boolean first = true;
+
+        int i = 0;
+
+        if (type.isComplex()) {
+            for (IBaseValue value : set.get()) {
+                if (value != null && value.getValue() != null) {
+                    if (!first) {
+                        str += ",";
+                    } else {
+                        first = false;
+                    }
+
+                    str +=  entityToJson((BaseEntity)(value.getValue()), "[" + i + "]",
+                                "[" + i + "]");
+                    i++;
+                }
+
+            }
+        } else {
+            for (IBaseValue value : set.get()) {
+                if (value != null && value.getValue() != null) {
+                    if (!first) {
+                        str += ",";
+                    } else {
+                        first = false;
+                    }
+
+                    if(((MetaValue)type).getTypeCode() != DataTypes.DATE)
+                    {
+                        str +=  "{" +
+                            "\"title\":\"" + "[" + i + "]" + "\",\n" +
+                            "\"code\":\"" + "[" + i + "]" + "\",\n" +
+                            "\"value\":\"" + testNull(value.getValue().toString()) + "\",\n" +
+                            "\"leaf\":true,\n" +
+                            "\"iconCls\":\"file\"\n" +
+                            "}";
+                    } else {
+                        Object dtVal = value.getValue();
+                        String dtStr = "";
+                        if (dtVal != null) {
+                            dtStr = new SimpleDateFormat("dd.MM.yyyy").format(dtVal);
+                        }
+
+                        str +=  "{" +
+                            "\"title\":\"" + "[" + i + "]" + "\",\n" +
+                            "\"code\":\"" + "[" + i + "]" + "\",\n" +
+                            "\"value\":\"" + dtStr + "\",\n" +
+                            "\"leaf\":true,\n" +
+                            "\"iconCls\":\"file\"\n" +
+                            "}";
+                    }
+                }
+            }
+        }
 
         str += "]}";
 
