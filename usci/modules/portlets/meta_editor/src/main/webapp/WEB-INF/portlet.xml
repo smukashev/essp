@@ -4,7 +4,7 @@
 	<portlet>
 		<portlet-name>meta-portlet</portlet-name>
 		<display-name>Портлет метаданных</display-name>
-		<portlet-class>kz.bsbnb.usci.porltet.metaeditor.MainPortlet</portlet-class>
+		<portlet-class>kz.bsbnb.usci.porltet.entityeditor.MainPortlet</portlet-class>
 		<init-param>
 			<name>view-template</name>
 			<value>/view.jsp</value>
