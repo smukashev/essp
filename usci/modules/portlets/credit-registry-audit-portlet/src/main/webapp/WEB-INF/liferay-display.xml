@@ -3,6 +3,6 @@
 
 <display>
     <category name="com.bsbnb.credit-registry">
-        <portlet id="credit-registry-upload-portlet" />
+        <portlet id="credit-registry-audit-portlet" />
     </category>
 </display>

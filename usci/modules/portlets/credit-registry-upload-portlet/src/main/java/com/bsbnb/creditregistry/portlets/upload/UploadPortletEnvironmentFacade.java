@@ -14,6 +14,7 @@ public class UploadPortletEnvironmentFacade implements PortletEnvironmentFacade{
     private ResourceBundle bundle;
     private boolean isKazakh;
     private User user;
+    private boolean usingDigitalSign = false;
     
     public UploadPortletEnvironmentFacade(User user) {
         this.user = user;
@@ -34,6 +35,14 @@ public class UploadPortletEnvironmentFacade implements PortletEnvironmentFacade{
     @Override
     public boolean isLanguageKazakh() {
         return isKazakh;
+    }
+
+    public boolean isUsingDigitalSign() {
+        return usingDigitalSign;
+    }
+
+    public void setUsingDigitalSign(boolean value) {
+        usingDigitalSign = value;
     }
     
 }

@@ -855,4 +855,33 @@
         <unique-column name="report_date"/>
       </unique>
     </table>
+
+
+
+    <table name = "AUDIT_EVENT_KIND">
+      <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+      <column name="name" primaryKey="false" required="true" type="VARCHAR" size="100" autoIncrement="false"/>
+      <column name="is_always_auditable" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+      <column name="is_active" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false" default="1"/>
+      <column name="code" primaryKey="false" required="true" type="VARCHAR" size="512" autoIncrement="false"/>
+    </table>
+
+    <table name="AUDIT_EVENT">
+      <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+      <column name="kind_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+      <column name="user_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+      <column name="event_begin_d" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+      <column name="event_begin_dt" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+      <column name="event_end_dt" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
+      <column name="is_success" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+      <column name="err_code" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+      <column name="err_msg" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+      <column name="add_info" primaryKey="false" required="false" type="VARCHAR" size="4000" autoIncrement="false"/>
+      <column name="table_name" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
+
+      <foreign-key foreignTable="AUDIT_EVENT_KIND" name="FK_AUDIT_EVENT_AEK">
+        <reference local="kind_id" foreign="id"/>
+      </foreign-key>
+
+    </table>
   </database>

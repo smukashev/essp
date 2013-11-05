@@ -12,4 +12,8 @@ public interface PortletEnvironmentFacade {
     
     public boolean isLanguageKazakh();
     
+    public boolean isUsingDigitalSign();
+    
+    public void setUsingDigitalSign(boolean value);
+    
 }

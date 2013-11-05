@@ -22,6 +22,9 @@ public class MainLayout extends TabSheet{
         
         Tab multiUploadTab = addTab(new MultiUploadComponent(portletEnvironment));
         multiUploadTab.setCaption(portletEnvironment.getResourceString(Localization.MULTIPLE_UPLOAD_TAB_CAPTION.getKey()));
+        
+        Tab digitalSigningConfigurationTab = addTab(new DigitalSignConfigurationComponent(portletEnvironment));
+        digitalSigningConfigurationTab.setCaption(portletEnvironment.getResourceString(Localization.DIGITAL_SIGN_TAB_CAPTION.getKey()));
     }
     
 }

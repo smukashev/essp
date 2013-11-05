@@ -31,4 +31,12 @@ public class TestPortletEnvironmentFacade implements PortletEnvironmentFacade {
     public boolean isLanguageKazakh() {
         return true;
     }
+
+    public boolean isUsingDigitalSign() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setUsingDigitalSign(boolean value) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
