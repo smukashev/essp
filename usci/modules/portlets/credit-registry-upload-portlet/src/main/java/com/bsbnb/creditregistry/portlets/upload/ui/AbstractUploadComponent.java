@@ -53,7 +53,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
     private Creditor creditor;
     private VerticalLayout statusPanel;
     private Label errorMessageLabel;
-    private static final String UPLOADS_PATH = "c:\\zips_tmp";
+    private static final String UPLOADS_PATH = "/tmp";
     public static final long MAX_FILE_LENGTH = 5 * (1L << 20);
     private PortletEnvironmentFacade portletEnvironment;
 

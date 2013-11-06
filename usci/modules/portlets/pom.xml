@@ -30,6 +30,7 @@
         <module>credit-registry-upload-portlet</module>
         <module>credit-registry-report-portlet</module>
         <module>credit-registry-audit-portlet</module>
+        <module>credit-registry-signing-portlet</module>
         <module>meta_editor</module>
         <module>entity_editor</module>
         <module>translit-util</module>
