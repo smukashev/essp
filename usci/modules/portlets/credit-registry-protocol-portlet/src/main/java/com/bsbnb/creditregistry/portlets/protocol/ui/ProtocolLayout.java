@@ -51,6 +51,8 @@ import com.vaadin.ui.VerticalLayout;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.SubjectType;
 
+import javax.portlet.PortletURL;
+
 /**
  *
  * @author Marat.Madybayev
@@ -85,12 +87,12 @@ public class ProtocolLayout extends VerticalLayout {
     private static final String[] FILES_TABLE_COLUMNS_TO_EXPORT = new String[]{
         "creditorName", "fileName", "receiverDate", "startDate", "completionDate", "statusName", "reportDate"};
     private static final String[] PROTOCOL_TABLE_COLUMNS = new String[]{
-        "statusIcon", "message", "note"};
+        "statusIcon", "message", "note", "link"};
     private static final String[] EXTENDED_PROTOCOL_TABLE_COLUMNS = new String[]{
-        "statusIcon", "typeName", "description", "primaryContractDate", "message", "note"
+        "statusIcon", "typeName", "description", "primaryContractDate", "message", "note", "link"
     };
     private static final String[] EXPORT_PROTOCOL_TABLE_COLUMNS = new String[]{
-        "description", "primaryContractDate", "typeName", "messageTypeName", "message", "note"
+        "description", "primaryContractDate", "typeName", "messageTypeName", "message", "note", "link"
     };
 
     public ProtocolLayout(DataProvider provider) {

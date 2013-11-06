@@ -10,6 +10,7 @@ import com.bsbnb.creditregistry.portlets.protocol.PortletEnvironmentFacade;
 import com.bsbnb.creditregistry.portlets.protocol.ProtocolPortletResource;
 import com.vaadin.terminal.Resource;
 import com.vaadin.ui.Embedded;
+import com.vaadin.ui.Link;
 import kz.bsbnb.usci.cr.model.Message;
 import kz.bsbnb.usci.cr.model.MessageType;
 import kz.bsbnb.usci.cr.model.Protocol;
@@ -134,5 +135,17 @@ public class ProtocolDisplayBean {
             return "";
         }
         return PortletEnvironmentFacade.get().isLanguageKazakh() ? messageType.getNameKz() : messageType.getNameRu();
+    }
+
+    private Link link;
+
+    public Link getLink()
+    {
+        return link;
+    }
+
+    public void setLink(Link link)
+    {
+        this.link = link;
     }
 }

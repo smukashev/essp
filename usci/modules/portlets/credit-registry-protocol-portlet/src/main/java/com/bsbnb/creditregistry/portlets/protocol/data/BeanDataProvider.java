@@ -10,6 +10,8 @@ import java.util.ArrayList;
 //import com.bsbnb.creditregistry.ejb.api.maintenance.PortalUserBeanRemoteBusiness;
 //import com.bsbnb.creditregistry.ejb.api.maintenance.ProtocolBeanRemoteBusiness;
 import com.bsbnb.creditregistry.portlets.protocol.PortletEnvironmentFacade;
+import com.vaadin.terminal.ExternalResource;
+import com.vaadin.ui.Link;
 import kz.bsbnb.usci.core.service.*;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputFile;
@@ -88,7 +90,12 @@ public class BeanDataProvider implements DataProvider {
         System.out.println("Protocols count: " + protocols.size());
         List<ProtocolDisplayBean> result = new ArrayList<ProtocolDisplayBean>();
         for (Protocol protocol : protocols) {
-            result.add(new ProtocolDisplayBean(protocol));
+            ProtocolDisplayBean pr = new ProtocolDisplayBean(protocol);
+            if (protocol.getMessageType().getNameRu().equals("SAVED"))
+                pr.setLink(new Link("Просмотр", new ExternalResource("?entityId=" +
+                        protocol.getMessage().getNameRu())));
+
+            result.add(pr);
         }
         return result;
     }

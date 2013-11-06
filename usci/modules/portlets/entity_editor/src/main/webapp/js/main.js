@@ -134,7 +134,8 @@ Ext.onReady(function() {
                 fieldLabel: 'Идентификатор сущности',
                 id: 'entityId',
                 name: 'entityId',
-                xtype: 'textfield'
+                xtype: 'textfield',
+                value: givenEntityId
             },
             buttonShow
         ]

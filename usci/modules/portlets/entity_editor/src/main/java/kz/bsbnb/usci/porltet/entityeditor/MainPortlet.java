@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.porltet.entityeditor;
 
 import com.google.gson.Gson;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -21,6 +22,7 @@ import org.hibernate.type.MetaType;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
@@ -65,7 +67,13 @@ public class MainPortlet extends MVCPortlet {
     @Override
     public void doView(RenderRequest renderRequest,
                        RenderResponse renderResponse) throws IOException, PortletException {
-       //renderRequest.setAttribute("entityList", baseEntityList);
+
+        HttpServletRequest httpReq = PortalUtil.getOriginalServletRequest(
+                PortalUtil.getHttpServletRequest(renderRequest));
+
+        String entityId = httpReq.getParameter("entityId");
+        renderRequest.setAttribute("entityId", entityId);
+
         super.doView(renderRequest, renderResponse);
     }
 

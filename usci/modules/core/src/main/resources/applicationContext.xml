@@ -9,6 +9,8 @@
 
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
     <context:component-scan base-package="kz.bsbnb.usci.core.service.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.core.factory" />
+    <context:component-scan base-package="kz.bsbnb.usci.core.protocol" />
 
     <context:annotation-config/>
 

@@ -1,7 +1,10 @@
 package kz.bsbnb.usci.core.service.impl;
 
+import kz.bsbnb.usci.core.protocol.ProtocolSingleton;
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * @author k.tulbassiyev
@@ -26,6 +30,9 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Autowired
     IMetaClassDao metaClassDao;
 
+    @Autowired
+    protected ProtocolSingleton statusSingleton;
+
     public EntityServiceImpl() throws RemoteException {
         super();
     }
@@ -33,10 +40,20 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Override
     public void save(BaseEntity baseEntity) {
         long t1 = System.currentTimeMillis();
-        baseEntityDao.process(baseEntity);
+        BaseEntity entity = (BaseEntity)baseEntityDao.process(baseEntity);
         long t2 = System.currentTimeMillis() - t1;
 
+        Date contractDate = (Date)entity.getEl("primary_contract.date");
+        String contractNo = (String)entity.getEl("primary_contract.no");
+
         System.out.println("[core][save]                :           " + t2);
+        System.out.println(contractNo + " - " + contractDate);
+
+        statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
+                entity.getBatchIndex() - 1,
+                "SAVED", "" + entity.getId(), new Date(),
+                contractNo,
+                contractDate));
     }
 
     @Override

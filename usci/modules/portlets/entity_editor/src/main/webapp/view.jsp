@@ -18,6 +18,7 @@
 
 <script>
     var dataUrl = '<%=getDataURL%>';
+    var givenEntityId = '<%=renderRequest.getAttribute("entityId")%>';
     var contextPathUrl = '<%=request.getContextPath()%>';
 </script>
 
