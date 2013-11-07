@@ -1,0 +1,13 @@
+th {
+    background-color: lightsteelblue;
+    border-color: black;
+    text-align: center; 
+}
+
+table {
+    width:100%;
+}
+
+td {
+    border-color:black;
+}
