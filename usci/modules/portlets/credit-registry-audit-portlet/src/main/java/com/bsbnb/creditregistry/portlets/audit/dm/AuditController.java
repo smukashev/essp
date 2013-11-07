@@ -41,10 +41,12 @@ public class AuditController {
         List<AuditTableRecord> ret = new ArrayList<AuditTableRecord>();
 
         try {
-               ResultSet rows = getStatement().executeQuery("SELECT * FROM Audit_Event order by EVENT_BEGIN_DT");
+               //ResultSet rows = getStatement().executeQuery("SELECT t.*, r.screen_name FROM Audit_Event t, users r where t.user_id = r.user_id ORDER BY EVENT_BEGIN_DT desc");
+            ResultSet rows = getStatement().executeQuery("SELECT t.*, k.name FROM Audit_Event t, Audit_Event_kind k WHERE t.kind_id = k.id ORDER BY EVENT_BEGIN_DT DESC");
                while(rows.next()){
                     ret.add(mapAuditTableRecord(rows));
                }
+               connection.close();
         } catch (SQLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -100,11 +102,13 @@ public class AuditController {
 
     public static Statement getStatement(){
         try {
-            if(connection == null){
+            Class.forName("oracle.jdbc.OracleDriver");
+            connection = DriverManager.getConnection("jdbc:oracle:thin:@192.168.0.44:1521:USCI", "BAUKA", "123123");
+            /*if(connection == null){
                 Class.forName("oracle.jdbc.OracleDriver");
                 connection = DriverManager.getConnection("jdbc:oracle:thin:@192.168.0.44:1521:USCI", "BAUKA", "123123");
                 return connection.createStatement();
-            }
+            } */
             return connection.createStatement();
         } catch (SQLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -118,20 +122,35 @@ public class AuditController {
     public AuditTableRecord mapAuditTableRecord(ResultSet row){
        AuditEvent ae = new AuditEvent();
        AuditTableRecord ret = new AuditTableRecord(ae);
+       AuditEventKind aek =new AuditEventKind();
 
-        String s = "";
+        //String s = "";
 
        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             ret.setUserId(Long.parseLong(row.getString("USER_ID")));
+            //ret.setUserId(2L);
             ret.setBeginDate(df.parse(row.getString("EVENT_BEGIN_DT")));
-            ret.setErrorCode(Integer.parseInt(row.getString("ERR_CODE")));
+            //ret.setErrorCode(Integer.parseInt(row.getString("ERR_CODE")));
             ret.setInfo(row.getString("ADD_INFO"));
             ret.setTableName(row.getString("TABLE_NAME"));
-            ret.setEndDate(df.parse(row.getString("EVENT_END_DT")));
+            aek.setId(Long.parseLong(row.getString("kind_id")));
+            aek.setName(row.getString("name"));
+            ret.setKind(aek);
+            //s = row.getString("TABLE_NAME");
+            //ret.setEndDate(df.parse(row.getString("EVENT_END_DT")));
         } catch (Exception e) {
-            s = e.getMessage();
+            //e.printStackTrace();
+            //s = e.getMessage();
         }
+
+        /*try {
+            PrintWriter pw = new PrintWriter(new File("C:\\sms.txt"));
+            pw.println("inf " + s);
+            pw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } */
 
         return ret;
     }
