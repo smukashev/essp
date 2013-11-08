@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.tool.ddl.DDLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
 import java.lang.reflect.Method;
@@ -144,5 +145,16 @@ public class PostgreSQLStorageImpl extends JDBCSupport implements IStorage {
         }
 
         return res;
+    }
+
+    @Override
+    public boolean simpleSql(String sql) {
+        try {
+            jdbcTemplate.execute(sql);
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 }

@@ -10,4 +10,5 @@ public interface IStorage
     public boolean isClean();
     public boolean testConnection();
     public HashMap<String, Long> tableCounts();
+    public boolean simpleSql(String sql);
 }

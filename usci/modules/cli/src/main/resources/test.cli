@@ -4,9 +4,9 @@ clear
 init
 
 # Convert xsd to MetaClass ct_package
-xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_package
-xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_base
-xsd convert ./usci/modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_msfo
+xsd convert ./modules/cli/src/main/resources/credit-registry.xsd ct_package
+xsd convert ./modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_base
+xsd convert ./modules/cli/src/main/resources/credit-registry.xsd ct_portfolio_flow_msfo
 
 #meta show name ct_package
 
@@ -515,37 +515,45 @@ meta key name ref_shared code
 rc
 
 # Load CR batch file 99999 entries beginning from 0
-#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 99999 0
+#crbatch ./modules/cli/src/main/resources/test_batch.xml 99999 0
 
-#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 2 90 01.02.2013
-#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 3 90
+#crbatch ./modules/cli/src/main/resources/test_batch.xml 2 90 01.02.2013
+#crbatch ./modules/cli/src/main/resources/test_batch.xml 3 90
 
-entity read  ./usci/modules/cli/src/main/resources/refs/doc1.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_balance_account.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_bank_relation.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_classification.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_contact_type.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_country.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_credit_object.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_credit_purpose.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_credit_type.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_creditor.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_creditor_branch.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_currency.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_doc_type.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_econ_trade.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_enterprise_type.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_finance_source.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_legal_form.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_offshore.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_pledge_type.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_portfolio.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_region.xml
-entity read  ./usci/modules/cli/src/main/resources/refs/ref_shared.xml
+#=============================================================================================
+#=Audit
+#=============================================================================================
+sql insert into audit_event_kind (name,is_always_auditable,is_active,code) values ('error',1,1,'122AA')
+sql insert into audit_event_kind (name,is_always_auditable,is_active,code) values ('warn',1,1,'126AA')
+sql insert into audit_event_kind (name,is_always_auditable,is_active,code) values ('debug',1,1,'126AA')
+#---------------------------------------------------------------------------------------------
+
+entity read  ./modules/cli/src/main/resources/refs/doc1.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_balance_account.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_bank_relation.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_classification.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_contact_type.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_country.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_credit_object.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_credit_purpose.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_credit_type.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_creditor.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_creditor_branch.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_currency.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_doc_type.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_econ_trade.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_enterprise_type.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_finance_source.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_legal_form.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_offshore.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_pledge_type.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_portfolio.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_region.xml
+entity read  ./modules/cli/src/main/resources/refs/ref_shared.xml
 
 
 
-crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 5 0
+crbatch ./modules/cli/src/main/resources/test_batch.xml 5 0
 #crbatch C:\Users\bauyrzhan.makhambeto\Documents\Portfolio_flow_20130901.xml 50 0
 #crbatch C:\1.xml 50 0
 #quit

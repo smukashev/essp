@@ -131,7 +131,7 @@ public class AuditController {
             ret.setUserId(Long.parseLong(row.getString("USER_ID")));
             //ret.setUserId(2L);
             ret.setBeginDate(df.parse(row.getString("EVENT_BEGIN_DT")));
-            //ret.setErrorCode(Integer.parseInt(row.getString("ERR_CODE")));
+            ret.setEndDate(df.parse(row.getString("EVENT_END_DT")));
             ret.setInfo(row.getString("ADD_INFO"));
             ret.setTableName(row.getString("TABLE_NAME"));
             aek.setId(Long.parseLong(row.getString("kind_id")));

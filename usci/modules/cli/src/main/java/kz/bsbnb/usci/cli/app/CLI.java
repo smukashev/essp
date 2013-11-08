@@ -628,6 +628,18 @@ public class CLI
         }
     }
 
+    public void commandSql(){
+
+        System.out.println("ok sql mode...");
+        StringBuilder str = new StringBuilder();
+        for(Object o : args)
+            str.append(o+" ");
+        System.out.println(str.toString());
+        boolean res = storage.simpleSql(str.toString());
+        System.out.println( res?"success":"fail");
+
+    }
+
     public void run() {
         if (storage.testConnection()) {
             System.out.println("Connected to DB.");
@@ -710,7 +722,9 @@ public class CLI
                     } else if (command.equals("meta")) {
                         commandMeta();
                     } else if (command.equals("entity")) {
-                        commandEntity();
+                        commandEntity();}
+                    else if(command.equals("sql")){
+                        commandSql();
                     } else {
                         System.out.println("No such command: " + command);
                     }

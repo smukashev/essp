@@ -663,8 +663,6 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         }
     }
 
-    static boolean created = false;
-
     @Override
     @Transactional
     public IBaseEntity process(IBaseEntity baseEntity)
@@ -676,30 +674,19 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         Long userId = ((BaseValue)((baseEntity.get().toArray())[0])).getBatch().getUserId();
         String str = baseEntity.getMeta().getClassName();
 
-        if(!created){
-            Insert insert2 = context
-                    .insertInto(AUDIT_EVENT_KIND)
-                    .set(AUDIT_EVENT_KIND.NAME, "warn")
-                    .set(AUDIT_EVENT_KIND.IS_ALWAYS_AUDITABLE, 1L)
-                    .set(AUDIT_EVENT_KIND.IS_ACTIVE, 1L)
-                    .set(AUDIT_EVENT_KIND.CODE, "213A");
-
-            insertWithId(insert2.getSQL(),insert2.getBindValues().toArray());
-            created = true;
-        }
-
         Insert insert = context
                 .insertInto(AUDIT_EVENT)
                 .set(AUDIT_EVENT.USER_ID, userId)
                 .set(AUDIT_EVENT.KIND_ID, 1L)
                 .set(AUDIT_EVENT.TABLE_NAME, str)
                 .set(AUDIT_EVENT.ADD_INFO, "test")
-                .set(AUDIT_EVENT.EVENT_BEGIN_D, new Date(System.currentTimeMillis()))
-                .set(AUDIT_EVENT.EVENT_BEGIN_DT, new Date(System.currentTimeMillis()))
+                .set(AUDIT_EVENT.EVENT_BEGIN_D, new Date(Calendar.getInstance().getTimeInMillis()))
+                .set(AUDIT_EVENT.EVENT_BEGIN_DT, new Timestamp(Calendar.getInstance().getTimeInMillis()))
+                .set(AUDIT_EVENT.EVENT_END_DT, new Timestamp(Calendar.getInstance().getTimeInMillis()))
                 .set(AUDIT_EVENT.IS_SUCCESS, 1L);
 
 
-        insertWithId(insert.getSQL(),insert.getBindValues().toArray());
+        insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
 
 
