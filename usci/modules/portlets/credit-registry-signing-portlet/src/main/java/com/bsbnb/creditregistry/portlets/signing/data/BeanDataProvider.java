@@ -88,7 +88,7 @@ public class BeanDataProvider implements DataProvider {
         List<InputFile> inputFiles = new ArrayList<InputFile>();
         InputFile inputFile1 = new InputFile();
 
-        inputFile1.setFilePath("asd");
+        inputFile1.setFilePath("batch22838.zip");
         inputFile1.setId(1L);
         inputFiles.add(inputFile1);
 

@@ -92,7 +92,8 @@ public class BeanDataProvider implements DataProvider {
         for (Protocol protocol : protocols) {
             ProtocolDisplayBean pr = new ProtocolDisplayBean(protocol);
             if (protocol.getMessageType().getNameRu().equals("SAVED"))
-                pr.setLink(new Link("Просмотр", new ExternalResource("?entityId=" +
+                pr.setLink(new Link("Просмотр",
+                        new ExternalResource("https://170.7.15.117/web/guest/31?entityId=" +
                         protocol.getMessage().getNameRu())));
 
             result.add(pr);

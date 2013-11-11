@@ -103,10 +103,10 @@ public class AuditController {
     public static Statement getStatement(){
         try {
             Class.forName("oracle.jdbc.OracleDriver");
-            connection = DriverManager.getConnection("jdbc:oracle:thin:@192.168.0.44:1521:USCI", "BAUKA", "123123");
+            connection = DriverManager.getConnection("jdbc:oracle:thin:@170.7.15.109:1521:ESSP", "CORE", "CORE_2013");
             /*if(connection == null){
                 Class.forName("oracle.jdbc.OracleDriver");
-                connection = DriverManager.getConnection("jdbc:oracle:thin:@192.168.0.44:1521:USCI", "BAUKA", "123123");
+                connection = DriverManager.getConnection("jdbc:oracle:thin:@170.7.15.109:1521:ESSP", "CORE", "CORE_2013");
                 return connection.createStatement();
             } */
             return connection.createStatement();
