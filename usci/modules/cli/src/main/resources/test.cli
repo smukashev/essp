@@ -381,6 +381,12 @@ meta add portfolio portfolio_msfo MetaClass ref_portfolio
 meta remove ct_portfolio_flow_base portfolio
 meta add ct_portfolio_flow_base portfolio MetaClass ref_portfolio
 
+meta add ct_portfolio_flow_base creditor MetaClass ref_creditor
+
+meta add ct_portfolio_flow_base account_date DATE
+meta add ct_portfolio_flow_base report_date DATE
+meta add ct_portfolio_flow_base actual_credit_count INTEGER
+
 meta remove ct_portfolio_flow_msfo portfolio
 meta add ct_portfolio_flow_msfo portfolio MetaClass ref_portfolio
 
@@ -389,6 +395,11 @@ meta add ct_portfolio_flow_msfo creditor MetaClass ref_creditor
 meta add ct_portfolio_flow_msfo account_date DATE
 meta add ct_portfolio_flow_msfo report_date DATE
 meta add ct_portfolio_flow_msfo actual_credit_count INTEGER
+
+meta create portfolio_data
+
+meta add portfolio_data portfolio_flow MetaClass ct_portfolio_flow_base true
+meta add portfolio_data portfolio_flow_msfo MetaClass ct_portfolio_flow_msfo true
 
 meta key name ref_portfolio code
 #---------------------------------------------------------------------------------------------
@@ -510,7 +521,13 @@ meta add ref_shared note STRING
 meta key name ref_shared code
 #---------------------------------------------------------------------------------------------
 
+meta create jur_name
 
+meta add jur_name lang STRING
+meta add jur_name st_string STRING
+
+meta remove organization names
+meta add organization names MetaClass jur_name true
 
 rc
 

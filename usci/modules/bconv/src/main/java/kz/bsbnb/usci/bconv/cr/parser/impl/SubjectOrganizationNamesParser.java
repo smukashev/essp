@@ -47,13 +47,13 @@ public class SubjectOrganizationNamesParser extends BatchParser {
             } else {
                 throw new UnknownValException(localName, attributes.getValue("lang"));
             }*/
-            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("name1"),new Date());
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("jur_name"),new Date());
             currentBaseEntity.put("lang",new BaseValue(batch,index,
                     event.asStartElement().getAttributeByName(new QName("lang")).getValue()));
             event = (XMLEvent) xmlReader.next();
-            BaseSet baseSet = new BaseSet(new MetaValue(DataTypes.STRING));
-            baseSet.put(new BaseValue(batch,index,event.asCharacters().getData()));
-            currentBaseEntity.put("st_string", new BaseValue(batch,index,baseSet));
+            //BaseSet baseSet = new BaseSet(new MetaValue(DataTypes.STRING));
+            //baseSet.put(new BaseValue(batch,index,event.asCharacters().getData()));
+            currentBaseEntity.put("st_string", new BaseValue(batch,index,event.asCharacters().getData()));
         } else {
             throw new UnknownTagException(localName);
         }

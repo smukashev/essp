@@ -136,15 +136,17 @@ public class MainParser extends BatchParser {
                 }
             }
         } else if(currentTag.equals("portfolio_data")) {
+
+            portfolioDataParser.setInfoParser(infoParser);
             portfolioDataParser.parse(xmlReader, batch, index);
             hasMorePortfolioData = portfolioDataParser.hasMore();
             if (hasMorePortfolioData) {
                 currentBaseEntity = portfolioDataParser.getCurrentBaseEntity();
 
-                currentBaseEntity.put("creditor", new BaseValue(batch,index,infoParser.getCurrentBaseEntity()));
-                currentBaseEntity.put("account_date", infoParser.getAccountDate());
-                currentBaseEntity.put("report_date", infoParser.getReportDate());
-                currentBaseEntity.put("actual_credit_count", infoParser.getActualCreditCount());
+                //currentBaseEntity.put("creditor", new BaseValue(batch,index,infoParser.getCurrentBaseEntity()));
+                //currentBaseEntity.put("account_date", infoParser.getAccountDate());
+                //currentBaseEntity.put("report_date", infoParser.getReportDate());
+                //currentBaseEntity.put("actual_credit_count", infoParser.getActualCreditCount());
             } else {
                 if (hasMorePackages) {
                     parse(xmlReader, batch, index--);
