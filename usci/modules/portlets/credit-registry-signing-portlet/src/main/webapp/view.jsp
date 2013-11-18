@@ -13,7 +13,7 @@
 <%@ taglib prefix="liferay-ui" uri="http://liferay.com/tld/ui" %>
 <portlet:defineObjects />
 
-<link type="text/css" rel="stylesheet" src="${PortalUrl}${ContextPath}/css/style.css" />
+<link type="text/css" rel="stylesheet" src="https://170.7.15.117/credit-registry-signing-portlet/css/style.css" />
 <script type="text/javascript">
 
     function loadProfiles() {
@@ -76,7 +76,7 @@
                 sign.value = pkcs7;
 
                 var acceptImage = document.createElement('img');
-                acceptImage.src = '${PortalUrl}${ContextPath}/accept.png';
+                acceptImage.src = 'https://170.7.15.117/credit-registry-signing-portlet/accept.png';
                 var signSymbolCell = document.getElementById("signSymbol" + id);
                 signSymbolCell.appendChild(acceptImage);
             }
@@ -84,9 +84,9 @@
     }
 
 </script>
-<script type="text/javascript" src="${PortalUrl}${ContextPath}/js/deployJava.js"></script>
+<script type="text/javascript" src="https://170.7.15.117/credit-registry-signing-portlet/js/deployJava.js"></script>
 <script type="text/javascript">
-    var contextPath = '${PortalUrl}${ContextPath}';
+    var contextPath = 'https://170.7.15.117/credit-registry-signing-portlet';
     var attributes = {
         codebase: './',
         code: 'kz.gamma.TumarCSP.class',

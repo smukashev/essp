@@ -100,6 +100,9 @@ public class MainPortlet extends MVCPortlet {
         str += "\"title\": \"" + title + "\",";
         str += "\"code\": \"" + code + "\",";
         str += "\"value\": \"" + testNull(meta.getClassTitle()) + "\",";
+        str += "\"simple\": false,";
+        str += "\"array\": false,";
+        str += "\"type\": \"CLASS\",";
         str += "\"iconCls\":\"folder\",";
         str += "\"children\":[";
 
@@ -164,6 +167,9 @@ public class MainPortlet extends MVCPortlet {
                     "\"title\":\"" + attrTitle + "\",\n" +
                     "\"code\":\"" + innerClassesNames + "\",\n" +
                     "\"value\":\"" + testNull(value.getValue().toString()) + "\",\n" +
+                    "\"simple\": true,\n" +
+                    "\"array\": false,\n" +
+                    "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
                     "\"leaf\":true,\n" +
                     "\"iconCls\":\"file\"\n" +
                     "}";
@@ -178,6 +184,9 @@ public class MainPortlet extends MVCPortlet {
                             "\"title\":\"" + attrTitle + "\",\n" +
                             "\"code\":\"" + innerClassesNames + "\",\n" +
                             "\"value\":\"" + dtStr + "\",\n" +
+                            "\"simple\": true,\n" +
+                            "\"array\": false,\n" +
+                            "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
                             "\"leaf\":true,\n" +
                             "\"iconCls\":\"file\"\n" +
                             "}";
@@ -202,6 +211,9 @@ public class MainPortlet extends MVCPortlet {
         str += "\"title\": \"" + title + "\",";
         str += "\"code\": \"" + code + "\",";
         str += "\"value\": \"" + set.get().size() + "\",";
+        str += "\"simple\": false,";
+        str += "\"array\": true,";
+        str += "\"type\": \"SET\",";
         str += "\"iconCls\":\"folder\",";
         str += "\"children\":[";
 
@@ -239,6 +251,9 @@ public class MainPortlet extends MVCPortlet {
                             "\"title\":\"" + "[" + i + "]" + "\",\n" +
                             "\"code\":\"" + "[" + i + "]" + "\",\n" +
                             "\"value\":\"" + testNull(value.getValue().toString()) + "\",\n" +
+                            "\"simple\": true,\n" +
+                            "\"array\": false,\n" +
+                            "\"type\": \"" + ((MetaValue)type).getTypeCode() + "\",\n" +
                             "\"leaf\":true,\n" +
                             "\"iconCls\":\"file\"\n" +
                             "}";
@@ -253,6 +268,9 @@ public class MainPortlet extends MVCPortlet {
                             "\"title\":\"" + "[" + i + "]" + "\",\n" +
                             "\"code\":\"" + "[" + i + "]" + "\",\n" +
                             "\"value\":\"" + dtStr + "\",\n" +
+                            "\"simple\": true,\n" +
+                            "\"array\": false,\n" +
+                            "\"type\": \"" + ((MetaValue)type).getTypeCode() + "\",\n" +
                             "\"leaf\":true,\n" +
                             "\"iconCls\":\"file\"\n" +
                             "}";

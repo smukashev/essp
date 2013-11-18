@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE database SYSTEM "http://db.apache.org/torque/dtd/database">
   <database name="model">
-    <table name="users">
+    <table name="eav_a_user">
       <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
       <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
       <column name="screen_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
@@ -10,26 +10,25 @@
       <column name="last_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
       <column name="middle_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
       <column name="modified_date" primaryKey="false" required="false" type="DATE"/>
-      <unique>
-        <unique-column name="id"/>
-      </unique>
     </table>
-
-    <table name="cred_app_state">
+    <table name="eav_a_creditor_state">
       <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
       <column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-      <unique>
-        <unique-column name="id"/>
-      </unique>
+      <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+      <foreign-key foreignTable="eav_be_entities" name="eav_fk_022_01">
+        <reference local="creditor_id" foreign="id"/>
+      </foreign-key>
     </table>
-
-    <table name="creditor_user">
+    <table name="eav_a_creditor_user">
       <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
       <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
       <column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-      <unique>
-        <unique-column name="id"/>
-      </unique>
+      <foreign-key foreignTable="eav_a_user" name="eav_fk_023_01">
+        <reference local="user_id" foreign="id"/>
+      </foreign-key>
+      <foreign-key foreignTable="eav_be_entities" name="eav_fk_023_02">
+        <reference local="creditor_id" foreign="id"/>
+      </foreign-key>
     </table>
 
     <!--<table name="eav_m_array_key_filter">
