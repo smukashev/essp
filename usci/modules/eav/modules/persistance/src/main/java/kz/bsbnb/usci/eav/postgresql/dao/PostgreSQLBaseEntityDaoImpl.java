@@ -2450,9 +2450,9 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     @Override
     public boolean isApproved(long id) {
         Select select = context
-                .select(CRED_APP_STATE.ID)
-                .from(CRED_APP_STATE)
-                .where(CRED_APP_STATE.CREDITOR_ID.equal(id));
+                .select(EAV_A_CREDITOR_STATE.ID)
+                .from(EAV_A_CREDITOR_STATE)
+                .where(EAV_A_CREDITOR_STATE.CREDITOR_ID.equal(id));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -2477,15 +2477,15 @@ where c.name = 'primary_contract' and cu.creditor_id is not null
 group by cu.creditor_id;
         */
         Select select = context
-                .select(CREDITOR_USER.CREDITOR_ID, EAV_BE_ENTITIES.ID.count().as("cr_count"))
+                .select(EAV_A_CREDITOR_USER.CREDITOR_ID, EAV_BE_ENTITIES.ID.count().as("cr_count"))
                 .from(EAV_BE_ENTITIES)
                 .leftOuterJoin(EAV_M_CLASSES).on(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
                 .leftOuterJoin(EAV_BE_COMPLEX_VALUES).on(EAV_BE_ENTITIES.ID.eq(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID))
                 .leftOuterJoin(EAV_BATCHES).on(EAV_BE_COMPLEX_VALUES.BATCH_ID.eq(EAV_BATCHES.ID))
-                .leftOuterJoin(CREDITOR_USER).on(EAV_BATCHES.USER_ID.eq(CREDITOR_USER.USER_ID))
+                .leftOuterJoin(EAV_A_CREDITOR_USER).on(EAV_BATCHES.USER_ID.eq(EAV_A_CREDITOR_USER.USER_ID))
                 .where(EAV_M_CLASSES.NAME.eq("primary_contract"))
-                .and(CREDITOR_USER.CREDITOR_ID.eq(id))
-                .groupBy(CREDITOR_USER.CREDITOR_ID);
+                .and(EAV_A_CREDITOR_USER.CREDITOR_ID.eq(id))
+                .groupBy(EAV_A_CREDITOR_USER.CREDITOR_ID);
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

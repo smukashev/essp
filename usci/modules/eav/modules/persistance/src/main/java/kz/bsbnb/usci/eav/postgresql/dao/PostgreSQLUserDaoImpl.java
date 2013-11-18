@@ -47,9 +47,9 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
 
 
         select = context.select(
-                CREDITOR_USER.ID
-        ).from(CREDITOR_USER).
-                where(CREDITOR_USER.USER_ID.eq(userId)).and(CREDITOR_USER.CREDITOR_ID.eq(creditorId));
+                EAV_A_CREDITOR_USER.ID
+        ).from(EAV_A_CREDITOR_USER).
+                where(EAV_A_CREDITOR_USER.USER_ID.eq(userId)).and(EAV_A_CREDITOR_USER.CREDITOR_ID.eq(creditorId));
 
 
         logger.debug(select.toString());
@@ -68,9 +68,9 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
         try
         {
             InsertOnDuplicateStep insert = context.insertInto(
-                    CREDITOR_USER,
-                    CREDITOR_USER.USER_ID,
-                    CREDITOR_USER.CREDITOR_ID
+                    EAV_A_CREDITOR_USER,
+                    EAV_A_CREDITOR_USER.USER_ID,
+                    EAV_A_CREDITOR_USER.CREDITOR_ID
             ).values(userId, creditorId);
 
             logger.debug(insert.toString());
@@ -87,8 +87,8 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
     public void unsetPortalUserCreditors(long userId, long creditorId)
     {
         DeleteConditionStep deleteFilter =
-                context.delete(CREDITOR_USER).
-                        where(CREDITOR_USER.USER_ID.eq(userId)).and(CREDITOR_USER.CREDITOR_ID.eq(creditorId));
+                context.delete(EAV_A_CREDITOR_USER).
+                        where(EAV_A_CREDITOR_USER.USER_ID.eq(userId)).and(EAV_A_CREDITOR_USER.CREDITOR_ID.eq(creditorId));
 
         long t = 0;
         if(sqlStats != null)
@@ -114,9 +114,9 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
 
 
         select = context.select(
-                CREDITOR_USER.CREDITOR_ID
-        ).from(CREDITOR_USER).
-                where(CREDITOR_USER.USER_ID.eq(userId));
+                EAV_A_CREDITOR_USER.CREDITOR_ID
+        ).from(EAV_A_CREDITOR_USER).
+                where(EAV_A_CREDITOR_USER.USER_ID.eq(userId));
 
 
         logger.debug(select.toString());
@@ -127,7 +127,7 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
             return creditors;
 
         for (Map<String, Object> row : rows){
-            Long id = ((BigDecimal)row.get(CREDITOR_USER.CREDITOR_ID.getName())).longValue();
+            Long id = ((BigDecimal)row.get(EAV_A_CREDITOR_USER.CREDITOR_ID.getName())).longValue();
 
             BaseEntity entity = (BaseEntity) postgreSQLBaseEntityDaoImpl.load(id);
 
@@ -183,15 +183,15 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
 
 
         select = context.select(
-                USERS.ID,
-                USERS.USER_ID,
-                USERS.FIRST_NAME,
-                USERS.LAST_NAME,
-                USERS.MIDDLE_NAME,
-                USERS.SCREEN_NAME,
-                USERS.EMAIL,
-                USERS.MODIFIED_DATE
-        ).from(USERS);
+                EAV_A_USER.ID,
+                EAV_A_USER.USER_ID,
+                EAV_A_USER.FIRST_NAME,
+                EAV_A_USER.LAST_NAME,
+                EAV_A_USER.MIDDLE_NAME,
+                EAV_A_USER.SCREEN_NAME,
+                EAV_A_USER.EMAIL,
+                EAV_A_USER.MODIFIED_DATE
+        ).from(EAV_A_USER);
 
 
         logger.debug(select.toString());
@@ -201,14 +201,14 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
         for (Map<String, Object> row : rows){
             PortalUser user = new PortalUser();
 
-            user.setId((BigInteger)row.get(USERS.ID.getName()));
-            user.setUserId(((BigInteger) row.get(USERS.ID.getName())).longValue());
-            user.setFirstName((String)row.get(USERS.FIRST_NAME.getName()));
-            user.setLastName((String) row.get(USERS.LAST_NAME.getName()));
-            user.setMiddleName((String) row.get(USERS.MIDDLE_NAME.getName()));
-            user.setScreenName((String)row.get(USERS.SCREEN_NAME.getName()));
-            user.setEmailAddress((String)row.get(USERS.EMAIL.getName()));
-            user.setModifiedDate(DataUtils.convert((Timestamp)row.get(USERS.MODIFIED_DATE.getName())));
+            user.setId((BigInteger)row.get(EAV_A_USER.ID.getName()));
+            user.setUserId(((BigInteger) row.get(EAV_A_USER.ID.getName())).longValue());
+            user.setFirstName((String)row.get(EAV_A_USER.FIRST_NAME.getName()));
+            user.setLastName((String) row.get(EAV_A_USER.LAST_NAME.getName()));
+            user.setMiddleName((String) row.get(EAV_A_USER.MIDDLE_NAME.getName()));
+            user.setScreenName((String)row.get(EAV_A_USER.SCREEN_NAME.getName()));
+            user.setEmailAddress((String)row.get(EAV_A_USER.EMAIL.getName()));
+            user.setModifiedDate(DataUtils.convert((Timestamp)row.get(EAV_A_USER.MODIFIED_DATE.getName())));
 
             usersFromDB.put(user.getUserId(), user);
         }
@@ -223,8 +223,8 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
 
         for (Long id : toDelete) {
             DeleteConditionStep deleteFilter =
-                    context.delete(CREDITOR_USER).
-                            where(CREDITOR_USER.USER_ID.eq(id));
+                    context.delete(EAV_A_CREDITOR_USER).
+                            where(EAV_A_CREDITOR_USER.USER_ID.eq(id));
 
             long t = 0;
             if(sqlStats != null)
@@ -240,8 +240,8 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
             }
 
             deleteFilter =
-                    context.delete(USERS).
-                            where(USERS.USER_ID.eq(id));
+                    context.delete(EAV_A_USER).
+                            where(EAV_A_USER.USER_ID.eq(id));
 
             t = 0;
             if(sqlStats != null)
@@ -263,14 +263,14 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
                 PortalUser pu = usersFromPortal.get(id);
 
                 InsertOnDuplicateStep insert = context.insertInto(
-                        USERS,
-                        USERS.USER_ID,
-                        USERS.FIRST_NAME,
-                        USERS.LAST_NAME,
-                        USERS.MIDDLE_NAME,
-                        USERS.SCREEN_NAME,
-                        USERS.EMAIL,
-                        USERS.MODIFIED_DATE
+                        EAV_A_USER,
+                        EAV_A_USER.USER_ID,
+                        EAV_A_USER.FIRST_NAME,
+                        EAV_A_USER.LAST_NAME,
+                        EAV_A_USER.MIDDLE_NAME,
+                        EAV_A_USER.SCREEN_NAME,
+                        EAV_A_USER.EMAIL,
+                        EAV_A_USER.MODIFIED_DATE
                 ).values(
                         pu.getUserId(),
                         pu.getFirstName(),
@@ -295,16 +295,16 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
             PortalUser pu = usersFromPortal.get(id);
 
             Update update = context
-                    .update(USERS)
-                    .set(USERS.USER_ID, pu.getUserId())
-                    .set(USERS.FIRST_NAME, pu.getFirstName())
-                    .set(USERS.LAST_NAME, pu.getLastName())
-                    .set(USERS.MIDDLE_NAME, pu.getMiddleName())
-                    .set(USERS.SCREEN_NAME, pu.getScreenName())
-                    .set(USERS.EMAIL, pu.getEmailAddress())
-                    .set(USERS.MODIFIED_DATE, DataUtils.convert(pu.getModifiedDate()))
-                    .where(USERS.USER_ID.equal(id))
-                    .and(USERS.MODIFIED_DATE.lessThan(DataUtils.convert(pu.getModifiedDate())));
+                    .update(EAV_A_USER)
+                    .set(EAV_A_USER.USER_ID, pu.getUserId())
+                    .set(EAV_A_USER.FIRST_NAME, pu.getFirstName())
+                    .set(EAV_A_USER.LAST_NAME, pu.getLastName())
+                    .set(EAV_A_USER.MIDDLE_NAME, pu.getMiddleName())
+                    .set(EAV_A_USER.SCREEN_NAME, pu.getScreenName())
+                    .set(EAV_A_USER.EMAIL, pu.getEmailAddress())
+                    .set(EAV_A_USER.MODIFIED_DATE, DataUtils.convert(pu.getModifiedDate()))
+                    .where(EAV_A_USER.USER_ID.equal(id))
+                    .and(EAV_A_USER.MODIFIED_DATE.lessThan(DataUtils.convert(pu.getModifiedDate())));
 
             logger.debug(update.toString());
             updateWithStats(update.getSQL(), update.getBindValues().toArray());
