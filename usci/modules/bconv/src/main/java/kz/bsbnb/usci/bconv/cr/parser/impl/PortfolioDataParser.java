@@ -34,21 +34,46 @@ public class PortfolioDataParser extends BatchParser {
         super();
     }
 
+    private BaseSet portfolioFlow;
+    private BaseSet portfolioFlowMsfo;
+
+    private InfoParser infoParser;
+
+    @Override
+    public void init() {
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_data"),new Date());
+        portfolioFlow = new BaseSet(metaClassRepository.getMetaClass("ct_portfolio_flow_base"));
+        portfolioFlowMsfo = new BaseSet(metaClassRepository.getMetaClass("ct_portfolio_flow_msfo"));
+
+    }
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("portfolio_data")) {
         } else if(localName.equals("portfolio_flow")) {
             portfolioFlowParser.parse(xmlReader, batch, index);
-            hasMore = portfolioFlowMsfoParser.hasMore();
-            currentBaseEntity = portfolioFlowParser.getCurrentBaseEntity();
+            hasMore = portfolioFlowParser.hasMore();
+            //currentBaseEntity = portfolioFlowParser.getCurrentBaseEntity();
+            BaseEntity t = portfolioFlowParser.getCurrentBaseEntity();
+            t.put("creditor",new BaseValue(batch,index,infoParser.getCurrentBaseEntity()));
+            t.put("account_date",infoParser.getAccountDate());
+            t.put("actual_credit_count",infoParser.getActualCreditCount());
+            t.put("report_date",infoParser.getReportDate());
+            portfolioFlow.put(new BaseValue(batch,index,portfolioFlowParser.getCurrentBaseEntity()));
 
-            return true;
+            //return true;
         } else if(localName.equals("portfolio_flow_msfo")) {
             portfolioFlowMsfoParser.parse(xmlReader, batch, index);
             hasMore = portfolioFlowMsfoParser.hasMore();
-            currentBaseEntity = portfolioFlowMsfoParser.getCurrentBaseEntity();
+            //currentBaseEntity = portfolioFlowMsfoParser.getCurrentBaseEntity();
+            BaseEntity t = portfolioFlowMsfoParser.getCurrentBaseEntity();
+            t.put("creditor",new BaseValue(batch,index,infoParser.getCurrentBaseEntity()));
+            t.put("account_date",infoParser.getAccountDate());
+            t.put("actual_credit_count",infoParser.getActualCreditCount());
+            t.put("report_date",infoParser.getReportDate());
+            portfolioFlowMsfo.put(new BaseValue(batch,index,t));
 
-            return true;
+            //return true;
         } else {
             throw new UnknownTagException(localName);
         }
@@ -61,6 +86,8 @@ public class PortfolioDataParser extends BatchParser {
         if(localName.equals("portfolio_data")) {
             //batch.setPortfolioData(portfolioData);
             //xmlReader.setContentHandler(contentHandler);
+            currentBaseEntity.put("portfolio_flow",new BaseValue(batch,index,portfolioFlow));
+            currentBaseEntity.put("portfolio_flow_msfo", new BaseValue(batch,index,portfolioFlowMsfo));
             return true;
         } else if(localName.equals("portfolio_flow")) {
         } else if(localName.equals("portfolio_flow_msfo")) {
@@ -69,5 +96,9 @@ public class PortfolioDataParser extends BatchParser {
         }
 
         return false;
+    }
+
+    public void setInfoParser(InfoParser infoParser) {
+        this.infoParser = infoParser;
     }
 }
