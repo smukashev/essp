@@ -114,14 +114,29 @@ Ext.onReady(function() {
 
     var buttonXML = Ext.create('Ext.button.Button', {
         id: "entityEditorXmlBtn",
-        text: 'XML',
+        text: 'Сохранить',
         handler : function (){
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
 
             var xmlStr = createXML(rootNode.childNodes[0], true, "");
 
-            var buttonClose = Ext.create('Ext.button.Button', {
+            Ext.Ajax.request({
+                url: dataUrl,
+                method: 'POST',
+                params: {
+                    xml_data: xmlStr,
+                    op: 'SAVE_XML'
+                },
+                success: function() {
+                    console.log('success');
+                },
+                failure: function() {
+                    console.log('woops');
+                }
+            });
+
+            /*var buttonClose = Ext.create('Ext.button.Button', {
                 id: "itemFormCancel",
                 text: 'Отмена',
                 handler : function (){
@@ -161,7 +176,7 @@ Ext.onReady(function() {
                 items:[xmlForm]
             });
 
-            xmlFromWin.show();
+            xmlFromWin.show();*/
         }
     });
 
@@ -222,12 +237,17 @@ Ext.onReady(function() {
 
                         for(var i = 0; i < children.length; i++){
                             if(children[i].data.simple) {
-                                children[i].data.value = Ext.getCmp(children[i].data.code + "FromItem")
-                                    .getValue();
+                                if(children[i].data.type == "DATE") {
+                                    children[i].data.value = Ext.getCmp(children[i].data.code + "FromItem")
+                                        .getSubmitValue();
+                                } else {
+                                    children[i].data.value = Ext.getCmp(children[i].data.code + "FromItem")
+                                        .getValue();
+                                }
                             }
                         }
 
-                        Ext.getCmp("entityTreeView").refresh();
+                        Ext.getCmp("entityTreeView").getView().refresh();
                     }
                 });
 
@@ -244,8 +264,10 @@ Ext.onReady(function() {
                                     id: children[i].data.code + "FromItem",
                                     fieldLabel: children[i].data.title,
                                     width: "100%",
-                                    format: 'm.d.Y',
-                                    value: children[i].data.value
+                                    format: 'd.m.Y',
+                                    value: new Date(
+                                        children[i].data.value.
+                                            replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1'))
                                 }));
                         } else {
                             form.add(Ext.create("Ext.form.field.Text",
@@ -301,6 +323,18 @@ Ext.onReady(function() {
             }],
         dockedItems: [
             {
+                fieldLabel: 'Класс',
+                id: 'entityEditorComplexTypeCombo',
+                xtype: 'combobox',
+                store: classesStore,
+                valueField:'classId',
+                displayField:'className',
+                listeners: {
+                    change: function (field, newValue, oldValue) {
+                            currentClassId = newValue;
+                        }
+                }
+            },{
                 fieldLabel: 'Идентификатор сущности',
                 id: 'entityId',
                 name: 'entityId',

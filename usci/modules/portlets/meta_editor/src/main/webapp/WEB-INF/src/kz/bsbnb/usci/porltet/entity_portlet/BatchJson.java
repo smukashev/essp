@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.porltet.entityeditor;
+package kz.bsbnb.usci.porltet.batch_entry_list;
 
 import java.sql.Date;
 import java.sql.Timestamp;

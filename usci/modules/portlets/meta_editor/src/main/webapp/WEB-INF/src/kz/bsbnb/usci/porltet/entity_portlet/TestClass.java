@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.porltet.entityeditor;
+package kz.bsbnb.usci.porltet.batch_entry_list;
 
 /**
  * Created with IntelliJ IDEA.
