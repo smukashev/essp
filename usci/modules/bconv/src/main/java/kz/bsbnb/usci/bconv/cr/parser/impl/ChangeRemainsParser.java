@@ -65,14 +65,14 @@ public class ChangeRemainsParser extends BatchParser {
                     changeRemainsDiscountParser.getCurrentBaseEntity()));
         } else if(localName.equals("correction")) {
             changeRemainsCorrectionParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("discount",new BaseValue(batch,index,
+            currentBaseEntity.put("correction",new BaseValue(batch,index,
                     changeRemainsCorrectionParser.getCurrentBaseEntity()));
         } else if(localName.equals("discounted_value")) {
             //ctRemainsTypeDiscountedValue = new CtRemainsTypeDiscountedValue();
+        } else if(localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
             currentBaseEntity.put("discounted_value",new BaseValue(batch, index,
                     new Double(event.asCharacters().getData())));
-        } else if(localName.equals("value")) {
         } else if(localName.equals("limit")) {
             changeRemainsLimitParser.parse(xmlReader, batch, index);
             currentBaseEntity.put("limit",new BaseValue(batch,index,changeRemainsLimitParser.getCurrentBaseEntity()));

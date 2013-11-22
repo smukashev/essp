@@ -32,6 +32,8 @@ import javax.xml.stream.events.XMLEvent;
 @Scope("prototype")
 public class CreditParser extends BatchParser {
     private Stack stack = new Stack();
+    private int portfolioCount;
+    private BaseEntity currentPortfolio;
 
     private Logger logger = Logger.getLogger(CreditParser.class);
 
@@ -45,7 +47,6 @@ public class CreditParser extends BatchParser {
         super();        
     }
 
-    private BaseEntity currentPortfolio;
 
     @Override
     public void init()
@@ -124,17 +125,25 @@ public class CreditParser extends BatchParser {
                 BaseEntity creditorBranch = creditorBranchParser.getCurrentBaseEntity();
                 currentBaseEntity.put("creditor_branch", new BaseValue(batch, index, creditorBranch));
             } else if(localName.equals("portfolio")) {
-                event = (XMLEvent) xmlReader.next();
-                BaseEntity portfolio = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),new Date());
-                currentPortfolio.put("portfolio",new BaseValue(batch,index,event.asCharacters().getData()));
-                if(!stack.pop().equals("portfolio")) {}
+                portfolioCount++;
+
+                if(portfolioCount == 2){
+                    event = (XMLEvent) xmlReader.next();
+                    BaseEntity portfolio = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),new Date());
+                    portfolio.put("code",new BaseValue(batch,index,event.asCharacters().getData()));
+                    currentPortfolio.put("portfolio",new BaseValue(batch,index,portfolio));
+                    //if(!stack.pop().equals("portfolio")) {}
                     //portfolio = new Portfolio();
-                currentPortfolio = new BaseEntity(metaClassRepository.getMetaClass("portfolio"),new Date());
+                } else{
+                    currentPortfolio = new BaseEntity(metaClassRepository.getMetaClass("portfolio"),new Date());
+                }
+
             } else if(localName.equals("portfolio_msfo")) {
                 event = (XMLEvent) xmlReader.next();
                 BaseEntity portfolioMSFO = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),new Date());
+                portfolioMSFO.put("code",new BaseValue(batch,index,event.asCharacters().getData()));
                 currentPortfolio.put("portfolio_msfo",new BaseValue(batch,index,portfolioMSFO));
-                currentBaseEntity.put("portfolio",new BaseValue(batch,index,currentPortfolio));
+                //currentBaseEntity.put("portfolio",new BaseValue(batch,index,currentPortfolio));
             } else {
                 throw new UnknownTagException(localName);
             }
@@ -174,6 +183,9 @@ public class CreditParser extends BatchParser {
                 //ctCredit.setHasCurrencyEarn(ParserUtils.parseBoolean(contents.toString()));
             } else if(localName.equals("creditor_branch")) {
             } else if(localName.equals("portfolio")) {
+                portfolioCount--;
+                if(portfolioCount ==0 )
+                    currentBaseEntity.put("portfolio",new BaseValue(batch,index,currentPortfolio));
                 if(stack.pop().equals("portfolio")) {
                     //portfolio.setPortfolio(contents.toString());
                 } else {

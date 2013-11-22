@@ -105,7 +105,20 @@ public class ChangeCreditFlowParser extends BatchParser {
 
         return false;
     }
-    
+
+    /**
+     * Sample xml :
+     * <credit_flow>
+     * <classification>...</classification>
+     *  <provision>
+     *    <balance_account>EE25</balance_account>
+     *    <value>777</value>
+     *    <balance_account_msfo>ERSX</balance_account_msfo>
+     *    <value_msfo>778</value_msfo>
+     *    <balance_account_msfo_over_balance>TTCCTT</balance_account_msfo_over_balance>
+     *  </provision>
+     * </credit_flow>
+     */
     @Override
     public boolean endElement(String localName) throws SAXException {
         if(localName.equals("credit_flow")) {
