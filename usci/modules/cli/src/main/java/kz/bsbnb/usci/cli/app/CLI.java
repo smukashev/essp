@@ -2,6 +2,12 @@ package kz.bsbnb.usci.cli.app;
 
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
+import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
+import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
+import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
+import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -22,13 +28,18 @@ import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.BadSqlGrammarException;
+import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
+import java.text.DateFormat;
 import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -64,6 +75,9 @@ public class CLI
 
     @Autowired
     private BasicBaseEntitySearcher searcher;
+
+    @Autowired
+    private RulesSingleton rulesSingleton;
 
     private BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
 
@@ -640,6 +654,179 @@ public class CLI
 
     }
 
+    private RmiProxyFactoryBean batchServiceFactoryBean;
+    private RmiProxyFactoryBean batchVersionServiceFactoryBean;
+    private RmiProxyFactoryBean ruleServiceFactoryBean;
+    private RmiProxyFactoryBean listenerServiceFactoryBean;
+
+    private RmiProxyFactoryBean entityServiceFactoryBean;
+
+    private IBatchService batchService;
+    private IRuleService ruleService;
+    private IBatchVersionService batchVersionService;
+
+    private static boolean initCalled = false;
+
+    public void init(){
+        rulesSingleton.reloadCache();
+
+        entityServiceFactoryBean = new RmiProxyFactoryBean();
+        entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
+        entityServiceFactoryBean.setServiceInterface(IBaseEntityDao.class);
+
+        entityServiceFactoryBean.afterPropertiesSet();
+
+
+        batchServiceFactoryBean = new RmiProxyFactoryBean();
+        batchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService");
+        batchServiceFactoryBean.setServiceInterface(IBatchService.class);
+
+        batchServiceFactoryBean.afterPropertiesSet();
+        batchService = (IBatchService) batchServiceFactoryBean.getObject();
+
+        batchVersionServiceFactoryBean = new RmiProxyFactoryBean();
+        batchVersionServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchVersionService");
+        batchVersionServiceFactoryBean.setServiceInterface(IBatchVersionService.class);
+
+        batchVersionServiceFactoryBean.afterPropertiesSet();
+        batchVersionService = (IBatchVersionService) batchVersionServiceFactoryBean.getObject();
+
+        ruleServiceFactoryBean = new RmiProxyFactoryBean();
+        ruleServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/ruleService");
+        ruleServiceFactoryBean.setServiceInterface(IRuleService.class);
+
+        ruleServiceFactoryBean.afterPropertiesSet();
+        ruleService = (IRuleService) ruleServiceFactoryBean.getObject();
+    }
+
+    public void getRules(){
+        String id = "1";
+
+            Date date = new Date();
+
+            kz.bsbnb.usci.brms.rulesvr.model.impl.Batch batch = batchService.load(Long.parseLong(id, 10));
+            BatchVersion batchVersion = batchVersionService.load(batch,date);
+            if (batchVersion!=null){
+                List<Rule> ruleList = ruleService.load(batchVersion);
+                for(Rule r : ruleList){
+                    System.out.println(r.getRule());
+                }
+            } else{
+            }
+
+    }
+
+    private Rule currenRule;
+    private String currentPackageName;
+    private Date currentDate = new Date();
+
+
+
+    public void commandRule(){
+
+        if(!initCalled || true)
+        {
+            init();
+            initCalled = true;
+        }
+
+
+        try{
+
+        if(args.get(0).equals("read")){
+            if(args.size() < 2){
+                throw new IllegalArgumentException();
+            }else{
+               System.out.println("reading until "+args.get(1) +"...");
+                Scanner in = new Scanner(System.in);
+                StringBuilder sb = new StringBuilder();
+                while(true){
+                    String line = in.nextLine();
+                    if(line.startsWith(args.get(1))) break;
+                    sb.append(line+"\n");
+                }
+                currenRule = new Rule();
+                currenRule.setRule(sb.toString());
+                currenRule.setTitle("sample");
+            }
+        } else if(args.get(0).equals("current")){
+            if(args.size() == 1)
+                System.out.println( currenRule==null?null:currenRule.getRule());
+            else if(args.get(1).equals("package"))
+                System.out.println(currentPackageName);
+            else if(args.get(1).equals("date"))
+                System.out.println(currentDate);
+            else throw new IllegalArgumentException();
+
+        } else if(args.get(0).equals("save")){
+
+            long packageId = -1;
+
+            for(kz.bsbnb.usci.brms.rulesvr.model.impl.Batch b: batchService.getAllBatches()){
+               if(b.getName().equals(currentPackageName)){
+                   packageId = b.getId();
+               }
+            }
+
+            if(packageId == -1)
+                throw new IllegalArgumentException("no such package :" + currentPackageName);
+
+            Long ruleId = ruleService.save(currenRule,new BatchVersion());
+            batchVersionService.copyRule(ruleId,batchService.load(packageId),currentDate);
+
+            System.out.println("ok saved: ruleId = " + ruleId);
+
+        }else if(args.get(0).equals("run")){
+            if(args.size() < 2) throw new  IllegalArgumentException();
+            long id = Long.parseLong(args.get(1));
+
+            BaseEntity baseEntity = (BaseEntity) baseEntityDao.load(id);
+
+            rulesSingleton.runRules(baseEntity,currentPackageName,currentDate);
+
+            for (String s: baseEntity.getValidationErrors())
+                System.out.println("Validation error:" + s);
+        }else if(args.get(0).equals("set")){
+             if(args.size() < 3) throw new IllegalArgumentException();
+               if(args.get(1).equals("package"))
+               {
+                   rulesSingleton.getRulePackageName(args.get(2),currentDate);
+                   currentPackageName = args.get(2);
+               }
+               else if(args.get(1).equals("date"))
+               {
+                   DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+                   currentDate = formatter.parse(args.get(2));
+               }else throw new IllegalArgumentException();
+        } else if(args.get(0).equals("create")){
+            try{
+               if(!args.get(1).equals("package") || args.size()<3) throw new IllegalArgumentException();
+            } catch (IllegalArgumentException e){
+                throw e;
+            }
+            kz.bsbnb.usci.brms.rulesvr.model.impl.Batch batch = new kz.bsbnb.usci.brms.rulesvr.model.impl.Batch(args.get(2),currentDate);
+            Long id = batchService.save(batch);
+            batch.setId(id);
+            batchVersionService.save(batch);
+            System.out.println("ok batch created with id:"+id);
+        }else throw new IllegalArgumentException();
+        }catch(IllegalArgumentException e){
+            if(e.getMessage()==null)
+              System.out.println("Argument needed: <read {label},current [<pckName,date>],save,run {id},set <package,date> {value} , create package {pckName}>");
+            else
+              System.out.println(e.getMessage());
+            return;
+        } catch (ParseException e) {
+            System.out.println("Parse exception day format must be: dd.MM.yyyy");
+            return;
+        }  catch (IncorrectResultSizeDataAccessException e){
+            System.out.println("Such rule already exists");
+            return;
+        }
+
+        //rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());*/
+    }
+
     public void run() {
         if (storage.testConnection()) {
             System.out.println("Connected to DB.");
@@ -725,7 +912,9 @@ public class CLI
                         commandEntity();}
                     else if(command.equals("sql")){
                         commandSql();
-                    } else {
+                    } else if(command.equals("rule")){
+                        commandRule();
+                    }else {
                         System.out.println("No such command: " + command);
                     }
                 } catch (Exception e) {
