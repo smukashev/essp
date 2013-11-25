@@ -19,6 +19,16 @@
         <reference local="creditor_id" foreign="id"/>
       </foreign-key>
     </table>
+    <table name="batch_entries">
+      <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+      <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+      <column name="value" primaryKey="false" required="true" type="CLOB" size="14,0" autoIncrement="false"/>
+      <column name="updated_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+      <unique>
+        <unique-column name="id"/>
+      </unique>
+    </table>
+
     <table name="eav_a_creditor_user">
       <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
       <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>

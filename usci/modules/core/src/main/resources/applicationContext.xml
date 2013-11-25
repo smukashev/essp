@@ -38,6 +38,13 @@
         <property name="registryPort" value="1099"/>
     </bean>
 
+    <bean id="batchEntryRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="batchEntryService"/>
+        <property name="service" ref="batchEntryServiceImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IBatchEntryService"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
     <bean id="metaFactoryRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
         <property name="serviceName" value="metaFactoryService"/>
         <property name="service" ref="metaFactoryServiceImpl"/>

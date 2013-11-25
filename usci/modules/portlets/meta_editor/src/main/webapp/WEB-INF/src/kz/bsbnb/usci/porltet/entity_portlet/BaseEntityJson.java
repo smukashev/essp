@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.porltet.entityeditor;
+package kz.bsbnb.usci.porltet.batch_entry_list;
 
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;

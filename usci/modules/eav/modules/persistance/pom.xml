@@ -437,7 +437,7 @@
                                         </forcedType>
                                         <forcedType>
                                             <name>java.sql.Timestamp</name>
-                                            <expressions>(.*\.RECEIPT_DATE)|(.*\.EVENT_BEGIN_DT)|(.*\.EVENT_END_DT)</expressions>
+                                            <expressions>(.*\.RECEIPT_DATE)|(.*\.EVENT_BEGIN_DT)|(.*\.EVENT_END_DT)|(.*\.UPDATE_DATE)</expressions>
                                         </forcedType>
                                     </forcedTypes>
                                 </database>
@@ -448,7 +448,7 @@
                             </generator>
                         </configuration>
                     </plugin>
-                    <!--<plugin>
+                    <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.2.1</version>
@@ -483,7 +483,7 @@
                                 </systemProperty>
                             </systemProperties>
                         </configuration>
-                    </plugin>-->
+                    </plugin>
                 </plugins>
             </build>
         </profile>
