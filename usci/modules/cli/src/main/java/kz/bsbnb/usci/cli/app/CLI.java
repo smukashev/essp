@@ -28,8 +28,6 @@ import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -665,74 +663,55 @@ public class CLI
     private IRuleService ruleService;
     private IBatchVersionService batchVersionService;
 
-    private static boolean initCalled = false;
-
     public void init(){
-        rulesSingleton.reloadCache();
-
-        entityServiceFactoryBean = new RmiProxyFactoryBean();
-        entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
-        entityServiceFactoryBean.setServiceInterface(IBaseEntityDao.class);
-
-        entityServiceFactoryBean.afterPropertiesSet();
 
 
-        batchServiceFactoryBean = new RmiProxyFactoryBean();
-        batchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService");
-        batchServiceFactoryBean.setServiceInterface(IBatchService.class);
+        try {
+            rulesSingleton.reloadCache();
 
-        batchServiceFactoryBean.afterPropertiesSet();
-        batchService = (IBatchService) batchServiceFactoryBean.getObject();
+            entityServiceFactoryBean = new RmiProxyFactoryBean();
+            entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
+            entityServiceFactoryBean.setServiceInterface(IBaseEntityDao.class);
 
-        batchVersionServiceFactoryBean = new RmiProxyFactoryBean();
-        batchVersionServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchVersionService");
-        batchVersionServiceFactoryBean.setServiceInterface(IBatchVersionService.class);
+            entityServiceFactoryBean.afterPropertiesSet();
 
-        batchVersionServiceFactoryBean.afterPropertiesSet();
-        batchVersionService = (IBatchVersionService) batchVersionServiceFactoryBean.getObject();
 
-        ruleServiceFactoryBean = new RmiProxyFactoryBean();
-        ruleServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/ruleService");
-        ruleServiceFactoryBean.setServiceInterface(IRuleService.class);
+            batchServiceFactoryBean = new RmiProxyFactoryBean();
+            batchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService");
+            batchServiceFactoryBean.setServiceInterface(IBatchService.class);
 
-        ruleServiceFactoryBean.afterPropertiesSet();
-        ruleService = (IRuleService) ruleServiceFactoryBean.getObject();
-    }
+            batchServiceFactoryBean.afterPropertiesSet();
+            batchService = (IBatchService) batchServiceFactoryBean.getObject();
 
-    public void getRules(){
-        String id = "1";
+            batchVersionServiceFactoryBean = new RmiProxyFactoryBean();
+            batchVersionServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchVersionService");
+            batchVersionServiceFactoryBean.setServiceInterface(IBatchVersionService.class);
 
-            Date date = new Date();
+            batchVersionServiceFactoryBean.afterPropertiesSet();
+            batchVersionService = (IBatchVersionService) batchVersionServiceFactoryBean.getObject();
 
-            kz.bsbnb.usci.brms.rulesvr.model.impl.Batch batch = batchService.load(Long.parseLong(id, 10));
-            BatchVersion batchVersion = batchVersionService.load(batch,date);
-            if (batchVersion!=null){
-                List<Rule> ruleList = ruleService.load(batchVersion);
-                for(Rule r : ruleList){
-                    System.out.println(r.getRule());
-                }
-            } else{
-            }
+            ruleServiceFactoryBean = new RmiProxyFactoryBean();
+            ruleServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/ruleService");
+            ruleServiceFactoryBean.setServiceInterface(IRuleService.class);
+
+            ruleServiceFactoryBean.afterPropertiesSet();
+            ruleService = (IRuleService) ruleServiceFactoryBean.getObject();
+        } catch (Exception e) {
+            System.out.println("Can\"t initialise services: " + e.getMessage());
+        }
 
     }
 
-    private Rule currenRule;
+    private Rule currentRule;
     private String currentPackageName;
     private Date currentDate = new Date();
 
 
 
     public void commandRule(){
-
-        if(!initCalled || true)
-        {
-            init();
-            initCalled = true;
-        }
-
+        init();
 
         try{
-
         if(args.get(0).equals("read")){
             if(args.size() < 2){
                 throw new IllegalArgumentException();
@@ -745,13 +724,13 @@ public class CLI
                     if(line.startsWith(args.get(1))) break;
                     sb.append(line+"\n");
                 }
-                currenRule = new Rule();
-                currenRule.setRule(sb.toString());
-                currenRule.setTitle("sample");
+                currentRule = new Rule();
+                currentRule.setRule(sb.toString());
+                currentRule.setTitle("sample");
             }
         } else if(args.get(0).equals("current")){
             if(args.size() == 1)
-                System.out.println( currenRule==null?null:currenRule.getRule());
+                System.out.println( currentRule ==null?null: currentRule.getRule());
             else if(args.get(1).equals("package"))
                 System.out.println(currentPackageName);
             else if(args.get(1).equals("date"))
@@ -771,7 +750,7 @@ public class CLI
             if(packageId == -1)
                 throw new IllegalArgumentException("no such package :" + currentPackageName);
 
-            Long ruleId = ruleService.save(currenRule,new BatchVersion());
+            Long ruleId = ruleService.save(currentRule,new BatchVersion());
             batchVersionService.copyRule(ruleId,batchService.load(packageId),currentDate);
 
             System.out.println("ok saved: ruleId = " + ruleId);
