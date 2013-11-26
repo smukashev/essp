@@ -1153,6 +1153,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         SelectForUpdateStep select;
 
         select = context.select(
+                EAV_M_CLASSES.ID,
                 EAV_M_CLASSES.NAME,
                 EAV_M_CLASSES.TITLE
         ).from(EAV_M_CLASSES).
@@ -1170,6 +1171,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             MetaClassName metaClassName = new MetaClassName();
 
+            metaClassName.setId(((BigDecimal)row.get("id")).longValue());
             metaClassName.setClassName((String)row.get("name"));
             metaClassName.setClassTitle((String)row.get("title"));
             metaClassNameList.add(metaClassName);

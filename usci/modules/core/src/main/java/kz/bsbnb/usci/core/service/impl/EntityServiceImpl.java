@@ -5,6 +5,7 @@ import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -15,6 +16,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author k.tulbassiyev
@@ -69,6 +71,12 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
         Long id = metaClassDao.save(baseEntityLoad.getMeta());
         baseEntityDao.saveOrUpdate(baseEntityLoad);
+    }
+
+    @Override
+    public List<Long> getEntityIDsByMetaclass(long id)
+    {
+        return baseEntityDao.getEntityIDsByMetaclass(id);
     }
 
     @Override

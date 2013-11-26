@@ -23,8 +23,8 @@
 </script>
 
 <script src="<%=request.getContextPath()%>/js/ext/ext-all.js" type="text/javascript"></script>
-<script src="<%=request.getContextPath()%>/js/main.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/main_bee.js" type="text/javascript"></script>
 
-<div id="meta-editor-content">
+<div id="entry-list-content">
 
 </div>

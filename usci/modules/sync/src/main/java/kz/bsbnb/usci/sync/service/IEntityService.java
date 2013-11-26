@@ -13,4 +13,5 @@ public interface IEntityService {
     public BaseEntity load(long id);
     public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
     public BaseEntity search(BaseEntity baseEntity);
+    public List<Long> getEntityIDsByMetaclass(long id);
 }

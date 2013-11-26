@@ -89,7 +89,8 @@ public class MainPortlet extends MVCPortlet {
     enum OperationTypes {
         LIST_CLASSES,
         LIST_ENTITY,
-        SAVE_XML
+        SAVE_XML,
+        LIST_BY_CLASS
     }
 
     private String testNull(String str) {
@@ -337,7 +338,7 @@ public class MainPortlet extends MVCPortlet {
                     for (MetaClassName metaName : metaClassesList) {
                         MetaClassListEntry metaClassListEntry = new MetaClassListEntry();
 
-                        metaClassListEntry.setClassId(metaName.getClassName());
+                        metaClassListEntry.setClassId("" + metaName.getId());
                         if(metaName.getClassTitle() != null
                                 && metaName.getClassTitle().trim().length() > 0)
                             metaClassListEntry.setClassName(metaName.getClassTitle());
@@ -348,6 +349,34 @@ public class MainPortlet extends MVCPortlet {
                     }
 
                     writer.write(gson.toJson(classesListJson));
+
+                    break;
+                case LIST_BY_CLASS:
+                    String metaId = resourceRequest.getParameter("metaId");
+                    if (metaId != null && metaId.trim().length() > 0) {
+                        List<Long> ids = entityService.getEntityIDsByMetaclass(Long.parseLong(metaId));
+
+                        writer.write("{\"total\":" + ids.size());
+                        writer.write(",\"data\":[");
+
+                        boolean first = true;
+
+                        for (Long id : ids) {
+                            if (first) {
+                                first = false;
+                            } else {
+                                writer.write(",");
+                            }
+
+                            writer.write("{");
+
+                            writer.write("\"id\":\"" + id + "\",");
+                            writer.write("\"title\":\"" + id + "\"");
+                            writer.write("}");
+                        }
+
+                        writer.write("]}");
+                    }
 
                     break;
                 case LIST_ENTITY:

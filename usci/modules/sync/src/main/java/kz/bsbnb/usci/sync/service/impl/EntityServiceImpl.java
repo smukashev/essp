@@ -52,4 +52,10 @@ public class EntityServiceImpl implements IEntityService {
     public BaseEntity search(BaseEntity baseEntity) {
         return remoteEntityService.search(baseEntity);
     }
+
+    @Override
+    public List<Long> getEntityIDsByMetaclass(long id)
+    {
+        return remoteEntityService.getEntityIDsByMetaclass(id);
+    }
 }
