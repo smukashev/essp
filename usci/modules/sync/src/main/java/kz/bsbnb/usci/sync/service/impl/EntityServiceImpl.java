@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.sync.service.impl;
 
+import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.sync.job.impl.DataJob;
 import kz.bsbnb.usci.sync.service.IEntityService;
@@ -57,5 +58,9 @@ public class EntityServiceImpl implements IEntityService {
     public List<Long> getEntityIDsByMetaclass(long id)
     {
         return remoteEntityService.getEntityIDsByMetaclass(id);
+    }
+
+    public List<RefListItem> getRefsByMetaclass(long metaClassId) {
+        return remoteEntityService.getRefsByMetaclass(metaClassId);
     }
 }

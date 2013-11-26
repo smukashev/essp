@@ -6,6 +6,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
 import kz.bsbnb.usci.eav.model.BatchEntry;
+import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
@@ -354,14 +355,14 @@ public class MainPortlet extends MVCPortlet {
                 case LIST_BY_CLASS:
                     String metaId = resourceRequest.getParameter("metaId");
                     if (metaId != null && metaId.trim().length() > 0) {
-                        List<Long> ids = entityService.getEntityIDsByMetaclass(Long.parseLong(metaId));
+                        List<RefListItem> ids = entityService.getRefsByMetaclass(Long.parseLong(metaId));
 
                         writer.write("{\"total\":" + ids.size());
                         writer.write(",\"data\":[");
 
                         boolean first = true;
 
-                        for (Long id : ids) {
+                        for (RefListItem id : ids) {
                             if (first) {
                                 first = false;
                             } else {
@@ -370,8 +371,8 @@ public class MainPortlet extends MVCPortlet {
 
                             writer.write("{");
 
-                            writer.write("\"id\":\"" + id + "\",");
-                            writer.write("\"title\":\"" + id + "\"");
+                            writer.write("\"id\":\"" + id.getId() + "\",");
+                            writer.write("\"title\":\"" + id.getTitle() + "\"");
                             writer.write("}");
                         }
 

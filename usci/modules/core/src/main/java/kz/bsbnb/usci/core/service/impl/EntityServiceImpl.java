@@ -2,6 +2,7 @@ package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.protocol.ProtocolSingleton;
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
@@ -83,5 +84,9 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     public BaseEntity load(long id) {
         System.out.println("Load with id: " + id);
         return (BaseEntity)baseEntityDao.load(id);
+    }
+
+    public List<RefListItem> getRefsByMetaclass(long metaClassId) {
+        return baseEntityDao.getRefsByMetaclass(metaClassId);
     }
 }

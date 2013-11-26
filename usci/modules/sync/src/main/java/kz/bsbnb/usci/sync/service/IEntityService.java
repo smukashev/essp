@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.sync.service;
 
 
+import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 
 import java.util.List;
@@ -14,4 +15,5 @@ public interface IEntityService {
     public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
     public BaseEntity search(BaseEntity baseEntity);
     public List<Long> getEntityIDsByMetaclass(long id);
+    public List<RefListItem> getRefsByMetaclass(long metaClassId);
 }

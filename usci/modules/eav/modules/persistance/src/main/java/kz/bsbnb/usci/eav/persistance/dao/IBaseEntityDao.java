@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao;
 
+import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
@@ -66,6 +67,8 @@ public interface IBaseEntityDao
     public void remove(IBaseEntity baseEntity);
 
     public List<Long> getEntityIDsByMetaclass(long metaClassId);
+
+    public List<RefListItem> getRefsByMetaclass(long metaClassId);
 
     public List<BaseEntity> getEntityByMetaclass(MetaClass meta);
 
