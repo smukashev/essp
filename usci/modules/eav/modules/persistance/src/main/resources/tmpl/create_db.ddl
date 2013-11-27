@@ -33,12 +33,12 @@
       <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
       <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
       <column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-      <foreign-key foreignTable="eav_a_user" name="eav_fk_023_01">
+      <!--<foreign-key foreignTable="eav_a_user" name="eav_fk_023_01">
         <reference local="user_id" foreign="id"/>
       </foreign-key>
       <foreign-key foreignTable="eav_be_entities" name="eav_fk_023_02">
         <reference local="creditor_id" foreign="id"/>
-      </foreign-key>
+      </foreign-key>-->
     </table>
 
     <!--<table name="eav_m_array_key_filter">
