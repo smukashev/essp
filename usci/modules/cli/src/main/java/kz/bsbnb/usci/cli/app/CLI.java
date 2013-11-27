@@ -705,25 +705,30 @@ public class CLI
     private Rule currentRule;
     private String currentPackageName;
     private Date currentDate = new Date();
+    private boolean started = false;
 
 
 
-    public void commandRule(){
-        init();
+    public void commandRule(Scanner in){
+        if(!started)
+        {
+            init();
+            started = true;
+        }
 
         try{
         if(args.get(0).equals("read")){
             if(args.size() < 2){
                 throw new IllegalArgumentException();
             }else{
-               System.out.println("reading until "+args.get(1) +"...");
-                Scanner in = new Scanner(System.in);
+                System.out.println("reading until "+args.get(1) +"...");
                 StringBuilder sb = new StringBuilder();
-                while(true){
-                    String line = in.nextLine();
-                    if(line.startsWith(args.get(1))) break;
+                do{
                     sb.append(line+"\n");
-                }
+                    line = in.nextLine();
+                    if(line.startsWith(args.get(1))) break;
+                }while(true);
+                line = in.nextLine();
                 currentRule = new Rule();
                 currentRule.setRule(sb.toString());
                 currentRule.setTitle("sample");
@@ -806,6 +811,8 @@ public class CLI
         //rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());*/
     }
 
+    String line;
+
     public void run() {
         if (storage.testConnection()) {
             System.out.println("Connected to DB.");
@@ -822,7 +829,6 @@ public class CLI
             in = new Scanner(inputStream);
         }
 
-        String line;
 
         Exception lastException = null;
 
@@ -892,7 +898,7 @@ public class CLI
                     else if(command.equals("sql")){
                         commandSql();
                     } else if(command.equals("rule")){
-                        commandRule();
+                        commandRule(in);
                     }else {
                         System.out.println("No such command: " + command);
                     }

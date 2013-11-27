@@ -45,7 +45,9 @@ public class ChangeRemainsDiscountParser extends BatchParser {
                     new Double(event.asCharacters().getData())));
         } else if(localName.equals("balance_account")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("balance_account", new BaseValue(batch,index,event.asCharacters().getData()) );
+            BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),new Date());
+            balanceAccount.put("no_",new BaseValue(batch,index,event.asCharacters().getData()));
+            currentBaseEntity.put("balance_account", new BaseValue(batch,index,balanceAccount) );
         } else {
             throw new UnknownTagException(localName);
         }
