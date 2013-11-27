@@ -79,9 +79,11 @@ public class ChangeRemainsDebtParser extends BatchParser {
             }
         } else if(localName.equals("balance_account")) {
             event = (XMLEvent) xmlReader.next();
-            BaseValue baseValue = new BaseValue(batch,index,new String(event.asCharacters().getData()));
+            BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),new Date());
+            baseEntity.put("no_",new BaseValue(batch,index,event.asCharacters().getData()));
+            BaseValue baseValue = new BaseValue(batch,index,baseEntity);
             if(debtWay.equals("current")){
-                fieldCurrent.put("balance_account",baseValue);
+                fieldCurrent.put("balance_account",new BaseValue(batch,index,baseEntity));
             }else if(debtWay.equals("pastdue")){
                 fieldPastDue.put("balance_account",baseValue);
             }else if(debtWay.equals("write_off")){

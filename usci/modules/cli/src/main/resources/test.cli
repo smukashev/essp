@@ -558,12 +558,32 @@ meta add provision provision_msfo_over_balance MetaClass prov_h
 #---------------------------------------------------------------------------------------------
 
 #=============================================================================================
-#= Discount                                                                                  =
+#= Balance Account                                                                           =
 #=============================================================================================
 
 meta remove discount balance_account
 meta add discount balance_account MetaClass ref_balance_account
 
+meta remove current balance_account
+meta add current balance_account MetaClass ref_balance_account
+
+meta remove pastdue balance_account
+meta add pastdue balance_account MetaClass ref_balance_account
+
+meta remove write_off balance_account
+meta add write_off balance_account MetaClass ref_balance_account
+
+meta remove correction balance_account
+meta add correction balance_account MetaClass ref_balance_account
+
+meta remove current1 balance_account
+meta add current1 balance_account MetaClass ref_balance_account
+
+meta remove pastdue1 balance_account
+meta add pastdue1 balance_account MetaClass ref_balance_account
+
+meta remove limit balance_account
+meta add limit balance_account MetaClass ref_balance_account
 
 #---------------------------------------------------------------------------------------------
 
