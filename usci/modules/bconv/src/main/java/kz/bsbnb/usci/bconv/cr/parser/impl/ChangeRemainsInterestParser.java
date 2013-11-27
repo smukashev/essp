@@ -46,15 +46,15 @@ public class ChangeRemainsInterestParser extends BatchParser {
         if(localName.equals("interest")) {
         } else if(localName.equals("current")) {
             //ctRemainsTypeCurrent = new CtRemainsTypeCurrent();
-            fieldCurrent = new BaseEntity(metaClassRepository.getMetaClass("current"),new Date());
+            fieldCurrent = new BaseEntity(metaClassRepository.getMetaClass("current1"),new Date());
             interestWay = localName;
         } else if(localName.equals("pastdue")) {
             //ctRemainsTypePastdue = new CtRemainsTypePastdue();
-            fieldPastDue = new BaseEntity(metaClassRepository.getMetaClass("pastdue"),new Date());
+            fieldPastDue = new BaseEntity(metaClassRepository.getMetaClass("pastdue1"),new Date());
             interestWay = localName;
         } else if(localName.equals("write_off")) {
             //ctRemainsTypeInterestWriteOff = new CtRemainsTypeInterestWriteOff();
-            fieldWriteOf = new BaseEntity(metaClassRepository.getMetaClass("write_off"),new Date());
+            fieldWriteOf = new BaseEntity(metaClassRepository.getMetaClass("write_off1"),new Date());
             interestWay = localName;
         } else if(localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
@@ -78,7 +78,9 @@ public class ChangeRemainsInterestParser extends BatchParser {
             }
         } else if(localName.equals("balance_account")) {
             event = (XMLEvent) xmlReader.next();
-            BaseValue baseValue = new BaseValue(batch,index,new String(event.asCharacters().getData()));
+            BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),new Date());
+            baseEntity.put("no_",new BaseValue(batch,index,event.asCharacters().getData()));
+            BaseValue baseValue = new BaseValue(batch,index,baseEntity);
             if(interestWay.equals("current")){
                 fieldCurrent.put("balance_account",baseValue);
             }else if(interestWay.equals("pastdue")){
