@@ -2445,7 +2445,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 .where(EAV_BE_ENTITIES.CLASS_ID.equal(metaClassId))
                 .and(EAV_BE_ENTITIES.ID.equal(EAV_BE_STRING_VALUES.ENTITY_ID))
                 .and(EAV_M_SIMPLE_ATTRIBUTES.ID.equal(EAV_BE_STRING_VALUES.ATTRIBUTE_ID))
-                .and(EAV_M_SIMPLE_ATTRIBUTES.TITLE.equal("name_ru"));
+                .and(EAV_M_SIMPLE_ATTRIBUTES.NAME.equal("name_ru"));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

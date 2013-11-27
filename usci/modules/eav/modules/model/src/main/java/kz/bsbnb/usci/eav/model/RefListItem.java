@@ -1,6 +1,8 @@
 package kz.bsbnb.usci.eav.model;
 
-public class RefListItem
+import java.io.Serializable;
+
+public class RefListItem implements Serializable
 {
     private long id;
     private String title;
