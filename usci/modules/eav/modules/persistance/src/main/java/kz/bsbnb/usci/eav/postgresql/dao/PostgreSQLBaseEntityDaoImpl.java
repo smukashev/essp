@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav.postgresql.dao;
 
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -2430,6 +2431,36 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             Map<String, Object> row = i.next();
 
             entityIds.add(((BigDecimal)row.get(EAV_BE_ENTITIES.ID.getName())).longValue());
+        }
+
+        return entityIds;
+    }
+
+    public List<RefListItem> getRefsByMetaclass(long metaClassId) {
+        ArrayList<RefListItem> entityIds = new ArrayList<RefListItem>();
+
+        Select select = context
+                .select(EAV_BE_ENTITIES.ID, EAV_BE_STRING_VALUES.VALUE)
+                .from(EAV_BE_ENTITIES, EAV_BE_STRING_VALUES, EAV_M_SIMPLE_ATTRIBUTES)
+                .where(EAV_BE_ENTITIES.CLASS_ID.equal(metaClassId))
+                .and(EAV_BE_ENTITIES.ID.equal(EAV_BE_STRING_VALUES.ENTITY_ID))
+                .and(EAV_M_SIMPLE_ATTRIBUTES.ID.equal(EAV_BE_STRING_VALUES.ATTRIBUTE_ID))
+                .and(EAV_M_SIMPLE_ATTRIBUTES.NAME.equal("name_ru"));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        Iterator<Map<String, Object>> i = rows.iterator();
+        while(i.hasNext())
+        {
+            Map<String, Object> row = i.next();
+
+            RefListItem rli = new RefListItem();
+
+            rli.setId(((BigDecimal)row.get(EAV_BE_ENTITIES.ID.getName())).longValue());
+            rli.setTitle((String)row.get(EAV_BE_STRING_VALUES.VALUE.getName()));
+
+            entityIds.add(rli);
         }
 
         return entityIds;

@@ -26,6 +26,9 @@
         <drools:resources>
             <!--<drools:resource source="classpath:drl/test.drl"/>-->
         </drools:resources>
+        <!--<drools:configuration>
+            <drools:consequenceExceptionHandler handler="kz.bsbnb.usci.brms.rulesingleton.RuleExceptionHandler" />
+        </drools:configuration>-->
     </drools:kbase>
 
     <!--<bean id="ruleSingleton" class="kz.bsbnb.usci.rules.RulesSingleton">-->

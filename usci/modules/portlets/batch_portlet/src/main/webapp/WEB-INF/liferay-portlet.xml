@@ -8,7 +8,7 @@
 		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<footer-portlet-javascript>
-			/js/main.js
+			/js/main_bee.js
 		</footer-portlet-javascript>
 		<css-class-wrapper>batchstatuslist-portlet</css-class-wrapper>
 	</portlet>
@@ -18,7 +18,7 @@
 		<instanceable>false</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<footer-portlet-javascript>
-			/js/main.js
+			/js/main_bee.js
 		</footer-portlet-javascript>
 		<css-class-wrapper>batchview-portlet</css-class-wrapper>
 	</portlet>

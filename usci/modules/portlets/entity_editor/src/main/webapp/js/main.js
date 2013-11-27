@@ -70,6 +70,31 @@ Ext.onReady(function() {
         remoteSort: true
     });
 
+    Ext.define('refStoreModel', {
+        extend: 'Ext.data.Model',
+        fields: ['id','title']
+    });
+
+    var refStore = Ext.create('Ext.data.Store', {
+        model: 'refStoreModel',
+        pageSize: 100,
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op : 'LIST_BY_CLASS'},
+            actionMethods: {
+                read: 'POST'
+            },
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
+        },
+        autoLoad: false,
+        remoteSort: true
+    });
+
     Ext.define('entityModel', {
         extend: 'Ext.data.Model',
         fields: [
@@ -293,7 +318,7 @@ Ext.onReady(function() {
         preventHeader: true,
         width : '100%',
         height: '500px',
-        renderTo : 'meta-editor-content',
+        renderTo : 'entity-editor-content',
         layout : 'border',
         defaults : {
             padding: '3'
@@ -323,7 +348,7 @@ Ext.onReady(function() {
             }],
         dockedItems: [
             {
-                fieldLabel: 'Класс',
+                fieldLabel: 'Справочник',
                 id: 'entityEditorComplexTypeCombo',
                 xtype: 'combobox',
                 store: classesStore,
@@ -332,7 +357,28 @@ Ext.onReady(function() {
                 listeners: {
                     change: function (field, newValue, oldValue) {
                             currentClassId = newValue;
+
+                            refStore.reload(
+                                {
+                                    params:
+                                    {
+                                        metaId : currentClassId
+                                    }
+                                });
                         }
+                }
+            },{
+                fieldLabel: 'Элементы',
+                id: 'entityEditorrefCombo',
+                xtype: 'combobox',
+                store: refStore,
+                valueField:'id',
+                displayField:'title',
+                listeners: {
+                    change: function (field, newValue, oldValue) {
+                        entityId = Ext.getCmp("entityId");
+                        entityId.setValue(newValue);
+                    }
                 }
             },{
                 fieldLabel: 'Идентификатор сущности',

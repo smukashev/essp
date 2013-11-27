@@ -2,9 +2,11 @@ package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.protocol.ProtocolSingleton;
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -15,6 +17,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author k.tulbassiyev
@@ -72,8 +75,18 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     @Override
+    public List<Long> getEntityIDsByMetaclass(long id)
+    {
+        return baseEntityDao.getEntityIDsByMetaclass(id);
+    }
+
+    @Override
     public BaseEntity load(long id) {
         System.out.println("Load with id: " + id);
         return (BaseEntity)baseEntityDao.load(id);
+    }
+
+    public List<RefListItem> getRefsByMetaclass(long metaClassId) {
+        return baseEntityDao.getRefsByMetaclass(metaClassId);
     }
 }

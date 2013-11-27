@@ -111,6 +111,17 @@
             <artifactId>commons-collections</artifactId>
             <version>3.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>kz.bsbnb.usci.brms</groupId>
+            <artifactId>rulesingleton</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>kz.bsbnb.usci.brms</groupId>
+            <artifactId>rulesvr</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 	<organization>

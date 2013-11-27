@@ -45,7 +45,7 @@ Ext.onReady(function() {
     var grid = Ext.create('Ext.grid.Panel', {
         id: "itemsGrid",
         store: store,
-        height: '500px',
+        anchor: '100% 100%',
         columns: [
             {
                 header: '',
@@ -53,7 +53,7 @@ Ext.onReady(function() {
                 width: 26,
                 sortable: false,
                 items: [{
-                    icon: 'pics/edit.png',
+                    icon: contextPathUrl + '/pics/edit.png',
                     tooltip: 'Редактировать',
                     handler: function (grid, rowIndex, colIndex) {
 
@@ -66,7 +66,7 @@ Ext.onReady(function() {
                 width: 26,
                 sortable: false,
                 items: [{
-                    icon: 'pics/delete.png',
+                    icon: contextPathUrl + '/pics/delete.png',
                     tooltip: 'Удалить',
                     handler: function (grid, rowIndex, colIndex) {
                         /*var rec = store.getAt(rowIndex);
@@ -112,7 +112,8 @@ Ext.onReady(function() {
         preventHeader: true,
         width : '100%',
         height: '500px',
-        renderTo : 'meta-editor-content',
+        layout: 'anchor',
+        renderTo : 'entry-list-content',
         //layout : 'border',
         defaults : {
             padding: '3'
