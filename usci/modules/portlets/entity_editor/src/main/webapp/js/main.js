@@ -7,7 +7,7 @@ Ext.require([
 
 var currentClassId = null;
 
-function createXML(currentNode, rootFlag, offset, arrayEl) {
+function createXML(currentNode, rootFlag, offset, arrayEl, first) {
     var xmlStr = "";
 
     var children = currentNode.childNodes;
@@ -15,8 +15,13 @@ function createXML(currentNode, rootFlag, offset, arrayEl) {
     if(arrayEl) {
         xmlStr += offset + "<item>\n";
     } else {
-        xmlStr += offset + "<" + currentNode.data.code +
-            (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
+        if(first) {
+            xmlStr += offset + "<entity " +
+                (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
+        } else {
+            xmlStr += offset + "<" + currentNode.data.code +
+                (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
+        }
     }
 
     for(var i = 0; i < children.length; i++){
@@ -31,14 +36,18 @@ function createXML(currentNode, rootFlag, offset, arrayEl) {
                 xmlStr += "</" + children[i].data.code + ">\n";
             }
         } else {
-            xmlStr += createXML(children[i], false, offset + "    ", currentNode.data.array);
+            xmlStr += createXML(children[i], false, offset + "    ", currentNode.data.array, false);
         }
     }
 
     if(arrayEl) {
         xmlStr += offset + "</item>\n";
     } else {
-        xmlStr += offset + "</" + currentNode.data.code + ">\n";
+        if(first) {
+            xmlStr += offset + "</entity>\n";
+        } else {
+            xmlStr += offset + "</" + currentNode.data.code + ">\n";
+        }
     }
 
     return xmlStr;
@@ -144,7 +153,7 @@ Ext.onReady(function() {
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
 
-            var xmlStr = createXML(rootNode.childNodes[0], true, "");
+            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
 
             Ext.Ajax.request({
                 url: dataUrl,
@@ -202,6 +211,59 @@ Ext.onReady(function() {
             });
 
             xmlFromWin.show();*/
+        }
+    });
+
+    var buttonShowXML = Ext.create('Ext.button.Button', {
+        id: "entityEditorShowXmlBtn",
+        text: 'XML',
+        handler : function (){
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+
+            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
+
+            var buttonClose = Ext.create('Ext.button.Button', {
+             id: "itemFormCancel",
+             text: 'Отмена',
+             handler : function (){
+             Ext.getCmp('xmlFromWin').destroy();
+             }
+             });
+
+             var xmlForm = Ext.create('Ext.form.Panel', {
+             id: 'xmlForm',
+             region: 'center',
+             width: 615,
+             fieldDefaults: {
+             msgTarget: 'side'
+             },
+             defaults: {
+             anchor: '100%'
+             },
+
+             bodyPadding: '5 5 0',
+             items: [{
+             fieldLabel: 'XML',
+             name: 'id',
+             xtype: 'textarea',
+             value: xmlStr,
+             height: 615
+             }],
+
+             buttons: [buttonClose]
+             });
+
+             xmlFromWin = new Ext.Window({
+             id: "xmlFromWin",
+             layout: 'fit',
+             title:'XML',
+             modal: true,
+             maximizable: true,
+             items:[xmlForm]
+             });
+
+             xmlFromWin.show();
         }
     });
 
@@ -387,7 +449,7 @@ Ext.onReady(function() {
                 xtype: 'textfield',
                 value: (givenEntityId == "null" ? "" : givenEntityId)
             },
-            buttonShow, buttonXML
+            buttonShow, buttonXML, buttonShowXML
         ]
     });
 });

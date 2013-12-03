@@ -119,6 +119,12 @@
             <artifactId>gson</artifactId>
             <version>2.2.4</version>
         </dependency>
+
+        <dependency>
+            <groupId>kz.bsbnb.usci</groupId>
+            <artifactId>receiver</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <distributionManagement>

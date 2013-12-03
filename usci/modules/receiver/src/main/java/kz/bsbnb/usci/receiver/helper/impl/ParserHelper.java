@@ -20,12 +20,18 @@ public class ParserHelper implements IHelper {
                 return Integer.parseInt(value);
             case DATE:
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Global.DATE_FORMAT);
+                SimpleDateFormat simpleDateFormatDot = new SimpleDateFormat(Global.DATE_FORMAT_DOT);
+
                 Date date = null;
 
                 try {
                     date = simpleDateFormat.parse(value);
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    try {
+                        date = simpleDateFormatDot.parse(value);
+                    } catch (ParseException ex) {
+                        e.printStackTrace();
+                    }
                 }
 
                 return date;

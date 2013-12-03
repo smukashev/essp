@@ -122,7 +122,8 @@ public class PostgreSQLBatchEntriesDaoImpl extends JDBCSupport implements IBatch
 
         Select select = context
                 .select(BATCH_ENTRIES.ID,
-                        BATCH_ENTRIES.UPDATED_DATE)
+                        BATCH_ENTRIES.UPDATED_DATE,
+                        BATCH_ENTRIES.VALUE)
                 .from(BATCH_ENTRIES)
                 .where(BATCH_ENTRIES.USER_ID.equal(userId));
 
@@ -133,6 +134,7 @@ public class PostgreSQLBatchEntriesDaoImpl extends JDBCSupport implements IBatch
             BatchEntry batchEntry = new BatchEntry();
 
             batchEntry.setId(((BigDecimal)row.get(BATCH_ENTRIES.ID.getName())).longValue());
+            batchEntry.setValue((String)row.get(BATCH_ENTRIES.VALUE.getName()));
             batchEntry.setUpdateDate(DataUtils.convert((Timestamp)
                     row.get(BATCH_ENTRIES.UPDATED_DATE.getName())));
 

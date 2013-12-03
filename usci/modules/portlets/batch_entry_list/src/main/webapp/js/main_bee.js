@@ -10,7 +10,19 @@ Ext.onReady(function() {
         id: "entityEditorShowBtn",
         text: 'Отправить',
         handler : function (){
-
+            Ext.Ajax.request({
+                url: dataUrl,
+                method: 'POST',
+                params: {
+                    op: 'SEND_XML'
+                },
+                success: function() {
+                    console.log('success');
+                },
+                failure: function() {
+                    console.log('woops');
+                }
+            });
         }
     });
 

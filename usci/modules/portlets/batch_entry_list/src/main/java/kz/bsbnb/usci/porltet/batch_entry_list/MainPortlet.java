@@ -14,19 +14,26 @@ import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class MainPortlet extends MVCPortlet {
     private RmiProxyFactoryBean batchEntryServiceFactoryBean;
+    private RmiProxyFactoryBean batchProcessServiceFactoryBean;
+
+    private IBatchProcessService batchProcessService;
+
+    private final static String TMP_FILE_DIR = "/home/a.tkachenko/temp_files";
 
     private IBatchEntryService batchEntryService;
 
@@ -39,6 +46,14 @@ public class MainPortlet extends MVCPortlet {
 
             batchEntryServiceFactoryBean.afterPropertiesSet();
             batchEntryService = (IBatchEntryService) batchEntryServiceFactoryBean.getObject();
+
+            batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+            batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchProcessService");
+            batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+            batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+            batchProcessServiceFactoryBean.afterPropertiesSet();
+            batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
         } catch (Exception e) {
             System.out.println("Can\"t initialise services: " + e.getMessage());
         }
@@ -62,7 +77,8 @@ public class MainPortlet extends MVCPortlet {
     }
 
     enum OperationTypes {
-        LIST_ENTRIES
+        LIST_ENTRIES,
+        SEND_XML
     }
 
     @Override
@@ -101,6 +117,56 @@ public class MainPortlet extends MVCPortlet {
                     }
 
                     writer.write("]}");
+
+                    break;
+                case SEND_XML:
+                    currentUser = PortalUtil.getUser(resourceRequest);
+
+                    entries = batchEntryService.getListByUser(currentUser.getUserId());
+
+                    String xml =
+                            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                                    "<batch>\n" +
+                                    "<entities>\n";
+
+                    for (BatchEntry batchEntry : entries) {
+                        xml += batchEntry.getValue() + "\n";
+                    }
+
+                    xml += "\n</entities>\n" +
+                            "</batch>";
+
+                    File f = File.createTempFile("tmp", ".zip", new File(TMP_FILE_DIR));
+
+                    String manifest = "<manifest>\n" +
+                            "\t<type>1</type>\n" +
+                            "\t<name>data.xml</name>\n" +
+                            "\t<userid>" + currentUser.getUserId() + "</userid>\n" +
+                            "\t<size>10</size>\n" +
+                            "\t<date>10.10.10</date>\n" +
+                            "</manifest>";
+
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    ZipOutputStream zipfile = new ZipOutputStream(bos);
+
+                    ZipEntry zipentry = new ZipEntry("data.xml");
+                    zipfile.putNextEntry(zipentry);
+                    zipfile.write(xml.getBytes());
+
+                    zipentry = new ZipEntry("manifest.xml");
+                    zipfile.putNextEntry(zipentry);
+                    zipfile.write(manifest.getBytes());
+
+                    zipfile.close();
+                    byte[] zipBytes = bos.toByteArray();
+
+                    FileOutputStream fileOutputStream = new FileOutputStream(f);
+
+                    fileOutputStream.write(zipBytes);
+
+                    fileOutputStream.close();
+
+                    batchProcessService.processBatch(f.getPath(), currentUser.getUserId());
 
                     break;
                 default:
