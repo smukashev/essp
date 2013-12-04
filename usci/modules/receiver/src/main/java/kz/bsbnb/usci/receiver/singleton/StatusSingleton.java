@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * @author k.tulbassiyev
@@ -35,6 +37,23 @@ public class StatusSingleton {
     public synchronized void startBatch(Long batchId, BatchFullJModel batchFullJModel, BatchInfo batchInfo) {
         //map.put(batchId, new ContractStatusArrayJModel());
 
+        BatchSign batchSign = new BatchSign();
+
+        batchSign.setUserId(batchInfo.getUserId());
+        batchSign.setFileName(batchInfo.getBatchName());
+        batchSign.setBatchId(batchId);
+
+        try
+        {
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+
+            batchSign.setMd5(md5.digest(batchFullJModel.getContent()).toString());
+        } catch (NoSuchAlgorithmException e)
+        {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+
         OperationFuture<Boolean> result = client.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
 
         while(true) if(result.isDone()) break; // must be completed
@@ -42,6 +61,10 @@ public class StatusSingleton {
         OperationFuture<Boolean> result1 = client.set("manifest:" + batchId, 0, gson.toJson(batchInfo));
 
         while(true) if(result1.isDone()) break; // must be completed
+
+        OperationFuture<Boolean> result2 = client.set("sign:" + batchId, 0, gson.toJson(batchSign));
+
+        while(true) if(result2.isDone()) break; // must be completed
     }
 
     public synchronized void addBatchStatus(Long batchId, BatchStatusJModel batchStatusJModel) {
@@ -81,7 +104,5 @@ public class StatusSingleton {
 
     public synchronized void endBatch(Long batchId) {
         //return map.remove(batchId);
-
-
     }
 }

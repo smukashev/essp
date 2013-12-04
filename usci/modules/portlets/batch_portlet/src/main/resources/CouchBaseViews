@@ -69,4 +69,13 @@ batch_status {
           }
         }
     }
+
+    batch_sign {
+        map:
+            function (doc, meta) {
+              if(doc.type == "sign" && !(doc.hasOwnProperty("sign"))) {
+                emit(doc.userId, doc);
+              }
+            }
+    }
 }

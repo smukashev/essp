@@ -83,14 +83,14 @@ public class BeanDataProvider implements DataProvider {
         return portalUserBusiness.getMainCreditorsInAlphabeticalOrder(userId);
     }
 
-    public List<FileSignatureRecord> getFilesToSign() {
-        //List<InputFile> inputFiles = inputFileBusiness.getFilesForSigning();
-        List<InputFile> inputFiles = new ArrayList<InputFile>();
-        InputFile inputFile1 = new InputFile();
+    public List<FileSignatureRecord> getFilesToSign(long userId) {
+        List<InputFile> inputFiles = inputFileBusiness.getFilesForSigning(userId);
+        //List<InputFile> inputFiles = new ArrayList<InputFile>();
+        //InputFile inputFile1 = new InputFile();
 
-        inputFile1.setFilePath("batch22838.zip");
-        inputFile1.setId(1L);
-        inputFiles.add(inputFile1);
+        //inputFile1.setFilePath("batch22838.zip");
+        //inputFile1.setId(1L);
+        //inputFiles.add(inputFile1);
 
         List<FileSignatureRecord> resultList = new ArrayList<FileSignatureRecord>(inputFiles.size());
         for (InputFile inputFile : inputFiles) {
@@ -98,6 +98,10 @@ public class BeanDataProvider implements DataProvider {
         }
 
         return resultList;
+    }
+
+    public void signFile(long fileId, String sign) {
+        inputFileBusiness.signFile(fileId, sign);
     }
 
     public String getBaseUrl() {

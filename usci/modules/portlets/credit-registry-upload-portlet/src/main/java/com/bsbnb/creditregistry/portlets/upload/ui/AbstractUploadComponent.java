@@ -53,7 +53,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
     private Creditor creditor;
     private VerticalLayout statusPanel;
     private Label errorMessageLabel;
-    private static final String UPLOADS_PATH = "/tmp";
+    private static final String UPLOADS_PATH = "/tmp/";
     public static final long MAX_FILE_LENGTH = 5 * (1L << 20);
     private PortletEnvironmentFacade portletEnvironment;
 
@@ -107,10 +107,12 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
         File uploadsDirectory = new File(UPLOADS_PATH);
         if (!uploadsDirectory.exists()) {
             if (!uploadsDirectory.mkdir()) {
+                System.out.println("Can't create dir");
                 return null;
             }
         }
         if (creditor == null || creditor.getId() <= 0) {
+            System.out.println("No creditor id");
             return null;
         }
         String creditorsPath = UPLOADS_PATH + creditor.getId() + "/";
@@ -158,6 +160,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
 
     protected void handleFile(byte[] array, String fileName) throws IllegalArgumentException {
         try {
+            System.out.println("#%% " + fileName);
             String path = saveFileOnDisk(array, fileName);
             log.log(Level.INFO, "Path: {0}", path);
             //Shared webServiceLoadType = sharedBusiness.findByC_T("WS", "input_type");

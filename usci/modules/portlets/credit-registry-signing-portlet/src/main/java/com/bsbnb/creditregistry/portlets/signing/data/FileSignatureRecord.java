@@ -15,7 +15,7 @@ public class FileSignatureRecord {
     
     private InputFile inputFile;
     private String signature;
-    
+
     public FileSignatureRecord(InputFile inputFile) {
         this.inputFile = inputFile;
     }
@@ -39,7 +39,7 @@ public class FileSignatureRecord {
     }
     
     public String getHash() {
-        return "" + inputFile.hashCode();
+        return inputFile.getMd5();
     }
     
     public String getSignature() {
@@ -53,5 +53,4 @@ public class FileSignatureRecord {
     public InputFile getInputFile() {
         return inputFile;
     }
-    
 }

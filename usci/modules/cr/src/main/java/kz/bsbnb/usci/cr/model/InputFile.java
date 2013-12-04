@@ -14,6 +14,8 @@ public class InputFile implements Serializable {
     
     private String filePath;
 
+    private String md5;
+
     /**
      * @return the id
      */
@@ -50,5 +52,15 @@ public class InputFile implements Serializable {
     public void setInputInfo(InputInfo inputInfo)
     {
         this.inputInfo = inputInfo;
+    }
+
+    public String getMd5()
+    {
+        return md5;
+    }
+
+    public void setMd5(String md5)
+    {
+        this.md5 = md5;
     }
 }

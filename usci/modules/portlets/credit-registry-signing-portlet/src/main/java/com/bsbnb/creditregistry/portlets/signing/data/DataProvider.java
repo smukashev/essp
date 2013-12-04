@@ -12,9 +12,11 @@ public interface DataProvider {
    
     public List<Creditor> getCreditorsList(long userId);
     
-    public List<FileSignatureRecord> getFilesToSign();
+    public List<FileSignatureRecord> getFilesToSign(long userId);
     
     public String getBaseUrl();
     
     public void addInputFileToQueue(FileSignatureRecord record);
+
+    public void signFile(long fileId, String sign);
 }

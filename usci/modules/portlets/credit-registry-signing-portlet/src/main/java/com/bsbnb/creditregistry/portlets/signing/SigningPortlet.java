@@ -82,7 +82,7 @@ public class SigningPortlet extends GenericPortlet {
             renderRequest.setAttribute("ContextPath", renderRequest.getContextPath());
             List<Creditor> userCreditors = provider.getCreditorsList(user.getUserId());
             renderRequest.setAttribute("hasAccess", userCreditors.size() == 1);
-            List<FileSignatureRecord> filesToSign = provider.getFilesToSign();
+            List<FileSignatureRecord> filesToSign = provider.getFilesToSign(user.getUserId());
             renderRequest.setAttribute("noFilesToSign", filesToSign.isEmpty());
             renderRequest.setAttribute("inputFiles", filesToSign);
             renderRequest.setAttribute("actionUrl", renderResponse.createActionURL());
@@ -102,7 +102,8 @@ public class SigningPortlet extends GenericPortlet {
         log.log(Level.INFO, "Command: {0}", command);
 
         DataProvider provider = new BeanDataProvider();
-        List<FileSignatureRecord> filesList = provider.getFilesToSign();
+        long userId = PortalUtil.getUserId(actionRequest);
+        List<FileSignatureRecord> filesList = provider.getFilesToSign(userId);
         Map<BigInteger, FileSignatureRecord> filesById = new HashMap<BigInteger, FileSignatureRecord>();
         for (FileSignatureRecord fileSignatureRecord : filesList) {
             filesById.put(fileSignatureRecord.getInputFileId(), fileSignatureRecord);
@@ -135,6 +136,8 @@ public class SigningPortlet extends GenericPortlet {
             for (FileSignatureRecord processedFile : processedFiles) {
                 processedFileNames.append("<br />");
                 processedFileNames.append(processedFile.getFilename());
+
+                provider.signFile(Long.parseLong(processedFile.getId()), processedFile.getSignature());
             }
             log.log(Level.INFO, "Processed file names: {0}", processedFileNames.toString());
             actionRequest.setAttribute("processedFilenames", new String[]{processedFileNames.toString()});
