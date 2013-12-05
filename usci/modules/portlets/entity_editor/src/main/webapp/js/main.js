@@ -53,7 +53,89 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first) {
     return xmlStr;
 }
 
+var grid;
+var store;
+
+function createItemsGrid(itemId) {
+    if(grid == null) {
+        Ext.define('myModel', {
+            extend: 'Ext.data.Model',
+            fields: ['id','code','title']
+        });
+
+        store = Ext.create('Ext.data.Store', {
+            model: 'myModel',
+            remoteGroup: true,
+            buffered: true,
+            leadingBufferZone: 300,
+            pageSize: 100,
+            proxy: {
+                type: 'ajax',
+                url: dataUrl,
+                extraParams: {op : 'LIST_BY_CLASS', metaId : itemId},
+                actionMethods: {
+                    read: 'POST'
+                },
+                reader: {
+                    type: 'json',
+                    root: 'data',
+                    totalProperty: 'total'
+                }
+            },
+            autoLoad: true,
+            remoteSort: true
+        });
+
+        grid = Ext.create('Ext.grid.Panel', {
+            id: "itemsGrid",
+            height: "100%",
+            store: store,
+
+            columns: [
+                {
+                    text     : 'ID',
+                    dataIndex: 'id',
+                    flex:1
+                },
+                {
+                    text     : 'Код',
+                    dataIndex: 'code',
+                    flex:1
+                },
+                {
+                    text     : 'Наименоваие',
+                    dataIndex: 'title',
+                    flex:3
+                }
+            ],
+            title: 'Элементы',
+            listeners : {
+                itemdblclick: function(dv, record, item, index, e) {
+                    entityId = Ext.getCmp("entityId");
+                    entityId.setValue(record.get('id'));
+                }
+            }
+        });
+
+        return grid;
+    } else {
+        store.load({
+            params: {
+                metaId: itemId,
+                op : 'LIST_BY_CLASS'
+            },
+            callback: function(records, operation, success) {
+                if (!success) {
+                    Ext.MessageBox.alert('Ошибка', 'Не возможно получить данные');
+                }
+            }
+        });
+    }
+}
+
 Ext.onReady(function() {
+    grid = null;
+
     Ext.define('classesStoreModel', {
         extend: 'Ext.data.Model',
         fields: ['classId','className']
@@ -407,6 +489,14 @@ Ext.onReady(function() {
                 },
                 bodyPadding: '5 5 0',
                 autoScroll:true
+            },{
+                xtype : 'panel',
+                region: 'south',
+                preventHeader: true,
+                width: "60%",
+                height: 150,
+                autoScroll:true,
+                items: [ createItemsGrid()]
             }],
         dockedItems: [
             {
@@ -427,6 +517,8 @@ Ext.onReady(function() {
                                         metaId : currentClassId
                                     }
                                 });
+
+                            createItemsGrid(currentClassId);
                         }
                 }
             },{

@@ -372,6 +372,7 @@ public class MainPortlet extends MVCPortlet {
                             writer.write("{");
 
                             writer.write("\"id\":\"" + id.getId() + "\",");
+                            writer.write("\"code\":\"" + id.getCode() + "\",");
                             writer.write("\"title\":\"" + id.getTitle() + "\"");
                             writer.write("}");
                         }
