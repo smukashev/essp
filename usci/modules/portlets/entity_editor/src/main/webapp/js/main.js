@@ -98,17 +98,17 @@ function createItemsGrid(itemId) {
                     flex:1
                 },
                 {
-                    text     : 'Код',
+                    text     : label_CODE,
                     dataIndex: 'code',
                     flex:1
                 },
                 {
-                    text     : 'Наименоваие',
+                    text     : label_TITLE,
                     dataIndex: 'title',
                     flex:3
                 }
             ],
-            title: 'Элементы',
+            title: label_ITEMS,
             listeners : {
                 itemdblclick: function(dv, record, item, index, e) {
                     entityId = Ext.getCmp("entityId");
@@ -126,7 +126,7 @@ function createItemsGrid(itemId) {
             },
             callback: function(records, operation, success) {
                 if (!success) {
-                    Ext.MessageBox.alert('Ошибка', 'Не возможно получить данные');
+                    Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA);
                 }
             }
         });
@@ -210,7 +210,7 @@ Ext.onReady(function() {
 
     var buttonShow = Ext.create('Ext.button.Button', {
         id: "entityEditorShowBtn",
-        text: 'Просмотр',
+        text: label_VIEW,
         handler : function (){
             entityId = Ext.getCmp("entityId");
 
@@ -221,7 +221,7 @@ Ext.onReady(function() {
                 },
                 callback: function(records, operation, success) {
                     if (!success) {
-                        Ext.MessageBox.alert('Ошибка', 'Не возможно получить данные: ' + operation.error);
+                        Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
                     }
                 }
             });
@@ -230,7 +230,7 @@ Ext.onReady(function() {
 
     var buttonXML = Ext.create('Ext.button.Button', {
         id: "entityEditorXmlBtn",
-        text: 'Сохранить',
+        text: label_SAVE,
         handler : function (){
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
@@ -307,7 +307,7 @@ Ext.onReady(function() {
 
             var buttonClose = Ext.create('Ext.button.Button', {
              id: "itemFormCancel",
-             text: 'Отмена',
+             text: label_CANCEL,
              handler : function (){
              Ext.getCmp('xmlFromWin').destroy();
              }
@@ -360,32 +360,32 @@ Ext.onReady(function() {
         singleExpand: true,
         columns: [{
             xtype: 'treecolumn',
-            text: 'Наименование',
+            text: label_TITLE,
             flex: 2,
             sortable: true,
             dataIndex: 'title'
         },{
-            text: 'Код',
+            text: label_CODE,
             flex: 1,
             dataIndex: 'code',
             sortable: true
         },{
-            text: 'Значение',
+            text: label_VALUE,
             flex: 4,
             dataIndex: 'value',
             sortable: true
         },{
-            text: 'Простой',
+            text: label_SIMPLE,
             flex: 1,
             dataIndex: 'simple',
             sortable: true
         },{
-            text: 'Массив',
+            text: label_ARRAY,
             flex: 1,
             dataIndex: 'array',
             sortable: true
         },{
-            text: 'Тип',
+            text: label_TYPE,
             flex: 1,
             dataIndex: 'type',
             sortable: true
@@ -397,7 +397,7 @@ Ext.onReady(function() {
 
                 var buttonSaveAttributes = Ext.create('Ext.button.Button', {
                     id: "entityEditorShowBtn",
-                    text: 'Сохранить',
+                    text: label_SAVE,
                     handler : function () {
                         var tree = Ext.getCmp('entityTreeView');
                         var selectedNode = tree.getSelectionModel().getLastSelected();
@@ -483,7 +483,7 @@ Ext.onReady(function() {
                 collapsible: true,
                 split:true,
                 //preventHeader: true,
-                title: "Форма ввода",
+                title: label_INPUT_FORM,
                 defaults: {
                     anchor: '100%'
                 },
@@ -500,7 +500,7 @@ Ext.onReady(function() {
             }],
         dockedItems: [
             {
-                fieldLabel: 'Справочник',
+                fieldLabel: label_REF,
                 id: 'entityEditorComplexTypeCombo',
                 xtype: 'combobox',
                 store: classesStore,
@@ -522,7 +522,7 @@ Ext.onReady(function() {
                         }
                 }
             },{
-                fieldLabel: 'Элементы',
+                fieldLabel: label_ITEMS,
                 id: 'entityEditorrefCombo',
                 xtype: 'combobox',
                 store: refStore,
@@ -535,7 +535,7 @@ Ext.onReady(function() {
                     }
                 }
             },{
-                fieldLabel: 'Идентификатор сущности',
+                fieldLabel: label_ENTITY_ID,
                 id: 'entityId',
                 name: 'entityId',
                 xtype: 'textfield',

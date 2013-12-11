@@ -31,7 +31,7 @@ public class CreditorBranchParser extends BatchParser {
     @Override
     public void init()
     {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("creditor_branch"), new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor_branch"), new Date());
     }
 
     @Override

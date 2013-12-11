@@ -196,6 +196,9 @@ meta add ref_credit_object name_kz STRING
 meta remove credit credit_object
 meta add credit credit_object MetaClass ref_credit_object
 
+meta remove credit creditor_branch
+meta add credit creditor_branch MetaClass ref_creditor_branch
+
 meta key name ref_credit_object code
 #---------------------------------------------------------------------------------------------
 

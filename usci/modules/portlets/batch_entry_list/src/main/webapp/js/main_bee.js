@@ -8,7 +8,7 @@ Ext.require([
 Ext.onReady(function() {
     var buttonSend = Ext.create('Ext.button.Button', {
         id: "entityEditorShowBtn",
-        text: 'Отправить',
+        text: label_SEND,
         handler : function (){
             Ext.Ajax.request({
                 url: dataUrl,
@@ -66,7 +66,7 @@ Ext.onReady(function() {
                 sortable: false,
                 items: [{
                     icon: contextPathUrl + '/pics/edit.png',
-                    tooltip: 'Редактировать',
+                    tooltip: label_EDIT,
                     handler: function (grid, rowIndex, colIndex) {
 
                     }}
@@ -79,7 +79,7 @@ Ext.onReady(function() {
                 sortable: false,
                 items: [{
                     icon: contextPathUrl + '/pics/delete.png',
-                    tooltip: 'Удалить',
+                    tooltip: label_DEL,
                     handler: function (grid, rowIndex, colIndex) {
                         /*var rec = store.getAt(rowIndex);
                         id_field = rec.get('id');
@@ -101,12 +101,12 @@ Ext.onReady(function() {
                 ]
             },
             {
-                text     : 'Код',
+                text     : label_CODE,
                 dataIndex: 'id',
                 flex:1
             },
             {
-                text     : 'Дата',
+                text     : label_DATE,
                 dataIndex: 'u_date',
                 flex:1
             }

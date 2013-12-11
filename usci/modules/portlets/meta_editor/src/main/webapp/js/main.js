@@ -56,14 +56,14 @@ function createMetaClassTree(classId, className) {
         items: [
             {
                 id: 'mtm-del',
-                text: 'Удалить'
+                text: label_DEL
             },{
                 id: 'mtm-edit',
-                text: 'Редактировать'
+                text: label_EDIT
             },
             ,{
                 id: 'mtm-add',
-                text: 'Добавить'
+                text: label_ADD
             }
         ],
         listeners: {
@@ -98,7 +98,7 @@ function createMetaClassTree(classId, className) {
 
                         Ext.Ajax.request({
                             url: dataUrl,
-                            waitMsg:'Идет удаление...',
+                            waitMsg: label_ADDING,
                             params : {op : 'DEL_ATTR', attrPathPart: attrPathPart,
                                 attrPathCode: attrPathCode},
                             actionMethods: {
@@ -109,7 +109,7 @@ function createMetaClassTree(classId, className) {
                             },
                             failure: function(response, opts) {
                                 data = JSON.parse(response.responseText);
-                                alert("Произошла ошибка: " + data.errorMessage);
+                                alert(label_ERROR_ACC.format(data.errorMessage));
                             }
                         });
 
@@ -162,7 +162,7 @@ function createMetaClassTree(classId, className) {
 function createMetaClassTreeStub(classId, className) {
     return Ext.create('Ext.panel.Panel', {
         preventHeader: true,
-        html  : 'Выберите класс для просмотра'
+        html  : label_CHOOSE
     });
 }
 
@@ -207,7 +207,7 @@ function createMetaClassesListView() {
                 sortable: false,
                 items: [{
                     icon: contextPathUrl + '/pics/edit.png',
-                    tooltip: 'Редактировать',
+                    tooltip: label_EDIT,
                     handler: function (grid, rowIndex, colIndex) {
                         var record = metaClassListStore.getAt(rowIndex);
                         createMCForm(record.get('classId'), record.get('className'), grid, record).show();
@@ -221,13 +221,13 @@ function createMetaClassesListView() {
                 sortable: false,
                 items: [{
                     icon: contextPathUrl + '/pics/delete.png',
-                    tooltip: 'Удалить',
+                    tooltip: label_DEL,
                     handler: function (grid, rowIndex, colIndex) {
                         var rec = metaClassListStore.getAt(rowIndex);
                         id_field = rec.get('classId');
                         Ext.Ajax.request({
                             url: dataUrl,
-                            waitMsg:'Идет удаление...',
+                            waitMsg:label_ADDING,
                             params : {op : 'DEL_CLASS', classId: id_field},
                             actionMethods: {
                                 read: 'POST'
@@ -243,7 +243,7 @@ function createMetaClassesListView() {
                 ]
             },
             {
-                text     : 'Наименование',
+                text     : label_TITLE,
                 dataIndex: 'className',
                 flex: 1
             }
@@ -254,7 +254,7 @@ function createMetaClassesListView() {
         collapsible: true,
         split:true,
         minSize:50,
-        title: "Классы",
+        title: label_CLASSES,
         listeners : {
             cellclick: function(grid, td, cellIndex, record, tr, rowIndex, e, eOpts) {
                 if(cellIndex == 2) {
@@ -269,7 +269,7 @@ function createMetaClassesListView() {
         dockedItems: [{
             xtype: 'toolbar',
             items: [{
-                text: 'Добавить',
+                text: label_ADD,
                 icon: contextPathUrl + '/pics/add.png',
                 handler: function(){
                     grid = Ext.getCmp("metaClassesGrid");
@@ -282,7 +282,7 @@ function createMetaClassesListView() {
 
 Ext.onReady(function() {
     mainMetaEditorPanel = Ext.create('Ext.panel.Panel', {
-        title : 'Панель метаданных',
+        title : label_DATA_PANEL,
         preventHeader: true,
         width : '100%',
         height: '500px',
@@ -296,19 +296,19 @@ Ext.onReady(function() {
                 xtype : 'panel',
                 id: 'metaclassTreeContainer',
                 region: 'center',
-                title : 'Структура класса',
+                title : label_CLASS_ST,
                 scroll: 'both',
                 autoScroll:true,
                 items: [createMetaClassTreeStub()],
                 dockedItems: [{
                     xtype: 'toolbar',
                     items: [{
-                        text: 'Раскрыть всё',
+                        text: label_UNFOLD,
                         handler: function(){
                             metaTreeView.expandAll();
                         }
                     }, {
-                        text: 'Свернуть всё',
+                        text: label_FOLD,
                         handler: function(){
                             metaTreeView.collapseAll();
                         }
