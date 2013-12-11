@@ -630,8 +630,10 @@ entity read  ./usci/modules/cli/src/main/resources/refs/ref_region.xml
 entity read  ./usci/modules/cli/src/main/resources/refs/ref_shared.xml
 
 
+crbatch /home/a.tkachenko/Documents/agro_batches/170413.xml 99999 0
+crbatch /home/a.tkachenko/Documents/agro_batches/180413.xml 99999 0
 
-crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 5 0
+#crbatch ./usci/modules/cli/src/main/resources/test_batch.xml 5 0
 #crbatch C:\Users\bauyrzhan.makhambeto\Documents\Portfolio_flow_20130901.xml 50 0
 #crbatch C:\1.xml 50 0
 #quit

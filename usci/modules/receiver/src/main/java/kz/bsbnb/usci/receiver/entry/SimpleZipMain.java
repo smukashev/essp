@@ -35,7 +35,7 @@ public class SimpleZipMain {
 
         ZipFilesMonitor monitor = ctx.getBean(ZipFilesMonitor.class);
         //monitor.monitor(Paths.get("c:\\zips"));
-        monitor.monitor(Paths.get("/tmp"));
+        monitor.monitor(Paths.get("/home/a.tkachenko/input"));
 
     }
 }

@@ -187,11 +187,20 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
 
             logger.debug("Path: " + path);
 
+            if (c2.getMeta().arrayInPath(path))
+                continue;
+
             IMetaType innerMetaType = c2.getMeta().getEl(path);
 
             if (!innerMetaType.isSet()) {
                 logger.debug("Is not set");
-                BaseEntity entity2 = (BaseEntity)c2.getEl(path);
+                BaseEntity entity2 = null;
+                try {
+                    entity2 = (BaseEntity)c2.getEl(path);
+                } catch(ClassCastException e) {
+                    System.out.println("============= " + path);
+                    e.printStackTrace();
+                }
 
                 if (entity1 != null && entity2 != null && compare(entity1, entity2)) {
                     paths.add(path);

@@ -106,7 +106,7 @@ public final class DataJob extends AbstractDataJob {
         }
     }
 
-    private BaseEntity getClearEntity() {
+    private synchronized BaseEntity getClearEntity() {
         Iterator<BaseEntity> iterator = entities.iterator();
 
         while(iterator.hasNext()) {
@@ -132,8 +132,8 @@ public final class DataJob extends AbstractDataJob {
     }
 
     private boolean hasCrossLine(BaseEntity entity1, BaseEntity entity2) {
-        //if (comparator.intersect(entity1, entity2).size() > 0)
-          //  return true;
+        if (comparator.intersect(entity1, entity2).size() > 0)
+            return true;
         return false;
     }
 }

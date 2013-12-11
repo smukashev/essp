@@ -693,6 +693,59 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
         return valueOut;
     }
 
+    public boolean arrayInPath(String path)
+    {
+        StringTokenizer tokenizer = new StringTokenizer(path, ".");
+
+        MetaClass meta = this;
+        IMetaType valueOut = null;
+
+        boolean wasArray = false;
+
+        while (tokenizer.hasMoreTokens())
+        {
+            if (wasArray)
+                return true;
+
+            String token = tokenizer.nextToken();
+
+            IMetaAttribute attribute = meta.getMetaAttribute(token);
+
+            if (attribute == null)
+                return false;
+
+            IMetaType type = attribute.getMetaType();
+
+            valueOut = type;
+
+            if (type.isSet())
+            {
+                if(!wasArray)
+                    wasArray = true;
+                while(type.isSet()) {
+                    valueOut = type;
+                    type = ((MetaSet)type).getMemberType();
+                }
+            }
+
+            if (valueOut.isComplex())
+            {
+                if (!valueOut.isSet()) {
+                    meta = (MetaClass)valueOut;
+                } else {
+                    meta = (MetaClass)type;
+                }
+            } else {
+                if (tokenizer.hasMoreTokens())
+                {
+                    throw new IllegalArgumentException("Path can't have intermediate simple values");
+                }
+            }
+        }
+
+        return false;
+    }
+
     public String getClassTitle()
     {
         return classTitle;
