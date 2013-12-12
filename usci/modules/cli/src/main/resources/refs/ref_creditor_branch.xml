@@ -18,11 +18,7 @@
              </doc_type>
            </item>
            <item><no>060641004991</no><doc_type><name_ru>Бизнес - идентификационный номер </name_ru><name_kz>Бизнес - идентификационный номер </name_kz>
-           <is_identification>1</is_identification><is_organization_doc>1</is_organization_doc><is_person_doc>0</is_person_doc><weight>10</weight><code>07
-           </code></doc_type></item></docs>
-           
-           <main_office>
-             <name>АО "Жилстройсбербанк Казахстана"</name>
+           <is_identification>1</is_identification><is_organization_doc>1</is_organization_doc><is_person_doc>0</is_person_doc><weight>10</weight><code>07</code></doc_type></item></docs><main_office><name>АО "Жилстройсбербанк Казахстана"</name>
              <docs>
               <item><no>HCSKKZKA</no><doc_type><name_ru>Банковский идентификационный код </name_ru><name_kz>Банковский идентификационный код </name_kz>
               <is_identification>0</is_identification><is_organization_doc>1</is_organization_doc><is_person_doc>0</is_person_doc><weight>30</weight><code>15</code>
