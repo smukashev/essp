@@ -35,6 +35,7 @@
         <module>entity_editor</module>
         <module>batch_entry_list</module>
         <module>translit-util</module>
+        <module>rules_portlet</module>
     </modules>
 
     <distributionManagement>
