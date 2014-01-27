@@ -50,7 +50,11 @@ public class SubjectOrganizationDocsParser extends BatchParser {
             currentBaseEntity.put("doc_type",new BaseValue(batch,index,organizationDoc));
 
         } else if(localName.equals("name")) {
+            event = (XMLEvent) xmlReader.next();
+            currentBaseEntity.put("name", new BaseValue(batch,index,event.asCharacters().getData()));
         } else if(localName.equals("no")) {
+            event = (XMLEvent) xmlReader.next();
+            currentBaseEntity.put("no",new BaseValue(batch,index,event.asCharacters().getData()));
         } else {
             throw new UnknownTagException(localName);
         }

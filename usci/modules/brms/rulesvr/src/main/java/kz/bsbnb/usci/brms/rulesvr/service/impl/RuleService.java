@@ -4,10 +4,12 @@ import kz.bsbnb.usci.brms.rulesvr.dao.IBatchDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 //import kz.bsbnb.usci.brms.rulesvr.service.ListenerSingleton;
@@ -56,7 +58,17 @@ public class RuleService implements IRuleService {
         return ruleDao.getAllRules();
     }
 
-//    public ListenerSingleton getListenerSingleton() {
+    @Override
+    public List<SimpleTrack> getRuleTitles(Long packageId, Date repDate) {
+        return ruleDao.getRuleTitles(packageId, repDate);
+    }
+
+    @Override
+    public Rule getRule(Long ruleId) {
+        return ruleDao.getRule(ruleId);
+    }
+
+    //    public ListenerSingleton getListenerSingleton() {
 //        return listenerSingleton;
 //    }
 //

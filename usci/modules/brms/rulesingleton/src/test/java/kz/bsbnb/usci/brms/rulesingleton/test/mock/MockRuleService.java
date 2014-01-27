@@ -2,10 +2,12 @@ package kz.bsbnb.usci.brms.rulesingleton.test.mock;
 
 import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -81,5 +83,15 @@ public class MockRuleService implements IRuleService
     {
         //not used in tests
         return null;
+    }
+
+    @Override
+    public List<SimpleTrack> getRuleTitles(Long packageId, Date repDate) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Rule getRule(Long ruleId) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

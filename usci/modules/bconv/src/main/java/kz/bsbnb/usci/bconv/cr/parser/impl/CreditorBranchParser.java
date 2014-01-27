@@ -42,11 +42,11 @@ public class CreditorBranchParser extends BatchParser {
             currentBaseEntity.put("code", new BaseValue(batch, index, event.asCharacters().getData()));
         } else if(localName.equals("docs")) {
             //ctCreditorDocs = new CtCreditor.Docs();
-            currentDocSet = new BaseSet(metaClassRepository.getMetaClass("doc"));
+            currentDocSet = new BaseSet(metaClassRepository.getMetaClass("doc1"));
         } else if(localName.equals("doc")) {
             //currentDoc = new CtDoc();
             //currentDoc.setDocType(attributes.getValue("doc_type"));
-            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("doc"), new Date());
+            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("doc1"), new Date());
 
             BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), new Date());
 
