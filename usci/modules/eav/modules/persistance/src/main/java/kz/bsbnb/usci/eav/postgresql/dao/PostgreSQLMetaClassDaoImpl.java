@@ -436,9 +436,11 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     EAV_M_COMPLEX_ATTRIBUTES.TITLE,
                     EAV_M_COMPLEX_ATTRIBUTES.IS_KEY,
                     EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE,
+                    EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL,
                     EAV_M_COMPLEX_ATTRIBUTES.CLASS_ID
                 ).values(parentId, parentType, attributeName, attributeTitle,
                     DataUtils.convert(metaAttribute.isKey()), DataUtils.convert(metaAttribute.isNullable()),
+                    DataUtils.convert(metaAttribute.isFinal()),
                     innerId);
         }
         else
@@ -451,10 +453,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     EAV_M_SIMPLE_ATTRIBUTES.TITLE,
                     EAV_M_SIMPLE_ATTRIBUTES.TYPE_CODE,
                     EAV_M_SIMPLE_ATTRIBUTES.IS_KEY,
-                    EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE
+                    EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE,
+                    EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL
                 ).values(parentId, parentType, attributeName, attributeTitle,
                     ((MetaValue)type).getTypeCode().toString(),
-                    DataUtils.convert(metaAttribute.isKey()), DataUtils.convert(metaAttribute.isNullable()));
+                    DataUtils.convert(metaAttribute.isKey()), DataUtils.convert(metaAttribute.isNullable()),
+                    DataUtils.convert(metaAttribute.isFinal()));
         }
 
         logger.debug(insert.toString());
@@ -670,7 +674,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE,
                 EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID,
                 EAV_M_SIMPLE_ATTRIBUTES.IS_KEY,
-                EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE
+                EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE,
+                EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL
             ).from(EAV_M_SIMPLE_ATTRIBUTES
         ).where(
                 EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
@@ -696,6 +701,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     ((BigDecimal)row.get("id")).longValue(),
                     ((BigDecimal)row.get("is_key")).longValue() == 1,
                     ((BigDecimal)row.get("is_nullable")).longValue() == 1);
+
+            metaAttirubute.setFinal(((BigDecimal)row.get("is_final")).longValue() == 1);
 
             metaAttirubute.setMetaType(new MetaValue(DataTypes.valueOf((String) row.get("type_code"))));
             metaAttirubute.setTitle((String) row.get("title"));
@@ -766,6 +773,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 EAV_M_COMPLEX_ATTRIBUTES.ID,
                 EAV_M_COMPLEX_ATTRIBUTES.IS_KEY,
                 EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE,
+                EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL,
                 EAV_M_COMPLEX_ATTRIBUTES.NAME,
                 EAV_M_COMPLEX_ATTRIBUTES.TITLE,
                 EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE,
@@ -799,6 +807,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     ((BigDecimal)row.get("id")).longValue(),
                     ((BigDecimal)row.get("is_key")).longValue() == 1,
                     ((BigDecimal)row.get("is_nullable")).longValue() == 1);
+
+            metaAttribute.setFinal(((BigDecimal)row.get("is_final")).longValue() == 1);
 
             metaAttribute.setMetaType(metaClass);
             metaAttribute.setTitle((String) row.get("title"));

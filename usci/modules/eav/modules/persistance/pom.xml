@@ -448,6 +448,7 @@
                             </generator>
                         </configuration>
                     </plugin>
+                    <!-- TODO: uncomment this to recreate the database  -->
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>

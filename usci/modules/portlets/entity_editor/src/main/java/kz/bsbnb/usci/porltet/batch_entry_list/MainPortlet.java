@@ -373,6 +373,11 @@ public class MainPortlet extends MVCPortlet {
 
                             writer.write("\"id\":\"" + id.getId() + "\",");
                             writer.write("\"code\":\"" + id.getCode() + "\",");
+
+                            for (String key : id.getKeys()) {
+                                writer.write("\"" + key + "\":\"" + id.getValue(key) + "\",");
+                            }
+
                             writer.write("\"title\":\"" + id.getTitle() + "\"");
                             writer.write("}");
                         }

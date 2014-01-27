@@ -1,12 +1,16 @@
 package kz.bsbnb.usci.eav.model;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Set;
 
 public class RefListItem implements Serializable
 {
     private long id;
     private String title;
     private String code;
+
+    private HashMap<String, Object> values = new HashMap<String, Object>();
 
     public long getId()
     {
@@ -36,5 +40,17 @@ public class RefListItem implements Serializable
     public void setCode(String code)
     {
         this.code = code;
+    }
+
+    public void addValue(String key, Object value) {
+        values.put(key, value);
+    }
+
+    public Object getValue(String key) {
+        return values.get(key);
+    }
+
+    public Set<String> getKeys() {
+        return values.keySet();
     }
 }

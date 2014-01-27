@@ -2436,41 +2436,146 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         return entityIds;
     }
 
+//    public List<RefListItem> getRefsByMetaclass(long metaClassId) {
+//        ArrayList<RefListItem> entityIds = new ArrayList<RefListItem>();
+//
+//        Select select = context
+//                .select(EAV_BE_ENTITIES.ID,
+//                        EAV_BE_STRING_VALUES.as("name_value").VALUE.as("value"),
+//                        EAV_BE_STRING_VALUES.as("code_value").VALUE.as("code"))
+//                .from(EAV_BE_ENTITIES,
+//                        EAV_BE_STRING_VALUES.as("name_value"),
+//                        EAV_M_SIMPLE_ATTRIBUTES.as("name_attr"),
+//                        EAV_BE_STRING_VALUES.as("code_value"),
+//                        EAV_M_SIMPLE_ATTRIBUTES.as("code_attr"))
+//                .where(EAV_BE_ENTITIES.CLASS_ID.equal(metaClassId))
+//
+//                .and(EAV_BE_ENTITIES.ID.equal(EAV_BE_STRING_VALUES.as("name_value").ENTITY_ID))
+//                .and(EAV_M_SIMPLE_ATTRIBUTES.as("name_attr").ID.equal(EAV_BE_STRING_VALUES.as("name_value").ATTRIBUTE_ID))
+//                .and(EAV_M_SIMPLE_ATTRIBUTES.as("name_attr").NAME.equal("name_ru"))
+//
+//                .and(EAV_BE_ENTITIES.ID.equal(EAV_BE_STRING_VALUES.as("code_value").ENTITY_ID))
+//                .and(EAV_M_SIMPLE_ATTRIBUTES.as("code_attr").ID.equal(EAV_BE_STRING_VALUES.as("code_value").ATTRIBUTE_ID))
+//                .and(EAV_M_SIMPLE_ATTRIBUTES.as("code_attr").NAME.equal("code"));
+//
+//        logger.debug(select.toString());
+//        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+//
+//        Iterator<Map<String, Object>> i = rows.iterator();
+//        while(i.hasNext())
+//        {
+//            Map<String, Object> row = i.next();
+//
+//            RefListItem rli = new RefListItem();
+//
+//            rli.setId(((BigDecimal)row.get(EAV_BE_ENTITIES.ID.getName())).longValue());
+//            rli.setTitle((String)row.get("value"));
+//            rli.setCode((String)row.get("code"));
+//
+//            entityIds.add(rli);
+//        }
+//
+//        return entityIds;
+//    }
+
     public List<RefListItem> getRefsByMetaclass(long metaClassId) {
         ArrayList<RefListItem> entityIds = new ArrayList<RefListItem>();
 
-        Select select = context
-                .select(EAV_BE_ENTITIES.ID,
-                        EAV_BE_STRING_VALUES.as("name_value").VALUE.as("value"),
-                        EAV_BE_STRING_VALUES.as("code_value").VALUE.as("code"))
-                .from(EAV_BE_ENTITIES,
-                        EAV_BE_STRING_VALUES.as("name_value"),
-                        EAV_M_SIMPLE_ATTRIBUTES.as("name_attr"),
-                        EAV_BE_STRING_VALUES.as("code_value"),
-                        EAV_M_SIMPLE_ATTRIBUTES.as("code_attr"))
-                .where(EAV_BE_ENTITIES.CLASS_ID.equal(metaClassId))
+        Select select = context.select().from(
+                context.select(
+                        EAV_BE_ENTITIES.ID,
+                        EAV_M_CLASSES.NAME.as("classes_name"),
+                        EAV_M_SIMPLE_ATTRIBUTES.NAME,
+                        EAV_BE_STRING_VALUES.VALUE,
+                        DSL.val("string", String.class).as("type"))
+                .from(EAV_BE_ENTITIES, EAV_M_CLASSES, EAV_M_SIMPLE_ATTRIBUTES, EAV_BE_STRING_VALUES)
+                .where(EAV_M_CLASSES.ID.eq(metaClassId))
+                .and(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
+                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(EAV_M_CLASSES.ID))
+                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(1))
+                .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
+                .and(EAV_BE_STRING_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
+                .union(context
+                        .select(
+                                EAV_BE_ENTITIES.ID,
+                                EAV_M_CLASSES.NAME.as("classes_name"),
+                                EAV_M_SIMPLE_ATTRIBUTES.NAME,
+                                DSL.field(
+                                        "TO_CHAR({0})", String.class, EAV_BE_INTEGER_VALUES.VALUE),
+                                DSL.val("integer", String.class).as("type"))
+                        .from(EAV_BE_ENTITIES, EAV_M_CLASSES, EAV_M_SIMPLE_ATTRIBUTES, EAV_BE_INTEGER_VALUES)
+                        .where(EAV_M_CLASSES.ID.eq(metaClassId))
+                        .and(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
+                        .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(EAV_M_CLASSES.ID))
+                        .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(1))
+                        .and(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
+                        .and(EAV_BE_INTEGER_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
+                    .union(context
+                            .select(
+                                    EAV_BE_ENTITIES.ID,
+                                    EAV_M_CLASSES.NAME.as("classes_name"),
+                                    EAV_M_SIMPLE_ATTRIBUTES.NAME,
+                                    DSL.field(
+                                            "TO_CHAR({0})", String.class, EAV_BE_DATE_VALUES.VALUE),
+                                    DSL.val("date", String.class).as("type"))
+                            .from(EAV_BE_ENTITIES, EAV_M_CLASSES, EAV_M_SIMPLE_ATTRIBUTES, EAV_BE_DATE_VALUES)
+                            .where(EAV_M_CLASSES.ID.eq(metaClassId))
+                            .and(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
+                            .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(EAV_M_CLASSES.ID))
+                            .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(1))
+                            .and(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
+                            .and(EAV_BE_DATE_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
+                        .union(context
+                                .select(
+                                        EAV_BE_ENTITIES.ID,
+                                        EAV_M_CLASSES.NAME.as("classes_name"),
+                                        EAV_M_SIMPLE_ATTRIBUTES.NAME,
+                                        DSL.field(
+                                                "TO_CHAR({0})", String.class, EAV_BE_BOOLEAN_VALUES.VALUE),
+                                        DSL.val("boolean", String.class).as("type"))
+                                .from(EAV_BE_ENTITIES, EAV_M_CLASSES, EAV_M_SIMPLE_ATTRIBUTES, EAV_BE_BOOLEAN_VALUES)
+                                .where(EAV_M_CLASSES.ID.eq(metaClassId))
+                                .and(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
+                                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(EAV_M_CLASSES.ID))
+                                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(1))
+                                .and(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
+                                .and(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID)))))).
+                orderBy(DSL.field("ID"));
 
-                .and(EAV_BE_ENTITIES.ID.equal(EAV_BE_STRING_VALUES.as("name_value").ENTITY_ID))
-                .and(EAV_M_SIMPLE_ATTRIBUTES.as("name_attr").ID.equal(EAV_BE_STRING_VALUES.as("name_value").ATTRIBUTE_ID))
-                .and(EAV_M_SIMPLE_ATTRIBUTES.as("name_attr").NAME.equal("name_ru"))
-
-                .and(EAV_BE_ENTITIES.ID.equal(EAV_BE_STRING_VALUES.as("code_value").ENTITY_ID))
-                .and(EAV_M_SIMPLE_ATTRIBUTES.as("code_attr").ID.equal(EAV_BE_STRING_VALUES.as("code_value").ATTRIBUTE_ID))
-                .and(EAV_M_SIMPLE_ATTRIBUTES.as("code_attr").NAME.equal("code"));
-
-        logger.debug(select.toString());
+        logger.debug("LIST_BY_CLASS SQL: " + select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         Iterator<Map<String, Object>> i = rows.iterator();
         while(i.hasNext())
         {
-            Map<String, Object> row = i.next();
-
             RefListItem rli = new RefListItem();
 
-            rli.setId(((BigDecimal)row.get(EAV_BE_ENTITIES.ID.getName())).longValue());
-            rli.setTitle((String)row.get("value"));
-            rli.setCode((String)row.get("code"));
+            Map<String, Object> row = i.next();
+            long id = (Long)row.get("ID");
+            long old_id = id;
+
+            logger.debug("#####################");
+
+            rli.setId(id);
+            while (old_id == id) {
+                if (((String)row.get("NAME")).equals("code")) {
+                    rli.setCode((String)row.get("VALUE"));
+                } else if (((String)row.get("NAME")).startsWith("name_")) {
+                    rli.setTitle((String)row.get("VALUE"));
+                }
+
+                for (String key : row.keySet()) {
+                    if (key.equals("NAME") || key.startsWith("name_")) {
+                        continue;
+                    }
+
+                    rli.addValue(key, row.get(key));
+                }
+
+                row = i.next();
+                old_id = id;
+                id = (Long)row.get("ID");
+            }
 
             entityIds.add(rli);
         }

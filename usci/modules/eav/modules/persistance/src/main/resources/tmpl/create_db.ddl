@@ -146,6 +146,7 @@
       <column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
       <column name="is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
       <column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+      <column name="is_final" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
       <column name="class_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
       <unique>
         <unique-column name="id"/>
@@ -244,6 +245,7 @@
       <column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
       <column name="is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
       <column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+      <column name="is_final" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
       <column name="type_code" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
       <unique>
         <unique-column name="id"/>

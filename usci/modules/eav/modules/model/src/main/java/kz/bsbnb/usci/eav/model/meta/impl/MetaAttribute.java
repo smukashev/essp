@@ -17,6 +17,8 @@ public class MetaAttribute extends Persistable implements IMetaAttribute
      * Defaults to <code>false</code>
      */
     private boolean isKey = false;
+
+    private boolean isFinal = false;
     /**
      * <code>true</code> if attribute can have <code>null</code> value
      * key attributes have this flag always set to false
@@ -140,5 +142,15 @@ public class MetaAttribute extends Persistable implements IMetaAttribute
     public void setTitle(String title)
     {
         this.title = title;
+    }
+
+    public boolean isFinal()
+    {
+        return isFinal;
+    }
+
+    public void setFinal(boolean aFinal)
+    {
+        isFinal = aFinal;
     }
 }
