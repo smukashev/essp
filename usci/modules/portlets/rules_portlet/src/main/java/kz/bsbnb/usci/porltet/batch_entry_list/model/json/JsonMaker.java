@@ -41,4 +41,9 @@ public class JsonMaker {
         m.put("success",true);
         return gson.toJson(m);
     }
+
+    public static String getJson(Map m){
+       m.put("success", true);
+       return gson.toJson(m);
+    }
 }

@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -49,7 +50,7 @@ public class BatchDao implements IBatchDao
             throw new IllegalArgumentException("Does not have id. Can't load.");
         }
 
-        String SQL = "Select * from packages where id  = ?";
+        String SQL = "SELECT * FROM packages WHERE id  = ?";
         Batch batch = jdbcTemplate.queryForObject(SQL,new Object[]{id},new BatchMapper());
         return batch;
     }
@@ -63,11 +64,11 @@ public class BatchDao implements IBatchDao
                     "of Batch saving to the DB.");
         }
 
-        String SQL = "Insert into packages(name,repdate) values (?,?)";
+        String SQL = "INSERT INTO packages(NAME,repdate) VALUES (?,?)";
         jdbcTemplate.update(SQL,batch.getName(),batch.getRepoDate());
         System.out.println("Created batch with repodate"+batch.getRepoDate()+" called "+batch.getName());
 
-        SQL = "Select id from packages where name = ?";
+        SQL = "SELECT id FROM packages WHERE NAME = ?";
         long id = jdbcTemplate.queryForLong(SQL,batch.getName());
         return id;
     }
@@ -79,7 +80,7 @@ public class BatchDao implements IBatchDao
             throw new IllegalArgumentException("Batch does not have id. Can't create batch version.");
         }
 
-       String SQL = "Insert into package_versions(package_id,repdate) values(?,?)";
+       String SQL = "INSERT INTO package_versions(package_id,repdate) VALUES(?,?)";
         jdbcTemplate.update(SQL,batchId,batch.getRepoDate());
     }
 
@@ -93,10 +94,20 @@ public class BatchDao implements IBatchDao
 
     @Override
     public List<Batch> getAllBatches() {
-        String SQL = "Select * from packages";
+        String SQL = "SELECT * FROM packages";
         List<Batch> batchList = jdbcTemplate.query(SQL,new BeanPropertyRowMapper(Batch.class));
         return batchList;
     }
 
+    @Override
+    public long getBatchVersionId(long batchId, Date repDate) {
+        String SQL = "SELECT id FROM package_versions WHERE repdate = \n" +
+                "  (SELECT MAX(repdate)\n" +
+                "     FROM\n" +
+                "     (SELECT * FROM package_versions WHERE package_id = ? AND repdate <= ? ) tm\n" +
+                "        )\n" +
+                "AND package_id = ? LIMIT 1";
 
+        return jdbcTemplate.queryForLong(SQL, batchId, repDate, batchId);
+    }
 }

@@ -8,4 +8,11 @@ package kz.bsbnb.usci.porltet.batch_entry_list.model.json;
  * To change this template use File | Settings | File Templates.
  */
 public class SimpleJson {
+    public long id;
+    public String name;
+
+    public SimpleJson(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

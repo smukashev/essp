@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MockRuleService implements IRuleService
@@ -86,12 +87,27 @@ public class MockRuleService implements IRuleService
     }
 
     @Override
-    public List<SimpleTrack> getRuleTitles(Long packageId, Date repDate) {
+    public Map getRuleTitles(Long packageId, Date repDate) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean deleteRule(long ruleId, long batchVersionId) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public Rule getRule(Long ruleId) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+//    @Override
+//    public long saveRule(long ruleId, long batchVersionId) {
+//        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+//    }
+
+    @Override
+    public long saveRule(String title, long batchVersionId) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

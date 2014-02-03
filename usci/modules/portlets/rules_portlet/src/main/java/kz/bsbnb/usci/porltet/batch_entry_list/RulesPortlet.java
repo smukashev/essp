@@ -79,6 +79,8 @@ public class RulesPortlet extends MVCPortlet{
         GET_RULE_TITLES,
         GET_RULE,
         UPDATE_RULE,
+        DEL_RULE,
+        NEW_RULE,
 
         LIST_ALL,
         LIST_CLASS,
@@ -125,6 +127,17 @@ public class RulesPortlet extends MVCPortlet{
                     rule.setTitle("sample");
                     ruleService.update(rule);
                     writer.write(JsonMaker.getJson(true));
+                    break;
+                case DEL_RULE:
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    long packageVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
+                    ruleService.deleteRule(ruleId, packageVersionId);
+                    writer.write(JsonMaker.getJson(true));
+                    break;
+                case NEW_RULE:
+                    long batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
+                    String title = resourceRequest.getParameter("title");
+                    writer.write(JsonMaker.getJson(ruleService.saveRule(title, batchVersionId)));
                     break;
             }
 
