@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 //import kz.bsbnb.usci.brms.rulesvr.service.ListenerSingleton;
 
@@ -59,13 +61,29 @@ public class RuleService implements IRuleService {
     }
 
     @Override
-    public List<SimpleTrack> getRuleTitles(Long packageId, Date repDate) {
-        return ruleDao.getRuleTitles(packageId, repDate);
+    public Map getRuleTitles(Long packageId, Date repDate) {
+        long batchVersionId = batchDao.getBatchVersionId(packageId, repDate);
+        Map m = new HashMap();
+        m.put("batchVersionId",batchVersionId);
+        m.put("data",ruleDao.getRuleTitles(packageId,repDate));
+        return m;
     }
 
     @Override
     public Rule getRule(Long ruleId) {
         return ruleDao.getRule(ruleId);
+    }
+
+    @Override
+    public boolean deleteRule(long ruleId, long batchVersionId) {
+        return ruleDao.deleteRule(ruleId,batchVersionId);
+    }
+
+    @Override
+    public long saveRule(String title, long batchVersionId) {
+        long ruleId = ruleDao.createRule(title);
+        ruleDao.save(ruleId, batchVersionId);
+        return ruleId;
     }
 
     //    public ListenerSingleton getListenerSingleton() {

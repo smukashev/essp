@@ -6,6 +6,7 @@ import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author abukabayev
@@ -29,7 +30,7 @@ public interface IRuleService {
      * @param repDate
      * @return
      */
-    public List<SimpleTrack> getRuleTitles(Long packageId, Date repDate);
+    public Map getRuleTitles(Long packageId, Date repDate);
 
     /**
      * Retrieves single rule by ruleId
@@ -38,4 +39,10 @@ public interface IRuleService {
      * @return
      */
     public Rule getRule(Long ruleId);
+
+
+    public boolean deleteRule(long ruleId, long batchVersionId );
+
+    public long saveRule(String title, long batchVersionId);
+
 }
