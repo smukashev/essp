@@ -206,7 +206,7 @@ function createMetaClassesListView() {
                 width: 26,
                 sortable: false,
                 items: [{
-                    icon: contextPathUrl + '/pics/edit.png',
+                    icon: contextPathUrl + '//pics/edit.png',
                     tooltip: label_EDIT,
                     handler: function (grid, rowIndex, colIndex) {
                         var record = metaClassListStore.getAt(rowIndex);
@@ -220,7 +220,7 @@ function createMetaClassesListView() {
                 width: 26,
                 sortable: false,
                 items: [{
-                    icon: contextPathUrl + '/pics/delete.png',
+                    icon: contextPathUrl + '//pics/delete.png',
                     tooltip: label_DEL,
                     handler: function (grid, rowIndex, colIndex) {
                         var rec = metaClassListStore.getAt(rowIndex);
@@ -270,7 +270,7 @@ function createMetaClassesListView() {
             xtype: 'toolbar',
             items: [{
                 text: label_ADD,
-                icon: contextPathUrl + '/pics/add.png',
+                icon: contextPathUrl + '//pics/add.png',
                 handler: function(){
                     grid = Ext.getCmp("metaClassesGrid");
                     createMCForm("", "", grid, null).show();
@@ -285,24 +285,13 @@ function createMetaClassesListView() {
 var ruleListGrid = null;
 
 function deleteRule(rowIndex){
-    rowIndex = (typeof rowIndex === 'undefined') ? -1 : rowIndex;
-
-    ruleListGrid.store.removeAt(rowIndex);
-
-    if(ruleListGrid.store.data.length == 0)
-        editor.setValue("",-1);
-    else{
-        ruleListGrid.getSelectionModel().select(0);
-        ruleListGrid.fireEvent("cellclick",ruleListGrid, null, 1, ruleListGrid.getSelectionModel().getLastSelected());
-    }
-
     Ext.Ajax.request({
         url: dataUrl,
         waitMsg: 'adding',
         params : {
             op : 'DEL_RULE',
-            ruleId: newValue.data.id,
-            packageId: Ext.getCmp("elemComboPackage").value
+            ruleId: editor.ruleId,
+            batchVersionId: editor.batchVersionId //Ext.getCmp("elemComboPackage").value
         },
         reader: {
             type: 'json'
@@ -312,12 +301,16 @@ function deleteRule(rowIndex){
             root: 'data'
         },
         success: function(response, opts) {
-            /*var obj = Ext.decode(response.responseText).data;
-             editor.backup = obj.rule;
-             editor.ruleId = newValue.data.id;
-             editor.infIndex = newValue.index;
-             editor.setValue(obj.rule, -1);*/
-            //ruleListGrid.fireEvent("itemclick",)
+            rowIndex = (typeof rowIndex === 'undefined') ? -1 : rowIndex;
+
+            ruleListGrid.store.removeAt(rowIndex);
+
+            if(ruleListGrid.store.data.length == 0)
+                reset();
+            else{
+                ruleListGrid.getSelectionModel().select(0);
+                ruleListGrid.fireEvent("cellclick",ruleListGrid, null, 1, ruleListGrid.getSelectionModel().getLastSelected());
+            }
         },
         failure: function(response, opts) {
             Ext.Msg.alert("ошибка",Ext.decode(response.responseText).errorMessage);
@@ -326,18 +319,22 @@ function deleteRule(rowIndex){
 }
 
 
+
 function initGrid(){
+
     var store = Ext.create('Ext.data.ArrayStore', {
         fields: ['id','name'],
         proxy: {
-         type: 'ajax',
-         url: dataUrl,
-         reader: {
-             type: 'json',
-             root: 'data'
-         }
+            type: 'ajax',
+            url : dataUrl,
+            reader: {
+                type: 'json',
+                root: 'data'
+            }
         }
+        //data: myData
     });
+
 
     return ruleListGrid = Ext.create('Ext.grid.Panel', {
         store: store,
@@ -349,15 +346,15 @@ function initGrid(){
                 sortable: false,
                 items: [{
                     tooltip: 'удалить',
-                    icon: contextPathUrl+'/pics/crop2.png',
+                    icon: contextPathUrl + '/pics/crop2.png',
                     handler: function(grid, rowIndex, colIndex){
                         Ext.MessageBox.show({
-                            title: 'sdf',
-                            msg: 'sdf',
+                            title: 'Потверждение',
+                            msg: 'Вы уверены что хотите удалить правило?',
                             buttons: Ext.MessageBox.OKCANCEL,
                             fn: function(btn){
-                                editor.preventDefault = true;
-                                deleteRule(rowIndex);
+                                if(btn == 'ok')
+                                    deleteRule(rowIndex);
                             }
                         });
                     }
@@ -390,12 +387,13 @@ function initGrid(){
                         root: 'data'
                     },
                     success: function(response, opts) {
-                        console.log("grid click at " + newValue.index);
                         var obj = Ext.decode(response.responseText).data;
                         editor.backup = obj.rule;
+                        editor.title = obj.title;
                         editor.ruleId = newValue.data.id;
                         editor.infIndex = newValue.index;
                         editor.setValue(obj.rule, -1);
+                        editor.$readOnly = false;
                     },
                     failure: function(response, opts) {
                         Ext.Msg.alert("ошибка",Ext.decode(response.responseText).errorMessage);
@@ -409,8 +407,54 @@ function initGrid(){
             items: [{
                 text: 'add',
                 icon: contextPathUrl + '/pics/add.png',
-                handler: function(){
-                    alert("add");
+                id: 'btnNewRule',
+                handler: function(e1,e2){
+                    Ext.getCmp('txtTitle').show();
+                    Ext.getCmp('txtTitle').focus(false,200);
+                    Ext.getCmp('btnAddGreen').show();
+                    Ext.EventObject.stopPropagation();
+                }
+            },{
+                xtype: 'textfield',
+                id: 'txtTitle',
+                hidden: true,
+                listeners: {
+                    render: function(cmd){
+                        cmd.getEl().on('click', function(){ Ext.EventObject.stopPropagation(); });
+                    }
+                }
+            },{
+                id: 'btnAddGreen',
+                text: '',
+                icon: contextPathUrl + '/pics/addgreen.png',
+                hidden: true,
+                handler: function(e1){
+
+                    console.log("ok press green button");
+
+                    Ext.Ajax.request({
+                        disableCaching: false,
+                        url: dataUrl,
+                        params: {
+                            op: 'NEW_RULE',
+                            title: Ext.getCmp('txtTitle').value,
+                            batchVersionId: editor.batchVersionId
+                        },
+                        success: function(response){
+                            var ruleId = Ext.decode(response.responseText).data;
+                            ruleListGrid.store.add({id: ruleId, name : Ext.getCmp('txtTitle').value });
+                            ruleListGrid.getSelectionModel().select(ruleListGrid.store.indexOfId(ruleId));
+                            ruleListGrid.fireEvent('cellclick', ruleListGrid, null, 1, ruleListGrid.getSelectionModel().getLastSelected());
+                            Ext.getCmp('btnAddGreen').hide();
+                            Ext.getCmp('txtTitle').hide();
+                            editor.focus();
+                        },
+                        failure: function(response){
+                            Ext.Msg.alert('',Ext.decode(response.responseText).errorMessage);
+                        }
+                    });
+
+                    Ext.EventObject.stopPropagation();
                 }
             },{
                 text: 'copy',
@@ -424,58 +468,111 @@ function initGrid(){
         region: 'south'
     });
 
-    /*return ruleListGrid = Ext.create('Ext.grid.Panel', {
-        store: store,
-        columns: [
-            {
-                text     : 'title',
-                dataIndex: 'name'
-            }
-        ],
-        height: 200,
-        region: 'south'
-    });*/
 }
 
+function reset(){
+    editor.setValue("",-1);
+    editor.$readOnly = true;
+    editor.batchVersionId = -1;
+    editor.backup = "";
+    Ext.getCmp('btnCancel').setDisabled(true);
+    Ext.getCmp('btnSave').setDisabled(true);
+    Ext.getCmp('btnDel').setDisabled(true);
+    ruleListGrid.store.loadData([],false);
+}
+
+
+
+
+
+
 function updateRules(){
+
     if(Ext.getCmp('elemComboPackage').value == null || Ext.getCmp('elemDatePackage').value == null)
         return;
-
-    ruleListGrid.store.load({
-        params: {
-          op: 'GET_RULE_TITLES',
-          packageId: Ext.getCmp('elemComboPackage').value,
-          date: Ext.Date.format(Ext.getCmp('elemDatePackage').value, 'd.m.Y')
+    reset();
+    ruleListGrid.store.load(
+        {
+            params: {
+                op: 'GET_RULE_TITLES',
+                packageId:Ext.getCmp('elemComboPackage').value,
+                date: Ext.Date.format(Ext.getCmp('elemDatePackage').value, 'd.m.Y')
+            },
+            callback: function(a,b,success){
+                if(success == false){
+                    Ext.Msg.alert('','Нет версии пакета');
+                    reset();
+                }else{
+                    editor.batchVersionId = Ext.decode(b.response.responseText).batchVersionId;
+                }
+            },
+            scope: this
         }
-    });
+    );
 
     ruleListGrid.getView().refresh();
 }
 
 
-Ext.onReady(function(){
+Ext.getDoc().on('click',function(){
+        Ext.getCmp('btnAddGreen').hide();
+        Ext.getCmp('txtTitle').hide();
+    }
+);
 
+
+Ext.onReady(function(){
     Ext.define('packageListModel',{
         extend: 'Ext.data.Model',
         fields: ['id','name']
     });
 
+    var myData = [
+        {
+            id : '12',
+            name: 'Alex',
+            surname: 'Brown'
+        },
+        {
+            id: '14',
+            name: 'Bruce',
+            surname : 'Gordon'
+        }
+    ];
+
+    //alert(JSON.stringify(myData));
+
+    /*Ext.Ajax.request({
+     disableCaching: false,
+     url: 'http://localhost/json',
+     success: function(response){
+     //alert(response.status);
+     },
+     failure: function(){
+     //alert("false");
+     }
+     });*/
+
+
     var packageStore = Ext.create('Ext.data.Store',{
         id: 'packageStore',
         model: 'packageListModel',
+        //data: myData,
         proxy: {
             type: 'ajax',
             url: dataUrl,
+            extraParams: {
+                op: 'PACKAGE_ALL'
+            },
             reader: {
                 type: 'json',
                 root: 'data'
-            },
-            extraParams: {
-                op: 'PACKAGE_ALL'
             }
         },
         autoLoad: true
     });
+
+
 
     var panel  = Ext.create('Ext.panel.Panel',{
             title : '',
@@ -553,9 +650,10 @@ Ext.onReady(function(){
                                 Ext.Msg.show({
                                     title: 'zapors',
                                     msg: 'mess',
-                                    buttons: Ext.Msg.YESNO,
+                                    buttons: Ext.Msg.OKCANCEL,
                                     fn: function(btn){
-                                        deleteRule(ruleListGrid.store.indexOf(ruleListGrid.getSelectionModel().getLastSelected()));
+                                        if(btn=='ok')
+                                            deleteRule(ruleListGrid.store.indexOf(ruleListGrid.getSelectionModel().getLastSelected()));
                                     }
                                 });
 
@@ -592,23 +690,6 @@ Ext.onReady(function(){
                                             //alert(this.value);
                                             //alert(Ext.Date.format(this.value, 'd.m.Y'));
                                             updateRules();
-                                            return;
-
-                                            if(packageId != null && false){
-                                                Ext.Ajax.request({
-                                                    disableCaching: false,
-                                                    url: dataUrl,
-                                                    params: {op: 'LIST_RULES', packageId : packageId, date: Ext.Date.format(this.value,'d.m.Y')},
-                                                    success: function(response){
-                                                        //alert(response.status);
-                                                    },
-                                                    failure: function(){
-                                                        alert("false");
-                                                    }
-                                                });
-
-                                            }
-
                                         }
                                     },
                                     format: 'd.m.Y'
@@ -616,114 +697,10 @@ Ext.onReady(function(){
                             ]
                         },
                         initGrid()
-                        //{
-                        /*xtype: 'panel',
-                         title: 'south',
-                         region: 'south',
-                         height: 200*/
-                        //myFunctionName()
-                        //}
-
                     ]
                 }
 
             ]
         }
     ); //end of panel
-
-
-
-//    var panel  = Ext.create('Ext.panel.Panel',{
-//            title : '',
-//            width : 600,
-//            height : 300,
-//            renderTo: 'rules-content',
-//            layout : 'border',
-//            id: 'MainPanel',
-//            defaults : {
-//                split: true
-//            },
-//            items: [
-//                {
-//                    region: 'east',
-//                    width: 300,
-//                    title: 'East',
-//                    html: "<div id='bkeditor'>function(){}</div>"
-//                },{
-//                    xtype: 'panel',
-//                    region: 'center',
-//                    layout: 'border',
-//                    defaults : {
-//                        split: true
-//                    },
-//                    items: [
-//                        {
-//                            xtype: 'panel',
-//                            region: 'center',
-//                            bodyStyle: 'padding: 15px',
-//                            items: [
-//                                {
-//                                    xtype : 'combobox',
-//                                    id: 'elemComboPackage',
-//                                    store: packageStore,
-//                                    valueField:'id',
-//                                    displayField:'name',
-//                                    fieldLabel: 'Choose'
-//                                }, {
-//                                    xtype: 'datefield',
-//                                    id: 'elemDatePackage',
-//                                    fieldLabel: 'date',
-//                                    listeners: {
-//                                        change: function(){updateRules();}
-//                                    },
-//                                    format: 'd.m.Y'
-//                                }//,
-//                            ]
-//                        },
-//                        initGrid()
-//                    ]
-//                }
-//
-//            ]
-//        }
-//    );
-
-})
-
-//Ext.onReady(function() {
-//    mainMetaEditorPanel = Ext.create('Ext.panel.Panel', {
-//        title : label_DATA_PANEL,
-//        preventHeader: true,
-//        width : '100%',
-//        height: '500px',
-//        renderTo : 'meta-editor-content',
-//        layout : 'border',
-//        defaults : {
-//            padding: '3'
-//        },
-//        items  : [createMetaClassesListView(),
-//            {
-//                xtype : 'panel',
-//                id: 'metaclassTreeContainer',
-//                region: 'center',
-//                title : label_CLASS_ST,
-//                scroll: 'both',
-//                autoScroll:true,
-//                items: [createMetaClassTreeStub()],
-//                dockedItems: [{
-//                    xtype: 'toolbar',
-//                    items: [{
-//                        text: label_UNFOLD,
-//                        handler: function(){
-//                            metaTreeView.expandAll();
-//                        }
-//                    }, {
-//                        text: label_FOLD,
-//                        handler: function(){
-//                            metaTreeView.collapseAll();
-//                        }
-//                    }]
-//                }]
-//            }]
-//    });
-//});
+});

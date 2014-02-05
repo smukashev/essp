@@ -78,10 +78,7 @@ public class RuleDao implements IRuleDao {
         String SQL = "SELECT id, title AS NAME FROM rules WHERE id IN (\n" +
                 "SELECT rule_id FROM rule_package_versions WHERE package_versions_id = \n" +
                 "(SELECT id FROM package_versions WHERE repdate = \n" +
-                " (SELECT MAX(repdate)  \n" +
-                "  FROM \n" +
-                "    (SELECT * FROM package_versions WHERE package_id = ? AND repdate <= ? ) tm\n" +
-                "  )\n" +
+                "    (SELECT max(repdate) FROM package_versions WHERE package_id = ? AND repdate <= ? ) \n" +
                 " AND package_id = ? LIMIT 1\n" +
                 " ))";
 
@@ -117,7 +114,7 @@ public class RuleDao implements IRuleDao {
 
     @Override
     public boolean deleteRule(long ruleId, long batchVersionId) {
-        jdbcTemplate.update("DELETE FROM rule_package_versions WHERE ruleId = ? AND package_versions_id = ?", ruleId, batchVersionId);
+        jdbcTemplate.update("DELETE FROM rule_package_versions WHERE rule_id = ? AND package_versions_id = ?", ruleId, batchVersionId);
         return true;
     }
 
