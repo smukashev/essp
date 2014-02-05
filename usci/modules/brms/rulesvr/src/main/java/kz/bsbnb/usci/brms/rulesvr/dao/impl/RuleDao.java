@@ -150,4 +150,11 @@ public class RuleDao implements IRuleDao {
 
         return keyHolder.getKey().longValue();
     }
+
+    @Override
+    public boolean updateBody(Long ruleId, String body) {
+        String sql = "Update rules set rule = ? where id=?";
+        jdbcTemplate.update(sql, new Object[]{body, ruleId});
+        return true;
+    }
 }

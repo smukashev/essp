@@ -121,11 +121,7 @@ public class RulesPortlet extends MVCPortlet{
                 case UPDATE_RULE:
                     String ruleBody = resourceRequest.getParameter("ruleBody");
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
-
-                    Rule rule = new Rule(ruleBody);
-                    rule.setId(ruleId);
-                    rule.setTitle("sample");
-                    ruleService.update(rule);
+                    ruleService.updateBody(ruleId, ruleBody);
                     writer.write(JsonMaker.getJson(true));
                     break;
                 case DEL_RULE:

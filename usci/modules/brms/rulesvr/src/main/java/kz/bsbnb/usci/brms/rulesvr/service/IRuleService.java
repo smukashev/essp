@@ -43,6 +43,18 @@ public interface IRuleService {
 
     public boolean deleteRule(long ruleId, long batchVersionId );
 
+
     public long saveRule(String title, long batchVersionId);
+
+
+    /**
+     * Creates new rule with given title and empty body <br/>
+     * returns generated id in db
+     *
+     * @param ruleId - rule id <br/>
+     * @param body - new body of rule <br/>
+     * @return if success or not
+     */
+    public boolean updateBody(Long ruleId, String body);
 
 }

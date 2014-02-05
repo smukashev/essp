@@ -86,6 +86,12 @@ public class RuleService implements IRuleService {
         return ruleId;
     }
 
+    @Override
+    public boolean updateBody(Long ruleId, String body) {
+        return ruleDao.updateBody(ruleId,body);
+    }
+
+
     //    public ListenerSingleton getListenerSingleton() {
 //        return listenerSingleton;
 //    }

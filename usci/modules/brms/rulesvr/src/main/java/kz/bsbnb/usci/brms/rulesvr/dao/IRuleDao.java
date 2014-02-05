@@ -20,4 +20,5 @@ public interface IRuleDao extends IDao{
     public boolean deleteRule(long ruleId, long batchVersionId);
     public long save(long ruleId, long BatchVersionId);
     public long createRule(String title);
+    public boolean updateBody(Long ruleId, String body);
 }
