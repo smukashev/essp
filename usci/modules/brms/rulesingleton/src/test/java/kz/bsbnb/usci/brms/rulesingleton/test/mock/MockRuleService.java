@@ -115,4 +115,14 @@ public class MockRuleService implements IRuleService
     public boolean updateBody(Long ruleId, String body) {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    @Override
+    public boolean copyExistingRule(long ruleId, long batchVersionId) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public long copyRule(long ruleId, String title, long batchVersionId) {
+        return -1L;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

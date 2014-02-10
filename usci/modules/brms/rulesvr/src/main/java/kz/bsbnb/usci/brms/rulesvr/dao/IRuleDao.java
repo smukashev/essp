@@ -21,4 +21,6 @@ public interface IRuleDao extends IDao{
     public long save(long ruleId, long BatchVersionId);
     public long createRule(String title);
     public boolean updateBody(Long ruleId, String body);
+    public boolean copyExistingRule(long ruleId, long batchVersionId);
+    public long copy(long ruleId, String title);
 }

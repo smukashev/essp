@@ -78,7 +78,7 @@ public class RuleDao implements IRuleDao {
         String SQL = "SELECT id, title AS NAME FROM rules WHERE id IN (\n" +
                 "SELECT rule_id FROM rule_package_versions WHERE package_versions_id = \n" +
                 "(SELECT id FROM package_versions WHERE repdate = \n" +
-                "    (SELECT max(repdate) FROM package_versions WHERE package_id = ? AND repdate <= ? ) \n" +
+                "    (SELECT MAX(repdate) FROM package_versions WHERE package_id = ? AND repdate <= ? ) \n" +
                 " AND package_id = ? LIMIT 1\n" +
                 " ))";
 
@@ -124,7 +124,7 @@ public class RuleDao implements IRuleDao {
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO rules (title) values(?)", new String[]{"id"});
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO rules (title) VALUES(?)", new String[]{"id"});
                 ps.setString(1,title);
                 return ps;
             }
@@ -138,7 +138,7 @@ public class RuleDao implements IRuleDao {
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT into rule_package_versions (rule_id, package_versions_id) values (?,?)", new String[]{"id"});
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO rule_package_versions (rule_id, package_versions_id) VALUES (?,?)", new String[]{"id"});
                 ps.setLong(1,ruleId);
                 ps.setLong(2,batchVersionId);
                 return ps;
@@ -150,8 +150,32 @@ public class RuleDao implements IRuleDao {
 
     @Override
     public boolean updateBody(Long ruleId, String body) {
-        String sql = "Update rules set rule = ? where id=?";
+        String sql = "UPDATE rules SET rule = ? WHERE id=?";
         jdbcTemplate.update(sql, new Object[]{body, ruleId});
         return true;
+    }
+
+    @Override
+    public boolean copyExistingRule(long ruleId, long batchVersionId) {
+        String sql = "INSERT INTO rule_package_versions (rule_id, package_versions_id) VALUES (?,?)";
+        jdbcTemplate.update(sql, new Object[]{ruleId, batchVersionId});
+        return true;
+    }
+
+    @Override
+    public long copy(final long ruleId, final String title) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO rules (rule, title)\n" +
+                        "  SELECT rule, ? AS title FROM rules WHERE id = ?", new String[]{"id"});
+                ps.setString(1, title);
+                ps.setLong(2,ruleId);
+                return ps;
+            }
+        },keyHolder);
+
+        return keyHolder.getKey().longValue();
     }
 }

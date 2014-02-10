@@ -206,7 +206,7 @@ function createMetaClassesListView() {
                 width: 26,
                 sortable: false,
                 items: [{
-                    icon: contextPathUrl + '//pics/edit.png',
+                    icon: contextPathUrl + '///pics/edit.png',
                     tooltip: label_EDIT,
                     handler: function (grid, rowIndex, colIndex) {
                         var record = metaClassListStore.getAt(rowIndex);
@@ -220,7 +220,7 @@ function createMetaClassesListView() {
                 width: 26,
                 sortable: false,
                 items: [{
-                    icon: contextPathUrl + '//pics/delete.png',
+                    icon: contextPathUrl + '///pics/delete.png',
                     tooltip: label_DEL,
                     handler: function (grid, rowIndex, colIndex) {
                         var rec = metaClassListStore.getAt(rowIndex);
@@ -270,7 +270,7 @@ function createMetaClassesListView() {
             xtype: 'toolbar',
             items: [{
                 text: label_ADD,
-                icon: contextPathUrl + '//pics/add.png',
+                icon: contextPathUrl + '///pics/add.png',
                 handler: function(){
                     grid = Ext.getCmp("metaClassesGrid");
                     createMCForm("", "", grid, null).show();
@@ -283,6 +283,7 @@ function createMetaClassesListView() {
 // ===============================================================================
 
 var ruleListGrid = null;
+var packageStore = null;
 
 function deleteRule(rowIndex){
     Ext.Ajax.request({
@@ -291,7 +292,7 @@ function deleteRule(rowIndex){
         params : {
             op : 'DEL_RULE',
             ruleId: editor.ruleId,
-            batchVersionId: editor.batchVersionId //Ext.getCmp("elemComboPackage").value
+            batchVersionId: editor.batchVersionId //Ext.getCmp("elemCombokage").value
         },
         reader: {
             type: 'json'
@@ -450,7 +451,7 @@ function initGrid(){
                             editor.focus();
                         },
                         failure: function(response){
-                            Ext.Msg.alert('',Ext.decode(response.responseText).errorMessage);
+                            Ext.Msg.alert('ошибка',Ext.decode(response.responseText).errorMessage);
                         }
                     });
 
@@ -458,9 +459,11 @@ function initGrid(){
                 }
             },{
                 text: 'copy',
+                id: 'btnCopy',
                 icon: contextPathUrl + '/pics/copy2.png',
+                disabled: true,
                 handler: function(){
-                    alert("copy");
+                    createRuleForm().show();
                 }
             }]
         }],
@@ -478,6 +481,7 @@ function reset(){
     Ext.getCmp('btnCancel').setDisabled(true);
     Ext.getCmp('btnSave').setDisabled(true);
     Ext.getCmp('btnDel').setDisabled(true);
+    Ext.getCmp('btnCopy').setDisabled(true);
     ruleListGrid.store.loadData([],false);
 }
 
@@ -504,12 +508,14 @@ function updateRules(){
                     reset();
                 }else{
                     editor.batchVersionId = Ext.decode(b.response.responseText).batchVersionId;
+                    Ext.getCmp('btnCopy').setDisabled(false);
                 }
             },
             scope: this
         }
     );
 
+    Ext.getCmp('btnCopy').setDisabled(false);
     ruleListGrid.getView().refresh();
 }
 
@@ -554,7 +560,7 @@ Ext.onReady(function(){
      });*/
 
 
-    var packageStore = Ext.create('Ext.data.Store',{
+    packageStore = Ext.create('Ext.data.Store',{
         id: 'packageStore',
         model: 'packageListModel',
         //data: myData,
@@ -678,17 +684,18 @@ Ext.onReady(function(){
                                     store: packageStore,
                                     valueField:'id',
                                     displayField:'name',
-                                    fieldLabel: 'Choose'
+                                    fieldLabel: 'Choose',
+                                    listeners: {
+                                        change: function(){
+                                            updateRules();
+                                        }
+                                    }
                                 }, {
                                     xtype: 'datefield',
                                     id: 'elemDatePackage',
                                     fieldLabel: 'date',
                                     listeners: {
                                         change: function(){
-
-                                            var packageId = Ext.getCmp('elemComboPackage').value;
-                                            //alert(this.value);
-                                            //alert(Ext.Date.format(this.value, 'd.m.Y'));
                                             updateRules();
                                         }
                                     },

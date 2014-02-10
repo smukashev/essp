@@ -23,12 +23,10 @@ public interface IRuleService {
     public List<Rule> getAllRules();
 
     /**
-     * Retrieves rules(<i>id</i>, <i>title <b>as name</b></i>) given <b>packageId</b> and <b>date</b><br/>
+     * Retrieves rules(<i>id</i>, <i>title <b>as name</b></i>) and <b>batchVersionId</b> given <b>packageId</b> and <b>date</b><br/>
      * Automatically defines its date (i.e the latest version of batch among all dates <= <b>repDate</b>)
      *
-     * @param packageId
-     * @param repDate
-     * @return
+     * @return map of : <br/> <b>data</b> - array of rules <br/><b>batchVersionId</b> - batchVersionId
      */
     public Map getRuleTitles(Long packageId, Date repDate);
 
@@ -43,18 +41,39 @@ public interface IRuleService {
 
     public boolean deleteRule(long ruleId, long batchVersionId );
 
-
+    /**
+     * Creates new rule with given title and empty body <br/>
+     *
+     * @param title
+     * @param batchVersionId
+     * @return generated id of rule
+     */
     public long saveRule(String title, long batchVersionId);
 
 
     /**
-     * Creates new rule with given title and empty body <br/>
-     * returns generated id in db
+     * Sets new body to rule with given <b>ruleId</b>
      *
      * @param ruleId - rule id <br/>
      * @param body - new body of rule <br/>
      * @return if success or not
      */
     public boolean updateBody(Long ruleId, String body);
+
+    /**
+     * Copy rule to batch version
+     *
+     * @return success status
+     */
+    public boolean copyExistingRule(long ruleId, long batchVersionId);
+
+    /**
+     * Copy body of rule as a new rule into the batch
+     *
+     * @param ruleId lookup id for rule body
+     * @param batchVersionId what package to add new rule
+     * @return id of created rule
+     */
+    public long copyRule(long ruleId, String title,  long batchVersionId);
 
 }

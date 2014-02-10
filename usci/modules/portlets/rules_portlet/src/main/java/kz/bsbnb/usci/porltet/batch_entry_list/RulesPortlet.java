@@ -81,6 +81,8 @@ public class RulesPortlet extends MVCPortlet{
         UPDATE_RULE,
         DEL_RULE,
         NEW_RULE,
+        COPY_EXISTING_RULE,
+        COPY_RULE,
 
         LIST_ALL,
         LIST_CLASS,
@@ -99,7 +101,8 @@ public class RulesPortlet extends MVCPortlet{
 
         try {
             OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
-            long ruleId;
+            long ruleId, batchVersionId;
+            String title;
 
             if(resourceRequest.getParameterMap().containsKey("fail"))
                throw new RuntimeException("some error Message");
@@ -131,15 +134,30 @@ public class RulesPortlet extends MVCPortlet{
                     writer.write(JsonMaker.getJson(true));
                     break;
                 case NEW_RULE:
-                    long batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
-                    String title = resourceRequest.getParameter("title");
+                    batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
+                    title = resourceRequest.getParameter("title");
                     writer.write(JsonMaker.getJson(ruleService.saveRule(title, batchVersionId)));
+                    break;
+                case COPY_EXISTING_RULE:
+                    batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    boolean status = ruleService.copyExistingRule(ruleId, batchVersionId);
+                    if(!status)
+                        throw new RuntimeException("something wrong when copy");
+                    writer.write(JsonMaker.getJson(true));
+                    break;
+                case COPY_RULE:
+                    batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    title = resourceRequest.getParameter("title");
+                    ruleId = ruleService.copyRule(ruleId,title,batchVersionId);
+                    writer.write(JsonMaker.getJson(ruleId));
                     break;
             }
 
         } catch (Exception e) {
-            resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "500");
-            writer.write("{ \"success\": false, \"errorMessage\": \""+e.getMessage()+"\"}");
+            resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
+            writer.write("{ \"success\": false, \"errorMessage\": \""+ e.getMessage().replaceAll("\"","").replaceAll("\n","")+"\"}");
             //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
