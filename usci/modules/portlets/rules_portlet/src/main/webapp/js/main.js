@@ -44,9 +44,7 @@ function deleteRule(rowIndex){
 }
 
 
-
 function initGrid(){
-
     var store = Ext.create('Ext.data.ArrayStore', {
         fields: ['id','name'],
         proxy: {
@@ -146,6 +144,11 @@ function initGrid(){
                 listeners: {
                     render: function(cmd){
                         cmd.getEl().on('click', function(){ Ext.EventObject.stopPropagation(); });
+                    },
+                    scope:this,
+                    specialkey: function(f,e){
+                        if(e.getKey()==e.ENTER)
+                            Ext.getCmp('btnAddGreen').handler();
                     }
                 }
             },{
@@ -270,6 +273,18 @@ Ext.onReady(function(){
         }
     ];
 
+    var map = new Ext.util.KeyMap(document,{
+            key: "s",
+            ctrl: true,
+            shift: true,
+            fn: function(){
+                if(editor.isFocused()){
+                    Ext.getCmp('btnSave').handler();
+                }
+            }
+        }
+    );
+
 
     packageStore = Ext.create('Ext.data.Store',{
         id: 'packageStore',
@@ -314,7 +329,7 @@ Ext.onReady(function(){
                             id: 'btnCancel',  icon: contextPathUrl + '/pics/undo.png', handler: function(){ editor.setValue(editor.backup, -1); }, disabled: true},
                         {
                             text: 'сохранить',
-                            scope: this,
+                            //scope: this, 
                             id: 'btnSave',
                             icon: contextPathUrl + '/pics/save.png',
                             disabled: true,
@@ -338,15 +353,15 @@ Ext.onReady(function(){
                                     success: function(response, opts) {
                                         console.log(response.responseText.success);
                                         //var obj = Ext.decode(response.responseText).data;
-                                        //ruleListGrid.fireEvent('itemclick',ruleListGrid, ruleListGrid.getSelectionModel().getLastSelected());
+                                        //ruleListGrid.fireEvent('itemclick',ruleListGrid, ruleListGrid.getSelectionModel().getLastSelected());                    
                                         ruleListGrid.fireEvent('cellclick', ruleListGrid, null, 1, ruleListGrid.getSelectionModel().getLastSelected()); //cellclick: function(grid, td, cellIndex, newValue, tr, rowIndex, e, eOpts){
-                                        //editor.backup = obj.rule;
+                                        //editor.backup = obj.rule; 
                                         //editor.setValue(obj.rule, -1);
 
 
-                                        /*editor.getSession().on('change', function(){
+                                        /*editor.getSession().on('change', function(){ 
                                          //alert(editor.isDirty());
-                                         Ext.getCmp('btnEdit').setDisabled(true);
+                                         Ext.getCmp('btnEdit').setDisabled(true); 
                                          })*/
                                         //console.log(obj.data[0].rule);
                                         //selectedNode.parentNode.removeChild(selectedNode);
@@ -366,7 +381,7 @@ Ext.onReady(function(){
                                 //Ext.Msg.alert("Сообщение","Вы точно хотите удалить правило ?");
                                 Ext.Msg.show({
                                     title: 'Потверждение',
-                                    msg: 'Вы точно хотите удалить правило?',
+                                    msg: 'Вы точно хотите удалить правило ?',
                                     buttons: Ext.Msg.OKCANCEL,
                                     fn: function(btn){
                                         if(btn=='ok')
