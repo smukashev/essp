@@ -10,9 +10,9 @@
 		http://drools.org/schema/drools-spring http://anonsvn.jboss.org/repos/labs/labs/jbossrules/trunk/drools-container/drools-spring/src/main/resources/org/drools/container/spring/drools-spring.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <context:component-scan base-package="kz.bsbnb.usci.brms.rulesingleton">
-        <context:exclude-filter type="regex" expression="kz\.bsbnb\.usci\.brms\.rulesingleton\.test\.errormock\..*"/>
+        <context:exclude-filter type="regex" expression="kz\.bsbnb\.usci\.brms\.rulesingleton\.test\.mock\..*"/>
     </context:component-scan>
-    <context:component-scan base-package="kz.bsbnb.usci.brms.rulesingleton.test.mock" />
+    <context:component-scan base-package="kz.bsbnb.usci.brms.rulesingleton.test.errormock" />
 
     <context:annotation-config/>
 

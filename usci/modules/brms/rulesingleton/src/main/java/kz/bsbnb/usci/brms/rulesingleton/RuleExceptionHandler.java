@@ -28,6 +28,7 @@ public class RuleExceptionHandler implements ConsequenceExceptionHandler, Extern
 
     public void handleException(Activation activation, WorkingMemory workingMemory, Exception exception)
     {
-        throw new RuleException(activation, workingMemory, exception);
+        //throw new RuleException(activation, workingMemory, exception);
+        System.out.println("######################## ERROR ##############################");
     }
 }
