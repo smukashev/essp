@@ -48,7 +48,8 @@ public class CLIXMLReader
 
     protected XMLEventReader xmlEventReader;
 
-    public static final String DATE_FORMAT = "yyyy-MM-dd";
+    //public static final String DATE_FORMAT = "yyyy-MM-dd";
+    public static final String DATE_FORMAT = "dd.MM.yyyy";
     protected DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 
     public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchRepository batchRepository) throws FileNotFoundException
