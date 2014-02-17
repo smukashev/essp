@@ -554,6 +554,145 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         return result;
     }
 
+
+    private Object[] queue;
+    private int queueStart;
+    private int queueEnd;
+
+    private void initQueue(){
+        queue = new Object[10000];
+        queueStart = 0;
+        queueEnd = 0;
+    }
+
+    private void enQueue(Object o){
+        queue[queueEnd++] = o;
+    }
+
+    private int queueSize(){
+        return queueEnd - queueStart;
+    }
+
+    private Object deQueue(){
+        if(queueSize()==0) throw new RuntimeException("queue is empty");
+        return queue[queueStart++];
+    }
+
+
+    public Object getEls(String path){
+      initQueue();
+      StringBuilder str = new StringBuilder();
+      String[] operations = new String[500];
+      boolean[] isFilter = new boolean[500];
+      String function = null;
+
+      if(!path.startsWith("{")) throw new RuntimeException("function must be specified");
+      for(int i=0;i<path.length();i++){
+          if(path.charAt(i) == '}')
+          {
+              function = path.substring(1,i);
+              path = path.substring(i+1);
+              break;
+          }
+      }
+
+      if(function == null) throw new RuntimeException("no function");
+
+
+      int yk = 0;
+      int open = 0;
+      int eqCnt = 0;
+
+      for(int i=0;i<=path.length();i++) {
+          if(i==path.length()) {
+              if(open!=0)
+                  throw  new RuntimeException("opening bracket not correct");
+              break;
+          }
+          if(path.charAt(i) == '=') eqCnt++;
+          if(path.charAt(i) == '[') open++;
+          if(path.charAt(i) == ']') {
+              open--;
+              if(eqCnt!=1) throw new RuntimeException("only exactly one equal sign in filter and only in filter");
+              eqCnt = 0;
+          }
+          if(open < 0 || open > 1) throw new RuntimeException("brackets not correct");
+      }
+
+      for(int i=0;i<=path.length();i++){
+          if(i==path.length()){
+              if(str.length() > 0)
+              {
+                  operations[yk] = str.toString();
+                  isFilter[yk]=false;
+                  yk++;
+              }
+              break;
+          }
+          char c = path.charAt(i);
+          if( c=='[' || c==']'){
+              if(str.length() > 0){
+                  operations[yk] = str.toString();
+                  isFilter[yk] = c==']';
+                  yk++;
+                  str.setLength(0);
+              }
+          } else{
+              str.append(c);
+          }
+      }
+
+        List ret = new LinkedList();
+        enQueue(this);
+        enQueue(0);
+
+        while(queueSize() > 0){
+            BaseEntity curO = (BaseEntity) deQueue();
+            int step = (Integer) deQueue();
+
+            if(step == yk)
+            {
+                ret.add(curO);
+                continue;
+            }
+
+
+           MetaClass curMeta = curO.getMeta();
+
+           if(!isFilter[step]){
+                 IMetaAttribute nextAttribute = curMeta.getMetaAttribute(operations[step]);
+
+                 if(nextAttribute.getMetaType().isSet()){
+                     BaseSet next = (BaseSet)curO.getEl(operations[step]);
+                     for(Object o: next.get()){
+                         {
+                             enQueue(((BaseValue) o).getValue());
+                             enQueue(step+1);
+                         }
+                     }
+                 } else{
+                     BaseEntity next = (BaseEntity) curO.getEl(operations[step]);
+                     enQueue(next);
+                     enQueue(step+1);
+                 }
+           }else{
+               String[] parts = operations[step].split("=");
+               Object o = curO.getEl(parts[0]);
+
+               if( (o==null && parts[1].equals("null")) || o.toString().equals(parts[1]))
+               {
+                   enQueue(curO);
+                   enQueue(step+1);
+               }
+           }
+        }
+
+      if(function.startsWith("count"))
+          return ret.size();
+      else throw new RuntimeException("unknown function");
+
+    }
+
     public Object getEl(String path)
     {
         StringTokenizer tokenizer = new StringTokenizer(path, ".");

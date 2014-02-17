@@ -7,6 +7,21 @@
 
     <context:component-scan base-package="kz.bsbnb.usci.brms.rulesingleton"/>
 
+
     <context:annotation-config/>
+
+
+    <bean id="remoteBatchService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1097/batchService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulesvr.service.IBatchService"/>
+    </bean>
+    <bean id="remoteBatchVersionService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1097/batchVersionService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService"/>
+    </bean>
+    <bean id="remoteRuleService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1097/ruleService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulesvr.service.IRuleService"/>
+    </bean>
 
 </beans>
