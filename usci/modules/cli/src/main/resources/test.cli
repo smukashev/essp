@@ -602,7 +602,20 @@ meta add credit creditor_branch MetaClass ref_creditor_branch
 
 #---------------------------------------------------------------------------------------------
 
+#====================================
+#= fix with dates
+#====================================
 
+meta remove primary_contract date
+meta add primary_contract contract_date  DATE
+
+meta remove contract date
+meta add contract contract_date  DATE
+
+meta remove write_off date
+meta add write_off write_off_date DATE
+
+#------------------------------------
 
 rc
 
@@ -643,6 +656,9 @@ entity read  usci/modules/cli/src/main/resources/refs/ref_portfolio.xml
 entity read  usci/modules/cli/src/main/resources/refs/ref_region.xml
 entity read  usci/modules/cli/src/main/resources/refs/ref_shared.xml
 
+
+crbatch C:\batches\artur\170413.xml 99999 0 01.04.2013
+crbatch C:\batches\artur\180413.xml 99999 0 01.04.2013
 
 #crbatch /home/a.tkachenko/Documents/agro_batches/170413.xml 99999 0
 #crbatch /home/a.tkachenko/Documents/agro_batches/180413.xml 99999 0

@@ -86,6 +86,24 @@ public class RuleService implements IRuleService {
         return ruleId;
     }
 
+    @Override
+    public boolean updateBody(Long ruleId, String body) {
+        return ruleDao.updateBody(ruleId,body);
+    }
+
+    @Override
+    public boolean copyExistingRule(long ruleId, long batchVersionId) {
+        return ruleDao.copyExistingRule(ruleId, batchVersionId);
+    }
+
+    @Override
+    public long copyRule(long ruleId, String title, long batchVersionId) {
+        long newRuleId = ruleDao.copy(ruleId, title);
+        ruleDao.copyExistingRule(newRuleId, batchVersionId);
+        return newRuleId;
+    }
+
+
     //    public ListenerSingleton getListenerSingleton() {
 //        return listenerSingleton;
 //    }

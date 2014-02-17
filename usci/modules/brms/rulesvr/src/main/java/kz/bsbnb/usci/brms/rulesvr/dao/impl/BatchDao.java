@@ -102,10 +102,7 @@ public class BatchDao implements IBatchDao
     @Override
     public long getBatchVersionId(long batchId, Date repDate) {
         String SQL = "SELECT id FROM package_versions WHERE repdate = \n" +
-                "  (SELECT MAX(repdate)\n" +
-                "     FROM\n" +
-                "     (SELECT * FROM package_versions WHERE package_id = ? AND repdate <= ? ) tm\n" +
-                "        )\n" +
+                "     (SELECT MAX(repdate) FROM package_versions WHERE package_id = ? AND repdate <= ? ) \n" +
                 "AND package_id = ? LIMIT 1";
 
         return jdbcTemplate.queryForLong(SQL, batchId, repDate, batchId);

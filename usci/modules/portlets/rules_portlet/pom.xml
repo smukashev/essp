@@ -53,6 +53,21 @@
 
     <dependencies>
         <dependency>
+            <groupId>kz.bsbnb.usci.eav</groupId>
+            <artifactId>model</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>kz.bsbnb.usci.eav</groupId>
+            <artifactId>persistance</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>kz.bsbnb.usci</groupId>
+            <artifactId>bconv</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>com.liferay.portal</groupId>
             <artifactId>portal-service</artifactId>
             <version>${liferay.version}</version>
@@ -102,11 +117,6 @@
         <dependency>
             <groupId>kz.bsbnb.usci</groupId>
             <artifactId>sync</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>kz.bsbnb.usci.eav</groupId>
-            <artifactId>model</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>

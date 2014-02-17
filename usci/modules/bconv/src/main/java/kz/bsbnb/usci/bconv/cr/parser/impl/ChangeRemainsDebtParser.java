@@ -106,7 +106,7 @@ public class ChangeRemainsDebtParser extends BatchParser {
         } else if(localName.equals("date")) {
             event = (XMLEvent) xmlReader.next();
             try {
-                fieldWriteOf.put("date",new BaseValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
+                fieldWriteOf.put("write_off_date",new BaseValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
             } catch (ParseException e) {
                 System.out.println(e.getMessage());
             }

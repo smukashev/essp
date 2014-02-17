@@ -25,6 +25,7 @@
 
 <script src="<%=request.getContextPath()%>/js/require.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/ext/ext-all.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/rform.js" type="text/javascript"></script>
 
 <script>
     require.config({
@@ -65,7 +66,7 @@
         right: 0;
         bottom: 0;
         left: 0;
-        height: 300px;
+        height: 100%;
     }
 </style>
 
