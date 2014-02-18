@@ -105,6 +105,7 @@ public class RulesPortlet extends MVCPortlet{
         COPY_EXISTING_RULE,
         COPY_RULE,
         RUN_RULE,
+        FLUSH,
 
         LIST_ALL,
         LIST_CLASS,
@@ -181,7 +182,9 @@ public class RulesPortlet extends MVCPortlet{
                     BaseEntity be = (BaseEntity) entityService.load(baseEntityId);
                     rulesSingleton.runRules(be,batchName,date);
                     writer.write(JsonMaker.getJson(be.getValidationErrors()));
-
+                    break;
+                case FLUSH:
+                    rulesSingleton.reloadCache();
                     break;
             }
 

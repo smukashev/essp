@@ -185,6 +185,69 @@ function initGrid(){
                     Ext.EventObject.stopPropagation();
                 }
             },{
+                text: 'run',
+                id:    'btnRun',
+                icon: contextPathUrl + '/pics/run.png',
+                handler: function(){
+                    Ext.MessageBox.prompt('Запуск','Введитие идшник baseEntity: ',function(btn,text){
+                        if(btn == "ok"){
+                            Ext.getCmp('btnRun').setIcon(contextPathUrl + "/pics/loading.gif");
+                            Ext.Ajax.request({
+                                url: dataUrl,
+                                waitMsg: 'adding',
+                                params : {
+                                    op : 'RUN_RULE',
+                                    date: Ext.Date.format(Ext.getCmp('elemDatePackage').value, 'd.m.Y'),
+                                    batchName: Ext.getCmp('elemComboPackage').getRawValue(),
+                                    baseEntityId: text
+                                },
+                                reader: {
+                                    type: 'json'
+                                },
+                                actionMethods: {
+                                    read: 'POST',
+                                    root: 'data'
+                                },
+                                success: function(response, opts) {
+                                    var errors = Ext.decode(response.responseText).data;
+                                    alert(errors.join('\n'));
+                                },
+                                failure: function(response, opts) {
+                                },
+                                callback: function(){
+                                    Ext.getCmp('btnRun').setIcon( contextPathUrl + "/pics/run.png");
+                                }
+                            });
+
+                        }
+                    });
+                }
+            },{
+                text: 'flush',
+                icon: contextPathUrl + '/pics/bin.png',
+                handler: function(){
+                    Ext.Ajax.request({
+                        url: dataUrl,
+                        waitMsg: 'adding',
+                        params : {
+                            op : 'FLUSH'
+                        },
+                        reader: {
+                            type: 'json'
+                        },
+                        actionMethods: {
+                            read: 'POST',
+                            root: 'data'
+                        },
+                        success: function(response, opts) {
+                            Ext.Msg.alert("Информация","Кэш очищен");
+                        },
+                        failure: function(response, opts) {
+                            Ext.Msg.alert("Информация","Кэш не очищен");
+                        }
+                    });
+                }
+            },{
                 text: 'copy',
                 id: 'btnCopy',
                 icon: contextPathUrl + '/pics/copy2.png',
