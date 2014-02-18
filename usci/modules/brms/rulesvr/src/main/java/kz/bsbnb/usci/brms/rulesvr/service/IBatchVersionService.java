@@ -15,4 +15,5 @@ public interface IBatchVersionService {
     public long save(Batch batch,Date date);
     public List<BatchVersion> getBatchVersions(Batch batch);
     public void copyRule(Long ruleId,Batch batch,Date versionDate);
+    public BatchVersion getBatchVersion(String batchName, Date date);
 }

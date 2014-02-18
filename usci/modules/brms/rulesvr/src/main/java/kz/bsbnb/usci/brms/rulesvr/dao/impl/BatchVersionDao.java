@@ -42,10 +42,10 @@ public class BatchVersionDao implements IBatchVersionDao {
             throw new IllegalArgumentException("Batch does not have id. Can't create batch version.");
         }
 
-        String SQL = "Insert into package_versions(package_id,repdate) values(?,?)";
+        String SQL = "INSERT INTO package_versions(package_id,repdate) VALUES(?,?)";
         jdbcTemplate.update(SQL,batch.getId(),batch.getRepoDate());
 
-        SQL = "Select id from package_versions where repdate = ? and package_id = ?";
+        SQL = "SELECT id FROM package_versions WHERE repdate = ? AND package_id = ?";
         long id = jdbcTemplate.queryForLong(SQL,batch.getRepoDate(),batch.getId());
 
         return id;
@@ -58,10 +58,10 @@ public class BatchVersionDao implements IBatchVersionDao {
             throw new IllegalArgumentException("Batch does not have id. Can't create batch version.");
         }
 
-        String SQL = "Insert into package_versions(package_id,repdate) values(?,?)";
+        String SQL = "INSERT INTO package_versions(package_id,repdate) VALUES(?,?)";
         jdbcTemplate.update(SQL,batch.getId(),date);
 
-        SQL = "Select id from package_versions where repdate = ? and package_id = ?";
+        SQL = "SELECT id FROM package_versions WHERE repdate = ? AND package_id = ?";
         long id = jdbcTemplate.queryForLong(SQL,date,batch.getId());
 
         return id;
@@ -111,7 +111,7 @@ public class BatchVersionDao implements IBatchVersionDao {
             throw new IllegalArgumentException("Batch id can not be null");
         }
 
-        String SQL = "Select * from package_versions where package_id  = ?";
+        String SQL = "SELECT * FROM package_versions WHERE package_id  = ?";
 
         List<BatchVersion> batchVersionList = jdbcTemplate.query(SQL, new Object[]{batch.getId()}, new BeanPropertyRowMapper(BatchVersion.class));
         return batchVersionList;
@@ -130,14 +130,28 @@ public class BatchVersionDao implements IBatchVersionDao {
             }
         }
         if (nn){
-            String SQL = "Insert into rule_package_versions(rule_id,package_versions_id) values(?,?)";
+            String SQL = "INSERT INTO rule_package_versions(rule_id,package_versions_id) VALUES(?,?)";
             jdbcTemplate.update(SQL,ruleId,batchVersionId);
 
         } else{
             Long id = saveBatchVersion(batch,versionDate);
-            String SQL = "Insert into rule_package_versions(rule_id,package_versions_id) values(?,?)";
+            String SQL = "INSERT INTO rule_package_versions(rule_id,package_versions_id) VALUES(?,?)";
             jdbcTemplate.update(SQL,ruleId,id);
         }
 
+    }
+
+    @Override
+    public BatchVersion getBatchVersion(String name, Date repdate) {
+        String Sql = "SELECT t1.name, t2.id, t2.package_id, t2.repdate" +
+                " from packages t1,package_versions t2" +
+                " where t1.id = t2.package_id" +
+                " and   t1.name = ?" +
+                " AND   t2.repdate <= ?" +
+                " ORDER BY t2.repdate desc" +
+                " limit 1";
+
+        return (BatchVersion) jdbcTemplate.queryForObject(Sql, new BeanPropertyRowMapper(BatchVersion.class),
+                new Object[]{name, repdate});
     }
 }

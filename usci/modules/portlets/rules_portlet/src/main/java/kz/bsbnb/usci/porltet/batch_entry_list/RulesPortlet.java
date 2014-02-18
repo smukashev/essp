@@ -159,21 +159,19 @@ public class RulesPortlet extends MVCPortlet{
                 case NEW_RULE:
                     batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
                     title = resourceRequest.getParameter("title");
-                    writer.write(JsonMaker.getJson(ruleService.saveRule(title, batchVersionId)));
+                    writer.write(JsonMaker.getJson(ruleService.saveEmptyRule(title, batchVersionId)));
                     break;
                 case COPY_EXISTING_RULE:
                     batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
-                    boolean status = ruleService.copyExistingRule(ruleId, batchVersionId);
-                    if(!status)
-                        throw new RuntimeException("something wrong when copy");
+                    ruleService.copyExistingRule(ruleId, batchVersionId);
                     writer.write(JsonMaker.getJson(true));
                     break;
                 case COPY_RULE:
                     batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     title = resourceRequest.getParameter("title");
-                    ruleId = ruleService.copyRule(ruleId,title,batchVersionId);
+                    ruleId = ruleService.createCopy(ruleId,title,batchVersionId);
                     writer.write(JsonMaker.getJson(ruleId));
                     break;
                 case RUN_RULE:

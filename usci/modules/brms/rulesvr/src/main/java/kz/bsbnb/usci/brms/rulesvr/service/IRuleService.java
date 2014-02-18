@@ -48,7 +48,7 @@ public interface IRuleService {
      * @param batchVersionId
      * @return generated id of rule
      */
-    public long saveRule(String title, long batchVersionId);
+    public long saveEmptyRule(String title, long batchVersionId);
 
 
     /**
@@ -56,16 +56,13 @@ public interface IRuleService {
      *
      * @param ruleId - rule id <br/>
      * @param body - new body of rule <br/>
-     * @return if success or not
      */
-    public boolean updateBody(Long ruleId, String body);
+    public void updateBody(Long ruleId, String body);
 
     /**
      * Copy rule to batch version
-     *
-     * @return success status
      */
-    public boolean copyExistingRule(long ruleId, long batchVersionId);
+    public void copyExistingRule(long ruleId, long batchVersionId);
 
     /**
      * Copy body of rule as a new rule into the batch
@@ -74,6 +71,12 @@ public interface IRuleService {
      * @param batchVersionId what package to add new rule
      * @return id of created rule
      */
-    public long copyRule(long ruleId, String title,  long batchVersionId);
+    public long createCopy(long ruleId, String title,  long batchVersionId);
+
+    /**
+     * Create new rule with given title and body into batchVersion
+     * @return id of created rule
+     */
+    public long createNewRuleInBatch(Rule rule, BatchVersion batchVersion);
 
 }
