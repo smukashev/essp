@@ -16,4 +16,5 @@ public interface IEntityService {
     public BaseEntity search(BaseEntity baseEntity);
     public List<Long> getEntityIDsByMetaclass(long id);
     public List<RefListItem> getRefsByMetaclass(long metaClassId);
+    public int getQueueSize();
 }

@@ -636,17 +636,31 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         {
             if(meta.getMemberType(typeName).isComplex())
             {
-                delete = context.delete(EAV_M_COMPLEX_ATTRIBUTES
-                    ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
-                    ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
-                    ).and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
+                if (!meta.getMemberType(typeName).isSet()) {
+                    delete = context.delete(EAV_M_COMPLEX_ATTRIBUTES
+                        ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
+                        ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                        ).and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
+                } else {
+                    delete = context.delete(EAV_M_COMPLEX_SET
+                        ).where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(meta.getId())
+                        ).and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                        ).and(EAV_M_COMPLEX_SET.NAME.eq(typeName));
+                }
             }
             else
             {
-                delete = context.delete(EAV_M_SIMPLE_ATTRIBUTES
-                    ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
-                    ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
-                    ).and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
+                if (!meta.getMemberType(typeName).isSet()) {
+                    delete = context.delete(EAV_M_SIMPLE_ATTRIBUTES
+                        ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
+                        ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                        ).and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
+                } else {
+                    delete = context.delete(EAV_M_SIMPLE_SET
+                        ).where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(meta.getId())
+                        ).and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                        ).and(EAV_M_SIMPLE_SET.NAME.eq(typeName));
+                }
             }
 
             logger.debug(delete.toString());

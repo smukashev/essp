@@ -63,4 +63,10 @@ public class EntityServiceImpl implements IEntityService {
     public List<RefListItem> getRefsByMetaclass(long metaClassId) {
         return remoteEntityService.getRefsByMetaclass(metaClassId);
     }
+
+    @Override
+    public int getQueueSize()
+    {
+        return dataJob.getQueueSize();
+    }
 }

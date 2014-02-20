@@ -503,8 +503,13 @@ public class CLI
                 }
             } else if (args.get(0).equals("add")) {
                 if (args.size() > 4) {
-                    addAttributeToMeta(args.get(1), args.get(2), args.get(3), args.get(4),
-                            args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false);
+                    if(args.get(3).equals("MetaClass")) {
+                        addAttributeToMeta(args.get(1), args.get(2), args.get(3), args.get(4),
+                                args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false);
+                    } else {
+                        addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
+                                args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false);
+                    }
                 } else {
                     addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
                             args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false);

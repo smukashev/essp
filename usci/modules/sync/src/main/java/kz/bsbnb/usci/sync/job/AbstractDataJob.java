@@ -30,4 +30,8 @@ public abstract class AbstractDataJob extends AbstractJob {
     public final synchronized void addAll(List<BaseEntity> entities) {
         this.entities.addAll(entities);
     }
+
+    public synchronized int getQueueSize() {
+        return entities.size();
+    }
 }

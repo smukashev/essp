@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver.monitor;
 
+import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
@@ -34,9 +35,7 @@ import java.io.InputStream;
 import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -64,9 +63,93 @@ public class ZipFilesMonitor{
     //private static Gson gson = new Gson();
 
     public static final int ZIP_BUFFER_SIZE = 1024;
+    public static final int MAX_SYNC_QUEUE_SIZE = 128;
 
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
+        new SenderThread().start();
+    }
+
+    private class SenderThread extends Thread {
+
+        private class JobInfo {
+            long batchId;
+            BatchInfo batchInfo;
+
+            private JobInfo(long batchId, BatchInfo batchInfo)
+            {
+                this.batchId = batchId;
+                this.batchInfo = batchInfo;
+            }
+
+            public long getBatchId()
+            {
+                return batchId;
+            }
+
+            public BatchInfo getBatchInfo()
+            {
+                return batchInfo;
+            }
+        }
+
+        private Stack<JobInfo> ids = new Stack<JobInfo>();
+
+        private synchronized void addJob(long id, BatchInfo batchInfo) {
+            ids.push(new JobInfo(id, batchInfo));
+        }
+
+        private synchronized JobInfo getNextJob() {
+            if (ids.size() > 0)
+                return ids.pop();
+            return null;
+        }
+
+        public void run()
+        {
+            while(true) {
+                JobInfo nextJob;
+                if ((nextJob = getNextJob()) != null) {
+                    logger.debug("Sending file with batchId: " + nextJob.getBatchId());
+
+                    try {
+                        JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+                        jobParametersBuilder.addParameter("batchId", new JobParameter(nextJob.getBatchId()));
+                        jobParametersBuilder.addParameter("userId", new JobParameter(nextJob.getBatchInfo().getUserId()));
+
+                        Job job = jobs.get(nextJob.getBatchInfo().getBatchType());
+
+                        if (job != null) {
+                            jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+                        } else {
+                            logger.error("Unknown batch file type: " + nextJob.getBatchInfo().getBatchType() +
+                                    " in batch with id: " + nextJob.getBatchId());
+
+                            statusSingleton.addBatchStatus(nextJob.getBatchId(),
+                                    new BatchStatusJModel(Global.BATCH_STATUS_ERROR, "Unknown batch file type: " +
+                                            nextJob.getBatchInfo().getBatchType(), new Date(), nextJob.getBatchInfo().getUserId()));
+                        }
+                    } catch (JobExecutionAlreadyRunningException e) {
+                        e.printStackTrace();
+                    } catch (JobRestartException e) {
+                        e.printStackTrace();
+                    } catch (JobInstanceAlreadyCompleteException e) {
+                        e.printStackTrace();
+                    } catch (JobParametersInvalidException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try
+                    {
+                        sleep(1000);
+                    } catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    logger.debug("No files to send");
+                }
+            }
+        }
     }
 
     public void saveData(BatchInfo batchInfo, String filename, byte[] bytes){
@@ -94,31 +177,31 @@ public class ZipFilesMonitor{
         statusSingleton.addBatchStatus(batchId,
                 new BatchStatusJModel(Global.BATCH_STATUS_PROCESSING, null, new Date(), batchInfo.getUserId()));
 
-        try {
-            JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-            jobParametersBuilder.addParameter("batchId", new JobParameter(batchId));
-            jobParametersBuilder.addParameter("userId", new JobParameter(batchInfo.getUserId()));
-
-            Job job = jobs.get(batchInfo.getBatchType());
-
-            if (job != null) {
-                jobLauncher.run(job, jobParametersBuilder.toJobParameters());
-            } else {
-                logger.error("Unknown batch file type: " + batchInfo.getBatchType() + " in batch with id: " + batchId);
-
-                statusSingleton.addBatchStatus(batchId,
-                        new BatchStatusJModel(Global.BATCH_STATUS_ERROR, "Unknown batch file type: " +
-                                batchInfo.getBatchType(), new Date(), batchInfo.getUserId()));
-            }
-        } catch (JobExecutionAlreadyRunningException e) {
-            e.printStackTrace();
-        } catch (JobRestartException e) {
-            e.printStackTrace();
-        } catch (JobInstanceAlreadyCompleteException e) {
-            e.printStackTrace();
-        } catch (JobParametersInvalidException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+//            jobParametersBuilder.addParameter("batchId", new JobParameter(batchId));
+//            jobParametersBuilder.addParameter("userId", new JobParameter(batchInfo.getUserId()));
+//
+//            Job job = jobs.get(batchInfo.getBatchType());
+//
+//            if (job != null) {
+//                jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+//            } else {
+//                logger.error("Unknown batch file type: " + batchInfo.getBatchType() + " in batch with id: " + batchId);
+//
+//                statusSingleton.addBatchStatus(batchId,
+//                        new BatchStatusJModel(Global.BATCH_STATUS_ERROR, "Unknown batch file type: " +
+//                                batchInfo.getBatchType(), new Date(), batchInfo.getUserId()));
+//            }
+//        } catch (JobExecutionAlreadyRunningException e) {
+//            e.printStackTrace();
+//        } catch (JobRestartException e) {
+//            e.printStackTrace();
+//        } catch (JobInstanceAlreadyCompleteException e) {
+//            e.printStackTrace();
+//        } catch (JobParametersInvalidException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public byte[] inputStreamToByte(InputStream in) throws IOException {
@@ -209,8 +292,14 @@ public class ZipFilesMonitor{
         WatchService watchService = FileSystems.getDefault().newWatchService();
         path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE);
 
+        IEntityService entityService = serviceFactory.getEntityService();
+
         boolean valid = true;
         do {
+            while(entityService.getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
+                Thread.sleep(1000);
+            }
+
             WatchKey watchKey = watchService.take();
 
             for (WatchEvent<?> event : watchKey.pollEvents()) {

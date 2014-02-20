@@ -615,6 +615,12 @@ meta add contract contract_date  DATE
 meta remove write_off date
 meta add write_off write_off_date DATE
 
+meta remove contact1 st_contact_details
+meta add contact1 details STRING true
+
+meta remove contact st_contact_details
+meta add contact details STRING true
+
 #------------------------------------
 
 rc
@@ -657,8 +663,8 @@ entity read  usci/modules/cli/src/main/resources/refs/ref_region.xml
 entity read  usci/modules/cli/src/main/resources/refs/ref_shared.xml
 
 
-crbatch C:\batches\artur\170413.xml 99999 0 01.04.2013
-crbatch C:\batches\artur\180413.xml 99999 0 01.04.2013
+#crbatch C:\batches\artur\170413.xml 99999 0 01.04.2013
+#crbatch C:\batches\artur\180413.xml 99999 0 01.04.2013
 
 #crbatch /home/a.tkachenko/Documents/agro_batches/170413.xml 99999 0
 #crbatch /home/a.tkachenko/Documents/agro_batches/180413.xml 99999 0
