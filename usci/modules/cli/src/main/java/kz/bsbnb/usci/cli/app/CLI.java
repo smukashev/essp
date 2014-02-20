@@ -5,13 +5,18 @@ import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseSet;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
@@ -708,9 +713,10 @@ public class CLI
     }
 
     private Rule currentRule;
-    private String currentPackageName;
+    private String currentPackageName = "afk";
     private Date currentDate = new Date();
     private boolean started = false;
+    private BatchVersion currentBatchVersion;
 
 
 
@@ -722,34 +728,83 @@ public class CLI
         }
 
         try{
+        if(args.get(0).equals("debug")){
+            //Batch batch = new Batch(new Date());
+            //kz.bsbnb.usci.brms.rulesvr.model.impl.Batch batch = new kz.bsbnb.usci.brms.rulesvr.model.impl.Batch();
+            //batch.setId(4);
+            //batchVersionService.copyRule(18606,batch,SimpleDateFormat.getInstance().parse("2013-10-20",""));
+
+            DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
+            Date date = dateFormatter.parse("18.02.2014");
+            //batchVersionService.copyRule(18606L,batch,date);
+            System.out.println(date);
+            //List<Rule> rules = ruleService.getRules(4L, date);
+//            List<SimpleTrack> tracks = ruleService.getRuleTitles(4L, date);
+//
+//            for (SimpleTrack track: tracks){
+//                System.out.println(track.getId());
+//            }
+            long r = 18606;
+            //System.out.println(ruleService.copyRule(18646, "title1", 3));
+
+            BaseEntity baseEntity = (BaseEntity) baseEntityDao.load(12887);
+            //IBaseValue bv = baseEntity.getBaseValue("pledges.pledge_type");
+
+            //System.out.println(baseEntity.getEls("{count}pledges[pledge_type.code=47]"));
+            System.out.println(batchVersionService.getBatchVersion("test",date));
+            //System.out.println(bs.getElementCount());
+        } else if(args.get(0).equals("dump")){
+            if(args.size() < 2)
+                throw new IllegalArgumentException("output file not specified");
+            try {
+                PrintWriter out = new PrintWriter(args.get(1));
+                List<Rule> rules = ruleService.getAllRules();
+                for(Rule r: rules){
+                    out.println("rule read $$$");
+                    out.println("title: " + r.getTitle());
+                    out.println(r.getRule());
+                    out.println("$$$\n");
+                }
+
+                out.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }else
         if(args.get(0).equals("read")){
             if(args.size() < 2){
                 throw new IllegalArgumentException();
             }else{
                 System.out.println("reading until "+args.get(1) +"...");
                 StringBuilder sb = new StringBuilder();
+                line = in.nextLine();
+                if(!line.startsWith("title: "))
+                    throw new IllegalArgumentException("title must be specified format title: <name>");
+                String title = line.split("title: ")[1];
                 do{
-                    sb.append(line+"\n");
                     line = in.nextLine();
                     if(line.startsWith(args.get(1))) break;
+                    sb.append(line+"\n");
                 }while(true);
-                line = in.nextLine();
                 currentRule = new Rule();
                 currentRule.setRule(sb.toString());
-                currentRule.setTitle("sample");
+                currentRule.setTitle(title);
             }
         } else if(args.get(0).equals("current")){
             if(args.size() == 1)
                 System.out.println( currentRule ==null?null: currentRule.getRule());
+            else if(args.get(1).equals("version"))
+                System.out.println(currentBatchVersion);
             else if(args.get(1).equals("package"))
                 System.out.println(currentPackageName);
             else if(args.get(1).equals("date"))
                 System.out.println(currentDate);
             else throw new IllegalArgumentException();
-
         } else if(args.get(0).equals("save")){
 
-            long packageId = -1;
+            long ruleId = ruleService.createNewRuleInBatch(currentRule, currentBatchVersion);
+
+            /*long packageId = -1;
 
             for(kz.bsbnb.usci.brms.rulesvr.model.impl.Batch b: batchService.getAllBatches()){
                if(b.getName().equals(currentPackageName)){
@@ -762,6 +817,8 @@ public class CLI
 
             Long ruleId = ruleService.save(currentRule,new BatchVersion());
             batchVersionService.copyRule(ruleId,batchService.load(packageId),currentDate);
+
+            //Long versionId = batchVersionService.getBatchVersions();*/
 
             System.out.println("ok saved: ruleId = " + ruleId);
 
@@ -776,8 +833,11 @@ public class CLI
             for (String s: baseEntity.getValidationErrors())
                 System.out.println("Validation error:" + s);
         }else if(args.get(0).equals("set")){
-             if(args.size() < 3) throw new IllegalArgumentException();
-               if(args.get(1).equals("package"))
+
+             if(args.get(1).equals("version")){
+               currentBatchVersion = batchVersionService.getBatchVersion(currentPackageName, currentDate);
+             }else if(args.size() < 3) throw new IllegalArgumentException();
+             else if(args.get(1).equals("package"))
                {
                    rulesSingleton.getRulePackageName(args.get(2),currentDate);
                    currentPackageName = args.get(2);
@@ -786,7 +846,7 @@ public class CLI
                {
                    DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
                    currentDate = formatter.parse(args.get(2));
-               }else throw new IllegalArgumentException();
+               } else throw new IllegalArgumentException();
         } else if(args.get(0).equals("create")){
             try{
                if(!args.get(1).equals("package") || args.size()<3) throw new IllegalArgumentException();
@@ -798,6 +858,8 @@ public class CLI
             batch.setId(id);
             batchVersionService.save(batch);
             System.out.println("ok batch created with id:"+id);
+        } else if(args.get(0).equals("rc")){
+            rulesSingleton.reloadCache();
         }else throw new IllegalArgumentException();
         }catch(IllegalArgumentException e){
             if(e.getMessage()==null)
@@ -850,14 +912,8 @@ public class CLI
                  e.printStackTrace();
              }
              */
-            line = in.nextLine();
-            while (!line.equals("quit")) {
+            while ( !(line = in.nextLine()).equals("quit")) {
                 StringTokenizer st = new StringTokenizer(line);
-                try {
-                    line = in.nextLine();
-                } catch (NoSuchElementException e) {
-                    break;
-                }
                 if (st.hasMoreTokens()) {
                     command = st.nextToken().trim();
 

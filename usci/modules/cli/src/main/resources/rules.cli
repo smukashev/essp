@@ -1,0 +1,87 @@
+rule create package afk
+rule set package afk
+rule set date 18.02.2014
+rule set version
+
+rule read $$$
+title: subjectTest
+rule "subject test"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "ct_package" && getEl("subjects")!=null)
+then
+  $entity.addValidationError("Не должны указываться субьекты");
+end
+
+$$$
+rule save
+
+rule read $$$
+title: pledgeType1
+rule "pledge type for zaem"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "ct_package" && getEl("credit.credit_type.code")==1 && getEl("pledges.pledge_type")==null)
+then
+  System.out.println("ERROR: Вид обеспечения должен указываться для заема ");
+end
+
+$$$
+rule save
+
+rule read $$$
+title: pledge_dogovor_number
+rule "pledge dogovor"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "ct_package" && getEls("{count}pledges[contract=null]") > 0)
+then
+  System.out.println("pledge error: contract is null " );
+end
+
+$$$
+rule save
+
+rule read $$$
+title: eeee
+sdfdsfsdf
+
+$$$
+rule save
+
+rule read $$$
+title: r_pledgeType_Zaem
+rule "pledge type for zaem"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "ct_package" && getEl("credit.credit_type.code")==1 && getEl("pledges.pledge_type")==null)
+then
+  System.out.println("ERROR: Вид обеспечения должен указываться для заема ");
+end
+
+$$$
+rule save
+
+rule read $$$
+title: r_pledgeType_GAP
+rule "pledge type for garanty, accreditiv, poru4itelstvo"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "ct_package" && 
+    ( getEl("credit.credit_type.code")==12 || getEl("credit.credit_type.code")==13 || getEl("credit.credit_type.code")==14 ) 
+    && getEl("pledges.pledge_type")==null)
+then
+  System.out.println("ERROR: Вид обеспечения должен указываться для гарантии, аккредитив, поручительства ");
+end
+
+$$$
+rule save
+
+rule read $$$
+title: pledge_typeDisplay
+rule "pledge test"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "ct_package" && getEls("{count}pledges[pledge_type=null]") > 0)
+then
+  System.out.println("pledge error " );
+end
+
+$$$
+rule save
+
+quit

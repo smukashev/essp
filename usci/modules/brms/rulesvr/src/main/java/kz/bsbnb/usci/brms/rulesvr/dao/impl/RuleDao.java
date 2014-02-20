@@ -119,7 +119,7 @@ public class RuleDao implements IRuleDao {
     }
 
     @Override
-    public long createRule(final String title){
+    public long createEmptyRule(final String title){
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
@@ -133,37 +133,25 @@ public class RuleDao implements IRuleDao {
     }
 
     @Override
-    public long save(final long ruleId, final long batchVersionId) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO rule_package_versions (rule_id, package_versions_id) VALUES (?,?)", new String[]{"id"});
-                ps.setLong(1,ruleId);
-                ps.setLong(2,batchVersionId);
-                return ps;
-            }
-        },keyHolder);
-
-        return keyHolder.getKey().longValue();
+    public void save(long ruleId, long batchVersionId) {
+        String sql = "INSERT INTO rule_package_versions (rule_id , package_versions_id) VALUES (?,?)";
+        jdbcTemplate.update(sql,new Object[]{ruleId,batchVersionId});
     }
 
     @Override
-    public boolean updateBody(Long ruleId, String body) {
+    public void updateBody(Long ruleId, String body) {
         String sql = "UPDATE rules SET rule = ? WHERE id=?";
         jdbcTemplate.update(sql, new Object[]{body, ruleId});
-        return true;
     }
 
     @Override
-    public boolean copyExistingRule(long ruleId, long batchVersionId) {
+    public void copyExistingRule(long ruleId, long batchVersionId) {
         String sql = "INSERT INTO rule_package_versions (rule_id, package_versions_id) VALUES (?,?)";
         jdbcTemplate.update(sql, new Object[]{ruleId, batchVersionId});
-        return true;
     }
 
     @Override
-    public long copy(final long ruleId, final String title) {
+    public long createCopy(final long ruleId, final String title) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
@@ -176,6 +164,22 @@ public class RuleDao implements IRuleDao {
             }
         },keyHolder);
 
+        return keyHolder.getKey().longValue();
+    }
+
+    @Override
+    public long createRule(final Rule rule) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO rules (title,rule)" +
+                        "values (?,?)", new String[]{"id"});
+                ps.setString(1, rule.getTitle());
+                ps.setString(2, rule.getRule());
+                return ps;
+            }
+        }, keyHolder);
         return keyHolder.getKey().longValue();
     }
 }

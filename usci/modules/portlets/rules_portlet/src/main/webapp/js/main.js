@@ -149,6 +149,11 @@ function initGrid(){
                     specialkey: function(f,e){
                         if(e.getKey()==e.ENTER)
                             Ext.getCmp('btnAddGreen').handler();
+                        else if(e.getKey() == e.ESC)
+                        {
+                            Ext.getCmp('btnAddGreen').hide();
+                            Ext.getCmp('txtTitle').hide();
+                        }
                     }
                 }
             },{
@@ -183,6 +188,71 @@ function initGrid(){
                     });
 
                     Ext.EventObject.stopPropagation();
+                }
+            },{
+                text: 'run',
+                id:    'btnRun',
+                icon: contextPathUrl + '/pics/run.png',
+                handler: function(){
+                    Ext.MessageBox.prompt('Запуск','Введитие идшник baseEntity: ', function(btn,text){
+                        if(btn == "ok"){
+                            Ext.getCmp('btnRun').setIcon(contextPathUrl + "/pics/loading.gif");
+                            this.lastValue = text;
+                            Ext.Ajax.request({
+                                url: dataUrl,
+                                waitMsg: 'adding',
+                                params : {
+                                    op : 'RUN_RULE',
+                                    date: Ext.Date.format(Ext.getCmp('elemDatePackage').value, 'd.m.Y'),
+                                    batchName: Ext.getCmp('elemComboPackage').getRawValue(),
+                                    baseEntityId: text
+                                },
+                                reader: {
+                                    type: 'json'
+                                },
+                                actionMethods: {
+                                    read: 'POST',
+                                    root: 'data'
+                                },
+                                success: function(response, opts) {
+                                    var errors = Ext.decode(response.responseText).data;
+                                    alert(errors.join('\n'));
+                                },
+                                failure: function(response, opts) {
+                                },
+                                callback: function(){
+                                    Ext.getCmp('btnRun').setIcon( contextPathUrl + "/pics/run.png");
+                                }
+                            });
+
+                        }
+                    }, this, false, this.lastValue);
+                }
+            },{
+                text: 'flush',
+                icon: contextPathUrl + '/pics/bin.png',
+                id: 'btnFlush',
+                handler: function(){
+                    Ext.Ajax.request({
+                        url: dataUrl,
+                        waitMsg: 'adding',
+                        params : {
+                            op : 'FLUSH'
+                        },
+                        reader: {
+                            type: 'json'
+                        },
+                        actionMethods: {
+                            read: 'POST',
+                            root: 'data'
+                        },
+                        success: function(response, opts) {
+                            Ext.Msg.alert("Информация","Кэш очищен");
+                        },
+                        failure: function(response, opts) {
+                            Ext.Msg.alert("Информация","Кэш не очищен");
+                        }
+                    });
                 }
             },{
                 text: 'copy',
@@ -273,7 +343,7 @@ Ext.onReady(function(){
         }
     ];
 
-    var map = new Ext.util.KeyMap(document,{
+    var map1 = new Ext.util.KeyMap(document,{
             key: "s",
             ctrl: true,
             shift: true,
@@ -284,6 +354,43 @@ Ext.onReady(function(){
             }
         }
     );
+
+    var map2 = new Ext.util.KeyMap(document,{
+            key: "a",
+            ctrl: true,
+            shift: true,
+            fn: function(){
+                Ext.getCmp('btnNewRule').handler();
+            }
+        }
+    );
+
+    var map3 = new Ext.util.KeyMap(document,{
+            key: "e",
+            ctrl: true,
+            shift: true,
+            fn: function(){
+                Ext.getCmp('btnRun').handler();
+            }
+        }
+    );
+
+    var map4 = new Ext.util.KeyMap(document,{
+            key: "f",
+            ctrl: true,
+            shift: true,
+            fn: function(){
+                Ext.getCmp('btnFlush').handler();
+            }
+        }
+    );
+
+
+
+
+
+
+
 
 
     packageStore = Ext.create('Ext.data.Store',{
@@ -329,7 +436,7 @@ Ext.onReady(function(){
                             id: 'btnCancel',  icon: contextPathUrl + '/pics/undo.png', handler: function(){ editor.setValue(editor.backup, -1); }, disabled: true},
                         {
                             text: 'сохранить',
-                            //scope: this, 
+                            //scope: this,
                             id: 'btnSave',
                             icon: contextPathUrl + '/pics/save.png',
                             disabled: true,
@@ -353,15 +460,15 @@ Ext.onReady(function(){
                                     success: function(response, opts) {
                                         console.log(response.responseText.success);
                                         //var obj = Ext.decode(response.responseText).data;
-                                        //ruleListGrid.fireEvent('itemclick',ruleListGrid, ruleListGrid.getSelectionModel().getLastSelected());                    
+                                        //ruleListGrid.fireEvent('itemclick',ruleListGrid, ruleListGrid.getSelectionModel().getLastSelected());
                                         ruleListGrid.fireEvent('cellclick', ruleListGrid, null, 1, ruleListGrid.getSelectionModel().getLastSelected()); //cellclick: function(grid, td, cellIndex, newValue, tr, rowIndex, e, eOpts){
-                                        //editor.backup = obj.rule; 
+                                        //editor.backup = obj.rule;
                                         //editor.setValue(obj.rule, -1);
 
 
-                                        /*editor.getSession().on('change', function(){ 
+                                        /*editor.getSession().on('change', function(){
                                          //alert(editor.isDirty());
-                                         Ext.getCmp('btnEdit').setDisabled(true); 
+                                         Ext.getCmp('btnEdit').setDisabled(true);
                                          })*/
                                         //console.log(obj.data[0].rule);
                                         //selectedNode.parentNode.removeChild(selectedNode);

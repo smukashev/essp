@@ -107,22 +107,25 @@ public class MockRuleService implements IRuleService
 //    }
 
     @Override
-    public long saveRule(String title, long batchVersionId) {
+    public long saveEmptyRule(String title, long batchVersionId) {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public boolean updateBody(Long ruleId, String body) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    public void updateBody(Long ruleId, String body) {
     }
 
     @Override
-    public boolean copyExistingRule(long ruleId, long batchVersionId) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    public void copyExistingRule(long ruleId, long batchVersionId) {
     }
 
     @Override
-    public long copyRule(long ruleId, String title, long batchVersionId) {
-        return -1L;  //To change body of implemented methods use File | Settings | File Templates.
+    public long createCopy(long ruleId, String title, long batchVersionId) {
+        return 0;
+    }
+
+    @Override
+    public long createNewRuleInBatch(Rule rule, BatchVersion batchVersion) {
+        return -1;
     }
 }

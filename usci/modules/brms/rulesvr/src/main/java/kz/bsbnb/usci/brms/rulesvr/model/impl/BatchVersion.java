@@ -10,6 +10,7 @@ import java.util.Date;
 public class BatchVersion extends Persistable implements IBatchVersion {
     private Date repDate;
     private long package_id;
+    private String name;
 
     public BatchVersion(){
 
@@ -34,5 +35,18 @@ public class BatchVersion extends Persistable implements IBatchVersion {
 
     public void setPackage_id(long package_id) {
         this.package_id = package_id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "id: " + id + ", name: " + name + ", package_id: " + package_id;
     }
 }

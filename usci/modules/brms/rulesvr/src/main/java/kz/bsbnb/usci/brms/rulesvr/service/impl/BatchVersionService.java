@@ -45,5 +45,8 @@ public class BatchVersionService implements IBatchVersionService {
         batchVersionDao.copyRule(ruleId,batch,versionDate);
     }
 
-
+    @Override
+    public BatchVersion getBatchVersion(String batchName, Date date) {
+        return batchVersionDao.getBatchVersion(batchName,date);
+    }
 }

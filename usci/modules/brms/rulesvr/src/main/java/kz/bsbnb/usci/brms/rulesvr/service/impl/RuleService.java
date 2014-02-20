@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.brms.rulesvr.service.impl;
 
 import kz.bsbnb.usci.brms.rulesvr.dao.IBatchDao;
+import kz.bsbnb.usci.brms.rulesvr.dao.IBatchVersionDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
@@ -28,6 +29,9 @@ public class RuleService implements IRuleService {
 
     @Autowired
     private IBatchDao batchDao;
+
+    @Autowired
+    private IBatchVersionDao batchVersionDao;
 
 //    @Autowired
 //    private ListenerSingleton listenerSingleton;
@@ -80,29 +84,35 @@ public class RuleService implements IRuleService {
     }
 
     @Override
-    public long saveRule(String title, long batchVersionId) {
-        long ruleId = ruleDao.createRule(title);
+    public long saveEmptyRule(String title, long batchVersionId) {
+        long ruleId = ruleDao.createEmptyRule(title);
         ruleDao.save(ruleId, batchVersionId);
         return ruleId;
     }
 
     @Override
-    public boolean updateBody(Long ruleId, String body) {
-        return ruleDao.updateBody(ruleId,body);
+    public void updateBody(Long ruleId, String body) {
+        ruleDao.updateBody(ruleId,body);
     }
 
     @Override
-    public boolean copyExistingRule(long ruleId, long batchVersionId) {
-        return ruleDao.copyExistingRule(ruleId, batchVersionId);
+    public void copyExistingRule(long ruleId, long batchVersionId) {
+        ruleDao.copyExistingRule(ruleId, batchVersionId);
     }
 
     @Override
-    public long copyRule(long ruleId, String title, long batchVersionId) {
-        long newRuleId = ruleDao.copy(ruleId, title);
+    public long createCopy(long ruleId, String title, long batchVersionId) {
+        long newRuleId = ruleDao.createCopy(ruleId, title);
         ruleDao.copyExistingRule(newRuleId, batchVersionId);
         return newRuleId;
     }
 
+    @Override
+    public long createNewRuleInBatch(Rule rule, BatchVersion batchVersion) {
+          long ruleId = ruleDao.createRule(rule);
+          ruleDao.save(ruleId, batchVersion.getId());
+          return ruleId;
+    }
 
     //    public ListenerSingleton getListenerSingleton() {
 //        return listenerSingleton;
