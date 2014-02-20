@@ -9,6 +9,7 @@ public class BatchInfo {
     private Long size;
     private Long userId;
     private Date repDate;
+    private Long creditorId;
 
     public String getBatchName() {
         return batchName;
@@ -48,5 +49,15 @@ public class BatchInfo {
 
     public void setRepDate(Date repDate) {
         this.repDate = repDate;
+    }
+
+    public Long getCreditorId()
+    {
+        return creditorId;
+    }
+
+    public void setCreditorId(Long creditorId)
+    {
+        this.creditorId = creditorId;
     }
 }

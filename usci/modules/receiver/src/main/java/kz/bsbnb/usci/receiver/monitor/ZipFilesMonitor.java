@@ -159,14 +159,18 @@ public class ZipFilesMonitor{
         batch.setUserId(batchInfo.getUserId());
         long batchId = batchService.save(batch);
 
-        List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
-
         Long cId;
 
-        if (cList.size() > 0) {
-            cId = cList.get(0).getId();
+        if(batchInfo.getUserId() != 100500L) {
+            List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
+
+            if (cList.size() > 0) {
+                cId = cList.get(0).getId();
+            } else {
+                cId = -1L;
+            }
         } else {
-            cId = -1L;
+            cId = batchInfo.getCreditorId();
         }
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
@@ -258,6 +262,68 @@ public class ZipFilesMonitor{
                     Long.parseLong(document.getElementsByTagName("userid").item(0).getTextContent()) :
                             userId
             );
+
+            batchInfo.setSize(Long.parseLong(document.getElementsByTagName("size").item(0).getTextContent()));
+
+
+            Date date = null;
+            try {
+                date = new SimpleDateFormat("dd.MM.yy").parse(document.getElementsByTagName("date").item(0).getTextContent());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+
+            batchInfo.setRepDate(date);
+
+            System.out.println(batchInfo.getSize());
+            System.out.println(batchInfo.getRepDate());
+
+
+            ZipEntry dataEntry = zipFile.getEntry(batchInfo.getBatchName());
+            InputStream inData = zipFile.getInputStream(dataEntry);
+
+
+            saveData(batchInfo,filename,inputStreamToByte(inData));
+
+
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void readFilesWithoutUser(String filename, Long creditorId) {
+        BatchInfo batchInfo = new BatchInfo();
+        try{
+
+            ZipFile zipFile = new ZipFile(filename);
+
+            ZipEntry manifestEntry = zipFile.getEntry("manifest.xml");
+
+            InputStream inManifest = zipFile.getInputStream(manifestEntry);
+
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+
+            DocumentBuilder documentBuilder = null;
+            try {
+                documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            }
+
+            Document document = null;
+            try {
+                document = documentBuilder.parse(inManifest);
+            } catch (SAXException e) {
+                e.printStackTrace();
+            }
+
+
+            batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent());
+            batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent());
+
+            batchInfo.setUserId(100500L);
+            batchInfo.setCreditorId(creditorId);
 
             batchInfo.setSize(Long.parseLong(document.getElementsByTagName("size").item(0).getTextContent()));
 
