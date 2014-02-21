@@ -123,7 +123,7 @@ public class ZipFilesMonitor{
             while(true) {
                 JobInfo nextJob;
 
-                if (serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
+                if (serviceFactory != null && serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
                     try
                     {
                         sleep(360L * 1000L);
@@ -196,19 +196,21 @@ public class ZipFilesMonitor{
                 cId = -1L;
             }
         } else {
-            String creditorCode = batchInfo.getAdditionalParams().get("CODE");
+            if(batchInfo.getAdditionalParams() != null) {
+                String creditorCode = batchInfo.getAdditionalParams().get("CODE");
 
-            boolean foundCreditor = false;
-            for (Creditor creditor : creditors) {
-                if (creditor.getCode().equals(creditorCode)) {
-                    cId = creditor.getId();
-                    foundCreditor = true;
-                    break;
+                boolean foundCreditor = false;
+                for (Creditor creditor : creditors) {
+                    if (creditor.getCode().equals(creditorCode)) {
+                        cId = creditor.getId();
+                        foundCreditor = true;
+                        break;
+                    }
                 }
-            }
 
-            if (!foundCreditor) {
-                throw new IllegalStateException("Can't find creditor with code: " + creditorCode);
+                if (!foundCreditor) {
+                    throw new IllegalStateException("Can't find creditor with code: " + creditorCode);
+                }
             }
         }
 
