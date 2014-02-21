@@ -51,4 +51,10 @@ public class MockBatchVersionService implements IBatchVersionService
     {
         //not used in tests
     }
+
+    @Override
+    public BatchVersion getBatchVersion(String batchName, Date date)
+    {
+        return null;
+    }
 }

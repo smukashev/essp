@@ -41,7 +41,7 @@ public class BatchProcessServiceImpl implements IBatchProcessService {
     }
 
     @Override
-    public void processBatchWithoutUser(String fileName, Long creditorId) {
-        zipFilesMonitor.readFilesWithoutUser(fileName, creditorId);
+    public void processBatchWithoutUser(String fileName) {
+        zipFilesMonitor.readFilesWithoutUser(fileName);
     }
 }

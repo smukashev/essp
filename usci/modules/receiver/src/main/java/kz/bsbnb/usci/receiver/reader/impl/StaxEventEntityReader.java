@@ -103,12 +103,16 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 try {
                     event = (XMLEvent) xmlEventReader.next();
                     o = parserHelper.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
-                    xmlEventReader.next();
+                    //xmlEventReader.next();
                 } catch (NumberFormatException n) {
                     n.printStackTrace();
+                } catch (ClassCastException ex) {
+                    logger.debug("Empty tag: " + localName);
+                    level--;
                 }
 
                 currentContainer.put(localName, new BaseValue(batch, index, o));
+                level++;
             }
         }
     }
@@ -176,8 +180,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     currentContainer.put(localName, new BaseValue(batch, index, o));
                 }
 
-                level--;
             }
+            level--;
         }
 
         return false;

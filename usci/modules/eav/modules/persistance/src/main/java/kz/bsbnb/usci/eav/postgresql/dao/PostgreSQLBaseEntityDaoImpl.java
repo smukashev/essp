@@ -329,49 +329,68 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
     private IBaseEntity applyWithoutComparison(final IBaseEntity baseEntity)
     {
-        boolean maxReportDate = baseEntity.isMaxReportDate();
-        for (String attribute: baseEntity.getIdentifiers())
+        String identifierWithError = null;
+        try
         {
-            boolean last = maxReportDate ? true : !presentInFuture(baseEntity, attribute);
+            boolean maxReportDate = baseEntity.isMaxReportDate();
+            Set<String> attributesToRemove = new HashSet<String>();
+            for (String attribute: baseEntity.getIdentifiers())
+            {
+                boolean last = maxReportDate ? true : !presentInFuture(baseEntity, attribute);
+                identifierWithError = attribute;
 
-            IMetaType metaType = baseEntity.getMemberType(attribute);
-            IBaseValue baseValueForSave = baseEntity.getBaseValue(attribute);
-            if (baseValueForSave.getValue() == null)
-            {
-                baseEntity.remove(attribute);
-            }
-            else
-            {
-                if (metaType.isComplex())
+                IMetaType metaType = baseEntity.getMemberType(attribute);
+                IBaseValue baseValueForSave = baseEntity.getBaseValue(attribute);
+                if (baseValueForSave.getValue() == null)
                 {
-                    if (metaType.isSet())
+                    attributesToRemove.add(attribute);
+                    //baseEntity.remove(attribute);
+                }
+                else
+                {
+                    if (metaType.isComplex())
                     {
-                        if (metaType.isSetOfSets())
+                        if (metaType.isSet())
                         {
-                            throw new UnsupportedOperationException("Not implemented yet.");
+                            if (metaType.isSetOfSets())
+                            {
+                                throw new UnsupportedOperationException("Not implemented yet.");
+                            }
+                            else
+                            {
+                                for (IBaseValue baseValue : ((BaseSet)baseValueForSave.getValue()).get())
+                                {
+                                    IBaseEntity baseEntityApplied = apply((BaseEntity)baseValue.getValue());
+                                    baseValue.setValue(baseEntityApplied);
+                                    baseValue.setLast(last);
+                                }
+                            }
                         }
                         else
                         {
-                            for (IBaseValue baseValue : ((BaseSet)baseValueForSave.getValue()).get())
-                            {
-                                IBaseEntity baseEntityApplied = apply((BaseEntity)baseValue.getValue());
-                                baseValue.setValue(baseEntityApplied);
-                                baseValue.setLast(last);
-                            }
+                            IBaseEntity baseEntityApplied = apply((BaseEntity)baseValueForSave.getValue());
+                            baseValueForSave.setValue(baseEntityApplied);
                         }
                     }
-                    else
-                    {
-                        IBaseEntity baseEntityApplied = apply((BaseEntity)baseValueForSave.getValue());
-                        baseValueForSave.setValue(baseEntityApplied);
-                    }
+
+                    baseValueForSave.setLast(last);
                 }
-
-                baseValueForSave.setLast(last);
             }
-        }
 
-        return baseEntity;
+            for (String attributeToRemove : attributesToRemove)
+            {
+                baseEntity.remove(attributeToRemove);
+            }
+
+            return baseEntity;
+        }
+        catch (ConcurrentModificationException ex)
+        {
+            logger.error(String.format("CONCURRENT_MODIFICATION_EXCEPTION. Identifier: {0}", identifierWithError));
+            logger.error(baseEntity.toString());
+
+            throw  ex;
+        }
     }
 
     private IBaseEntity applyWithComparison(final IBaseEntity baseEntityForSave, IBaseEntity baseEntityLoaded)

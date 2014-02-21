@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav.model.json; /**
  * @author abukabayev
  */
 import java.util.Date;
+import java.util.HashMap;
 
 public class BatchInfo {
     private String batchType;
@@ -9,7 +10,7 @@ public class BatchInfo {
     private Long size;
     private Long userId;
     private Date repDate;
-    private Long creditorId;
+    private HashMap<String, String> additionalParams;
 
     public String getBatchName() {
         return batchName;
@@ -51,13 +52,13 @@ public class BatchInfo {
         this.repDate = repDate;
     }
 
-    public Long getCreditorId()
+    public HashMap<String, String> getAdditionalParams()
     {
-        return creditorId;
+        return additionalParams;
     }
 
-    public void setCreditorId(Long creditorId)
+    public void setAdditionalParams(HashMap<String, String> additionalParams)
     {
-        this.creditorId = creditorId;
+        this.additionalParams = additionalParams;
     }
 }

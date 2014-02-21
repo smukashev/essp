@@ -23,8 +23,11 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -60,6 +63,10 @@ public class ZipFilesMonitor{
 
     private Map<String,Job> jobs;
 
+    private List<Creditor> creditors;
+
+    SenderThread sender;
+
     //private static Gson gson = new Gson();
 
     public static final int ZIP_BUFFER_SIZE = 1024;
@@ -67,7 +74,13 @@ public class ZipFilesMonitor{
 
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
-        new SenderThread().start();
+        sender = new SenderThread();
+        sender.start();
+    }
+
+    @PostConstruct
+    public void init() {
+        creditors = serviceFactory.getRemoteCreditorBusiness().findMainOfficeCreditors();
     }
 
     private class SenderThread extends Thread {
@@ -109,8 +122,21 @@ public class ZipFilesMonitor{
         {
             while(true) {
                 JobInfo nextJob;
+
+                if (serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
+                    try
+                    {
+                        sleep(360L * 1000L);
+                    } catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    continue;
+                }
+
                 if ((nextJob = getNextJob()) != null) {
                     logger.debug("Sending file with batchId: " + nextJob.getBatchId());
+                    System.out.println("Sending file with batchId: " + nextJob.getBatchId());
 
                     try {
                         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
@@ -159,7 +185,7 @@ public class ZipFilesMonitor{
         batch.setUserId(batchInfo.getUserId());
         long batchId = batchService.save(batch);
 
-        Long cId;
+        Long cId = -1l;
 
         if(batchInfo.getUserId() != 100500L) {
             List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
@@ -170,7 +196,20 @@ public class ZipFilesMonitor{
                 cId = -1L;
             }
         } else {
-            cId = batchInfo.getCreditorId();
+            String creditorCode = batchInfo.getAdditionalParams().get("CODE");
+
+            boolean foundCreditor = false;
+            for (Creditor creditor : creditors) {
+                if (creditor.getCode().equals(creditorCode)) {
+                    cId = creditor.getId();
+                    foundCreditor = true;
+                    break;
+                }
+            }
+
+            if (!foundCreditor) {
+                throw new IllegalStateException("Can't find creditor with code: " + creditorCode);
+            }
         }
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
@@ -180,6 +219,8 @@ public class ZipFilesMonitor{
                 new BatchStatusJModel(Global.BATCH_STATUS_WAITING, null, new Date(), batchInfo.getUserId()));
         statusSingleton.addBatchStatus(batchId,
                 new BatchStatusJModel(Global.BATCH_STATUS_PROCESSING, null, new Date(), batchInfo.getUserId()));
+
+        sender.addJob(batchId, batchInfo);
 
 //        try {
 //            JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
@@ -268,7 +309,7 @@ public class ZipFilesMonitor{
 
             Date date = null;
             try {
-                date = new SimpleDateFormat("dd.MM.yy").parse(document.getElementsByTagName("date").item(0).getTextContent());
+                date = new SimpleDateFormat("dd.MM.yyyy").parse(document.getElementsByTagName("date").item(0).getTextContent());
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -292,7 +333,7 @@ public class ZipFilesMonitor{
         }
     }
 
-    public void readFilesWithoutUser(String filename, Long creditorId) {
+    public void readFilesWithoutUser(String filename) {
         BatchInfo batchInfo = new BatchInfo();
         try{
 
@@ -323,14 +364,33 @@ public class ZipFilesMonitor{
             batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent());
 
             batchInfo.setUserId(100500L);
-            batchInfo.setCreditorId(creditorId);
+            NodeList nlist = document.getElementsByTagName("property");
+            HashMap<String, String> params = new HashMap<String, String>();
+            for (int i = 0; i < nlist.getLength(); i++) {
+                Node node = nlist.item(i);
+                NodeList childrenList = node.getChildNodes();
+                String name = "";
+                String value = "";
+                for (int j = 0; j < childrenList.getLength(); j++) {
+                    Node curChild = childrenList.item(j);
+                    if (curChild.getNodeName().equals("name")) {
+                        name = curChild.getTextContent();
+                    }
+                    if (curChild.getNodeName().equals("value")) {
+                        value = curChild.getTextContent();
+                    }
+                }
+                params.put(name, value);
+            }
+
+            batchInfo.setAdditionalParams(params);
 
             batchInfo.setSize(Long.parseLong(document.getElementsByTagName("size").item(0).getTextContent()));
 
 
             Date date = null;
             try {
-                date = new SimpleDateFormat("dd.MM.yy").parse(document.getElementsByTagName("date").item(0).getTextContent());
+                date = new SimpleDateFormat("dd.MM.yyyy").parse(document.getElementsByTagName("date").item(0).getTextContent());
             } catch (ParseException e) {
                 e.printStackTrace();
             }

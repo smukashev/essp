@@ -9,6 +9,7 @@ import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
+import kz.bsbnb.usci.core.service.IBatchEntryService;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -31,6 +32,7 @@ import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
+import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -42,10 +44,12 @@ import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
+import java.sql.*;
 import java.text.DateFormat;
 import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Component
 public class CLI
@@ -573,6 +577,151 @@ public class CLI
         }
     }
 
+    public Connection connectToDB(String url, String name, String password) throws ClassNotFoundException, SQLException
+    {
+        Class.forName("oracle.jdbc.OracleDriver");
+        return DriverManager.getConnection(url, name, password);
+    }
+
+    public void commandImport()
+    {
+        if (args.size() > 4) {
+            Connection conn = null;
+
+            RmiProxyFactoryBean batchProcessServiceFactoryBean = null;
+
+            IBatchProcessService batchProcessService = null;
+
+            try {
+                batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+                batchProcessServiceFactoryBean.setServiceUrl(args.get(3));
+                batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+                batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+                batchProcessServiceFactoryBean.afterPropertiesSet();
+                batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+            } catch (Exception e) {
+                System.out.println("Can't connect to receiver service: " + e.getMessage());
+            }
+
+            try
+            {
+                conn = connectToDB(args.get(0), args.get(1), args.get(2));
+            } catch (ClassNotFoundException e)
+            {
+                System.out.println("Error can't load driver: oracle.jdbc.OracleDriver");
+                return;
+            } catch (SQLException e)
+            {
+                System.out.println("Can't connect to DB: " + e.getMessage());
+                return;
+            }
+
+            PreparedStatement preparedStatement = null;
+            PreparedStatement preparedStatementDone = null;
+            try
+            {
+                preparedStatement = conn.prepareStatement("select xf.id, xf.file_name, xf.file_content\n" +
+                        "  from core.xml_file xf\n" +
+                        " where xf.status = 'COMPLETED'\n" +
+                        "   and xf.sent = 0");
+
+                preparedStatementDone = conn.prepareStatement("update core.xml_file xf \n" +
+                        "   set xf.sent = 1 \n" +
+                        " where xf.id = ?");
+            } catch (SQLException e)
+            {
+                System.out.println("Can't create prepared statement: " + e.getMessage());
+                try
+                {
+                    conn.close();
+                } catch (SQLException e1)
+                {
+                    e1.printStackTrace();
+                }
+                return;
+            }
+
+            File tempDir = new File(args.get(4));
+
+            if (!tempDir.exists()) {
+                System.out.println("No such directory " + args.get(4));
+                return;
+            }
+
+            if (!tempDir.isDirectory()) {
+                System.out.println(args.get(4) + " must be a directory");
+                return;
+            }
+
+            while(true) {
+                ResultSet result2 = null;
+                try
+                {
+                    result2 = preparedStatement.executeQuery();
+                } catch (SQLException e)
+                {
+                    System.out.println("Can't execute db query: " + e.getMessage());
+                    break;
+                }
+
+                try
+                {
+                    if (result2.next()) {
+                        int id = result2.getInt("id");
+                        String fileName = result2.getString("file_name");
+                        Blob blob = result2.getBlob("file_content");
+
+                        File newFile = new File(tempDir.getAbsolutePath() + "/" + fileName + ".zip");
+                        newFile.createNewFile();
+
+                        InputStream in = blob.getBinaryStream();
+
+                        byte[] buffer = new byte[1024];
+
+                        FileOutputStream fout = new FileOutputStream(newFile);
+
+                        while(in.read(buffer) > 0) {
+                            fout.write(buffer);
+                        }
+
+                        fout.close();
+
+                        System.out.println("Sending file: " + newFile.getCanonicalFile());
+
+                        batchProcessService.processBatchWithoutUser(newFile.getAbsolutePath());
+
+                        preparedStatementDone.setInt(1, id);
+
+                        if (preparedStatementDone.execute()) {
+                            System.out.println("Error can't mark sent file: " + id);
+                        }
+
+                        Thread.sleep(1000);
+                    } else {
+                        System.out.println("Nothing to do.");
+                        Thread.sleep(1000);
+                    }
+                } catch (SQLException e)
+                {
+                    System.out.println("Can't get result from db: " + e.getMessage());
+                    break;
+                } catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                } catch (IOException e)
+                {
+                    System.out.println("Can't create temp file: " + e.getMessage());
+                }
+            }
+
+        } else {
+            System.out.println("Argument needed: <credits_db_url> <user> <password> <receiver_url> <temp_files_folder>");
+            System.out.println("Example: import jdbc:oracle:thin:@localhost:1521:XE ARTUR 123456 rmi://127.0.0.1:1097/batchProcessService /tmp");
+        }
+    }
+
     public void commandEntity()
     {
         if (args.size() > 1) {
@@ -958,9 +1107,11 @@ public class CLI
                         commandEntity();}
                     else if(command.equals("sql")){
                         commandSql();
-                    } else if(command.equals("rule")){
+                    } else if(command.equals("rule")) {
                         commandRule(in);
-                    }else {
+                    } else if(command.equals("import")) {
+                        commandImport();
+                    } else {
                         System.out.println("No such command: " + command);
                     }
                 } catch (Exception e) {

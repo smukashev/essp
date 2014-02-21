@@ -59,7 +59,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
             BaseEntity entity = (BaseEntity)iter.next();
             rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());
 
-            Date contractDate = (Date)entity.getEl("primary_contract.date");
+            Date contractDate = (Date)entity.getEl("primary_contract.contract_date");
             String contractNo = (String)entity.getEl("primary_contract.no");
 
             if (entity.getValidationErrors().size() > 0) {
@@ -88,7 +88,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
         while (entityIterator.hasNext()) {
             BaseEntity entity = entityIterator.next();
 
-            Date contractDate = (Date)entity.getEl("primary_contract.date");
+            Date contractDate = (Date)entity.getEl("primary_contract.contract_date");
             String contractNo = (String)entity.getEl("primary_contract.no");
 
             statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(entity.getBatchIndex() - 1,

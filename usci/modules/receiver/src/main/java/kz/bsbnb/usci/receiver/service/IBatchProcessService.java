@@ -5,5 +5,5 @@ package kz.bsbnb.usci.receiver.service;
  */
 public interface IBatchProcessService {
     public void processBatch(String fileName, Long userId);
-    public void processBatchWithoutUser(String fileName, Long creditorId);
+    public void processBatchWithoutUser(String fileName);
 }

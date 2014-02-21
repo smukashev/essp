@@ -46,7 +46,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
         BaseEntity entity = (BaseEntity)baseEntityDao.process(baseEntity);
         long t2 = System.currentTimeMillis() - t1;
 
-        Date contractDate = (Date)entity.getEl("primary_contract.date");
+        Date contractDate = (Date)entity.getEl("primary_contract.contract_date");
         String contractNo = (String)entity.getEl("primary_contract.no");
 
         System.out.println("[core][save]                :           " + t2);
