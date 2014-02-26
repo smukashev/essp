@@ -374,7 +374,7 @@ meta add ref_portfolio creditor MetaClass ref_creditor
 
 meta create organization_name
 meta add organization_name lang STRING
-meta add organization_name st_string STRING
+meta add organization_name name STRING
 
 #====================================
 #= ORGANIZATION
