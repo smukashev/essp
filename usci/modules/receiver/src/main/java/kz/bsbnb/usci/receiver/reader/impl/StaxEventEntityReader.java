@@ -15,12 +15,15 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.receiver.common.Global;
+import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
+import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -54,6 +57,11 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     private Gson gson = new Gson();
 
     private BatchFullJModel batchFullJModel;
+
+    private static final long WAIT_TIMEOUT = 3600; //in sec
+
+    @Autowired
+    private IServiceRepository serviceFactory;
 
     @PostConstruct
     public void init() {
@@ -120,7 +128,24 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     @Override
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException {
         logger.info("Read called");
+        long sleepCounter = 0;
         while(xmlEventReader.hasNext()) {
+            while(serviceFactory.getEntityService().getQueueSize() > ZipFilesMonitor.MAX_SYNC_QUEUE_SIZE) {
+                try
+                {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                sleepCounter++;
+                if (sleepCounter > WAIT_TIMEOUT) {
+                    throw new IllegalStateException("Sync timeout in reader.");
+                }
+            }
+
+            sleepCounter = 0;
+
             XMLEvent event = (XMLEvent) xmlEventReader.next();
 
             if(event.isStartDocument()) {

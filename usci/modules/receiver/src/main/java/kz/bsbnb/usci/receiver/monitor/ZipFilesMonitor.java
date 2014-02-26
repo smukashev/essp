@@ -72,6 +72,8 @@ public class ZipFilesMonitor{
     public static final int ZIP_BUFFER_SIZE = 1024;
     public static final int MAX_SYNC_QUEUE_SIZE = 128;
 
+    private static final long WAIT_TIMEOUT = 3600; //in sec
+
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
         sender = new SenderThread();
@@ -120,19 +122,25 @@ public class ZipFilesMonitor{
 
         public void run()
         {
+            long sleepCounter = 0;
             while(true) {
                 JobInfo nextJob;
 
                 if (serviceFactory != null && serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
                     try
                     {
-                        sleep(360L * 1000L);
+                        sleep(1000L);
                     } catch (InterruptedException e)
                     {
                         e.printStackTrace();
                     }
+                    sleepCounter++;
+                    if (sleepCounter > WAIT_TIMEOUT) {
+                        throw new IllegalStateException("Sync timeout in reader.");
+                    }
                     continue;
                 }
+                sleepCounter = 0;
 
                 if ((nextJob = getNextJob()) != null) {
                     logger.debug("Sending file with batchId: " + nextJob.getBatchId());
@@ -423,10 +431,17 @@ public class ZipFilesMonitor{
         IEntityService entityService = serviceFactory.getEntityService();
 
         boolean valid = true;
+        long sleepCounter = 0;
         do {
             while(entityService.getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
                 Thread.sleep(1000);
+
+                sleepCounter++;
+                if (sleepCounter > WAIT_TIMEOUT) {
+                    throw new IllegalStateException("Sync timeout in reader.");
+                }
             }
+            sleepCounter = 0;
 
             WatchKey watchKey = watchService.take();
 
