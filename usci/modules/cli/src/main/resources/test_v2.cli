@@ -1,0 +1,647 @@
+# Warning this line clears DB!
+clear
+# Recreate DB
+init
+
+#====================================
+#= REF_DOC_TYPE
+#====================================
+
+meta create ref_doc_type
+meta add ref_doc_type code INTEGER
+meta key name ref_doc_type code
+meta add ref_doc_type is_identification BOOLEAN
+meta add ref_doc_type is_organization_doc BOOLEAN
+meta add ref_doc_type is_person_doc BOOLEAN
+meta add ref_doc_type name_kz STRING
+meta add ref_doc_type name_ru STRING
+meta add ref_doc_type short_name_kz STRING
+meta add ref_doc_type short_name_ru STRING
+meta add ref_doc_type sign_count INTEGER
+meta add ref_doc_type weight INTEGER
+
+#====================================
+#= DOCUMENT
+#====================================
+
+meta create document
+meta add document name STRING
+meta add document no STRING
+meta key name document no
+meta add document doc_type MetaClass ref_doc_type
+meta key name document doc_type
+
+#====================================
+#= REF_SUBJECT_TYPE
+#====================================
+
+meta create ref_subject_type
+meta add ref_subject_type code INTEGER
+meta key name ref_subject_type code
+meta add ref_subject_type kind_id INTEGER
+meta add ref_subject_type name_kz STRING
+meta add ref_subject_type name_ru STRING
+meta add ref_subject_type report_period_duration_months INTEGER
+
+#====================================
+#= REF_BALANCE_ACCOUNT
+#====================================
+
+meta create ref_balance_account
+meta add ref_balance_account display_no STRING
+meta add ref_balance_account fifth_sign STRING
+meta add ref_balance_account first_fourth_signs STRING
+meta add ref_balance_account is_in_balance BOOLEAN
+meta add ref_balance_account name_kz STRING
+meta add ref_balance_account name_ru STRING
+meta add ref_balance_account no_ STRING
+meta key name ref_balance_account no_
+meta add ref_balance_account seventh_sign STRING
+meta add ref_balance_account sixth_sign STRING
+
+#====================================
+#= PERSON_NAME
+#====================================
+
+meta create person_name
+meta add person_name firstname STRING
+meta add person_name lang STRING
+meta add person_name lastname STRING
+meta add person_name middlename STRING
+meta add person_name middlename STRING
+
+#====================================
+#= REMAINS_DEBT_PASTDUE
+#====================================
+
+meta create remains_debt_pastdue
+meta add remains_debt_pastdue close_date DATE
+meta add remains_debt_pastdue open_date DATE
+meta add remains_debt_pastdue value DOUBLE
+meta add remains_debt_pastdue value_currency DOUBLE
+meta add remains_debt_pastdue balance_account MetaClass ref_balance_account
+
+#====================================
+#= REMAINS_DEBT_CURRENT
+#====================================
+
+meta create remains_debt_current
+meta add remains_debt_current value DOUBLE
+meta add remains_debt_current value_currency DOUBLE
+meta add remains_debt_current balance_account MetaClass ref_balance_account
+
+#====================================
+#= REMAINS_DEBT_WRITE_OFF
+#====================================
+
+meta create remains_debt_write_off
+meta add remains_debt_write_off value DOUBLE
+meta add remains_debt_write_off value_currency DOUBLE
+meta add remains_debt_write_off date DATE
+meta add remains_debt_write_off balance_account MetaClass ref_balance_account
+
+#====================================
+#= REMAINS_INTEREST_PASTDUE
+#====================================
+
+meta create remains_interest_pastdue
+meta add remains_interest_pastdue close_date DATE
+meta add remains_interest_pastdue open_date DATE
+meta add remains_interest_pastdue value DOUBLE
+meta add remains_interest_pastdue value_currency DOUBLE
+meta add remains_interest_pastdue balance_account MetaClass ref_balance_account
+
+#====================================
+#= REMAINS_INTEREST_CURRENT
+#====================================
+
+meta create remains_interest_current
+meta add remains_interest_current value DOUBLE
+meta add remains_interest_current value_currency DOUBLE
+meta add remains_interest_current balance_account MetaClass ref_balance_account
+
+#====================================
+#= REMAINS_INTEREST_WRITE_OFF
+#====================================
+
+meta create remains_interest_write_off
+meta add remains_interest_write_off date DATE
+meta add remains_interest_write_off value DOUBLE
+meta add remains_interest_write_off value_currency DOUBLE
+
+#====================================
+#= REF_COUNTRY
+#====================================
+
+meta create ref_country
+meta add ref_country code STRING
+meta add ref_country code_numeric INTEGER
+meta key name ref_country code_numeric
+meta add ref_country name_kz STRING
+meta add ref_country name_ru STRING
+meta add ref_country short_name_kz STRING
+meta add ref_country short_name_ru STRING
+
+#====================================
+#= REF_CREDITOR
+#====================================
+
+meta create ref_creditor
+meta add ref_creditor code STRING
+meta add ref_creditor name STRING
+meta add ref_creditor nokbdb_code STRING
+meta add ref_creditor short_name STRING
+meta add ref_creditor subject_type MetaClass ref_subject_type
+meta add ref_creditor docs MetaClass document true
+meta key name ref_creditor docs
+
+#====================================
+#= REF_REGION
+#====================================
+
+meta create ref_region
+meta add ref_region code INTEGER
+meta key name ref_region code
+meta add ref_region name_kz STRING
+meta add ref_region name_ru STRING
+
+#====================================
+#= REF_CONTACT_TYPE
+#====================================
+
+meta create ref_contact_type
+meta add ref_contact_type code INTEGER
+meta key name ref_contact_type code
+meta add ref_contact_type name_kz STRING
+meta add ref_contact_type name_ru STRING
+
+#====================================
+#= PROVISION
+#====================================
+
+meta create provision
+meta add provision value DOUBLE
+meta add provision balance_account MetaClass ref_balance_account
+
+#====================================
+#= HEAD
+#====================================
+
+meta create head
+meta add head docs MetaClass document true
+meta add head names MetaClass person_name true
+
+#====================================
+#= ADDRESS
+#====================================
+
+meta create address
+meta add address details STRING
+meta add address type STRING
+meta add address region MetaClass ref_region
+
+#====================================
+#= CONTACT
+#====================================
+
+meta create contact
+meta add contact details STRING true
+meta add contact contact_type MetaClass ref_contact_type
+
+#====================================
+#= REMAINS_LIMIT
+#====================================
+
+meta create remains_limit
+meta add remains_limit value DOUBLE
+meta add remains_limit value_currency DOUBLE
+meta add remains_limit balance_account MetaClass ref_balance_account
+
+#====================================
+#= REMAINS_DEBT
+#====================================
+
+meta create remains_debt
+meta add remains_debt current MetaClass remains_debt_current
+meta add remains_debt pastdue MetaClass remains_debt_pastdue
+meta add remains_debt write_off MetaClass remains_debt_write_off
+
+#====================================
+#= REMAINS_INTEREST
+#====================================
+
+meta create remains_interest
+meta add remains_interest current MetaClass remains_interest_current
+meta add remains_interest pastdue MetaClass remains_interest_pastdue
+meta add remains_interest write_off MetaClass remains_interest_write_off
+
+#====================================
+#= REMAINS_CORRECTION
+#====================================
+
+meta create remains_correction
+meta add remains_correction value DOUBLE
+meta add remains_correction value_currency DOUBLE
+meta add remains_correction balance_account MetaClass ref_balance_account
+
+#====================================
+#= REMAINS_DISCOUNT
+#====================================
+
+meta create remains_discount
+meta add remains_discount value DOUBLE
+meta add remains_discount value_currency DOUBLE
+meta add remains_discount balance_account MetaClass ref_balance_account
+
+#====================================
+#= REMAINS_DISCOUNTED_VALUE
+#====================================
+
+meta create remains_discounted_value
+meta add remains_discounted_value value DOUBLE
+
+#====================================
+#= TURNOVER_ISSUE_DEBT
+#====================================
+
+meta create turnover_issue_debt
+meta add turnover_issue_debt amount DOUBLE
+meta add turnover_issue_debt amount_currency DOUBLE
+
+#====================================
+#= TURNOVER_ISSUE_INTEREST
+#====================================
+
+meta create turnover_issue_interest
+meta add turnover_issue_interest amount DOUBLE
+meta add turnover_issue_interest amount_currency DOUBLE
+
+#====================================
+#= PROVISION_GROUP
+#====================================
+
+meta create provision_group
+meta add provision_group provision_kfn MetaClass provision
+meta add provision_group provision_msfo MetaClass provision
+meta add provision_group provision_msfo_over_balance MetaClass provision
+
+#====================================
+#= REF_BANK_RELATION
+#====================================
+
+meta create ref_bank_relation
+meta add ref_bank_relation code INTEGER
+meta key name ref_bank_relation code
+meta add ref_bank_relation name_kz STRING
+meta add ref_bank_relation name_ru STRING
+
+#====================================
+#= REF_CLASSIFICATION
+#====================================
+
+meta create ref_classification
+meta add ref_classification code INTEGER
+meta key name ref_classification code
+meta add ref_classification comment_kz STRING
+meta add ref_classification comment_ru STRING
+meta add ref_classification is_input_value BOOLEAN
+meta add ref_classification name_kz STRING
+meta add ref_classification name_ru STRING
+meta add ref_classification provision_debt DOUBLE
+meta add ref_classification provision_portfolio_max DOUBLE
+meta add ref_classification provision_portfolio_min DOUBLE
+meta add ref_classification value_ DOUBLE
+
+#====================================
+#= REF_ECON_TRADE
+#====================================
+
+meta create ref_econ_trade
+meta add ref_econ_trade code INTEGER
+meta key name ref_econ_trade code
+meta add ref_econ_trade name_kz STRING
+meta add ref_econ_trade name_ru STRING
+
+#====================================
+#= REF_ENTERPRISE_TYPE
+#====================================
+
+meta create ref_enterprise_type
+meta add ref_enterprise_type code STRING
+meta key name ref_enterprise_type code
+meta add ref_enterprise_type is_organization BOOLEAN
+meta add ref_enterprise_type is_se BOOLEAN
+meta add ref_enterprise_type name_kz STRING
+meta add ref_enterprise_type name_ru STRING
+
+#====================================
+#= REF_LEGAL_FORM
+#====================================
+
+meta create ref_legal_form
+meta add ref_legal_form code INTEGER
+meta key name ref_legal_form code
+meta add ref_legal_form name_kz STRING
+meta add ref_legal_form name_ru STRING
+meta add ref_legal_form short_name_kz STRING
+meta add ref_legal_form short_name_ru STRING
+
+#====================================
+#= REF_OFFSHORE
+#====================================
+
+meta create ref_offshore
+meta add ref_offshore code INTEGER
+meta key name ref_offshore code
+meta add ref_offshore name_kz STRING
+meta add ref_offshore name_ru STRING
+meta add ref_offshore country MetaClass ref_country
+
+#====================================
+#= REF_PORTFOLIO
+#====================================
+
+meta create ref_portfolio
+meta add ref_portfolio code STRING
+meta key name ref_portfolio code
+meta add ref_portfolio name_kz STRING
+meta add ref_portfolio name_ru STRING
+meta add ref_portfolio creditor MetaClass ref_creditor
+
+#====================================
+#= ORGANIZATION_NAME
+#====================================
+
+meta create organization_name
+meta add organization_name lang STRING
+meta add organization_name st_string STRING
+
+#====================================
+#= ORGANIZATION
+#====================================
+
+meta create organization
+meta add organization is_se BOOLEAN
+meta add organization country MetaClass ref_country
+meta add organization econ_trade MetaClass ref_econ_trade
+meta add organization enterprise_type MetaClass ref_enterprise_type
+meta add organization head MetaClass head
+meta add organization legal_form MetaClass ref_legal_form
+meta add organization offshore MetaClass ref_offshore
+meta add organization addresses MetaClass address true
+meta add organization bank_relations MetaClass ref_bank_relation true
+meta add organization contacts MetaClass contact true
+meta add organization docs MetaClass document true
+meta add organization names MetaClass organization_name true
+
+#====================================
+#= PERSON
+#====================================
+
+meta create person
+meta add person country MetaClass ref_country
+meta add person offshore MetaClass ref_offshore
+meta add person addresses MetaClass address true
+meta add person bank_relations MetaClass ref_bank_relation true
+meta add person contacts MetaClass contact true
+meta add person docs MetaClass document true
+meta key name person docs
+meta add person names MetaClass person_name true
+
+#====================================
+#= CREDITOR
+#====================================
+
+meta create creditor
+meta add creditor code STRING
+meta add creditor docs MetaClass document true
+
+#====================================
+#= REMAINS
+#====================================
+
+meta create remains
+meta add remains discounted_value MetaClass remains_discounted_value
+meta add remains correction MetaClass remains_correction
+meta add remains debt MetaClass remains_debt
+meta add remains discount MetaClass remains_discount
+meta add remains interest MetaClass remains_interest
+meta add remains limit MetaClass remains_limit
+
+#====================================
+#= TURNOVER_ISSUE
+#====================================
+
+meta create turnover_issue
+meta add turnover_issue debt MetaClass turnover_issue_debt
+meta add turnover_issue interest MetaClass turnover_issue_interest
+
+#====================================
+#= TURNOVER
+#====================================
+
+meta create turnover
+meta add turnover issue MetaClass turnover_issue
+
+#====================================
+#= CREDIT_FLOW
+#====================================
+
+meta create credit_flow
+meta add credit_flow classification MetaClass ref_classification
+meta add credit_flow provision MetaClass provision_group
+
+#====================================
+#= CONTRACT
+#====================================
+
+meta create contract
+meta add contract date DATE
+meta add contract no STRING
+
+#====================================
+#= PORTFOLIO
+#====================================
+
+meta create portfolio
+meta add portfolio portfolio MetaClass ref_portfolio
+meta add portfolio portfolio_msfo MetaClass ref_portfolio
+
+#====================================
+#= REF_CREDITOR_BRANCH
+#====================================
+
+meta create ref_creditor_branch
+meta add ref_creditor_branch code INTEGER
+meta add ref_creditor_branch name STRING
+meta add ref_creditor_branch short_name STRING
+meta add ref_creditor_branch main_office MetaClass ref_creditor
+meta add ref_creditor_branch docs MetaClass document true
+meta key name ref_creditor_branch docs
+
+#====================================
+#= REF_CREDIT_OBJECT
+#====================================
+
+meta create ref_credit_object
+meta add ref_credit_object code INTEGER
+meta key name ref_credit_object code
+meta add ref_credit_object name_kz STRING
+meta add ref_credit_object name_ru STRING
+
+#====================================
+#= REF_CREDIT_PURPOSE
+#====================================
+
+meta create ref_credit_purpose
+meta add ref_credit_purpose code INTEGER
+meta key name ref_credit_purpose code
+meta add ref_credit_purpose name_kz STRING
+meta add ref_credit_purpose name_ru STRING
+
+#====================================
+#= REF_CURRENCY
+#====================================
+
+meta create ref_currency
+meta add ref_currency code STRING
+meta key name ref_currency code
+meta add ref_currency is_convertible BOOLEAN
+meta add ref_currency name_kz STRING
+meta add ref_currency name_ru STRING
+meta add ref_currency rating STRING
+meta add ref_currency short_name STRING
+
+#====================================
+#= REF_FINANCE_SOURCE
+#====================================
+
+meta create ref_finance_source
+meta add ref_finance_source code INTEGER
+meta key name ref_finance_source code
+meta add ref_finance_source name_kz STRING
+meta add ref_finance_source name_ru STRING
+
+#====================================
+#= REF_PLEDGE_TYPE
+#====================================
+
+meta create ref_pledge_type
+meta add ref_pledge_type code INTEGER
+meta key name ref_pledge_type code
+meta add ref_pledge_type is_liquid_all BOOLEAN
+meta add ref_pledge_type is_liquid_invest BOOLEAN
+meta add ref_pledge_type name_kz STRING
+meta add ref_pledge_type name_ru STRING
+
+#====================================
+#= REF_CREDIT_TYPE
+#====================================
+
+meta create ref_credit_type
+meta add ref_credit_type code INTEGER
+meta key name ref_credit_type code
+meta add ref_credit_type kind_id INTEGER
+meta add ref_credit_type name_kz STRING
+meta add ref_credit_type name_ru STRING
+
+#====================================
+#= PLEDGE
+#====================================
+
+meta create pledge
+meta add pledge contract STRING
+meta add pledge value DOUBLE
+meta add pledge pledge_type MetaClass ref_pledge_type
+
+#====================================
+#= SUBJECT
+#====================================
+
+meta create subject
+meta add subject creditor MetaClass creditor
+meta add subject organization MetaClass organization
+meta add subject person MetaClass person
+
+#====================================
+#= CHANGE
+#====================================
+
+meta create change
+meta add change maturity_date DATE
+meta add change prolongation_date DATE
+meta add change credit_flow MetaClass credit_flow
+meta add change remains MetaClass remains
+meta add change turnover MetaClass turnover
+
+#====================================
+#= PRIMARY_CONTRACT
+#====================================
+
+meta create primary_contract
+meta add primary_contract date DATE
+meta key name primary_contract date
+meta add primary_contract no STRING
+meta key name primary_contract no
+
+#====================================
+#= CREDIT
+#====================================
+
+meta create credit
+meta add credit actual_issue_date DATE
+meta add credit amount DOUBLE
+meta add credit contract_maturity_date DATE
+meta add credit has_currency_earn BOOLEAN
+meta add credit interest_rate_yearly DOUBLE
+meta add credit contract MetaClass contract
+meta add credit credit_object MetaClass ref_credit_object
+meta add credit creditor_branch MetaClass ref_creditor_branch
+meta add credit credit_purpose MetaClass ref_credit_purpose
+meta add credit credit_type MetaClass ref_credit_type
+meta add credit currency MetaClass ref_currency
+meta add credit finance_source MetaClass ref_finance_source
+meta add credit portfolio MetaClass portfolio
+meta add credit change MetaClass change
+meta add credit creditor MetaClass ref_creditor
+meta key name credit creditor
+meta add credit subjects MetaClass subject true
+meta add credit pledges MetaClass pledge true
+meta add credit primary_contract MetaClass primary_contract
+meta key name credit primary_contract
+
+#====================================
+# Clear metadata cache
+#====================================
+rc
+
+#=============================================================================================
+#=Audit
+#=============================================================================================
+sql insert into audit_event_kind (name,is_always_auditable,is_active,code) values ('error',1,1,'122AA')
+sql insert into audit_event_kind (name,is_always_auditable,is_active,code) values ('warn',1,1,'126AA')
+sql insert into audit_event_kind (name,is_always_auditable,is_active,code) values ('debug',1,1,'126AA')
+#---------------------------------------------------------------------------------------------
+
+#entity read  usci/modules/cli/src/main/resources/refs/doc1.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_balance_account.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_bank_relation.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_classification.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_contact_type.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_country.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_credit_object.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_credit_purpose.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_credit_type.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_creditor.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_creditor_branch.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_currency.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_doc_type.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_econ_trade.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_enterprise_type.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_finance_source.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_legal_form.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_offshore.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_pledge_type.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_portfolio.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_region.xml
+#entity read  usci/modules/cli/src/main/resources/refs/ref_shared.xml
