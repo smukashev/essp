@@ -128,24 +128,23 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     @Override
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException {
         logger.info("Read called");
+        System.out.println("Sync queue size: " + serviceFactory.getEntityService().getQueueSize());
         long sleepCounter = 0;
-        while(xmlEventReader.hasNext()) {
-            while(serviceFactory.getEntityService().getQueueSize() > ZipFilesMonitor.MAX_SYNC_QUEUE_SIZE) {
-                try
-                {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-                sleepCounter++;
-                if (sleepCounter > WAIT_TIMEOUT) {
-                    throw new IllegalStateException("Sync timeout in reader.");
-                }
+        while(serviceFactory.getEntityService().getQueueSize() > ZipFilesMonitor.MAX_SYNC_QUEUE_SIZE) {
+            System.out.println("Sync queue limit exceeded: " + serviceFactory.getEntityService().getQueueSize());
+            try
+            {
+                Thread.sleep(1000);
+            } catch (InterruptedException e)
+            {
+                e.printStackTrace();
             }
-
-            sleepCounter = 0;
-
+            sleepCounter++;
+            if (sleepCounter > WAIT_TIMEOUT) {
+                throw new IllegalStateException("Sync timeout in reader.");
+            }
+        }
+        while(xmlEventReader.hasNext()) {
             XMLEvent event = (XMLEvent) xmlEventReader.next();
 
             if(event.isStartDocument()) {
