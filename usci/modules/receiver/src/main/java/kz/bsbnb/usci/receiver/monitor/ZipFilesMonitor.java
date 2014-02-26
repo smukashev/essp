@@ -163,6 +163,8 @@ public class ZipFilesMonitor{
                                     new BatchStatusJModel(Global.BATCH_STATUS_ERROR, "Unknown batch file type: " +
                                             nextJob.getBatchInfo().getBatchType(), new Date(), nextJob.getBatchInfo().getUserId()));
                         }
+
+                        sleep(10000);
                     } catch (JobExecutionAlreadyRunningException e) {
                         e.printStackTrace();
                     } catch (JobRestartException e) {
@@ -170,6 +172,8 @@ public class ZipFilesMonitor{
                     } catch (JobInstanceAlreadyCompleteException e) {
                         e.printStackTrace();
                     } catch (JobParametersInvalidException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 } else {

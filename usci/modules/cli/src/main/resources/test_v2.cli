@@ -645,3 +645,6 @@ entity read  usci/modules/cli/src/main/resources/refs/ref_pledge_type.xml
 entity read  usci/modules/cli/src/main/resources/refs/ref_portfolio.xml
 entity read  usci/modules/cli/src/main/resources/refs/ref_region.xml
 #entity read  usci/modules/cli/src/main/resources/refs/ref_shared.xml
+
+
+rule create package credit_parser

@@ -23,7 +23,7 @@ public abstract class AbstractDataJob extends AbstractJob {
     protected final int SLEEP_TIME_NORMAL = 1000;
     protected final int SLEEP_TIME_LONG = 5000;
     protected final int SKIP_TIME_MAX = 10;
-    protected final int MAX_THREAD = 10;
+    protected final int MAX_THREAD = 30;
 
     protected volatile int skip_count = 0;
 
@@ -31,7 +31,7 @@ public abstract class AbstractDataJob extends AbstractJob {
         this.entities.addAll(entities);
     }
 
-    public synchronized int getQueueSize() {
+    public int getQueueSize() {
         return entities.size();
     }
 }
