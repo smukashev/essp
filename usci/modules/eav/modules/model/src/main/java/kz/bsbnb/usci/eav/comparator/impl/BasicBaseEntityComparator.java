@@ -258,6 +258,10 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
                 continue;
             }
 
+            if(type.isReference() && type.isImmutable()) {
+                continue;
+            }
+
             if (!type.isSet()) {
                 IBaseValue value1 = c1.safeGetValue(name);
                 if (value1 != null) {

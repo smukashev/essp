@@ -461,8 +461,11 @@ public class CLI
         }
     }
 
-    private void createMetaClass(String metaName) {
+    private void createMetaClass(String metaName, boolean isRef, boolean isImmutable) {
         MetaClass meta = new MetaClass(metaName);
+
+        meta.setReference(isRef);
+        meta.setImmutable(isImmutable);
 
         metaClassRepository.saveMetaClass(meta);
     }
@@ -528,7 +531,9 @@ public class CLI
                     removeAttributeFromMeta(args.get(1), args.get(2));
                 }
             } else if (args.get(0).equals("create")) {
-                createMetaClass(args.get(1));
+                createMetaClass(args.get(1),
+                        args.size() > 2 ? Boolean.parseBoolean(args.get(2)) : false,
+                        args.size() > 3 ? Boolean.parseBoolean(args.get(3)) : false);
             } else if (args.get(0).equals("delete")) {
                 System.out.println("Unimplemented stub in cli");
             } else if (args.get(0).equals("key")) {

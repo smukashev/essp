@@ -7,7 +7,7 @@ init
 #= REF_DOC_TYPE
 #====================================
 
-meta create ref_doc_type
+meta create ref_doc_type true true
 meta add ref_doc_type code INTEGER
 meta key name ref_doc_type code
 meta add ref_doc_type is_identification BOOLEAN
@@ -35,7 +35,7 @@ meta key name document doc_type
 #= REF_SUBJECT_TYPE
 #====================================
 
-meta create ref_subject_type
+meta create ref_subject_type true true
 meta add ref_subject_type code INTEGER
 meta key name ref_subject_type code
 meta add ref_subject_type kind_id INTEGER
@@ -47,7 +47,7 @@ meta add ref_subject_type report_period_duration_months INTEGER
 #= REF_BALANCE_ACCOUNT
 #====================================
 
-meta create ref_balance_account
+meta create ref_balance_account true true
 meta add ref_balance_account display_no STRING
 meta add ref_balance_account fifth_sign STRING
 meta add ref_balance_account first_fourth_signs STRING
@@ -133,7 +133,7 @@ meta add remains_interest_write_off value_currency DOUBLE
 #= REF_COUNTRY
 #====================================
 
-meta create ref_country
+meta create ref_country true true
 meta add ref_country code STRING
 meta add ref_country code_numeric INTEGER
 meta key name ref_country code_numeric
@@ -146,7 +146,7 @@ meta add ref_country short_name_ru STRING
 #= REF_CREDITOR
 #====================================
 
-meta create ref_creditor
+meta create ref_creditor true true
 meta add ref_creditor code STRING
 meta add ref_creditor name STRING
 meta add ref_creditor nokbdb_code STRING
@@ -159,7 +159,7 @@ meta key name ref_creditor docs
 #= REF_REGION
 #====================================
 
-meta create ref_region
+meta create ref_region true true
 meta add ref_region code INTEGER
 meta key name ref_region code
 meta add ref_region name_kz STRING
@@ -169,7 +169,7 @@ meta add ref_region name_ru STRING
 #= REF_CONTACT_TYPE
 #====================================
 
-meta create ref_contact_type
+meta create ref_contact_type true true
 meta add ref_contact_type code INTEGER
 meta key name ref_contact_type code
 meta add ref_contact_type name_kz STRING
@@ -289,7 +289,7 @@ meta add provision_group provision_msfo_over_balance MetaClass provision
 #= REF_BANK_RELATION
 #====================================
 
-meta create ref_bank_relation
+meta create ref_bank_relation true true
 meta add ref_bank_relation code INTEGER
 meta key name ref_bank_relation code
 meta add ref_bank_relation name_kz STRING
@@ -299,7 +299,7 @@ meta add ref_bank_relation name_ru STRING
 #= REF_CLASSIFICATION
 #====================================
 
-meta create ref_classification
+meta create ref_classification true true
 meta add ref_classification code INTEGER
 meta key name ref_classification code
 meta add ref_classification comment_kz STRING
@@ -316,7 +316,7 @@ meta add ref_classification value_ DOUBLE
 #= REF_ECON_TRADE
 #====================================
 
-meta create ref_econ_trade
+meta create ref_econ_trade true true
 meta add ref_econ_trade code INTEGER
 meta key name ref_econ_trade code
 meta add ref_econ_trade name_kz STRING
@@ -326,7 +326,7 @@ meta add ref_econ_trade name_ru STRING
 #= REF_ENTERPRISE_TYPE
 #====================================
 
-meta create ref_enterprise_type
+meta create ref_enterprise_type true true
 meta add ref_enterprise_type code STRING
 meta key name ref_enterprise_type code
 meta add ref_enterprise_type is_organization BOOLEAN
@@ -338,7 +338,7 @@ meta add ref_enterprise_type name_ru STRING
 #= REF_LEGAL_FORM
 #====================================
 
-meta create ref_legal_form
+meta create ref_legal_form true true
 meta add ref_legal_form code INTEGER
 meta key name ref_legal_form code
 meta add ref_legal_form name_kz STRING
@@ -350,7 +350,7 @@ meta add ref_legal_form short_name_ru STRING
 #= REF_OFFSHORE
 #====================================
 
-meta create ref_offshore
+meta create ref_offshore true true
 meta add ref_offshore code INTEGER
 meta key name ref_offshore code
 meta add ref_offshore name_kz STRING
@@ -361,7 +361,7 @@ meta add ref_offshore country MetaClass ref_country
 #= REF_PORTFOLIO
 #====================================
 
-meta create ref_portfolio
+meta create ref_portfolio true false
 meta add ref_portfolio code STRING
 meta key name ref_portfolio code
 meta add ref_portfolio name_kz STRING
@@ -471,7 +471,7 @@ meta add portfolio portfolio_msfo MetaClass ref_portfolio
 #= REF_CREDITOR_BRANCH
 #====================================
 
-meta create ref_creditor_branch
+meta create ref_creditor_branch true true
 meta add ref_creditor_branch code INTEGER
 meta add ref_creditor_branch name STRING
 meta add ref_creditor_branch short_name STRING
@@ -483,7 +483,7 @@ meta key name ref_creditor_branch docs
 #= REF_CREDIT_OBJECT
 #====================================
 
-meta create ref_credit_object
+meta create ref_credit_object true true
 meta add ref_credit_object code INTEGER
 meta key name ref_credit_object code
 meta add ref_credit_object name_kz STRING
@@ -493,7 +493,7 @@ meta add ref_credit_object name_ru STRING
 #= REF_CREDIT_PURPOSE
 #====================================
 
-meta create ref_credit_purpose
+meta create ref_credit_purpose true true
 meta add ref_credit_purpose code INTEGER
 meta key name ref_credit_purpose code
 meta add ref_credit_purpose name_kz STRING
@@ -503,7 +503,7 @@ meta add ref_credit_purpose name_ru STRING
 #= REF_CURRENCY
 #====================================
 
-meta create ref_currency
+meta create ref_currency true true
 meta add ref_currency code STRING
 meta key name ref_currency code
 meta add ref_currency is_convertible BOOLEAN
@@ -516,7 +516,7 @@ meta add ref_currency short_name STRING
 #= REF_FINANCE_SOURCE
 #====================================
 
-meta create ref_finance_source
+meta create ref_finance_source true true
 meta add ref_finance_source code INTEGER
 meta key name ref_finance_source code
 meta add ref_finance_source name_kz STRING
@@ -526,7 +526,7 @@ meta add ref_finance_source name_ru STRING
 #= REF_PLEDGE_TYPE
 #====================================
 
-meta create ref_pledge_type
+meta create ref_pledge_type true true
 meta add ref_pledge_type code INTEGER
 meta key name ref_pledge_type code
 meta add ref_pledge_type is_liquid_all BOOLEAN
@@ -538,7 +538,7 @@ meta add ref_pledge_type name_ru STRING
 #= REF_CREDIT_TYPE
 #====================================
 
-meta create ref_credit_type
+meta create ref_credit_type true true
 meta add ref_credit_type code INTEGER
 meta key name ref_credit_type code
 meta add ref_credit_type kind_id INTEGER
