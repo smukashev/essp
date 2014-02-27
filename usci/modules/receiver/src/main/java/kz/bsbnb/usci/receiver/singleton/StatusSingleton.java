@@ -4,6 +4,7 @@ import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.json.*;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
+import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.factory.ICouchbaseClientFactory;
 import net.spy.memcached.internal.OperationFuture;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,24 @@ public class StatusSingleton {
     public void init()
     {
         client = clientFactory.getCouchbaseClient();
+    }
+
+    public boolean isContractCompleted(long batchId, long index) {
+        Object contractStatus = client.get("contract_status:" + batchId + ":" + index);
+
+        ContractStatusArrayJModel cStatuses;
+
+        if (contractStatus != null) {
+            cStatuses = gson.fromJson(contractStatus.toString(), ContractStatusArrayJModel.class);
+
+            for (ContractStatusJModel status : cStatuses.getContractStatuses()) {
+                if (status.getProtocol().equals(Global.CONTRACT_STATUS_COMPLETED)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public synchronized void startBatch(Long batchId, BatchFullJModel batchFullJModel, BatchInfo batchInfo) {

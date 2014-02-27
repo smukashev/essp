@@ -57,10 +57,21 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
         while(iter.hasNext()) {
             BaseEntity entity = (BaseEntity)iter.next();
-            rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());
 
             Date contractDate = (Date)entity.getEl("primary_contract.date");
             String contractNo = (String)entity.getEl("primary_contract.no");
+
+            if (statusSingleton.isContractCompleted(entity.getBatchId(), entity.getBatchIndex() - 1)) {
+                System.out.println("Contract no " + contractNo + " with date " + contractDate + " skipped because it " +
+                        "has status \"COMPLETED\"");
+                continue;
+            }
+
+            try {
+                rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());
+            } catch(Exception e) {
+                logger.error("Can't run rules: " + e.getMessage());
+            }
 
             if (entity.getValidationErrors().size() > 0) {
                 for (String errorMsg : entity.getValidationErrors()) {
