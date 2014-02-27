@@ -266,15 +266,32 @@ public class ZipFilesMonitor{
 
                 boolean foundCreditor = false;
                 for (Creditor creditor : creditors) {
-                    if (creditor.getCode().equals(creditorCode)) {
-                        cId = creditor.getId();
-                        foundCreditor = true;
-                        break;
+                    if (creditor.getCode() != null) {
+                        if (creditor.getCode().equals(creditorCode)) {
+                            cId = creditor.getId();
+                            foundCreditor = true;
+                            break;
+                        }
                     }
                 }
 
                 if (!foundCreditor) {
-                    throw new IllegalStateException("Can't find creditor with code: " + creditorCode);
+                    String creditorBIN = batchInfo.getAdditionalParams().get("BIN");
+
+                    for (Creditor creditor : creditors) {
+                        if (creditor.getBIN() != null) {
+                            if (creditor.getBIN().equals(creditorBIN)) {
+                                cId = creditor.getId();
+                                foundCreditor = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!foundCreditor) {
+                        throw new IllegalStateException("Can't find creditor with code: " + creditorCode + " or BIN: " +
+                            creditorBIN);
+                    }
                 }
             }
         }

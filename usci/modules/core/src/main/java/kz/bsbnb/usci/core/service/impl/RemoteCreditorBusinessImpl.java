@@ -2,7 +2,9 @@ package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.RemoteCreditorBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
@@ -50,6 +52,22 @@ public class RemoteCreditorBusinessImpl implements RemoteCreditorBusiness
                 creditor.setCode((String)value.getValue());
             else
                 creditor.setCode("none");
+
+            creditor.setBIN("");
+            value = (BaseValue)entity.getBaseValue("docs");
+            if (value != null && value.getValue() != null) {
+                BaseSet docs = (BaseSet)value.getValue();
+
+                for (IBaseValue doc : docs.get()) {
+                    BaseEntity docEntity = (BaseEntity)doc.getValue();
+                    if(docEntity != null) {
+                        Integer doc_type = (Integer)docEntity.getEl("doc_type.code");
+                        if (doc_type != 15) {
+                            creditor.setBIN((String)docEntity.getEl("no"));
+                        }
+                    }
+                }
+            }
 
             creditors.add(creditor);
         }

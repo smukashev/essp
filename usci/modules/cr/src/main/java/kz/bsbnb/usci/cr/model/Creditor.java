@@ -18,6 +18,7 @@ public class Creditor implements Serializable {
     private String code;
     private Date shutdownDate;
     private Date changeDate;
+    private String BIN;
 
     private Creditor mainOffice;
 
@@ -178,5 +179,15 @@ public class Creditor implements Serializable {
      */
     public void setSubjectType(SubjectType subjectType) {
         this.subjectType = subjectType;
+    }
+
+    public String getBIN()
+    {
+        return BIN;
+    }
+
+    public void setBIN(String BIN)
+    {
+        this.BIN = BIN;
     }
 }
