@@ -61,7 +61,7 @@ public class BeStorageDaoImpl implements IBeStorageDao {
 
     }
 
-    public static final int CONCURRENCY_LEVEL = 4;
+    public static final int CONCURRENCY_LEVEL = 50;
     public static final long MAXIMUM_SIZE  = 10000;
     public static final long DURATION  = 10;
     public static final TimeUnit UNIT  = TimeUnit.MINUTES;

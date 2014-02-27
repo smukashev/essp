@@ -723,7 +723,7 @@ public class CLI
 
         } else {
             System.out.println("Argument needed: <credits_db_url> <user> <password> <receiver_url> <temp_files_folder>");
-            System.out.println("Example: import jdbc:oracle:thin:@localhost:1521:XE ARTUR 123456 rmi://127.0.0.1:1097/batchProcessService /tmp");
+            System.out.println("Example: import jdbc:oracle:thin:@srv-scan.corp.nb.rk:1521/DBM01 core ***** rmi://127.0.0.1:1097/batchProcessService D:\\usci\\temp_xml_folder");
         }
     }
 
