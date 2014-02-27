@@ -20,8 +20,9 @@ batch_status {
           return obj;
         }
     }
+}
 
-    batch {
+batch {
     map:
         function (doc, meta) {
           if(doc.type == "batch") {
@@ -39,8 +40,9 @@ batch_status {
 
           return values[1];
         }
+}
 
-    contract_status {
+contract_status {
     /*map:
         function (doc, meta) {
           if(doc.type == "contract_status") {
@@ -68,14 +70,22 @@ batch_status {
             emit(doc.batchId + "_" + doc.index + "_" + (str.substring(str.length-10)), {index: doc.index, contractStatuses: doc.contractStatuses});
           }
         }
-    }
+}
 
-    batch_sign {
+batch_sign {
         map:
             function (doc, meta) {
               if(doc.type == "sign" && !(doc.hasOwnProperty("sign"))) {
                 emit(doc.userId, doc);
               }
             }
-    }
+}
+
+batch_pending {
+        map:
+            function (doc, meta) {
+              if(doc.type == "batch_status" && doc.batchStatuses[doc.batchStatuses.length - 1].protocol != "COMPLETED") {
+                emit(meta.id.substring(13), doc.batchStatuses[doc.batchStatuses.length - 1].protocol);
+              }
+            }
 }
