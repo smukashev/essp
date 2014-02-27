@@ -463,6 +463,8 @@ public class CLI
 
     private void createMetaClass(String metaName, boolean isRef, boolean isImmutable) {
         MetaClass meta = new MetaClass(metaName);
+        meta.setImmutable(isImmutable);
+        meta.setReference(isRef);
 
         meta.setReference(isRef);
         meta.setImmutable(isImmutable);

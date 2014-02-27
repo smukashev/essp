@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author k.tulbassiyev
@@ -132,7 +133,19 @@ public final class DataJob extends AbstractDataJob {
     }
 
     private boolean hasCrossLine(BaseEntity entity1, BaseEntity entity2) {
-        if (comparator.intersect(entity1, entity2).size() > 0)
+        List<String> interList = comparator.intersect(entity1, entity2);
+
+        logger.debug("###################################################");
+        logger.debug(entity1.toString());
+        logger.debug("---------------------------------------------------");
+        for (String str : interList) {
+            logger.debug(str);
+        }
+        logger.debug("---------------------------------------------------");
+        logger.debug(entity2.toString());
+        logger.debug("###################################################");
+
+        if (interList.size() > 0)
             return true;
         return false;
     }

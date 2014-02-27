@@ -449,7 +449,7 @@
                         </configuration>
                     </plugin>
                     <!-- TODO: uncomment this to recreate the database  -->
-                    <!--<plugin>
+                    <!----><plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.2.1</version>
@@ -484,7 +484,7 @@
                                 </systemProperty>
                             </systemProperties>
                         </configuration>
-                    </plugin> -->
+                    </plugin> <!-- -->
                 </plugins>
             </build>
         </profile>
