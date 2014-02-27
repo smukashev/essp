@@ -249,7 +249,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         switch (simple_value.getTypeCode())
         {
             case BOOLEAN:
-                SelectConditionStep outerBooleanSQL = null;
+                Select outerBooleanSQL = null;
 
                 BaseSet actual_set_value = (BaseSet)value.getValue();
 
@@ -268,7 +268,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                         outerBooleanSQL = innerSQL;
                     }
                     else {
-                        outerBooleanSQL.unionAll(innerSQL);
+                        outerBooleanSQL = outerBooleanSQL.unionAll(innerSQL);
                     }
                 }
 
@@ -320,7 +320,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                 }
                 break;
             case DATE:
-                SelectConditionStep outerDateSQL = null;
+                Select outerDateSQL = null;
 
                 BaseSet actual_date_value = (BaseSet)value.getValue();
 
@@ -340,7 +340,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                         outerDateSQL = innerSQL;
                     }
                     else {
-                        outerDateSQL.unionAll(innerSQL);
+                        outerDateSQL = outerDateSQL.unionAll(innerSQL);
                     }
                 }
 
@@ -393,7 +393,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
                 break;
             case DOUBLE:
-                SelectConditionStep outerDoubleSQL = null;
+                Select outerDoubleSQL = null;
 
                 BaseSet actual_double_value = (BaseSet)value.getValue();
 
@@ -413,7 +413,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                         outerDoubleSQL = innerSQL;
                     }
                     else {
-                        outerDoubleSQL.unionAll(innerSQL);
+                        outerDoubleSQL = outerDoubleSQL.unionAll(innerSQL);
                     }
                 }
 
@@ -466,7 +466,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
                 break;
             case INTEGER:
-                SelectConditionStep outerIntegerSQL = null;
+                Select outerIntegerSQL = null;
 
                 BaseSet actual_integer_value = (BaseSet)value.getValue();
 
@@ -485,7 +485,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                         outerIntegerSQL = innerSQL;
                     }
                     else {
-                        outerIntegerSQL.unionAll(innerSQL);
+                        outerIntegerSQL = outerIntegerSQL.unionAll(innerSQL);
                     }
                 }
 
@@ -538,7 +538,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
                 break;
             case STRING:
-                SelectConditionStep outerStringSQL = null;
+                Select outerStringSQL = null;
 
                 BaseSet actual_string_value = (BaseSet)value.getValue();
 
@@ -558,7 +558,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                         outerStringSQL = innerSQL;
                     }
                     else {
-                        outerStringSQL.unionAll(innerSQL);
+                        outerStringSQL = outerStringSQL.unionAll(innerSQL);
                     }
                 }
 
@@ -621,7 +621,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
     private Condition generateComplexArrayCondition(Condition condition, String name, IMetaType type, IBaseValue value,
                                                     boolean and) throws ParseException
     {
-        SelectConditionStep outerComplexSQL = null;
+        Select outerComplexSQL = null;
 
         BaseSet actual_set_value = (BaseSet)value.getValue();
 
@@ -638,7 +638,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
                 outerComplexSQL = innerSQL;
             }
             else {
-                outerComplexSQL.unionAll(innerSQL);
+                outerComplexSQL = outerComplexSQL.unionAll(innerSQL);
             }
         }
 
