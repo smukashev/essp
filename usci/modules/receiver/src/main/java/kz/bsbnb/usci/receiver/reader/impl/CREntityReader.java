@@ -126,14 +126,14 @@ public class CREntityReader<T> extends CommonReader<T> {
             return entity;
         }
 
-        statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
-                Global.BATCH_STATUS_COMPLETED, null, new Date(), userId));
+        //statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
+                //Global.BATCH_STATUS_COMPLETED, null, new Date(), userId));
 
         //ContractStatusArrayJModel statusJModel = statusSingleton.endBatch(batchId);
-        statusSingleton.endBatch(batchId);
+        //statusSingleton.endBatch(batchId);
         //batchFullJModel.setStatus(statusJModel);
 
-        couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
+        //couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
 
         return null;
     }

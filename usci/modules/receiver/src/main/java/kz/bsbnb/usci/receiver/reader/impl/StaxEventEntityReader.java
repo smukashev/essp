@@ -161,13 +161,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 if(endElement(localName)) return (T) currentContainer;
             } else if(event.isEndDocument()) {
                 logger.info("end document");
-                //statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
-                  //      Global.BATCH_STATUS_COMPLETED, null, new Date()));
-
-                //ContractStatusArrayJModel statusJModel = statusSingleton.endBatch(batchId);
-                //batchFullJModel.setStatus(statusJModel);
-
-                couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
+                //couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
             } else {
                 logger.info(event);
             }

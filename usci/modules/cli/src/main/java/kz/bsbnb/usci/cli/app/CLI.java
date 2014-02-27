@@ -662,7 +662,20 @@ public class CLI
                 return;
             }
 
+            int fileLimit = -1;
+            if (args.size() > 5) {
+                fileLimit = Integer.parseInt(args.get(5));
+            }
+            int fileNumber = 0;
+
             while(true) {
+                if (fileLimit > 0) {
+                    if (fileNumber >= fileLimit) {
+                        break;
+                    }
+                }
+                fileNumber++;
+
                 ResultSet result2 = null;
                 try
                 {
@@ -695,7 +708,7 @@ public class CLI
 
                         fout.close();
 
-                        System.out.println("Sending file: " + newFile.getCanonicalFile());
+                        System.out.println(fileNumber + " - Sending file: " + newFile.getCanonicalFile());
 
                         batchProcessService.processBatchWithoutUser(newFile.getAbsolutePath());
 
@@ -726,6 +739,7 @@ public class CLI
         } else {
             System.out.println("Argument needed: <credits_db_url> <user> <password> <receiver_url> <temp_files_folder>");
             System.out.println("Example: import jdbc:oracle:thin:@srv-scan.corp.nb.rk:1521/DBM01 core ***** rmi://127.0.0.1:1097/batchProcessService D:\\usci\\temp_xml_folder");
+            System.out.println("Example: import jdbc:oracle:thin:@192.168.0.44:1521/CREDITS core core_feb_2013 rmi://127.0.0.1:1097/batchProcessService /home/a.tkachenko/temp_files");
         }
     }
 
