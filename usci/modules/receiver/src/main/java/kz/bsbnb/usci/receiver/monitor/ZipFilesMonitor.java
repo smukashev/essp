@@ -1,5 +1,9 @@
 package kz.bsbnb.usci.receiver.monitor;
 
+import com.couchbase.client.CouchbaseClient;
+import com.couchbase.client.protocol.views.*;
+import com.google.gson.Gson;
+import kz.bsbnb.usci.eav.model.json.BatchFullStatusJModel;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.Batch;
@@ -35,6 +39,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -48,6 +53,8 @@ import java.util.zip.ZipFile;
 
 public class ZipFilesMonitor{
     private final Logger logger = LoggerFactory.getLogger(ZipFilesMonitor.class);
+
+    private CouchbaseClient couchbaseClient;
 
     //@Autowired
     //private ICouchbaseClientFactory clientFactory;
@@ -76,13 +83,59 @@ public class ZipFilesMonitor{
 
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
+
         sender = new SenderThread();
+
         sender.start();
     }
 
     @PostConstruct
     public void init() {
+        System.out.println("Retrieving creditors list");
         creditors = serviceFactory.getRemoteCreditorBusiness().findMainOfficeCreditors();
+        System.out.println("Found " + creditors.size() + " creditors");
+
+        Gson gson = new Gson();
+
+        System.setProperty("viewmode", "production");
+        //System.setProperty("viewmode", "development");
+
+        ArrayList<URI> nodes = new ArrayList<URI>();
+        nodes.add(URI.create("http://127.0.0.1:8091/pools"));
+
+        try {
+            couchbaseClient = new CouchbaseClient(nodes, "test", "");
+        } catch (Exception e) {
+            logger.error("Error connecting to Couchbase: " + e.getMessage());
+        }
+
+        View view = couchbaseClient.getView("batch", "batch_pending");
+        Query query = new Query();
+
+        ViewResponse response = couchbaseClient.query(view, query);
+
+        Iterator<ViewRow> rows = response.iterator();
+
+        if (response.size() > 0) {
+            System.out.println("Found pending jobs: ");
+            System.out.println("-------------------------------------------------------------------------");
+
+            while(rows.hasNext()) {
+                ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) rows.next();
+                long batchId = Long.parseLong(viewRowNoDocs.getKey());
+
+                System.out.println("batchId: " + batchId + ", status: " + viewRowNoDocs.getValue());
+
+                String batchInfoStr = couchbaseClient.get("manifest:" + batchId).toString();
+
+                System.out.println(batchInfoStr);
+                System.out.println("-------------------------------------------------------------------------");
+
+                BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
+
+                sender.addJob(batchId, batchInfo);
+            }
+        }
     }
 
     private class SenderThread extends Thread {
