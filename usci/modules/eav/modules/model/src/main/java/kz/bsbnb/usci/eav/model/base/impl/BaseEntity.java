@@ -41,6 +41,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      */
     private Date reportDate;
 
+    private boolean withClosedValues = false;
+
     private Date maxReportDate;
 
     private Date minReportDate;
@@ -88,9 +90,15 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     public BaseEntity(long id, MetaClass meta, Date reportDate, Set<Date> availableReportDates)
     {
+        this(id, meta, reportDate, availableReportDates, false);
+    }
+
+    public BaseEntity(long id, MetaClass meta, Date reportDate, Set<Date> availableReportDates, boolean withClosedValues)
+    {
         super(id);
         this.meta = meta;
         this.availableReportDates = availableReportDates;
+        this.withClosedValues = withClosedValues;
 
         if (reportDate == null)
         {
@@ -153,6 +161,17 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         }
         return minReportDate;
     }
+
+    public boolean isWithClosedValues()
+    {
+        return withClosedValues;
+    }
+
+    public void setWithClosedValues(boolean withClosedValues)
+    {
+        this.withClosedValues = withClosedValues;
+    }
+
 
     @Override
     public boolean isMaxReportDate()

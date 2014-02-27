@@ -9,6 +9,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.IMetaValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
@@ -160,7 +161,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
             }
 
             MetaClass meta = metaClassRepository.getMetaClass(((BigDecimal)row.get(EAV_BE_ENTITIES.CLASS_ID.getName())).longValue());
-            BaseEntity baseEntity = new BaseEntity(id, meta, reportDate, availableReportDates);
+            BaseEntity baseEntity = new BaseEntity(id, meta, reportDate, availableReportDates, withClosedValues);
 
             if (((BigDecimal)row.get(EAV_BE_ENTITY_REPORT_DATES.INTEGER_VALUES_COUNT.getName())).longValue() != 0)
             {
@@ -218,9 +219,15 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     @Override
     public long search(IBaseEntity baseEntity)
     {
-        MetaClass meta = baseEntity.getMeta();
-        Long baseEntityId = searcherPool.getSearcher(meta.getClassName())
+        IMetaClass metaClass = baseEntity.getMeta();
+        Long baseEntityId = searcherPool.getSearcher(metaClass.getClassName())
                 .findSingle((BaseEntity)baseEntity);
+
+        /*if (metaClass.isReference() && metaClass.isImmutable())
+        {
+            throw new RuntimeException(
+                    String.format("MetaClass with name {0} marked as immutable reference.", metaClass.getClassName()));
+        }*/
 
         return baseEntityId == null ? 0 : baseEntityId;
     }
@@ -329,68 +336,55 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
     private IBaseEntity applyWithoutComparison(final IBaseEntity baseEntity)
     {
-        String identifierWithError = null;
-        try
+        boolean maxReportDate = baseEntity.isMaxReportDate();
+        Set<String> attributesToRemove = new HashSet<String>();
+        for (String attribute: baseEntity.getIdentifiers())
         {
-            boolean maxReportDate = baseEntity.isMaxReportDate();
-            Set<String> attributesToRemove = new HashSet<String>();
-            for (String attribute: baseEntity.getIdentifiers())
-            {
-                boolean last = maxReportDate ? true : !presentInFuture(baseEntity, attribute);
-                identifierWithError = attribute;
+            boolean last = maxReportDate ? true : !presentInFuture(baseEntity, attribute);
 
-                IMetaType metaType = baseEntity.getMemberType(attribute);
-                IBaseValue baseValueForSave = baseEntity.getBaseValue(attribute);
-                if (baseValueForSave.getValue() == null)
+            IMetaType metaType = baseEntity.getMemberType(attribute);
+            IBaseValue baseValueForSave = baseEntity.getBaseValue(attribute);
+            if (baseValueForSave.getValue() == null)
+            {
+                attributesToRemove.add(attribute);
+            }
+            else
+            {
+                if (metaType.isComplex())
                 {
-                    attributesToRemove.add(attribute);
-                    //baseEntity.remove(attribute);
-                }
-                else
-                {
-                    if (metaType.isComplex())
+                    if (metaType.isSet())
                     {
-                        if (metaType.isSet())
+                        if (metaType.isSetOfSets())
                         {
-                            if (metaType.isSetOfSets())
-                            {
-                                throw new UnsupportedOperationException("Not implemented yet.");
-                            }
-                            else
-                            {
-                                for (IBaseValue baseValue : ((BaseSet)baseValueForSave.getValue()).get())
-                                {
-                                    IBaseEntity baseEntityApplied = apply((BaseEntity)baseValue.getValue());
-                                    baseValue.setValue(baseEntityApplied);
-                                    baseValue.setLast(last);
-                                }
-                            }
+                            throw new UnsupportedOperationException("Not implemented yet.");
                         }
                         else
                         {
-                            IBaseEntity baseEntityApplied = apply((BaseEntity)baseValueForSave.getValue());
-                            baseValueForSave.setValue(baseEntityApplied);
+                            for (IBaseValue baseValue : ((BaseSet)baseValueForSave.getValue()).get())
+                            {
+                                IBaseEntity baseEntityApplied = apply((BaseEntity)baseValue.getValue());
+                                baseValue.setValue(baseEntityApplied);
+                                baseValue.setLast(last);
+                            }
                         }
                     }
-
-                    baseValueForSave.setLast(last);
+                    else
+                    {
+                        IBaseEntity baseEntityApplied = apply((BaseEntity)baseValueForSave.getValue());
+                        baseValueForSave.setValue(baseEntityApplied);
+                    }
                 }
-            }
 
-            for (String attributeToRemove : attributesToRemove)
-            {
-                baseEntity.remove(attributeToRemove);
+                baseValueForSave.setLast(last);
             }
-
-            return baseEntity;
         }
-        catch (ConcurrentModificationException ex)
+
+        for (String attributeToRemove : attributesToRemove)
         {
-            logger.error(String.format("CONCURRENT_MODIFICATION_EXCEPTION. Identifier: {0}", identifierWithError));
-            logger.error(baseEntity.toString());
-
-            throw  ex;
+            baseEntity.remove(attributeToRemove);
         }
+
+        return baseEntity;
     }
 
     private IBaseEntity applyWithComparison(final IBaseEntity baseEntityForSave, IBaseEntity baseEntityLoaded)
@@ -691,7 +685,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         baseEntity = apply(baseEntity);
         baseEntity = saveOrUpdate(baseEntity);
 
-        Long userId = ((BaseValue)((baseEntity.get().toArray())[0])).getBatch().getUserId();
+        /*Long userId = ((BaseValue)((baseEntity.get().toArray())[0])).getBatch().getUserId();
         String str = baseEntity.getMeta().getClassName();
 
         Insert insert = context
@@ -704,16 +698,10 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                 .set(AUDIT_EVENT.EVENT_BEGIN_DT, new Timestamp(Calendar.getInstance().getTimeInMillis()))
                 .set(AUDIT_EVENT.EVENT_END_DT, new Timestamp(Calendar.getInstance().getTimeInMillis()))
                 .set(AUDIT_EVENT.IS_SUCCESS, 1L);
-
-
-        insertWithId(insert.getSQL(), insert.getBindValues().toArray());
-
-
+        insertWithId(insert.getSQL(), insert.getBindValues().toArray());*/
 
         //((BaseValue)((baseEntity.get().toArray())[0])).getBatch().getUserId() -- userId
         //baseEntity.getMeta().getClassName() -- table
-        // TODO: Make an automatic update cache
-        beStorageDao.clean();
 
         return baseEntity;
     }

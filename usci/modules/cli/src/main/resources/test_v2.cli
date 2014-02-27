@@ -8,7 +8,7 @@ init
 #====================================
 
 meta create ref_doc_type true true
-meta add ref_doc_type code INTEGER
+meta add ref_doc_type code STRING
 meta key name ref_doc_type code
 meta add ref_doc_type is_identification BOOLEAN
 meta add ref_doc_type is_organization_doc BOOLEAN
@@ -36,7 +36,7 @@ meta key name document doc_type
 #====================================
 
 meta create ref_subject_type true true
-meta add ref_subject_type code INTEGER
+meta add ref_subject_type code STRING
 meta key name ref_subject_type code
 meta add ref_subject_type kind_id INTEGER
 meta add ref_subject_type name_kz STRING
@@ -160,7 +160,7 @@ meta key name ref_creditor docs
 #====================================
 
 meta create ref_region true true
-meta add ref_region code INTEGER
+meta add ref_region code STRING
 meta key name ref_region code
 meta add ref_region name_kz STRING
 meta add ref_region name_ru STRING
@@ -170,7 +170,7 @@ meta add ref_region name_ru STRING
 #====================================
 
 meta create ref_contact_type true true
-meta add ref_contact_type code INTEGER
+meta add ref_contact_type code STRING
 meta key name ref_contact_type code
 meta add ref_contact_type name_kz STRING
 meta add ref_contact_type name_ru STRING
@@ -290,7 +290,7 @@ meta add provision_group provision_msfo_over_balance MetaClass provision
 #====================================
 
 meta create ref_bank_relation true true
-meta add ref_bank_relation code INTEGER
+meta add ref_bank_relation code STRING
 meta key name ref_bank_relation code
 meta add ref_bank_relation name_kz STRING
 meta add ref_bank_relation name_ru STRING
@@ -300,7 +300,7 @@ meta add ref_bank_relation name_ru STRING
 #====================================
 
 meta create ref_classification true true
-meta add ref_classification code INTEGER
+meta add ref_classification code STRING
 meta key name ref_classification code
 meta add ref_classification comment_kz STRING
 meta add ref_classification comment_ru STRING
@@ -317,7 +317,7 @@ meta add ref_classification value_ DOUBLE
 #====================================
 
 meta create ref_econ_trade true true
-meta add ref_econ_trade code INTEGER
+meta add ref_econ_trade code STRING
 meta key name ref_econ_trade code
 meta add ref_econ_trade name_kz STRING
 meta add ref_econ_trade name_ru STRING
@@ -339,7 +339,7 @@ meta add ref_enterprise_type name_ru STRING
 #====================================
 
 meta create ref_legal_form true true
-meta add ref_legal_form code INTEGER
+meta add ref_legal_form code STRING
 meta key name ref_legal_form code
 meta add ref_legal_form name_kz STRING
 meta add ref_legal_form name_ru STRING
@@ -351,7 +351,7 @@ meta add ref_legal_form short_name_ru STRING
 #====================================
 
 meta create ref_offshore true true
-meta add ref_offshore code INTEGER
+meta add ref_offshore code STRING
 meta key name ref_offshore code
 meta add ref_offshore name_kz STRING
 meta add ref_offshore name_ru STRING
@@ -472,7 +472,7 @@ meta add portfolio portfolio_msfo MetaClass ref_portfolio
 #====================================
 
 meta create ref_creditor_branch true true
-meta add ref_creditor_branch code INTEGER
+meta add ref_creditor_branch code STRING
 meta add ref_creditor_branch name STRING
 meta add ref_creditor_branch short_name STRING
 meta add ref_creditor_branch main_office MetaClass ref_creditor
@@ -484,7 +484,7 @@ meta key name ref_creditor_branch docs
 #====================================
 
 meta create ref_credit_object true true
-meta add ref_credit_object code INTEGER
+meta add ref_credit_object code STRING
 meta key name ref_credit_object code
 meta add ref_credit_object name_kz STRING
 meta add ref_credit_object name_ru STRING
@@ -494,7 +494,7 @@ meta add ref_credit_object name_ru STRING
 #====================================
 
 meta create ref_credit_purpose true true
-meta add ref_credit_purpose code INTEGER
+meta add ref_credit_purpose code STRING
 meta key name ref_credit_purpose code
 meta add ref_credit_purpose name_kz STRING
 meta add ref_credit_purpose name_ru STRING
@@ -517,7 +517,7 @@ meta add ref_currency short_name STRING
 #====================================
 
 meta create ref_finance_source true true
-meta add ref_finance_source code INTEGER
+meta add ref_finance_source code STRING
 meta key name ref_finance_source code
 meta add ref_finance_source name_kz STRING
 meta add ref_finance_source name_ru STRING
@@ -527,7 +527,7 @@ meta add ref_finance_source name_ru STRING
 #====================================
 
 meta create ref_pledge_type true true
-meta add ref_pledge_type code INTEGER
+meta add ref_pledge_type code STRING
 meta key name ref_pledge_type code
 meta add ref_pledge_type is_liquid_all BOOLEAN
 meta add ref_pledge_type is_liquid_invest BOOLEAN
@@ -539,7 +539,7 @@ meta add ref_pledge_type name_ru STRING
 #====================================
 
 meta create ref_credit_type true true
-meta add ref_credit_type code INTEGER
+meta add ref_credit_type code STRING
 meta key name ref_credit_type code
 meta add ref_credit_type kind_id INTEGER
 meta add ref_credit_type name_kz STRING

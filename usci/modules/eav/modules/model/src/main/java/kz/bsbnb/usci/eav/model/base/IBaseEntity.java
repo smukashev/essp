@@ -25,6 +25,10 @@ public interface IBaseEntity extends IBaseContainer {
 
     public void setAvailableReportDates(Set<Date> availableReportDates);
 
+    public boolean isWithClosedValues();
+
+    public void setWithClosedValues(boolean withClosedValues);
+
     public MetaClass getMeta();
 
     public void remove(String attribute);

@@ -4,11 +4,12 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeStorageDao;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -61,20 +63,31 @@ public class BeStorageDaoImpl implements IBeStorageDao {
 
     }
 
-    public static final int CONCURRENCY_LEVEL = 50;
-    public static final long MAXIMUM_SIZE  = 10000;
-    public static final long DURATION  = 10;
-    public static final TimeUnit UNIT  = TimeUnit.MINUTES;
+    public static final boolean DEFAULT_ENABLED = true;
+    public static final int DEFAULT_CONCURRENCY_LEVEL = 50;
+    public static final long DEFAULT_MAXIMUM_SIZE = 10000;
+    public static final long DEFAULT_DURATION = 10;
+    public static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.MINUTES;
+
+    private boolean enabled = DEFAULT_ENABLED;
+    private int concurrencyLevel = DEFAULT_CONCURRENCY_LEVEL;
+    private long maximumSize = DEFAULT_MAXIMUM_SIZE;
+    private long duration = DEFAULT_DURATION;
+    private TimeUnit timeUnit = DEFAULT_TIME_UNIT;
 
     @Autowired
     private IBaseEntityDao baseEntityDao;
 
     // TODO: Maybe use LinkedHashMap
-    LoadingCache<BaseEntityKey, IBaseEntity> cache = CacheBuilder.newBuilder()
-            .concurrencyLevel(CONCURRENCY_LEVEL)
+    LoadingCache<BaseEntityKey, IBaseEntity> cache;
+
+    public void reinitialize()
+    {
+        cache = CacheBuilder.newBuilder()
+            .concurrencyLevel(concurrencyLevel)
             .weakKeys()
-            .maximumSize(MAXIMUM_SIZE)
-            .expireAfterAccess(DURATION, UNIT)
+            .maximumSize(maximumSize)
+            .expireAfterAccess(duration, timeUnit)
             .build(
                     new CacheLoader<BaseEntityKey, IBaseEntity>() {
                         public IBaseEntity load(BaseEntityKey key) throws Exception {
@@ -88,6 +101,7 @@ public class BeStorageDaoImpl implements IBeStorageDao {
                             }
                         }
                     });
+    }
 
     public IBaseEntity getBaseEntity(long id, Date reportDate)
     {
@@ -97,11 +111,29 @@ public class BeStorageDaoImpl implements IBeStorageDao {
 
     public IBaseEntity getBaseEntity(long id, Date reportDate, boolean withClosedValues)
     {
-        BaseEntityKey key = new BaseEntityKey(id, reportDate, withClosedValues);
-        try {
-            return cache.get(key);
-        } catch (ExecutionException e) {
-            throw new RuntimeException("When receiving instance of BaseEntity unexpected error occurred.");
+        if (enabled)
+        {
+            if (cache == null)
+            {
+                reinitialize();
+            }
+            BaseEntityKey key = new BaseEntityKey(id, reportDate, withClosedValues);
+            try {
+                return cache.get(key);
+            } catch (ExecutionException e) {
+                throw new RuntimeException("When receiving instance of BaseEntity unexpected error occurred.");
+            }
+        }
+        else
+        {
+            if (reportDate == null)
+            {
+                return baseEntityDao.load(id, withClosedValues);
+            }
+            else
+            {
+                return baseEntityDao.load(id, reportDate, withClosedValues);
+            }
         }
     }
 
@@ -115,28 +147,108 @@ public class BeStorageDaoImpl implements IBeStorageDao {
         return getBaseEntity(id, null, withClosedValues);
     }
 
-    public void clean()
+    public void setEnabled(boolean enabled)
     {
-        cache.asMap().clear();
+        this.enabled = enabled;
     }
 
-    @AfterReturning(pointcut = "execution(* kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLBaseEntityDaoImpl.saveOrUpdate(..))",
-                    returning = "baseEntity")
-    public void refresh(JoinPoint joinPoint, IBaseEntity baseEntity)
+    public boolean getEnabled()
     {
-        //logger.error("*******************************************************************************");
-        //logger.error("Join point kind : " + joinPoint.getKind());
-        //logger.error("Signature declaring type : "+ joinPoint.getSignature().getDeclaringTypeName());
-        //logger.error("Signature name : " + joinPoint.getSignature().getName());
-        //logger.error("Argument count : " + joinPoint.getArgs().length);
-        //logger.error("Target class : "+ joinPoint.getTarget().getClass().getName());
-        //logger.error("This class : " + joinPoint.getThis().getClass().getName());
+        return enabled;
     }
 
-    @Around("execution(* kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLBaseEntityDaoImpl.update(..))")
-    public Object advice(ProceedingJoinPoint pjp) throws Throwable
+    public void setConcurrencyLevel(int concurrencyLevel)
     {
-        return pjp.proceed();
+        this.concurrencyLevel = concurrencyLevel;
+    }
+
+    public int getConcurrencyLevel()
+    {
+        return concurrencyLevel;
+    }
+
+    public void setDuration(long duration)
+    {
+        this.duration = duration;
+    }
+
+    public long getDuration()
+    {
+        return duration;
+    }
+
+    public void setTimeUnit(TimeUnit timeUnit)
+    {
+        this.timeUnit = timeUnit;
+    }
+
+    public TimeUnit getTimeUnit()
+    {
+        return timeUnit;
+    }
+
+    @Around("execution(* kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLBaseEntityDaoImpl.process(..))")
+    public Object processAround(ProceedingJoinPoint pjp) throws Throwable
+    {
+        if (enabled)
+        {
+            Exception exception = null;
+            IBaseEntity outputBaseEntity = null;
+
+            try
+            {
+                outputBaseEntity = (IBaseEntity)pjp.proceed();
+            }
+            catch(Exception ex)
+            {
+                exception = ex;
+            }
+
+            if (exception != null)
+            {
+                throw exception;
+            }
+            else
+            {
+                refreshBaseEntity(outputBaseEntity);
+            }
+
+            return outputBaseEntity;
+        }
+        else
+        {
+            return pjp.proceed();
+        }
+    }
+
+    private void refreshBaseEntity(IBaseEntity baseEntity)
+    {
+        IMetaClass metaClass = baseEntity.getMeta();
+
+        Iterator it = baseEntity.getIdentifiers().iterator();
+
+        while (it.hasNext())
+        {
+            String identifier = (String)it.next();
+            IMetaType type = metaClass.getMemberType(identifier);
+
+            if (!type.isSet() && type.isComplex() && (!type.isReference() & !type.isImmutable()))
+            {
+                IBaseValue baseValue = baseEntity.getBaseValue(identifier);
+                if (baseValue.getValue() != null)
+                {
+                    refreshBaseEntity((IBaseEntity)baseValue.getValue());
+                }
+            }
+
+        }
+
+        BaseEntityKey key = new BaseEntityKey(baseEntity.getId(), baseEntity.getReportDate(), baseEntity.isWithClosedValues());
+        if (cache == null)
+        {
+            reinitialize();
+        }
+        cache.put(key, baseEntity);
     }
 
 }
