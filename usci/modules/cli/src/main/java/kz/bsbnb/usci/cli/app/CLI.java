@@ -34,6 +34,7 @@ import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import org.jooq.SelectConditionStep;
+import org.jooq.SelectLimitStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.BadSqlGrammarException;
@@ -383,7 +384,7 @@ public class CLI
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
         } else {
-            SelectConditionStep where = searcher.generateSQL(entity, null);
+            SelectLimitStep where = searcher.generateSQL(entity, null);
 
             if (where != null) {
                 System.out.println(where.getSQL(true));

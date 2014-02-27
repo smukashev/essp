@@ -57,7 +57,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         return ids.size() == 1 ? ids.get(0) : null;
     }
 
-    public SelectConditionStep generateSQL(IBaseEntity entity, String entityName) {
+    public SelectLimitStep generateSQL(IBaseEntity entity, String entityName) {
         return generateSQL(entity, entityName, null);
     }
 
@@ -225,7 +225,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
     private Condition generateComplexCondition(Condition condition, String name, IBaseValue value, boolean and) {
         BaseEntity actual_complex_value = (BaseEntity)value.getValue();
 
-        SelectConditionStep innerSQL = generateSQL(actual_complex_value, name);
+        SelectLimitStep innerSQL = generateSQL(actual_complex_value, name);
 
         if (condition == null)
         {
@@ -631,7 +631,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         {
             BaseEntity actualBaseEntityValue = (BaseEntity)actSetElementValue.getValue();
 
-            SelectConditionStep innerSQL = generateSQL(actualBaseEntityValue, name,
+            SelectLimitStep innerSQL = generateSQL(actualBaseEntityValue, name,
                     simple_set.getArrayKeyFilter());
 
             if (outerComplexSQL == null) {
@@ -701,7 +701,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         return condition;
     }
 
-    public SelectConditionStep generateSQL(IBaseEntity entity, String entityName, HashMap<String, ArrayList<String>> arrayKeyFilter)
+    public SelectLimitStep generateSQL(IBaseEntity entity, String entityName, HashMap<String, ArrayList<String>> arrayKeyFilter)
     {
         MetaClass meta = entity.getMeta();
 
@@ -843,7 +843,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
         logger.debug("Searcher SQL after conditions generated: " + where.toString());
 
-        return where;
+        return where.orderBy(EAV_BE_ENTITIES.as(the_name).ID.as("inner_id"));
     }
 
     @Override
@@ -853,7 +853,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         java.util.Date reportDate =  entity.getReportDate();
         ArrayList<Long> result = new ArrayList<Long>();
 
-        SelectConditionStep where = generateSQL(entity, null);
+        SelectLimitStep where = generateSQL(entity, null);
 
         //System.out.println("Gen sql: " + where.toString());
 
