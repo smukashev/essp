@@ -152,7 +152,7 @@ meta add ref_creditor name STRING
 meta add ref_creditor nokbdb_code STRING
 meta add ref_creditor short_name STRING
 meta add ref_creditor subject_type MetaClass ref_subject_type
-meta add ref_creditor docs MetaClass document true
+meta add ref_creditor docs MetaClass document true ANY
 meta key name ref_creditor docs
 
 #====================================

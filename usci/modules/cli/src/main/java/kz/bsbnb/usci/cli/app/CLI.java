@@ -24,6 +24,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -473,7 +474,8 @@ public class CLI
         metaClassRepository.saveMetaClass(meta);
     }
 
-    public void addAttributeToMeta(String metaName, String attrName, String type, String className, boolean arrayFlag) {
+    public void addAttributeToMeta(String metaName, String attrName, String type, String className, boolean arrayFlag,
+                                   ComplexKeyTypes keyType) {
         MetaClass meta = metaClassRepository.getMetaClass(metaName);
 
         if (type.equals("MetaClass")) {
@@ -482,7 +484,11 @@ public class CLI
             if (!arrayFlag) {
                 meta.setMetaAttribute(attrName, new MetaAttribute(false, false, toAdd));
             } else {
-                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, new MetaSet(toAdd)));
+                MetaSet setToAdd = new MetaSet(toAdd);
+                if (keyType != null) {
+                    setToAdd.setArrayKeyType(keyType);
+                }
+                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, setToAdd));
             }
         } else {
             MetaValue value = new MetaValue(DataTypes.valueOf(type));
@@ -490,7 +496,11 @@ public class CLI
             if (!arrayFlag) {
                 meta.setMetaAttribute(attrName, new MetaAttribute(false, false, value));
             } else {
-                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, new MetaSet(value)));
+                MetaSet setToAdd = new MetaSet(value);
+                if (keyType != null) {
+                    setToAdd.setArrayKeyType(keyType);
+                }
+                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, setToAdd));
             }
         }
 
@@ -520,14 +530,16 @@ public class CLI
                 if (args.size() > 4) {
                     if(args.get(3).equals("MetaClass")) {
                         addAttributeToMeta(args.get(1), args.get(2), args.get(3), args.get(4),
-                                args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false);
+                                args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false,
+                                args.size() > 6 ? ComplexKeyTypes.valueOf(args.get(6)) : null);
                     } else {
                         addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
-                                args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false);
+                                args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false,
+                                args.size() > 5 ? ComplexKeyTypes.valueOf(args.get(5)) : null);
                     }
                 } else {
                     addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
-                            args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false);
+                            args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false, null);
                 }
             } else if (args.get(0).equals("remove")) {
                 if (args.size() > 2) {
