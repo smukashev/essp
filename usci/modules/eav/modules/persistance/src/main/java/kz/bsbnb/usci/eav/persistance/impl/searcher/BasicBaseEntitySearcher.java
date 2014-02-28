@@ -57,7 +57,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         return ids.size() == 1 ? ids.get(0) : null;
     }
 
-    public SelectLimitStep generateSQL(IBaseEntity entity, String entityName) {
+    public SelectConditionStep generateSQL(IBaseEntity entity, String entityName) {
         return generateSQL(entity, entityName, null);
     }
 
@@ -225,7 +225,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
     private Condition generateComplexCondition(Condition condition, String name, IBaseValue value, boolean and) {
         BaseEntity actual_complex_value = (BaseEntity)value.getValue();
 
-        SelectLimitStep innerSQL = generateSQL(actual_complex_value, name);
+        SelectConditionStep innerSQL = generateSQL(actual_complex_value, name);
 
         if (condition == null)
         {
@@ -631,7 +631,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         {
             BaseEntity actualBaseEntityValue = (BaseEntity)actSetElementValue.getValue();
 
-            SelectLimitStep innerSQL = generateSQL(actualBaseEntityValue, name,
+            SelectConditionStep innerSQL = generateSQL(actualBaseEntityValue, name,
                     simple_set.getArrayKeyFilter());
 
             if (outerComplexSQL == null) {
@@ -701,7 +701,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         return condition;
     }
 
-    public SelectLimitStep generateSQL(IBaseEntity entity, String entityName, HashMap<String, ArrayList<String>> arrayKeyFilter)
+    public SelectConditionStep generateSQL(IBaseEntity entity, String entityName, HashMap<String, ArrayList<String>> arrayKeyFilter)
     {
         MetaClass meta = entity.getMeta();
 
@@ -794,15 +794,18 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
             }
             else
             {
-                if (!type.isComplex()) {
-                    condition = generateSimpleArrayCondition(condition, name, type, value, and);
-                } else {
-                    try
-                    {
-                        condition = generateComplexArrayCondition(condition, name, type, value, and);
-                    } catch (ParseException e)
-                    {
-                        throw new IllegalArgumentException("Error in array key filter: " + e.getMessage());
+                BaseSet baseSet = (BaseSet)value.getValue();
+                if (baseSet.get().size() > 0) {
+                    if (!type.isComplex()) {
+                        condition = generateSimpleArrayCondition(condition, name, type, value, and);
+                    } else {
+                        try
+                        {
+                            condition = generateComplexArrayCondition(condition, name, type, value, and);
+                        } catch (ParseException e)
+                        {
+                            throw new IllegalArgumentException("Error in array key filter: " + e.getMessage());
+                        }
                     }
                 }
             }
@@ -843,7 +846,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
 
         logger.debug("Searcher SQL after conditions generated: " + where.toString());
 
-        return where.orderBy(EAV_BE_ENTITIES.as(the_name).ID.as("inner_id"));
+        return where;
     }
 
     @Override
@@ -853,7 +856,7 @@ public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntityS
         java.util.Date reportDate =  entity.getReportDate();
         ArrayList<Long> result = new ArrayList<Long>();
 
-        SelectLimitStep where = generateSQL(entity, null);
+        SelectConditionStep where = generateSQL(entity, null);
 
         //System.out.println("Gen sql: " + where.toString());
 

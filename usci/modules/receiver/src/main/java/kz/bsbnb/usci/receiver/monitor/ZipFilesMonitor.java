@@ -81,6 +81,8 @@ public class ZipFilesMonitor{
 
     private static final long WAIT_TIMEOUT = 3600; //in sec
 
+    private static final int MAX_FILES_IN_PROCESSING = 20;
+
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
 
@@ -179,7 +181,7 @@ public class ZipFilesMonitor{
             while(true) {
                 JobInfo nextJob;
 
-                if (serviceFactory != null && serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
+                if ((statusSingleton != null && statusSingleton.getProcessingCount() > MAX_FILES_IN_PROCESSING) || (serviceFactory != null && serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE)) {
                     try
                     {
                         sleep(1000L);

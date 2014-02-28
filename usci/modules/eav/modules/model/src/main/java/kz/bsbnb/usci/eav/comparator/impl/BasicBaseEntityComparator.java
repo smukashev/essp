@@ -259,7 +259,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
                 continue;
             }
 
-            if(type.isReference() && type.isImmutable()) {
+            if(type.isReference()) {
                 continue;
             }
 

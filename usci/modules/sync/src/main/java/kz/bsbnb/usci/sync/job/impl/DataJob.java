@@ -32,8 +32,10 @@ public final class DataJob extends AbstractDataJob {
 
         while(true) {
             try {
-                if(entities.size() > 0 && entitiesInProcess.size() < MAX_THREAD)
+                if(entities.size() > 0 && entitiesInProcess.size() < MAX_THREAD) {
+                    System.out.println("Number of threads: " + entitiesInProcess.size());
                     processNewEntities();
+                }
 
                 if(processingJobs.size() > 0)
                     removeDeadJobs();
@@ -135,7 +137,7 @@ public final class DataJob extends AbstractDataJob {
     private boolean hasCrossLine(BaseEntity entity1, BaseEntity entity2) {
         List<String> interList = comparator.intersect(entity1, entity2);
 
-        logger.debug("###################################################");
+        /*logger.debug("###################################################");
         logger.debug(entity1.toString());
         logger.debug("---------------------------------------------------");
         for (String str : interList) {
@@ -143,7 +145,13 @@ public final class DataJob extends AbstractDataJob {
         }
         logger.debug("---------------------------------------------------");
         logger.debug(entity2.toString());
-        logger.debug("###################################################");
+        logger.debug("###################################################");*/
+
+        /*System.out.println("---------------------------------------------------");
+        for (String str : interList) {
+            System.out.println(str);
+        }
+        System.out.println("---------------------------------------------------");*/
 
         if (interList.size() > 0)
             return true;

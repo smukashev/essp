@@ -61,6 +61,27 @@ public class BeStorageDaoImpl implements IBeStorageDao {
             return withClosedValues;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            BaseEntityKey that = (BaseEntityKey) o;
+
+            if (id != that.id) return false;
+            if (withClosedValues != that.withClosedValues) return false;
+            if (reportDate != null ? !reportDate.equals(that.reportDate) : that.reportDate != null) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = (int) (id ^ (id >>> 32));
+            result = 31 * result + (reportDate != null ? reportDate.hashCode() : 0);
+            result = 31 * result + (withClosedValues ? 1 : 0);
+            return result;
+        }
     }
 
     public static final boolean DEFAULT_ENABLED = true;
@@ -85,7 +106,7 @@ public class BeStorageDaoImpl implements IBeStorageDao {
     {
         cache = CacheBuilder.newBuilder()
             .concurrencyLevel(concurrencyLevel)
-            .weakKeys()
+            .softValues()
             .maximumSize(maximumSize)
             .expireAfterAccess(duration, timeUnit)
             .build(
@@ -230,14 +251,18 @@ public class BeStorageDaoImpl implements IBeStorageDao {
         while (it.hasNext())
         {
             String identifier = (String)it.next();
-            IMetaType type = metaClass.getMemberType(identifier);
+            IMetaType metaType = metaClass.getMemberType(identifier);
 
-            if (!type.isSet() && type.isComplex() && (!type.isReference() & !type.isImmutable()))
+            if (!metaType.isSet() && metaType.isComplex() && (!metaType.isReference() & !metaType.isImmutable()))
             {
-                IBaseValue baseValue = baseEntity.getBaseValue(identifier);
-                if (baseValue.getValue() != null)
+                IMetaClass childMetaClass = (IMetaClass)metaType;
+                if (childMetaClass.isSearchable())
                 {
-                    refreshBaseEntity((IBaseEntity)baseValue.getValue());
+                    IBaseValue baseValue = baseEntity.getBaseValue(identifier);
+                    if (baseValue.getValue() != null)
+                    {
+                        refreshBaseEntity((IBaseEntity)baseValue.getValue());
+                    }
                 }
             }
 
