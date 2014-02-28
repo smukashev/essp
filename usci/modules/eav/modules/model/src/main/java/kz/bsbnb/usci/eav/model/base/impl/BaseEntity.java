@@ -997,24 +997,24 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
             switch (simple_value.getTypeCode())
             {
                 case BOOLEAN:
-                    Boolean actual_boolean_value = (Boolean)value.getValue();
-                    if (actual_boolean_value == Boolean.parseBoolean(strValue)) return true;
+                    Boolean booleanValue = (Boolean)value.getValue();
+                    if (booleanValue == Boolean.parseBoolean(strValue)) return true;
                     break;
                 case DATE:
-                    java.sql.Date actual_date_value = DataUtils.convert((java.util.Date) value.getValue());
-                    if (actual_date_value == dateFormat.parse(strValue)) return true;
+                    java.sql.Date dateValue = DataUtils.convert((java.util.Date) value.getValue());
+                    if (dateValue == dateFormat.parse(strValue)) return true;
                     break;
                 case DOUBLE:
-                    Double actual_double_value = (Double)value.getValue();
-                    if (actual_double_value == Double.parseDouble(strValue)) return true;
+                    Double doubleValue = (Double)value.getValue();
+                    if (doubleValue == Double.parseDouble(strValue)) return true;
                     break;
                 case INTEGER:
-                    Integer actual_integer_value = (Integer)value.getValue();
-                    if (actual_integer_value == Integer.parseInt(strValue)) return true;
+                    Integer integerValue = (Integer)value.getValue();
+                    if (integerValue == Integer.parseInt(strValue)) return true;
                     break;
                 case STRING:
-                    String actual_string_value = (String)value.getValue();
-                    if (actual_string_value.equals(strValue)) return true;
+                    String stringValue = (String)value.getValue();
+                    if (stringValue.equals(strValue)) return true;
                     break;
                 default:
                     throw new IllegalStateException("Unknown data type: " + simple_value.getTypeCode());

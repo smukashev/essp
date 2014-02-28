@@ -31,7 +31,7 @@ import static kz.bsbnb.eav.persistance.generated.Tables.*;
 /**
  * Used to compare BaseEntity in memory, and to retrieve BaseEntities from storage by example.
  */
-@Component
+//@Component
 public class BasicBaseEntitySearcher extends JDBCSupport implements IBaseEntitySearcher
 {
     Logger logger = LoggerFactory.getLogger(BasicBaseEntitySearcher.class);

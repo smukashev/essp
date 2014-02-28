@@ -13,14 +13,14 @@ public class BasicBaseEntitySearcherPool implements IBaseEntitySearcherPool
     private HashMap<String, IBaseEntitySearcher> searchersByName = new HashMap<String, IBaseEntitySearcher>();
 
     @Autowired
-    private BasicBaseEntitySearcher basicBaseEntitySearcher;
+    private ImprovedBaseEntitySearcher baseEntitySearcher;
 
     @Override
     public IBaseEntitySearcher getSearcher(String name)
     {
         IBaseEntitySearcher searcher = searchersByName.get(name);
         if(searcher == null)
-            return basicBaseEntitySearcher;
+            return baseEntitySearcher;
         return searcher;
     }
 

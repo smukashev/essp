@@ -24,11 +24,11 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
-import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcher;
+import kz.bsbnb.usci.eav.persistance.impl.searcher.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
@@ -83,7 +83,7 @@ public class CLI
     private IBaseEntityDao baseEntityDao;
 
     @Autowired
-    private BasicBaseEntitySearcher searcher;
+    private ImprovedBaseEntitySearcher searcher;
 
     @Autowired
     private RulesSingleton rulesSingleton;
@@ -474,8 +474,7 @@ public class CLI
         metaClassRepository.saveMetaClass(meta);
     }
 
-    public void addAttributeToMeta(String metaName, String attrName, String type, String className, boolean arrayFlag,
-                                   ComplexKeyTypes keyType) {
+    public void addAttributeToMeta(String metaName, String attrName, String type, String className, boolean arrayFlag) {
         MetaClass meta = metaClassRepository.getMetaClass(metaName);
 
         if (type.equals("MetaClass")) {
@@ -484,11 +483,7 @@ public class CLI
             if (!arrayFlag) {
                 meta.setMetaAttribute(attrName, new MetaAttribute(false, false, toAdd));
             } else {
-                MetaSet setToAdd = new MetaSet(toAdd);
-                if (keyType != null) {
-                    setToAdd.setArrayKeyType(keyType);
-                }
-                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, setToAdd));
+                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, new MetaSet(toAdd)));
             }
         } else {
             MetaValue value = new MetaValue(DataTypes.valueOf(type));
@@ -496,11 +491,7 @@ public class CLI
             if (!arrayFlag) {
                 meta.setMetaAttribute(attrName, new MetaAttribute(false, false, value));
             } else {
-                MetaSet setToAdd = new MetaSet(value);
-                if (keyType != null) {
-                    setToAdd.setArrayKeyType(keyType);
-                }
-                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, setToAdd));
+                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, new MetaSet(value)));
             }
         }
 
@@ -530,16 +521,14 @@ public class CLI
                 if (args.size() > 4) {
                     if(args.get(3).equals("MetaClass")) {
                         addAttributeToMeta(args.get(1), args.get(2), args.get(3), args.get(4),
-                                args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false,
-                                args.size() > 6 ? ComplexKeyTypes.valueOf(args.get(6)) : null);
+                                args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false);
                     } else {
                         addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
-                                args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false,
-                                args.size() > 5 ? ComplexKeyTypes.valueOf(args.get(5)) : null);
+                                args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false);
                     }
                 } else {
                     addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
-                            args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false, null);
+                            args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false);
                 }
             } else if (args.get(0).equals("remove")) {
                 if (args.size() > 2) {
