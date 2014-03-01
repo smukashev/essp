@@ -2019,32 +2019,5 @@
       </docs>
       <nokbdb_code>J:Агр КредКорп:</nokbdb_code>
     </entity>
-    <entity class="ref_creditor">
-      <name>Тестовая организация</name>
-      <short_name>Тестовая организация</short_name>
-      <subject_type>
-        <code>0001</code>
-        <name_ru>Банк второго уровня</name_ru>
-        <name_kz>Банк второго уровня</name_kz>
-        <report_period_duration_months>1</report_period_duration_months>
-        <kind_id>31</kind_id>
-      </subject_type>
-      <docs>
-        <item>
-          <doc_type>
-            <code>15</code>
-            <name_ru>Банковский идентификационный код </name_ru>
-            <name_kz>Банковский идентификационный код </name_kz>
-            <short_name_ru>БИК</short_name_ru>
-            <short_name_kz>БИК</short_name_kz>
-            <is_identification>0</is_identification>
-            <is_organization_doc>1</is_organization_doc>
-            <is_person_doc>0</is_person_doc>
-            <weight>30</weight>
-          </doc_type>
-          <no>TESTBIN111</no>
-        </item>
-      </docs>
-    </entity>
   </entities>
 </batch>

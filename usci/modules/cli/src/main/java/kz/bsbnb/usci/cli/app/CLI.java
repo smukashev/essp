@@ -29,6 +29,7 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcher;
+import kz.bsbnb.usci.eav.persistance.impl.searcher.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
@@ -83,7 +84,7 @@ public class CLI
     private IBaseEntityDao baseEntityDao;
 
     @Autowired
-    private BasicBaseEntitySearcher searcher;
+    private ImprovedBaseEntitySearcher searcher;
 
     @Autowired
     private RulesSingleton rulesSingleton;
@@ -486,9 +487,7 @@ public class CLI
                 if (keyType != null) {
                     setToAdd.setArrayKeyType(keyType);
                 }
-                MetaAttribute metaAttr = new MetaAttribute(false, false, setToAdd);
-                metaAttr.setImmutable(isImmutable);
-                meta.setMetaAttribute(attrName, metaAttr);
+                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, setToAdd));
             }
         } else {
             MetaValue value = new MetaValue(DataTypes.valueOf(type));
@@ -503,10 +502,7 @@ public class CLI
                 if (keyType != null) {
                     setToAdd.setArrayKeyType(keyType);
                 }
-
-                MetaAttribute metaAttr = new MetaAttribute(false, false, setToAdd);
-                metaAttr.setImmutable(isImmutable);
-                meta.setMetaAttribute(attrName, metaAttr);
+                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, setToAdd));
             }
         }
 
@@ -537,18 +533,15 @@ public class CLI
                     if(args.get(3).equals("MetaClass")) {
                         addAttributeToMeta(args.get(1), args.get(2), args.get(3), args.get(4),
                                 args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false,
-                                args.size() > 6 ? ComplexKeyTypes.valueOf(args.get(6)) : null,
-                                args.size() > 7 ? Boolean.parseBoolean(args.get(7)) : false);
+                                args.size() > 6 ? ComplexKeyTypes.valueOf(args.get(6)) : null);
                     } else {
                         addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
                                 args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false,
-                                args.size() > 5 ? ComplexKeyTypes.valueOf(args.get(5)) : null,
-                                args.size() > 6 ? Boolean.parseBoolean(args.get(6)) : false);
+                                args.size() > 5 ? ComplexKeyTypes.valueOf(args.get(5)) : null);
                     }
                 } else {
                     addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
-                            args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false, null,
-                            args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false);
+                            args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false, null);
                 }
             } else if (args.get(0).equals("remove")) {
                 if (args.size() > 2) {
