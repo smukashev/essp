@@ -533,15 +533,18 @@ public class CLI
                     if(args.get(3).equals("MetaClass")) {
                         addAttributeToMeta(args.get(1), args.get(2), args.get(3), args.get(4),
                                 args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false,
-                                args.size() > 6 ? ComplexKeyTypes.valueOf(args.get(6)) : null);
+                                args.size() > 6 ? ComplexKeyTypes.valueOf(args.get(6)) : null,
+                                args.size() > 7 ? Boolean.parseBoolean(args.get(7)) : false);
                     } else {
                         addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
                                 args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false,
-                                args.size() > 5 ? ComplexKeyTypes.valueOf(args.get(5)) : null);
+                                args.size() > 5 ? ComplexKeyTypes.valueOf(args.get(5)) : null,
+                                args.size() > 6 ? Boolean.parseBoolean(args.get(6)) : false);
                     }
                 } else {
                     addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
-                            args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false, null);
+                            args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false, null,
+                            args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false);
                 }
             } else if (args.get(0).equals("remove")) {
                 if (args.size() > 2) {

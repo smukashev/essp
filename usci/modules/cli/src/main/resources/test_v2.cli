@@ -28,7 +28,7 @@ meta create document
 meta add document name STRING
 meta add document no STRING
 meta key name document no
-meta add document doc_type MetaClass ref_doc_type
+meta add document doc_type MetaClass ref_doc_type false ANY true
 meta key name document doc_type
 
 #====================================
@@ -79,7 +79,7 @@ meta add remains_debt_pastdue close_date DATE
 meta add remains_debt_pastdue open_date DATE
 meta add remains_debt_pastdue value DOUBLE
 meta add remains_debt_pastdue value_currency DOUBLE
-meta add remains_debt_pastdue balance_account MetaClass ref_balance_account
+meta add remains_debt_pastdue balance_account MetaClass ref_balance_account false ANY true
 
 #====================================
 #= REMAINS_DEBT_CURRENT
@@ -88,7 +88,7 @@ meta add remains_debt_pastdue balance_account MetaClass ref_balance_account
 meta create remains_debt_current
 meta add remains_debt_current value DOUBLE
 meta add remains_debt_current value_currency DOUBLE
-meta add remains_debt_current balance_account MetaClass ref_balance_account
+meta add remains_debt_current balance_account MetaClass ref_balance_account false ANY true
 
 #====================================
 #= REMAINS_DEBT_WRITE_OFF
@@ -98,7 +98,7 @@ meta create remains_debt_write_off
 meta add remains_debt_write_off value DOUBLE
 meta add remains_debt_write_off value_currency DOUBLE
 meta add remains_debt_write_off date DATE
-meta add remains_debt_write_off balance_account MetaClass ref_balance_account
+meta add remains_debt_write_off balance_account MetaClass ref_balance_account false ANY true
 
 #====================================
 #= REMAINS_INTEREST_PASTDUE
@@ -109,7 +109,7 @@ meta add remains_interest_pastdue close_date DATE
 meta add remains_interest_pastdue open_date DATE
 meta add remains_interest_pastdue value DOUBLE
 meta add remains_interest_pastdue value_currency DOUBLE
-meta add remains_interest_pastdue balance_account MetaClass ref_balance_account
+meta add remains_interest_pastdue balance_account MetaClass ref_balance_account false ANY true
 
 #====================================
 #= REMAINS_INTEREST_CURRENT
@@ -118,7 +118,7 @@ meta add remains_interest_pastdue balance_account MetaClass ref_balance_account
 meta create remains_interest_current
 meta add remains_interest_current value DOUBLE
 meta add remains_interest_current value_currency DOUBLE
-meta add remains_interest_current balance_account MetaClass ref_balance_account
+meta add remains_interest_current balance_account MetaClass ref_balance_account false ANY true
 
 #====================================
 #= REMAINS_INTEREST_WRITE_OFF
@@ -151,7 +151,7 @@ meta add ref_creditor code STRING
 meta add ref_creditor name STRING
 meta add ref_creditor nokbdb_code STRING
 meta add ref_creditor short_name STRING
-meta add ref_creditor subject_type MetaClass ref_subject_type
+meta add ref_creditor subject_type MetaClass ref_subject_type false ANY true
 meta add ref_creditor docs MetaClass document true ANY
 meta key name ref_creditor docs
 
@@ -181,7 +181,7 @@ meta add ref_contact_type name_ru STRING
 
 meta create provision
 meta add provision value DOUBLE
-meta add provision balance_account MetaClass ref_balance_account
+meta add provision balance_account MetaClass ref_balance_account false ANY true
 
 #====================================
 #= HEAD
@@ -198,7 +198,7 @@ meta add head names MetaClass person_name true
 meta create address
 meta add address details STRING
 meta add address type STRING
-meta add address region MetaClass ref_region
+meta add address region MetaClass ref_region false ANY true
 
 #====================================
 #= CONTACT
@@ -206,7 +206,7 @@ meta add address region MetaClass ref_region
 
 meta create contact
 meta add contact details STRING true
-meta add contact contact_type MetaClass ref_contact_type
+meta add contact contact_type MetaClass ref_contact_type false ANY true
 
 #====================================
 #= REMAINS_LIMIT
@@ -215,7 +215,7 @@ meta add contact contact_type MetaClass ref_contact_type
 meta create remains_limit
 meta add remains_limit value DOUBLE
 meta add remains_limit value_currency DOUBLE
-meta add remains_limit balance_account MetaClass ref_balance_account
+meta add remains_limit balance_account MetaClass ref_balance_account false ANY true
 
 #====================================
 #= REMAINS_DEBT
@@ -242,7 +242,7 @@ meta add remains_interest write_off MetaClass remains_interest_write_off
 meta create remains_correction
 meta add remains_correction value DOUBLE
 meta add remains_correction value_currency DOUBLE
-meta add remains_correction balance_account MetaClass ref_balance_account
+meta add remains_correction balance_account MetaClass ref_balance_account false ANY true
 
 #====================================
 #= REMAINS_DISCOUNT
@@ -251,7 +251,7 @@ meta add remains_correction balance_account MetaClass ref_balance_account
 meta create remains_discount
 meta add remains_discount value DOUBLE
 meta add remains_discount value_currency DOUBLE
-meta add remains_discount balance_account MetaClass ref_balance_account
+meta add remains_discount balance_account MetaClass ref_balance_account false ANY true
 
 #====================================
 #= REMAINS_DISCOUNTED_VALUE
@@ -355,7 +355,7 @@ meta add ref_offshore code STRING
 meta key name ref_offshore code
 meta add ref_offshore name_kz STRING
 meta add ref_offshore name_ru STRING
-meta add ref_offshore country MetaClass ref_country
+meta add ref_offshore country MetaClass ref_country false ANY true
 
 #====================================
 #= REF_PORTFOLIO
@@ -366,7 +366,7 @@ meta add ref_portfolio code STRING
 meta key name ref_portfolio code
 meta add ref_portfolio name_kz STRING
 meta add ref_portfolio name_ru STRING
-meta add ref_portfolio creditor MetaClass ref_creditor
+meta add ref_portfolio creditor MetaClass ref_creditor false ANY true
 
 #====================================
 #= ORGANIZATION_NAME
@@ -382,14 +382,14 @@ meta add organization_name name STRING
 
 meta create organization
 meta add organization is_se BOOLEAN
-meta add organization country MetaClass ref_country
-meta add organization econ_trade MetaClass ref_econ_trade
-meta add organization enterprise_type MetaClass ref_enterprise_type
+meta add organization country MetaClass ref_country false ANY true
+meta add organization econ_trade MetaClass ref_econ_trade false ANY true
+meta add organization enterprise_type MetaClass ref_enterprise_type false ANY true
 meta add organization head MetaClass head
-meta add organization legal_form MetaClass ref_legal_form
-meta add organization offshore MetaClass ref_offshore
+meta add organization legal_form MetaClass ref_legal_form false ANY true
+meta add organization offshore MetaClass ref_offshore false ANY true
 meta add organization addresses MetaClass address true
-meta add organization bank_relations MetaClass ref_bank_relation true
+meta add organization bank_relations MetaClass ref_bank_relation true ANY true
 meta add organization contacts MetaClass contact true
 meta add organization docs MetaClass document true
 meta add organization names MetaClass organization_name true
@@ -399,10 +399,10 @@ meta add organization names MetaClass organization_name true
 #====================================
 
 meta create person
-meta add person country MetaClass ref_country
-meta add person offshore MetaClass ref_offshore
+meta add person country MetaClass ref_country false ANY true
+meta add person offshore MetaClass ref_offshore false ANY true
 meta add person addresses MetaClass address true
-meta add person bank_relations MetaClass ref_bank_relation true
+meta add person bank_relations MetaClass ref_bank_relation true ANY true
 meta add person contacts MetaClass contact true
 meta add person docs MetaClass document true
 meta key name person docs
@@ -448,7 +448,7 @@ meta add turnover issue MetaClass turnover_issue
 #====================================
 
 meta create credit_flow
-meta add credit_flow classification MetaClass ref_classification
+meta add credit_flow classification MetaClass ref_classification false ANY true
 meta add credit_flow provision MetaClass provision_group
 
 #====================================
@@ -464,8 +464,8 @@ meta add contract no STRING
 #====================================
 
 meta create portfolio
-meta add portfolio portfolio MetaClass ref_portfolio
-meta add portfolio portfolio_msfo MetaClass ref_portfolio
+meta add portfolio portfolio MetaClass ref_portfolio false ANY true
+meta add portfolio portfolio_msfo MetaClass ref_portfolio false ANY true
 
 #====================================
 #= REF_CREDITOR_BRANCH
@@ -475,7 +475,7 @@ meta create ref_creditor_branch true true
 meta add ref_creditor_branch code STRING
 meta add ref_creditor_branch name STRING
 meta add ref_creditor_branch short_name STRING
-meta add ref_creditor_branch main_office MetaClass ref_creditor
+meta add ref_creditor_branch main_office MetaClass ref_creditor false ANY true
 meta add ref_creditor_branch docs MetaClass document true
 meta key name ref_creditor_branch docs
 
@@ -552,7 +552,7 @@ meta add ref_credit_type name_ru STRING
 meta create pledge
 meta add pledge contract STRING
 meta add pledge value DOUBLE
-meta add pledge pledge_type MetaClass ref_pledge_type
+meta add pledge pledge_type MetaClass ref_pledge_type false ANY true
 
 #====================================
 #= SUBJECT
@@ -595,15 +595,15 @@ meta add credit contract_maturity_date DATE
 meta add credit has_currency_earn BOOLEAN
 meta add credit interest_rate_yearly DOUBLE
 meta add credit contract MetaClass contract
-meta add credit credit_object MetaClass ref_credit_object
-meta add credit creditor_branch MetaClass ref_creditor_branch
-meta add credit credit_purpose MetaClass ref_credit_purpose
-meta add credit credit_type MetaClass ref_credit_type
-meta add credit currency MetaClass ref_currency
-meta add credit finance_source MetaClass ref_finance_source
+meta add credit credit_object MetaClass ref_credit_object false ANY true
+meta add credit creditor_branch MetaClass ref_creditor_branch false ANY true
+meta add credit credit_purpose MetaClass ref_credit_purpose false ANY true
+meta add credit credit_type MetaClass ref_credit_type false ANY true
+meta add credit currency MetaClass ref_currency false ANY true
+meta add credit finance_source MetaClass ref_finance_source false ANY true
 meta add credit portfolio MetaClass portfolio
 meta add credit change MetaClass change
-meta add credit creditor MetaClass ref_creditor
+meta add credit creditor MetaClass ref_creditor false ANY true
 meta key name credit creditor
 meta add credit subjects MetaClass subject true
 meta add credit pledges MetaClass pledge true
