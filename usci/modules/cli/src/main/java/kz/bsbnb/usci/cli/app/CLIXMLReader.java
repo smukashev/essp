@@ -59,6 +59,7 @@ public class CLIXMLReader
 
         FileInputStream inputStream = new FileInputStream(fileName);
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
 
         try {
             xmlEventReader = inputFactory.createXMLEventReader(inputStream);

@@ -291,8 +291,29 @@ public class ZipFilesMonitor{
                     }
 
                     if (!foundCreditor) {
-                        throw new IllegalStateException("Can't find creditor with code: " + creditorCode + " or BIN: " +
-                            creditorBIN);
+                        String creditorRNN = batchInfo.getAdditionalParams().get("RNN");
+
+                        for (Creditor creditor : creditors) {
+                            if (creditor.getRNN() != null) {
+                                if (creditor.getRNN().equals(creditorRNN)) {
+                                    cId = creditor.getId();
+                                    foundCreditor = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!foundCreditor) {
+                            logger.error("Can't find creditor with code: " + creditorCode + " or BIN: " +
+                                    creditorBIN + "or RNN: " + creditorRNN);
+
+                            statusSingleton.addBatchStatus(batchId,
+                                    new BatchStatusJModel(Global.BATCH_STATUS_ERROR,
+                                            "Can't find creditor with code: " + creditorCode + " or BIN: " +
+                                            creditorBIN + "or RNN: " + creditorRNN, new Date(), batchInfo.getUserId()));
+
+                            return;
+                        }
                     }
                 }
             }

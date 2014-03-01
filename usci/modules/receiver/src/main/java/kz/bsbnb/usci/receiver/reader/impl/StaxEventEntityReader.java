@@ -73,6 +73,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(batchFullJModel.getContent());
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
 
         try {
             xmlEventReader = inputFactory.createXMLEventReader(inputStream);

@@ -286,10 +286,9 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             String setValueAlias = "sv_" + className;
             String setAlias = "s_" + className;
             String entitySetAlias = "es_" + className;
-            Select select =
-                    metaSet.getArrayKeyType() == ComplexKeyTypes.ANY ?
-                            context.select(EAV_BE_ENTITIES.as(childEntityAlias).ID) :
-                            context.selectCount()
+            Select select = null;
+            if(metaSet.getArrayKeyType() == ComplexKeyTypes.ANY) {
+                select = context.select(EAV_BE_ENTITIES.as(childEntityAlias).ID)
                     .from(EAV_BE_ENTITIES.as(childEntityAlias))
                     .join(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
                     .on(EAV_BE_ENTITIES.as(childEntityAlias).ID.equal(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID))
@@ -299,6 +298,18 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                     .on(EAV_BE_SETS.as(setAlias).ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
                     .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
                     .and(EAV_BE_ENTITIES.as(childEntityAlias).ID.in(baseEntityIds));
+            } else {
+                select = context.selectCount()
+                        .from(EAV_BE_ENTITIES.as(childEntityAlias))
+                        .join(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
+                        .on(EAV_BE_ENTITIES.as(childEntityAlias).ID.equal(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID))
+                        .join(EAV_BE_SETS.as(setAlias))
+                        .on(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_SETS.as(setAlias).ID))
+                        .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
+                        .on(EAV_BE_SETS.as(setAlias).ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
+                        .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
+                        .and(EAV_BE_ENTITIES.as(childEntityAlias).ID.in(baseEntityIds));
+            }
 
             if (metaSet.getArrayKeyType() == ComplexKeyTypes.ANY)
             {
@@ -428,6 +439,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
     public ArrayList<Long> findAll(BaseEntity baseEntity)
     {
         ArrayList<Long> result = new ArrayList<Long>();
+        //System.out.println("################");
+        //System.out.println(baseEntity.toString());
         SelectConditionStep select = generateSQL(baseEntity, null);
 
         if (select != null)
@@ -436,7 +449,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
             long t2 = System.currentTimeMillis() - t1;
 
-            System.out.println("[searcher]: " + t2 + " (" + baseEntity.getMeta().getClassName() + ")");
+            //System.out.println("[searcher]: " + t2 + " (" + baseEntity.getMeta().getClassName() + ")");
 
             for (Map<String, Object> row : rows)
             {

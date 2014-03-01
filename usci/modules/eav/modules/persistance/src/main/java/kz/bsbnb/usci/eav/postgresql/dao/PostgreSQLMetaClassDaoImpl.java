@@ -230,10 +230,10 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             throw new IllegalArgumentException("MetaClass must have id to be updated");
         }
 
-        System.out.println("########################");
+        /*System.out.println("########################");
         System.out.println(metaClass.getClassName());
         System.out.println(metaClass.getClassTitle());
-        System.out.println("########################");
+        System.out.println("########################");   */
 
         UpdateConditionStep update = context.update(EAV_M_CLASSES
             ).set(EAV_M_CLASSES.NAME, metaClass.getClassName()
@@ -320,6 +320,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                         .set(EAV_M_COMPLEX_SET.TITLE, metaAttribute.getTitle())
                         .set(EAV_M_COMPLEX_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
                         .set(EAV_M_COMPLEX_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
+                        .set(EAV_M_COMPLEX_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
                         .set(EAV_M_COMPLEX_SET.CLASS_ID, innerId)
                         .set(EAV_M_COMPLEX_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
                         .set(EAV_M_COMPLEX_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()));
@@ -335,6 +336,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                         .set(EAV_M_SIMPLE_SET.TYPE_CODE, metaSet.getTypeCode().toString())
                         .set(EAV_M_SIMPLE_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
                         .set(EAV_M_SIMPLE_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
+                        .set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
                         .set(EAV_M_SIMPLE_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
                         .set(EAV_M_SIMPLE_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()));
             }
@@ -522,6 +524,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     ).set(EAV_M_COMPLEX_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey())
                     ).set(EAV_M_COMPLEX_SET.TITLE, metaAttribute.getTitle()
                     ).set(EAV_M_COMPLEX_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
+                    ).set(EAV_M_COMPLEX_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable())
                     ).where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(dbMeta.getId())
                     ).and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
                     ).and(EAV_M_COMPLEX_SET.NAME.eq(typeName));
@@ -580,6 +583,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     ).set(EAV_M_SIMPLE_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey())
                     ).set(EAV_M_SIMPLE_SET.TITLE, metaAttribute.getTitle()
                     ).set(EAV_M_SIMPLE_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
+                    ).set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable())
                     ).where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(dbMeta.getId())
                     ).and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
                     ).and(EAV_M_SIMPLE_SET.NAME.eq(typeName));
@@ -734,6 +738,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 EAV_M_SIMPLE_SET.CONTAINING_ID,
                 EAV_M_SIMPLE_SET.IS_KEY,
                 EAV_M_SIMPLE_SET.IS_NULLABLE,
+                EAV_M_SIMPLE_SET.IS_IMMUTABLE,
                 EAV_M_SIMPLE_SET.TYPE_CODE,
                 EAV_M_SIMPLE_SET.ARRAY_KEY_TYPE,
                 EAV_M_SIMPLE_SET.IS_REFERENCE
@@ -761,6 +766,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     ((BigDecimal)row.get("id")).longValue(),
                     ((BigDecimal)row.get("is_key")).longValue() == 1,
                     ((BigDecimal)row.get("is_nullable")).longValue() == 1);
+
+            metaAttribute.setImmutable(((BigDecimal)row.get("is_immutable")).longValue() == 1);
 
 
             MetaSet metaSet = new MetaSet(new MetaValue(DataTypes.valueOf((String) row.get("type_code"))));
@@ -833,6 +840,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         SelectForUpdateStep select = context.select(
                 EAV_M_COMPLEX_SET.ID,
                 EAV_M_COMPLEX_SET.IS_NULLABLE,
+                EAV_M_COMPLEX_SET.IS_IMMUTABLE,
                 EAV_M_COMPLEX_SET.IS_KEY,
                 EAV_M_COMPLEX_SET.NAME,
                 EAV_M_COMPLEX_SET.TITLE,
@@ -867,6 +875,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     ((BigDecimal)row.get("id")).longValue(),
                     ((BigDecimal)row.get("is_key")).longValue() == 1,
                     ((BigDecimal)row.get("is_nullable")).longValue() == 1);
+
+            metaAttribute.setImmutable(((BigDecimal)row.get("is_immutable")).longValue() == 1);
 
             MetaSet metaSet = new MetaSet(metaClass);
             metaSet.setId(((BigDecimal)row.get("id")).longValue());

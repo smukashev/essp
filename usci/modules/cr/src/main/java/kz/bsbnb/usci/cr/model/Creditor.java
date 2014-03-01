@@ -19,6 +19,7 @@ public class Creditor implements Serializable {
     private Date shutdownDate;
     private Date changeDate;
     private String BIN;
+    private String RNN;
 
     private Creditor mainOffice;
 
@@ -189,5 +190,13 @@ public class Creditor implements Serializable {
     public void setBIN(String BIN)
     {
         this.BIN = BIN;
+    }
+
+    public String getRNN() {
+        return RNN;
+    }
+
+    public void setRNN(String RNN) {
+        this.RNN = RNN;
     }
 }

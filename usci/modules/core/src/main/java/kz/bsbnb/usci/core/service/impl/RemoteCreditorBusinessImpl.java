@@ -65,6 +65,9 @@ public class RemoteCreditorBusinessImpl implements RemoteCreditorBusiness
                         if (doc_type.equals("15")) {
                             creditor.setBIN((String)docEntity.getEl("no"));
                         }
+                        if (doc_type.equals("11")) {
+                            creditor.setRNN((String)docEntity.getEl("no"));
+                        }
                     }
                 }
             }
