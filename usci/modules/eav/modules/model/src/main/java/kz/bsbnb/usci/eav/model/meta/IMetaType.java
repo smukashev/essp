@@ -14,11 +14,7 @@ public interface IMetaType extends Serializable
 
     public String toJava(String prefix);
 
-    public boolean isImmutable();
-
     public boolean isReference();
-
-    public void setImmutable(boolean value);
 
     public void setReference(boolean value);
 }

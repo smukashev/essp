@@ -465,42 +465,48 @@ public class CLI
 
     private void createMetaClass(String metaName, boolean isRef, boolean isImmutable) {
         MetaClass meta = new MetaClass(metaName);
-        meta.setImmutable(isImmutable);
         meta.setReference(isRef);
-
-        meta.setReference(isRef);
-        meta.setImmutable(isImmutable);
 
         metaClassRepository.saveMetaClass(meta);
     }
 
     public void addAttributeToMeta(String metaName, String attrName, String type, String className, boolean arrayFlag,
-                                   ComplexKeyTypes keyType) {
+                                   ComplexKeyTypes keyType, boolean isImmutable) {
         MetaClass meta = metaClassRepository.getMetaClass(metaName);
 
         if (type.equals("MetaClass")) {
             MetaClass toAdd = metaClassRepository.getMetaClass(className);
 
             if (!arrayFlag) {
-                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, toAdd));
+                MetaAttribute metaAttr = new MetaAttribute(false, false, toAdd);
+                metaAttr.setImmutable(isImmutable);
+                meta.setMetaAttribute(attrName, metaAttr);
             } else {
                 MetaSet setToAdd = new MetaSet(toAdd);
                 if (keyType != null) {
                     setToAdd.setArrayKeyType(keyType);
                 }
-                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, setToAdd));
+                MetaAttribute metaAttr = new MetaAttribute(false, false, setToAdd);
+                metaAttr.setImmutable(isImmutable);
+                meta.setMetaAttribute(attrName, metaAttr);
             }
         } else {
             MetaValue value = new MetaValue(DataTypes.valueOf(type));
 
             if (!arrayFlag) {
-                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, value));
+                MetaAttribute metaAttr = new MetaAttribute(false, false, value);
+                metaAttr.setImmutable(isImmutable);
+
+                meta.setMetaAttribute(attrName, metaAttr);
             } else {
                 MetaSet setToAdd = new MetaSet(value);
                 if (keyType != null) {
                     setToAdd.setArrayKeyType(keyType);
                 }
-                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, setToAdd));
+
+                MetaAttribute metaAttr = new MetaAttribute(false, false, setToAdd);
+                metaAttr.setImmutable(isImmutable);
+                meta.setMetaAttribute(attrName, metaAttr);
             }
         }
 
@@ -531,15 +537,18 @@ public class CLI
                     if(args.get(3).equals("MetaClass")) {
                         addAttributeToMeta(args.get(1), args.get(2), args.get(3), args.get(4),
                                 args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false,
-                                args.size() > 6 ? ComplexKeyTypes.valueOf(args.get(6)) : null);
+                                args.size() > 6 ? ComplexKeyTypes.valueOf(args.get(6)) : null,
+                                args.size() > 7 ? Boolean.parseBoolean(args.get(7)) : false);
                     } else {
                         addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
                                 args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false,
-                                args.size() > 5 ? ComplexKeyTypes.valueOf(args.get(5)) : null);
+                                args.size() > 5 ? ComplexKeyTypes.valueOf(args.get(5)) : null,
+                                args.size() > 6 ? Boolean.parseBoolean(args.get(6)) : false);
                     }
                 } else {
                     addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
-                            args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false, null);
+                            args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false, null,
+                            args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false);
                 }
             } else if (args.get(0).equals("remove")) {
                 if (args.size() > 2) {

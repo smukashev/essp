@@ -5,8 +5,10 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeStorageDao;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -251,9 +253,10 @@ public class BeStorageDaoImpl implements IBeStorageDao {
         while (it.hasNext())
         {
             String identifier = (String)it.next();
+            IMetaAttribute metaAttr = ((MetaClass)metaClass).getMetaAttribute(identifier);
             IMetaType metaType = metaClass.getMemberType(identifier);
 
-            if (!metaType.isSet() && metaType.isComplex() && (!metaType.isReference() & !metaType.isImmutable()))
+            if (!metaType.isSet() && metaType.isComplex() && (!metaType.isReference() & !metaAttr.isImmutable()))
             {
                 IMetaClass childMetaClass = (IMetaClass)metaType;
                 if (childMetaClass.isSearchable())

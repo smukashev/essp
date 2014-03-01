@@ -11,8 +11,6 @@ public interface IMetaClass extends IMetaContainer {
 
     public boolean isReference();
 
-    public boolean isImmutable();
-
     public boolean isSearchable();
 
 }

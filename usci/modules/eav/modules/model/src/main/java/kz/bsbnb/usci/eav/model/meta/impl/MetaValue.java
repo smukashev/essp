@@ -101,21 +101,9 @@ public class MetaValue implements IMetaValue
     }
 
     @Override
-    public boolean isImmutable()
-    {
-        return immutable;
-    }
-
-    @Override
     public boolean isReference()
     {
         return reference;
-    }
-
-    @Override
-    public void setImmutable(boolean value)
-    {
-        immutable = value;
     }
 
     @Override

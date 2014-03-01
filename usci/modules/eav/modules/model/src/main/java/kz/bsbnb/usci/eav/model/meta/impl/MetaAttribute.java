@@ -19,6 +19,8 @@ public class MetaAttribute extends Persistable implements IMetaAttribute
     private boolean isKey = false;
 
     private boolean isFinal = false;
+
+    private boolean immutable = false;
     /**
      * <code>true</code> if attribute can have <code>null</code> value
      * key attributes have this flag always set to false
@@ -152,5 +154,15 @@ public class MetaAttribute extends Persistable implements IMetaAttribute
     public void setFinal(boolean aFinal)
     {
         isFinal = aFinal;
+    }
+
+    public boolean isImmutable()
+    {
+        return immutable;
+    }
+
+    public void setImmutable(boolean immutable)
+    {
+        this.immutable = immutable;
     }
 }
