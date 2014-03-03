@@ -79,9 +79,7 @@ public class ZipFilesMonitor{
     public static final int ZIP_BUFFER_SIZE = 1024;
     public static final int MAX_SYNC_QUEUE_SIZE = 128;
 
-    private static final long WAIT_TIMEOUT = 3600; //in sec
-
-    private static final int MAX_FILES_IN_PROCESSING = 20;
+    private static final long WAIT_TIMEOUT = 360; //in 10 sec units
 
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
@@ -138,6 +136,8 @@ public class ZipFilesMonitor{
                 sender.addJob(batchId, batchInfo);
             }
         }
+
+        couchbaseClient.shutdown();
     }
 
     private class SenderThread extends Thread {
@@ -181,10 +181,11 @@ public class ZipFilesMonitor{
             while(true) {
                 JobInfo nextJob;
 
-                if ((statusSingleton != null && statusSingleton.getProcessingCount() > MAX_FILES_IN_PROCESSING) || (serviceFactory != null && serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE)) {
+                if (serviceFactory != null && serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
+                    System.out.println("Can't send more files because of file limit or sync queue overload.");
                     try
                     {
-                        sleep(1000L);
+                        sleep(10000L);
                     } catch (InterruptedException e)
                     {
                         e.printStackTrace();

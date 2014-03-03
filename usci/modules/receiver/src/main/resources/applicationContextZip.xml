@@ -57,7 +57,7 @@
         <property name="jobRepository" ref="jobRepository" />
         <property name="taskExecutor">
             <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor">
-                <property name="concurrencyLimit" value="3" />
+                <property name="concurrencyLimit" value="20" />
             </bean>
         </property>
     </bean>
@@ -67,7 +67,7 @@
             <batch:tasklet>
                 <batch:chunk reader="staxEventEntityReader"
                              writer="rmiEventEntityWriter"
-                             processor="entityProcessor" commit-interval="10"/>
+                             processor="entityProcessor" commit-interval="5"/>
             </batch:tasklet>
         </batch:step>
         <batch:listeners>

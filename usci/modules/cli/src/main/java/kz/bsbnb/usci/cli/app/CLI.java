@@ -736,10 +736,10 @@ public class CLI
                             System.out.println("Error can't mark sent file: " + id);
                         }
 
-                        Thread.sleep(1000);
+                        Thread.sleep(10000);
                     } else {
                         System.out.println("Nothing to do.");
-                        Thread.sleep(1000);
+                        Thread.sleep(10000);
                     }
                 } catch (SQLException e)
                 {

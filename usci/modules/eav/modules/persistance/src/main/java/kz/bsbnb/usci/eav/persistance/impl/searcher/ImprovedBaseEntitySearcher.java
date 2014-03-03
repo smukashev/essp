@@ -47,13 +47,21 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
     @Override
     public Long findSingle(BaseEntity entity)
     {
+        if (entity.getId() > 0)
+            return entity.getId();
+
         List<Long> ids = findAll(entity);
 
         if (ids.size() > 1) {
             //throw new RuntimeException("Found more than one instance of BaseEntity. Needed one.");
         }
 
-        return ids.size() == 1 ? ids.get(0) : null;
+        Long id = ids.size() == 1 ? ids.get(0) : null;
+
+        if (id != null)
+            entity.setId(id);
+
+        return id;
     }
 
     public SelectConditionStep generateSQL(IBaseEntity entity, String entityName) {

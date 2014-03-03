@@ -378,6 +378,12 @@
         <index-column name="set_id"/>
         <index-column name="is_last"/>
       </index>
+      <index name="eav_ind_004_02">
+          <index-column name="set_id"/>
+        </index>
+      <index name="eav_ind_004_03">
+          <index-column name="entity_value_id"/>
+        </index>
     </table>
     <!-- EAV_BE_COMPLEX_VALUES -->
     <table name="eav_be_complex_values">
@@ -415,6 +421,13 @@
         <unique-column name="attribute_id"/>
         <unique-column name="report_date"/>
       </unique>
+      <index name="eav_ind_006_00">
+          <index-column name="entity_value_id"/>
+          <index-column name="attribute_id"/>
+        </index>
+      <index name="eav_ind_007_00">
+        <index-column name="entity_id"/>
+      </index>
     </table>
     <!-- EAV_BE_DATE_SET_VALUES -->
     <table name="eav_be_date_set_values">

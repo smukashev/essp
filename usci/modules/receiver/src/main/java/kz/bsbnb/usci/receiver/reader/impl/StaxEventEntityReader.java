@@ -65,11 +65,13 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     @PostConstruct
     public void init() {
-        logger.info("Reader init.");
+        //logger.info("Reader init.");
         batchService = serviceRepository.getBatchService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
         couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
         batchFullJModel = gson.fromJson(couchbaseClient.get("batch:" + batchId).toString(), BatchFullJModel.class);
+
+        couchbaseClient.shutdown();
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(batchFullJModel.getContent());
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -86,15 +88,15 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     public void startElement(XMLEvent event, StartElement startElement, String localName) {
         if(localName.equals("batch")) {
-            logger.info("batch");
+            //logger.info("batch");
         } else if(localName.equals("entities")) {
-            logger.info("entities");
+            //logger.info("entities");
         } else if(localName.equals("entity")) {
-            logger.info("entity");
+            //logger.info("entity");
             currentContainer = metaFactoryService.getBaseEntity(
                     startElement.getAttributeByName(new QName("class")).getValue());
         } else {
-            logger.info("other: " + localName);
+            //logger.info("other: " + localName);
             IMetaType metaType = currentContainer.getMemberType(localName);
 
             if(metaType.isSet()) {
@@ -128,7 +130,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     @Override
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException {
-        logger.info("Read called");
+        //logger.info("Read called");
         System.out.println("Sync queue size: " + serviceFactory.getEntityService().getQueueSize());
         long sleepCounter = 0;
         while(serviceFactory.getEntityService().getQueueSize() > ZipFilesMonitor.MAX_SYNC_QUEUE_SIZE) {
@@ -149,7 +151,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             XMLEvent event = (XMLEvent) xmlEventReader.next();
 
             if(event.isStartDocument()) {
-                logger.info("start document");
+                //logger.info("start document");
             } else if(event.isStartElement()) {
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
@@ -161,10 +163,10 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
                 if(endElement(localName)) return (T) currentContainer;
             } else if(event.isEndDocument()) {
-                logger.info("end document");
+                //logger.info("end document");
                 //couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
             } else {
-                logger.info(event);
+                //logger.info(event);
             }
         }
 
@@ -173,9 +175,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     public boolean endElement(String localName) {
         if(localName.equals("batch")) {
-            logger.info("batch");
+            //logger.info("batch");
         } else if(localName.equals("entities")) {
-            logger.info("entities");
+            //logger.info("entities");
             currentContainer = null;
             return true;
         } else if(localName.equals("entity")) {
