@@ -9,6 +9,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.IMetaValue;
@@ -342,7 +343,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         {
             boolean last = maxReportDate ? true : !presentInFuture(baseEntity, attribute);
 
-            IMetaType metaType = baseEntity.getMemberType(attribute);
+            IMetaAttribute metaAttribute = baseEntity.getMetaAttribute(attribute);
+            IMetaType metaType = metaAttribute.getMetaType();
             IBaseValue baseValueForSave = baseEntity.getBaseValue(attribute);
             if (baseValueForSave.getValue() == null)
             {
@@ -370,8 +372,29 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     }
                     else
                     {
-                        IBaseEntity baseEntityApplied = apply((BaseEntity)baseValueForSave.getValue());
-                        baseValueForSave.setValue(baseEntityApplied);
+                        if (metaAttribute.isImmutable())
+                        {
+                            IBaseEntity baseEntityForSave = (IBaseEntity)baseValueForSave.getValue();
+                            if (baseEntityForSave.getId() < 1)
+                            {
+                                throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
+                                        baseEntityForSave.getMeta().getClassName() + "\n" + baseEntityForSave.toString());
+                            }
+
+                            IBaseEntity immutableBaseEntity = load(baseEntityForSave.getId(), baseEntityForSave.getReportDate());
+                            if (immutableBaseEntity == null)
+                            {
+                                throw new RuntimeException(String.format("Instance of BaseEntity with id {0} not found in the DB.",
+                                        baseEntityForSave.getId()));
+                            }
+
+                            baseValueForSave.setValue(immutableBaseEntity);
+                        }
+                        else
+                        {
+                            IBaseEntity baseEntityApplied = apply((BaseEntity)baseValueForSave.getValue());
+                            baseValueForSave.setValue(baseEntityApplied);
+                        }
                     }
                 }
 
@@ -420,7 +443,8 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
 
         for (String attribute: otherAttributes)
         {
-            IMetaType metaType = baseEntityLoaded.getMemberType(attribute);
+            IMetaAttribute metaAttribute = baseEntityLoaded.getMetaAttribute(attribute);
+            IMetaType metaType = metaAttribute.getMetaType();
             IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
             IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
 
@@ -493,20 +517,40 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                     long forSaveId = ((BaseEntity)baseValueForSave.getValue()).getId();
                     long loadedId = ((BaseEntity)baseValueLoaded.getValue()).getId();
 
-                    if (forSaveId != loadedId)
+                    if (metaAttribute.isImmutable())
                     {
-                        IBaseValue baseValue = ((BaseValue)baseValueForSave).clone();
-                        IBaseEntity baseEntity = apply((BaseEntity)baseValue.getValue());
-                        baseValue.setValue(baseEntity);
-                        baseValue.setLast(baseEntityLoaded.isMaxReportDate() ? true : baseValueLoaded.isLast());
+                        if (forSaveId != loadedId)
+                        {
+                            IBaseEntity immutableBaseEntity = load(forSaveId, baseEntityForSave.getReportDate());
+                            if (immutableBaseEntity == null)
+                            {
+                                throw new RuntimeException(String.format("Instance of BaseEntity with id {0} not found in the DB.", forSaveId));
+                            }
 
-                        baseEntityLoaded.put(attribute, baseValue);
+                            IBaseValue baseValue = ((BaseValue)baseValueForSave).clone();
+                            baseValue.setValue(immutableBaseEntity);
+                            baseValue.setLast(baseEntityLoaded.isMaxReportDate() ? true : baseValueLoaded.isLast());
+
+                            baseEntityLoaded.put(attribute, baseValue);
+                        }
                     }
                     else
                     {
+                        if (forSaveId != loadedId)
+                        {
+                            IBaseValue baseValue = ((BaseValue)baseValueForSave).clone();
+                            IBaseEntity baseEntity = apply((BaseEntity)baseValue.getValue());
+                            baseValue.setValue(baseEntity);
+                            baseValue.setLast(baseEntityLoaded.isMaxReportDate() ? true : baseValueLoaded.isLast());
 
-                        IBaseEntity baseEntity = apply(((BaseEntity)baseValueForSave.getValue()).clone());
-                        baseValueLoaded.setValue(baseEntity);
+                            baseEntityLoaded.put(attribute, baseValue);
+                        }
+                        else
+                        {
+
+                            IBaseEntity baseEntity = apply(((BaseEntity)baseValueForSave.getValue()).clone());
+                            baseValueLoaded.setValue(baseEntity);
+                        }
                     }
                 }
             }

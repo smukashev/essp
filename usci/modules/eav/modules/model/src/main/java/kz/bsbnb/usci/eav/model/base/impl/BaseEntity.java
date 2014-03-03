@@ -842,7 +842,13 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     private void setListeners(String attribute)
     {
-        IMetaType metaType = meta.getMemberType(attribute);
+        IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
+        if (metaAttribute.isImmutable())
+        {
+            return;
+        }
+
+        IMetaType metaType = metaAttribute.getMetaType();
         if (metaType.isComplex())
         {
             IBaseValue baseValue = values.get(attribute);
@@ -915,7 +921,14 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     public void removeListeners(String attribute)
     {
-        IMetaType metaType = meta.getMemberType(attribute);
+
+        IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
+        if (metaAttribute.isImmutable())
+        {
+            return;
+        }
+
+        IMetaType metaType = metaAttribute.getMetaType();
         if (!metaType.isSet() && metaType.isComplex())
         {
             IBaseValue baseValue = values.get(attribute);

@@ -377,6 +377,14 @@ meta add organization_name lang STRING
 meta add organization_name name STRING
 
 #====================================
+#= BANK_RELATION
+#====================================
+
+meta create bank_relation
+meta add bank_relation bank_relation MetaClass ref_bank_relation false ANY true
+meta add bank_relation creditor MetaClass ref_creditor false ANY true
+
+#====================================
 #= ORGANIZATION
 #====================================
 
@@ -389,7 +397,7 @@ meta add organization head MetaClass head
 meta add organization legal_form MetaClass ref_legal_form false ANY true
 meta add organization offshore MetaClass ref_offshore false ANY true
 meta add organization addresses MetaClass address true
-meta add organization bank_relations MetaClass ref_bank_relation true ANY true
+meta add organization bank_relations MetaClass bank_relation true ANY true
 meta add organization contacts MetaClass contact true
 meta add organization docs MetaClass document true
 meta add organization names MetaClass organization_name true
@@ -402,7 +410,7 @@ meta create person
 meta add person country MetaClass ref_country false ANY true
 meta add person offshore MetaClass ref_offshore false ANY true
 meta add person addresses MetaClass address true
-meta add person bank_relations MetaClass ref_bank_relation true ANY true
+meta add person bank_relations MetaClass bank_relation true ANY true
 meta add person contacts MetaClass contact true
 meta add person docs MetaClass document true
 meta key name person docs
@@ -625,7 +633,9 @@ sql insert into audit_event_kind (name,is_always_auditable,is_active,code) value
 
 #quit
 
-entity read  usci/modules/cli/src/main/resources/refs/doc1.xml
+#entity read  usci/modules/cli/src/main/resources/refs/doc1.xml
+entity read  usci/modules/cli/src/main/resources/refs/ref_subject_type.xml
+entity read  usci/modules/cli/src/main/resources/refs/ref_doc_type.xml
 entity read  usci/modules/cli/src/main/resources/refs/ref_balance_account.xml
 entity read  usci/modules/cli/src/main/resources/refs/ref_bank_relation.xml
 entity read  usci/modules/cli/src/main/resources/refs/ref_classification.xml
@@ -637,7 +647,6 @@ entity read  usci/modules/cli/src/main/resources/refs/ref_credit_type.xml
 entity read  usci/modules/cli/src/main/resources/refs/ref_creditor.xml
 entity read  usci/modules/cli/src/main/resources/refs/ref_creditor_branch.xml
 entity read  usci/modules/cli/src/main/resources/refs/ref_currency.xml
-entity read  usci/modules/cli/src/main/resources/refs/ref_doc_type.xml
 entity read  usci/modules/cli/src/main/resources/refs/ref_econ_trade.xml
 entity read  usci/modules/cli/src/main/resources/refs/ref_enterprise_type.xml
 entity read  usci/modules/cli/src/main/resources/refs/ref_finance_source.xml

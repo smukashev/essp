@@ -22,8 +22,14 @@ public class SetUtils
 
 	public static <T> Set<T> difference(Set<T> setA, Set<T> setB)
     {
-		Set<T> tmp = new HashSet<T>(setA);
-		tmp.removeAll(setB);
+		Set<T> tmp = new HashSet<T>();
+        for (T key : setA)
+        {
+            if (!setB.contains(key))
+            {
+                tmp.add(key);
+            }
+        }
 		return tmp;
 	}
 

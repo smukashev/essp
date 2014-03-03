@@ -595,6 +595,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_KEY, DataUtils.convert(metaAttribute.isKey())
                     ).set(EAV_M_COMPLEX_ATTRIBUTES.TITLE, metaAttribute.getTitle()
                     ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
+                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable())
                     ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId())
                     ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
                     ).and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
@@ -605,6 +606,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     ).set(EAV_M_SIMPLE_ATTRIBUTES.IS_KEY, DataUtils.convert(metaAttribute.isKey())
                     ).set(EAV_M_SIMPLE_ATTRIBUTES.TITLE, metaAttribute.getTitle()
                     ).set(EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
+                    ).set(EAV_M_SIMPLE_ATTRIBUTES.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable())
                     ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId())
                     ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
                     ).and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
@@ -692,6 +694,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID,
                 EAV_M_SIMPLE_ATTRIBUTES.IS_KEY,
                 EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE,
+                EAV_M_SIMPLE_ATTRIBUTES.IS_IMMUTABLE,
                 EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL
             ).from(EAV_M_SIMPLE_ATTRIBUTES
         ).where(
@@ -720,6 +723,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     ((BigDecimal)row.get("is_nullable")).longValue() == 1);
 
             metaAttirubute.setFinal(((BigDecimal)row.get("is_final")).longValue() == 1);
+            metaAttirubute.setImmutable(((BigDecimal) row.get("is_immutable")).longValue() == 1);
 
             metaAttirubute.setMetaType(new MetaValue(DataTypes.valueOf((String) row.get("type_code"))));
             metaAttirubute.setTitle((String) row.get("title"));
@@ -792,6 +796,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 EAV_M_COMPLEX_ATTRIBUTES.IS_KEY,
                 EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE,
                 EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL,
+                EAV_M_COMPLEX_ATTRIBUTES.IS_IMMUTABLE,
                 EAV_M_COMPLEX_ATTRIBUTES.NAME,
                 EAV_M_COMPLEX_ATTRIBUTES.TITLE,
                 EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE,
@@ -824,7 +829,8 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
             MetaAttribute metaAttribute = new MetaAttribute(
                     ((BigDecimal)row.get("id")).longValue(),
                     ((BigDecimal)row.get("is_key")).longValue() == 1,
-                    ((BigDecimal)row.get("is_nullable")).longValue() == 1);
+                    ((BigDecimal)row.get("is_nullable")).longValue() == 1); 
+            metaAttribute.setImmutable(((BigDecimal)row.get("is_immutable")).longValue() == 1);
 
             metaAttribute.setFinal(((BigDecimal)row.get("is_final")).longValue() == 1);
 
@@ -876,7 +882,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     ((BigDecimal)row.get("is_key")).longValue() == 1,
                     ((BigDecimal)row.get("is_nullable")).longValue() == 1);
 
-            metaAttribute.setImmutable(((BigDecimal)row.get("is_immutable")).longValue() == 1);
+            metaAttribute.setImmutable(((BigDecimal) row.get("is_immutable")).longValue() == 1);
 
             MetaSet metaSet = new MetaSet(metaClass);
             metaSet.setId(((BigDecimal)row.get("id")).longValue());

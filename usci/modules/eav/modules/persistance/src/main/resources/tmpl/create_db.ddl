@@ -344,6 +344,13 @@
         <index-column name="attribute_id"/>
         <index-column name="is_last"/>
       </index>
+      <index name="eav_ind_003_02">
+        <index-column name="entity_id"/>
+      </index>
+      <index name="eav_ind_003_03">
+        <index-column name="attribute_id"/>
+        <index-column name="value"/>
+      </index>
       <unique name="eav_uk_003_00">
         <unique-column name="entity_id"/>
         <unique-column name="attribute_id"/>
@@ -425,11 +432,11 @@
         <unique-column name="attribute_id"/>
         <unique-column name="report_date"/>
       </unique>
-      <index name="eav_ind_006_00">
+      <index name="eav_ind_005_02">
           <index-column name="entity_value_id"/>
           <index-column name="attribute_id"/>
         </index>
-      <index name="eav_ind_007_00">
+      <index name="eav_ind_005_03">
         <index-column name="entity_id"/>
       </index>
     </table>
@@ -489,6 +496,13 @@
         <index-column name="entity_id"/>
         <index-column name="attribute_id"/>
         <index-column name="is_last"/>
+      </index>
+      <index name="eav_ind_007_02">
+        <index-column name="entity_id"/>
+      </index>
+      <index name="eav_ind_007_03">
+        <index-column name="attribute_id"/>
+        <index-column name="value"/>
       </index>
       <unique name="eav_uk_007_00">
         <unique-column name="entity_id"/>
@@ -552,6 +566,13 @@
         <index-column name="entity_id"/>
         <index-column name="attribute_id"/>
         <index-column name="is_last"/>
+      </index>
+      <index name="eav_ind_009_02">
+        <index-column name="entity_id"/>
+      </index>
+      <index name="eav_ind_009_03">
+        <index-column name="attribute_id"/>
+        <index-column name="value"/>
       </index>
       <unique name="eav_uk_009_00">
         <unique-column name="entity_id"/>
@@ -726,6 +747,13 @@
         <index-column name="attribute_id"/>
         <index-column name="is_last"/>
       </index>
+      <index name="eav_ind_016_02">
+        <index-column name="entity_id"/>
+      </index>
+      <index name="eav_ind_016_03">
+        <index-column name="attribute_id"/>
+        <index-column name="value"/>
+      </index>
       <unique name="eav_uk_016_00">
         <unique-column name="entity_id"/>
         <unique-column name="attribute_id"/>
@@ -878,6 +906,13 @@
         <index-column name="entity_id"/>
         <index-column name="attribute_id"/>
         <index-column name="is_last"/>
+      </index>
+      <index name="eav_ind_021_02">
+        <index-column name="entity_id"/>
+      </index>
+      <index name="eav_ind_021_03">
+        <index-column name="attribute_id"/>
+        <index-column name="value"/>
       </index>
       <unique>
         <unique-column name="entity_id"/>
