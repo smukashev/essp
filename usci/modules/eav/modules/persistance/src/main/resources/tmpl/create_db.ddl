@@ -384,6 +384,10 @@
       <index name="eav_ind_004_03">
           <index-column name="entity_value_id"/>
         </index>
+      <index name="eav_ind_004_04">
+        <index-column name="entity_value_id"/>
+        <index-column name="set_id"/>
+      </index>
     </table>
     <!-- EAV_BE_COMPLEX_VALUES -->
     <table name="eav_be_complex_values">
