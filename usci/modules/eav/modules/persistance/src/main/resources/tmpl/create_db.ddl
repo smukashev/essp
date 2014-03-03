@@ -170,7 +170,7 @@
       <column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
       <column name="array_key_type" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
       <column name="class_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-      <column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+      <!--<column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>-->
       <column name="is_reference" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
       <unique>
         <unique-column name="id"/>
@@ -267,7 +267,7 @@
       <column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
       <column name="array_key_type" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
       <column name="type_code" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
-      <column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+      <!--<column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>-->
       <column name="is_reference" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
       <unique>
         <unique-column name="id"/>
@@ -377,6 +377,10 @@
       <index name="eav_ind_004_01">
         <index-column name="set_id"/>
         <index-column name="is_last"/>
+      </index>
+      <index name="eav_ind_004_02">
+        <index-column name="entity_value_id"/>
+        <index-column name="set_id"/>
       </index>
     </table>
     <!-- EAV_BE_COMPLEX_VALUES -->
