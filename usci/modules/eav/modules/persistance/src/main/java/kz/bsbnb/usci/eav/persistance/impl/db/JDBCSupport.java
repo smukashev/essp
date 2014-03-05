@@ -95,7 +95,7 @@ public class JDBCSupport {
         double t2 = System.nanoTime() - t1;
         if(sqlStats != null)
         {
-            sqlStats.put(sql, t2 / 1000);
+            sqlStats.put(sql, t2 / 1000000);
         }
 
         return count;
@@ -125,7 +125,20 @@ public class JDBCSupport {
     {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
+        double t1 = 0;
+        if(sqlStats != null)
+            t1 = System.nanoTime();
+
         jdbcTemplate.update(new GenericInsertPreparedStatementCreator(query, values), keyHolder);
+
+        double t2 = System.nanoTime() - t1;
+        //double t3 = (t2 % rows.size()) / 1000;
+
+        if(sqlStats != null)
+        {
+            //for (int i = 0; i < rows.size(); i++)
+            sqlStats.put(query, t2 / 1000000);
+        }
 
         return keyHolder.getKey().longValue();
     }

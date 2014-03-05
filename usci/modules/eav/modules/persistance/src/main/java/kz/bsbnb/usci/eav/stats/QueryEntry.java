@@ -1,6 +1,8 @@
 package kz.bsbnb.usci.eav.stats;
 
-public class QueryEntry {
+import java.io.Serializable;
+
+public class QueryEntry implements Serializable {
     public double maxTime;
     public double minTime;
     public double totalTime;

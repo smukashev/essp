@@ -10,6 +10,7 @@ import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
+import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -33,6 +34,7 @@ import kz.bsbnb.usci.eav.persistance.impl.searcher.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import org.jooq.SelectConditionStep;
@@ -650,7 +652,7 @@ public class CLI
                 preparedStatement = conn.prepareStatement("select xf.id, xf.file_name, xf.file_content\n" +
                         "  from core.xml_file xf\n" +
                         " where xf.status = 'COMPLETED'\n" +
-                        "   and xf.sent = 0");
+                        "   and xf.sent = 0 order by xf.id asc");
 
                 preparedStatementDone = conn.prepareStatement("update core.xml_file xf \n" +
                         "   set xf.sent = 1 \n" +
@@ -758,6 +760,74 @@ public class CLI
             System.out.println("Argument needed: <credits_db_url> <user> <password> <receiver_url> <temp_files_folder>");
             System.out.println("Example: import jdbc:oracle:thin:@srv-scan.corp.nb.rk:1521/DBM01 core ***** rmi://127.0.0.1:1097/batchProcessService D:\\usci\\temp_xml_folder");
             System.out.println("Example: import jdbc:oracle:thin:@192.168.0.44:1521/CREDITS core core_feb_2013 rmi://127.0.0.1:1097/batchProcessService /home/a.tkachenko/temp_files");
+        }
+    }
+
+    public void commandSQLStat()
+    {
+        if (args.size() > 0) {
+            Connection conn = null;
+
+            RmiProxyFactoryBean serviceFactory = null;
+
+            IEntityService entityService = null;
+
+            try {
+                serviceFactory = new RmiProxyFactoryBean();
+                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+                serviceFactory.setServiceUrl(args.get(0));
+                serviceFactory.setServiceInterface(IEntityService.class);
+                serviceFactory.setRefreshStubOnConnectFailure(true);
+
+                serviceFactory.afterPropertiesSet();
+                entityService = (IEntityService) serviceFactory.getObject();
+            } catch (Exception e) {
+                System.out.println("Can't connect to receiver service: " + e.getMessage());
+            }
+
+            HashMap<String, QueryEntry> map = entityService.getSQLStats();
+
+            System.out.println();
+            System.out.println("+---------+------------------+------------------------+");
+            System.out.println("|  count  |     avg (ms)     |       total (ms)       |");
+            System.out.println("+---------+------------------+------------------------+");
+
+            double totalInserts = 0;
+            double totalSelects = 0;
+            double totalProcess = 0;
+            int totalProcessCount = 0;
+
+            for (String query : map.keySet()) {
+                QueryEntry qe = map.get(query);
+
+                System.out.printf("| %7d | %16.6f | %22.6f | %s%n", qe.count,
+                        qe.totalTime / qe.count, qe.totalTime, query);
+
+                if (query.startsWith("insert")) {
+                    totalInserts += qe.totalTime;
+                }
+                if (query.startsWith("select")) {
+                    totalSelects += qe.totalTime;
+                }
+                if (query.startsWith("coreService")) {
+                    totalProcess += qe.totalTime;
+                    totalProcessCount += qe.count;
+                }
+            }
+
+            System.out.println("+---------+------------------+------------------------+");
+
+            if(totalProcessCount > 0) {
+                System.out.println("AVG process: " + totalProcess / totalProcessCount);
+                System.out.println("AVG inserts per process: " + totalInserts / totalProcessCount);
+                System.out.println("AVG selects per process: " + totalSelects / totalProcessCount);
+            }
+
+            entityService.clearSQLStats();
+
+        } else {
+            System.out.println("Argument needed: <core_url>");
+            System.out.println("Example: sqlstat rmi://127.0.0.1:1099/entityService");
         }
     }
 
@@ -1150,6 +1220,8 @@ public class CLI
                         commandRule(in);
                     } else if(command.equals("import")) {
                         commandImport();
+                    } else if(command.equals("sqlstat")) {
+                        commandSQLStat();
                     } else {
                         System.out.println("No such command: " + command);
                     }

@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class SQLQueriesStats {
     private HashMap<String, QueryEntry> stats = new HashMap<String, QueryEntry>();
 
-    public void put(String query, double time)
+    public synchronized void put(String query, double time)
     {
         QueryEntry qe = stats.get(query);
 
@@ -35,12 +35,24 @@ public class SQLQueriesStats {
         }
     }
 
-    public HashMap<String, QueryEntry> getStats()
+    public synchronized HashMap<String, QueryEntry> getStats()
     {
-        return stats;
+        HashMap<String, QueryEntry> ret = new HashMap<String, QueryEntry>();
+
+        for(String query : stats.keySet()) {
+            QueryEntry cur = stats.get(query);
+            QueryEntry qe = new QueryEntry();
+            qe.maxTime = cur.maxTime;
+            qe.minTime = cur.minTime;
+            qe.totalTime = cur.totalTime;
+            qe.count = cur.count;
+            ret.put(query, qe);
+        }
+
+        return ret;
     }
 
-    public void clear()
+    public synchronized void clear()
     {
         stats.clear();
     }

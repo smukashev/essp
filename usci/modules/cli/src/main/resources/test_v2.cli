@@ -658,6 +658,6 @@ entity read  usci/modules/cli/src/main/resources/refs/ref_region.xml
 #entity read  usci/modules/cli/src/main/resources/refs/ref_shared.xml
 
 
-rule create package credit_parser
+#rule create package credit_parser
 
 quit

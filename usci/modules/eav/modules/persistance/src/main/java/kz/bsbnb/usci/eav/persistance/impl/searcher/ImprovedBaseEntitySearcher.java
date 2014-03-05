@@ -428,9 +428,9 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
         if (select != null)
         {
-            long t1 = System.currentTimeMillis();
+            //long t1 = System.currentTimeMillis();
             List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-            long t2 = System.currentTimeMillis() - t1;
+            //long t2 = System.currentTimeMillis() - t1;
 
             //System.out.println("[searcher]: " + t2 + " (" + baseEntity.getMeta().getClassName() + ")");
 

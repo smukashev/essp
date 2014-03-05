@@ -39,15 +39,27 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     IBaseEntityDao baseEntityDao;
 
     @Override
+    @Deprecated
     public BaseEntity getBaseEntity(String className) {
-        // TODO: Implement generation of the reporting date.
+        // TODO: remove
         return new BaseEntity(metaClassRepository.getMetaClass(className), new Date());
     }
 
     @Override
+    @Deprecated
     public BaseEntity getBaseEntity(MetaClass metaClass) {
-        // TODO: Implement generation of the reporting date.
+        // TODO: remove
         return new BaseEntity(metaClass, new Date());
+    }
+
+    @Override
+    public BaseEntity getBaseEntity(String className, Date reportDate) {
+        return new BaseEntity(metaClassRepository.getMetaClass(className), reportDate);
+    }
+
+    @Override
+    public BaseEntity getBaseEntity(MetaClass metaClass, Date reportDate) {
+        return new BaseEntity(metaClass, reportDate);
     }
 
     @Override

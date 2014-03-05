@@ -4,6 +4,7 @@ import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
@@ -94,7 +95,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         } else if(localName.equals("entity")) {
             //logger.info("entity");
             currentContainer = metaFactoryService.getBaseEntity(
-                    startElement.getAttributeByName(new QName("class")).getValue());
+                    startElement.getAttributeByName(new QName("class")).getValue(), batch.getRepDate());
         } else {
             //logger.info("other: " + localName);
             IMetaType metaType = currentContainer.getMemberType(localName);
@@ -105,7 +106,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 level++;
             } else if(metaType.isComplex() && !metaType.isSet()) {
                 stack.push(currentContainer);
-                currentContainer = metaFactoryService.getBaseEntity((MetaClass)metaType);
+                currentContainer = new BaseEntity((MetaClass)metaType, batch.getRepDate());
+                //metaFactoryService.getBaseEntity((MetaClass)metaType, batch.getRepDate());
                 level++;
             } else if(!metaType.isComplex() && !metaType.isSet()) {
                 Object o = null;
@@ -131,10 +133,10 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     @Override
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException {
         //logger.info("Read called");
-        System.out.println("Sync queue size: " + serviceFactory.getEntityService().getQueueSize());
+        //System.out.println("Sync queue size: " + serviceFactory.getEntityService().getQueueSize());
         long sleepCounter = 0;
         while(serviceFactory.getEntityService().getQueueSize() > ZipFilesMonitor.MAX_SYNC_QUEUE_SIZE) {
-            System.out.println("Sync queue limit exceeded: " + serviceFactory.getEntityService().getQueueSize());
+            //System.out.println("Sync queue limit exceeded: " + serviceFactory.getEntityService().getQueueSize());
             try
             {
                 Thread.sleep(1000);

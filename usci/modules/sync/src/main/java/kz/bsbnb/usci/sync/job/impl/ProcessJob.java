@@ -10,6 +10,7 @@ import kz.bsbnb.usci.sync.job.AbstractJob;
 public class ProcessJob extends AbstractJob {
     private BaseEntity baseEntity;
     private IEntityService entityService;
+    private long timeSpent = 0;
 
     public ProcessJob(IEntityService entityService, BaseEntity baseEntity) {
         this.entityService = entityService;
@@ -20,12 +21,16 @@ public class ProcessJob extends AbstractJob {
     public void run() {
         long t1 = System.currentTimeMillis();
         entityService.save(baseEntity);
-        long t2 = System.currentTimeMillis() - t1;
+        timeSpent = System.currentTimeMillis() - t1;
 
-        System.out.println("[sync][save]                :               " + t2);
+        //System.out.println("[sync][save]                :               " + t2);
     }
 
     public BaseEntity getBaseEntity() {
         return baseEntity;
+    }
+
+    public long getTimeSpent() {
+        return timeSpent;
     }
 }

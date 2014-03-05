@@ -57,6 +57,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
         while(iter.hasNext()) {
             BaseEntity entity = (BaseEntity)iter.next();
+            //System.out.println(entity.toString());
 
             Date contractDate = (Date)entity.getEl("primary_contract.date");
             String contractNo = (String)entity.getEl("primary_contract.no");
@@ -67,7 +68,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                 continue;
             }
 
-            try {
+            /*try {
                 rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());
             } catch(Exception e) {
                 logger.error("Can't run rules: " + e.getMessage());
@@ -82,14 +83,14 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                             contractNo,
                             contractDate));
                 }
-            } else {
+            } else {*/
                 statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
                         entity.getBatchIndex() - 1,
                         Global.CONTRACT_STATUS_PROCESSING, null, new Date(),
                         contractNo,
                         contractDate));
                 entitiesToSave.add(entity);
-            }
+            /*}*/
         }
 
         entityService.process(entitiesToSave);

@@ -10,6 +10,8 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav.stats.QueryEntry;
+import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -34,6 +37,9 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     IMetaClassDao metaClassDao;
 
     @Autowired
+    SQLQueriesStats stats;
+
+    @Autowired
     protected ProtocolSingleton statusSingleton;
 
     public EntityServiceImpl() throws RemoteException {
@@ -49,8 +55,9 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
         Date contractDate = (Date)entity.getEl("primary_contract.date");
         String contractNo = (String)entity.getEl("primary_contract.no");
 
-        System.out.println("[core][save]                :           " + t2);
-        System.out.println(contractNo + " - " + contractDate);
+        stats.put("coreService", t2);
+
+        System.out.println("[core][save] : " + contractNo + " - " + contractDate + " : " + t2);
 
         statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
                 entity.getBatchIndex() - 1,
@@ -88,5 +95,15 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     public List<RefListItem> getRefsByMetaclass(long metaClassId) {
         return baseEntityDao.getRefsByMetaclass(metaClassId);
+    }
+
+    @Override
+    public HashMap<String, QueryEntry> getSQLStats() {
+        return stats.getStats();
+    }
+
+    @Override
+    public void clearSQLStats() {
+        stats.clear();
     }
 }

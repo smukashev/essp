@@ -27,8 +27,6 @@ public class StatusSingleton {
 
     CouchbaseClient client;
 
-    private int processingCount = 0;
-
     private static Gson gson = new Gson();
 
     @PostConstruct
@@ -56,7 +54,6 @@ public class StatusSingleton {
     }
 
     public synchronized void startBatch(Long batchId, BatchFullJModel batchFullJModel, BatchInfo batchInfo) {
-        processingCount++;
         //map.put(batchId, new ContractStatusArrayJModel());
 
         BatchSign batchSign = new BatchSign();
@@ -125,11 +122,6 @@ public class StatusSingleton {
     }
 
     public synchronized void endBatch(Long batchId) {
-        processingCount--;
         //return map.remove(batchId);
-    }
-
-    public int getProcessingCount() {
-        return processingCount;
     }
 }

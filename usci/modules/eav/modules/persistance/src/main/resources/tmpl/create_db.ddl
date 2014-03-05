@@ -72,11 +72,11 @@
       <unique>
         <unique-column name="id"/>
       </unique>
-      <index>
+      <index name="ind_m_001_01">
         <index-column name="containing_id"/>
         <index-column name="container_type"/>
       </index>
-      <index>
+      <index name="ind_m_001_02">
         <index-column name="name"/>
         <index-column name="containing_id"/>
         <index-column name="container_type"/>
@@ -132,11 +132,14 @@
       <unique>
         <unique-column name="id"/>
       </unique>
-      <index>
+      <index  name="ind_m_002_01">
         <index-column name="begin_date"/>
         <index-column name="name"/>
         <index-column name="is_disabled"/>
       </index>
+      <index  name="ind_m_002_02">
+          <index-column name="begin_date"/>
+        </index>
     </table>
     <table name="eav_m_complex_attributes">
       <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -152,10 +155,10 @@
       <unique>
         <unique-column name="id"/>
       </unique>
-      <index>
+      <index name="ind_m_003_01">
         <index-column name="class_id"/>
       </index>
-      <index>
+      <index name="ind_m_003_02">
         <index-column name="containing_id"/>
         <index-column name="container_type"/>
       </index>
@@ -175,7 +178,7 @@
       <unique>
         <unique-column name="id"/>
       </unique>
-      <index>
+      <index name="ind_m_004_01">
         <index-column name="containing_id"/>
         <index-column name="container_type"/>
       </index>
@@ -189,7 +192,7 @@
       <unique>
         <unique-column name="id"/>
       </unique>
-      <index>
+      <index name="ind_m_005_01">
         <index-column name="set_id"/>
       </index>
     </table>
@@ -214,7 +217,7 @@
       <unique>
         <unique-column name="id"/>
       </unique>
-      <index>
+      <index name="ind_m_006_01">
         <index-column name="containing_id"/>
         <index-column name="container_type"/>
       </index>
@@ -233,7 +236,7 @@
       <unique>
         <unique-column name="id"/>
       </unique>
-      <index>
+      <index name="ind_m_007_01">
         <index-column name="containing_id"/>
         <index-column name="container_type"/>
       </index>
@@ -252,7 +255,7 @@
       <unique>
         <unique-column name="id"/>
       </unique>
-      <index>
+      <index name="ind_m_008_01">
         <index-column name="containing_id"/>
         <index-column name="container_type"/>
       </index>
@@ -272,7 +275,7 @@
       <unique>
         <unique-column name="id"/>
       </unique>
-      <index>
+      <index name="ind_m_009_01">
         <index-column name="containing_id"/>
         <index-column name="container_type"/>
       </index>

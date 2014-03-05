@@ -12,6 +12,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,6 +40,16 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     @Override
     public BaseEntity getBaseEntity(MetaClass metaClass) {
         return remoteMetaFactoryService.getBaseEntity(metaClass);
+    }
+
+    @Override
+    public BaseEntity getBaseEntity(String className, Date reportDate) {
+        return remoteMetaFactoryService.getBaseEntity(className, reportDate);
+    }
+
+    @Override
+    public BaseEntity getBaseEntity(MetaClass metaClass, Date reportDate) {
+        return remoteMetaFactoryService.getBaseEntity(metaClass, reportDate);
     }
 
     @Override

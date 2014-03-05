@@ -22,6 +22,7 @@ import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import org.jooq.*;
@@ -71,6 +72,9 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     IBeComplexValueDao beComplexValueDao;
     @Autowired
     IBeComplexSetValueDao beComplexSetValueDao;
+
+    @Autowired
+    SQLQueriesStats stats;
 
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
@@ -725,9 +729,16 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     @Transactional
     public IBaseEntity process(IBaseEntity baseEntity)
     {
+        long t1 = System.currentTimeMillis();
         baseEntity = prepare(baseEntity);
+        stats.put("coreProcess_Prepare", (System.currentTimeMillis() - t1));
+        t1 = System.currentTimeMillis();
         baseEntity = apply(baseEntity);
+        stats.put("coreProcess_Apply", (System.currentTimeMillis() - t1));
+        t1 = System.currentTimeMillis();
         baseEntity = saveOrUpdate(baseEntity);
+        stats.put("coreProcess_SaveOrUpdate", (System.currentTimeMillis() - t1));
+        t1 = System.currentTimeMillis();
 
         /*Long userId = ((BaseValue)((baseEntity.get().toArray())[0])).getBatch().getUserId();
         String str = baseEntity.getMeta().getClassName();

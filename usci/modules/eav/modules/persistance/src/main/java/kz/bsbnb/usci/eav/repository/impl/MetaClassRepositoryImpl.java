@@ -17,9 +17,10 @@ import java.util.List;
 public class MetaClassRepositoryImpl implements IMetaClassRepository
 {
     private HashMap<String, MetaClass> cache = new HashMap<String, MetaClass>();
+    private HashMap<Long, String> names = new HashMap<Long, String>();
 
     @Autowired
-    IMetaClassDao storage;
+    IMetaClassDao metaClassDao;
 
     @Override
     public MetaClass getMetaClass(String className)
@@ -27,30 +28,52 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository
         MetaClass metaClass = cache.get(className);
 
         if(metaClass == null)
-            metaClass = storage.load(className);
+        {
+            synchronized(this) {
+                metaClass = metaClassDao.load(className);
+                if(metaClass != null) {
+                    cache.put(className, metaClass);
+                    names.put(metaClass.getId(), className);
+                }
+            }
+        }
 
         return metaClass;
     }
 
     @Override
     public MetaClass getMetaClass(long id) {
+        String className = names.get(id);
+        MetaClass metaClass = null;
 
-        MetaClass metaClass = storage.load(id);
-        cache.put(metaClass.getClassName(), metaClass);
+        if (className != null) {
+            metaClass = cache.get(className);
+        }
+
+        if(metaClass == null)
+        {
+            synchronized(this) {
+                metaClass = metaClassDao.load(id);
+                if(metaClass != null) {
+                    cache.put(className, metaClass);
+                    names.put(metaClass.getId(), metaClass.getClassName());
+                }
+            }
+        }
 
         return metaClass;
-
     }
 
     @Override
     public List<MetaClass> getMetaClasses() {
-        return storage.loadAll();
+        return metaClassDao.loadAll();
     }
 
     @Override
+    //TODO: does not check names
     synchronized public void saveMetaClass(MetaClass meta)
     {
-        storage.save(meta);
+        long id = metaClassDao.save(meta);
 
         for (String name : cache.keySet()) {
             cache.get(name).recursiveSet(meta);
@@ -62,21 +85,23 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository
     @Override
     synchronized public void resetCache() {
         cache.clear();
+        names.clear();
     }
 
     @Override
     public List<MetaClassName> getMetaClassesNames()
     {
-        return storage.getMetaClassesNames();
+        return metaClassDao.getMetaClassesNames();
     }
 
     @Override
+    //TODO: does not erase from names
     public boolean delMetaClass(String className)
     {
         MetaClass meta = getMetaClass(className);
 
         if (meta != null) {
-            storage.remove(meta);
+            metaClassDao.remove(meta);
             return true;
         } else {
             return false;

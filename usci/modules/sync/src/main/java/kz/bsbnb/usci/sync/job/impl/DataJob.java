@@ -25,6 +25,10 @@ public final class DataJob extends AbstractDataJob {
     private IEntityService entityService;
     private final Logger logger = Logger.getLogger(DataJob.class);
 
+    private double avgTimePrev = 0;
+    private double avgTimeCur = 0;
+    private long entityCounter = 0;
+
     @Override
     public void run() {
         System.out.println("Data Job Started.");
@@ -33,7 +37,7 @@ public final class DataJob extends AbstractDataJob {
         while(true) {
             try {
                 if(entities.size() > 0 && entitiesInProcess.size() < MAX_THREAD) {
-                    System.out.println("Number of threads: " + entitiesInProcess.size());
+                    //System.out.println("Number of threads: " + entitiesInProcess.size());
                     processNewEntities();
                 }
 
@@ -72,6 +76,35 @@ public final class DataJob extends AbstractDataJob {
 
             if(!processJob.isAlive()) {
                 BaseEntity entity = processJob.getBaseEntity();
+
+                ////////////////
+                entityCounter++;
+                if (entityCounter < WATCH_INTERVAL) {
+                    avgTimeCur = (avgTimeCur * (entityCounter - 1)) / entityCounter +
+                            processJob.getTimeSpent() / entityCounter;
+                } else {
+                    if (avgTimePrev > 0) {
+                        double offset = avgTimeCur / avgTimePrev - 1;
+                        if (offset > THRESHOLD) {
+                            currentThread--;
+                        } else {
+                            currentThread++;
+                        }
+
+                        if (currentThread >= MAX_THREAD) {
+                            currentThread = MAX_THREAD - 10;
+                        }
+                        if (currentThread < MIN_THREAD) {
+                            currentThread = MIN_THREAD;
+                        }
+
+                        System.out.println("Threads: " + currentThread + ", avgPrev: " +
+                                avgTimePrev + ", avgCur: " + avgTimeCur + ", offset: " + offset);
+                    }
+                    entityCounter = 0;
+                    avgTimePrev = avgTimeCur;
+                }
+                ////////////////
 
                 Iterator<BaseEntity> entityProcessIterator = entitiesInProcess.iterator();
 

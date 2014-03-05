@@ -134,7 +134,7 @@ public class BeStorageDaoImpl implements IBeStorageDao {
 
     public IBaseEntity getBaseEntity(long id, Date reportDate, boolean withClosedValues)
     {
-        if (enabled)
+        /*if (enabled)
         {
             if (cache == null)
             {
@@ -157,6 +157,14 @@ public class BeStorageDaoImpl implements IBeStorageDao {
             {
                 return baseEntityDao.load(id, reportDate, withClosedValues);
             }
+        }*/
+        if (reportDate == null)
+        {
+            return baseEntityDao.load(id, withClosedValues);
+        }
+        else
+        {
+            return baseEntityDao.load(id, reportDate, withClosedValues);
         }
     }
 
@@ -210,7 +218,7 @@ public class BeStorageDaoImpl implements IBeStorageDao {
         return timeUnit;
     }
 
-    @Around("execution(* kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLBaseEntityDaoImpl.process(..))")
+    /*@Around("execution(* kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLBaseEntityDaoImpl.process(..))")
     public Object processAround(ProceedingJoinPoint pjp) throws Throwable
     {
         if (enabled)
@@ -242,7 +250,7 @@ public class BeStorageDaoImpl implements IBeStorageDao {
         {
             return pjp.proceed();
         }
-    }
+    }*/
 
     private void refreshBaseEntity(IBaseEntity baseEntity)
     {
