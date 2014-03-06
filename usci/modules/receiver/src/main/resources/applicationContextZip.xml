@@ -24,6 +24,7 @@
     <context:component-scan base-package="kz.bsbnb.usci.bconv" />
     <context:component-scan base-package="kz.bsbnb.usci.brms.rulesingleton" />
     <context:component-scan base-package="kz.bsbnb.usci.receiver" />
+    <context:component-scan base-package="kz.bsbnb.usci.tool.couchbase" />
 
     <bean id="log4jInitializer" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="staticMethod" value="org.springframework.util.Log4jConfigurer.initLogging"/>
