@@ -2,6 +2,7 @@ package kz.bsbnb.usci.receiver.reader.impl;
 
 import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
+import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -34,6 +35,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Stack;
@@ -82,15 +84,25 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
         ZipInputStream zis = new ZipInputStream(inputStream);
         ZipEntry entry;
-        byte[] data = null;
+        byte[] buffer = new byte[4096];
+        ByteArrayOutputStream out = null;
         try {
             while ((entry = zis.getNextEntry()) != null)
             {
                 if (entry.getName().equals("manifest.xml"))
                     continue;
 
-                data = new byte[(int)entry.getSize()];
-                zis.read(data);
+                int len;
+                out = new ByteArrayOutputStream((int)entry.getSize());
+                int size = (int)entry.getSize();
+                while ((len = zis.read(buffer, 0, Math.min(buffer.length, size))) > 0)
+                {
+                    size -= len;
+                    out.write(buffer, 0, len);
+                    if (size <= 0)
+                        break;
+                }
+                break;
             }
         } catch (IOException e) {
             statusSingleton.addBatchStatus(batchId,
@@ -99,7 +111,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         }
 
         try {
-            xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(data));
+            xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
         } catch (XMLStreamException e) {
             statusSingleton.addBatchStatus(batchId,
                     new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));

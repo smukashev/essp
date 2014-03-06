@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.core.service.impl;
 
-import kz.bsbnb.usci.core.protocol.ProtocolSingleton;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -13,6 +12,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
+import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     SQLQueriesStats stats;
 
     @Autowired
-    protected ProtocolSingleton statusSingleton;
+    protected StatusSingleton statusSingleton;
 
     public EntityServiceImpl() throws RemoteException {
         super();

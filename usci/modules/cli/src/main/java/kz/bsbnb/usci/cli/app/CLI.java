@@ -334,9 +334,10 @@ public class CLI
         }
     }
 
-    public void readEntityFromXML(String fileName) {
+    public void readEntityFromXML(String fileName, String repDate) {
         try {
-            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository);
+            Date reportDate = sdfout.parse(repDate);
+            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
             BaseEntity entity;
             while((entity = reader.read()) != null) {
                 long id = baseEntityDao.process(entity).getId();
@@ -345,6 +346,8 @@ public class CLI
         } catch (FileNotFoundException e)
         {
             System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
+        } catch (ParseException e) {
+            System.out.println("Can't parse date " + repDate + " must be in format "+ sdfout.toString());
         }
 
     }
@@ -925,10 +928,10 @@ public class CLI
                     System.out.println("Argument needed: <xml> <id> <fileName>");
                 }
             } else if(args.get(0).equals("read")) {
-                if (args.size() > 1) {
-                    readEntityFromXML(args.get(1));
+                if (args.size() > 2) {
+                    readEntityFromXML(args.get(1), args.get(2));
                 } else {
-                    System.out.println("Argument needed: <read> <fileName>");
+                    System.out.println("Argument needed: <read> <fileName> <rep_date>");
                 }
             } else {
                 System.out.println("No such operation: " + args.get(0));

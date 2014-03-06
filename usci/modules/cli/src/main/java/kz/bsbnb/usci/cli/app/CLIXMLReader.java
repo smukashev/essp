@@ -47,12 +47,13 @@ public class CLIXMLReader
     private IMetaClassRepository metaClassRepository;
 
     protected XMLEventReader xmlEventReader;
+    private Date reportDate;
 
     //public static final String DATE_FORMAT = "yyyy-MM-dd";
     public static final String DATE_FORMAT = "dd.MM.yyyy";
     protected DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 
-    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchRepository batchRepository) throws FileNotFoundException
+    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchRepository batchRepository, Date repDate) throws FileNotFoundException
     {
         logger.info("Reader init.");
         metaClassRepository = metaRepo;
@@ -67,7 +68,9 @@ public class CLIXMLReader
             e.printStackTrace();
         }
 
-        batch = new Batch(new Date(), 1L);
+        this.reportDate = repDate;
+
+        batch = new Batch(reportDate, 1L);
 
         batchRepository.addBatch(batch);
     }
@@ -108,7 +111,7 @@ public class CLIXMLReader
             currentContainer =
                     new BaseEntity(
                             metaClassRepository.getMetaClass(startElement.getAttributeByName(
-                                    new QName("class")).getValue()), new Date());
+                                    new QName("class")).getValue()), reportDate);
         } else {
             logger.info("other: " + localName);
             IMetaType metaType = currentContainer.getMemberType(localName);
@@ -119,7 +122,7 @@ public class CLIXMLReader
                 level++;
             } else if(metaType.isComplex() && !metaType.isSet()) {
                 stack.push(currentContainer);
-                currentContainer = new BaseEntity((MetaClass)metaType, new Date());
+                currentContainer = new BaseEntity((MetaClass)metaType, reportDate);
                 level++;
             } else if(!metaType.isComplex() && !metaType.isSet()) {
                 Object o = null;

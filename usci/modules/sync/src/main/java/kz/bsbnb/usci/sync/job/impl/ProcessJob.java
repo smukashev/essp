@@ -18,12 +18,12 @@ public class ProcessJob extends AbstractJob {
     private IEntityService entityService;
     private long timeSpent = 0;
 
-    @Autowired
     protected StatusSingleton statusSingleton;
 
-    public ProcessJob(IEntityService entityService, BaseEntity baseEntity) {
+    public ProcessJob(IEntityService entityService, BaseEntity baseEntity, StatusSingleton statusSingleton) {
         this.entityService = entityService;
         this.baseEntity = baseEntity;
+        this.statusSingleton = statusSingleton;
     }
 
     @Override
