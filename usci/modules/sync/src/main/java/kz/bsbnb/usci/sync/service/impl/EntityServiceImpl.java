@@ -69,4 +69,10 @@ public class EntityServiceImpl implements IEntityService {
     {
         return dataJob.getQueueSize();
     }
+
+    @Override
+    public void setThreadsCount(int threadsCount, boolean allowAutoIncrement) {
+        dataJob.setCurrentThread(threadsCount);
+        dataJob.setAutoChooseThreshold(allowAutoIncrement);
+    }
 }

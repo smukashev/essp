@@ -655,7 +655,7 @@ public class CLI
                         "   and xf.sent = 0 order by xf.id asc");
 
                 preparedStatementDone = conn.prepareStatement("update core.xml_file xf \n" +
-                        "   set xf.sent = 1 \n" +
+                        "   set xf.sent = ? \n" +
                         " where xf.id = ?");
             } catch (SQLException e)
             {
@@ -706,10 +706,12 @@ public class CLI
                     break;
                 }
 
+                int id = 0;
+
                 try
                 {
                     if (result2.next()) {
-                        int id = result2.getInt("id");
+                        id = result2.getInt("id");
                         String fileName = result2.getString("file_name");
                         Blob blob = result2.getBlob("file_content");
 
@@ -732,7 +734,8 @@ public class CLI
 
                         batchProcessService.processBatchWithoutUser(newFile.getAbsolutePath());
 
-                        preparedStatementDone.setInt(1, id);
+                        preparedStatementDone.setInt(1, 1);
+                        preparedStatementDone.setInt(2, id);
 
                         if (preparedStatementDone.execute()) {
                             System.out.println("Error can't mark sent file: " + id);
@@ -753,6 +756,19 @@ public class CLI
                 } catch (IOException e)
                 {
                     System.out.println("Can't create temp file: " + e.getMessage());
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                    try {
+                        preparedStatementDone.setInt(1, 1);
+                        preparedStatementDone.setInt(2, id);
+
+                        if (preparedStatementDone.execute()) {
+                            System.out.println("Error can't mark sent file: " + id);
+                        }
+                    } catch (SQLException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
 
@@ -828,6 +844,38 @@ public class CLI
         } else {
             System.out.println("Argument needed: <core_url>");
             System.out.println("Example: sqlstat rmi://127.0.0.1:1099/entityService");
+        }
+    }
+
+    public void commandSTC()
+    {
+        if (args.size() > 2) {
+            Connection conn = null;
+
+            RmiProxyFactoryBean serviceFactory = null;
+
+            kz.bsbnb.usci.sync.service.IEntityService entityService = null;
+
+            try {
+                serviceFactory = new RmiProxyFactoryBean();
+                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+                serviceFactory.setServiceUrl(args.get(0));
+                serviceFactory.setServiceInterface(kz.bsbnb.usci.sync.service.IEntityService.class);
+                serviceFactory.setRefreshStubOnConnectFailure(true);
+
+                serviceFactory.afterPropertiesSet();
+                entityService = (kz.bsbnb.usci.sync.service.IEntityService) serviceFactory.getObject();
+            } catch (Exception e) {
+                System.out.println("Can't connect to receiver service: " + e.getMessage());
+            }
+
+            int tCount = Integer.parseInt(args.get(1));
+            boolean allowAutoIncrement = Boolean.parseBoolean(args.get(2));
+
+            entityService.setThreadsCount(tCount, allowAutoIncrement);
+        } else {
+            System.out.println("Argument needed: <core_url> <threads_count> <allow_auto_increment>");
+            System.out.println("Example: stc rmi://127.0.0.1:1098/entityService 32 false");
         }
     }
 
@@ -1222,6 +1270,8 @@ public class CLI
                         commandImport();
                     } else if(command.equals("sqlstat")) {
                         commandSQLStat();
+                    } else if(command.equals("stc")) {
+                        commandSTC();
                     } else {
                         System.out.println("No such command: " + command);
                     }

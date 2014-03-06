@@ -85,17 +85,19 @@ public final class DataJob extends AbstractDataJob {
                 } else {
                     if (avgTimePrev > 0) {
                         double offset = avgTimeCur / avgTimePrev - 1;
-                        if (offset > THRESHOLD) {
-                            currentThread--;
-                        } else {
-                            currentThread++;
-                        }
+                        if (autoChooseThreshold) {
+                            if (offset > THRESHOLD) {
+                                currentThread--;
+                            } else {
+                                currentThread++;
+                            }
 
-                        if (currentThread >= MAX_THREAD) {
-                            currentThread = MAX_THREAD - 10;
-                        }
-                        if (currentThread < MIN_THREAD) {
-                            currentThread = MIN_THREAD;
+                            if (currentThread >= MAX_THREAD) {
+                                currentThread = MAX_THREAD - 10;
+                            }
+                            if (currentThread < MIN_THREAD) {
+                                currentThread = MIN_THREAD;
+                            }
                         }
 
                         System.out.println("Threads: " + currentThread + ", avgPrev: " +

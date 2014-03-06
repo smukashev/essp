@@ -17,4 +17,5 @@ public interface IEntityService {
     public List<Long> getEntityIDsByMetaclass(long id);
     public List<RefListItem> getRefsByMetaclass(long metaClassId);
     public int getQueueSize();
+    public void setThreadsCount(int threadsCount, boolean allowAutoIncrement);
 }

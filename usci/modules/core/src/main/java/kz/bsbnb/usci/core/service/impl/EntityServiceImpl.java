@@ -12,6 +12,9 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +30,8 @@ import java.util.List;
  */
 @Service
 public class EntityServiceImpl extends UnicastRemoteObject implements IEntityService {
+    private final Logger logger = LoggerFactory.getLogger(EntityServiceImpl.class);
+
     @Autowired
     IBaseEntityDao baseEntityDao;
 
@@ -48,22 +53,38 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Override
     public void save(BaseEntity baseEntity) {
-        long t1 = System.currentTimeMillis();
-        BaseEntity entity = (BaseEntity)baseEntityDao.process(baseEntity);
-        long t2 = System.currentTimeMillis() - t1;
+        try {
+            long t1 = System.currentTimeMillis();
+            BaseEntity entity = (BaseEntity)baseEntityDao.process(baseEntity);
+            long t2 = System.currentTimeMillis() - t1;
 
-        Date contractDate = (Date)entity.getEl("primary_contract.date");
-        String contractNo = (String)entity.getEl("primary_contract.no");
+            Date contractDate = (Date)entity.getEl("primary_contract.date");
+            String contractNo = (String)entity.getEl("primary_contract.no");
 
-        stats.put("coreService", t2);
+            stats.put("coreService", t2);
 
-        System.out.println("[core][save] : " + contractNo + " - " + contractDate + " : " + t2);
+            System.out.println("[core][save] : " + contractNo + " - " + contractDate + " : " + t2);
 
-        statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
-                entity.getBatchIndex() - 1,
-                "SAVED", "" + entity.getId(), new Date(),
-                contractNo,
-                contractDate));
+            statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
+                    entity.getBatchIndex() - 1,
+                    "COMPLETED", "" + entity.getId(), new Date(),
+                    contractNo,
+                    contractDate));
+        } catch (Exception e) {
+            Date contractDate = (Date)baseEntity.getEl("primary_contract.date");
+            String contractNo = (String)baseEntity.getEl("primary_contract.no");
+
+
+
+            logger.error("Batch id: " + baseEntity.getBatchId() + ", index: " + (baseEntity.getBatchIndex() - 1) +
+                    ExceptionUtils.getStackTrace(e));
+
+            statusSingleton.addContractStatus(baseEntity.getBatchId(), new ContractStatusJModel(
+                    baseEntity.getBatchIndex() - 1,
+                    "ERROR", e.getMessage(), new Date(),
+                    contractNo,
+                    contractDate));
+        }
     }
 
     @Override

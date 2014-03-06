@@ -103,10 +103,10 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
             Date contractDate = (Date)entity.getEl("primary_contract.date");
             String contractNo = (String)entity.getEl("primary_contract.no");
 
-            statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(entity.getBatchIndex() - 1,
+            /*statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(entity.getBatchIndex() - 1,
                     Global.CONTRACT_STATUS_COMPLETED, null, new Date(),
                     contractNo,
-                    contractDate));
+                    contractDate));*/
         }
     }
 }
