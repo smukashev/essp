@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.receiver.factory;
+package kz.bsbnb.usci.tool.couchbase.factory;
 
 import com.couchbase.client.CouchbaseClient;
 

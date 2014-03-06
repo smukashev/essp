@@ -1,10 +1,9 @@
 package kz.bsbnb.usci.receiver.entry;
 
-import com.couchbase.client.CouchbaseClient;
-import kz.bsbnb.usci.receiver.factory.ICouchbaseClientFactory;
+import kz.bsbnb.usci.tool.couchbase.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
-import kz.bsbnb.usci.receiver.singleton.StatusSingleton;
+import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

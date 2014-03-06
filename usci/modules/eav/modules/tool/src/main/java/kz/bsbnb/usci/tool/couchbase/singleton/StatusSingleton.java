@@ -1,11 +1,12 @@
-package kz.bsbnb.usci.receiver.singleton;
+package kz.bsbnb.usci.tool.couchbase.singleton;
 
 import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.json.*;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
-import kz.bsbnb.usci.receiver.common.Global;
-import kz.bsbnb.usci.receiver.factory.ICouchbaseClientFactory;
+import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
+import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
+import kz.bsbnb.usci.tool.couchbase.factory.ICouchbaseClientFactory;
 import net.spy.memcached.internal.OperationFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,15 +14,10 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 
-/**
- * @author k.tulbassiyev
- */
 @Component
 public class StatusSingleton {
-//    private Map<Long, ContractStatusArrayJModel> map =
-//            Collections.synchronizedMap(new HashMap<Long, ContractStatusArrayJModel>());
-
     @Autowired(required = true)
     private ICouchbaseClientFactory clientFactory;
 
@@ -35,7 +31,7 @@ public class StatusSingleton {
         client = clientFactory.getCouchbaseClient();
     }
 
-    public boolean isContractCompleted(long batchId, long index) {
+    public boolean isEntityCompleted(long batchId, long index) {
         Object contractStatus = client.get("contract_status:" + batchId + ":" + index);
 
         ContractStatusArrayJModel cStatuses;
@@ -44,7 +40,7 @@ public class StatusSingleton {
             cStatuses = gson.fromJson(contractStatus.toString(), ContractStatusArrayJModel.class);
 
             for (ContractStatusJModel status : cStatuses.getContractStatuses()) {
-                if (status.getProtocol().equals(Global.CONTRACT_STATUS_COMPLETED)) {
+                if (status.getProtocol().equals(EntityStatuses.COMPLETED)) {
                     return true;
                 }
             }
@@ -54,8 +50,6 @@ public class StatusSingleton {
     }
 
     public synchronized void startBatch(Long batchId, BatchFullJModel batchFullJModel, BatchInfo batchInfo) {
-        //map.put(batchId, new ContractStatusArrayJModel());
-
         BatchSign batchSign = new BatchSign();
 
         batchSign.setUserId(batchInfo.getUserId());
@@ -69,7 +63,7 @@ public class StatusSingleton {
             batchSign.setMd5(md5.digest(batchFullJModel.getContent()).toString());
         } catch (NoSuchAlgorithmException e)
         {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
 
 
@@ -87,7 +81,6 @@ public class StatusSingleton {
     }
 
     public synchronized void addBatchStatus(Long batchId, BatchStatusJModel batchStatusJModel) {
-        //map.get(batchId).getBatchStatuses().add(batchStatusJModel);
         Object batchStatus = client.get("batch_status:" + batchId);
 
         BatchStatusArrayJModel bStatuses;
@@ -104,8 +97,6 @@ public class StatusSingleton {
     }
 
     public synchronized void addContractStatus(Long batchId, ContractStatusJModel contractStatusJModel) {
-        //map.get(batchId).getContractStatuses().add(contractStatusJModel);
-
         Object contractStatus = client.get("contract_status:" + batchId + ":" + contractStatusJModel.getIndex());
 
         ContractStatusArrayJModel cStatuses;
@@ -121,7 +112,8 @@ public class StatusSingleton {
         client.set("contract_status:" + batchId + ":" + contractStatusJModel.getIndex(), 0, gson.toJson(cStatuses));
     }
 
-    public synchronized void endBatch(Long batchId) {
-        //return map.remove(batchId);
+    public synchronized void endBatch(Long batchId, Long userId) {
+        addBatchStatus(batchId, new BatchStatusJModel(
+                BatchStatuses.PARSING_COMPLETED, null, new Date(), userId));
     }
 }

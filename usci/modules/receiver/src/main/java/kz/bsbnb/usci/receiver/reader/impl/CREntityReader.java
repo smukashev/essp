@@ -12,6 +12,7 @@ import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
 import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -72,7 +73,7 @@ public class CREntityReader<T> extends CommonReader<T> {
 
         if (obj == null) {
             statusSingleton.addBatchStatus(batchId,
-                    new BatchStatusJModel(Global.BATCH_STATUS_ERROR, "Can't load batch from couchbase!", new Date(),
+                    new BatchStatusJModel(EntityStatuses.ERROR, "Can't load batch from couchbase!", new Date(),
                             userId));
 
             throw new IllegalStateException("Can't load batch from couchbase!");
@@ -115,7 +116,7 @@ public class CREntityReader<T> extends CommonReader<T> {
             } catch (SAXException e)
             {
                 statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
-                        Global.CONTRACT_STATUS_ERROR, "Can't parse", new Date(), null, null));
+                        EntityStatuses.ERROR, "Can't parse", new Date(), null, null));
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 return null;
             }

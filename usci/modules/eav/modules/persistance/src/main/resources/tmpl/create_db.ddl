@@ -85,37 +85,6 @@
         <unique-column name="id"/>
       </unique>
     </table>
-
-
-
-    <table name="eav_be_boolean_values_by_date">
-      <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-      <column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-      <column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-      <column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-      <column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-      <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-      <column name="value" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-      <column name="is_closed" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-      <column name="is_last" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-      <foreign-key foreignTable="eav_batches" name="fk_1002">
-        <reference local="batch_id" foreign="id"/>
-      </foreign-key>
-      <foreign-key foreignTable="eav_be_entities" name="fk_2000">
-        <reference local="entity_id" foreign="id"/>
-      </foreign-key>
-      <foreign-key foreignTable="eav_m_simple_attributes" name="fk_2001">
-        <reference local="attribute_id" foreign="id"/>
-      </foreign-key>
-      <index name="ind_2000">
-        <index-column name="entity_id"/>
-        <index-column name="report_date"/>
-        <index-column name="is_closed"/>
-      </index>
-      <unique>
-        <unique-column name="id"/>
-      </unique>
-    </table>
     <table name="eav_m_classes">
       <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
       <column name="complex_key_type" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>

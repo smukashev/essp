@@ -3,7 +3,6 @@ package kz.bsbnb.usci.receiver.monitor;
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
-import kz.bsbnb.usci.eav.model.json.BatchFullStatusJModel;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.Batch;
@@ -12,7 +11,8 @@ import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
 import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
-import kz.bsbnb.usci.receiver.singleton.StatusSingleton;
+import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
+import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
@@ -35,10 +35,7 @@ import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.nio.file.*;
 import java.text.ParseException;
@@ -211,12 +208,15 @@ public class ZipFilesMonitor{
 
                         if (job != null) {
                             jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+                            statusSingleton.addBatchStatus(nextJob.getBatchId(),
+                                    new BatchStatusJModel(BatchStatuses.PROCESSING, null, new Date(),
+                                            nextJob.getBatchInfo().getUserId()));
                         } else {
                             logger.error("Unknown batch file type: " + nextJob.getBatchInfo().getBatchType() +
                                     " in batch with id: " + nextJob.getBatchId());
 
                             statusSingleton.addBatchStatus(nextJob.getBatchId(),
-                                    new BatchStatusJModel(Global.BATCH_STATUS_ERROR, "Unknown batch file type: " +
+                                    new BatchStatusJModel(BatchStatuses.ERROR, "Unknown batch file type: " +
                                             nextJob.getBatchInfo().getBatchType(), new Date(), nextJob.getBatchInfo().getUserId()));
                         }
 
@@ -249,7 +249,7 @@ public class ZipFilesMonitor{
     public void saveData(BatchInfo batchInfo, String filename, byte[] bytes){
         IBatchService batchService = serviceFactory.getBatchService();
 
-        Batch batch = new Batch(new java.sql.Date(new java.util.Date().getTime()));
+        Batch batch = new Batch(batchInfo.getRepDate());
         batch.setUserId(batchInfo.getUserId());
         long batchId = batchService.save(batch);
 
@@ -309,7 +309,7 @@ public class ZipFilesMonitor{
                                     creditorBIN + "or RNN: " + creditorRNN);
 
                             statusSingleton.addBatchStatus(batchId,
-                                    new BatchStatusJModel(Global.BATCH_STATUS_ERROR,
+                                    new BatchStatusJModel(BatchStatuses.ERROR,
                                             "Can't find creditor with code: " + creditorCode + " or BIN: " +
                                             creditorBIN + "or RNN: " + creditorRNN, new Date(), batchInfo.getUserId()));
 
@@ -324,9 +324,7 @@ public class ZipFilesMonitor{
                 batchInfo.getUserId(), cId);
         statusSingleton.startBatch(batchId, batchFullJModel, batchInfo);
         statusSingleton.addBatchStatus(batchId,
-                new BatchStatusJModel(Global.BATCH_STATUS_WAITING, null, new Date(), batchInfo.getUserId()));
-        statusSingleton.addBatchStatus(batchId,
-                new BatchStatusJModel(Global.BATCH_STATUS_PROCESSING, null, new Date(), batchInfo.getUserId()));
+                new BatchStatusJModel(BatchStatuses.WAITING, null, new Date(), batchInfo.getUserId()));
 
         sender.addJob(batchId, batchInfo);
 
@@ -429,11 +427,13 @@ public class ZipFilesMonitor{
             System.out.println(batchInfo.getRepDate());
 
 
-            ZipEntry dataEntry = zipFile.getEntry(batchInfo.getBatchName());
-            InputStream inData = zipFile.getInputStream(dataEntry);
+            zipFile.close();
+
+            //ZipEntry dataEntry = zipFile.getEntry(batchInfo.getBatchName());
+            //InputStream inData = zipFile.getInputStream(dataEntry);
 
 
-            saveData(batchInfo,filename,inputStreamToByte(inData));
+            saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));
 
 
         }catch(IOException e){
@@ -509,14 +509,12 @@ public class ZipFilesMonitor{
             System.out.println(batchInfo.getSize());
             System.out.println(batchInfo.getRepDate());
 
+            zipFile.close();
 
-            ZipEntry dataEntry = zipFile.getEntry(batchInfo.getBatchName());
-            InputStream inData = zipFile.getInputStream(dataEntry);
+            //ZipEntry dataEntry = zipFile.getEntry(batchInfo.getBatchName());
+            //InputStream inData = zipFile.getInputStream(dataEntry);
 
-
-            saveData(batchInfo,filename,inputStreamToByte(inData));
-
-
+            saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));
         }catch(IOException e){
             e.printStackTrace();
         }

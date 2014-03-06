@@ -2,10 +2,10 @@ package kz.bsbnb.usci.receiver.writer.impl;
 
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
 import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
 import kz.bsbnb.usci.receiver.common.Global;
-import kz.bsbnb.usci.receiver.singleton.StatusSingleton;
+import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
+import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import kz.bsbnb.usci.receiver.writer.IWriter;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import org.apache.log4j.Logger;
@@ -62,12 +62,18 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
             Date contractDate = (Date)entity.getEl("primary_contract.date");
             String contractNo = (String)entity.getEl("primary_contract.no");
 
-            if (statusSingleton.isContractCompleted(entity.getBatchId(), entity.getBatchIndex() - 1)) {
+            if (statusSingleton.isEntityCompleted(entity.getBatchId(), entity.getBatchIndex() - 1)) {
                 System.out.println("Contract no " + contractNo + " with date " + contractDate + " skipped because it " +
-                        "has status \"COMPLETED\"");
+                        "has status \"" + EntityStatuses.COMPLETED + "\"");
                 continue;
             }
 
+            //TODO: uncomment!!!
+            statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
+                    entity.getBatchIndex() - 1,
+                    EntityStatuses.CHECK_IN_PARSER, null, new Date(),
+                    contractNo,
+                    contractDate));
             /*try {
                 rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());
             } catch(Exception e) {
@@ -85,28 +91,15 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                 }
             } else {*/
                 statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
-                        entity.getBatchIndex() - 1,
-                        Global.CONTRACT_STATUS_PROCESSING, null, new Date(),
-                        contractNo,
-                        contractDate));
+                    entity.getBatchIndex() - 1,
+                    EntityStatuses.WAITING, null, new Date(),
+                    contractNo,
+                    contractDate));
+
                 entitiesToSave.add(entity);
             /*}*/
         }
 
         entityService.process(entitiesToSave);
-
-        Iterator<BaseEntity> entityIterator = entitiesToSave.iterator();
-
-        while (entityIterator.hasNext()) {
-            BaseEntity entity = entityIterator.next();
-
-            Date contractDate = (Date)entity.getEl("primary_contract.date");
-            String contractNo = (String)entity.getEl("primary_contract.no");
-
-            /*statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(entity.getBatchIndex() - 1,
-                    Global.CONTRACT_STATUS_COMPLETED, null, new Date(),
-                    contractNo,
-                    contractDate));*/
-        }
     }
 }

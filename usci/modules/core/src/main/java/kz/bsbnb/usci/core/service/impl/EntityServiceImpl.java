@@ -12,6 +12,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
+import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +68,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
             statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
                     entity.getBatchIndex() - 1,
-                    "COMPLETED", "" + entity.getId(), new Date(),
+                    EntityStatuses.COMPLETED, "" + entity.getId(), new Date(),
                     contractNo,
                     contractDate));
         } catch (Exception e) {
@@ -81,7 +82,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
             statusSingleton.addContractStatus(baseEntity.getBatchId(), new ContractStatusJModel(
                     baseEntity.getBatchIndex() - 1,
-                    "ERROR", e.getMessage(), new Date(),
+                    EntityStatuses.ERROR, e.getMessage(), new Date(),
                     contractNo,
                     contractDate));
         }

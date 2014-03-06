@@ -1,11 +1,10 @@
-package kz.bsbnb.usci.receiver.factory.impl;
+package kz.bsbnb.usci.tool.couchbase.factory.impl;
 
 import com.couchbase.client.CouchbaseClient;
-import kz.bsbnb.usci.receiver.factory.ICouchbaseClientFactory;
+import kz.bsbnb.usci.tool.couchbase.factory.ICouchbaseClientFactory;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.util.ArrayList;
 

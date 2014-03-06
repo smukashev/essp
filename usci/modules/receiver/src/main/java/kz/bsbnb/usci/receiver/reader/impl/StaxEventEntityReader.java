@@ -9,17 +9,15 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
-import kz.bsbnb.usci.eav.model.json.ContractStatusArrayJModel;
-import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
-import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -36,8 +34,12 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Stack;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 /**
  * @author k.tulbassiyev
@@ -78,10 +80,30 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
 
+        ZipInputStream zis = new ZipInputStream(inputStream);
+        ZipEntry entry;
+        byte[] data = null;
         try {
-            xmlEventReader = inputFactory.createXMLEventReader(inputStream);
+            while ((entry = zis.getNextEntry()) != null)
+            {
+                if (entry.getName().equals("manifest.xml"))
+                    continue;
+
+                data = new byte[(int)entry.getSize()];
+                zis.read(data);
+            }
+        } catch (IOException e) {
+            statusSingleton.addBatchStatus(batchId,
+                    new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
+            throw new RuntimeException(e);
+        }
+
+        try {
+            xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(data));
         } catch (XMLStreamException e) {
-            e.printStackTrace();
+            statusSingleton.addBatchStatus(batchId,
+                    new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
+            throw new RuntimeException(e);
         }
 
         batch = batchService.load(batchId);

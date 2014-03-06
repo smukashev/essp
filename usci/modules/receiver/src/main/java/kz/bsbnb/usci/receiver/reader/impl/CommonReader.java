@@ -1,13 +1,12 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
-import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.receiver.common.Global;
-import kz.bsbnb.usci.receiver.factory.ICouchbaseClientFactory;
+import kz.bsbnb.usci.tool.couchbase.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.receiver.helper.impl.FileHelper;
 import kz.bsbnb.usci.receiver.helper.impl.ParserHelper;
 import kz.bsbnb.usci.receiver.reader.IReader;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
-import kz.bsbnb.usci.receiver.singleton.StatusSingleton;
+import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;

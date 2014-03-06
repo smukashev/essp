@@ -3,7 +3,7 @@ package kz.bsbnb.usci.receiver.listener.impl;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
 import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.listener.IListener;
-import kz.bsbnb.usci.receiver.singleton.StatusSingleton;
+import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
@@ -27,11 +27,7 @@ public class BatchJobListener implements IListener {
         long userId = jobExecution.getJobInstance().getJobParameters().getLong("batchId");
         System.out.println(" --- AFTER JOB --- batch: " + batchId + ", userId: " + userId);
 
-        statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
-                Global.BATCH_STATUS_COMPLETED, null, new Date(), userId));
-
-        //ContractStatusArrayJModel statusJModel = statusSingleton.endBatch(batchId);
-        statusSingleton.endBatch(batchId);
+        statusSingleton.endBatch(batchId, userId);
     }
 
     @BeforeJob
