@@ -40,7 +40,7 @@ public final class DataJob extends AbstractDataJob {
 
         while(true) {
             try {
-                if(entities.size() > 0 && entitiesInProcess.size() < MAX_THREAD) {
+                if(entities.size() > 0 && entitiesInProcess.size() < currentThread) {
                     //System.out.println("Number of threads: " + entitiesInProcess.size());
                     processNewEntities();
                 }
