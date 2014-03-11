@@ -334,16 +334,13 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                                     if (metaSet.getArrayKeyType() == ComplexKeyTypes.ANY)
                                     {
-                                        select = context.select(EAV_BE_ENTITIES.as(childEntityAlias).ID)
-                                                .from(EAV_BE_ENTITIES.as(childEntityAlias))
-                                                .join(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
-                                                .on(EAV_BE_ENTITIES.as(childEntityAlias).ID.equal(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID))
-                                                .join(EAV_BE_SETS.as(setAlias))
-                                                .on(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_SETS.as(setAlias).ID))
+                                        select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID)
+                                                .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
                                                 .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
-                                                .on(EAV_BE_SETS.as(setAlias).ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
+                                                .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
                                                 .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
-                                                .and(EAV_BE_ENTITIES.as(childEntityAlias).ID.in(childBaseEntityIds));
+                                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds));
 
                                                 /*
                                                 .from(EAV_BE_SETS.as(setAlias))
@@ -361,16 +358,22 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                     }
                                     else
                                     {
-                                        select = context.selectCount()
-                                                .from(EAV_BE_ENTITIES.as(childEntityAlias))
-                                                .join(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
-                                                .on(EAV_BE_ENTITIES.as(childEntityAlias).ID.equal(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID))
-                                                .join(EAV_BE_SETS.as(setAlias))
-                                                .on(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_SETS.as(setAlias).ID))
+                                        /*
+                                        from core.eav_be_complex_set_values sv_document
+                                        join core.eav_be_entity_complex_sets es_document
+                                          on (es_document.attribute_id = 12 and
+                                             sv_document.set_id = es_document.set_id)
+                                       where (es_document.entity_id = root.id and
+                                             sv_document.entity_value_id in (157322))
+                                        */
+
+                                        /*select = context.selectCount()
+                                                .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
                                                 .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
-                                                .on(EAV_BE_SETS.as(setAlias).ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
+                                                .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
                                                 .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
-                                                .and(EAV_BE_ENTITIES.as(childEntityAlias).ID.in(childBaseEntityIds));
+                                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds));*/
 
                                                 /*
                                                 .from(EAV_BE_SETS.as(setAlias))
@@ -382,10 +385,29 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                                 .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds));
                                                 */
 
-                                        condition = condition == null ? DSL.val(childBaseEntityIds.size()).lessOrEqual(select):
+                                        /*condition = condition == null ? DSL.val(childBaseEntityIds.size()).lessOrEqual(select):
                                                 metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
                                                         condition.and(DSL.val(childBaseEntityIds.size()).lessOrEqual(select)) :
-                                                        condition.or(DSL.val(childBaseEntityIds.size()).lessOrEqual(select));
+                                                        condition.or(DSL.val(childBaseEntityIds.size()).lessOrEqual(select));*/
+
+                                        Condition setCondition = null;
+
+                                        for (Long childBaseEntityId : childBaseEntityIds) {
+                                            select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID)
+                                                    .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
+                                                    .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
+                                                    .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
+                                                    .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
+                                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.equal(childBaseEntityId));
+
+                                            setCondition = setCondition == null ? DSL.exists(select) :
+                                                    setCondition.and(DSL.exists(select));
+                                        }
+
+                                        condition = condition == null ? setCondition :
+                                                metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
+                                                        condition.and(setCondition) : condition.or(setCondition);
                                     }
                                 }
                             }
@@ -428,8 +450,12 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
         if (select != null)
         {
-            //long t1 = System.currentTimeMillis();
+            double t1 = System.nanoTime();
             List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+            double t2 = System.nanoTime() - t1;
+            sqlStats.put(" * " + select.toString(), t2 / 1000000);
+
+
             //long t2 = System.currentTimeMillis() - t1;
 
             //System.out.println("[searcher]: " + t2 + " (" + baseEntity.getMeta().getClassName() + ")");

@@ -405,9 +405,9 @@
         <unique-column name="report_date"/>
       </unique>
       <index name="eav_ind_005_02">
-          <index-column name="entity_value_id"/>
-          <index-column name="attribute_id"/>
-        </index>
+        <index-column name="attribute_id"/>
+        <index-column name="entity_value_id"/>
+      </index>
       <index name="eav_ind_005_03">
         <index-column name="entity_id"/>
       </index>
@@ -561,6 +561,10 @@
       <index name="eav_ind_010_00">
         <index-column name="class_id"/>
       </index>
+      <index name="eav_ind_010_01">
+        <index-column name="id"/>
+        <index-column name="class_id"/>
+      </index>
     </table>
     <table name="eav_be_entity_complex_sets">
       <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -596,6 +600,18 @@
         <index-column name="attribute_id"/>
         <index-column name="set_id"/>
         <index-column name="is_last"/>
+      </index>
+      <index name="eav_ind_011_02">
+        <index-column name="entity_id"/>
+      </index>
+      <index name="eav_ind_011_03">
+        <index-column name="attribute_id"/>
+        <index-column name="set_id"/>
+      </index>
+      <index name="eav_ind_011_04">
+        <index-column name="attribute_id"/>
+        <index-column name="set_id"/>
+        <index-column name="entity_id"/>
       </index>
       <unique name="eav_uk_011_00">
         <unique-column name="entity_id"/>

@@ -731,6 +731,14 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
     {
         long t1 = System.currentTimeMillis();
         baseEntity = prepare(baseEntity);
+
+        // TODO: Remove this code after couchbase repaired
+        if (baseEntity.getMeta().getClassName().equals("credit") && baseEntity.getId() > 0)
+        {
+            System.out.println("Skipped because exists " + (System.currentTimeMillis() - t1));
+            return baseEntity;
+        }
+
         stats.put("coreProcess_Prepare", (System.currentTimeMillis() - t1));
         t1 = System.currentTimeMillis();
         baseEntity = apply(baseEntity);
