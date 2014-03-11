@@ -450,16 +450,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
         if (select != null)
         {
-            double t1 = System.nanoTime();
             List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-            double t2 = System.nanoTime() - t1;
-            sqlStats.put(" * " + select.toString(), t2 / 1000000);
-
-
-            //long t2 = System.currentTimeMillis() - t1;
-
-            //System.out.println("[searcher]: " + t2 + " (" + baseEntity.getMeta().getClassName() + ")");
-
             for (Map<String, Object> row : rows)
             {
                 result.add(((BigDecimal)row.get("inner_id")).longValue());
