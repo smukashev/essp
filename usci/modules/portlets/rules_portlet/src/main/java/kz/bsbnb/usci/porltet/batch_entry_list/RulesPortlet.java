@@ -106,6 +106,7 @@ public class RulesPortlet extends MVCPortlet{
         COPY_RULE,
         RUN_RULE,
         FLUSH,
+        RENAME_RULE,
 
         LIST_ALL,
         LIST_CLASS,
@@ -185,6 +186,11 @@ public class RulesPortlet extends MVCPortlet{
                     break;
                 case FLUSH:
                     rulesSingleton.reloadCache();
+                    break;
+                case RENAME_RULE:
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    title = resourceRequest.getParameter("title");
+                    ruleService.renameRule(ruleId,title);
                     break;
             }
 

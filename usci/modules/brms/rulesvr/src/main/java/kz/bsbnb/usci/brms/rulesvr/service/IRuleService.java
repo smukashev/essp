@@ -79,4 +79,6 @@ public interface IRuleService {
      */
     public long createNewRuleInBatch(Rule rule, BatchVersion batchVersion);
 
+    public void renameRule(long ruleId, String title);
+
 }

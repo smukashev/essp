@@ -126,7 +126,12 @@ public class MockRuleServiceWithError implements IRuleService
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-//    @Override
+    @Override
+    public void renameRule(long ruleId, String title) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    //    @Override
 //    public long saveRule(long ruleId, long batchVersionId) {
 //        return 0;  //To change body of implemented methods use File | Settings | File Templates.
 //    }

@@ -617,6 +617,25 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
       if(function == null) throw new RuntimeException("no function");
 
+        Set allowedSet = new TreeSet<Long>();
+
+        if(function.startsWith("set")){
+            String[] elems = function.substring(function.indexOf('(') + 1,function.indexOf(')')).split(",");
+            if(function.startsWith("setInt")){
+                allowedSet = new TreeSet<Integer>();
+                for(String e: elems)
+                    allowedSet.add(Integer.parseInt(e.trim()));
+            } else if( function.startsWith("setLong")){
+                allowedSet = new TreeSet<Long>();
+                for(String e: elems)
+                    allowedSet.add(Long.parseLong(e.trim()));
+            } else if( function.startsWith("setString")){
+                allowedSet = new TreeSet<String>();
+                for(String e: elems)
+                    allowedSet.add(e.trim());
+            }
+        }
+
 
       int yk = 0;
       int open = 0;
@@ -664,39 +683,48 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         List ret = new LinkedList();
         enQueue(this);
         enQueue(0);
+        int retCount = 0;
 
         while(queueSize() > 0){
-            BaseEntity curO = (BaseEntity) deQueue();
+            Object curO = deQueue();
             int step = (Integer) deQueue();
 
             if(step == yk)
             {
+                if(function.startsWith("count")) retCount ++;
+                else if(function.startsWith("set"))
+                    if(allowedSet.contains( curO ))
+                        retCount++;
                 ret.add(curO);
                 continue;
             }
 
 
-           MetaClass curMeta = curO.getMeta();
+            BaseEntity curBE = (BaseEntity) curO;
+            MetaClass curMeta = curBE.getMeta();
 
            if(!isFilter[step]){
                  IMetaAttribute nextAttribute = curMeta.getMetaAttribute(operations[step]);
 
-                 if(nextAttribute.getMetaType().isSet()){
-                     BaseSet next = (BaseSet)curO.getEl(operations[step]);
+               if(nextAttribute == null){ // transition to BASIC type
+                   enQueue(curBE.getEl(operations[step]));
+                   enQueue(step + 1);
+               } else if(nextAttribute.getMetaType().isSet()){ //transition to array
+                   BaseSet next = (BaseSet)curBE.getEl(operations[step]);
                      for(Object o: next.get()){
                          {
                              enQueue(((BaseValue) o).getValue());
                              enQueue(step+1);
                          }
                      }
-                 } else{
-                     BaseEntity next = (BaseEntity) curO.getEl(operations[step]);
+               } else{ //transition to simple
+                   BaseEntity next =  (BaseEntity) curBE.getEl(operations[step]);
                      enQueue(next);
                      enQueue(step+1);
                  }
            }else{
                String[] parts = operations[step].split("=");
-               Object o = curO.getEl(parts[0]);
+               Object o = curBE.getEl(parts[0]);
 
                if( (o==null && parts[1].equals("null")) || o.toString().equals(parts[1]))
                {
@@ -706,10 +734,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
            }
         }
 
-      if(function.startsWith("count"))
-          return ret.size();
-      else throw new RuntimeException("unknown function");
-
+        return retCount;
     }
 
     public Object getEl(String path)

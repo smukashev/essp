@@ -182,4 +182,10 @@ public class RuleDao implements IRuleDao {
         }, keyHolder);
         return keyHolder.getKey().longValue();
     }
+
+    @Override
+    public void renameRule(long ruleId, String title) {
+        String sql = "Update rules set title = ? where id = ?";
+        jdbcTemplate.update(sql, title, ruleId);
+    }
 }

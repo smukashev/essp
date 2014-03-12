@@ -652,14 +652,14 @@ public class CLI
             PreparedStatement preparedStatementDone = null;
             try
             {
-                preparedStatement = conn.prepareStatement("select xf.id, xf.file_name, xf.file_content\n" +
-                        "  from core.xml_file xf\n" +
-                        " where xf.status = 'COMPLETED'\n" +
-                        "   and xf.sent = 0 order by xf.id asc");
+                preparedStatement = conn.prepareStatement("SELECT xf.id, xf.file_name, xf.file_content\n" +
+                        "  FROM core.xml_file xf\n" +
+                        " WHERE xf.status = 'COMPLETED'\n" +
+                        "   AND xf.sent = 0 ORDER BY xf.id ASC");
 
-                preparedStatementDone = conn.prepareStatement("update core.xml_file xf \n" +
-                        "   set xf.sent = ? \n" +
-                        " where xf.id = ?");
+                preparedStatementDone = conn.prepareStatement("UPDATE core.xml_file xf \n" +
+                        "   SET xf.sent = ? \n" +
+                        " WHERE xf.id = ?");
             } catch (SQLException e)
             {
                 System.out.println("Can't create prepared statement: " + e.getMessage());
@@ -1026,6 +1026,10 @@ public class CLI
     private Date currentDate = new Date();
     private boolean started = false;
     private BatchVersion currentBatchVersion;
+    private String defaultDumpFile = "c:/rules/pledge2.cli";
+    private String defaultEntityFile = "c:/rules/baseEntityId.txt";
+    private long currentBaseEntityId = -1;
+    private final boolean DEBUG = false;
 
 
 
@@ -1034,6 +1038,15 @@ public class CLI
         {
             init();
             started = true;
+            try {
+                if(DEBUG){
+                    Scanner reader = new Scanner(new File(defaultEntityFile));
+                    currentBaseEntityId = Long.parseLong(reader.nextLine());
+                    reader.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
         }
 
         try{
@@ -1056,17 +1069,18 @@ public class CLI
             long r = 18606;
             //System.out.println(ruleService.copyRule(18646, "title1", 3));
 
-            BaseEntity baseEntity = (BaseEntity) baseEntityDao.load(12887);
+            BaseEntity baseEntity = (BaseEntity) baseEntityDao.load(4081);
             //IBaseValue bv = baseEntity.getBaseValue("pledges.pledge_type");
 
-            //System.out.println(baseEntity.getEls("{count}pledges[pledge_type.code=47]"));
-            System.out.println(batchVersionService.getBatchVersion("test",date));
+            System.out.println(baseEntity.getEls("{setString(1,2,3,4)}credit_type.code"));
+            //System.out.println(baseEntity.getEl("credit_type.code"));
+            //System.out.println(batchVersionService.getBatchVersion("test",date));
             //System.out.println(bs.getElementCount());
         } else if(args.get(0).equals("dump")){
             if(args.size() < 2)
-                throw new IllegalArgumentException("output file not specified");
+                System.out.println("using default dump file path");
             try {
-                PrintWriter out = new PrintWriter(args.get(1));
+                PrintWriter out = new PrintWriter( args.size() < 2 ? defaultDumpFile : args.get(1));
                 List<Rule> rules = ruleService.getAllRules();
                 for(Rule r: rules){
                     out.println("rule read $$$");
@@ -1132,8 +1146,11 @@ public class CLI
             System.out.println("ok saved: ruleId = " + ruleId);
 
         }else if(args.get(0).equals("run")){
-            if(args.size() < 2) throw new  IllegalArgumentException();
-            long id = Long.parseLong(args.get(1));
+            long id;
+            if(args.size() > 1) id = Long.parseLong(args.get(1));
+            else id = currentBaseEntityId;
+
+            System.out.println("running on baseEntity id: " + id);
 
             BaseEntity baseEntity = (BaseEntity) baseEntityDao.load(id);
 

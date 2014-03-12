@@ -128,4 +128,9 @@ public class MockRuleService implements IRuleService
     public long createNewRuleInBatch(Rule rule, BatchVersion batchVersion) {
         return -1;
     }
+
+    @Override
+    public void renameRule(long ruleId, String title) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

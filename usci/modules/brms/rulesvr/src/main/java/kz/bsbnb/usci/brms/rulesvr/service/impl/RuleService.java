@@ -114,6 +114,11 @@ public class RuleService implements IRuleService {
           return ruleId;
     }
 
+    @Override
+    public void renameRule(long ruleId, String title) {
+        ruleDao.renameRule(ruleId,title);
+    }
+
     //    public ListenerSingleton getListenerSingleton() {
 //        return listenerSingleton;
 //    }
