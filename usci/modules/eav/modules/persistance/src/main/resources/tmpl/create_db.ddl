@@ -411,6 +411,11 @@
       <index name="eav_ind_005_03">
         <index-column name="entity_id"/>
       </index>
+      <unique name="eav_ind_005_04">
+        <unique-column name="attribute_id"/>
+        <unique-column name="entity_value_id"/>
+        <unique-column name="entity_id"/>
+      </unique>
     </table>
     <!-- EAV_BE_DATE_SET_VALUES -->
     <table name="eav_be_date_set_values">
@@ -899,6 +904,11 @@
         <index-column name="entity_id"/>
       </index>
       <index name="eav_ind_021_03">
+        <index-column name="attribute_id"/>
+        <index-column name="value"/>
+      </index>
+      <index name="eav_ind_021_04">
+        <index-column name="entity_id"/>
         <index-column name="attribute_id"/>
         <index-column name="value"/>
       </index>

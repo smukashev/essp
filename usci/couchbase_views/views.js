@@ -19,7 +19,7 @@ function(key, values, rereduce) {
 //batch_pending
 
 function (doc, meta) {
-  if(doc.type == "batch_status" && doc.batchStatuses[doc.batchStatuses.length - 1].protocol != "PARSING_COMPLETED") {
+  if(doc.type == "batch_status" && doc.batchStatuses[doc.batchStatuses.length - 1].protocol != "COMPLETED") {
     emit(meta.id.substring(13), doc.batchStatuses[doc.batchStatuses.length - 1].protocol);
   }
 }

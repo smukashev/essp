@@ -114,6 +114,6 @@ public class StatusSingleton {
 
     public synchronized void endBatch(Long batchId, Long userId) {
         addBatchStatus(batchId, new BatchStatusJModel(
-                BatchStatuses.PARSING_COMPLETED, null, new Date(), userId));
+                BatchStatuses.COMPLETED, null, new Date(), userId));
     }
 }

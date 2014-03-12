@@ -735,7 +735,7 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
         // TODO: Remove this code after couchbase repaired
         if (baseEntity.getMeta().getClassName().equals("credit") && baseEntity.getId() > 0)
         {
-            System.out.println("Skipped because exists " + (System.currentTimeMillis() - t1));
+            //System.out.println("Skipped because exists " + (System.currentTimeMillis() - t1));
             return baseEntity;
         }
 
