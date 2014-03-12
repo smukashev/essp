@@ -5,6 +5,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcherPool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 
 @Repository
@@ -14,6 +15,14 @@ public class BasicBaseEntitySearcherPool implements IBaseEntitySearcherPool
 
     @Autowired
     private ImprovedBaseEntitySearcher baseEntitySearcher;
+
+    @Autowired
+    private DocumentSearcher ds;
+
+    @PostConstruct
+    public void init() {
+        searchersByName.put(ds.getClassName(), ds);
+    }
 
     @Override
     public IBaseEntitySearcher getSearcher(String name)

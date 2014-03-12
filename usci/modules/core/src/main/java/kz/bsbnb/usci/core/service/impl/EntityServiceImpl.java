@@ -8,6 +8,7 @@ import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
@@ -37,7 +38,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     IBaseEntityDao baseEntityDao;
 
     @Autowired
-    IBaseEntitySearcher searcher;
+    IBaseEntitySearcherPool searcherPool;
 
     @Autowired
     IMetaClassDao metaClassDao;
@@ -90,7 +91,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Override
     public BaseEntity search(BaseEntity baseEntity) {
-        ArrayList<Long> result = searcher.findAll(baseEntity);
+        ArrayList<Long> result = searcherPool.getSearcher(baseEntity.getMeta().getClassName()).findAll(baseEntity);
 
         return (BaseEntity)baseEntityDao.load(result.get(0));
     }

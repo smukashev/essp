@@ -2,7 +2,6 @@ package kz.bsbnb.usci.receiver.reader.impl;
 
 import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;

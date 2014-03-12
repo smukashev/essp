@@ -39,6 +39,9 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
     @Autowired
     private DSLContext context;
 
+    @Autowired
+    private BasicBaseEntitySearcherPool searcherPool;
+
     @Override
     public String getClassName() {
         return null;
@@ -50,7 +53,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         if (entity.getId() > 0)
             return entity.getId();
 
-        List<Long> ids = findAll(entity);
+        List<Long> ids = searcherPool.getSearcher(entity.getMeta().
+                getClassName()).findAll(entity);
 
         if (ids.size() > 1) {
             //throw new RuntimeException("Found more than one instance of BaseEntity. Needed one.");
@@ -262,7 +266,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                             }
                         } else {
                             BaseEntity childBaseEntity = (BaseEntity)baseValue.getValue();
-                            Long childBaseEntityId = findSingle(childBaseEntity);
+                            //Long childBaseEntityId = findSingle(childBaseEntity);
+                            Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().getClassName()).findSingle(childBaseEntity);
                             if (childBaseEntityId == null)
                             {
                                 if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
@@ -308,7 +313,9 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                 for (IBaseValue childBaseValue : baseSet.get())
                                 {
                                     BaseEntity childBaseEntity = (BaseEntity)childBaseValue.getValue();
-                                    Long childBaseEntityId = findSingle(childBaseEntity);
+                                    //Long childBaseEntityId = findSingle(childBaseEntity);
+                                    Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().
+                                            getClassName()).findSingle(childBaseEntity);
 
                                     if (childBaseEntityId != null)
                                     {
