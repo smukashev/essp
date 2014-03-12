@@ -1,7 +1,10 @@
 Ext.require([
     'Ext.Msg',
     'Ext.panel.*',
-    'Ext.form.*'
+    'Ext.form.*',
+    'Ext.selection.CellModel',
+    'Ext.grid.*',
+    'Ext.data.*'
 ]);
 
 
@@ -59,7 +62,7 @@ function initGrid(){
     });
 
 
-    return ruleListGrid = Ext.create('Ext.grid.Panel', {
+    ruleListGrid = Ext.create('Ext.grid.Panel', {
         store: store,
         columns: [
             {
@@ -86,7 +89,11 @@ function initGrid(){
             {
                 text     : 'Title',
                 dataIndex: 'name',
-                width: 200
+                width: 200,
+                flex: 1,
+                field: {
+                    allowBlank: false
+                }
             } ,
             {
                 text : 'Id6nik',
@@ -125,6 +132,10 @@ function initGrid(){
 
             }
         },
+        plugins: [
+            Ext.create('Ext.grid.plugin.CellEditing', {
+                clicksToEdit: 2
+            })],
         dockedItems: [{
             xtype: 'toolbar',
             items: [{
@@ -268,6 +279,31 @@ function initGrid(){
         region: 'south'
     });
 
+    ruleListGrid.on('edit', function(e,r){
+        Ext.Ajax.request({
+            url: dataUrl,
+            waitMsg: 'adding',
+            params : {
+                op : 'RENAME_RULE',
+                ruleId: ruleListGrid.getSelectionModel().getLastSelected().data.id,
+                title: r.value
+            },
+            reader: {
+                type: 'json'
+            },
+            actionMethods: {
+                read: 'POST',
+                root: 'data'
+            },
+            success: function(response, opts) {
+            },
+            failure: function(response, opts) {
+                Ext.Msg.alert("Ошибка", JSON.parse(response.responseText).errorMessage );
+            }
+        });
+    }, this);
+
+    return ruleListGrid;
 }
 
 function reset(){
