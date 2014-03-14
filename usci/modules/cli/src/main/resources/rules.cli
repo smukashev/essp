@@ -1,87 +1,222 @@
+#rule set date 01.04.2013
 rule create package afk
+rc
 rule set package afk
-rule set date 18.02.2014
 rule set version
 
 rule read $$$
-title: subjectTest
-rule "subject test"
+title: pledgeType_hm
+rule "pledge type for homogenous zaem"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "ct_package" && getEl("subjects")!=null)
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
+            && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+            && getEls("{count}pledges[pledge_type=null]") > 0 )
 then
-  $entity.addValidationError("Не должны указываться субьекты");
+  $entity.addValidationError("Вид обеспечения должен указываться для однородных кредитов" );
 end
-
 $$$
+
 rule save
 
 rule read $$$
-title: pledgeType1
+title: contract_date
+rule "contract date check"
+when: 
+ $entity: BaseEntity( getMeta().getClassName == "credit" && getEls("{count}[primary_contract.date=null]") > 0 )
+then
+ $entity.addValidationError("Отсутствует дата соглашения");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: contract_no
+rule "contract number check"
+when: 
+ $entity: BaseEntity( getMeta().getClassName == "credit" && getEls("{count}[primary_contract.no=null]") > 0 )
+then
+ $entity.addValidationError("Отсутствует номер соглашения");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: credit code 2 digits
+rule "credit type code must be xx format"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && (getEl("credit_type.code") not matches ("[\\d]{2}") ) ) 
+then
+  $entity.addValidationError("код кредита должен быть 2х значным числом ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: maturity_date_contract
+rule "maturity date contract"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{setString(01,02,03,09,11,12,13,14,16,17,18,24,26)}credit_type.code") > 0  
+                                                           && getEl("contract_maturity_date") == null )
+then
+  $entity.addValidationError("Дата погашения по условиям договора должна указываться для данного типа займа");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: pledge_contract_no
+rule "pledge contract number for invest zaem, overdraft i overnait"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0
+                                                           && getEls("{setString(01,02,03,09,10,11,12,13,14,15,25,26)}credit_type.code") > 0
+                                                           && getEls("{count}pledges[contract=null]") > 0)
+then
+  $entity.addValidationError("Номер залога должен указываться для данного типа кредита при наличии обеспечения");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: pledge_contract_no_hm
+rule "pledge contract number for homogenous zaem"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0
+                                                           && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                                                           && getEls("{count}pledges[contract=null]") > 0)
+then
+  $entity.addValidationError("Номер залога должен указываться для однородного кредита при наличии обеспечения");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: actual_issue_date
+rule "actual issue date must be present for some credits"
+when: 
+ $entity: BaseEntity( getMeta().getClassName == "credit" 
+                                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,24,26)}credit_type.code") > 0
+                                && getEl("actual_issue_date") == null)
+then
+   $entity.addValidationError("Фактическая дата выдачи должна быть указана для данного типа займа");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: pledge_value_hm
+rule "pledge value for homogenous zaem"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0 
+                                                           && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                                                           && getEls("{count}pledges[value=null]") > 0)
+then
+  $entity.addValidationError("Сумма залога должна указываться для однородных кредитов при наличии обеспечения");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: pledgeType
 rule "pledge type for zaem"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "ct_package" && getEl("credit.credit_type.code")==1 && getEl("pledges.pledge_type")==null)
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{setString(01,02,03,09,10,11,12,13,14,15,16,17,18,24,25,26)}credit_type.code") > 0  
+                                                           && getEls("{count}pledges[pledge_type=null]") > 0 )
 then
-  System.out.println("ERROR: Вид обеспечения должен указываться для заема ");
-end
-
+  $entity.addValidationError("Вид обеспечения должен указываться для данного типа кредита");
+end 
 $$$
+
 rule save
 
 rule read $$$
-title: pledge_dogovor_number
-rule "pledge dogovor"
+title: maturity_date_contract_hm
+rule "maturity date contract homogenous credit"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "ct_package" && getEls("{count}pledges[contract=null]") > 0)
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                                                           && getEl("contract_maturity_date") == null )
 then
-  System.out.println("pledge error: contract is null " );
+  $entity.addValidationError("Дата погашения по условиям договора должна указываться для однородного займа");
 end
-
 $$$
+
 rule save
 
 rule read $$$
-title: eeee
-sdfdsfsdf
-
+title: actual_issue_date >= contract_date
+rule "credit.actual_issue_date must not be earlier than contrat_date"
+when: 
+ $entity: BaseEntity( getMeta().getClassName == "credit" 
+                            && getEl("actual_issue_date")!=null
+                            && getEl("actual_issue_date") < getEl("primary_contract.date")
+                     )
+then
+ $entity.addValidationError("Дата фактической выдачи  не может быть ранее даты договора");
+end
 $$$
+
 rule save
 
 rule read $$$
-title: r_pledgeType_Zaem
-rule "pledge type for zaem"
+title: credit_type
+rule "credit Type check"
+when: 
+ $entity: BaseEntity( getMeta().getClassName == "credit" && getEls("{count}[credit_type=null]") > 0 )
+then
+ $entity.addValidationError("Не указан справочник вид займа и условных обязательств ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: pledge_value_check
+rule "pledge value for invest zaem"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "ct_package" && getEl("credit.credit_type.code")==1 && getEl("pledges.pledge_type")==null)
+  
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0 
+                                                           && getEls("{setString(01,02,03,09,10,11,12,13,14,15,25,26)}credit_type.code") > 0
+                                                           && getEls("{count}pledges[value=null]") > 0)
 then
-  System.out.println("ERROR: Вид обеспечения должен указываться для заема ");
-end
-
+  $entity.addValidationError("Сумма залога должна указываться для данного типа кредита при наличии обеспечения");
+end 
 $$$
+
 rule save
 
 rule read $$$
-title: r_pledgeType_GAP
-rule "pledge type for garanty, accreditiv, poru4itelstvo"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "ct_package" && 
-    ( getEl("credit.credit_type.code")==12 || getEl("credit.credit_type.code")==13 || getEl("credit.credit_type.code")==14 ) 
-    && getEl("pledges.pledge_type")==null)
+title: actual_issue_date_hm
+rule "actual issue date must be present for homegenous credit"
+when: 
+ $entity: BaseEntity( getMeta().getClassName == "credit" 
+                                && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                                && getEl("actual_issue_date") == null)
 then
-  System.out.println("ERROR: Вид обеспечения должен указываться для гарантии, аккредитив, поручительства ");
+   $entity.addValidationError("Фактическая дата выдачи должна быть указана для однородного займа");
 end
-
 $$$
+
 rule save
 
 rule read $$$
-title: pledge_typeDisplay
-rule "pledge test"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "ct_package" && getEls("{count}pledges[pledge_type=null]") > 0)
+title: credit.contract_date >= contract_date
+rule "contract_date must not be earlier primary_contract.date"
+when: 
+ $entity: BaseEntity( getMeta().getClassName == "credit" 
+                    && getEl("contract.date")!=null
+                    && getEl("contract.date") < getEl("primary_contract.date"))
 then
-  System.out.println("pledge error " );
+   $entity.addValidationError("Дата дополнительного соглашения не может быть ранее даты договора");
 end
-
 $$$
+
 rule save
 
 quit

@@ -691,7 +691,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
             if(step == yk)
             {
-                if(function.startsWith("count")) retCount ++;
+                if(function.startsWith("count")) {
+                    if(curO != null )retCount ++;
+                }
                 else if(function.startsWith("set"))
                     if(allowedSet.contains( curO ))
                         retCount++;
