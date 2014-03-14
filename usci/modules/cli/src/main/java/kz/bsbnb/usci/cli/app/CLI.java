@@ -1090,8 +1090,7 @@ public class CLI
     private BatchVersion currentBatchVersion;
     private String defaultDumpFile = "c:/rules/pledge2.cli";
     private String defaultEntityFile = "c:/rules/baseEntityId.txt";
-    private long currentBaseEntityId = -1;
-    private final boolean DEBUG = false;
+    private BaseEntity currentBaseEntity;
 
 
 
@@ -1101,11 +1100,6 @@ public class CLI
             init();
             started = true;
             try {
-                if(DEBUG){
-                    Scanner reader = new Scanner(new File(defaultEntityFile));
-                    currentBaseEntityId = Long.parseLong(reader.nextLine());
-                    reader.close();
-                }
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
@@ -1113,44 +1107,37 @@ public class CLI
 
         try{
         if(args.get(0).equals("debug")){
-            //Batch batch = new Batch(new Date());
-            //kz.bsbnb.usci.brms.rulesvr.model.impl.Batch batch = new kz.bsbnb.usci.brms.rulesvr.model.impl.Batch();
-            //batch.setId(4);
-            //batchVersionService.copyRule(18606,batch,SimpleDateFormat.getInstance().parse("2013-10-20",""));
 
             DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
-            Date date = dateFormatter.parse("18.02.2014");
-            //batchVersionService.copyRule(18606L,batch,date);
-            System.out.println(date);
-            //List<Rule> rules = ruleService.getRules(4L, date);
-//            List<SimpleTrack> tracks = ruleService.getRuleTitles(4L, date);
-//
-//            for (SimpleTrack track: tracks){
-//                System.out.println(track.getId());
-//            }
-            long r = 18606;
-            //System.out.println(ruleService.copyRule(18646, "title1", 3));
+            Date date = dateFormatter.parse("01.03.2014");
 
-            BaseEntity baseEntity = (BaseEntity) baseEntityDao.load(4081);
-            //IBaseValue bv = baseEntity.getBaseValue("pledges.pledge_type");
-
-            System.out.println(baseEntity.getEls("{setString(1,2,3,4)}credit_type.code"));
-            //System.out.println(baseEntity.getEl("credit_type.code"));
-            //System.out.println(batchVersionService.getBatchVersion("test",date));
-            //System.out.println(bs.getElementCount());
+            try {
+                CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, date);
+                BaseEntity baseEntity = reader.read();
+                System.out.println(baseEntity);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         } else if(args.get(0).equals("dump")){
             if(args.size() < 2)
-                System.out.println("using default dump file path");
+                System.out.println("using default dump file path " + defaultDumpFile);
             try {
                 PrintWriter out = new PrintWriter( args.size() < 2 ? defaultDumpFile : args.get(1));
                 List<Rule> rules = ruleService.getAllRules();
+
+                out.println("#rule set date 01.04.2013");
+                out.println("rule create package afk");
+                out.println("rc");
+                out.println("rule set package afk");
+                out.println("rule set version\n");
                 for(Rule r: rules){
                     out.println("rule read $$$");
                     out.println("title: " + r.getTitle());
                     out.println(r.getRule());
                     out.println("$$$\n");
+                    out.println("rule save\n");
                 }
-
+                out.println("quit");
                 out.close();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -1166,10 +1153,14 @@ public class CLI
                 if(!line.startsWith("title: "))
                     throw new IllegalArgumentException("title must be specified format title: <name>");
                 String title = line.split("title: ")[1];
+                line = in.nextLine();
+                if(line.startsWith(args.get(1)))
+                    throw new IllegalArgumentException("rule must not be empty");
+                sb.append(line);
                 do{
                     line = in.nextLine();
                     if(line.startsWith(args.get(1))) break;
-                    sb.append(line+"\n");
+                    sb.append("\n" + line);
                 }while(true);
                 currentRule = new Rule();
                 currentRule.setRule(sb.toString());
@@ -1184,42 +1175,30 @@ public class CLI
                 System.out.println(currentPackageName);
             else if(args.get(1).equals("date"))
                 System.out.println(currentDate);
+            else if(args.get(1).equals("entity"))
+                System.out.println(currentBaseEntity);
             else throw new IllegalArgumentException();
         } else if(args.get(0).equals("save")){
-
             long ruleId = ruleService.createNewRuleInBatch(currentRule, currentBatchVersion);
+            System.out.println("ok saved: ruleId = " + ruleId);
+        }else if(args.get(0).equals("run")){
 
-            /*long packageId = -1;
+            DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
+            Date reportDate = dateFormatter.parse("01.03.2014");
 
-            for(kz.bsbnb.usci.brms.rulesvr.model.impl.Batch b: batchService.getAllBatches()){
-               if(b.getName().equals(currentPackageName)){
-                   packageId = b.getId();
-               }
+            try {
+                CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, reportDate);
+                currentBaseEntity = reader.read();
+                rulesSingleton.runRules(currentBaseEntity,currentPackageName,currentDate);
+
+                for (String s: currentBaseEntity.getValidationErrors())
+                    System.out.println("Validation error:" + s);
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
 
-            if(packageId == -1)
-                throw new IllegalArgumentException("no such package :" + currentPackageName);
 
-            Long ruleId = ruleService.save(currentRule,new BatchVersion());
-            batchVersionService.copyRule(ruleId,batchService.load(packageId),currentDate);
-
-            //Long versionId = batchVersionService.getBatchVersions();*/
-
-            System.out.println("ok saved: ruleId = " + ruleId);
-
-        }else if(args.get(0).equals("run")){
-            long id;
-            if(args.size() > 1) id = Long.parseLong(args.get(1));
-            else id = currentBaseEntityId;
-
-            System.out.println("running on baseEntity id: " + id);
-
-            BaseEntity baseEntity = (BaseEntity) baseEntityDao.load(id);
-
-            rulesSingleton.runRules(baseEntity,currentPackageName,currentDate);
-
-            for (String s: baseEntity.getValidationErrors())
-                System.out.println("Validation error:" + s);
         }else if(args.get(0).equals("set")){
 
              if(args.get(1).equals("version")){
@@ -1227,6 +1206,7 @@ public class CLI
              }else if(args.size() < 3) throw new IllegalArgumentException();
              else if(args.get(1).equals("package"))
                {
+                   rulesSingleton.reloadCache();
                    rulesSingleton.getRulePackageName(args.get(2),currentDate);
                    currentPackageName = args.get(2);
                }
@@ -1248,7 +1228,11 @@ public class CLI
             System.out.println("ok batch created with id:"+id);
         } else if(args.get(0).equals("rc")){
             rulesSingleton.reloadCache();
-        }else throw new IllegalArgumentException();
+        } else if( args.get(0).equals("eval")){
+            System.out.println(currentBaseEntity.getEls(args.get(1)));
+        } else if( args.get(0).equals("eval2")){
+            System.out.println(currentBaseEntity.getEl(args.get(1)));
+        }  else throw new IllegalArgumentException();
         }catch(IllegalArgumentException e){
             if(e.getMessage()==null)
               System.out.println("Argument needed: <read {label},current [<pckName,date>],save,run {id},set <package,date> {value} , create package {pckName}>");
