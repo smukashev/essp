@@ -121,6 +121,12 @@ public class ZipFilesMonitor{
                 ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) rows.next();
                 long batchId = Long.parseLong(viewRowNoDocs.getKey());
 
+                if (viewRowNoDocs.getValue().equals("ERROR"))
+                {
+                    System.out.println("Skipped because of error!");
+                    continue;
+                }
+
                 System.out.println("batchId: " + batchId + ", status: " + viewRowNoDocs.getValue());
 
                 String batchInfoStr = couchbaseClient.get("manifest:" + batchId).toString();
