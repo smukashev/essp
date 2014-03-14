@@ -66,7 +66,7 @@ public class RuleDao implements IRuleDao {
 
     @Override
     public List<Rule> getAllRules() {
-        String SQL = "SELECT * FROM rules";
+        String SQL = "SELECT * FROM rules order by id";
         List<Rule> ruleList = jdbcTemplate.query(SQL,new BeanPropertyRowMapper(Rule.class));
 
         return ruleList;
