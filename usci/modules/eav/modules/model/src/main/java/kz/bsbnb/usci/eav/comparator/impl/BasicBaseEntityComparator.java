@@ -244,6 +244,9 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
     {
         ArrayList<String> paths = new ArrayList<String>();
 
+        if (c1 == null)
+            return paths;
+
         MetaClass meta = c1.getMeta();
 
         Set<String> names = meta.getMemberNames();

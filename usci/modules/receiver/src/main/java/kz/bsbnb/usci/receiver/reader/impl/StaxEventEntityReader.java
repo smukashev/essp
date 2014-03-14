@@ -50,6 +50,7 @@ import java.util.zip.ZipInputStream;
 public class StaxEventEntityReader<T> extends CommonReader<T> {
     private Logger logger = Logger.getLogger(StaxEventEntityReader.class);
     private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
+    private Stack<Boolean> flagsStack = new Stack<Boolean>();
     private IBaseContainer currentContainer;
     private Batch batch;
     private Long index = 1L, level = 0L;
@@ -66,6 +67,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     @Autowired
     private IServiceRepository serviceFactory;
+
+    private boolean hasMembers = false;
 
     @PostConstruct
     public void init() {
@@ -140,6 +143,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             } else if(metaType.isComplex() && !metaType.isSet()) {
                 stack.push(currentContainer);
                 currentContainer = new BaseEntity((MetaClass)metaType, batch.getRepDate());
+                flagsStack.push(hasMembers);
+                hasMembers = false;
                 //metaFactoryService.getBaseEntity((MetaClass)metaType, batch.getRepDate());
                 level++;
             } else if(!metaType.isComplex() && !metaType.isSet()) {
@@ -155,6 +160,10 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 } catch (ClassCastException ex) {
                     logger.debug("Empty tag: " + localName);
                     level--;
+                }
+
+                if (o != null) {
+                    hasMembers = true;
                 }
 
                 currentContainer.put(localName, new BaseValue(batch, index, o));
@@ -231,11 +240,18 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 currentContainer = stack.pop();
 
                 if (currentContainer.isSet()) {
-                    ((BaseSet)currentContainer).put(new BaseValue(batch, index, o));
+                    if (hasMembers)
+                        ((BaseSet)currentContainer).put(new BaseValue(batch, index, o));
+                    else
+                        ((BaseSet)currentContainer).put(new BaseValue(batch, index, null));
                 } else {
-                    currentContainer.put(localName, new BaseValue(batch, index, o));
+                    if (hasMembers)
+                        currentContainer.put(localName, new BaseValue(batch, index, o));
+                    else
+                        currentContainer.put(localName, new BaseValue(batch, index, null));
                 }
 
+                hasMembers = flagsStack.pop();
             }
             level--;
         }

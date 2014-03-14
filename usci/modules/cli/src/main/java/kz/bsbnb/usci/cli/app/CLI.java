@@ -37,6 +37,8 @@ import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
+import kz.bsbnb.usci.tool.status.ReceiverStatus;
+import kz.bsbnb.usci.tool.status.SyncStatus;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -782,6 +784,66 @@ public class CLI
         }
     }
 
+    public void commandRStat()
+    {
+        if (args.size() > 0) {
+            RmiProxyFactoryBean batchProcessServiceFactoryBean = null;
+
+            IBatchProcessService batchProcessService = null;
+
+            try {
+                batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+                batchProcessServiceFactoryBean.setServiceUrl(args.get(0));
+                batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+                batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+                batchProcessServiceFactoryBean.afterPropertiesSet();
+                batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+
+                ReceiverStatus rs = batchProcessService.getStatus();
+
+                System.out.println(rs.toString());
+            } catch (Exception e) {
+                System.out.println("Can't connect to receiver service: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Argument needed: <receiver_url>");
+            System.out.println("Example: rstat rmi://127.0.0.1:1097/batchProcessService");
+        }
+    }
+
+    public void commandSStat()
+    {
+        if (args.size() > 0) {
+            RmiProxyFactoryBean entityServiceFactoryBean = null;
+
+            kz.bsbnb.usci.sync.service.IEntityService entityService = null;
+
+            try {
+                entityServiceFactoryBean = new RmiProxyFactoryBean();
+                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+                entityServiceFactoryBean.setServiceUrl(args.get(0));
+                entityServiceFactoryBean.setServiceInterface(kz.bsbnb.usci.sync.service.IEntityService.class);
+                entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+                entityServiceFactoryBean.afterPropertiesSet();
+                entityService = (kz.bsbnb.usci.sync.service.IEntityService) entityServiceFactoryBean.getObject();
+
+                SyncStatus rs = entityService.getStatus();
+
+                System.out.println(rs.toString());
+            } catch (Exception e) {
+                System.out.println("Can't connect to sync service: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Argument needed: <receiver_url>");
+            System.out.println("Example: sstat rmi://127.0.0.1:1098/entityService");
+        }
+    }
+
     public void commandSQLStat()
     {
         if (args.size() > 0) {
@@ -1288,6 +1350,10 @@ public class CLI
                         commandRule(in);
                     } else if(command.equals("import")) {
                         commandImport();
+                    } else if(command.equals("rstat")) {
+                        commandRStat();
+                    } else if(command.equals("sstat")) {
+                        commandSStat();
                     } else if(command.equals("sqlstat")) {
                         commandSQLStat();
                     } else if(command.equals("stc")) {

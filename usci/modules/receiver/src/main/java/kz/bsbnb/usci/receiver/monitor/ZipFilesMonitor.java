@@ -14,6 +14,7 @@ import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import kz.bsbnb.usci.sync.service.IBatchService;
+import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +66,9 @@ public class ZipFilesMonitor{
     @Autowired
     private JobLauncher jobLauncher;
 
+    @Autowired
+    private ReceiverStatusSingleton receiverStatusSingleton;
+
     private Map<String,Job> jobs;
 
     private List<Creditor> creditors;
@@ -88,6 +92,8 @@ public class ZipFilesMonitor{
 
     @PostConstruct
     public void init() {
+
+        sender.setReceiverStatusSingleton(receiverStatusSingleton);
         System.out.println("Retrieving creditors list");
         creditors = serviceFactory.getRemoteCreditorBusiness().findMainOfficeCreditors();
         System.out.println("Found " + creditors.size() + " creditors");
@@ -137,6 +143,7 @@ public class ZipFilesMonitor{
                 BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
 
                 sender.addJob(batchId, batchInfo);
+                receiverStatusSingleton.batchReceived();
             }
         }
 
@@ -144,6 +151,17 @@ public class ZipFilesMonitor{
     }
 
     private class SenderThread extends Thread {
+        private ReceiverStatusSingleton receiverStatusSingleton;
+
+        public ReceiverStatusSingleton getReceiverStatusSingleton()
+        {
+            return receiverStatusSingleton;
+        }
+
+        public void setReceiverStatusSingleton(ReceiverStatusSingleton receiverStatusSingleton)
+        {
+            this.receiverStatusSingleton = receiverStatusSingleton;
+        }
 
         private class JobInfo {
             long batchId;
@@ -214,6 +232,7 @@ public class ZipFilesMonitor{
 
                         if (job != null) {
                             jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+                            receiverStatusSingleton.batchStarted();
                             statusSingleton.addBatchStatus(nextJob.getBatchId(),
                                     new BatchStatusJModel(BatchStatuses.PROCESSING, null, new Date(),
                                             nextJob.getBatchInfo().getUserId()));
@@ -253,6 +272,8 @@ public class ZipFilesMonitor{
     }
 
     public void saveData(BatchInfo batchInfo, String filename, byte[] bytes){
+        receiverStatusSingleton.batchReceived();
+
         IBatchService batchService = serviceFactory.getBatchService();
 
         Batch batch = new Batch(batchInfo.getRepDate());

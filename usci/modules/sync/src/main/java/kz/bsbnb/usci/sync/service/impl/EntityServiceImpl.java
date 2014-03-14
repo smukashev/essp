@@ -4,6 +4,8 @@ import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.sync.job.impl.DataJob;
 import kz.bsbnb.usci.sync.service.IEntityService;
+import kz.bsbnb.usci.tool.status.SyncStatus;
+import kz.bsbnb.usci.tool.status.SyncStatusSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -26,6 +28,9 @@ public class EntityServiceImpl implements IEntityService {
     RmiProxyFactoryBean rmiProxyFactoryBean;
 
     kz.bsbnb.usci.core.service.IEntityService remoteEntityService;
+
+    @Autowired
+    SyncStatusSingleton syncStatusSingleton;
 
     @PostConstruct
     public void init() {
@@ -74,5 +79,11 @@ public class EntityServiceImpl implements IEntityService {
     public void setThreadsCount(int threadsCount, boolean allowAutoIncrement) {
         dataJob.setCurrentThread(threadsCount);
         dataJob.setAutoChooseThreshold(allowAutoIncrement);
+    }
+
+    @Override
+    public SyncStatus getStatus()
+    {
+        return syncStatusSingleton.getStatus();
     }
 }
