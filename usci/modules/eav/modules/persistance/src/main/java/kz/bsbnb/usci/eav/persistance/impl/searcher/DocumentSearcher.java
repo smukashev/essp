@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import org.jooq.DSLContext;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectJoinStep;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -73,7 +74,7 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
             }
 
             if (docTypeId > 0) {
-                SelectConditionStep select = context.
+                /*SelectConditionStep select = context.
                         select(EAV_BE_STRING_VALUES.as("d_no").ENTITY_ID.as("inner_id")).
                         from(EAV_BE_STRING_VALUES.as("d_no")).
                             join(EAV_BE_COMPLEX_VALUES.as("d_dt")).
@@ -86,12 +87,54 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
                             and(EAV_BE_STRING_VALUES.as("d_no").ATTRIBUTE_ID.equal(entity.getMetaAttribute("no").getId())).
 
                             and(EAV_BE_COMPLEX_VALUES.as("d_dt").ENTITY_VALUE_ID.equal(docTypeId)).
-                            and(EAV_BE_STRING_VALUES.as("d_no").VALUE.equal((String)(entity.getBaseValue("no").getValue())));
+                            and(EAV_BE_STRING_VALUES.as("d_no").VALUE.equal((String)(entity.getBaseValue("no").getValue())));*/
 
-                List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+                /*SelectConditionStep select = context.
+                        select(EAV_BE_STRING_VALUES.as("d_no").ENTITY_ID.as("inner_id")).
+                        from(EAV_BE_STRING_VALUES.as("d_no")).
+                        join(EAV_BE_COMPLEX_VALUES.as("d_dt")).
+                        on(EAV_BE_COMPLEX_VALUES.as("d_dt").ENTITY_ID.equal(EAV_BE_STRING_VALUES.as("d_no").ENTITY_ID)).
+                        where(EAV_BE_COMPLEX_VALUES.as("d_dt").ATTRIBUTE_ID.equal(entity.getMetaAttribute("doc_type").getId())).
+                        and(EAV_BE_STRING_VALUES.as("d_no").ATTRIBUTE_ID.equal(entity.getMetaAttribute("no").getId())).
+
+                        and(EAV_BE_COMPLEX_VALUES.as("d_dt").ENTITY_VALUE_ID.equal(docTypeId)).
+                        and(EAV_BE_STRING_VALUES.as("d_no").VALUE.equal((String)(entity.getBaseValue("no").getValue())));*/
+
+                /*SelectConditionStep select = context.
+                    select(EAV_BE_STRING_VALUES.as("d_no").ENTITY_ID.as("inner_id")).
+                        from(EAV_BE_STRING_VALUES.as("d_no")).
+                        where(
+                            DSL.exists(
+                                    context.select(DSL.val(1)).
+                                    from(EAV_BE_COMPLEX_VALUES.as("d_dt")).
+                                    where(EAV_BE_COMPLEX_VALUES.as("d_dt").ENTITY_ID.equal(EAV_BE_STRING_VALUES.as("d_no").ENTITY_ID)).
+                                    and(EAV_BE_COMPLEX_VALUES.as("d_dt").ATTRIBUTE_ID.equal(entity.getMetaAttribute("doc_type").getId())).
+                                and(EAV_BE_COMPLEX_VALUES.as("d_dt").ENTITY_VALUE_ID.equal(docTypeId))
+                            ).
+                        and(EAV_BE_STRING_VALUES.as("d_no").ATTRIBUTE_ID.equal(entity.getMetaAttribute("no").getId())).
+                        and(EAV_BE_STRING_VALUES.as("d_no").VALUE.equal((String) (entity.getBaseValue("no").getValue()))));*/
+
+                SelectConditionStep select = context.
+                select(EAV_BE_STRING_VALUES.as("d_no").ENTITY_ID.as("inner_id")).
+                from(EAV_BE_STRING_VALUES.as("d_no")).
+                where(EAV_BE_STRING_VALUES.as("d_no").ATTRIBUTE_ID.equal(entity.getMetaAttribute("no").getId())).
+                and(EAV_BE_STRING_VALUES.as("d_no").VALUE.equal((String) (entity.getBaseValue("no").getValue())));
+
+                List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray()); 
                 for (Map<String, Object> row : rows)
                 {
-                    res.add(((BigDecimal)row.get("inner_id")).longValue());
+                    long newId = ((BigDecimal)row.get("inner_id")).longValue();
+                    SelectConditionStep selectInner = context.
+                        select(EAV_BE_COMPLEX_VALUES.as("d_dt").ENTITY_ID.as("inner_id")).
+                        from(EAV_BE_COMPLEX_VALUES.as("d_dt")).
+                        where(EAV_BE_COMPLEX_VALUES.as("d_dt").ATTRIBUTE_ID.equal(entity.getMetaAttribute("doc_type").getId())).
+                        and(EAV_BE_COMPLEX_VALUES.as("d_dt").ENTITY_VALUE_ID.equal(docTypeId)).
+                        and(EAV_BE_COMPLEX_VALUES.as("d_dt").ENTITY_ID.equal(newId));
+
+                    if (queryForListWithStats(selectInner.getSQL(), selectInner.getBindValues().toArray()).size() <= 0)
+                        continue;
+
+                    res.add(newId);
                 }
             }
         }
