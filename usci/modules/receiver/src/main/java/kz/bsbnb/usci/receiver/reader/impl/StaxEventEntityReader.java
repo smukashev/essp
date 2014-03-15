@@ -138,6 +138,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
             if(metaType.isSet()) {
                 stack.push(currentContainer);
+                flagsStack.push(hasMembers);
                 currentContainer = metaFactoryService.getBaseSet(((MetaSet)metaType).getMemberType());
                 level++;
             } else if(metaType.isComplex() && !metaType.isSet()) {
@@ -242,8 +243,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 if (currentContainer.isSet()) {
                     if (hasMembers)
                         ((BaseSet)currentContainer).put(new BaseValue(batch, index, o));
-                    else
-                        ((BaseSet)currentContainer).put(new BaseValue(batch, index, null));
                 } else {
                     if (hasMembers)
                         currentContainer.put(localName, new BaseValue(batch, index, o));

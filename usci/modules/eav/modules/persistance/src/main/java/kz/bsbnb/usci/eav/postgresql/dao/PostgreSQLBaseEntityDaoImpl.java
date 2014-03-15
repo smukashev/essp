@@ -286,31 +286,23 @@ public class PostgreSQLBaseEntityDaoImpl extends JDBCSupport implements IBaseEnt
                         }
                         else
                         {
-                            IMetaClass childMetaClass = (IMetaClass)childMetaType;
                             IBaseSet childBaseSet = (IBaseSet)baseValue.getValue();
-                            if (childMetaClass.isSearchable())
+                            for (IBaseValue childBaseValue: childBaseSet.get())
                             {
-                                for (IBaseValue childBaseValue: childBaseSet.get())
+                                IBaseEntity childBaseEntity = (IBaseEntity)childBaseValue.getValue();
+                                if (childBaseEntity.getValueCount() != 0)
                                 {
-                                    IBaseEntity childBaseEntity = (IBaseEntity)childBaseValue.getValue();
-                                    if (childBaseEntity.getValueCount() != 0)
-                                    {
-                                        prepare((IBaseEntity)childBaseValue.getValue());
-                                    }
+                                    prepare((IBaseEntity)childBaseValue.getValue());
                                 }
                             }
                         }
                     }
                     else
                     {
-                        IMetaClass childMetaClass = (IMetaClass)metaType;
-                        if (childMetaClass.isSearchable())
+                        IBaseEntity childBaseEntity = (IBaseEntity)baseValue.getValue();
+                        if (childBaseEntity.getValueCount() != 0)
                         {
-                            IBaseEntity childBaseEntity = (IBaseEntity)baseValue.getValue();
-                            if (childBaseEntity.getValueCount() != 0)
-                            {
-                                prepare((IBaseEntity)baseValue.getValue());
-                            }
+                            prepare((IBaseEntity)baseValue.getValue());
                         }
                     }
                 }
