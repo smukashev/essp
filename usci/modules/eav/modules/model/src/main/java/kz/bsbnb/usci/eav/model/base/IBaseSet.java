@@ -13,6 +13,4 @@ public interface IBaseSet extends IBaseContainer {
 
     public void remove(String identifier);
 
-    public int getElementCount();
-
 }

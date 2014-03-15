@@ -219,7 +219,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
                         continue;
                     }
 
-                    for (String identifier : set2.getIdentifiers()) {
+                    for (String identifier : set2.getAttributes()) {
                         IBaseValue value2 = set2.getBaseValue(identifier);
                         if (value2 != null) {
                             BaseEntity entity2 = (BaseEntity)value2.getValue();

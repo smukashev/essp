@@ -510,8 +510,8 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
         BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
 
-        long countCreate = entityCreate.getAttributeCount();
-        long countLoad = entityLoad.getAttributeCount();
+        long countCreate = entityCreate.getValueCount();
+        long countLoad = entityLoad.getValueCount();
         assertEquals(countCreate, countLoad);
     }
 
@@ -539,8 +539,8 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
         BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
 
-        long countCreate = entityCreate.getAttributeCount();
-        long countLoad = entityLoad.getAttributeCount();
+        long countCreate = entityCreate.getValueCount();
+        long countLoad = entityLoad.getValueCount();
         assertEquals(countCreate, countLoad);
     }*/
 
@@ -572,8 +572,8 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         BaseEntity entityProcessed = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entityCreated.clone());
         BaseEntity entityLoaded = (BaseEntity)postgreSQLBaseEntityDaoImpl.load(entityProcessed.getId());
 
-        long countCreate = entityCreated.getAttributeCount();
-        long countLoad = entityLoaded.getAttributeCount();
+        long countCreate = entityCreated.getValueCount();
+        long countLoad = entityLoaded.getValueCount();
         assertEquals(countCreate, countLoad);
     }
 
@@ -620,7 +620,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         BaseEntity entityFirstSaved = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entityFirstForSave.clone());
 
         assertEquals("Incorrect number of attribute values in the saved BaseEntity after processing first batch,",
-                4, entityFirstSaved.getAttributeCount());
+                4, entityFirstSaved.getValueCount());
 
         IBaseValue baseValueFirstAfterFirstBatch = entityFirstSaved.getBaseValue("date_first");
         assertNotNull("Value for attribute <date_first> has not been loaded after processing first batch.",
@@ -644,7 +644,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         BaseEntity entitySecondUpdated = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entitySecondForUpdate.clone());
 
         assertEquals("Incorrect number of attribute values in the updated BaseEntity after processing second batch,",
-                5, entitySecondUpdated.getAttributeCount());
+                5, entitySecondUpdated.getValueCount());
 
         IBaseValue baseValueFirstAfterSecondBatch = entitySecondUpdated.getBaseValue("date_first");
         assertTrue("Value for attribute <date_first> designed to remove is not marked as closed.",
@@ -682,7 +682,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         BaseEntity entityThirdUpdated = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entityThirdForUpdate.clone());
 
         assertEquals("Incorrect number of attribute values in the updated BaseEntity after processing third batch,",
-                5, entityThirdUpdated.getAttributeCount());
+                5, entityThirdUpdated.getValueCount());
 
         IBaseValue baseValueFirstAfterThirdBatch = entityThirdUpdated.getBaseValue("date_first");
         assertNotNull("Value for attribute <date_first> designed to update has not been loaded " +
@@ -752,11 +752,11 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         BaseEntity entityLoaded = (BaseEntity)postgreSQLBaseEntityDaoImpl.load(entityUpdated.getId(), false);
 
         assertEquals("Incorrect number of attribute values in the saved BaseEntity,",
-                4, entitySaved.getAttributeCount());
+                4, entitySaved.getValueCount());
         assertEquals("Incorrect number of attribute values in the updated BaseEntity,",
-                4, entityLoaded.getAttributeCount());
+                4, entityLoaded.getValueCount());
 
-        Set<String> attributeNames = entityLoaded.getIdentifiers();
+        Set<String> attributeNames = entityLoaded.getAttributes();
 
         assertFalse("Attribute value designed to remove is not removed.",
                 attributeNames.contains("inner_meta_class_first"));
@@ -823,9 +823,9 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         IBaseEntity baseEntityUpdated = postgreSQLBaseEntityDaoImpl.process(entityParentForUpdate);
 
         assertEquals("Incorrect number of attribute values in the saved BaseEntity,",
-                2, entityParentSaved.getAttributeCount());
+                2, entityParentSaved.getValueCount());
         assertEquals("Incorrect number of attribute values in the updated BaseEntity,",
-                2, entityParentUpdated.getAttributeCount());
+                2, entityParentUpdated.getValueCount());
 
         IBaseValue valueSetSaved = entityParentSaved.getBaseValue("complex_set");
         IBaseValue valueSetUpdated = entityParentUpdated.getBaseValue("complex_set");

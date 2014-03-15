@@ -454,11 +454,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      * Names of all attributes that are actually set in entity
      * @return - set of needed attributes
      */
-    public Set<String> getIdentifiers() {
+    public Set<String> getAttributes() {
         return values.keySet();
     }
 
-    public int getAttributeCount() {
+    public int getValueCount() {
 
         return values.size();
     }
@@ -497,10 +497,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
         BaseEntity that = (BaseEntity) obj;
 
-        int thisAttributeCount = this.getAttributeCount();
-        int thatAttributeCount = that.getAttributeCount();
+        int thisValueCount = this.getValueCount();
+        int thatValueCount = that.getValueCount();
 
-        if (thisAttributeCount != thatAttributeCount)
+        if (thisValueCount != thatValueCount)
         {
             return false;
         }
@@ -542,7 +542,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     public IBaseValue safeGetValue(String name)
     {
-        if (this.getIdentifiers().contains(name))
+        if (this.getAttributes().contains(name))
         {
             return getBaseValue(name);
         }
