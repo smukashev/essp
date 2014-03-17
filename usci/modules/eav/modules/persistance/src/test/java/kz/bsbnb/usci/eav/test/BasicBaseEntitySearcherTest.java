@@ -90,12 +90,12 @@ public class BasicBaseEntitySearcherTest extends GenericTestCase
         BaseEntity streetEntity4 = generateBaseEntity1(batch, metaFactory, "Street4");
         BaseEntity streetEntity5 = generateBaseEntity1(batch, metaFactory, "Street5");
 
-        baseEntityDao.save(streetEntity1);
-        baseEntityDao.save(streetEntity2);
+        baseEntityDao.process(streetEntity1);
+        baseEntityDao.process(streetEntity2);
         // TODO: Fix this block
         //long id3 = baseEntityDao.save(streetEntity3);
-        baseEntityDao.save(streetEntity4);
-        baseEntityDao.save(streetEntity5);
+        baseEntityDao.process(streetEntity4);
+        baseEntityDao.process(streetEntity5);
 
         ArrayList<Long> result = searcher.findAll(streetEntity3);
 
@@ -149,12 +149,12 @@ public class BasicBaseEntitySearcherTest extends GenericTestCase
         c.set(2014, 01, 01);
         BaseEntity streetEntity5 = generateBaseEntity2(batch, metaFactory, "Street5", new Date(c.getTimeInMillis()));
 
-        baseEntityDao.save(streetEntity1);
-        baseEntityDao.save(streetEntity2);
+        baseEntityDao.process(streetEntity1);
+        baseEntityDao.process(streetEntity2);
         // TODO: Fix this block
         //long id3 = baseEntityDao.save(streetEntity3);
-        baseEntityDao.save(streetEntity4);
-        baseEntityDao.save(streetEntity5);
+        baseEntityDao.process(streetEntity4);
+        baseEntityDao.process(streetEntity5);
 
         ArrayList<Long> result = searcher.findAll(streetEntity3);
 

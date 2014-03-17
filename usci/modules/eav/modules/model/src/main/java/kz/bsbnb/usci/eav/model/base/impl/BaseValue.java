@@ -2,7 +2,9 @@ package kz.bsbnb.usci.eav.model.base.impl;
 
 
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -26,6 +28,10 @@ public class BaseValue extends Persistable implements IBaseValue
 
     private UUID uuid = UUID.randomUUID();
 
+    private IBaseContainer baseContainer;
+
+    private IMetaAttribute metaAttribute;
+
     /**
      * Information about the sequential number of record in the batch
      */
@@ -43,7 +49,7 @@ public class BaseValue extends Persistable implements IBaseValue
 
     private Date reportDate;
 
-    private boolean last = false;
+    private boolean last = true;
 
     private boolean closed = false;
 
@@ -131,6 +137,26 @@ public class BaseValue extends Persistable implements IBaseValue
         this.index = index;
         this.value = value;
         this.reportDate = batch.getRepDate();
+    }
+
+    @Override
+    public IBaseContainer getBaseContainer() {
+        return baseContainer;
+    }
+
+    @Override
+    public void setBaseContainer(IBaseContainer baseContainer) {
+        this.baseContainer = baseContainer;
+    }
+
+    @Override
+    public IMetaAttribute getMetaAttribute() {
+        return metaAttribute;
+    }
+
+    @Override
+    public void setMetaAttribute(IMetaAttribute metaAttribute) {
+        this.metaAttribute = metaAttribute;
     }
 
     @Override
@@ -293,9 +319,13 @@ public class BaseValue extends Persistable implements IBaseValue
                 {
                     baseValue.setValue(((BaseEntity)value).clone());
                 }
-                if (value instanceof java.util.Date)
+                if (value instanceof BaseSet)
                 {
-                    baseValue.setValue(((java.util.Date)value).clone());
+                    baseValue.setValue(((BaseSet)value).clone());
+                }
+                if (value instanceof Date)
+                {
+                    baseValue.setValue(((Date)value).clone());
                 }
             }
         }

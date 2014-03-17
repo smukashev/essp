@@ -2,7 +2,9 @@ package kz.bsbnb.usci.eav.persistance.dao;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,14 +13,10 @@ import java.util.Set;
  */
 public interface IBeValueDao {
 
-    public IBaseValue save(IBaseEntity baseEntity, String attribute);
+    public void insert(IPersistable persistable);
 
-    public Map<String, IBaseValue> save(IBaseEntity baseEntity, Set<String> attributes);
+    public void update(IPersistable persistable);
 
-    public IBaseValue update(IBaseEntity baseEntityLoaded, IBaseEntity baseEntityForSave, String attribute);
-
-    public boolean presentInFuture(IBaseEntity baseEntity, String attribute);
-
-    void remove(IBaseEntity baseEntity, String attribute);
+    public void delete(IPersistable persistable);
 
 }

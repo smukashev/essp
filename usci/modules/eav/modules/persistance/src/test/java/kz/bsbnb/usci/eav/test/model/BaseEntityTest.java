@@ -517,7 +517,7 @@ public class BaseEntityTest extends GenericTestCase{
         }
     }*/
 
-    @Test
+    /*@Test
     public void testClone() {
         Set<Date> availableReportDates = new HashSet<Date>() {{
             // 1 january 2013
@@ -536,6 +536,6 @@ public class BaseEntityTest extends GenericTestCase{
 
         assertFalse(baseEntity.getAvailableReportDates().equals(baseEntityCloned.getAvailableReportDates()));
         assertFalse(baseEntity.getReportDate().equals(baseEntityCloned.getReportDate()));
-    }
+    }*/
 
 }

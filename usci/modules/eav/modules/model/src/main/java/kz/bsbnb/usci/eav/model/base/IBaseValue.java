@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav.model.base;
 
 
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 
 import java.util.Date;
@@ -16,6 +17,15 @@ import java.util.UUID;
  */
 public interface IBaseValue extends IPersistable, Cloneable
 {
+
+    public IBaseContainer getBaseContainer();
+
+    public void setBaseContainer(IBaseContainer baseContainer);
+
+    public IMetaAttribute getMetaAttribute();
+
+    public void setMetaAttribute(IMetaAttribute metaAttribute);
+
     /**
      * Returns the <code>Batch</code> that contains information about the origin of this value.
      * @return <code>Batch</code> that contains information about the origin of this value.

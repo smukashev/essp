@@ -99,9 +99,9 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Override
     public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad) {
 
-
-        Long id = metaClassDao.save(baseEntityLoad.getMeta());
-        baseEntityDao.saveOrUpdate(baseEntityLoad);
+        // TODO: Uncomment and fix
+        /*Long id = metaClassDao.save(baseEntityLoad.getMeta());
+        baseEntityDao.saveOrUpdate(baseEntityLoad);*/
     }
 
     @Override

@@ -76,7 +76,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
     }
 
-    @Test
+    /*@Test
     public void prepareAndApplyFirst() throws Exception
     {
         MetaClass childMetaCreate = new MetaClass("child_meta_class");
@@ -142,7 +142,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         assertFalse("", DataUtils.compareBeginningOfTheDay(
                 parentEntitySaved.getBaseValue("child_meta_class").getRepDate(),
                 parentEntityApplied.getBaseValue("child_meta_class").getRepDate()) == 0);
-    }
+    }*/
 
     /*@Test
     public void prepareAndApplySecond() throws Exception

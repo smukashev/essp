@@ -27,7 +27,9 @@ public class BaseSet extends BaseContainer implements IBaseSet
 
     private Map<String, IBaseValue> values = new HashMap<String, IBaseValue>();
 
-    private Set<String> modifiedObjects = new HashSet<String>();
+    private long level = 1;
+
+    private boolean last = true;
 
     /**
      * Initializes entity with a class name.
@@ -66,6 +68,26 @@ public class BaseSet extends BaseContainer implements IBaseSet
     }
 
     @Override
+    public long getLevel() {
+        return level;
+    }
+
+    @Override
+    public void setLevel(long level) {
+        this.level = level;
+    }
+
+    @Override
+    public boolean isLast() {
+        return last;
+    }
+
+    @Override
+    public void setLast(boolean last) {
+        this.last = last;
+    }
+
+    @Override
     public void put(String name, IBaseValue value)
     {
         if (name == null)
@@ -73,6 +95,8 @@ public class BaseSet extends BaseContainer implements IBaseSet
             UUID uuid = UUID.randomUUID();
             put(uuid.toString(), value);
         }
+        value.setMetaAttribute();
+
         values.put(name, value);
     }
 
