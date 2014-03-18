@@ -3,6 +3,7 @@ package kz.bsbnb.usci.sync.service;
 
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.tool.status.SyncStatus;
 
 import java.util.List;
 
@@ -18,4 +19,6 @@ public interface IEntityService {
     public List<RefListItem> getRefsByMetaclass(long metaClassId);
     public int getQueueSize();
     public void setThreadsCount(int threadsCount, boolean allowAutoIncrement);
+
+    public SyncStatus getStatus();
 }

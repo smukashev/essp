@@ -60,7 +60,7 @@ public class BaseSet extends BaseContainer implements IBaseSet
         return metaType;
     }
 
-    public Set<String> getIdentifiers()
+    public Set<String> getAttributes()
     {
         return values.keySet();
     }
@@ -100,7 +100,7 @@ public class BaseSet extends BaseContainer implements IBaseSet
         return values.get(identifier);
     }
 
-    public int getElementCount()
+    public int getValueCount()
     {
         return values.size();
     }
@@ -231,7 +231,7 @@ public class BaseSet extends BaseContainer implements IBaseSet
             }
         }
 
-        if (this.getElementCount() != that.getElementCount())
+        if (this.getValueCount() != that.getValueCount())
         {
             return false;
         }

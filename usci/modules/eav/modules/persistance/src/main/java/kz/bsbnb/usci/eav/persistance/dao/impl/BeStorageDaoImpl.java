@@ -11,8 +11,6 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeStorageDao;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Iterator;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -256,7 +253,7 @@ public class BeStorageDaoImpl implements IBeStorageDao {
     {
         IMetaClass metaClass = baseEntity.getMeta();
 
-        Iterator it = baseEntity.getIdentifiers().iterator();
+        Iterator it = baseEntity.getAttributes().iterator();
 
         while (it.hasNext())
         {

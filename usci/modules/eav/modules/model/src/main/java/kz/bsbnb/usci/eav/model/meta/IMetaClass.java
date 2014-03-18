@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav.model.meta;
 
+import java.util.Set;
+
 /**
  *
  */
@@ -12,5 +14,7 @@ public interface IMetaClass extends IMetaContainer {
     public boolean isReference();
 
     public boolean isSearchable();
+
+    public Set<String> getAttributeNames();
 
 }

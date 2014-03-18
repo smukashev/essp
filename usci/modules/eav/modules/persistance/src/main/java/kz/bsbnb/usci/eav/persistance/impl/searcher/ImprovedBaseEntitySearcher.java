@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.text.ParseException;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
@@ -451,8 +450,11 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
     public ArrayList<Long> findAll(BaseEntity baseEntity)
     {
         ArrayList<Long> result = new ArrayList<Long>();
-        //System.out.println("################");
-        //System.out.println(baseEntity.toString());
+        if (baseEntity.getValueCount() == 0)
+        {
+            return result;
+        }
+
         SelectConditionStep select = generateSQL(baseEntity, null);
 
         if (select != null)

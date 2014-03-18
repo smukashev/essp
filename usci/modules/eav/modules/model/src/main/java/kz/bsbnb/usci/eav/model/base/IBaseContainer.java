@@ -49,7 +49,7 @@ public interface IBaseContainer extends IBaseObject
 
     public boolean isListening();
 
-    public Set<String> getIdentifiers();
+    public Set<String> getAttributes();
 
     public void put(String identifier, IBaseValue value);
 
@@ -64,4 +64,7 @@ public interface IBaseContainer extends IBaseObject
     public Set<String> getModifiedIdentifiers();
 
     public boolean isSet();
+
+    public int getValueCount();
+
 }
