@@ -1065,7 +1065,7 @@ public class CLI
 
                 out.println("#rule set date 01.04.2013");
                 out.println("rule create package afk");
-                out.println("rc");
+                out.println("rule rc");
                 out.println("rule set package afk");
                 out.println("rule set version\n");
                 for(Rule r: rules){

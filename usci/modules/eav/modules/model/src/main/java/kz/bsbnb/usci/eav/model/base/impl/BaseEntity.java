@@ -661,18 +661,26 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
           if(i==path.length()){
               if(str.length() > 0)
               {
-                  operations[yk] = str.toString();
-                  isFilter[yk]=false;
-                  yk++;
+                  String[] arr = str.toString().split("\\.");
+                  for(int j=0;j<arr.length;j++)
+                  {
+                      operations[yk] = arr[j];
+                      isFilter[yk]=false;
+                      yk++;
+                  }
               }
               break;
           }
           char c = path.charAt(i);
           if( c=='[' || c==']'){
               if(str.length() > 0){
-                  operations[yk] = str.toString();
-                  isFilter[yk] = c==']';
-                  yk++;
+                  String[] arr = str.toString().split("\\.");
+                  for(int j = 0;j<arr.length;j++){
+                      //operations[yk] = str.toString();
+                      operations[yk] = arr[j];
+                      isFilter[yk] = c==']';
+                      yk++;
+                  }
                   str.setLength(0);
               }
           } else{

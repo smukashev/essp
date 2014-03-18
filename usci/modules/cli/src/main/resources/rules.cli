@@ -1,6 +1,6 @@
 #rule set date 01.04.2013
 rule create package afk
-rc
+rule rc
 rule set package afk
 rule set version
 
