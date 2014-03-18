@@ -62,7 +62,7 @@ public class RemoteCreditorBusinessImpl implements RemoteCreditorBusiness
                     BaseEntity docEntity = (BaseEntity)doc.getValue();
                     if(docEntity != null) {
                         String doc_type = (String)docEntity.getEl("doc_type.code");
-                        if (doc_type.equals("15")) {
+                        if (doc_type.equals("07")) {
                             creditor.setBIN((String)docEntity.getEl("no"));
                         }
                         if (doc_type.equals("11")) {

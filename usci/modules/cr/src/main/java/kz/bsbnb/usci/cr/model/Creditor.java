@@ -199,4 +199,15 @@ public class Creditor implements Serializable {
     public void setRNN(String RNN) {
         this.RNN = RNN;
     }
+
+    @Override
+    public String toString() {
+        return "Creditor{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", code='" + code + '\'' +
+                ", BIN='" + BIN + '\'' +
+                ", RNN='" + RNN + '\'' +
+                '}';
+    }
 }

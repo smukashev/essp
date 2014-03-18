@@ -23,6 +23,8 @@ public class StatusSingleton {
 
     CouchbaseClient client;
 
+    private static final boolean readOnly = false;
+
     private static Gson gson = new Gson();
 
     @PostConstruct
@@ -50,6 +52,9 @@ public class StatusSingleton {
     }
 
     public synchronized void startBatch(Long batchId, BatchFullJModel batchFullJModel, BatchInfo batchInfo) {
+        if (readOnly)
+            return;
+
         BatchSign batchSign = new BatchSign();
 
         batchSign.setUserId(batchInfo.getUserId());
@@ -81,6 +86,9 @@ public class StatusSingleton {
     }
 
     public synchronized void addBatchStatus(Long batchId, BatchStatusJModel batchStatusJModel) {
+        if (readOnly)
+            return;
+
         Object batchStatus = client.get("batch_status:" + batchId);
 
         BatchStatusArrayJModel bStatuses;
@@ -96,7 +104,24 @@ public class StatusSingleton {
         client.set("batch_status:" + batchId, 0, gson.toJson(bStatuses));
     }
 
+    public synchronized BatchStatusArrayJModel getBatchStatus(Long batchId) {
+        Object batchStatus = client.get("batch_status:" + batchId);
+
+        BatchStatusArrayJModel bStatuses;
+
+        if (batchStatus == null) {
+            bStatuses = new BatchStatusArrayJModel();
+        } else {
+            bStatuses = gson.fromJson(batchStatus.toString(), BatchStatusArrayJModel.class);
+        }
+
+        return bStatuses;
+    }
+
     public synchronized void addContractStatus(Long batchId, ContractStatusJModel contractStatusJModel) {
+        if (readOnly)
+            return;
+
         Object contractStatus = client.get("contract_status:" + batchId + ":" + contractStatusJModel.getIndex());
 
         ContractStatusArrayJModel cStatuses;
@@ -113,6 +138,9 @@ public class StatusSingleton {
     }
 
     public synchronized void endBatch(Long batchId, Long userId) {
+        if (readOnly)
+            return;
+
         addBatchStatus(batchId, new BatchStatusJModel(
                 BatchStatuses.COMPLETED, null, new Date(), userId));
     }

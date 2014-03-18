@@ -1,3 +1,4 @@
+//http://blog.couchbase.com/understanding-grouplevel-view-queries-compound-keys
 //batch
 
 function (doc, meta) {
@@ -54,11 +55,11 @@ function(key, values, rereduce) {
         }
 
 //contract_status
+//use key filter - [batch_id, index]
 
 function (doc, meta) {
-          if(doc.type == "contract_status") {
-            var str = ("000000000000" + doc.index);
-            emit(doc.batchId + "_" + (str.substring(str.length-10)), {index: doc.index, contractStatuses: doc.contractStatuses});
-          }
-        }
+  if(doc.type == "contract_status") {
+    emit([doc.batchId, doc.index], {index: doc.index, contractStatuses: doc.contractStatuses});
+  }
+}
 

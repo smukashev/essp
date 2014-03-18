@@ -140,281 +140,282 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         Set<String> names = metaClass.getMemberNames();
 
         Condition condition = null;
-        if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
-        {
-            for(String name : names) {
-                IMetaAttribute metaAttribute = metaClass.getMetaAttribute(name);
-                IMetaType memberType = metaClass.getMemberType(name);
-                if(metaAttribute.isKey()) {
-                    IBaseValue baseValue = entity.safeGetValue(name);
-                    if(baseValue == null) {
-                        throw new IllegalArgumentException("Key attribute " + name + " can't be null. MetaClass: " +
-                                entity.getMeta().getClassName());
-                    }
+        for(String name : names) {
+            IMetaAttribute metaAttribute = metaClass.getMetaAttribute(name);
+            IMetaType memberType = metaClass.getMemberType(name);
+            if(metaAttribute.isKey()) {
+                IBaseValue baseValue = entity.safeGetValue(name);
+                if((baseValue == null || baseValue.getValue() == null) && (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)) {
+                    throw new IllegalArgumentException("Key attribute " + name + " can't be null. MetaClass: " +
+                            entity.getMeta().getClassName());
+                }
 
-                    if (!memberType.isSet()) {
-                        if (!memberType.isComplex()) {
-                            generateJoins(joins, entityAlias, name, memberType, metaAttribute);
+                if((baseValue == null || baseValue.getValue() == null) && (metaClass.getComplexKeyType() == ComplexKeyTypes.ANY)) {
+                    continue;
+                }
 
-                            MetaValue metaValue = (MetaValue)memberType;
-                            switch (metaValue.getTypeCode())
-                            {
-                                case BOOLEAN:
-                                    Boolean booleanValue = (Boolean)baseValue.getValue();
-                                    if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
-                                    {
-                                        String valueAlias = "v_" + name;
-                                        condition = condition == null ?
-                                                EAV_BE_BOOLEAN_VALUES.as(valueAlias).VALUE.equal(DataUtils.convert(booleanValue)) :
-                                                condition.and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).VALUE.equal(DataUtils.convert(booleanValue)));
-                                    }
-                                    else
-                                    {
-                                        String valueAlias = "v";
-                                        Select select = context
-                                                .select(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ID)
-                                                .from(EAV_BE_BOOLEAN_VALUES.as(valueAlias))
-                                                .where(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
-                                                .and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).VALUE.equal(DataUtils.convert(booleanValue)));
-                                        condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
-                                    }
-                                    break;
-                                case DATE:
-                                    Date dateValue = DataUtils.convert((java.util.Date)baseValue.getValue());
-                                    if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
-                                    {
-                                        String valueAlias = "v_" + name;
-                                        condition = condition == null ?
-                                                EAV_BE_DATE_VALUES.as(valueAlias).VALUE.equal(dateValue) :
-                                                condition.and(EAV_BE_DATE_VALUES.as(valueAlias).VALUE.equal(dateValue));
-                                    }
-                                    else
-                                    {
-                                        String valueAlias = "v";
-                                        Select select = context
-                                                .select(EAV_BE_DATE_VALUES.as(valueAlias).ID)
-                                                .from(EAV_BE_DATE_VALUES.as(valueAlias))
-                                                .where(EAV_BE_DATE_VALUES.as(valueAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
-                                                .and(EAV_BE_DATE_VALUES.as(valueAlias).VALUE.equal(dateValue));
-                                        condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
-                                    }
-                                    break;
-                                case DOUBLE:
-                                    Double doubleValue = (Double)baseValue.getValue();
-                                    if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
-                                    {
-                                        String valueAlias = "v_" + name;
-                                        condition = condition == null ?
-                                                EAV_BE_DOUBLE_VALUES.as(valueAlias).VALUE.equal(doubleValue) :
-                                                condition.and(EAV_BE_DOUBLE_VALUES.as(valueAlias).VALUE.equal(doubleValue));
-                                    }
-                                    else
-                                    {
-                                        String valueAlias = "v";
-                                        Select select = context
-                                                .select(EAV_BE_DOUBLE_VALUES.as(valueAlias).ID)
-                                                .from(EAV_BE_DOUBLE_VALUES.as(valueAlias))
-                                                .where(EAV_BE_DOUBLE_VALUES.as(valueAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
-                                                .and(EAV_BE_DOUBLE_VALUES.as(valueAlias).VALUE.equal(doubleValue));
-                                        condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
-                                    }
-                                    break;
-                                case INTEGER:
-                                    Integer integerValue = (Integer)baseValue.getValue();
-                                    if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
-                                    {
-                                        String valueAlias = "v_" + name;
-                                        condition = condition == null ?
-                                                EAV_BE_INTEGER_VALUES.as(valueAlias).VALUE.equal(integerValue) :
-                                                condition.and(EAV_BE_INTEGER_VALUES.as(valueAlias).VALUE.equal(integerValue));
-                                    }
-                                    else
-                                    {
-                                        String valueAlias = "v";
-                                        Select select = context
-                                                .select(EAV_BE_INTEGER_VALUES.as(valueAlias).ID)
-                                                .from(EAV_BE_INTEGER_VALUES.as(valueAlias))
-                                                .where(EAV_BE_INTEGER_VALUES.as(valueAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
-                                                .and(EAV_BE_INTEGER_VALUES.as(valueAlias).VALUE.equal(integerValue));
-                                        condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
-                                    }
-                                    break;
-                                case STRING:
-                                    String stringValue = (String)baseValue.getValue();
-                                    if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
-                                    {
-                                        String valueAlias = "v_" + name;
-                                        condition = condition == null ?
-                                                EAV_BE_STRING_VALUES.as(valueAlias).VALUE.equal(stringValue) :
-                                                condition.and(EAV_BE_STRING_VALUES.as(valueAlias).VALUE.equal(stringValue));
-                                    }
-                                    else
-                                    {
-                                        String valueAlias = "v";
-                                        Select select = context
-                                                .select(EAV_BE_STRING_VALUES.as(valueAlias).ID)
-                                                .from(EAV_BE_STRING_VALUES.as(valueAlias))
-                                                .where(EAV_BE_STRING_VALUES.as(valueAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
-                                                .and(EAV_BE_STRING_VALUES.as(valueAlias).VALUE.equal(stringValue));
-                                        condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
-                                    }
-                                    break;
-                                default:
-                                    throw new IllegalStateException("Unknown data type: " + metaValue.getTypeCode() +
-                                            " for attribute: " + name);
-                            }
-                        } else {
-                            BaseEntity childBaseEntity = (BaseEntity)baseValue.getValue();
-                            //Long childBaseEntityId = findSingle(childBaseEntity);
-                            Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().getClassName()).findSingle(childBaseEntity);
-                            if (childBaseEntityId == null)
-                            {
-                                if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
-                                {
-                                    return null;
-                                }
-                            }
-                            else
-                            {
-                                generateJoins(joins, entityAlias, name, memberType, metaAttribute);
+                if (!memberType.isSet()) {
+                    if (!memberType.isComplex()) {
+                        generateJoins(joins, entityAlias, name, memberType, metaAttribute);
 
+                        MetaValue metaValue = (MetaValue)memberType;
+                        switch (metaValue.getTypeCode())
+                        {
+                            case BOOLEAN:
+                                Boolean booleanValue = (Boolean)baseValue.getValue();
                                 if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
                                 {
                                     String valueAlias = "v_" + name;
                                     condition = condition == null ?
-                                            EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_VALUE_ID.equal(childBaseEntityId) :
-                                            condition.and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_VALUE_ID.equal(childBaseEntityId));
+                                            EAV_BE_BOOLEAN_VALUES.as(valueAlias).VALUE.equal(DataUtils.convert(booleanValue)) :
+                                            condition.and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).VALUE.equal(DataUtils.convert(booleanValue)));
                                 }
                                 else
                                 {
                                     String valueAlias = "v";
                                     Select select = context
-                                            .select(EAV_BE_COMPLEX_VALUES.as(valueAlias).ID)
-                                            .from(EAV_BE_COMPLEX_VALUES.as(valueAlias))
-                                            .where(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
-                                            .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_VALUE_ID.equal(childBaseEntityId));
+                                            .select(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ID)
+                                            .from(EAV_BE_BOOLEAN_VALUES.as(valueAlias))
+                                            .where(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
+                                            .and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).VALUE.equal(DataUtils.convert(booleanValue)));
                                     condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
                                 }
+                                break;
+                            case DATE:
+                                Date dateValue = DataUtils.convert((java.util.Date)baseValue.getValue());
+                                if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
+                                {
+                                    String valueAlias = "v_" + name;
+                                    condition = condition == null ?
+                                            EAV_BE_DATE_VALUES.as(valueAlias).VALUE.equal(dateValue) :
+                                            condition.and(EAV_BE_DATE_VALUES.as(valueAlias).VALUE.equal(dateValue));
+                                }
+                                else
+                                {
+                                    String valueAlias = "v";
+                                    Select select = context
+                                            .select(EAV_BE_DATE_VALUES.as(valueAlias).ID)
+                                            .from(EAV_BE_DATE_VALUES.as(valueAlias))
+                                            .where(EAV_BE_DATE_VALUES.as(valueAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
+                                            .and(EAV_BE_DATE_VALUES.as(valueAlias).VALUE.equal(dateValue));
+                                    condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
+                                }
+                                break;
+                            case DOUBLE:
+                                Double doubleValue = (Double)baseValue.getValue();
+                                if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
+                                {
+                                    String valueAlias = "v_" + name;
+                                    condition = condition == null ?
+                                            EAV_BE_DOUBLE_VALUES.as(valueAlias).VALUE.equal(doubleValue) :
+                                            condition.and(EAV_BE_DOUBLE_VALUES.as(valueAlias).VALUE.equal(doubleValue));
+                                }
+                                else
+                                {
+                                    String valueAlias = "v";
+                                    Select select = context
+                                            .select(EAV_BE_DOUBLE_VALUES.as(valueAlias).ID)
+                                            .from(EAV_BE_DOUBLE_VALUES.as(valueAlias))
+                                            .where(EAV_BE_DOUBLE_VALUES.as(valueAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
+                                            .and(EAV_BE_DOUBLE_VALUES.as(valueAlias).VALUE.equal(doubleValue));
+                                    condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
+                                }
+                                break;
+                            case INTEGER:
+                                Integer integerValue = (Integer)baseValue.getValue();
+                                if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
+                                {
+                                    String valueAlias = "v_" + name;
+                                    condition = condition == null ?
+                                            EAV_BE_INTEGER_VALUES.as(valueAlias).VALUE.equal(integerValue) :
+                                            condition.and(EAV_BE_INTEGER_VALUES.as(valueAlias).VALUE.equal(integerValue));
+                                }
+                                else
+                                {
+                                    String valueAlias = "v";
+                                    Select select = context
+                                            .select(EAV_BE_INTEGER_VALUES.as(valueAlias).ID)
+                                            .from(EAV_BE_INTEGER_VALUES.as(valueAlias))
+                                            .where(EAV_BE_INTEGER_VALUES.as(valueAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
+                                            .and(EAV_BE_INTEGER_VALUES.as(valueAlias).VALUE.equal(integerValue));
+                                    condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
+                                }
+                                break;
+                            case STRING:
+                                String stringValue = (String)baseValue.getValue();
+                                if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
+                                {
+                                    String valueAlias = "v_" + name;
+                                    condition = condition == null ?
+                                            EAV_BE_STRING_VALUES.as(valueAlias).VALUE.equal(stringValue) :
+                                            condition.and(EAV_BE_STRING_VALUES.as(valueAlias).VALUE.equal(stringValue));
+                                }
+                                else
+                                {
+                                    String valueAlias = "v";
+                                    Select select = context
+                                            .select(EAV_BE_STRING_VALUES.as(valueAlias).ID)
+                                            .from(EAV_BE_STRING_VALUES.as(valueAlias))
+                                            .where(EAV_BE_STRING_VALUES.as(valueAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
+                                            .and(EAV_BE_STRING_VALUES.as(valueAlias).VALUE.equal(stringValue));
+                                    condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
+                                }
+                                break;
+                            default:
+                                throw new IllegalStateException("Unknown data type: " + metaValue.getTypeCode() +
+                                        " for attribute: " + name);
+                        }
+                    } else {
+                        BaseEntity childBaseEntity = (BaseEntity)baseValue.getValue();
+                        //Long childBaseEntityId = findSingle(childBaseEntity);
+                        Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().getClassName()).findSingle(childBaseEntity);
+                        if (childBaseEntityId == null)
+                        {
+                            if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
+                            {
+                                return null;
+                            }
+                        }
+                        else
+                        {
+                            generateJoins(joins, entityAlias, name, memberType, metaAttribute);
+
+                            if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
+                            {
+                                String valueAlias = "v_" + name;
+                                condition = condition == null ?
+                                        EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_VALUE_ID.equal(childBaseEntityId) :
+                                        condition.and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_VALUE_ID.equal(childBaseEntityId));
+                            }
+                            else
+                            {
+                                String valueAlias = "v";
+                                Select select = context
+                                        .select(EAV_BE_COMPLEX_VALUES.as(valueAlias).ID)
+                                        .from(EAV_BE_COMPLEX_VALUES.as(valueAlias))
+                                        .where(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
+                                        .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_VALUE_ID.equal(childBaseEntityId));
+                                condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
                             }
                         }
                     }
-                    else
-                    {
-                        BaseSet baseSet = (BaseSet)baseValue.getValue();
-                        MetaSet metaSet = (MetaSet)memberType;
-                        if (baseSet.get().size() > 0) {
-                            if (!memberType.isComplex()) {
-                                throw new UnsupportedOperationException("Not yet implemented.");
-                            } else {
+                }
+                else
+                {
+                    BaseSet baseSet = (BaseSet)baseValue.getValue();
+                    MetaSet metaSet = (MetaSet)memberType;
+                    if (baseSet.get().size() > 0) {
+                        if (!memberType.isComplex()) {
+                            throw new UnsupportedOperationException("Not yet implemented.");
+                        } else {
 
-                                MetaClass childMetaClass = (MetaClass)metaSet.getMemberType();
-                                List<Long> childBaseEntityIds = new ArrayList<Long>();
-                                for (IBaseValue childBaseValue : baseSet.get())
+                            MetaClass childMetaClass = (MetaClass)metaSet.getMemberType();
+                            List<Long> childBaseEntityIds = new ArrayList<Long>();
+                            for (IBaseValue childBaseValue : baseSet.get())
+                            {
+                                BaseEntity childBaseEntity = (BaseEntity)childBaseValue.getValue();
+                                //Long childBaseEntityId = findSingle(childBaseEntity);
+                                Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().
+                                        getClassName()).findSingle(childBaseEntity);
+
+                                if (childBaseEntityId != null)
                                 {
-                                    BaseEntity childBaseEntity = (BaseEntity)childBaseValue.getValue();
-                                    //Long childBaseEntityId = findSingle(childBaseEntity);
-                                    Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().
-                                            getClassName()).findSingle(childBaseEntity);
-
-                                    if (childBaseEntityId != null)
+                                    childBaseEntityIds.add(childBaseEntityId);
+                                }
+                                else
+                                {
+                                    if (metaSet.getArrayKeyType() == ComplexKeyTypes.ALL)
                                     {
-                                        childBaseEntityIds.add(childBaseEntityId);
-                                    }
-                                    else
-                                    {
-                                        if (metaSet.getArrayKeyType() == ComplexKeyTypes.ALL)
-                                        {
-                                            return null;
-                                        }
+                                        return null;
                                     }
                                 }
+                            }
 
-                                if (childBaseEntityIds.size() > 0)
+                            if (childBaseEntityIds.size() > 0)
+                            {
+                                String className = childMetaClass.getClassName();
+                                String childEntityAlias = "e_" + className;
+                                String setValueAlias = "sv_" + className;
+                                String setAlias = "s_" + className;
+                                String entitySetAlias = "es_" + className;
+                                Select select = null;
+
+                                if (metaSet.getArrayKeyType() == ComplexKeyTypes.ANY)
                                 {
-                                    String className = childMetaClass.getClassName();
-                                    String childEntityAlias = "e_" + className;
-                                    String setValueAlias = "sv_" + className;
-                                    String setAlias = "s_" + className;
-                                    String entitySetAlias = "es_" + className;
-                                    Select select = null;
+                                    select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID)
+                                            .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
+                                            .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
+                                            .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
+                                            .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
+                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds));
 
-                                    if (metaSet.getArrayKeyType() == ComplexKeyTypes.ANY)
-                                    {
+                                            /*
+                                            .from(EAV_BE_SETS.as(setAlias))
+                                            .join(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
+                                            .on(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_SETS.as(setAlias).ID))
+                                            .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
+                                            .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID.eq(EAV_BE_SETS.as(setAlias).ID))
+                                            .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
+                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds));
+                                            */
+
+                                    condition = condition == null ? DSL.exists(select) :
+                                            metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
+                                                    condition.and(DSL.exists(select)) : condition.or(DSL.exists(select));
+                                }
+                                else
+                                {
+                                    /*
+                                    from core.eav_be_complex_set_values sv_document
+                                    join core.eav_be_entity_complex_sets es_document
+                                      on (es_document.attribute_id = 12 and
+                                         sv_document.set_id = es_document.set_id)
+                                   where (es_document.entity_id = root.id and
+                                         sv_document.entity_value_id in (157322))
+                                    */
+
+                                    /*select = context.selectCount()
+                                            .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
+                                            .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
+                                            .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
+                                            .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
+                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds));*/
+
+                                            /*
+                                            .from(EAV_BE_SETS.as(setAlias))
+                                            .join(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
+                                            .on(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_SETS.as(setAlias).ID))
+                                            .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
+                                            .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID.eq(EAV_BE_SETS.as(setAlias).ID))
+                                            .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
+                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds));
+                                            */
+
+                                    /*condition = condition == null ? DSL.val(childBaseEntityIds.size()).lessOrEqual(select):
+                                            metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
+                                                    condition.and(DSL.val(childBaseEntityIds.size()).lessOrEqual(select)) :
+                                                    condition.or(DSL.val(childBaseEntityIds.size()).lessOrEqual(select));*/
+
+                                    Condition setCondition = null;
+
+                                    for (Long childBaseEntityId : childBaseEntityIds) {
                                         select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID)
                                                 .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
                                                 .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
                                                 .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                                                 .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
                                                 .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
-                                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds));
+                                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.equal(childBaseEntityId));
 
-                                                /*
-                                                .from(EAV_BE_SETS.as(setAlias))
-                                                .join(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
-                                                .on(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_SETS.as(setAlias).ID))
-                                                .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
-                                                .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID.eq(EAV_BE_SETS.as(setAlias).ID))
-                                                .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
-                                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds));
-                                                */
-
-                                        condition = condition == null ? DSL.exists(select) :
-                                                metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
-                                                        condition.and(DSL.exists(select)) : condition.or(DSL.exists(select));
+                                        setCondition = setCondition == null ? DSL.exists(select) :
+                                                setCondition.and(DSL.exists(select));
                                     }
-                                    else
-                                    {
-                                        /*
-                                        from core.eav_be_complex_set_values sv_document
-                                        join core.eav_be_entity_complex_sets es_document
-                                          on (es_document.attribute_id = 12 and
-                                             sv_document.set_id = es_document.set_id)
-                                       where (es_document.entity_id = root.id and
-                                             sv_document.entity_value_id in (157322))
-                                        */
 
-                                        /*select = context.selectCount()
-                                                .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
-                                                .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
-                                                .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
-                                                .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
-                                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds));*/
-
-                                                /*
-                                                .from(EAV_BE_SETS.as(setAlias))
-                                                .join(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
-                                                .on(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_SETS.as(setAlias).ID))
-                                                .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
-                                                .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID.eq(EAV_BE_SETS.as(setAlias).ID))
-                                                .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
-                                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds));
-                                                */
-
-                                        /*condition = condition == null ? DSL.val(childBaseEntityIds.size()).lessOrEqual(select):
-                                                metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
-                                                        condition.and(DSL.val(childBaseEntityIds.size()).lessOrEqual(select)) :
-                                                        condition.or(DSL.val(childBaseEntityIds.size()).lessOrEqual(select));*/
-
-                                        Condition setCondition = null;
-
-                                        for (Long childBaseEntityId : childBaseEntityIds) {
-                                            select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID)
-                                                    .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
-                                                    .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
-                                                    .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
-                                                    .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID))
-                                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.equal(childBaseEntityId));
-
-                                            setCondition = setCondition == null ? DSL.exists(select) :
-                                                    setCondition.and(DSL.exists(select));
-                                        }
-
-                                        condition = condition == null ? setCondition :
-                                                metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
-                                                        condition.and(setCondition) : condition.or(setCondition);
-                                    }
+                                    condition = condition == null ? setCondition :
+                                            metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
+                                                    condition.and(setCondition) : condition.or(setCondition);
                                 }
                             }
                         }
