@@ -200,6 +200,17 @@ public class CLI
         }
     }
 
+    public void setMetaClassKeyType(String name, ComplexKeyTypes type) {
+        MetaClass meta = metaClassRepository.getMetaClass(name);
+
+        if (meta == null) {
+            System.out.println("No such meta class with name: " + name);
+        } else {
+            meta.setComplexKeyType(type);
+            metaClassRepository.saveMetaClass(meta);
+        }
+    }
+
     public void showMetaClassPaths(long id, String subMetaName) {
         MetaClass meta = metaClassRepository.getMetaClass(id);
         MetaClass subMeta = metaClassRepository.getMetaClass(subMetaName);
@@ -574,6 +585,12 @@ public class CLI
                     }
                 } else {
                     System.out.println("Argument needed: <key> <id, name> <id or name> <attributeName>");
+                }
+            } else if (args.get(0).equals("keytype")) {
+                if (args.size() > 2) {
+                    setMetaClassKeyType(args.get(1), ComplexKeyTypes.valueOf(args.get(2)));
+                } else {
+                    System.out.println("Argument needed: <keytype> <name> <key_type>");
                 }
             } else if (args.get(0).equals("paths")) {
                 if (args.size() > 3) {
