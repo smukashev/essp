@@ -3,16 +3,20 @@ package kz.bsbnb.usci.eav.model.base.impl;
 
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaSet;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.IMetaValue;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Attributes value place holder for BaseEntity. Contains information about batch and record number of the value's
@@ -238,6 +242,107 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
         result = 31 * result + (value != null ? value.hashCode() : 0);
         result = 31 * result + reportDate.hashCode();
         return result;
+    }
+
+    public boolean equalsByValue(IBaseValue baseValue)
+    {
+        IMetaAttribute thisMetaAttribute = this.getMetaAttribute();
+        IMetaAttribute thatMetaAttribute = baseValue.getMetaAttribute();
+
+        if (thisMetaAttribute == null || thatMetaAttribute == null)
+        {
+            throw new RuntimeException("Comparison values of two instances of BaseValue without meta data is not possible.");
+        }
+
+        Object thisValue = this.getValue();
+        Object thatValue = baseValue.getValue();
+
+        if (thisValue == null || thatValue == null)
+        {
+            throw new RuntimeException("Comparison values of two instances of BaseValue with null values is not possible.");
+        }
+
+        if (thisMetaAttribute.getId() == thatMetaAttribute.getId())
+        {
+            IMetaType metaType = thisMetaAttribute.getMetaType();
+            if (metaType.isSetOfSets())
+            {
+                throw new UnsupportedOperationException("Not yet implemented");
+            }
+
+            if (metaType.isComplex())
+            {
+                if (metaType.isSet())
+                {
+                    IBaseSet thisBaseSet = (IBaseSet)thisValue;
+                    IBaseSet thatBaseSet = (IBaseSet)thatValue;
+
+                    List<Long> thisIds = new ArrayList<Long>();
+                    for (IBaseValue thisChildBaseValue : thisBaseSet.get())
+                    {
+                        IBaseEntity thisBaseEntity = (IBaseEntity)thisChildBaseValue.getValue();
+                        thisIds.add(thisBaseEntity.getId());
+                    }
+
+                    List<Long> thatIds = new ArrayList<Long>();
+                    for (IBaseValue thatChildBaseValue : thatBaseSet.get())
+                    {
+                        BaseEntity thatBaseEntity = (BaseEntity)thatChildBaseValue.getValue();
+                        thatIds.add(thatBaseEntity.getId());
+                    }
+                    Collections.sort(thatIds);
+                    Collections.sort(thatIds);
+
+                    return thisIds.equals(thatIds);
+                }
+                else
+                {
+                    IBaseEntity thisBaseEntity = (IBaseEntity)thisValue;
+                    IBaseEntity thatBaseEntity = (IBaseEntity)thatValue;
+                    return thisBaseEntity.getId() == thatBaseEntity.getId();
+                }
+            }
+            else
+            {
+                if (metaType.isSet())
+                {
+                    IMetaSet metaSet = (IMetaSet)metaType;
+                    IMetaValue metaValue = (IMetaValue)metaSet.getMemberType();
+
+                    IBaseSet thisBaseSet = (IBaseSet)thisValue;
+                    IBaseSet thatBaseSet = (IBaseSet)thatValue;
+
+                    List<Object> thisIds = new ArrayList<Object>();
+                    for (IBaseValue thisChildBaseValue : thisBaseSet.get())
+                    {
+                        thisIds.add(metaValue.getTypeCode() == DataTypes.DATE ?
+                                DataUtils.toBeginningOfTheDay(new Date(((Date)thisChildBaseValue).getTime())) :
+                                thisChildBaseValue.getValue());
+                    }
+
+                    List<Long> thatIds = new ArrayList<Long>();
+                    for (IBaseValue thatChildBaseValue : thatBaseSet.get())
+                    {
+                        thisIds.add(metaValue.getTypeCode() == DataTypes.DATE ?
+                                DataUtils.toBeginningOfTheDay(new Date(((Date)thatChildBaseValue).getTime())) :
+                                thatChildBaseValue.getValue());
+                    }
+                    Collections.sort(thatIds);
+                    Collections.sort(thatIds);
+
+                    return thisIds.equals(thatIds);
+                }
+                else
+                {
+                    IMetaValue metaValue = (IMetaValue)metaType;
+                    return metaValue.getTypeCode() == DataTypes.DATE ?
+                            DataUtils.compareBeginningOfTheDay((Date)thisValue, (Date)thatValue) == 0 :
+                            thisValue.equals(thatValue);
+                }
+            }
+        }
+
+        return false;
     }
 
     public boolean equalsToString(String str, DataTypes type)

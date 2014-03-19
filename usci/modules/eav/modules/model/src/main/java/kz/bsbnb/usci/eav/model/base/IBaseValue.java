@@ -67,4 +67,6 @@ public interface IBaseValue<T> extends IPersistable, Cloneable
 
     public UUID getUuid();
 
+    public boolean equalsByValue(IBaseValue baseValue);
+
 }
