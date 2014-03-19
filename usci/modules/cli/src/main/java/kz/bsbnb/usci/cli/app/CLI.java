@@ -669,7 +669,7 @@ public class CLI
                         "   AND xf.sent = 0 ORDER BY xf.id ASC");
 
                 preparedStatementDone = conn.prepareStatement("UPDATE core.xml_file xf \n" +
-                        "   META_SET xf.sent = ? \n" +
+                        "   SET xf.sent = ? \n" +
                         " WHERE xf.id = ?");
             } catch (SQLException e)
             {
@@ -790,6 +790,7 @@ public class CLI
             System.out.println("Argument needed: <credits_db_url> <user> <password> <receiver_url> <temp_files_folder>");
             System.out.println("Example: import jdbc:oracle:thin:@srv-scan.corp.nb.rk:1521/DBM01 core ***** rmi://127.0.0.1:1097/batchProcessService D:\\usci\\temp_xml_folder");
             System.out.println("Example: import jdbc:oracle:thin:@192.168.0.44:1521/CREDITS core core_feb_2013 rmi://127.0.0.1:1097/batchProcessService /home/a.tkachenko/temp_files");
+            System.out.println("Example: import jdbc:oracle:thin:@192.168.0.44:1521/CREDITS core core_mar_2014 rmi://127.0.0.1:1097/batchProcessService D:\\USCI\\Temp");
         }
     }
 

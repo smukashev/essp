@@ -547,7 +547,49 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 {
                     if (metaType.isSet())
                     {
+                        if (metaType.isSetOfSets())
+                        {
+                            throw new UnsupportedOperationException("Not yet implemented.");
+                        }
+                        else
+                        {
+                            IMetaSet childMetaSet = (IMetaSet)metaType;
+                            IBaseSet childBaseSet = (IBaseSet)baseValue.getValue();
 
+                            IBaseSet childBaseSetApplied = new BaseSet(childMetaSet.getMemberType());
+                            for (IBaseValue childBaseValue: childBaseSet.get())
+                            {
+                                IBaseValue childBaseValueApplied =
+                                        BaseValueFactory.create(
+                                                childMetaSet.getType(),
+                                                childMetaSet.getMemberType(),
+                                                childBaseValue.getBatch(),
+                                                childBaseValue.getIndex(),
+                                                new Date(baseValue.getRepDate().getTime()),
+                                                childBaseValue.getValue(),
+                                                false,
+                                                true);
+                                childBaseSetApplied.put(childBaseValueApplied);
+                                baseEntityManager.registerAsInserted(childBaseValueApplied);
+                            }
+
+                            baseEntityManager.registerAsInserted(childBaseSetApplied);
+
+                            IBaseValue baseValueApplied =
+                                    BaseValueFactory.create(
+                                            metaClass.getType(),
+                                            metaType,
+                                            baseValue.getBatch(),
+                                            baseValue.getIndex(),
+                                            new Date(baseValue.getRepDate().getTime()),
+                                            childBaseSetApplied,
+                                            false,
+                                            true
+                                    );
+
+                            baseEntityApplied.put(attribute, baseValueApplied);
+                            baseEntityManager.registerAsInserted(baseValueApplied);
+                        }
                     }
                     else
                     {
