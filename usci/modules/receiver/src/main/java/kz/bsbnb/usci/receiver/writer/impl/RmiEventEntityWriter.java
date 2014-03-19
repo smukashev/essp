@@ -50,6 +50,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
     @Override
     public void write(List items) throws Exception {
         logger.info("Writer write: " + items.size());
+        //System.out.println("Writer write: " + items.size());
 
         Iterator<Object> iter = items.iterator();
 
@@ -63,8 +64,8 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
             String contractNo = (String)entity.getEl("primary_contract.no");
 
             if (statusSingleton.isEntityCompleted(entity.getBatchId(), entity.getBatchIndex() - 1)) {
-                System.out.println("Contract no " + contractNo + " with date " + contractDate + " skipped because it " +
-                        "has status \"" + EntityStatuses.COMPLETED + "\"");
+                //System.out.println("Contract no " + contractNo + " with date " + contractDate + " skipped because it " +
+                        //"has status \"" + EntityStatuses.COMPLETED + "\"");
                 continue;
             }
 

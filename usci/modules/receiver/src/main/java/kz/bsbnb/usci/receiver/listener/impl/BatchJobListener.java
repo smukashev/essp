@@ -29,7 +29,7 @@ public class BatchJobListener implements IListener {
     @AfterJob
     public void afterJob(JobExecution jobExecution) {
         long batchId = jobExecution.getJobInstance().getJobParameters().getLong("batchId");
-        long userId = jobExecution.getJobInstance().getJobParameters().getLong("batchId");
+        long userId = jobExecution.getJobInstance().getJobParameters().getLong("userId");
         System.out.println(" --- AFTER JOB --- batch: " + batchId + ", userId: " + userId);
 
         statusSingleton.endBatch(batchId, userId);
