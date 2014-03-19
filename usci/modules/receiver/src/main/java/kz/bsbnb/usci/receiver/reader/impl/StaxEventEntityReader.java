@@ -73,6 +73,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     @PostConstruct
     public void init() {
         //logger.info("Reader init.");
+        //System.out.println("Reader created " + batchId);
         batchService = serviceRepository.getBatchService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
         couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
@@ -139,6 +140,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             if(metaType.isSet()) {
                 stack.push(currentContainer);
                 flagsStack.push(hasMembers);
+                hasMembers = false;
                 currentContainer = metaFactoryService.getBaseSet(((MetaSet)metaType).getMemberType());
                 level++;
             } else if(metaType.isComplex() && !metaType.isSet()) {
@@ -241,16 +243,25 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 currentContainer = stack.pop();
 
                 if (currentContainer.isSet()) {
-                    if (hasMembers)
+                    if (hasMembers) {
                         ((BaseSet)currentContainer).put(new BaseValue(batch, index, o));
+                        flagsStack.pop();
+                        hasMembers = true;
+                    } else {
+                        hasMembers = flagsStack.pop();
+                    }
                 } else {
-                    if (hasMembers)
+                    if (hasMembers) {
                         currentContainer.put(localName, new BaseValue(batch, index, o));
-                    else
+                        flagsStack.pop();
+                        hasMembers = true;
+                    } else {
                         currentContainer.put(localName, new BaseValue(batch, index, null));
+                        hasMembers = flagsStack.pop();
+                    }
                 }
 
-                hasMembers = flagsStack.pop();
+                //hasMembers = flagsStack.pop();
             }
             level--;
         }

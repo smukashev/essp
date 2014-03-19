@@ -470,7 +470,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
 
     public String toString(String prefix)
     {
-        String str = className + ":metaClass(" + getId() + "_" + searchable +  ");";
+        String str = className + ":metaClass(" + getId() + "_" + searchable + "_" + complexKeyType + ");";
 
         String[] names;
 

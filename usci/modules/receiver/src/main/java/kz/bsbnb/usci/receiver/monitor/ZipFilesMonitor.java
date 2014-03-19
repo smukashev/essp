@@ -3,13 +3,11 @@ package kz.bsbnb.usci.receiver.monitor;
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
+import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.eav.model.json.*;
 import kz.bsbnb.usci.sync.service.IEntityService;
-import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
-import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
 import kz.bsbnb.usci.receiver.common.Global;
-import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
@@ -90,6 +88,35 @@ public class ZipFilesMonitor{
         sender.start();
     }
 
+    public void restartBatch(long batchId) {
+        Gson gson = new Gson();
+        while(true) {
+            try {
+                Object batchObject = couchbaseClient.get("batch:" + batchId);
+                Object manifestObject = couchbaseClient.get("manifest:" + batchId);
+
+                if (batchObject == null || manifestObject == null) {
+                    System.out.println("Batch with id: " + batchId + " has no manifest or batch. Restart failed.");
+                    break;
+                }
+
+                String batchInfoStr = manifestObject.toString();
+                BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
+
+                System.out.println(batchId + " - restarted");
+                sender.addJob(batchId, batchInfo);
+                receiverStatusSingleton.batchReceived();
+
+                break;
+            } catch (Exception e) {
+                System.out.println("Error in pending batches view: " + e.getMessage());
+                e.printStackTrace();
+                System.out.println("Retrying...");
+            }
+        }
+        System.out.println("Done");
+    }
+
     @PostConstruct
     public void init() {
 
@@ -111,41 +138,161 @@ public class ZipFilesMonitor{
         } catch (Exception e) {
             logger.error("Error connecting to Couchbase: " + e.getMessage());
         }
+        while(true) {
+            try {
+                View view = couchbaseClient.getView("batch", "batch_pending");
+                Query query = new Query();
 
-        View view = couchbaseClient.getView("batch", "batch_pending");
-        Query query = new Query();
+                ViewResponse response = couchbaseClient.query(view, query);
 
-        ViewResponse response = couchbaseClient.query(view, query);
+                Iterator<ViewRow> rows = response.iterator();
 
-        Iterator<ViewRow> rows = response.iterator();
+                if (response.size() > 0) {
+                    System.out.println("Found pending jobs: ");
+                    System.out.println("-------------------------------------------------------------------------");
 
-        if (response.size() > 0) {
-            System.out.println("Found pending jobs: ");
-            System.out.println("-------------------------------------------------------------------------");
+                    while(rows.hasNext()) {
+                        ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) rows.next();
+                        long batchId = Long.parseLong(viewRowNoDocs.getKey());
 
-            while(rows.hasNext()) {
-                ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) rows.next();
-                long batchId = Long.parseLong(viewRowNoDocs.getKey());
+                        if (viewRowNoDocs.getValue().equals("ERROR"))
+                        {
+                            System.out.println("Skipped because of error!");
+                            continue;
+                        }
 
-                if (viewRowNoDocs.getValue().equals("ERROR"))
-                {
-                    System.out.println("Skipped because of error!");
-                    continue;
+                        System.out.println("batchId: " + batchId + ", status: " + viewRowNoDocs.getValue());
+
+                        String batchInfoStr = couchbaseClient.get("manifest:" + batchId).toString();
+
+                        System.out.println(batchInfoStr);
+                        System.out.println("-------------------------------------------------------------------------");
+
+                        BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
+
+                        sender.addJob(batchId, batchInfo);
+                        receiverStatusSingleton.batchReceived();
+                    }
                 }
-
-                System.out.println("batchId: " + batchId + ", status: " + viewRowNoDocs.getValue());
-
-                String batchInfoStr = couchbaseClient.get("manifest:" + batchId).toString();
-
-                System.out.println(batchInfoStr);
-                System.out.println("-------------------------------------------------------------------------");
-
-                BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
-
-                sender.addJob(batchId, batchInfo);
-                receiverStatusSingleton.batchReceived();
+                break;
+            } catch (Exception e) {
+                System.out.println("Error in pending batches view: " + e.getMessage());
+                System.out.println("Retrying...");
             }
         }
+
+        //restartBatch(3853);
+
+        //////////////////////////
+
+        /*File f = new File("D:\\usci\\out.txt");
+        FileOutputStream fout = null;
+        try {
+            f.createNewFile();
+
+            fout = new FileOutputStream(f);
+
+            while(true) {
+                try {
+                    for(int batchId = 1; batchId < 5344; batchId++) {
+                        Object batchObject = couchbaseClient.get("batch:" + batchId);
+                        Object manifestObject = couchbaseClient.get("manifest:" + batchId);
+                        Object batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
+
+                        if (batchObject == null || manifestObject == null) {
+                            System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
+
+                            if (batchObject != null) {
+                                couchbaseClient.delete("batch:" + batchId);
+                            }
+                            if (manifestObject != null) {
+                                couchbaseClient.delete("manifest:" + batchId);
+                            }
+                            if (batchStatusObject != null) {
+                                couchbaseClient.delete("batch_status:" + batchId);
+                            }
+                            continue;
+                        }
+
+                        String batchStr = batchObject.toString();
+
+                        BatchFullJModel batchFull = gson.fromJson(batchStr, BatchFullJModel.class);
+
+
+
+                        String batchInfoStr = manifestObject.toString();
+
+                        BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
+
+                        View view = couchbaseClient.getView("batch", "contract_status");
+                        Query query = new Query();
+                        query.setDescending(true);
+                        query.setRangeEnd("[" + batchId + ", 0]");
+                        query.setRangeStart("[" + batchId + ", 999999999999999]");
+
+
+                        ViewResponse response = couchbaseClient.query(view, query);
+
+                        Iterator<ViewRow> rows = response.iterator();
+
+                        int row_count = 0;
+                        int error_count = 0;
+                        while(rows.hasNext()) {
+                            ViewRow viewRowNoDocs = rows.next();
+
+                            row_count++;
+
+                            ContractStatusArrayJModel batchFullStatusJModel =
+                                    gson.fromJson(viewRowNoDocs.getValue(), ContractStatusArrayJModel.class);
+
+                            boolean errorFound = false;
+                            boolean completedFound = false;
+                            for (ContractStatusJModel csajm : batchFullStatusJModel.getContractStatuses()) {
+                                if (csajm.getProtocol().equals("ERROR"))
+                                {
+                                    errorFound = true;
+                                }
+                                if (csajm.getProtocol().equals("COMPLETED"))
+                                {
+                                    completedFound = true;
+                                }
+                            }
+                            if (errorFound && !completedFound)
+                                error_count++;
+                        }
+
+//                        if (error_count > 0 || row_count != batchInfo.getSize()) {
+//                            System.out.println(batchId + " - " + batchInfo.getSize() + "/" + row_count + " - " + error_count);
+//                            sender.addJob(batchId, batchInfo);
+//                            receiverStatusSingleton.batchReceived();
+//                        }
+
+                        fout.write((batchId + "," +
+                                batchFull.getFileName() + "," +
+                                batchInfo.getSize() + "," + row_count + "," + error_count + "\n").getBytes());
+                    }
+                    break;
+                } catch (Exception e) {
+                    System.out.println("Error in pending batches view: " + e.getMessage());
+                    e.printStackTrace();
+                    System.out.println("Retrying...");
+                }
+            }
+            System.out.println("Done");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(fout != null) {
+                try {
+                    fout.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }      */
+        //////////////////////////
 
         couchbaseClient.shutdown();
     }
@@ -281,6 +428,7 @@ public class ZipFilesMonitor{
         long batchId = batchService.save(batch);
 
         Long cId = -1l;
+        boolean haveError = false;
 
         if(batchInfo.getUserId() != 100500L) {
             List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
@@ -289,6 +437,10 @@ public class ZipFilesMonitor{
                 cId = cList.get(0).getId();
             } else {
                 cId = -1L;
+                statusSingleton.addBatchStatus(batchId,
+                        new BatchStatusJModel(BatchStatuses.ERROR,
+                                "Can't find user with id: " + batchInfo.getUserId(), new Date(), batchInfo.getUserId()));
+                haveError = true;
             }
         } else {
             if(batchInfo.getAdditionalParams() != null) {
@@ -340,7 +492,7 @@ public class ZipFilesMonitor{
                                             "Can't find creditor with code: " + creditorCode + " or BIN: " +
                                             creditorBIN + "or RNN: " + creditorRNN, new Date(), batchInfo.getUserId()));
 
-                            return;
+                            haveError = true;
                         }
                     }
                 }
@@ -350,36 +502,12 @@ public class ZipFilesMonitor{
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
                 batchInfo.getUserId(), cId);
         statusSingleton.startBatch(batchId, batchFullJModel, batchInfo);
-        statusSingleton.addBatchStatus(batchId,
-                new BatchStatusJModel(BatchStatuses.WAITING, null, new Date(), batchInfo.getUserId()));
+        if (!haveError) {
+            statusSingleton.addBatchStatus(batchId,
+                    new BatchStatusJModel(BatchStatuses.WAITING, null, new Date(), batchInfo.getUserId()));
 
-        sender.addJob(batchId, batchInfo);
-
-//        try {
-//            JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-//            jobParametersBuilder.addParameter("batchId", new JobParameter(batchId));
-//            jobParametersBuilder.addParameter("userId", new JobParameter(batchInfo.getUserId()));
-//
-//            Job job = jobs.get(batchInfo.getBatchType());
-//
-//            if (job != null) {
-//                jobLauncher.run(job, jobParametersBuilder.toJobParameters());
-//            } else {
-//                logger.error("Unknown batch file type: " + batchInfo.getBatchType() + " in batch with id: " + batchId);
-//
-//                statusSingleton.addBatchStatus(batchId,
-//                        new BatchStatusJModel(Global.BATCH_STATUS_ERROR, "Unknown batch file type: " +
-//                                batchInfo.getBatchType(), new Date(), batchInfo.getUserId()));
-//            }
-//        } catch (JobExecutionAlreadyRunningException e) {
-//            e.printStackTrace();
-//        } catch (JobRestartException e) {
-//            e.printStackTrace();
-//        } catch (JobInstanceAlreadyCompleteException e) {
-//            e.printStackTrace();
-//        } catch (JobParametersInvalidException e) {
-//            e.printStackTrace();
-//        }
+            sender.addJob(batchId, batchInfo);
+        }
     }
 
     public byte[] inputStreamToByte(InputStream in) throws IOException {
