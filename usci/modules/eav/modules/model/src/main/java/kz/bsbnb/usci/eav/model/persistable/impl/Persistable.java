@@ -4,6 +4,9 @@ import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 
 public class Persistable implements IPersistable
 {
+
+    public static final long DEFAULT_ID = 0;
+
 	/**
 	 * id fields value of the persisted object
 	 */

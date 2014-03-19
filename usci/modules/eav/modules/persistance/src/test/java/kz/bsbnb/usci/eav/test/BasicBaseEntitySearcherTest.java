@@ -8,7 +8,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -46,7 +46,7 @@ public class BasicBaseEntitySearcherTest extends GenericTestCase
     IMetaClassDao metaClassDao;
 
     @Autowired
-    IBaseEntityDao baseEntityDao;
+    IBaseEntityProcessorDao baseEntityProcessorDao;
 
     @Autowired
     IMetaFactory metaFactory;
@@ -90,12 +90,12 @@ public class BasicBaseEntitySearcherTest extends GenericTestCase
         BaseEntity streetEntity4 = generateBaseEntity1(batch, metaFactory, "Street4");
         BaseEntity streetEntity5 = generateBaseEntity1(batch, metaFactory, "Street5");
 
-        baseEntityDao.process(streetEntity1);
-        baseEntityDao.process(streetEntity2);
+        baseEntityProcessorDao.process(streetEntity1);
+        baseEntityProcessorDao.process(streetEntity2);
         // TODO: Fix this block
-        //long id3 = baseEntityDao.save(streetEntity3);
-        baseEntityDao.process(streetEntity4);
-        baseEntityDao.process(streetEntity5);
+        //long id3 = baseEntityProcessorDao.save(streetEntity3);
+        baseEntityProcessorDao.process(streetEntity4);
+        baseEntityProcessorDao.process(streetEntity5);
 
         ArrayList<Long> result = searcher.findAll(streetEntity3);
 
@@ -149,12 +149,12 @@ public class BasicBaseEntitySearcherTest extends GenericTestCase
         c.set(2014, 01, 01);
         BaseEntity streetEntity5 = generateBaseEntity2(batch, metaFactory, "Street5", new Date(c.getTimeInMillis()));
 
-        baseEntityDao.process(streetEntity1);
-        baseEntityDao.process(streetEntity2);
+        baseEntityProcessorDao.process(streetEntity1);
+        baseEntityProcessorDao.process(streetEntity2);
         // TODO: Fix this block
-        //long id3 = baseEntityDao.save(streetEntity3);
-        baseEntityDao.process(streetEntity4);
-        baseEntityDao.process(streetEntity5);
+        //long id3 = baseEntityProcessorDao.save(streetEntity3);
+        baseEntityProcessorDao.process(streetEntity4);
+        baseEntityProcessorDao.process(streetEntity5);
 
         ArrayList<Long> result = searcher.findAll(streetEntity3);
 

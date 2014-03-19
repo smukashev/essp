@@ -3,5 +3,6 @@ package kz.bsbnb.usci.eav.persistance.dao;
 /**
  * Created by Alexandr.Motov on 16.03.14.
  */
-public interface IBeReportDateDao extends IBeValueDao {
+public interface IBeEntitySimpleSetDao extends IPersistableDao {
+
 }

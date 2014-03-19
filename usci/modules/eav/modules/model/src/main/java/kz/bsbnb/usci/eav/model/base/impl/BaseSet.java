@@ -95,13 +95,15 @@ public class BaseSet extends BaseContainer implements IBaseSet
             UUID uuid = UUID.randomUUID();
             put(uuid.toString(), value);
         }
-        value.setMetaAttribute();
+        value.setBaseContainer(this);
 
         values.put(name, value);
     }
 
     public BaseSet put(IBaseValue value)
     {
+        value.setBaseContainer(this);
+
         UUID uuid = UUID.randomUUID();
         put(uuid.toString(), value);
 

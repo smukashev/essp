@@ -3,7 +3,7 @@ package kz.bsbnb.usci.eav.tool.generator.nonrandom;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
@@ -43,7 +43,7 @@ public class GenerateInsertXml {
 
         IStorage storage = ctx.getBean(IStorage.class);
         IMetaClassDao metaClassDao = ctx.getBean(IMetaClassDao.class);
-        IBaseEntityDao baseEntityDao = ctx.getBean(IBaseEntityDao.class);
+        IBaseEntityProcessorDao baseEntityProcessorDao = ctx.getBean(IBaseEntityProcessorDao.class);
         IBatchDao batchDao = ctx.getBean(IBatchDao.class);
 
         AttributeTree tree = new AttributeTree("entities",null);
@@ -83,8 +83,8 @@ public class GenerateInsertXml {
                 BaseEntity baseEntity = baseEntityGenerator.generateBaseEntity(batch, aData, ++index);
                 entities.add(baseEntity);
                 // TODO: Fix this block
-                //Long id = baseEntityDao.save(baseEntity);
-                //BaseEntity bb = baseEntityDao.load(id);
+                //Long id = baseEntityProcessorDao.save(baseEntity);
+                //BaseEntity bb = baseEntityProcessorDao.load(id);
             }
 
             Document document = baseEntityXmlGenerator.getGeneratedDocument(entities);

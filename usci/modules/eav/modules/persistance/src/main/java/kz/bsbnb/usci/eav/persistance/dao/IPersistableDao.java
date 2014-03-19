@@ -11,9 +11,9 @@ import java.util.Set;
 /**
  * @author a.motov
  */
-public interface IBeValueDao {
+public interface IPersistableDao {
 
-    public void insert(IPersistable persistable);
+    public long insert(IPersistable persistable);
 
     public void update(IPersistable persistable);
 

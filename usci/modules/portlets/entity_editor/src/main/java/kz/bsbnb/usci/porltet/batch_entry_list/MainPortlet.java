@@ -114,7 +114,7 @@ public class MainPortlet extends MVCPortlet {
         str += "\"value\": \"" + testNull(meta.getClassTitle()) + "\",";
         str += "\"simple\": false,";
         str += "\"array\": false,";
-        str += "\"type\": \"CLASS\",";
+        str += "\"type\": \"META_CLASS\",";
         str += "\"iconCls\":\"folder\",";
         str += "\"children\":[";
 
@@ -225,7 +225,7 @@ public class MainPortlet extends MVCPortlet {
         str += "\"value\": \"" + set.get().size() + "\",";
         str += "\"simple\": false,";
         str += "\"array\": true,";
-        str += "\"type\": \"SET\",";
+        str += "\"type\": \"META_SET\",";
         str += "\"iconCls\":\"folder\",";
         str += "\"children\":[";
 

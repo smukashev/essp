@@ -11,6 +11,14 @@ public interface IBaseEntityManager {
 
     public void registerAsInserted(IPersistable persistableObject);
 
+    public void registerAsUpdated(IPersistable persistableObject);
+
+    public void registerAsDeleted(IPersistable persistableObject);
+
     public List<IPersistable> getInsertedObjects(Class objectClass);
+
+    public List<IPersistable> getUpdatedObjects(Class objectClass);
+
+    public List<IPersistable> getDeletedObjects(Class objectClass);
 
 }

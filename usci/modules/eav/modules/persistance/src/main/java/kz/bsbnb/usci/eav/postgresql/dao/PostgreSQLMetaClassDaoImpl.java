@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.postgresql.dao;
 
-import kz.bsbnb.usci.eav.model.base.ContainerTypes;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -304,7 +304,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 sqlStats.put(insert.getSQL(), (System.nanoTime() - t) / 1000000);
             }
 
-            saveSet(metaSet.getMemberType(), id, ContainerTypes.SET, new MetaAttribute(false, false, null), "item");
+            saveSet(metaSet.getMemberType(), id, MetaContainerTypes.META_SET, new MetaAttribute(false, false, null), "item");
         }
         else
         {
@@ -494,11 +494,11 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
 
             if(metaType.isSet())
             {
-                saveSet(metaType, meta.getId(), ContainerTypes.CLASS, metaAttribute, typeName);
+                saveSet(metaType, meta.getId(), MetaContainerTypes.META_CLASS, metaAttribute, typeName);
             }
             else
             {
-                metaAttribute.setId(saveAttribute(metaType, meta.getId(), ContainerTypes.CLASS,
+                metaAttribute.setId(saveAttribute(metaType, meta.getId(), MetaContainerTypes.META_CLASS,
                         metaAttribute, typeName, metaAttribute.getTitle()));
             }
         }
@@ -526,7 +526,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     ).set(EAV_M_COMPLEX_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
                     ).set(EAV_M_COMPLEX_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable())
                     ).where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(dbMeta.getId())
-                    ).and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
                     ).and(EAV_M_COMPLEX_SET.NAME.eq(typeName));
 
                     MetaSet metaSet = (MetaSet)meta.getMemberType(typeName);
@@ -585,7 +585,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     ).set(EAV_M_SIMPLE_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
                     ).set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable())
                     ).where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(dbMeta.getId())
-                    ).and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
                     ).and(EAV_M_SIMPLE_SET.NAME.eq(typeName));
                 }
             } else {
@@ -597,7 +597,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
                     ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable())
                     ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId())
-                    ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
                     ).and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
                 }
                 else
@@ -608,7 +608,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                     ).set(EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
                     ).set(EAV_M_SIMPLE_ATTRIBUTES.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable())
                     ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId())
-                    ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                    ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
                     ).and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
                 }
             }
@@ -644,12 +644,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 if (!meta.getMemberType(typeName).isSet()) {
                     delete = context.delete(EAV_M_COMPLEX_ATTRIBUTES
                         ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
-                        ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                        ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
                         ).and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
                 } else {
                     delete = context.delete(EAV_M_COMPLEX_SET
                         ).where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(meta.getId())
-                        ).and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                        ).and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
                         ).and(EAV_M_COMPLEX_SET.NAME.eq(typeName));
                 }
             }
@@ -658,12 +658,12 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
                 if (!meta.getMemberType(typeName).isSet()) {
                     delete = context.delete(EAV_M_SIMPLE_ATTRIBUTES
                         ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
-                        ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                        ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
                         ).and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
                 } else {
                     delete = context.delete(EAV_M_SIMPLE_SET
                         ).where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(meta.getId())
-                        ).and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(ContainerTypes.CLASS)
+                        ).and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
                         ).and(EAV_M_SIMPLE_SET.NAME.eq(typeName));
                 }
             }
@@ -1122,7 +1122,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         if (set.getMemberType().isSet())
         {
             removeSet((MetaSet)set.getMemberType());
-            removeAllAttributes(set.getId(), ContainerTypes.SET);
+            removeAllAttributes(set.getId(), MetaContainerTypes.META_SET);
         }
         else
         {
@@ -1149,7 +1149,7 @@ public class PostgreSQLMetaClassDaoImpl extends JDBCSupport implements IMetaClas
         }
 
         //delete all class attributes
-        removeAllAttributes(metaClass.getId(), ContainerTypes.CLASS);
+        removeAllAttributes(metaClass.getId(), MetaContainerTypes.META_CLASS);
 
         //delete class
         DeleteConditionStep delete = context.delete(EAV_M_CLASSES).where(EAV_M_CLASSES.ID.eq(metaClass.getId()));

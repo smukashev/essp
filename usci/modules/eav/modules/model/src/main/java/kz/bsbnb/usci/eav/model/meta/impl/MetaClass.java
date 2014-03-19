@@ -1,23 +1,15 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
-import kz.bsbnb.usci.eav.model.base.ContainerTypes;
-import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
-import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
-import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DataUtils;
 
-public class MetaClass extends Persistable implements IMetaType, IMetaClass
+public class MetaClass extends MetaContainer implements IMetaClass
 {
 	/**
 	 * Name of the meta. Used as a key value for database search if <code>id</code> is 0
@@ -56,7 +48,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
 
     public MetaClass()
     {
-        super();
+        super(MetaContainerTypes.META_CLASS);
 
         this.beginDate = new Date();
         DataUtils.toBeginningOfTheDay(beginDate);
@@ -64,8 +56,9 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
 
     public MetaClass(MetaClass meta)
     {
+        super(meta.id, MetaContainerTypes.META_CLASS);
+
         this.className = meta.className;
-        this.id = meta.id;
         this.disabled = meta.disabled;
         this.beginDate = meta.beginDate;
         this.complexKeyType = meta.complexKeyType;
@@ -75,6 +68,8 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
 
 	public MetaClass(String className)
     {
+        super(MetaContainerTypes.META_CLASS);
+
 		this.className = className;
         this.beginDate = new Date();
         DataUtils.toBeginningOfTheDay(beginDate);
@@ -82,6 +77,8 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
 
     public MetaClass(String className, Date beginDate)
     {
+        super(MetaContainerTypes.META_CLASS);
+
         this.className = className;
         this.beginDate = beginDate;
     }
@@ -182,12 +179,6 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
         }
         members.put(name, metaAttribute);
 	}
-
-    @Override
-    public int getType()
-    {
-        return ContainerTypes.CLASS;
-    }
 
     public String getSearchProcedureName()
     {

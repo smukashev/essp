@@ -2,12 +2,9 @@ package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.RefListItem;
-import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcher;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
@@ -35,7 +32,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     private final Logger logger = LoggerFactory.getLogger(EntityServiceImpl.class);
 
     @Autowired
-    IBaseEntityDao baseEntityDao;
+    IBaseEntityProcessorDao baseEntityProcessorDao;
 
     @Autowired
     IBaseEntitySearcherPool searcherPool;
@@ -57,7 +54,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     public void save(BaseEntity baseEntity) {
         try {
             long t1 = System.currentTimeMillis();
-            BaseEntity entity = (BaseEntity)baseEntityDao.process(baseEntity);
+            BaseEntity entity = (BaseEntity) baseEntityProcessorDao.process(baseEntity);
             long t2 = System.currentTimeMillis() - t1;
 
             Date contractDate = (Date)entity.getEl("primary_contract.date");
@@ -93,7 +90,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     public BaseEntity search(BaseEntity baseEntity) {
         ArrayList<Long> result = searcherPool.getSearcher(baseEntity.getMeta().getClassName()).findAll(baseEntity);
 
-        return (BaseEntity)baseEntityDao.load(result.get(0));
+        return (BaseEntity) baseEntityProcessorDao.load(result.get(0));
     }
 
     @Override
@@ -101,23 +98,23 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
         // TODO: Uncomment and fix
         /*Long id = metaClassDao.save(baseEntityLoad.getMeta());
-        baseEntityDao.saveOrUpdate(baseEntityLoad);*/
+        baseEntityProcessorDao.saveOrUpdate(baseEntityLoad);*/
     }
 
     @Override
     public List<Long> getEntityIDsByMetaclass(long id)
     {
-        return baseEntityDao.getEntityIDsByMetaclass(id);
+        return baseEntityProcessorDao.getEntityIDsByMetaclass(id);
     }
 
     @Override
     public BaseEntity load(long id) {
         System.out.println("Load with id: " + id);
-        return (BaseEntity)baseEntityDao.load(id);
+        return (BaseEntity) baseEntityProcessorDao.load(id);
     }
 
     public List<RefListItem> getRefsByMetaclass(long metaClassId) {
-        return baseEntityDao.getRefsByMetaclass(metaClassId);
+        return baseEntityProcessorDao.getRefsByMetaclass(metaClassId);
     }
 
     @Override

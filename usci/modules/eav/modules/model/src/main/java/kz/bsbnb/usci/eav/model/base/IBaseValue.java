@@ -15,7 +15,7 @@ import java.util.UUID;
  *
  * @author a.motov
  */
-public interface IBaseValue extends IPersistable, Cloneable
+public interface IBaseValue<T> extends IPersistable, Cloneable
 {
 
     public IBaseContainer getBaseContainer();
@@ -51,9 +51,9 @@ public interface IBaseValue extends IPersistable, Cloneable
      * @see kz.bsbnb.usci.eav.model.type.DataTypes
      * @see kz.bsbnb.usci.eav.model.base.impl.BaseEntity
      */
-    public Object getValue();
+    public T getValue();
 
-    public void setValue(Object value);
+    public void setValue(T value);
 
     public Date getRepDate();
 

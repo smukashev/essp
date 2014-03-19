@@ -5,7 +5,7 @@ import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.cr.model.SubjectType;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IUserDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -37,7 +37,7 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
     private DSLContext context;
 
     @Autowired
-    IBaseEntityDao postgreSQLBaseEntityDaoImpl;
+    IBaseEntityProcessorDao baseEntityProcessorDao;
 
     @Override
     public boolean hasPortalUserCreditor(long userId, long creditorId)
@@ -129,7 +129,7 @@ public class PostgreSQLUserDaoImpl extends JDBCSupport implements IUserDao
         for (Map<String, Object> row : rows){
             Long id = ((BigDecimal)row.get(EAV_A_CREDITOR_USER.CREDITOR_ID.getName())).longValue();
 
-            BaseEntity entity = (BaseEntity) postgreSQLBaseEntityDaoImpl.load(id);
+            BaseEntity entity = (BaseEntity) baseEntityProcessorDao.load(id);
 
             Creditor creditor = new Creditor();
 

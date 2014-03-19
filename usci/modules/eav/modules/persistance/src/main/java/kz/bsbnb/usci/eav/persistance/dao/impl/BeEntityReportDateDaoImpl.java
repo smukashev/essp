@@ -2,10 +2,11 @@ package kz.bsbnb.usci.eav.persistance.dao.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
-import kz.bsbnb.usci.eav.persistance.dao.IBeReportDateDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBeEntityReportDateDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
+import org.jooq.Delete;
 import org.jooq.Insert;
 import org.jooq.Update;
 import org.slf4j.Logger;
@@ -21,16 +22,16 @@ import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITY_REPORT_DAT
  * Created by Alexandr.Motov on 16.03.14.
  */
 @Repository
-public class BeReportDateDaoImpl extends JDBCSupport implements IBeReportDateDao {
+public class BeEntityReportDateDaoImpl extends JDBCSupport implements IBeEntityReportDateDao {
 
-    private final Logger logger = LoggerFactory.getLogger(BeReportDateDaoImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(BeEntityReportDateDaoImpl.class);
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
 
     @Override
-    public void insert(IPersistable persistable) {
+    public long insert(IPersistable persistable) {
         IBaseEntityReportDate baseEntityReportDate = (IBaseEntityReportDate)persistable;
         long baseEntityReportDateId = insert(baseEntityReportDate.getBaseEntity().getId(), baseEntityReportDate.getReportDate(),
                 baseEntityReportDate.getIntegerValuesCount(), baseEntityReportDate.getDateValuesCount(),
@@ -38,9 +39,11 @@ public class BeReportDateDaoImpl extends JDBCSupport implements IBeReportDateDao
                 baseEntityReportDate.getDoubleValuesCount(), baseEntityReportDate.getComplexValuesCount(),
                 baseEntityReportDate.getSimpleSetsCount(), baseEntityReportDate.getComplexSetsCount());
         baseEntityReportDate.setId(baseEntityReportDateId);
+
+        return baseEntityReportDateId;
     }
 
-    private long insert(
+    protected long insert(
             long baseEntityId,
             Date reportDate,
             long integerValuesCount,
@@ -84,7 +87,7 @@ public class BeReportDateDaoImpl extends JDBCSupport implements IBeReportDateDao
                 baseEntityReportDate.getComplexSetsCount());
     }
 
-    private void update(
+    protected void update(
             long id,
             long integerValuesCount,
             long dateValuesCount,
@@ -109,11 +112,31 @@ public class BeReportDateDaoImpl extends JDBCSupport implements IBeReportDateDao
                 .where(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ID.equal(id));
 
         logger.debug(update.toString());
-        updateWithStats(update.getSQL(), update.getBindValues().toArray());
+        int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
+        if (count != 1)
+        {
+            throw new RuntimeException("UPDATE operation should be update only one record.");
+        }
     }
 
     @Override
     public void delete(IPersistable persistable) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        delete(persistable.getId());
     }
+
+    protected void delete(long id)
+    {
+        String tableAlias = "rd";
+        Delete delete = context
+                .delete(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias))
+                .where(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ID.equal(id));
+
+        logger.debug(delete.toString());
+        int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+        if (count != 1)
+        {
+            throw new RuntimeException("DELETE operation should be delete only one record.");
+        }
+    }
+
 }

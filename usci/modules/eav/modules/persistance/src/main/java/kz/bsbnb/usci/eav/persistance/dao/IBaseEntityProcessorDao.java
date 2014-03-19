@@ -16,7 +16,7 @@ import java.util.Set;
  * @since 1.0
  * @version 1.0
  */
-public interface IBaseEntityDao
+public interface IBaseEntityProcessorDao
 {
 
     /**
@@ -48,8 +48,6 @@ public interface IBaseEntityDao
     public IBaseEntity apply(IBaseEntity baseEntity, IBaseEntityManager baseEntityManager);
 
     public IBaseEntity process(IBaseEntity baseEntity);
-
-    public boolean isUsed(long baseEntityId);
 
     public Set<Date> getAvailableReportDates(long baseEntityId);
 

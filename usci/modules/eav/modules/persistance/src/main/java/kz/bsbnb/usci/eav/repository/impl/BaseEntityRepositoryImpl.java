@@ -4,7 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.repository.IBaseEntityRepository;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
@@ -82,7 +82,7 @@ public class BaseEntityRepositoryImpl implements IBaseEntityRepository {
     private TimeUnit timeUnit = DEFAULT_TIME_UNIT;
 
     @Autowired
-    private IBaseEntityDao baseEntityDao;
+    private IBaseEntityProcessorDao baseEntityProcessorDao;
 
     // TODO: Maybe use LinkedHashMap
     LoadingCache<BaseEntityKey, IBaseEntity> cache;
@@ -105,7 +105,7 @@ public class BaseEntityRepositoryImpl implements IBaseEntityRepository {
             .build(
                     new CacheLoader<BaseEntityKey, IBaseEntity>() {
                         public IBaseEntity load(BaseEntityKey key) throws Exception {
-                            return baseEntityDao.load(key.getId(), key.getReportDate());
+                            return baseEntityProcessorDao.load(key.getId(), key.getReportDate());
                         }
                     });
     }
@@ -133,7 +133,7 @@ public class BaseEntityRepositoryImpl implements IBaseEntityRepository {
         }
         else
         {
-            return baseEntityDao.load(id, reportDate);
+            return baseEntityProcessorDao.load(id, reportDate);
         }
     }
 

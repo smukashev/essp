@@ -22,8 +22,13 @@ import java.util.UUID;
  *
  * @author a.motov
  */
-public class BaseValue extends Persistable implements IBaseValue
+public class BaseValue<T> extends Persistable implements IBaseValue<T>
 {
+
+    public static final boolean DEFAULT_LAST = true;
+
+    public static final boolean DEFAULT_CLOSED = false;
+
     Logger logger = LoggerFactory.getLogger(BaseValue.class);
 
     private UUID uuid = UUID.randomUUID();
@@ -45,54 +50,35 @@ public class BaseValue extends Persistable implements IBaseValue
     /**
      * Can be a simple type, an array or a complex type.
      */
-    private Object value;
+    private T value;
 
     private Date reportDate;
 
-    private boolean last = true;
+    private boolean last = DEFAULT_LAST;
 
-    private boolean closed = false;
+    private boolean closed = DEFAULT_CLOSED;
 
-    /**
-     * Initializes batch value with a batch information, index and value.
-     * @param batch information about the origin of this value.
-     * @param index the index of the value
-     * @param value the value. May be is null.
-     * @throws IllegalArgumentException if <code>Batch</code> is null or <code>Batch</code> has no id
-     */
-    public BaseValue(Batch batch, long index, Date reportDate, Object value)
+    public BaseValue(Batch batch, long index, Date reportDate, T value)
     {
-        if (reportDate == null)
-            throw new IllegalArgumentException
-                    ("reportDate is null. Initialization of the BaseValue ​​is not possible.");
-
-        if (batch == null)
-            throw new IllegalArgumentException
-                    ("Batch is null. Initialization of the BaseValue ​​is not possible.");
-
-        if (batch.getId() < 1)
-            throw new IllegalArgumentException
-                    ("Batch has no id. Initialization of the BaseValue ​​is not possible.");
-
-
-        this.batch = batch;
-        this.index = index;
-        this.value = value;
-
-        Date newReportDate = (Date)reportDate.clone();
-        DataUtils.toBeginningOfTheDay(newReportDate);
-
-        this.reportDate = newReportDate;
+        this(DEFAULT_ID, batch, index, reportDate, value, DEFAULT_CLOSED, DEFAULT_LAST);
     }
 
-    public BaseValue(Batch batch, long index, Date reportDate, Object value, boolean closed, boolean last)
+    public BaseValue(Batch batch, long index, Date reportDate, T value, boolean closed, boolean last)
     {
-        this(batch, index, reportDate, value);
-        this.closed = closed;
-        this.last = last;
+        this(DEFAULT_ID, batch, index, reportDate, value, closed, last);
     }
 
-    public BaseValue(long id, Batch batch, long index, Date reportDate, Object value)
+    public BaseValue(long id, Batch batch, long index, Date reportDate, T value)
+    {
+        this(id, batch, index, reportDate, value, DEFAULT_CLOSED, DEFAULT_LAST);
+    }
+
+    public BaseValue(Batch batch, long index, T value)
+    {
+        this(DEFAULT_ID, batch, index, batch.getRepDate(), value, DEFAULT_CLOSED, DEFAULT_LAST);
+    }
+
+    public BaseValue(long id, Batch batch, long index, Date reportDate, T value, boolean closed, boolean last)
     {
         super(id);
 
@@ -104,39 +90,19 @@ public class BaseValue extends Persistable implements IBaseValue
             throw new IllegalArgumentException
                     ("Batch has no id. Initialization of the BaseValue ​​is not possible.");
 
-        this.batch = batch;
-        this.index = index;
-        this.value = value;
+        if (reportDate == null)
+            throw new IllegalArgumentException
+                    ("reportDate is null. Initialization of the BaseValue ​​is not possible.");
 
         Date newReportDate = (Date)reportDate.clone();
         DataUtils.toBeginningOfTheDay(newReportDate);
 
-        this.reportDate = newReportDate;
-    }
-
-    public BaseValue(long id, Batch batch, long index, Date reportDate, Object value, boolean closed, boolean last)
-    {
-        this(id, batch, index, reportDate, value);
-        this.closed = closed;
-        this.last = last;
-
-    }
-
-    public BaseValue(Batch batch, long index, Object value)
-    {
-        if (batch == null)
-            throw new IllegalArgumentException
-                    ("Batch is null. Initialization of the BaseValue ​​is not possible.");
-
-        if (batch.getId() < 1)
-            throw new IllegalArgumentException
-                    ("Batch has no id. Initialization of the BaseValue ​​is not possible.");
-
-
         this.batch = batch;
         this.index = index;
-        this.value = value;
-        this.reportDate = batch.getRepDate();
+        this.value = (T)value;
+        this.reportDate = newReportDate;
+        this.closed = closed;
+        this.last = last;
     }
 
     @Override
@@ -178,13 +144,13 @@ public class BaseValue extends Persistable implements IBaseValue
     }
 
     @Override
-    public Object getValue()
+    public T getValue()
     {
         return value;
     }
 
     @Override
-    public void setValue(Object value)
+    public void setValue(T value)
     {
         this.value = value;
     }
