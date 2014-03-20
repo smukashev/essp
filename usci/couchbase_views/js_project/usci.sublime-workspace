@@ -1,0 +1,955 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"account",
+				"account_code"
+			],
+			[
+				"post",
+				"posting_id"
+			],
+			[
+				"mod",
+				"module_name"
+			],
+			[
+				"quer",
+				"query_filter"
+			],
+			[
+				"Add",
+				"addslashes"
+			],
+			[
+				"fl",
+				"floor"
+			],
+			[
+				"pa",
+				"page"
+			],
+			[
+				"tot",
+				"total_pages"
+			],
+			[
+				"for",
+				"for	for …"
+			],
+			[
+				"prod",
+				"products_total"
+			],
+			[
+				"products_",
+				"products_per_page"
+			],
+			[
+				"pr",
+				"products"
+			],
+			[
+				"page",
+				"page_number"
+			],
+			[
+				"comp",
+				"company_id_user"
+			],
+			[
+				"compa",
+				"company_id"
+			],
+			[
+				"panel",
+				"panelMain"
+			],
+			[
+				"pane",
+				"panelRightTop"
+			],
+			[
+				"marking",
+				"marking_query"
+			],
+			[
+				"add",
+				"addslashes"
+			],
+			[
+				"user",
+				"userpass"
+			],
+			[
+				"pass",
+				"pass_part"
+			],
+			[
+				"las",
+				"last_name"
+			],
+			[
+				"compan",
+				"companyId"
+			],
+			[
+				"item",
+				"item_id"
+			],
+			[
+				"resp",
+				"responseText"
+			],
+			[
+				"store",
+				"storeToReload"
+			],
+			[
+				"rep",
+				"reptime"
+			],
+			[
+				"get",
+				"getCmp"
+			],
+			[
+				"submit",
+				"submitLoginForm"
+			],
+			[
+				"arrakey",
+				"array_key_exists"
+			],
+			[
+				"cash",
+				"cashDefault"
+			],
+			[
+				"button",
+				"buttonPrint"
+			],
+			[
+				"buttonSa",
+				"buttonSaveClose"
+			],
+			[
+				"font",
+				"font-family"
+			],
+			[
+				"sub",
+				"submitForm"
+			],
+			[
+				"refre",
+				"refreshGrids"
+			],
+			[
+				"fiel",
+				"fieldLabel"
+			],
+			[
+				"doc",
+				"doctype_id"
+			],
+			[
+				"op",
+				"options"
+			],
+			[
+				"type",
+				"typeof"
+			],
+			[
+				"fu",
+				"function"
+			],
+			[
+				"array_key",
+				"array_key_exists"
+			],
+			[
+				"fir",
+				"first_row"
+			],
+			[
+				"pro",
+				"proxy"
+			],
+			[
+				"ret",
+				"retCode"
+			],
+			[
+				"suce",
+				"successFunc"
+			],
+			[
+				"whdoc",
+				"whdocItemsGrid"
+			],
+			[
+				"va",
+				"value"
+			],
+			[
+				"id",
+				"id_field"
+			],
+			[
+				"ite",
+				"itemForm"
+			],
+			[
+				"print",
+				"print_r"
+			],
+			[
+				"so",
+				"sort_str"
+			],
+			[
+				"s",
+				"s_order"
+			],
+			[
+				"s_",
+				"s_field"
+			],
+			[
+				"backgr",
+				"background-color"
+			],
+			[
+				"background",
+				"background-color"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "config.php",
+			"settings":
+			{
+				"buffer_size": 172,
+				"line_ending": "Unix",
+				"name": "<?php"
+			}
+		},
+		{
+			"file": "install.php",
+			"settings":
+			{
+				"buffer_size": 938,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "view.php",
+			"settings":
+			{
+				"buffer_size": 1919,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "index.php",
+			"settings":
+			{
+				"buffer_size": 856,
+				"line_ending": "Unix",
+				"name": "<html>"
+			}
+		},
+		{
+			"file": "importer.php",
+			"settings":
+			{
+				"buffer_size": 1367,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "Packages/User/js.sublime-build",
+	"command_palette":
+	{
+		"height": 92.0,
+		"selected_items":
+		[
+			[
+				"git push",
+				"Git: Push"
+			],
+			[
+				"git comm",
+				"Git: Commit"
+			],
+			[
+				"git add",
+				"Git: Add..."
+			],
+			[
+				"git com",
+				"Git: Commit"
+			],
+			[
+				"com",
+				"Git: Commit"
+			],
+			[
+				"add",
+				"Git: Add..."
+			],
+			[
+				"push",
+				"Git: Push"
+			],
+			[
+				"comm",
+				"Git: Commit"
+			],
+			[
+				"pus",
+				"Git: Push"
+			],
+			[
+				"ad",
+				"Git: Add..."
+			],
+			[
+				"comi",
+				"Git: Commit"
+			],
+			[
+				"tag",
+				"Git: Push Tags"
+			],
+			[
+				"commit",
+				"Git: Commit"
+			],
+			[
+				"co",
+				"Git: Commit"
+			],
+			[
+				"gitad",
+				"Git: Add..."
+			],
+			[
+				"commi",
+				"Git: Commit"
+			],
+			[
+				"git co",
+				"Git: Commit"
+			],
+			[
+				"gadd",
+				"Git: Add..."
+			],
+			[
+				"gitadd",
+				"Git: Add..."
+			],
+			[
+				"gitco",
+				"Git: Commit"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"git pus",
+				"Git: Push"
+			],
+			[
+				"gitst",
+				"Git: Status"
+			],
+			[
+				"pack",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 146.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/var/www/html/pawnshop/js.php",
+		"/var/www/html/pawnshop/index.php",
+		"/var/www/html/usci/index.php",
+		"/var/www/html/usci/view.php",
+		"/var/www/html/pawnshop/out_whdocitems.php",
+		"/var/www/html/pawnshop/config.php",
+		"/home/a.tkachenko/Documents/log/core.log",
+		"/var/www/html/pawnshop/whdocs.php",
+		"/home/a.tkachenko/Documents/ct_package.txt",
+		"/home/a.tkachenko/usci.xml",
+		"/var/www/html/pawnshop/logging.php",
+		"/var/www/html/pawnshop/modules/in_whdoc.php",
+		"/var/www/html/pawnshop/modules/out_whdoc.php",
+		"/var/www/html/pawnshop/modules/common.php",
+		"/home/a.tkachenko/10/manifest.xml",
+		"/home/a.tkachenko/Downloads/Задача/ReadMe.txt",
+		"/var/www/html/pawnshop/out_whdoc.php",
+		"/var/www/html/pawnshop/common.php",
+		"/var/www/html/pawnshop/in_whdoc.php",
+		"/var/www/html/pawnshop/item.php",
+		"/var/www/html/pawnshop/re_whdoc.php",
+		"/var/www/html/pawnshop/wo_whdoc.php",
+		"/var/www/html/pawnshop/wo_whdoc.js",
+		"/var/www/html/pawnshop/out_whdoc.js",
+		"/var/www/html/pawnshop/re_whdoc.js",
+		"/var/www/html/pawnshop/in_whdoc.js",
+		"/var/www/html/pawnshop/items.js",
+		"/var/www/html/pawnshop/rep_whremains.js",
+		"/home/a.tkachenko/Documents/agro_batches/180413_2.xml",
+		"/home/a.tkachenko/Documents/agro_batches/170413.xml",
+		"/var/www/html/pawnshop/item.js",
+		"/var/www/html/pawnshop/common.js",
+		"/var/www/html/pawnshop/items.php",
+		"/home/a.tkachenko/Documents/agro_batches/180413.xml",
+		"/home/a.tkachenko/git/usci/usci/modules/cli/src/main/resources/refs/ref_creditor_branch.xml",
+		"/var/www/html/pawnshop/tabs.js",
+		"/var/www/html/pawnshop/item_img.js",
+		"/var/www/html/dd.php",
+		"/home/a.tkachenko/software/liferay/glassfish/domains/liferay-portal-domain/logs/server.log",
+		"/home/a.tkachenko/testing.xml",
+		"/home/a.tkachenko/cr.xsd",
+		"/home/a.tkachenko/10/batch/test-batch.xml",
+		"/home/a.tkachenko/10/batch_with_bad_rnn/test-batch.xml",
+		"/home/a.tkachenko/software/liferay/tomcat-7.0.40/logs/catalina.out",
+		"/home/a.tkachenko/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/a.tkachenko/.config/sublime-text-2/Packages/User/Default (Linux).sublime-keymap",
+		"/home/a.tkachenko/software/liferay/logs/liferay.2013-09-19.log",
+		"/home/a.tkachenko/cr.xml",
+		"/var/www/html/pawnshop/ext/ux/FileUploadField.js",
+		"/var/www/html/pawnshop/users.js",
+		"/var/www/html/pawnshop/user.js",
+		"/var/www/html/pawnshop/cashdocs.php",
+		"/var/www/html/pawnshop/user.php",
+		"/var/www/html/pawnshop/users.php",
+		"/var/www/html/pawnshop/in_cashdoc.php",
+		"/home/a.tkachenko/git/usci/usci/modules/bconv/src/test/resources/test_batch.xml",
+		"/home/a.tkachenko/send-remoting-file.ps1",
+		"/var/www/html/pawnshop/eshop/css/style.css",
+		"/var/www/html/pawnshop/banners.php",
+		"/var/www/html/pawnshop/banner.php",
+		"/var/www/html/pawnshop/banner.js",
+		"/var/www/html/pawnshop/eshop.js",
+		"/var/www/html/pawnshop/eshop/index.php",
+		"/var/www/html/pawnshop/build.sh",
+		"/var/www/html/pawnshop/deploy.sh",
+		"/var/www/html/pawnshop/banner_img.php",
+		"/var/www/html/pawnshop/version.php",
+		"/var/www/html/pawnshop/gitinfo.php",
+		"/var/www/html/pawnshop/item_image.php",
+		"/var/www/html/pawnshop/upload_item_images.php",
+		"/var/www/html/pawnshop/branch.php",
+		"/var/www/html/pawnshop/branch.js",
+		"/var/www/html/pawnshop/branches.php",
+		"/var/www/html/pawnshop/company.js",
+		"/var/www/html/pawnshop/get-item-images.php",
+		"/var/www/html/pawnshop/shared.php",
+		"/var/www/html/pawnshop/eshop/index.html",
+		"/var/www/html/pawnshop/dev.sql",
+		"/var/www/html/pawnshop/in_whdocitems.php",
+		"/home/a.tkachenko/git/credit-registry/model/credit-registry-dm/src/main/resources/credit-registry.xsd",
+		"/var/www/html/pawnshop/target/item_image.php",
+		"/var/www/html/pawnshop/target/items.php",
+		"/var/www/html/pawnshop/ext/ux/data-view.css",
+		"/var/www/html/pawnshop/delete_item_image.php",
+		"/var/www/html/pawnshop/whdocs.js",
+		"/var/www/html/pawnshop/ext/ux/DataView-more.js",
+		"/var/www/html/pawnshop/in_cashdoc.js",
+		"/var/www/html/pawnshop/update.php",
+		"/var/www/html/pawnshop/re_item.php",
+		"/var/www/html/pawnshop/out_item.php",
+		"/var/www/html/pawnshop/rep_whremains.php",
+		"/var/www/html/pawnshop/out_cashdoc.js",
+		"/var/www/html/pawnshop/wo_whdoc_print.php",
+		"/var/www/html/pawnshop/re_whdoc_print.php",
+		"/var/www/html/pawnshop/out_whdoc_print.php",
+		"/var/www/html/pawnshop/out_cashdoc_print.php",
+		"/var/www/html/pawnshop/in_whdoc_print.php",
+		"/var/www/html/pawnshop/in_cashdoc_print.php",
+		"/var/www/html/pawnshop/company.php",
+		"/var/www/html/pawnshop/login.php",
+		"/var/www/html/pawnshop/cashdocs.js",
+		"/var/www/html/pawnshop/out_cashdoc.php",
+		"/var/www/html/pawnshop/wo_item.php",
+		"/var/www/html/pawnshop/wo_whdocitems.php",
+		"/var/www/html/pawnshop/re_whdocitems.php",
+		"/var/www/html/pawnshop/item_search.php",
+		"/var/www/html/pawnshop/login.js",
+		"/var/www/html/pawnshop/style.css",
+		"/var/www/html/pawnshop/rep_tabs.js",
+		"/var/www/html/test/update.php",
+		"/var/www/html/pawnshop/.htaccess",
+		"/var/www/html/pawnshop/updates/readme.txt",
+		"/var/www/html/pawnshop/uploads/readme.txt",
+		"/var/www/html/pawnshop/target/log/zip.log",
+		"/var/www/html/pawnshop/package.sh",
+		"/var/www/html/pawnshop/.gitignore",
+		"/home/a.tkachenko/.config/sublime-text-2/Packages/User/js.sublime-build",
+		"/var/www/html/pawnshop/target/c220513.js",
+		"/var/www/html/pawnshop/style/print.css",
+		"/var/www/html/pawnshop/in_whdocs.js",
+		"/var/www/html/pawnshop/in_whdocs.php",
+		"/var/www/html/pawnshop/whdoc.js",
+		"/var/www/html/pawnshop/whdoc.php",
+		"/var/www/html/pawnshop/pawnshop.sublime-workspace",
+		"/var/www/html/pawnshop/whdocitems.php",
+		"/var/www/html/items.php",
+		"/var/www/html/index.html",
+		"/var/www/html/main.css"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			"*.js",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"'].\"",
+			"\".$row['",
+			"`stats`.",
+			"code_numeric",
+			"contact",
+			"st_contact_details",
+			"organiz",
+			"</issue>",
+			"<issue>",
+			"issue",
+			"last",
+			"branch_id",
+			"id: 'branch_id',",
+			"<value_currency>",
+			"ZKO-0019-11",
+			"ZKO",
+			"ZKO-0019-11",
+			"createItemForm",
+			"flex",
+			"contact_type",
+			"region",
+			"legal_form",
+			"enterprise_type",
+			"econ_trade",
+			"currency",
+			"country",
+			"detail",
+			"ct_portfolio_flow",
+			"ct_package",
+			"doc_type",
+			"contact_type",
+			"econ_trade",
+			"currency",
+			"ref=\"creditor",
+			"creditor",
+			"classification",
+			"bank_relation",
+			"ref=\"balance_account",
+			"currency",
+			"subject_type",
+			"reop",
+			"re",
+			"Орынбасарова",
+			"Орын",
+			"wrap",
+			"height",
+			"createItemImageGallery",
+			"'].\",\";\n",
+			"{\n",
+			">1<",
+			"has",
+			"Каталог",
+			"?",
+			"$hot_products",
+			"item_images",
+			"[$num]",
+			"createBranchForm",
+			"branch",
+			"branchId",
+			"banners",
+			"refresh",
+			"_POST",
+			"createItemImageGallery",
+			"ct_package",
+			"item.php",
+			"createCompanyForm",
+			"companyId",
+			"createBranchForm",
+			"company_id",
+			"getBranchIdComboValue",
+			"branch_id_combo",
+			"getBranchIdComboValue",
+			"branch_id_combo",
+			"column:",
+			"column",
+			"myModel",
+			"reload",
+			"createBranchForm",
+			"branch",
+			"Branch",
+			"Branches",
+			"createBranchForm",
+			"branch.php",
+			"branchs:",
+			"items",
+			"Item",
+			"default",
+			"inwhdoc",
+			"InWarehouseDoc",
+			"in_whdoc",
+			"фввКщц",
+			".php.php",
+			"cellEditing",
+			"in_whdocitems",
+			"InWhdocItems",
+			"CURRENT_TIMESTAMP",
+			"total_price",
+			"price",
+			"last_chan",
+			"out_whdoc",
+			"outwhdoc",
+			"OutWhdoc",
+			"inwhdoc",
+			"1",
+			"in_whdocitem",
+			"in_whdoc",
+			"InWhdoc",
+			"addRow",
+			"in_cashdoc",
+			"incash",
+			"in_whdoc",
+			"inwhdoc",
+			"gridItem",
+			"whdocs",
+			"has_cash",
+			"\n ",
+			"'in_whdoc.php'",
+			"WhdocItemsGrid",
+			"`in_whdocitems`",
+			"`in_whdocs`",
+			"createOutWarehouseDocForm",
+			"createoutwhdocItemsGrid",
+			"inwhdoc",
+			"in_whdocitems.php",
+			"in_whdocs.php",
+			"whdocsitems",
+			"inwhdoc",
+			"whdoc"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"",
+			"$products",
+			"banners",
+			"",
+			"createBannerForm",
+			"banners",
+			"banner",
+			"bannerId",
+			"_GET",
+			"getBranchIdComboValueWhRemainsRep",
+			"branch_id_combo_whremains_rep",
+			"getBranchIdComboValueCash",
+			"branch_id_combo_cash",
+			"cashDocsGridModel",
+			"whDocsGridModel",
+			"createUserForm",
+			"users",
+			"user",
+			"User",
+			"users",
+			"Users",
+			"items:",
+			"branch",
+			"Branch",
+			"company",
+			"Company",
+			"company",
+			".php",
+			"branches.php",
+			"Branches",
+			"\"'.unPreatifyDateTime($_POST['repdate'], $_POST['reptime']).'\"",
+			"total_quantity",
+			"wo_whdoc",
+			"wowhdoc",
+			"WoWhdoc",
+			"repWh",
+			"re_whdocitem",
+			"re_whdoc",
+			"ReWhdoc",
+			"out_cashdoc",
+			"outcash",
+			"in_cashdoc",
+			"incashdoc",
+			"cashdocs",
+			"'out_whdoc.php'",
+			"`out_whdocitems`",
+			"`whdocs`",
+			"createOutWhdocItemsGrid",
+			"outwhdoc",
+			"out_whdocitems.php",
+			"whdocs.php",
+			"in_whdoc",
+			"whdocs",
+			"inwhdoc",
+			"inwhdocs",
+			"inwhdoc",
+			"whdocIncome",
+			"},",
+			"zzz",
+			"ext"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "config.php",
+					"settings":
+					{
+						"buffer_size": 172,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								167,
+								167
+							]
+						],
+						"settings":
+						{
+							"auto_name": "<?php",
+							"syntax": "Packages/PHP/PHP.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "install.php",
+					"settings":
+					{
+						"buffer_size": 938,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								358,
+								358
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "view.php",
+					"settings":
+					{
+						"buffer_size": 1919,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								316,
+								316
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "index.php",
+					"settings":
+					{
+						"buffer_size": 856,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								762,
+								762
+							]
+						],
+						"settings":
+						{
+							"auto_name": "<html>",
+							"syntax": "Packages/PHP/PHP.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "importer.php",
+					"settings":
+					{
+						"buffer_size": 1367,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1252,
+								1252
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 211.0
+	},
+	"output.git":
+	{
+		"height": 307.0
+	},
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 218.0,
+	"status_bar_visible": true
+}

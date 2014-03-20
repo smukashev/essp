@@ -484,7 +484,7 @@ public class CLI
         if (args.size() > 2) {
             if (args.size() > 3) {
                 processCRBatch(args.get(0), Integer.parseInt(args.get(1)), Integer.parseInt(args.get(2)),
-                    new Date(sdfout.parse(args.get(3)).getTime()));
+                        new Date(sdfout.parse(args.get(3)).getTime()));
             } else {
                 processCRBatch(args.get(0), Integer.parseInt(args.get(1)), Integer.parseInt(args.get(2)),
                         new Date((new java.util.Date()).getTime()));
@@ -901,6 +901,8 @@ public class CLI
 
             Gson gson = new Gson();
 
+            String url = args.get(3);
+
             while(true) {
                 ReceiverStatus receiverStatus = batchProcessService.getStatus();
                 SyncStatus syncStatus = entityServiceSync.getStatus();
@@ -945,21 +947,28 @@ public class CLI
                 HttpClient httpClient = new DefaultHttpClient();
 
                 try {
-                    HttpPost request = new HttpPost(args.get(3));
+                    HttpPost request = new HttpPost(url);
                     StringEntity params = new StringEntity(systemStatusString);
                     request.addHeader("content-type", "application/x-www-form-urlencoded");
                     request.setEntity(params);
                     HttpResponse response = httpClient.execute(request);
-
-                    System.out.println("//////////////////////////////////////");
 
                     StringWriter writer = new StringWriter();
                     IOUtils.copy(response.getEntity().getContent(), writer);
                     String resultString = writer.toString();
 
                     System.out.println(resultString);
+
+                    if (!resultString.equals("COMMAND: nocommand") && !resultString.startsWith("ERROR:")) {
+                        String command = resultString.substring(9);
+
+                        System.out.println("Command found: " + command);
+                        processCommand(command.trim(), null);
+                        System.out.println("Command done");
+                    }
                 }catch (Exception ex) {
                     // handle exception here
+                    ex.printStackTrace();
                 } finally {
                     httpClient.getConnectionManager().shutdown();
                 }
@@ -1428,6 +1437,78 @@ public class CLI
     }
 
     String line;
+    Exception lastException = null;
+
+    public void processCommand(String line, Scanner in) {
+        StringTokenizer st = new StringTokenizer(line);
+        if (st.hasMoreTokens()) {
+            command = st.nextToken().trim();
+
+            args.clear();
+            while(st.hasMoreTokens()) {
+                args.add(st.nextToken().trim());
+            }
+        } else {
+            return;
+        }
+
+
+        if (command.startsWith("#")) {
+            return;
+        }
+
+        try {
+
+            if (command.equals("test")) {
+                commandTest();
+            } else if (command.equals("clear")) {
+                storage.clear();
+            } else if (command.equals("rc")) {
+                metaClassRepository.resetCache();
+            } else if (command.equals("init")) {
+                storage.initialize();
+            } else if (command.equals("tc")) {
+                storage.tableCounts();
+            } else if (command.equals("le")) {
+                if (lastException != null) {
+                    lastException.printStackTrace();
+                } else {
+                    System.out.println("No errors.");
+                }
+            } else if (command.equals("xsd")) {
+                commandXSD();
+            } else if (command.equals("crbatch")) {
+                commandCRBatch();
+            } else if (command.equals("meta")) {
+                commandMeta();
+            } else if (command.equals("entity")) {
+                commandEntity();
+            } else if(command.equals("refs")){
+                commandRefs();
+            } else if(command.equals("sql")){
+                commandSql();
+            } else if(command.equals("rule")) {
+                commandRule(in);
+            } else if(command.equals("import")) {
+                commandImport();
+            } else if(command.equals("rstat")) {
+                commandRStat();
+            } else if(command.equals("sstat")) {
+                commandSStat();
+            } else if(command.equals("sqlstat")) {
+                commandSQLStat();
+            } else if(command.equals("remotestat")) {
+                commandRemoteStat();
+            } else if(command.equals("stc")) {
+                commandSTC();
+            } else {
+                System.out.println("No such command: " + command);
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            lastException = e;
+        }
+    }
 
     public void run() {
         if (storage.testConnection()) {
@@ -1445,9 +1526,6 @@ public class CLI
             in = new Scanner(inputStream);
         }
 
-
-        Exception lastException = null;
-
         while(true) {
             /*
              //args.clear(); args.add("c:\\2_portfolio.xml"); args.add("2"); args.add("0");
@@ -1462,74 +1540,8 @@ public class CLI
              }
              */
             while ( !(line = in.nextLine()).equals("quit")) {
-                StringTokenizer st = new StringTokenizer(line);
-                if (st.hasMoreTokens()) {
-                    command = st.nextToken().trim();
+                processCommand(line, in);
 
-                    args.clear();
-                    while(st.hasMoreTokens()) {
-                        args.add(st.nextToken().trim());
-                    }
-                } else {
-                    continue;
-                }
-
-
-                if (command.startsWith("#")) {
-                    continue;
-                }
-
-                try {
-
-                    if (command.equals("test")) {
-                        commandTest();
-                    } else if (command.equals("clear")) {
-                        storage.clear();
-                    } else if (command.equals("rc")) {
-                        metaClassRepository.resetCache();
-                    } else if (command.equals("init")) {
-                        storage.initialize();
-                    } else if (command.equals("tc")) {
-                        storage.tableCounts();
-                    } else if (command.equals("le")) {
-                        if (lastException != null) {
-                            lastException.printStackTrace();
-                        } else {
-                            System.out.println("No errors.");
-                        }
-                    } else if (command.equals("xsd")) {
-                        commandXSD();
-                    } else if (command.equals("crbatch")) {
-                        commandCRBatch();
-                    } else if (command.equals("meta")) {
-                        commandMeta();
-                    } else if (command.equals("entity")) {
-                        commandEntity();
-                    } else if(command.equals("refs")){
-                        commandRefs();
-                    } else if(command.equals("sql")){
-                        commandSql();
-                    } else if(command.equals("rule")) {
-                        commandRule(in);
-                    } else if(command.equals("import")) {
-                        commandImport();
-                    } else if(command.equals("rstat")) {
-                        commandRStat();
-                    } else if(command.equals("sstat")) {
-                        commandSStat();
-                    } else if(command.equals("sqlstat")) {
-                        commandSQLStat();
-                    } else if(command.equals("remotestat")) {
-                        commandRemoteStat();
-                    } else if(command.equals("stc")) {
-                        commandSTC();
-                    } else {
-                        System.out.println("No such command: " + command);
-                    }
-                } catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                    lastException = e;
-                }
                 if (inputStream == null) {
                     System.out.print("> ");
                 }
