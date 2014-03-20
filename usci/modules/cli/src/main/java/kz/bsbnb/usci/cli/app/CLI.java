@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.cli.app;
 
+import com.google.gson.Gson;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
@@ -37,8 +38,16 @@ import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
+import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 import kz.bsbnb.usci.tool.status.SyncStatus;
+import kz.bsbnb.usci.tool.status.SystemStatus;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +58,7 @@ import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import javax.sound.sampled.AudioFormat;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.sql.*;
@@ -831,6 +841,144 @@ public class CLI
         }
     }
 
+    public void commandRemoteStat()
+    {
+        if (args.size() > 3) {
+            RmiProxyFactoryBean batchProcessServiceFactoryBean = null;
+
+            IBatchProcessService batchProcessService = null;
+
+            try {
+                batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+                batchProcessServiceFactoryBean.setServiceUrl(args.get(0));
+                batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+                batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+                batchProcessServiceFactoryBean.afterPropertiesSet();
+                batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+            } catch (Exception e) {
+                System.out.println("Can't connect to receiver service: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            RmiProxyFactoryBean entityServiceFactoryBean = null;
+
+            kz.bsbnb.usci.sync.service.IEntityService entityServiceSync = null;
+
+            try {
+                entityServiceFactoryBean = new RmiProxyFactoryBean();
+                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+                entityServiceFactoryBean.setServiceUrl(args.get(1));
+                entityServiceFactoryBean.setServiceInterface(kz.bsbnb.usci.sync.service.IEntityService.class);
+                entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+                entityServiceFactoryBean.afterPropertiesSet();
+                entityServiceSync = (kz.bsbnb.usci.sync.service.IEntityService) entityServiceFactoryBean.getObject();
+            } catch (Exception e) {
+                System.out.println("Can't connect to sync service: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            RmiProxyFactoryBean serviceFactory = null;
+
+            IEntityService entityServiceCore = null;
+
+            try {
+                serviceFactory = new RmiProxyFactoryBean();
+                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+                serviceFactory.setServiceUrl(args.get(2));
+                serviceFactory.setServiceInterface(IEntityService.class);
+                serviceFactory.setRefreshStubOnConnectFailure(true);
+
+                serviceFactory.afterPropertiesSet();
+                entityServiceCore = (IEntityService) serviceFactory.getObject();
+            } catch (Exception e) {
+                System.out.println("Can't connect to receiver service: " + e.getMessage());
+            }
+
+            Gson gson = new Gson();
+
+            while(true) {
+                ReceiverStatus receiverStatus = batchProcessService.getStatus();
+                SyncStatus syncStatus = entityServiceSync.getStatus();
+                HashMap<String, QueryEntry> map = entityServiceCore.getSQLStats();
+
+                double totalInserts = 0;
+                double totalSelects = 0;
+                double totalProcess = 0;
+                int totalProcessCount = 0;
+
+                for (String query : map.keySet()) {
+                    QueryEntry qe = map.get(query);
+
+                    if (query.startsWith("insert")) {
+                        totalInserts += qe.totalTime;
+                    }
+                    if (query.startsWith("select")) {
+                        totalSelects += qe.totalTime;
+                    }
+                    if (query.startsWith("coreService")) {
+                        totalProcess += qe.totalTime;
+                        totalProcessCount += qe.count;
+                    }
+                }
+
+                CoreStatus coreStatus = new CoreStatus();
+
+                coreStatus.setTotalProcessed(totalProcessCount);
+
+                if(totalProcessCount > 0) {
+                    coreStatus.setAvgProcessed(totalProcess / totalProcessCount);
+                    coreStatus.setAvgInserts(totalInserts / totalProcessCount);
+                    coreStatus.setAvgSelects(totalSelects / totalProcessCount);
+                }
+
+                entityServiceCore.clearSQLStats();
+
+                SystemStatus systemStatus = new SystemStatus(receiverStatus, syncStatus, coreStatus);
+
+                String systemStatusString = gson.toJson(systemStatus);
+
+                HttpClient httpClient = new DefaultHttpClient();
+
+                try {
+                    HttpPost request = new HttpPost(args.get(3));
+                    StringEntity params = new StringEntity(systemStatusString);
+                    request.addHeader("content-type", "application/x-www-form-urlencoded");
+                    request.setEntity(params);
+                    HttpResponse response = httpClient.execute(request);
+
+                    System.out.println("//////////////////////////////////////");
+
+                    StringWriter writer = new StringWriter();
+                    IOUtils.copy(response.getEntity().getContent(), writer);
+                    String resultString = writer.toString();
+
+                    System.out.println(resultString);
+                }catch (Exception ex) {
+                    // handle exception here
+                } finally {
+                    httpClient.getConnectionManager().shutdown();
+                }
+
+                try
+                {
+                    Thread.sleep(15000L);
+                } catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
+        } else {
+            System.out.println("Argument needed: <receiver_url> <sync_url> <core_url> <remote_url>");
+            System.out.println("Example: remotestat rmi://127.0.0.1:1097/batchProcessService " +
+                    "rmi://127.0.0.1:1098/entityService rmi://127.0.0.1:1099/entityService " +
+                    "http://localhost/usci/importer.php");
+        }
+    }
+
     public void commandSStat()
     {
         if (args.size() > 0) {
@@ -856,7 +1004,7 @@ public class CLI
                 e.printStackTrace();
             }
         } else {
-            System.out.println("Argument needed: <receiver_url>");
+            System.out.println("Argument needed: <sync_url>");
             System.out.println("Example: sstat rmi://127.0.0.1:1098/entityService");
         }
     }
@@ -864,8 +1012,6 @@ public class CLI
     public void commandSQLStat()
     {
         if (args.size() > 0) {
-            Connection conn = null;
-
             RmiProxyFactoryBean serviceFactory = null;
 
             IEntityService entityService = null;
@@ -1357,6 +1503,8 @@ public class CLI
                         commandSStat();
                     } else if(command.equals("sqlstat")) {
                         commandSQLStat();
+                    } else if(command.equals("remotestat")) {
+                        commandRemoteStat();
                     } else if(command.equals("stc")) {
                         commandSTC();
                     } else {
