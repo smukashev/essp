@@ -58,6 +58,7 @@
                 <list>
                     <value>classpath:properties/profiles/oracle.properties</value>
                     <value>classpath:properties/main.properties</value>
+                    <value>classpath:properties/refs.properties</value>
                 </list>
             </property>
         </bean>

@@ -178,6 +178,7 @@ public class MetaClass extends MetaContainer implements IMetaClass
             searchable = true;
         }
         members.put(name, metaAttribute);
+        metaAttribute.setName(name);
 	}
 
     public String getSearchProcedureName()

@@ -33,4 +33,8 @@ public interface IMetaAttribute extends IPersistable
     public boolean isImmutable();
 
     public void setImmutable(boolean immutable);
+
+    public String getName();
+
+    public void setName(String name);
 }
