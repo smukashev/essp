@@ -181,6 +181,7 @@ public class MetaClass extends Persistable implements IMetaType, IMetaClass
             searchable = true;
         }
         members.put(name, metaAttribute);
+        metaAttribute.setName(name);
 	}
 
     @Override
