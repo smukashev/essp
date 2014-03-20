@@ -1312,7 +1312,7 @@ public class CLI
                     continue;
                 }
 
-                //try {
+                try {
 
                     if (command.equals("test")) {
                         commandTest();
@@ -1355,10 +1355,10 @@ public class CLI
                     } else {
                         System.out.println("No such command: " + command);
                     }
-                /*} catch (Exception e) {
+                } catch (Exception e) {
                     System.out.println("Error: " + e.getMessage());
                     lastException = e;
-                }*/
+                }
                 if (inputStream == null) {
                     System.out.print("> ");
                 }
