@@ -15,7 +15,7 @@ mysql_select_db($dbname)
         or die('db not found');
 
 if ($stats != null) {
-	$query = "INSERT INTO `usci`.`stats`
+	$query = "INSERT INTO `stats`
 				(
 				`r_queue_size`,
 				`r_batches_in_progress`,

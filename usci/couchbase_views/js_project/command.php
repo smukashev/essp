@@ -14,7 +14,7 @@ mysql_select_db($dbname)
 
 echo "{";
 
-$query = 'INSERT INTO `usci`.`commands` (`command`) VALUES (\''.$_POST['command'].'\')';
+$query = 'INSERT INTO `commands` (`command`) VALUES (\''.$_POST['command'].'\')';
 
 $result = mysql_query($query)
     or trigger_error(mysql_errno() . ' ' .
