@@ -10,6 +10,8 @@ import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
+import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
+import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
@@ -1196,6 +1198,18 @@ public class CLI
 
     }
 
+    public void commandRefs(){
+        if(args.get(0).equals("import")){
+            if(args.size() > 1)
+                BaseCrawler.fileName = args.get(1);
+            else {
+                BaseCrawler.fileName = "C:\\entity_show\\mine";
+                System.out.println("using default file " + BaseCrawler.fileName);
+            }
+            new BaseRepository().run();
+        } else throw new IllegalArgumentException("allowed operations refs [import] [filename]");
+    }
+
     private RmiProxyFactoryBean batchServiceFactoryBean;
     private RmiProxyFactoryBean batchVersionServiceFactoryBean;
     private RmiProxyFactoryBean ruleServiceFactoryBean;
@@ -1490,8 +1504,10 @@ public class CLI
                     } else if (command.equals("meta")) {
                         commandMeta();
                     } else if (command.equals("entity")) {
-                        commandEntity();}
-                    else if(command.equals("sql")){
+                        commandEntity();
+                    } else if(command.equals("refs")){
+                        commandRefs();
+                    } else if(command.equals("sql")){
                         commandSql();
                     } else if(command.equals("rule")) {
                         commandRule(in);
