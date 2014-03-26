@@ -14,7 +14,7 @@ function(key, values, rereduce) {
           var obj = values[1];
           obj["status"] = values[0];
 
-          return values[1];
+          return obj;
         }
 
 //batch_pending
