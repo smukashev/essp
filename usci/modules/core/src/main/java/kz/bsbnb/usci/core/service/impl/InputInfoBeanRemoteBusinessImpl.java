@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusiness
@@ -76,6 +73,23 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
         return gson.fromJson(couchbaseClient.get("manifest:" + id).toString(), BatchInfo.class);
     }
 
+    private long getCreditorId(long batchId) {
+        View view = couchbaseClient.getView("batch", "batch_creditor");
+        Query query = new Query();
+        query.setDescending(true);
+        query.setKey("" + batchId);
+
+        ViewResponse response = couchbaseClient.query(view, query);
+
+        Iterator<ViewRow> rows = response.iterator();
+
+        if (rows.hasNext()) {
+            return Long.parseLong(rows.next().getValue());
+        }
+
+        return 0;
+    }
+
     @Override
     public List<InputInfo> getAllInputInfosBy_Creditors_By_RepDateSortedBy_Id_Desc(List<Creditor> creditorsList, Date reportDate)
     {
@@ -83,13 +97,19 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
         View view = couchbaseClient.getView("batch", "batch");
         Query query = new Query();
-        query.setLimit(20);
+        //query.setLimit(20);
         query.setGroup(true);
         query.setGroupLevel(1);
 
         ViewResponse viewResponse = couchbaseClient.query(view, query);
 
         Gson gson = new Gson();
+
+        HashMap<Long, Creditor> inputCreditors = new HashMap<Long, Creditor>();
+
+        for(Creditor cred : creditorsList) {
+            inputCreditors.put(cred.getId(), cred);
+        }
 
         if(viewResponse != null) {
             for(ViewRow row : viewResponse) {
@@ -99,6 +119,13 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                         gson.fromJson(viewRowNoDocs.getValue(), BatchFullStatusJModel.class);
 
                 Long id = batchFullStatusJModel.getId();
+
+                Long creditorId = getCreditorId(id);
+
+                Creditor currentCreditor = inputCreditors.get(creditorId);
+
+                if (currentCreditor == null)
+                    continue;
 
                 List<BatchStatusJModel> statusesList = batchFullStatusJModel.getStatus().getBatchStatuses();
 
@@ -126,7 +153,8 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
 
                 ii.setId(BigInteger.valueOf(id));
-                ii.setCreditor(creditorsList.get(0));
+
+                ii.setCreditor(currentCreditor);
                 ii.setFileName(batchFullStatusJModel.getFileName());
 
                 Shared s = new Shared();

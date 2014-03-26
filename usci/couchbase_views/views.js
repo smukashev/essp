@@ -42,3 +42,10 @@ function (doc, meta) {
   }
 }
 
+//batch_creditor
+function (doc, meta) {
+   if(doc.type == "batch") {
+     emit(doc.id, doc.creditorId);
+   }
+ }
+

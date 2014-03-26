@@ -100,6 +100,13 @@ public class MainPortlet extends MVCPortlet {
         return str;
     }
 
+    private String clearSlashes(String str) {
+        //TODO: str.replaceAll("\"","\\\""); does not work! Fix needed.
+        String outStr = str.replaceAll("\""," ");
+        System.out.println(outStr);
+        return outStr;
+    }
+
     private String entityToJson(BaseEntity entity, String title, String code) {
         MetaClass meta = entity.getMeta();
 
@@ -111,7 +118,7 @@ public class MainPortlet extends MVCPortlet {
 
         str += "\"title\": \"" + title + "\",";
         str += "\"code\": \"" + code + "\",";
-        str += "\"value\": \"" + testNull(meta.getClassTitle()) + "\",";
+        str += "\"value\": \"" + clearSlashes(testNull(meta.getClassTitle())) + "\",";
         str += "\"simple\": false,";
         str += "\"array\": false,";
         str += "\"type\": \"CLASS\",";
@@ -178,7 +185,7 @@ public class MainPortlet extends MVCPortlet {
                     str +=  "{" +
                     "\"title\":\"" + attrTitle + "\",\n" +
                     "\"code\":\"" + innerClassesNames + "\",\n" +
-                    "\"value\":\"" + testNull(value.getValue().toString()) + "\",\n" +
+                    "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
                     "\"simple\": true,\n" +
                     "\"array\": false,\n" +
                     "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
@@ -262,7 +269,7 @@ public class MainPortlet extends MVCPortlet {
                         str +=  "{" +
                             "\"title\":\"" + "[" + i + "]" + "\",\n" +
                             "\"code\":\"" + "[" + i + "]" + "\",\n" +
-                            "\"value\":\"" + testNull(value.getValue().toString()) + "\",\n" +
+                            "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
                             "\"simple\": true,\n" +
                             "\"array\": false,\n" +
                             "\"type\": \"" + ((MetaValue)type).getTypeCode() + "\",\n" +
