@@ -3,28 +3,59 @@ package com.bsbnb.creditregistry.portlets.report.dm;
 import com.bsbnb.creditregistry.portlets.report.ReportApplication;
 import java.io.Serializable;
 import java.util.Locale;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Aidar.Myrzahanov
  */
+@Entity
+@Table(name = "REPORT_INPUT_PARAMETER")
 @XmlRootElement
+@NamedQueries({
+    @NamedQuery(name = "ReportInputParameter.findAll", query = "SELECT rip FROM ReportInputParameter rip"),
+    @NamedQuery(name = "ReportInputParameter.findById", query = "SELECT rip FROM ReportInputParameter rip WHERE rip.id = :id")})
 public class ReportInputParameter implements Serializable{
     public ReportInputParameter() {
         
     }
     
     private static final long serialVersionUID = 1L;
+    @Id
+    @Basic(optional = false)
+    @Column(name = "ID")
     private long id;
+    @Basic(optional = false)
+    @Column(name = "NAME_RU")
     private String nameRu;
+    @Basic(optional = false)
+    @Column(name="NAME_KZ") 
     private String nameKz;
+    @Column(name="TYPE")
     private String type;
+    @Column(name="PROCEDURE_NAME")
     private String procedureName;
+    @Column(name="MINIMUM")
     private int minimum;
+    @Column(name="MAXIMUM")
     private int maximum;
+    @Column(name="NAME")
     private String parameterName;
+    @Column(name="ORDER_NUMBER")
     private Integer orderNumber;
+    @ManyToOne(fetch= FetchType.LAZY)
+    @JoinColumn(name="REPORT_ID")
     private Report report;
 
     /**
@@ -139,6 +170,7 @@ public class ReportInputParameter implements Serializable{
         this.report = report;
     }
 
+    @Transient
     private ParameterType parameterType;
     
     /**

@@ -3,13 +3,12 @@ package com.bsbnb.creditregistry.portlets.report.export;
 import com.bsbnb.creditregistry.portlets.report.dm.ReportController;
 import com.bsbnb.creditregistry.portlets.report.dm.ReportLoad;
 import com.bsbnb.creditregistry.portlets.report.dm.ReportLoadFile;
-import java.util.List;
-
 import com.bsbnb.creditregistry.portlets.report.ui.ReportComponent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -17,7 +16,7 @@ import java.util.Date;
  */
 public abstract class AbstractReportExporter extends VerticalLayout {
 
-    public static final File REPORT_FILES_FOLDER = new File("/tmp/");
+    public static final File REPORT_FILES_FOLDER = new File("C:\\Portal_afn\\generated_reports\\");
     protected ReportComponent targetReportComponent;
     private ReportLoad load;
     private ReportController controller = new ReportController();
@@ -44,7 +43,7 @@ public abstract class AbstractReportExporter extends VerticalLayout {
         List<String> parameterValues = targetReportComponent.getParameterCaptions();
         StringBuilder noteBuilder = new StringBuilder();
         for (int i = 0; i < Math.min(parameterCaptions.size(), parameterValues.size()); i++) {
-            if (i>0) {
+            if (i > 0) {
                 noteBuilder.append(", ");
             }
             noteBuilder.append(parameterCaptions.get(i));

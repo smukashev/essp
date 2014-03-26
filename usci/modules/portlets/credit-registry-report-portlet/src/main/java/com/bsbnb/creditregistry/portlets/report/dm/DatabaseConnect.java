@@ -1,6 +1,14 @@
 package com.bsbnb.creditregistry.portlets.report.dm;
 
-import java.io.Serializable;
+import static com.bsbnb.creditregistry.portlets.report.ReportApplication.log;
+import com.bsbnb.creditregistry.portlets.report.ui.CustomDataSource;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.Organization;
+import com.liferay.portal.model.User;
+import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portlet.expando.model.ExpandoTableConstants;
+import com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -12,27 +20,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-
-import static com.bsbnb.creditregistry.portlets.report.ReportApplication.log;
-import com.bsbnb.creditregistry.portlets.report.ui.CustomDataSource;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.model.Organization;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portlet.expando.model.ExpandoTableConstants;
-import com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil;
+import oracle.jdbc.OracleCallableStatement;
+import oracle.jdbc.OracleTypes;
 
 /**
  *
  * @author Aidar.Myrzahanov
  */
-public class DatabaseConnect implements Serializable {
+public class DatabaseConnect {
 
     private User user;
 
@@ -47,7 +46,7 @@ public class DatabaseConnect implements Serializable {
     private boolean hasAccessToPersonalData() {
         try {
             return ExpandoValueLocalServiceUtil.getData(user.getCompanyId(), User.class.getName(),
-                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "hasAccessToPersonalData", user.getPrimaryKey(), false);
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "hasAccessToPersonalData", user.getUserId(), false);
         } catch (PortalException pe) {
             log.log(Level.WARNING, "", pe);
         } catch (SystemException se) {
@@ -57,7 +56,7 @@ public class DatabaseConnect implements Serializable {
     }
 
     public boolean isUserNationalBankEmployee() {
-        /*try {
+        try {
             return ExpandoValueLocalServiceUtil.getData(user.getCompanyId(), User.class.getName(),
                     ExpandoTableConstants.DEFAULT_TABLE_NAME, "isNb", user.getPrimaryKey(), false);
         } catch (PortalException pe) {
@@ -65,28 +64,26 @@ public class DatabaseConnect implements Serializable {
         } catch (SystemException se) {
             log.log(Level.WARNING, "", se);
         }
-        return false;*/
-
-        return true;
+        return false;
     }
-    
+
     public List<User> getCoworkers() {
         List<User> users = new ArrayList<User>();
         users.add(user);
         try {
-            if(!isUserNationalBankEmployee()) {
+            if (!isUserNationalBankEmployee()) {
                 List<Organization> organizations = user.getOrganizations();
-                if(organizations.size()==1) {
+                if (organizations.size() == 1) {
                     Organization organization = organizations.get(0);
                     String organizationName = organization.getName().toLowerCase();
-                    if(!(organizationName.contains("национальный банк")||organizationName.contains("бсб"))) {
-                    users = UserLocalServiceUtil.getOrganizationUsers(organization.getOrganizationId());
+                    if (!(organizationName.contains("национальный банк") || organizationName.contains("бсб"))) {
+                        users = UserLocalServiceUtil.getOrganizationUsers(organization.getOrganizationId());
                     }
                 }
             }
-        } catch(SystemException se) {
+        } catch (SystemException se) {
             log.log(Level.SEVERE, "", se);
-        } catch(PortalException se) {
+        } catch (PortalException se) {
             log.log(Level.SEVERE, "", se);
         }
         return users;
@@ -140,16 +137,85 @@ public class DatabaseConnect implements Serializable {
     }
 
     public List<ValuePair> getValueListFromStoredProcedure(String procedureName) {
-        List<ValuePair> result = new ArrayList<ValuePair>();
-        result.add(new ValuePair("value", "displayName"));
-        return result;
+        Connection connection = getConnection();
+        CallableStatement statement = null;
+        OracleCallableStatement ocs = null;
+        ResultSet cursor = null;
+        try {
+            String procedureCallString = "{ call " + procedureName + "(?,?)}";
+            statement = connection.prepareCall(procedureCallString);
+            ocs = statement.unwrap(OracleCallableStatement.class);
+            statement.registerOutParameter(1, OracleTypes.CURSOR);
+            log.log(Level.INFO, "Procedure name: {0}", procedureName);
+            log.log(Level.INFO, "User id for procedure : {0}", user.getUserId());
+            statement.setLong(2, user.getUserId());
+            statement.execute();
+            cursor = ocs.getCursor(1);
+            List<ValuePair> result = new ArrayList<ValuePair>();
+            int rowNumber = 0;
+            while (cursor.next()) {
+                ++rowNumber;
+                result.add(new ValuePair(cursor.getString(1), cursor.getString(2)));
+            }
+            return result;
+        } catch (SQLException sqle) {
+            log.log(Level.SEVERE, "SQL Exception", sqle);
+        } finally {
+            closeResources(cursor, ocs, statement, connection);
+        }
+        return null;
     }
 
     public CustomDataSource getDataSourceFromStoredProcedure(String procedureName, List<Object> parameterList) throws SQLException {
-        return new CustomDataSource();
+        Connection connection = getConnection();
+        CallableStatement statement = null;
+        OracleCallableStatement ocs = null;
+        ResultSet cursor = null;
+        try {
+            StringBuilder procedureCallBuilder = new StringBuilder("{ call ");
+            procedureCallBuilder.append(procedureName);
+            procedureCallBuilder.append("(");
+            int parametersCount = parameterList.size();
+            for (int parameterIndex = 0; parameterIndex < parametersCount + 3; parameterIndex++) {
+                procedureCallBuilder.append("?");
+                procedureCallBuilder.append(",");
+            }
+            procedureCallBuilder.deleteCharAt(procedureCallBuilder.length() - 1);
+            procedureCallBuilder.append(")}");
+            String procedureCallString = procedureCallBuilder.toString();
+            log.log(Level.INFO, "Procedure call string: {0}", procedureCallString);
+            statement = connection.prepareCall(procedureCallBuilder.toString());
+            ocs = statement.unwrap(OracleCallableStatement.class);
+            statement.registerOutParameter(1, OracleTypes.CURSOR);
+            log.log(Level.INFO, "User id : {0}", user.getUserId());
+
+            statement.setLong(2, user.getUserId());
+            boolean hasAccess = hasAccessToPersonalData();
+            log.log(Level.INFO, "Has access: {0}", hasAccess);
+            statement.setLong(3, hasAccess ? 1 : 0);
+            for (int parameterIndex = 0; parameterIndex < parametersCount; parameterIndex++) {
+                Object parameter = parameterList.get(parameterIndex);
+                log.log(Level.INFO, "Parameter value: {0}", parameter.toString());
+                String parameterValueString = "";
+                if (parameter instanceof Date) {
+                    Date dateParameter = (Date) parameter;
+                    statement.setDate(parameterIndex + 4, new java.sql.Date(dateParameter.getTime()));
+                } else {
+                    parameterValueString = parameter.toString();
+                    statement.setString(parameterIndex + 4, parameterValueString);
+                }
+
+                log.log(Level.INFO, "String parameter: {0}", parameterValueString);
+            }
+            statement.execute();
+            cursor = ocs.getCursor(1);
+            return new CustomDataSource(cursor);
+        } finally {
+            closeResources(cursor, ocs, statement, connection);
+        }
     }
 
-    /*public ResultSet getResultSetFromStoredProcedure(String procedureName, List<Object> parameterList) throws SQLException {
+    public ResultSet getResultSetFromStoredProcedure(String procedureName, List<Object> parameterList) throws SQLException {
         Connection connection = getConnection();
         CallableStatement statement = null;
         OracleCallableStatement ocs = null;
@@ -193,28 +259,6 @@ public class DatabaseConnect implements Serializable {
         } finally {
             closeResources(null, null, null, connection);
         }
-    }*/
-
-    public boolean approveReport(int reportID, int statusId) {
-        /*Connection connection = null;
-        CallableStatement statement = null;
-        try {
-            connection = getConnection();
-            String sqlString = "update core.report r set r.status_id=?, r.username=? where r.id=?";
-            statement = connection.prepareCall(sqlString);
-            statement.setInt(1, statusId);
-            statement.setString(2, user.getFullName());
-            statement.setInt(3, reportID);
-            int result = statement.executeUpdate();
-            return result == 1;
-        } catch (SQLException sqle) {
-            log.log(Level.WARNING, null, sqle);
-        } finally {
-            closeResources(null, statement, null, connection);
-        }
-        return false;*/
-
-        return true;
     }
 
     public ResultSet runQuery(String sqlQuery) {

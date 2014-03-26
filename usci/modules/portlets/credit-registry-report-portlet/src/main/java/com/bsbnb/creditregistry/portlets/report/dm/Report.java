@@ -1,34 +1,70 @@
 package com.bsbnb.creditregistry.portlets.report.dm;
 
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import static com.bsbnb.creditregistry.portlets.report.ReportApplication.getApplicationLocale;
+import static com.bsbnb.creditregistry.portlets.report.ReportApplication.getApplicationLocale;;
 
 /**
  *
  * @author Aidar.Myrzahanov
  */
+@Entity
+@Table(name = "REPORT")
+@NamedQueries({
+    @NamedQuery(name = "Report.findAll", query = "SELECT r FROM Report r"),
+    @NamedQuery(name = "Report.findById", query = "SELECT r FROM Report r WHERE r.id = :id")})
 public class Report implements Serializable {
 
     public Report() {
     }
     private static final long serialVersionUID = 1L;
+    @Id
+    @Basic(optional = false)
+    @Column(name = "ID")
     private long id;
+    @Basic(optional = false)
+    @Column(name = "NAME_RU")
     private String nameRu;
+    @Basic(optional = false)
+    @Column(name = "NAME_KZ")
     private String nameKz;
+    @Column(name = "NAME")
     private String name;
+    @Column(name = "PROCEDURE_NAME")
     private String procedureName;
+    @Column(name="TYPE")
     private String type;
+    @Column(name="ORDER_NUMBER") 
     private int orderNumber;
-    private Set<ReportInputParameter> inputParameters = new HashSet<ReportInputParameter>();
+    @OneToMany(targetEntity = com.bsbnb.creditregistry.portlets.report.dm.ReportInputParameter.class, cascade = CascadeType.ALL, mappedBy = "report")
+    @OrderBy(value="orderNumber")
+    private Set<ReportInputParameter> inputParameters;
     
-    private List<ExportType> exportTypesList;
+    @ManyToMany(fetch=FetchType.LAZY)
+    @JoinTable(name="REPORT_EXPORT_TYPE",
+               joinColumns=@JoinColumn(name="REPORT_ID"),
+               inverseJoinColumns=@JoinColumn(name="EXPORT_TYPE_ID"))
+        private List<ExportType> exportTypesList;
 
     /**
      * @return the id

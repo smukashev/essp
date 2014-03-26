@@ -1,0 +1,77 @@
+@import "../reindeer/styles.css";
+
+.colored-table .v-table-cell-wrapper {
+    /* Do not specify any margins, paddings or borders here */
+    white-space: normal;
+    overflow: hidden;
+}
+
+.colored-table .v-table-header-wrap {
+    white-space:normal;
+    height: 40px;
+    background: transparent repeat-x;
+    background-image: url(common/img/table-column-header-background.png);
+    -background-image: url(common/img/table-column-header-background.png.png);
+}
+
+.colored-table .v-table-header {
+    height: 40px;
+    background: none;
+}
+
+.v-table-caption-container 
+{
+    height: 40px;
+}
+
+.colored-table .v-table-header-cell{
+    height: 40px;
+    background: none;
+}
+
+.colored-table .v-table-caption-container {
+    white-space: normal;
+    height: 40px;
+    background: none;
+}
+
+.colored-table .v-table-resizer {
+    height:40px;
+}
+
+.colored-table .v-table-cell-content {
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 0 6px;
+    border-right: 1px solid #aaa;
+}
+
+.colored-table .v-table-cell-content-lightgreen {
+    background: #C1FFAC;
+    color:      black;
+    border-bottom: 1px solid #AAAAAA;
+}
+.colored-table .v-table-cell-content-red{
+    background: #FFC4C4;
+    color:      black;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.colored-table .v-table-cell-content-lightblue {
+    background: #8CE0EC;
+    color:      black;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.colored-table .v-table-cell-content-white {
+    background: #FFFFFF;
+    color:      black;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.colored-table .v-table-cell-content-orange {
+    background: #F7E0B5;
+    color:      black;
+    border-bottom: 1px solid #AAAAAA;
+}
+

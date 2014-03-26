@@ -1,23 +1,5 @@
 package com.bsbnb.creditregistry.portlets.report;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
-import javax.portlet.EventRequest;
-import javax.portlet.EventResponse;
-import javax.portlet.PortletPreferences;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
-
 import com.bsbnb.creditregistry.portlets.report.dm.DatabaseConnect;
 import com.bsbnb.creditregistry.portlets.report.ui.MainLayout;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -31,6 +13,22 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
+import javax.portlet.EventRequest;
+import javax.portlet.EventResponse;
+import javax.portlet.PortletPreferences;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
 public class ReportApplication extends Application {
 
@@ -42,17 +40,16 @@ public class ReportApplication extends Application {
     private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private static Date defaultReportDate = null;
     private static ResourceBundle bundle;
-    
-    
+
     public static void setStartTime() {
         startTimeMillis = System.currentTimeMillis();
         log.log(Level.INFO, "Start time: {0}", startTimeMillis);
     }
-    
+
     public static void logTime(String message) {
-        log.log(Level.INFO, "{0}: {1}", new Object[]{ message, System.currentTimeMillis()-startTimeMillis});
+        log.log(Level.INFO, "{0}: {1}", new Object[]{message, System.currentTimeMillis() - startTimeMillis});
     }
-    
+
     public static void logTime() {
         logTime("Current time");
     }
@@ -108,11 +105,7 @@ public class ReportApplication extends Application {
                         viewType = prefs.getValue("type", "REPORT");
                         String defaultReportDateString = prefs.getValue("defaultreportdate", "");
                         try {
-                            if (defaultReportDateString.trim().equals("")) {
-                                defaultReportDate = new Date();
-                            } else {
-                                defaultReportDate = DEFAULT_DATE_FORMAT.parse(defaultReportDateString);
-                            }
+                            defaultReportDate = DEFAULT_DATE_FORMAT.parse(defaultReportDateString);
                             log.log(Level.INFO, "Parsed default date: {0}", defaultReportDate);
                         } catch (ParseException pe) {
                             log.log(Level.INFO, "Failed to parse date config", pe);
@@ -130,7 +123,7 @@ public class ReportApplication extends Application {
                 }
             } catch (PortalException pe) {
                 log.log(Level.SEVERE, "Failed to access user", pe);
-            } catch(SystemException se) {
+            } catch (SystemException se) {
                 log.log(Level.SEVERE, "Failed to access user", se);
             }
         }

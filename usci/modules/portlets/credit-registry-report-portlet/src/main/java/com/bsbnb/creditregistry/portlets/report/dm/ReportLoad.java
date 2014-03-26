@@ -4,6 +4,24 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.service.UserLocalServiceUtil;
@@ -12,17 +30,40 @@ import com.liferay.portal.service.UserLocalServiceUtil;
  *
  * @author Aidar.Myrzahanov
  */
+@Entity
+@Table(name = "REPORT_LOAD")
+@SequenceGenerator(name = "REPORT_LOAD_SEQUENCE", sequenceName = "REPORT_LOAD_SEQ", initialValue = 1000, allocationSize = 1)
+@NamedQueries({
+    @NamedQuery(name = "ReportLoad.findAll", query = "SELECT r FROM ReportLoad r"),
+    @NamedQuery(name = "ReportLoad.findById", query = "SELECT r FROM ReportLoad r WHERE r.id = :id")})
 public class ReportLoad implements Serializable {
 
     public ReportLoad() {
     }
     private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REPORT_LOAD_SEQUENCE")
+    @Column(name = "ID")
     private Long id;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "REPORT_ID")
     private Report report;
+    @Basic(optional = false)
+    @Column(name = "PORTAL_USER_ID")
     private long portalUserId;
+    @Basic(optional = false)
+    @Column(name = "START_TIME")
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date startTime;
+    @Basic(optional = false)
+    @Column(name = "FINISH_TIME")
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date finishTime;
+    @Basic(optional = false)
+    @Column(name = "NOTE")
     private String note;
+    @OneToMany(targetEntity = com.bsbnb.creditregistry.portlets.report.dm.ReportLoadFile.class, cascade = CascadeType.ALL, mappedBy = "reportLoad")
+    @OrderBy(value = "id")
     private List<ReportLoadFile> files;
 
     /**

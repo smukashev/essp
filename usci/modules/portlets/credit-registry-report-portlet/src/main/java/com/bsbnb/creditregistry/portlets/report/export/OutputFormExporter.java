@@ -65,7 +65,7 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
         CellView autosizeCellView = new CellView();
         autosizeCellView.setAutosize(true);
         WritableWorkbook workbook = null;
-        //ResultSet dataSource = null;
+        ResultSet dataSource = null;
 
         try {
             File xlsFile = File.createTempFile("Records", ".xls", AbstractReportExporter.REPORT_FILES_FOLDER);
@@ -77,13 +77,13 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
             int lastRecordNumber = sheetNumber * recordsBySheet;
             int recordCounter = firstRecordNumber;
             setStartTime();
-            //dataSource = getTargetReportComponent().getResultSet(firstRecordNumber, lastRecordNumber);
+            dataSource = getTargetReportComponent().getResultSet(firstRecordNumber, lastRecordNumber);
             logTime("After query");
-            //ResultSetMetaData rsmd = dataSource.getMetaData();
+            ResultSetMetaData rsmd = dataSource.getMetaData();
             int previousId = -1;
             int previousRowIndex = rowIndex;
             int startIdIndex = idIndex;
-            /*while (dataSource.next()) {
+            while (dataSource.next()) {
                 int id = dataSource.getInt(2);
                 int startColumnIndex = 1;
                 int finishColumnIndex = rsmd.getColumnCount();
@@ -139,7 +139,7 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
                         currentSheet.mergeCells(columnNumber, previousRowIndex, columnNumber, rowIndex - 1);
                     }
                 }
-            }*/
+            }
             logTime("After reading data source");
             workbook.write();
             workbook.close();
@@ -171,12 +171,12 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
                 } catch (Exception e) {
                 }
             }
-            /*if (dataSource != null) {
+            if (dataSource != null) {
                 try {
                     dataSource.close();
                 } catch (Exception e) {
                 }
-            }*/
+            }
         }
     }
 }

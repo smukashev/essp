@@ -1,17 +1,22 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.bsbnb.creditregistry.portlets.report.dm;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Aidar.Myrzahanov
  */
+@Entity
+@Table(name = "EXPORT_TYPE")
 @XmlRootElement
 public class ExportType implements Serializable {
     public static final String TABLE_VAADIN = "TABLE_VAADIN";
@@ -19,7 +24,15 @@ public class ExportType implements Serializable {
     public static final String TEMPLATE_XLS = "TEMPLATE_XLS";
     
     private static final long serialVersionUID = 1L;
+    @Id
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "ID")
     private BigDecimal id;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 200)
+    @Column(name = "NAME")
     private String name;
 
     public ExportType() {

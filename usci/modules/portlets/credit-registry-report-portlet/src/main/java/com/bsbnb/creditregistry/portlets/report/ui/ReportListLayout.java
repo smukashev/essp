@@ -115,9 +115,25 @@ public class ReportListLayout extends VerticalLayout {
         displayReportHeader(getReportHeaderString(report.getLocalizedName()));
         ReportComponent reportComponent = new ReportComponent(report, connect);
         String reportName = report.getName();
-        System.out.println("###");
-        reportComponent.addReportExporter(new BanksWithDataTableReportExporter());
-        //reportComponent.addReportExporter(new JasperReportExporter());
+        if ("BanksWithData".equalsIgnoreCase(reportName)) {
+            reportComponent.addReportExporter(new BanksWithDataTableReportExporter());
+            reportComponent.addReportExporter(new JasperReportExporter());
+        } else if(reportName.contains("Pledge")) {
+            reportComponent.addReportExporter(new OutputFormExporter());
+            log.log(Level.INFO, "Output form exporter applied");
+        } else {
+            for (ExportType exportType : report.getExportTypesList()) {
+                if (ExportType.JASPER_XLS.equals(exportType.getName())) {
+                    reportComponent.addReportExporter(new JasperReportExporter());
+                } else if (ExportType.TABLE_VAADIN.equals(exportType.getName())) {
+                    reportComponent.addReportExporter(new TableReportExporter());
+                } else if (ExportType.TEMPLATE_XLS.equals(exportType.getName())) {
+                    reportComponent.addReportExporter(new TemplatedPagedXlsReportExporter());
+                } else {
+                    log.log(Level.WARNING, "Unknown export type: {0}", exportType.getName());
+                }
+            }
+        }
         reportComponent.setWidth("100%");
         reportComponentLayout.removeAllComponents();
         reportComponentLayout.addComponent(reportComponent);

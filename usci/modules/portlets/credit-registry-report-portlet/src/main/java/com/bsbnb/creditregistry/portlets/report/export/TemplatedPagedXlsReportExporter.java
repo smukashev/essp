@@ -253,9 +253,9 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
             int lastRecordNumber = sheetNumber * recordsBySheet;
             int recordCounter = firstRecordNumber;
             logTime("Before query");
-            //ResultSet dataSource = getTargetReportComponent().getResultSet(firstRecordNumber, lastRecordNumber);
+            ResultSet dataSource = getTargetReportComponent().getResultSet(firstRecordNumber, lastRecordNumber);
             logTime("After query");
-            /*ResultSetMetaData rsmd = dataSource.getMetaData();
+            ResultSetMetaData rsmd = dataSource.getMetaData();
             while (dataSource.next()) {
                 for (int columnIndex = 1; columnIndex <= rsmd.getColumnCount(); columnIndex++) {
                     int columnNumber = columnIndex;
@@ -273,7 +273,7 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
                 }
                 rowIndex++;
                 recordCounter++;
-            }*/
+            }
             workbook.write();
             workbook.close();
             logTime("After xls file write");

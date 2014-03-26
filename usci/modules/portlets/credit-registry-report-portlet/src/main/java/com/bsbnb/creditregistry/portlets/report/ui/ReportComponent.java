@@ -62,7 +62,7 @@ public class ReportComponent extends VerticalLayout {
         return getConnect().getDataSourceFromStoredProcedure(report.getProcedureName(), parameterValues);
     }
     
-    /*public ResultSet getResultSet(int firstRowNum, int lastRowNum) throws SQLException {
+    public ResultSet getResultSet(int firstRowNum, int lastRowNum) throws SQLException {
         List<Object> parameterValues = getParameterValues();
         if(parameterValues==null) {
             return null;
@@ -70,7 +70,7 @@ public class ReportComponent extends VerticalLayout {
         parameterValues.add(0, lastRowNum);
         parameterValues.add(0, firstRowNum);
         return getConnect().getResultSetFromStoredProcedure(report.getProcedureName(), parameterValues);
-    }*/
+    }
     
     public List<Object> getParameterValues() {
         return parametersComponent.getParameterValues();

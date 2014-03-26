@@ -13,10 +13,14 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.FileResource;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
-
+import com.vaadin.ui.VerticalLayout;
 import java.io.File;
 import java.util.List;
 
@@ -113,7 +117,7 @@ class GeneratedFilesLayout extends VerticalLayout {
         filesTable.setContainerDataSource(filesContainer);
         filesTable.addGeneratedColumn("downloadButton", new ColumnGenerator() {
 
-            public Component generateCell(Table source, Object itemId, Object columnId) {
+            public Object generateCell(Table source, Object itemId, Object columnId) {
                 final ReportLoadFile file = (ReportLoadFile) itemId;
                 Button content = new Button("", new Button.ClickListener() {
 
