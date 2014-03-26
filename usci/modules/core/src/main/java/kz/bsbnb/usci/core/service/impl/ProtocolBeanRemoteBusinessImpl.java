@@ -54,8 +54,8 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
             View view = couchbaseClient.getView("batch", "contract_status");
             Query query = new Query();
             query.setDescending(true);
-            query.setRangeEnd("\"" + batchId + "_0\"");
-            query.setRangeStart("\"" + batchId + "_9\"");
+            query.setRangeEnd("[" + batchId + ",0]");
+            query.setRangeStart("[" + batchId + ",999999999]");
 
 
             ViewResponse response = couchbaseClient.query(view, query);

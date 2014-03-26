@@ -33,27 +33,6 @@ function (doc, meta) {
               }
             }
 
-//batch_statuses
-
-function (doc, meta) {
-          if(doc.type == "batch") {
-            emit(meta.id.substring(6), [doc.id, doc.fileName]);
-          }
-          if(doc.type == "batch_status") {
-            emit(meta.id.substring(13), [doc.batchStatuses[doc.batchStatuses.length - 1].protocol]);
-          }
-        }
-
-function(key, values, rereduce) {
-          var obj = values[values.length - 1];
-
-          for (i = values.length - 2; i >= 0; i--) {
-            obj = obj.concat(values[i]);
-          }
-
-          return obj;
-        }
-
 //contract_status
 //use key filter - [batch_id, index]
 

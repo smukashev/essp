@@ -81,7 +81,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     {
         ArrayList<InputInfo> list = new ArrayList<InputInfo>();
 
-        View view = couchbaseClient.getView("batch", "batch_statuses");
+        View view = couchbaseClient.getView("batch", "batch");
         Query query = new Query();
         query.setLimit(20);
         query.setGroup(true);
@@ -95,16 +95,19 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
             for(ViewRow row : viewResponse) {
                 ViewRowReduced viewRowNoDocs = (ViewRowReduced) row;
 
-                List statusList = gson.fromJson(viewRowNoDocs.getValue(), ArrayList.class);
+                BatchFullStatusJModel batchFullStatusJModel =
+                        gson.fromJson(viewRowNoDocs.getValue(), BatchFullStatusJModel.class);
 
-                Double dId = Double.parseDouble(statusList.get(0).toString());
-                Long id = dId.longValue();
+                Long id = batchFullStatusJModel.getId();
 
-                List<BatchStatusJModel> statusesList = getBatchStatuses(id);
+                List<BatchStatusJModel> statusesList = batchFullStatusJModel.getStatus().getBatchStatuses();
 
                 InputInfo ii = new InputInfo();
 
+                String lastStatus = "";
+
                 for (BatchStatusJModel statusModel : statusesList) {
+                    lastStatus = statusModel.getProtocol();
                     if (statusModel.getProtocol().equals("PROCESSING")) {
                         ii.setStartedDate(statusModel.getReceived());
                     } else if(statusModel.getProtocol().equals("COMPLETED")) {
@@ -124,12 +127,12 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
                 ii.setId(BigInteger.valueOf(id));
                 ii.setCreditor(creditorsList.get(0));
-                ii.setFileName(statusList.get(1).toString());
+                ii.setFileName(batchFullStatusJModel.getFileName());
 
                 Shared s = new Shared();
                 s.setCode("S");
-                s.setNameRu(statusList.get(2).toString());
-                s.setNameKz(statusList.get(2).toString());
+                s.setNameRu(lastStatus);
+                s.setNameKz(lastStatus);
 
                 ii.setReceiverType(s);
                 ii.setStatus(s);
