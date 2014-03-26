@@ -1,5 +1,4 @@
 <?php
-include_once "logging.php";
 
 function preatifyDate($date)
 {
@@ -30,16 +29,5 @@ function shortenName($last_name, $first_name, $middle_name)
 	return $last_name.' '.mb_substr($first_name, 0, 1, 'UTF-8').'.'.mb_substr($middle_name, 0, 1, 'UTF-8').'.';
 }
 
-session_start();
-
-if(!isset($_SESSION['userlogin']) && $nologin == false)
-{
-	echo "{";
-	echo "\"success\": false, ";
-	echo "\"errorMessage\": \"User not logged in\",";
-	echo "\"code\": 1";
-	echo "}";
-	exit();
-}
 
 ?>

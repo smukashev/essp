@@ -969,13 +969,16 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
             IBaseValue baseValue = values.get(attribute);
             BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
 
-            List<IValueChangeListener> childListeners =
-                    (List<IValueChangeListener>)baseEntity.getListeners(ValueChangeEvent.class);
-            final Iterator<IValueChangeListener> childIt = childListeners.iterator();
-            while (childIt.hasNext())
+            if (baseEntity != null)
             {
-                final IValueChangeListener listener = childIt.next();
-                baseEntity.removeListener(listener);
+                List<IValueChangeListener> childListeners =
+                        (List<IValueChangeListener>)baseEntity.getListeners(ValueChangeEvent.class);
+                final Iterator<IValueChangeListener> childIt = childListeners.iterator();
+                while (childIt.hasNext())
+                {
+                    final IValueChangeListener listener = childIt.next();
+                    baseEntity.removeListener(listener);
+                }
             }
         }
     }
