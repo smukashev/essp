@@ -57,7 +57,7 @@ public class PersistableDaoPool implements IPersistableDaoPool {
         {
             return applicationContext.getBean(persistableDaoClass);
         }
-        throw new RuntimeException("Not found appropriate interface for persistable class " + persistableClass.getClass().getName());
+        throw new RuntimeException("Not found appropriate interface for persistable class " + persistableClass.getName());
     }
 
     public <T extends IPersistableDao> T getPersistableDao(Class<? extends IPersistable> persistableClass, Class<T> extendedPersistableDaoClass)
@@ -68,11 +68,11 @@ public class PersistableDaoPool implements IPersistableDaoPool {
         }
 
         Class<? extends IPersistableDao> persistableDaoClass =  persistableDaoMap.get(persistableClass);
-        if (persistableDaoClass != null && extendedPersistableDaoClass.getClass().isAssignableFrom(persistableDaoClass))
+        if (persistableDaoClass != null && extendedPersistableDaoClass.isAssignableFrom(persistableDaoClass))
         {
             return (T)applicationContext.getBean(persistableDaoClass);
         }
-        throw new RuntimeException("Not found appropriate interface for persistable class " + persistableClass.getClass().getName());
+        throw new RuntimeException("Not found appropriate interface for persistable class " + persistableClass.getName());
     }
 
 }

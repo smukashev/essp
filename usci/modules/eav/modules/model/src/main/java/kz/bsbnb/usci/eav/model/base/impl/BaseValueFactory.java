@@ -45,6 +45,26 @@ public class BaseValueFactory {
                 value, BaseValue.DEFAULT_CLOSED, BaseValue.DEFAULT_LAST);
     }
 
+    public static IBaseValue create(BaseContainerType baseContainerType, IMetaType metaType, Batch batch,
+                                    long index, Object value)
+    {
+        return create(baseContainerType, metaType, BaseValue.DEFAULT_ID, batch, index, batch.getRepDate(),
+                value, BaseValue.DEFAULT_CLOSED, BaseValue.DEFAULT_LAST);
+    }
+
+    public static IBaseValue create(BaseContainerType baseContainerType, IMetaType metaType, long id, Batch batch,
+                                    long index, Date reportDate, Object value, boolean closed, boolean last)
+    {
+        int metaContainerType = 0;
+        switch(baseContainerType)
+        {
+            case BASE_ENTITY: metaContainerType = MetaContainerTypes.META_CLASS; break;
+            case BASE_SET: metaContainerType = MetaContainerTypes.META_SET; break;
+        }
+
+        return create(metaContainerType, metaType, id, batch, index, reportDate, value, closed, last);
+    }
+
     public static IBaseValue create(int metaContainerType, IMetaType metaType, long id, Batch batch,
                                     long index, Date reportDate, Object value, boolean closed, boolean last)
     {
@@ -169,7 +189,8 @@ public class BaseValueFactory {
 
         if (baseValue == null)
         {
-            baseValue = new BaseValue(id, batch, index, reportDate, value, closed, last);
+            throw new RuntimeException("Can not create instance of BaseValue.");
+            //baseValue = new BaseValue(id, batch, index, reportDate, value, closed, last);
         }
 
         return baseValue;

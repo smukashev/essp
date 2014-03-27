@@ -113,4 +113,18 @@ public class BeComplexSetValueDaoImpl extends JDBCSupport implements IBeComplexS
         }
     }
 
+    @Override
+    public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
+        return null;
+    }
+
+    @Override
+    public IBaseValue getNextBaseValue(IBaseValue baseValue) {
+        return null;
+    }
+
+    @Override
+    public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
+        return null;
+    }
 }

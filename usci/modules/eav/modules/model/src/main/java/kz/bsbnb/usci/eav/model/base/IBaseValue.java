@@ -3,6 +3,7 @@ package kz.bsbnb.usci.eav.model.base;
 
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 
 import java.util.Date;
@@ -32,6 +33,8 @@ public interface IBaseValue<T> extends IPersistable, Cloneable
      */
     public Batch getBatch();
 
+    public void setBatch(Batch batch);
+
     /**
      * Returns the index of the value.
      * @return the index
@@ -57,6 +60,8 @@ public interface IBaseValue<T> extends IPersistable, Cloneable
 
     public Date getRepDate();
 
+    public void setRepDate(Date reportDate);
+
     public void setLast(boolean last);
 
     public boolean isLast();
@@ -68,5 +73,7 @@ public interface IBaseValue<T> extends IPersistable, Cloneable
     public UUID getUuid();
 
     public boolean equalsByValue(IBaseValue baseValue);
+
+    public boolean equalsByValue(IMetaType metaType, IBaseValue baseValue);
 
 }

@@ -3,6 +3,8 @@ package kz.bsbnb.usci.eav.model.base.impl;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
@@ -38,12 +40,13 @@ public class BaseSet extends BaseContainer implements IBaseSet
      */
     public BaseSet(IMetaType metaType)
     {
+        super(BaseContainerType.BASE_SET);
         this.metaType = metaType;
     }
 
     public BaseSet(long id, IMetaType metaType)
     {
-        super(id);
+        super(id, BaseContainerType.BASE_SET);
         this.metaType = metaType;
     }
 
@@ -356,6 +359,8 @@ public class BaseSet extends BaseContainer implements IBaseSet
         try {
             BaseSet baseSet = (BaseSet)super.clone();
 
+
+
             return baseSet;
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("BaseSet class does not implement interface Cloneable.");
@@ -385,4 +390,9 @@ public class BaseSet extends BaseContainer implements IBaseSet
     public boolean isSet() {
         return true;
     }
+
+    /*@Override
+    public IMetaContainer getMetaContainer() {
+        return new MetaSet(metaType);
+    }*/
 }

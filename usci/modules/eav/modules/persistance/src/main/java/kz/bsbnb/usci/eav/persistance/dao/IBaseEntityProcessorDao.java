@@ -35,6 +35,8 @@ public interface IBaseEntityProcessorDao
 
     public List<Long> search(String className);
 
+    public IBaseEntity loadByMaxReportDate(long id, Date reportDate);
+
     public IBaseEntity load(long id);
 
     public IBaseEntity load(long id, boolean caching);
@@ -44,8 +46,6 @@ public interface IBaseEntityProcessorDao
     public IBaseEntity load(long id, Date reportDate, boolean caching);
 
     public IBaseEntity prepare(IBaseEntity baseEntity);
-
-    public IBaseEntity apply(IBaseEntity baseEntity, IBaseEntityManager baseEntityManager);
 
     public IBaseEntity process(IBaseEntity baseEntity);
 

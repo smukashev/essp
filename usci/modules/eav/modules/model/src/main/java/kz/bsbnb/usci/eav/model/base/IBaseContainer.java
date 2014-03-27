@@ -1,6 +1,9 @@
 package kz.bsbnb.usci.eav.model.base;
 
+import kz.bsbnb.usci.eav.model.base.impl.BaseContainerType;
+import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaContainer;
 import kz.bsbnb.usci.eav.model.persistable.IBaseObject;
 
 import java.io.Serializable;
@@ -67,4 +70,9 @@ public interface IBaseContainer extends IBaseObject
 
     public int getValueCount();
 
+    public BaseContainerType getBaseContainerType();
+
+    public void setBaseContainerType(BaseContainerType baseContainerType);
+
+    //public IMetaContainer getMetaContainer();
 }

@@ -119,5 +119,24 @@ public class BeEntitySimpleSetDaoImpl extends JDBCSupport implements IBeEntitySi
         }
     }
 
+    @Override
+    public IBaseValue getNextBaseValue(IBaseValue baseValue) {
+        return null;
+    }
+
+    @Override
+    public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
+        return null;
+    }
+
+    @Override
+    public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
+        return null;
+    }
+
+    @Override
+    public IBaseValue getLastBaseValue(IBaseValue baseValue) {
+        return null;
+    }
 }
 

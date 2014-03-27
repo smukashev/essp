@@ -9,6 +9,8 @@ public interface IMetaClass extends IMetaContainer {
 
     public String getClassName();
 
+    public IMetaAttribute getMetaAttribute(String name);
+
     public IMetaType getMemberType(String name);
 
     public boolean isReference();

@@ -58,12 +58,30 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      */
     public BaseEntity()
     {
-
+        super(BaseContainerType.BASE_ENTITY);
     }
 
-    public BaseEntity(IBaseEntity baseEntity)
+    public BaseEntity(IBaseEntity baseEntity, Date reportDate)
     {
-        this(baseEntity.getMeta(), baseEntity.getReportDate());
+        super(baseEntity.getId(), BaseContainerType.BASE_ENTITY);
+
+        IBaseEntityReportDate thatBaseEntityReportDate = baseEntity.getBaseEntityReportDate();
+        IBaseEntityReportDate thisBaseEntityReportDate = new BaseEntityReportDate(
+                thatBaseEntityReportDate.getId(),
+                reportDate,
+                thatBaseEntityReportDate.getIntegerValuesCount(),
+                thatBaseEntityReportDate.getDateValuesCount(),
+                thatBaseEntityReportDate.getStringValuesCount(),
+                thatBaseEntityReportDate.getBooleanValuesCount(),
+                thatBaseEntityReportDate.getDoubleValuesCount(),
+                thatBaseEntityReportDate.getComplexValuesCount(),
+                thatBaseEntityReportDate.getSimpleSetsCount(),
+                thatBaseEntityReportDate.getComplexSetsCount()
+        );
+        thisBaseEntityReportDate.setBaseEntity(this);
+
+        this.meta = baseEntity.getMeta();
+        this.baseEntityReportDate = thisBaseEntityReportDate;
     }
 
     /**
@@ -73,20 +91,22 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      */
     public BaseEntity(MetaClass meta, Date reportDate)
     {
+        super(BaseContainerType.BASE_ENTITY);
+
         this.meta = meta;
         this.baseEntityReportDate = new BaseEntityReportDate(this, reportDate);
     }
 
     public BaseEntity(long id, MetaClass meta, Date reportDate)
     {
-        super(id);
+        super(id, BaseContainerType.BASE_ENTITY);
         this.meta = meta;
         this.baseEntityReportDate = new BaseEntityReportDate(this, reportDate);
     }
 
     public BaseEntity(long id, MetaClass meta, IBaseEntityReportDate baseEntityReportDate)
     {
-        super(id);
+        super(id, BaseContainerType.BASE_ENTITY);
         this.meta = meta;
 
         baseEntityReportDate.setBaseEntity(this);
@@ -994,7 +1014,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                 baseValueCloned.setBaseContainer(baseEntityCloned);
                 valuesCloned.put(attribute, baseValueCloned);
             }
-
+            baseEntityCloned.values = valuesCloned;
         }
         catch(CloneNotSupportedException ex)
         {

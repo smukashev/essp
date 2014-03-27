@@ -20,6 +20,8 @@ public class BaseEntityManager implements IBaseEntityManager {
         CLASS_PRIORITY.add(BaseEntity.class);
         CLASS_PRIORITY.add(BaseEntityReportDate.class);
 
+        CLASS_PRIORITY.add(BaseSet.class);
+
         CLASS_PRIORITY.add(BaseEntityBooleanValue.class);
         CLASS_PRIORITY.add(BaseEntityDateValue.class);
         CLASS_PRIORITY.add(BaseEntityDoubleValue.class);
@@ -27,11 +29,14 @@ public class BaseEntityManager implements IBaseEntityManager {
         CLASS_PRIORITY.add(BaseEntityStringValue.class);
         CLASS_PRIORITY.add(BaseEntityComplexValue.class);
 
-        CLASS_PRIORITY.add(BaseSet.class);
-
         CLASS_PRIORITY.add(BaseEntitySimpleSet.class);
         CLASS_PRIORITY.add(BaseEntityComplexSet.class);
 
+        CLASS_PRIORITY.add(BaseSetBooleanValue.class);
+        CLASS_PRIORITY.add(BaseSetDateValue.class);
+        CLASS_PRIORITY.add(BaseSetDoubleValue.class);
+        CLASS_PRIORITY.add(BaseSetIntegerValue.class);
+        CLASS_PRIORITY.add(BaseSetStringValue.class);
         CLASS_PRIORITY.add(BaseSetComplexValue.class);
     }
 
