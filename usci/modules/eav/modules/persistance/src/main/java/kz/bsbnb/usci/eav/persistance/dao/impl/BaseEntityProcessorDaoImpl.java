@@ -612,6 +612,18 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             }
             else
             {
+                /*boolean last = true;
+                if (metaAttribute.isFinal())
+                {
+                    IBeValueDao valueDao = persistableDaoPool
+                            .getPersistableDao(baseValue.getClass(), IBeValueDao.class);
+                    IBaseValue lastBaseValue = valueDao.getLastBaseValue(baseValue);
+                    if (lastBaseValue != null)
+                    {
+
+                    }
+                }*/
+
                 if (metaAttribute.isImmutable())
                 {
                     IMetaClass childMetaClass = (IMetaClass)metaType;
@@ -1359,7 +1371,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             {
                                 childBaseSetApplied.put(childBaseValuePrevious);
                             }
-                            return;
+                            //continue;
                         }
                         else
                         {
@@ -1371,6 +1383,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             childBaseValueClosed.setClosed(false);
                             baseEntityManager.registerAsUpdated(childBaseValueClosed);
                         }
+                    }
+                    else
+                    {
+
                     }
 
                     //TODO: Check next value
