@@ -2466,7 +2466,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    private void loadComplexValues(IBaseEntity baseEntity, boolean last)
+    private void loadComplexValues(IBaseEntity baseEntity, boolean lastReportDate)
     {
         IMetaClass metaClass = baseEntity.getMeta();
 
@@ -2474,7 +2474,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         Table tableOfValues = EAV_BE_COMPLEX_VALUES.as("v");
         Select select = null;
 
-        if (last)
+        if (lastReportDate)
         {
             select = context
                     .select(tableOfAttributes.field(EAV_M_COMPLEX_ATTRIBUTES.NAME),
@@ -2558,13 +2558,13 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    private void loadEntitySimpleSets(IBaseEntity baseEntity, boolean last)
+    private void loadEntitySimpleSets(IBaseEntity baseEntity, boolean lastReportDate)
     {
         Table tableOfSimpleSets = EAV_M_SIMPLE_SET.as("ss");
         Table tableOfEntitySimpleSets = EAV_BE_ENTITY_SIMPLE_SETS.as("ess");
         Select select = null;
 
-        if (last)
+        if (lastReportDate)
         {
             select = context
                     .select(tableOfSimpleSets.field(EAV_M_SIMPLE_SET.NAME),
@@ -2641,11 +2641,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             if (metaType.isComplex())
             {
-                loadComplexSetValues(baseSet, baseEntity.getReportDate());
+                loadComplexSetValues(baseSet, baseEntity.getReportDate(), lastReportDate);
             }
             else
             {
-                loadSimpleSetValues(baseSet, baseEntity.getReportDate());
+                loadSimpleSetValues(baseSet, baseEntity.getReportDate(), lastReportDate);
             }
 
             Batch batch = batchRepository.getBatch(batchId);
@@ -2654,13 +2654,13 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    private void loadEntityComplexSets(IBaseEntity baseEntity, boolean last)
+    private void loadEntityComplexSets(IBaseEntity baseEntity, boolean lastReportDate)
     {
         Table tableOfComplexSets = EAV_M_COMPLEX_SET.as("cs");
         Table tableOfEntityComplexSets = EAV_BE_ENTITY_COMPLEX_SETS.as("ecs");
-        Select select = null;
 
-        if (last)
+        Select select;
+        if (lastReportDate)
         {
             select = context
                     .select(tableOfComplexSets.field(EAV_M_COMPLEX_SET.NAME),
@@ -2737,11 +2737,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             if (metaType.isComplex())
             {
-                loadComplexSetValues(baseSet, baseEntity.getReportDate());
+                loadComplexSetValues(baseSet, baseEntity.getReportDate(), lastReportDate);
             }
             else
             {
-                loadSimpleSetValues(baseSet, baseEntity.getReportDate());
+                loadSimpleSetValues(baseSet, baseEntity.getReportDate(), lastReportDate);
             }
 
             Batch batch = batchRepository.getBatch(batchId);
@@ -2750,7 +2750,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    private void loadSetOfSimpleSets(IBaseSet baseSet, Date baseEntityReportDate)
+    private void loadSetOfSimpleSets(IBaseSet baseSet, Date baseEntityReportDate, boolean lastReportDate)
     {
         SelectForUpdateStep select = context
                 .select(EAV_BE_SETS.ID,
@@ -2772,11 +2772,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             if (metaType.isComplex())
             {
-                loadComplexSetValues(baseSetChild, baseEntityReportDate);
+                loadComplexSetValues(baseSetChild, baseEntityReportDate, lastReportDate);
             }
             else
             {
-                loadSimpleSetValues(baseSetChild, baseEntityReportDate);
+                loadSimpleSetValues(baseSetChild, baseEntityReportDate, lastReportDate);
             }
 
             Batch batch = batchRepository.getBatch(((BigDecimal)row.get(EAV_BE_SET_OF_SIMPLE_SETS.BATCH_ID.getName())).longValue());
@@ -2786,7 +2786,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    private void loadSetOfComplexSets(IBaseSet baseSet, Date baseEntityReportDate)
+    private void loadSetOfComplexSets(IBaseSet baseSet, Date baseEntityReportDate, boolean lastReportDate)
     {
         SelectForUpdateStep select = context
                 .select(EAV_BE_SETS.ID,
@@ -2809,11 +2809,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             if (metaType.isComplex())
             {
-                loadComplexSetValues(baseSetChild, baseEntityReportDate);
+                loadComplexSetValues(baseSetChild, baseEntityReportDate, lastReportDate);
             }
             else
             {
-                loadSimpleSetValues(baseSetChild, baseEntityReportDate);
+                loadSimpleSetValues(baseSetChild, baseEntityReportDate, lastReportDate);
             }
 
 
@@ -2824,7 +2824,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    public void loadSimpleSetValues(IBaseSet baseSet, Date baseEntityReportDate)
+    public void loadSimpleSetValues(IBaseSet baseSet, Date baseEntityReportDate, boolean lastReportDate)
     {
         IMetaType metaType = baseSet.getMemberType();
         if (metaType.isComplex())
@@ -2833,7 +2833,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         if (metaType.isSet())
         {
-            loadSetOfSimpleSets(baseSet, baseEntityReportDate);
+            loadSetOfSimpleSets(baseSet, baseEntityReportDate, lastReportDate);
         }
         else
         {
@@ -2854,7 +2854,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 }
                 case STRING:
                 {
-                    loadStringSetValues(baseSet, baseEntityReportDate, false);
+                    loadStringSetValues(baseSet, baseEntityReportDate, lastReportDate);
                     break;
                 }
                 case BOOLEAN:
@@ -3065,32 +3065,70 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    private void loadComplexSetValues(IBaseSet baseSet, Date baseEntityReportDate)
+    public void loadComplexSetValues(IBaseSet baseSet, Date baseEntityReportDate, boolean lastReportDate)
     {
         IMetaType metaType = baseSet.getMemberType();
         if (!metaType.isComplex())
         {
             throw new RuntimeException("Load the complex set values is not possible. " +
-                    "Complex values ??can not be added to an set of simple values.");
+                    "Complex values can not be added to an set of simple values.");
         }
 
         if (metaType.isSet())
         {
-            loadSetOfComplexSets(baseSet, baseEntityReportDate);
+            loadSetOfComplexSets(baseSet, baseEntityReportDate, lastReportDate);
         }
         else
         {
             IMetaClass metaClass = (IMetaClass)metaType;
 
-            SelectForUpdateStep select = context
-                    .select(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID,
-                            EAV_BE_COMPLEX_SET_VALUES.BATCH_ID,
-                            EAV_BE_COMPLEX_SET_VALUES.INDEX_,
-                            EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE,
-                            EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED,
-                            EAV_BE_COMPLEX_SET_VALUES.IS_LAST)
-                    .from(EAV_BE_COMPLEX_SET_VALUES)
-                    .where(EAV_BE_COMPLEX_SET_VALUES.SET_ID.equal(baseSet.getId()));
+            Table tableOfValues = EAV_BE_COMPLEX_SET_VALUES.as("v");
+            Select select;
+            if (lastReportDate)
+            {
+                select = context
+                        .select(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ID),
+                                tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID),
+                                tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.INDEX_),
+                                tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
+                                tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID),
+                                tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
+                                tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
+                        .from(tableOfValues)
+                        .where(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.SET_ID).equal(baseSet.getId()))
+                        .and(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST).equal(true)
+                                .and(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED).equal(false)));
+            }
+            else
+            {
+                Table tableNumbering = context
+                        .select(DSL.rank().over()
+                                .partitionBy(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID))
+                                .orderBy(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
+                                tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ID),
+                                tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID),
+                                tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID),
+                                tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.INDEX_),
+                                tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
+                                tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
+                                tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
+                        .from(tableOfValues)
+                        .where(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.SET_ID).eq(baseSet.getId()))
+                        .and(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE)
+                                .lessOrEqual(DataUtils.convert(baseEntityReportDate)))
+                        .asTable("vn");
+
+                select = context
+                        .select(tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.ID),
+                                tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID),
+                                tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.INDEX_),
+                                tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
+                                tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID),
+                                tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
+                        .from(tableNumbering)
+                        .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
+                        .and(tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED).equal(false));
+            }
 
             logger.debug(select.toString());
             List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -3103,7 +3141,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 long batchId = ((BigDecimal)row.get(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID.getName())).longValue();
                 long index = ((BigDecimal)row.get(EAV_BE_COMPLEX_SET_VALUES.INDEX_.getName())).longValue();
                 long entityValueId = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID.getName())).longValue();
-                boolean isClosed = ((BigDecimal)row.get(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
                 boolean isLast = ((BigDecimal)row.get(EAV_BE_COMPLEX_SET_VALUES.IS_LAST.getName())).longValue() == 1;
                 Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
@@ -3111,7 +3148,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 IBaseEntity baseEntity = loadByMaxReportDate(entityValueId, baseEntityReportDate, metaClass.isReference());
 
                 baseSet.put(BaseValueFactory.create(MetaContainerTypes.META_SET, baseSet.getMemberType(),
-                        batch, index, reportDate, baseEntity, isClosed, isLast));
+                        batch, index, reportDate, baseEntity, false, isLast));
             }
         }
     }

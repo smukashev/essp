@@ -1,11 +1,10 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.model.*;
+import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
@@ -14,7 +13,6 @@ import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
-import org.jooq.Batch;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -191,7 +189,7 @@ public class BeStringSetValueDaoImpl extends JDBCSupport implements IBeStringSet
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
 
-            kz.bsbnb.usci.eav.model.Batch batch = batchRepository.getBatch(batchId);
+            Batch batch = batchRepository.getBatch(batchId);
 
             previousBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
                     id, batch, index, reportDate, baseValue.getValue(), closed, last);
@@ -262,7 +260,7 @@ public class BeStringSetValueDaoImpl extends JDBCSupport implements IBeStringSet
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
 
-            kz.bsbnb.usci.eav.model.Batch batch = batchRepository.getBatch(batchId);
+            Batch batch = batchRepository.getBatch(batchId);
 
             nextBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
                     id, batch, index, reportDate, baseValue.getValue(), closed, last);
@@ -318,7 +316,7 @@ public class BeStringSetValueDaoImpl extends JDBCSupport implements IBeStringSet
             boolean last = ((BigDecimal)row
                     .get(EAV_BE_STRING_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            kz.bsbnb.usci.eav.model.Batch batch = batchRepository.getBatch(batchId);
+            Batch batch = batchRepository.getBatch(batchId);
 
             closedBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
                     id, batch, index, baseValue.getRepDate(), baseValue.getValue(), true, last);
@@ -370,7 +368,7 @@ public class BeStringSetValueDaoImpl extends JDBCSupport implements IBeStringSet
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
 
-            kz.bsbnb.usci.eav.model.Batch batch = batchRepository.getBatch(batchId);
+            Batch batch = batchRepository.getBatch(batchId);
 
             lastBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
                     id, batch, index, reportDate, baseValue.getValue(), closed, true);

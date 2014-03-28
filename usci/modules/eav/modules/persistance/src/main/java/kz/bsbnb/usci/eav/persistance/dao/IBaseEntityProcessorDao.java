@@ -69,6 +69,8 @@ public interface IBaseEntityProcessorDao
     public int batchCount(long id, String className);
 
 
-    public void loadSimpleSetValues(IBaseSet baseSet, Date baseEntityReportDate);
+    public void loadSimpleSetValues(IBaseSet baseSet, Date baseEntityReportDate, boolean lastReportDate);
+
+    public void loadComplexSetValues(IBaseSet baseSet, Date baseEntityReportDate, boolean lastReportDate);
 
 }

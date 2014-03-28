@@ -213,7 +213,7 @@ public class BeEntitySimpleSetDaoImpl extends JDBCSupport implements IBeEntitySi
                     .get(EAV_BE_ENTITY_SIMPLE_SETS.BATCH_ID.getName())).longValue());
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-            baseEntityProcessorDao.loadSimpleSetValues(baseSet, reportDate);
+            baseEntityProcessorDao.loadSimpleSetValues(baseSet, reportDate, false);
 
             nextBaseValue = BaseValueFactory.create(metaClass.getType(), metaType,
                     id, batch, index, reportDate, baseSet, closed, last);
@@ -294,7 +294,7 @@ public class BeEntitySimpleSetDaoImpl extends JDBCSupport implements IBeEntitySi
                     .get(EAV_BE_ENTITY_SIMPLE_SETS.BATCH_ID.getName())).longValue());
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-            baseEntityProcessorDao.loadSimpleSetValues(baseSet, reportDate);
+            baseEntityProcessorDao.loadSimpleSetValues(baseSet, reportDate, false);
 
             previousBaseValue = BaseValueFactory.create(metaClass.getType(), metaType,
                     id, batch, index, reportDate, baseSet, closed, last);
@@ -349,7 +349,7 @@ public class BeEntitySimpleSetDaoImpl extends JDBCSupport implements IBeEntitySi
                     .get(EAV_BE_ENTITY_SIMPLE_SETS.BATCH_ID.getName())).longValue());
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-            baseEntityProcessorDao.loadSimpleSetValues(baseSet, baseValue.getRepDate());
+            baseEntityProcessorDao.loadSimpleSetValues(baseSet, baseValue.getRepDate(), false);
 
             closedBaseValue = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
                     id, batch, index, baseValue.getRepDate(), baseSet, true, last);
@@ -406,7 +406,7 @@ public class BeEntitySimpleSetDaoImpl extends JDBCSupport implements IBeEntitySi
                     .get(EAV_BE_ENTITY_SIMPLE_SETS.BATCH_ID.getName())).longValue());
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-            baseEntityProcessorDao.loadSimpleSetValues(baseSet, baseValue.getRepDate());
+            baseEntityProcessorDao.loadSimpleSetValues(baseSet, baseValue.getRepDate(), false);
 
             lastBaseValue = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
                     id, batch, index, reportDate, baseSet, closed, true);
