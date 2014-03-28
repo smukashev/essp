@@ -13,4 +13,6 @@ public interface IBeSetValueDao extends IPersistableDao {
 
     public IBaseValue getClosedBaseValue(IBaseValue baseValue);
 
+    public IBaseValue getLastBaseValue(IBaseValue baseValue);
+
 }

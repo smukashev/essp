@@ -34,7 +34,7 @@ public class BaseValueFactory {
     public static IBaseValue create(int metaContainerType, IMetaType metaType, long id,
                                     Batch batch, long index, Date reportDate, Object value)
     {
-        return create(metaContainerType, metaType, BaseValue.DEFAULT_ID, batch, index, reportDate,
+        return create(metaContainerType, metaType, id, batch, index, reportDate,
                 value, BaseValue.DEFAULT_CLOSED, BaseValue.DEFAULT_LAST);
     }
 

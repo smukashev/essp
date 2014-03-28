@@ -115,17 +115,22 @@ public class BeDateSetValueDaoImpl extends JDBCSupport implements IBeDateSetValu
     }
 
     @Override
-    public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
-        return null;
-    }
+     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
+    throw new UnsupportedOperationException("Not yet implemented.");
+}
 
     @Override
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
-        return null;
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Override
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
-        return null;
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    @Override
+    public IBaseValue getLastBaseValue(IBaseValue baseValue) {
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 }

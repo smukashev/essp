@@ -441,7 +441,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             else
             {
                 IBaseEntity baseEntityLoaded = load(baseEntityForSave.getId(), maxReportDate);
-                return applyWithComparison(baseEntityForSave, baseEntityLoaded, baseEntityManager);
+                return applyBaseEntityAdvanced(baseEntityForSave, baseEntityLoaded, baseEntityManager);
             }
         }
     }
@@ -472,7 +472,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return baseEntityApplied;
     }
 
-    private IBaseEntity applyBaseEntityAdvanced(IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager)
+    /*private IBaseEntity applyBaseEntityAdvanced(IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager)
     {
         IBaseEntity baseEntityApplied =
                 new BaseEntity(
@@ -492,12 +492,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         baseEntityManager.registerAsInserted(baseEntityReportDate);
 
         return baseEntityApplied;
-    }
+    }*/
 
 
 
-    private IBaseEntity applyWithComparison(IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded,
-                                            IBaseEntityManager baseEntityManager)
+    private IBaseEntity applyBaseEntityAdvanced(IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded,
+                                                IBaseEntityManager baseEntityManager)
     {
         IMetaClass metaClass = baseEntitySaving.getMeta();
         IBaseEntity baseEntityApplied = new BaseEntity(baseEntityLoaded, baseEntitySaving.getReportDate());
@@ -513,8 +513,53 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 continue;
             }
 
-            applyBaseValueHard(baseEntityApplied, baseValueSaving, baseValueLoaded, baseEntityManager);
+            IBaseContainer baseContainer = baseValueSaving.getBaseContainer();
+            if (baseContainer == null && baseContainer.getBaseContainerType() != BaseContainerType.BASE_ENTITY)
+            {
+                throw new RuntimeException("Advanced applying instance of BaseValue changes " +
+                        "contained not in the instance of BaseEntity is not possible.");
+            }
 
+            IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
+            if (metaAttribute == null)
+            {
+                throw new RuntimeException("Advanced applying instance of BaseValue changes " +
+                        "without meta data is not possible.");
+            }
+
+            IMetaType metaType = metaAttribute.getMetaType();
+            if (metaType.isComplex())
+            {
+                if (metaType.isSetOfSets())
+                {
+                    throw new UnsupportedOperationException("Not yet implemented.");
+                }
+
+                if (metaType.isSet())
+                {
+                    applyComplexSet(baseEntityApplied, baseValueSaving, baseValueLoaded, baseEntityManager);
+                }
+                else
+                {
+                    applyComplexValue(baseEntityApplied, baseValueSaving, baseValueLoaded, baseEntityManager);
+                }
+            }
+            else
+            {
+                if (metaType.isSetOfSets())
+                {
+                    throw new UnsupportedOperationException("Not yet implemented.");
+                }
+
+                if (metaType.isSet())
+                {
+                    applySimpleSet(baseEntityApplied, baseValueSaving, baseValueLoaded, baseEntityManager);
+                }
+                else
+                {
+                    applySimpleValue(baseEntityApplied, baseValueSaving, baseValueLoaded, baseEntityManager);
+                }
+            }
         }
 
         // Calculate values count
@@ -749,7 +794,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    protected void applyBaseValueAdvanced(IBaseEntity baseEntityApplied, IBaseValue baseValue,
+    /*protected void applyBaseValueAdvanced(IBaseEntity baseEntityApplied, IBaseValue baseValue,
                                           IBaseEntityManager baseEntityManager)
     {
         if (baseValue.getValue() == null)
@@ -934,382 +979,147 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 }
             }
         }
-    }
+    }*/
 
-    protected void applyBaseValueHard(IBaseEntity baseEntity, IBaseValue baseValueSaving, IBaseValue baseValueLoaded,
+    protected void applySimpleSet(IBaseEntity baseEntity, IBaseValue baseValueSaving, IBaseValue baseValueLoaded,
                                       IBaseEntityManager baseEntityManager)
     {
-        IBaseContainer baseContainer = baseValueSaving.getBaseContainer();
-        if (baseContainer == null && baseContainer.getBaseContainerType() != BaseContainerType.BASE_ENTITY)
-        {
-            throw new RuntimeException("Advanced applying instance of BaseValue changes contained not in the instance " +
-                    "of BaseEntity is not possible.");
-        }
-
         IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
-        if (metaAttribute == null)
-        {
-            throw new RuntimeException("Advanced applying instance of BaseValue changes without meta data is not possible.");
-        }
-
         IMetaType metaType = metaAttribute.getMetaType();
-        if (metaType.isComplex())
+
+        IMetaSet childMetaSet = (IMetaSet)metaType;
+        IMetaType childMetaType = childMetaSet.getMemberType();
+        IMetaValue childMetaValue = (IMetaValue)childMetaType;
+
+        IBaseSet childBaseSetSaving = (IBaseSet)baseValueSaving.getValue();
+        IBaseSet childBaseSetLoaded = null;
+        IBaseSet childBaseSetApplied = null;
+        if (baseValueLoaded != null)
         {
-            if (metaType.isSet())
+            childBaseSetLoaded = (IBaseSet)baseValueLoaded.getValue();
+
+            if (childBaseSetSaving == null || childBaseSetSaving.getValueCount() <= 0)
             {
-                if (metaType.isSetOfSets())
-                {
-                    throw new UnsupportedOperationException("Not yet implemented.");
-                }
-                if (baseValueLoaded != null)
-                {
-                    baseEntity.put(metaAttribute.getName(), baseValueLoaded);
-                }
+                IBaseValue baseValueClosed = BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        baseValueLoaded.getId(),
+                        baseValueLoaded.getBatch(),
+                        baseValueLoaded.getIndex(),
+                        new Date(baseValueLoaded.getRepDate().getTime()),
+                        childBaseSetLoaded,
+                        true,
+                        baseValueLoaded.isLast());
+                baseValueClosed.setBaseContainer(baseEntity);
+                baseValueClosed.setMetaAttribute(metaAttribute);
+                baseEntityManager.registerAsUpdated(baseValueClosed);
             }
             else
             {
-                IMetaClass metaClass = (IMetaClass)metaType;
-                if (baseValueLoaded != null)
-                {
-                    if (baseValueSaving.getValue() == null)
-                    {
-                        Date reportDateSaving = baseValueSaving.getRepDate();
-                        Date reportDateLoaded = baseValueLoaded.getRepDate();
-                        boolean reportDateEquals =
-                                DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded) == 0;
-                        if (reportDateEquals)
-                        {
-                            IBaseValue baseValueClosed = BaseValueFactory.create(
-                                    MetaContainerTypes.META_CLASS,
-                                    metaType,
-                                    baseValueLoaded.getId(),
-                                    baseValueSaving.getBatch(),
-                                    baseValueSaving.getIndex(),
-                                    new Date(baseValueLoaded.getRepDate().getTime()),
-                                    baseValueLoaded.getValue(),
-                                    true,
-                                    baseValueLoaded.isLast()
-                            );
-                            baseValueClosed.setBaseContainer(baseEntity);
-                            baseValueClosed.setMetaAttribute(metaAttribute);
-                            baseEntityManager.registerAsUpdated(baseValueClosed);
-                        }
-                        else
-                        {
-                            if (baseValueLoaded.isLast())
-                            {
-                                IBaseValue baseValueLast = BaseValueFactory.create(
-                                        MetaContainerTypes.META_CLASS,
-                                        metaType,
-                                        baseValueLoaded.getId(),
-                                        baseValueSaving.getBatch(),
-                                        baseValueSaving.getIndex(),
-                                        new Date(baseValueLoaded.getRepDate().getTime()),
-                                        baseValueLoaded.getValue(),
-                                        baseValueLoaded.isClosed(),
-                                        false
-                                );
-                                baseValueLast.setBaseContainer(baseEntity);
-                                baseValueLast.setMetaAttribute(metaAttribute);
-                                baseEntityManager.registerAsUpdated(baseValueLast);
-                            }
+                childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
 
-                            IBaseValue baseValueClosed = BaseValueFactory.create(
-                                    MetaContainerTypes.META_CLASS,
-                                    metaType,
-                                    baseValueSaving.getBatch(),
-                                    baseValueSaving.getIndex(),
-                                    new Date(baseValueSaving.getRepDate().getTime()),
-                                    baseValueLoaded.getValue(),
-                                    true,
-                                    baseValueLoaded.isLast()
-                            );
-                            baseValueClosed.setBaseContainer(baseEntity);
-                            baseValueClosed.setMetaAttribute(metaAttribute);
-                            baseEntityManager.registerAsInserted(baseValueClosed);
-                        }
-                        return;
-                    }
-
-                    IBaseEntity baseEntitySaving = (IBaseEntity)baseValueSaving.getValue();
-                    IBaseEntity baseEntityLoaded = (IBaseEntity)baseValueLoaded.getValue();
-
-                    if (baseValueSaving.equalsByValue(baseValueLoaded) || !metaClass.isSearchable())
-                    {
-                        IBaseEntity baseEntityApplied;
-                        if (metaAttribute.isImmutable())
-                        {
-                            if (baseEntitySaving.getId() < 1)
-                            {
-                                throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
-                                        baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
-                            }
-                            baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
-                        }
-                        else
-                        {
-                            baseEntityApplied = metaClass.isSearchable() ?
-                                    apply(baseEntitySaving, baseEntityManager) :
-                                    applyWithComparison(baseEntitySaving, baseEntityLoaded, baseEntityManager);
-                        }
-
-                        IBaseValue baseValueApplied = BaseValueFactory.create(
-                                MetaContainerTypes.META_CLASS,
-                                metaType,
-                                baseValueLoaded.getId(),
-                                baseValueLoaded.getBatch(),
-                                baseValueLoaded.getIndex(),
-                                new Date(baseValueLoaded.getRepDate().getTime()),
-                                baseEntityApplied,
-                                baseValueLoaded.isClosed(),
-                                baseValueLoaded.isLast()
-                        );
-                        baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                    }
-                    else
-                    {
-
-                        IBaseEntity baseEntityApplied;
-                        if (metaAttribute.isImmutable())
-                        {
-                            if (baseEntitySaving.getId() < 1)
-                            {
-                                throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
-                                        baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
-                            }
-                            baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
-                        }
-                        else
-                        {
-                            baseEntityApplied = metaClass.isSearchable() ?
-                                    apply(baseEntitySaving, baseEntityManager) :
-                                    applyWithComparison(baseEntitySaving, baseEntityLoaded, baseEntityManager);
-                        }
-
-                        Date reportDateSaving = baseValueSaving.getRepDate();
-                        Date reportDateLoaded = baseValueLoaded.getRepDate();
-                        boolean reportDateEquals =
-                                DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded) == 0;
-                        if (reportDateEquals)
-                        {
-                            IBaseValue baseValueApplied = BaseValueFactory.create(
-                                    MetaContainerTypes.META_CLASS,
-                                    metaType,
-                                    baseValueLoaded.getId(),
-                                    baseValueSaving.getBatch(),
-                                    baseValueSaving.getIndex(),
-                                    new Date(baseValueLoaded.getRepDate().getTime()),
-                                    baseEntityApplied,
-                                    baseValueLoaded.isClosed(),
-                                    baseValueLoaded.isLast()
-                            );
-                            baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                            baseEntityManager.registerAsUpdated(baseValueApplied);
-                        }
-                        else
-                        {
-                            IBaseValue baseValueApplied = BaseValueFactory.create(
-                                    MetaContainerTypes.META_CLASS,
-                                    metaType,
-                                    baseValueSaving.getBatch(),
-                                    baseValueSaving.getIndex(),
-                                    new Date(baseValueSaving.getRepDate().getTime()),
-                                    baseEntityApplied,
-                                    false,
-                                    baseValueLoaded.isLast()
-                            );
-                            baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                            baseEntityManager.registerAsInserted(baseValueApplied);
-
-                            if (baseValueLoaded.isLast())
-                            {
-                                IBaseValue baseValuePrevious = BaseValueFactory.create(
-                                        MetaContainerTypes.META_CLASS,
-                                        metaType,
-                                        baseValueLoaded.getId(),
-                                        baseValueSaving.getBatch(),
-                                        baseValueSaving.getIndex(),
-                                        new Date(baseValueLoaded.getRepDate().getTime()),
-                                        baseValueLoaded.getValue(),
-                                        baseValueLoaded.isClosed(),
-                                        false);
-                                baseValuePrevious.setBaseContainer(baseEntity);
-                                baseValuePrevious.setMetaAttribute(metaAttribute);
-                                baseEntityManager.registerAsUpdated(baseValuePrevious);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    IBaseEntity baseEntitySaving = (IBaseEntity)baseValueSaving.getValue();
-                    if (baseEntitySaving == null)
-                    {
-                        return;
-                    }
-
-                    IBeValueDao valueDao = persistableDaoPool
-                            .getPersistableDao(baseValueSaving.getClass(), IBeValueDao.class);
-                    IBaseValue baseValueClosed = valueDao.getClosedBaseValue(baseValueSaving);
-                    baseValueClosed.setMetaAttribute(metaAttribute);
-
-                    if (baseValueClosed != null)
-                    {
-                        IBaseEntity baseEntityClosed = (IBaseEntity)baseValueClosed.getValue();
-                        if (baseValueClosed.equalsByValue(baseValueSaving))
-                        {
-                            baseValueClosed.setBaseContainer(baseEntity);
-                            baseEntityManager.registerAsDeleted(baseValueClosed);
-
-                            IBaseValue baseValuePrevious = valueDao.getPreviousBaseValue(baseValueClosed);
-
-                            IBaseEntity baseEntityApplied;
-                            if (metaAttribute.isImmutable())
-                            {
-                                if (baseEntitySaving.getId() < 1)
-                                {
-                                    throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
-                                            baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
-                                }
-                                baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(),
-                                        baseEntitySaving.getReportDate());
-                            }
-                            else
-                            {
-                                baseEntityApplied = metaClass.isSearchable() ?
-                                        apply(baseEntitySaving, baseEntityManager) :
-                                        applyWithComparison(baseEntitySaving, baseEntityClosed, baseEntityManager);
-                            }
-                            baseValuePrevious.setValue(baseEntityApplied);
-
-                            if (baseValueClosed.isLast())
-                            {
-                                baseValuePrevious.setIndex(baseValueSaving.getIndex());
-                                baseValuePrevious.setBatch(baseValueSaving.getBatch());
-                                baseValuePrevious.setLast(true);
-
-                                baseEntity.put(metaAttribute.getName(), baseValuePrevious);
-                                baseEntityManager.registerAsUpdated(baseValuePrevious);
-                            }
-                            else
-                            {
-                                baseEntity.put(metaAttribute.getName(), baseValuePrevious);
-                            }
-                        }
-                        else
-                        {
-                            IBaseEntity baseEntityApplied;
-                            if (metaAttribute.isImmutable())
-                            {
-                                if (baseEntitySaving.getId() < 1)
-                                {
-                                    throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
-                                            baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
-                                }
-                                baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(),
-                                        baseEntitySaving.getReportDate());
-                            }
-                            else
-                            {
-                                baseEntityApplied = metaClass.isSearchable() ?
-                                        apply(baseEntitySaving, baseEntityManager) :
-                                        applyWithComparison(baseEntitySaving, baseEntityClosed, baseEntityManager);
-                            }
-
-                            baseValueClosed.setIndex(baseValueSaving.getIndex());
-                            baseValueClosed.setBatch(baseValueSaving.getBatch());
-                            baseValueClosed.setValue(baseEntityApplied);
-                            baseValueClosed.setClosed(false);
-                            baseEntity.put(metaAttribute.getName(), baseValueClosed);
-                            baseEntityManager.registerAsUpdated(baseValueClosed);
-                        }
-                    }
-                    else
-                    {
-                        IBaseValue baseValueLast = valueDao.getLastBaseValue(baseValueSaving);
-                        IBaseEntity baseEntityApplied;
-                        if (metaAttribute.isImmutable())
-                        {
-                            if (baseEntitySaving.getId() < 1)
-                            {
-                                throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
-                                        baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
-                            }
-                            baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(),
-                                    baseEntitySaving.getReportDate());
-                        }
-                        else
-                        {
-                            baseEntityApplied = apply(baseEntitySaving, baseEntityManager);
-                        }
-
-                        if (baseValueLast == null)
-                        {
-                            IBaseValue baseValueApplied = BaseValueFactory.create(
-                                    MetaContainerTypes.META_CLASS,
-                                    metaType,
-                                    baseValueSaving.getBatch(),
-                                    baseValueSaving.getIndex(),
-                                    new Date(baseValueSaving.getRepDate().getTime()),
-                                    baseEntityApplied,
-                                    false,
-                                    true
-                            );
-                            baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                            baseEntityManager.registerAsInserted(baseValueApplied);
-                        }
-                        else
-                        {
-                            Date reportDateSaving = baseValueSaving.getRepDate();
-                            Date reportDateLast = baseValueLast.getRepDate();
-                            int reportDateCompare =
-                                    DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLast);
-                            boolean last = reportDateCompare == -1 ? false : true;
-
-                            if (last)
-                            {
-                                baseValueLast.setBaseContainer(baseEntity);
-                                baseValueLast.setLast(false);
-                                baseEntityManager.registerAsUpdated(baseValueLast);
-                            }
-
-                            IBaseValue baseValueApplied = BaseValueFactory.create(
-                                    MetaContainerTypes.META_CLASS,
-                                    metaType,
-                                    baseValueSaving.getBatch(),
-                                    baseValueSaving.getIndex(),
-                                    new Date(baseValueSaving.getRepDate().getTime()),
-                                    baseEntityApplied,
-                                    false,
-                                    last
-                            );
-                            baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                            baseEntityManager.registerAsInserted(baseValueApplied);
-                        }
-                    }
-                }
+                IBaseValue baseValueApplied = BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        baseValueLoaded.getId(),
+                        baseValueLoaded.getBatch(),
+                        baseValueLoaded.getIndex(),
+                        new Date(baseValueLoaded.getRepDate().getTime()),
+                        childBaseSetApplied,
+                        baseValueLoaded.isClosed(),
+                        baseValueLoaded.isLast());
+                baseEntity.put(metaAttribute.getName(), baseValueApplied);
             }
         }
         else
         {
-            if (metaType.isSet())
+            if (childBaseSetSaving == null)
             {
-                if (metaType.isSetOfSets())
+                return;
+            }
+
+            IBeValueDao baseValueDao = persistableDaoPool
+                    .getPersistableDao(baseValueSaving.getClass(), IBeValueDao.class);
+
+            IBaseValue baseValueClosed = baseValueDao.getClosedBaseValue(baseValueSaving);
+            if (baseValueClosed != null)
+            {
+                childBaseSetLoaded = (IBaseSet)baseValueClosed.getValue();
+                childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+
+                IBaseValue baseValueApplied = BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        baseValueClosed.getId(),
+                        baseValueClosed.getBatch(),
+                        baseValueClosed.getIndex(),
+                        new Date(baseValueClosed.getRepDate().getTime()),
+                        childBaseSetApplied,
+                        false,
+                        baseValueClosed.isLast());
+                baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                baseEntityManager.registerAsUpdated(baseValueApplied);
+            }
+            else
+            {
+                IBaseValue baseValuePrevious = baseValueDao.getPreviousBaseValue(baseValueSaving);
+                if (baseValuePrevious != null)
                 {
-                    throw new UnsupportedOperationException("Not yet implemented.");
+                    childBaseSetLoaded = (IBaseSet)baseValuePrevious.getValue();
+                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+
+                    IBaseValue baseValueApplied = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueSaving.getRepDate().getTime()),
+                            childBaseSetApplied,
+                            false,
+                            baseValuePrevious.isLast());
+                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityManager.registerAsInserted(baseValueApplied);
+
+                    if (baseValuePrevious.isLast())
+                    {
+                        baseValuePrevious.setBaseContainer(baseEntity);
+                        baseValuePrevious.setMetaAttribute(metaAttribute);
+                        baseValuePrevious.setBatch(baseValueSaving.getBatch());
+                        baseValuePrevious.setIndex(baseValueSaving.getIndex());
+                        baseValuePrevious.setLast(false);
+                        baseEntityManager.registerAsUpdated(baseValuePrevious);
+                    }
                 }
+                else
+                {
+                    childBaseSetApplied = new BaseSet(childMetaType);
+                    baseEntityManager.registerAsInserted(childBaseSetApplied);
 
-                IMetaSet childMetaSet = (IMetaSet)metaType;
-                IMetaType childMetaType = childMetaSet.getMemberType();
-                IMetaValue childMetaValue = (IMetaValue)childMetaType;
+                    // TODO: Check next value
 
-                IBaseSet childBaseSetSaving = (IBaseSet)baseValueSaving.getValue();
-                IBaseSet childBaseSetLoaded = (IBaseSet)baseValueLoaded.getValue();
-                IBaseSet childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+                    IBaseValue baseValueApplied = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueSaving.getRepDate().getTime()),
+                            childBaseSetApplied,
+                            false,
+                            true);
+                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityManager.registerAsInserted(baseValueApplied);
+                }
+            }
+        }
 
-                boolean baseValueFound = false;
-                Set<UUID> processedUuids = new HashSet<UUID>();
-                for (IBaseValue childBaseValueSaving: childBaseSetSaving.get())
+        Set<UUID> processedUuids = new HashSet<UUID>();
+        if (childBaseSetSaving != null && childBaseSetSaving.getValueCount() > 0)
+        {
+            boolean baseValueFound;
+            for (IBaseValue childBaseValueSaving: childBaseSetSaving.get())
+            {
+
+                if (childBaseSetLoaded != null)
                 {
                     baseValueFound = false;
                     for (IBaseValue childBaseValueLoaded: childBaseSetLoaded.get())
@@ -1332,8 +1142,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                     childBaseValueLoaded.getIndex(),
                                     new Date(childBaseValueLoaded.getRepDate().getTime()),
                                     childMetaValue.getTypeCode() == DataTypes.DATE ?
-                                        new Date(((Date)childBaseValueLoaded.getValue()).getTime()) :
-                                        childBaseValueLoaded.getValue(),
+                                            new Date(((Date)childBaseValueLoaded.getValue()).getTime()) :
+                                            childBaseValueLoaded.getValue(),
                                     childBaseValueLoaded.isClosed(),
                                     childBaseValueLoaded.isLast());
                             childBaseSetApplied.put(baseValueApplied);
@@ -1345,51 +1155,538 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     {
                         continue;
                     }
+                }
 
-                    IBeSetValueDao setValueDao = persistableDaoPool
-                            .getPersistableDao(baseValueSaving.getClass(), IBeSetValueDao.class);
+                IBeSetValueDao setValueDao = persistableDaoPool
+                        .getPersistableDao(childBaseValueSaving.getClass(), IBeSetValueDao.class);
 
-                    // Check closed value
-                    IBaseValue childBaseValueClosed = setValueDao.getClosedBaseValue(baseValueSaving);
-                    if (childBaseValueClosed != null)
+                // Check closed value
+                IBaseValue baseValueForSearch = BaseValueFactory.create(
+                        MetaContainerTypes.META_SET,
+                        childMetaType,
+                        childBaseValueSaving.getBatch(),
+                        childBaseValueSaving.getIndex(),
+                        new Date(childBaseValueSaving.getRepDate().getTime()),
+                        childMetaValue.getTypeCode() == DataTypes.DATE ?
+                                new Date(((Date)childBaseValueSaving.getValue()).getTime()) :
+                                childBaseValueSaving.getValue(),
+                        childBaseValueSaving.isClosed(),
+                        childBaseValueSaving.isLast());
+                baseValueForSearch.setBaseContainer(childBaseSetApplied);
+
+                IBaseValue childBaseValueClosed = setValueDao.getClosedBaseValue(baseValueForSearch);
+                if (childBaseValueClosed != null)
+                {
+                    childBaseValueClosed.setBaseContainer(childBaseSetApplied);
+                    baseEntityManager.registerAsDeleted(childBaseValueClosed);
+
+                    IBaseValue childBaseValuePrevious = setValueDao.getPreviousBaseValue(childBaseValueClosed);
+                    if (childBaseValueClosed.isLast())
                     {
-                        if (childBaseValueSaving.equalsByValue(childMetaType, childBaseValueClosed))
+                        childBaseValuePrevious.setIndex(childBaseValueSaving.getIndex());
+                        childBaseValuePrevious.setBatch(childBaseValueSaving.getBatch());
+                        childBaseValuePrevious.setLast(true);
+
+                        childBaseSetApplied.put(childBaseValuePrevious);
+                        baseEntityManager.registerAsUpdated(childBaseValuePrevious);
+                    }
+                    else
+                    {
+                        childBaseSetApplied.put(childBaseValuePrevious);
+                    }
+
+                    continue;
+                }
+
+                // Check next value
+                IBaseValue childBaseValueNext = setValueDao.getNextBaseValue(childBaseValueSaving);
+                if (childBaseValueNext != null)
+                {
+                    childBaseValueNext.setBatch(childBaseValueSaving.getBatch());
+                    childBaseValueNext.setIndex(childBaseValueSaving.getIndex());
+                    childBaseValueNext.setRepDate(new Date(childBaseValueSaving.getRepDate().getTime()));
+
+                    childBaseSetApplied.put(childBaseValueNext);
+                    baseEntityManager.registerAsUpdated(childBaseValueNext);
+                    continue;
+                }
+
+
+                IBaseValue childBaseValueLast = setValueDao.getLastBaseValue(childBaseValueSaving);
+                if (childBaseValueLast != null)
+                {
+                    childBaseValueLast.setBaseContainer(childBaseSetApplied);
+                    childBaseValueLast.setBatch(childBaseValueSaving.getBatch());
+                    childBaseValueLast.setIndex(childBaseValueSaving.getIndex());
+                    childBaseValueLast.setLast(false);
+
+                    baseEntityManager.registerAsUpdated(childBaseValueLast);
+                }
+
+                IBaseValue childBaseValueApplied = BaseValueFactory.create(
+                        MetaContainerTypes.META_SET,
+                        childMetaType,
+                        childBaseValueSaving.getBatch(),
+                        childBaseValueSaving.getIndex(),
+                        childBaseValueSaving.getRepDate(),
+                        childMetaValue.getTypeCode() == DataTypes.DATE ?
+                                new Date(((Date)childBaseValueSaving.getValue()).getTime()) :
+                                childBaseValueSaving.getValue(),
+                        false,
+                        true
+                );
+                childBaseSetApplied.put(childBaseValueApplied);
+                baseEntityManager.registerAsInserted(childBaseValueApplied);
+            }
+        }
+
+        if (childBaseSetLoaded != null)
+        {
+            for (IBaseValue childBaseValueLoaded: childBaseSetLoaded.get())
+            {
+                if (processedUuids.contains(childBaseValueLoaded.getUuid()))
+                {
+                    continue;
+                }
+
+                Date reportDateSaving = baseValueSaving.getRepDate();
+                Date reportDateLoaded = childBaseValueLoaded.getRepDate();
+                boolean reportDateEquals = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded) == 0;
+
+                IBeSetValueDao setValueDao = persistableDaoPool
+                        .getPersistableDao(childBaseValueLoaded.getClass(), IBeSetValueDao.class);
+
+                if (reportDateEquals)
+                {
+                    baseEntityManager.registerAsDeleted(childBaseValueLoaded);
+                    boolean last = childBaseValueLoaded.isLast();
+
+                    IBaseValue childBaseValueNext = setValueDao.getNextBaseValue(childBaseValueLoaded);
+                    if (childBaseValueNext != null && childBaseValueNext.isClosed())
+                    {
+                        baseEntityManager.registerAsDeleted(childBaseValueNext);
+
+                        last = childBaseValueNext.isLast();
+                    }
+
+                    if (last) {
+                        IBaseValue childBaseValuePrevious = setValueDao.getPreviousBaseValue(childBaseValueLoaded);
+                        if (childBaseValuePrevious != null)
                         {
-                            baseEntityManager.registerAsDeleted(childBaseValueClosed);
-
-                            IBaseValue childBaseValuePrevious = setValueDao.getPreviousBaseValue(childBaseValueClosed);
-                            if (childBaseValueClosed.isLast())
-                            {
-                                childBaseValuePrevious.setIndex(childBaseValueSaving.getIndex());
-                                childBaseValuePrevious.setBatch(childBaseValueSaving.getBatch());
-                                childBaseValuePrevious.setLast(true);
-
-                                childBaseSetApplied.put(childBaseValuePrevious);
-                                baseEntityManager.registerAsUpdated(childBaseValuePrevious);
-                            }
-                            else
-                            {
-                                childBaseSetApplied.put(childBaseValuePrevious);
-                            }
-                            //continue;
+                            childBaseValuePrevious.setBaseContainer(childBaseSetApplied);
+                            childBaseValuePrevious.setBatch(baseValueSaving.getBatch());
+                            childBaseValuePrevious.setIndex(baseValueSaving.getIndex());
+                            childBaseValuePrevious.setLast(true);
+                            baseEntityManager.registerAsUpdated(childBaseValuePrevious);
                         }
-                        else
+                    }
+                }
+                else
+                {
+                    IBaseValue childBaseValueNext = setValueDao.getNextBaseValue(childBaseValueLoaded);
+                    if (childBaseValueNext == null || !childBaseValueNext.isClosed())
+                    {
+                        IBaseValue childBaseValue = BaseValueFactory.create(
+                                MetaContainerTypes.META_SET,
+                                childMetaType,
+                                baseValueSaving.getBatch(),
+                                baseValueSaving.getIndex(),
+                                baseValueSaving.getRepDate(),
+                                childMetaValue.getTypeCode() == DataTypes.DATE ?
+                                        new Date(((Date)childBaseValueLoaded.getValue()).getTime()) :
+                                        childBaseValueLoaded.getValue(),
+                                true,
+                                childBaseValueLoaded.isLast()
+                        );
+                        childBaseValue.setBaseContainer(childBaseSetApplied);
+                        baseEntityManager.registerAsInserted(childBaseValue);
+
+                        if (childBaseValueLoaded.isLast())
                         {
-                            childBaseValueClosed.setIndex(childBaseValueSaving.getIndex());
-                            childBaseValueClosed.setBatch(childBaseValueSaving.getBatch());
-                            childBaseValueClosed.setValue(childMetaValue.getTypeCode() == DataTypes.DATE ?
-                                    new Date(((Date) childBaseValueSaving.getValue()).getTime()) :
-                                    childBaseValueSaving.getValue());
-                            childBaseValueClosed.setClosed(false);
-                            baseEntityManager.registerAsUpdated(childBaseValueClosed);
+                            IBaseValue childBaseValueLast = BaseValueFactory.create(
+                                    MetaContainerTypes.META_SET,
+                                    childMetaType,
+                                    childBaseValueLoaded.getId(),
+                                    baseValueSaving.getBatch(),
+                                    baseValueSaving.getIndex(),
+                                    childBaseValueLoaded.getRepDate(),
+                                    childMetaValue.getTypeCode() == DataTypes.DATE ?
+                                            new Date(((Date)childBaseValueLoaded.getValue()).getTime()) :
+                                            childBaseValueLoaded.getValue(),
+                                    childBaseValueLoaded.isClosed(),
+                                    false
+                            );
+                            childBaseValueLast.setBaseContainer(childBaseSetApplied);
+                            baseEntityManager.registerAsUpdated(childBaseValueLast);
                         }
                     }
                     else
                     {
+                        childBaseValueNext.setBaseContainer(childBaseSetApplied);
+                        childBaseValueNext.setBatch(baseValueSaving.getBatch());
+                        childBaseValueNext.setIndex(baseValueSaving.getIndex());
+                        childBaseValueNext.setRepDate(baseValueSaving.getRepDate());
 
+                        baseEntityManager.registerAsUpdated(childBaseValueNext);
+                    }
+                }
+            }
+        }
+    }
+
+    protected void applyComplexSet(IBaseEntity baseEntity, IBaseValue baseValueSaving, IBaseValue baseValueLoaded,
+                                  IBaseEntityManager baseEntityManager)
+    {
+        IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
+        IMetaType metaType = metaAttribute.getMetaType();
+
+        if (baseValueLoaded != null)
+        {
+            baseEntity.put(metaAttribute.getName(), baseValueLoaded);
+        }
+    }
+
+    protected void applySimpleValue(IBaseEntity baseEntity, IBaseValue baseValueSaving, IBaseValue baseValueLoaded,
+                                     IBaseEntityManager baseEntityManager)
+    {
+        IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
+        IMetaType metaType = metaAttribute.getMetaType();
+        IMetaValue metaValue = (IMetaValue)metaType;
+        if (baseValueLoaded != null)
+        {
+            if (baseValueSaving.getValue() == null)
+            {
+                Date reportDateSaving = baseValueSaving.getRepDate();
+                Date reportDateLoaded = baseValueLoaded.getRepDate();
+                boolean reportDateEquals =
+                        DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded) == 0;
+                if (reportDateEquals)
+                {
+                    IBaseValue baseValueClosed = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueLoaded.getId(),
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueLoaded.getRepDate().getTime()),
+                            metaValue.getTypeCode() == DataTypes.DATE ?
+                                    new Date(((Date)baseValueLoaded.getValue()).getTime()) :
+                                    baseValueLoaded.getValue(),
+                            true,
+                            baseValueLoaded.isLast()
+                    );
+                    baseValueClosed.setBaseContainer(baseEntity);
+                    baseValueClosed.setMetaAttribute(metaAttribute);
+                    baseEntityManager.registerAsUpdated(baseValueClosed);
+                }
+                else
+                {
+                    if (baseValueLoaded.isLast())
+                    {
+                        IBaseValue baseValueLast = BaseValueFactory.create(
+                                MetaContainerTypes.META_CLASS,
+                                metaType,
+                                baseValueLoaded.getId(),
+                                baseValueSaving.getBatch(),
+                                baseValueSaving.getIndex(),
+                                new Date(baseValueLoaded.getRepDate().getTime()),
+                                metaValue.getTypeCode() == DataTypes.DATE ?
+                                        new Date(((Date)baseValueLoaded.getValue()).getTime()) :
+                                        baseValueLoaded.getValue(),
+                                baseValueLoaded.isClosed(),
+                                false
+                        );
+                        baseValueLast.setBaseContainer(baseEntity);
+                        baseValueLast.setMetaAttribute(metaAttribute);
+                        baseEntityManager.registerAsUpdated(baseValueLast);
                     }
 
-                    //TODO: Check next value
+                    IBaseValue baseValueClosed = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueSaving.getRepDate().getTime()),
+                            metaValue.getTypeCode() == DataTypes.DATE ?
+                                    new Date(((Date)baseValueLoaded.getValue()).getTime()) :
+                                    baseValueLoaded.getValue(),
+                            true,
+                            baseValueLoaded.isLast()
+                    );
+                    baseValueClosed.setBaseContainer(baseEntity);
+                    baseValueClosed.setMetaAttribute(metaAttribute);
+                    baseEntityManager.registerAsInserted(baseValueClosed);
+                }
+                return;
+            }
+
+            if (baseValueSaving.equalsByValue(baseValueLoaded))
+            {
+                IBaseValue baseValueApplied = BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        baseValueLoaded.getId(),
+                        baseValueLoaded.getBatch(),
+                        baseValueLoaded.getIndex(),
+                        new Date(baseValueLoaded.getRepDate().getTime()),
+                        metaValue.getTypeCode() == DataTypes.DATE ?
+                                new Date(((Date)baseValueLoaded.getValue()).getTime()) :
+                                baseValueLoaded.getValue(),
+                        baseValueLoaded.isClosed(),
+                        baseValueLoaded.isLast()
+                );
+                baseEntity.put(metaAttribute.getName(), baseValueApplied);
+            }
+            else
+            {
+                Date reportDateSaving = baseValueSaving.getRepDate();
+                Date reportDateLoaded = baseValueLoaded.getRepDate();
+                boolean reportDateEquals =
+                        DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded) == 0;
+                if (reportDateEquals)
+                {
+                    IBaseValue baseValueApplied = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueLoaded.getId(),
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueLoaded.getRepDate().getTime()),
+                            metaValue.getTypeCode() == DataTypes.DATE ?
+                                    new Date(((Date)baseValueSaving.getValue()).getTime()) :
+                                    baseValueSaving.getValue(),
+                            baseValueLoaded.isClosed(),
+                            baseValueLoaded.isLast()
+                    );
+                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityManager.registerAsUpdated(baseValueApplied);
+                }
+                else
+                {
+                    IBaseValue baseValueApplied = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueSaving.getRepDate().getTime()),
+                            metaValue.getTypeCode() == DataTypes.DATE ?
+                                    new Date(((Date)baseValueSaving.getValue()).getTime()) :
+                                    baseValueSaving.getValue(),
+                            false,
+                            baseValueLoaded.isLast()
+                    );
+                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityManager.registerAsInserted(baseValueApplied);
+
+                    if (baseValueLoaded.isLast())
+                    {
+                        IBaseValue baseValuePrevious = BaseValueFactory.create(
+                                MetaContainerTypes.META_CLASS,
+                                metaType,
+                                baseValueLoaded.getId(),
+                                baseValueSaving.getBatch(),
+                                baseValueSaving.getIndex(),
+                                new Date(baseValueLoaded.getRepDate().getTime()),
+                                metaValue.getTypeCode() == DataTypes.DATE ?
+                                        new Date(((Date)baseValueLoaded.getValue()).getTime()) :
+                                        baseValueLoaded.getValue(),
+                                baseValueLoaded.isClosed(),
+                                false);
+                        baseValuePrevious.setBaseContainer(baseEntity);
+                        baseValuePrevious.setMetaAttribute(metaAttribute);
+                        baseEntityManager.registerAsUpdated(baseValuePrevious);
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (baseValueSaving.getValue() == null)
+            {
+                return;
+            }
+
+            IBeValueDao valueDao = persistableDaoPool
+                    .getPersistableDao(baseValueSaving.getClass(), IBeValueDao.class);
+            IBaseValue baseValueClosed = valueDao.getClosedBaseValue(baseValueSaving);
+            baseValueClosed.setMetaAttribute(metaAttribute);
+
+            if (baseValueClosed != null)
+            {
+                if (baseValueClosed.equalsByValue(baseValueSaving))
+                {
+                    baseValueClosed.setBaseContainer(baseEntity);
+                    baseEntityManager.registerAsDeleted(baseValueClosed);
+
+                    IBaseValue baseValuePrevious = valueDao.getPreviousBaseValue(baseValueClosed);
+                    if (baseValueClosed.isLast())
+                    {
+                        baseValuePrevious.setIndex(baseValueSaving.getIndex());
+                        baseValuePrevious.setBatch(baseValueSaving.getBatch());
+                        baseValuePrevious.setLast(true);
+
+                        baseEntity.put(metaAttribute.getName(), baseValuePrevious);
+                        baseEntityManager.registerAsUpdated(baseValuePrevious);
+                    }
+                    else
+                    {
+                        baseEntity.put(metaAttribute.getName(), baseValuePrevious);
+                    }
+                }
+                else
+                {
+                    baseValueClosed.setIndex(baseValueSaving.getIndex());
+                    baseValueClosed.setBatch(baseValueSaving.getBatch());
+                    baseValueClosed.setValue(metaValue.getTypeCode() == DataTypes.DATE ?
+                            new Date(((Date) baseValueSaving.getValue()).getTime()) :
+                            baseValueSaving.getValue());
+                    baseValueClosed.setClosed(false);
+                    baseEntity.put(metaAttribute.getName(), baseValueClosed);
+                    baseEntityManager.registerAsUpdated(baseValueClosed);
+                }
+            }
+            else
+            {
+                IBaseValue baseValueLast = valueDao.getLastBaseValue(baseValueSaving);
+                if (baseValueLast == null)
+                {
+                    IBaseValue baseValueApplied = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueSaving.getRepDate().getTime()),
+                            metaValue.getTypeCode() == DataTypes.DATE ?
+                                    new Date(((Date)baseValueSaving.getValue()).getTime()) :
+                                    baseValueSaving.getValue(),
+                            false,
+                            true
+                    );
+                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityManager.registerAsInserted(baseValueApplied);
+                }
+                else
+                {
+                    Date reportDateSaving = baseValueSaving.getRepDate();
+                    Date reportDateLast = baseValueLast.getRepDate();
+                    int reportDateCompare =
+                            DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLast);
+                    boolean last = reportDateCompare == -1 ? false : true;
+
+                    if (last)
+                    {
+                        baseValueLast.setBaseContainer(baseEntity);
+                        baseValueLast.setLast(false);
+                        baseEntityManager.registerAsUpdated(baseValueLast);
+                    }
+
+                    IBaseValue baseValueApplied = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueSaving.getRepDate().getTime()),
+                            metaValue.getTypeCode() == DataTypes.DATE ?
+                                    new Date(((Date)baseValueSaving.getValue()).getTime()) :
+                                    baseValueSaving.getValue(),
+                            false,
+                            last
+                    );
+                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityManager.registerAsInserted(baseValueApplied);
+                }
+            }
+        }
+    }
+
+    protected void applyComplexValue(IBaseEntity baseEntity, IBaseValue baseValueSaving, IBaseValue baseValueLoaded,
+                                      IBaseEntityManager baseEntityManager)
+    {
+        IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
+        IMetaType metaType = metaAttribute.getMetaType();
+        IMetaClass metaClass = (IMetaClass)metaType;
+        if (baseValueLoaded != null)
+        {
+            if (baseValueSaving.getValue() == null)
+            {
+                Date reportDateSaving = baseValueSaving.getRepDate();
+                Date reportDateLoaded = baseValueLoaded.getRepDate();
+                boolean reportDateEquals =
+                        DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded) == 0;
+                if (reportDateEquals)
+                {
+                    IBaseValue baseValueClosed = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueLoaded.getId(),
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueLoaded.getRepDate().getTime()),
+                            baseValueLoaded.getValue(),
+                            true,
+                            baseValueLoaded.isLast()
+                    );
+                    baseValueClosed.setBaseContainer(baseEntity);
+                    baseValueClosed.setMetaAttribute(metaAttribute);
+                    baseEntityManager.registerAsUpdated(baseValueClosed);
+                }
+                else
+                {
+                    if (baseValueLoaded.isLast())
+                    {
+                        IBaseValue baseValueLast = BaseValueFactory.create(
+                                MetaContainerTypes.META_CLASS,
+                                metaType,
+                                baseValueLoaded.getId(),
+                                baseValueSaving.getBatch(),
+                                baseValueSaving.getIndex(),
+                                new Date(baseValueLoaded.getRepDate().getTime()),
+                                baseValueLoaded.getValue(),
+                                baseValueLoaded.isClosed(),
+                                false
+                        );
+                        baseValueLast.setBaseContainer(baseEntity);
+                        baseValueLast.setMetaAttribute(metaAttribute);
+                        baseEntityManager.registerAsUpdated(baseValueLast);
+                    }
+
+                    IBaseValue baseValueClosed = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueSaving.getRepDate().getTime()),
+                            baseValueLoaded.getValue(),
+                            true,
+                            baseValueLoaded.isLast()
+                    );
+                    baseValueClosed.setBaseContainer(baseEntity);
+                    baseValueClosed.setMetaAttribute(metaAttribute);
+                    baseEntityManager.registerAsInserted(baseValueClosed);
+                }
+                return;
+            }
+
+            IBaseEntity baseEntitySaving = (IBaseEntity)baseValueSaving.getValue();
+            IBaseEntity baseEntityLoaded = (IBaseEntity)baseValueLoaded.getValue();
+
+            if (baseValueSaving.equalsByValue(baseValueLoaded) || !metaClass.isSearchable())
+            {
+                IBaseEntity baseEntityApplied;
+                if (metaAttribute.isImmutable())
+                {
+                    if (baseEntitySaving.getId() < 1)
+                    {
+                        throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
+                                baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                    }
+                    baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
+                }
+                else
+                {
+                    baseEntityApplied = metaClass.isSearchable() ?
+                            apply(baseEntitySaving, baseEntityManager) :
+                            applyBaseEntityAdvanced(baseEntitySaving, baseEntityLoaded, baseEntityManager);
                 }
 
                 IBaseValue baseValueApplied = BaseValueFactory.create(
@@ -1399,258 +1696,231 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         baseValueLoaded.getBatch(),
                         baseValueLoaded.getIndex(),
                         new Date(baseValueLoaded.getRepDate().getTime()),
-                        childBaseSetApplied,
+                        baseEntityApplied,
                         baseValueLoaded.isClosed(),
-                        baseValueLoaded.isLast());
+                        baseValueLoaded.isLast()
+                );
                 baseEntity.put(metaAttribute.getName(), baseValueApplied);
             }
             else
             {
-                IMetaValue metaValue = (IMetaValue)metaType;
-                if (baseValueLoaded != null)
+
+                IBaseEntity baseEntityApplied;
+                if (metaAttribute.isImmutable())
                 {
-                    if (baseValueSaving.getValue() == null)
+                    if (baseEntitySaving.getId() < 1)
                     {
-                        Date reportDateSaving = baseValueSaving.getRepDate();
-                        Date reportDateLoaded = baseValueLoaded.getRepDate();
-                        boolean reportDateEquals =
-                                DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded) == 0;
-                        if (reportDateEquals)
-                        {
-                            IBaseValue baseValueClosed = BaseValueFactory.create(
-                                    MetaContainerTypes.META_CLASS,
-                                    metaType,
-                                    baseValueLoaded.getId(),
-                                    baseValueSaving.getBatch(),
-                                    baseValueSaving.getIndex(),
-                                    new Date(baseValueLoaded.getRepDate().getTime()),
-                                    metaValue.getTypeCode() == DataTypes.DATE ?
-                                            new Date(((Date)baseValueLoaded.getValue()).getTime()) :
-                                            baseValueLoaded.getValue(),
-                                    true,
-                                    baseValueLoaded.isLast()
-                            );
-                            baseValueClosed.setBaseContainer(baseEntity);
-                            baseValueClosed.setMetaAttribute(metaAttribute);
-                            baseEntityManager.registerAsUpdated(baseValueClosed);
-                        }
-                        else
-                        {
-                            if (baseValueLoaded.isLast())
-                            {
-                                IBaseValue baseValueLast = BaseValueFactory.create(
-                                        MetaContainerTypes.META_CLASS,
-                                        metaType,
-                                        baseValueLoaded.getId(),
-                                        baseValueSaving.getBatch(),
-                                        baseValueSaving.getIndex(),
-                                        new Date(baseValueLoaded.getRepDate().getTime()),
-                                        metaValue.getTypeCode() == DataTypes.DATE ?
-                                                new Date(((Date)baseValueLoaded.getValue()).getTime()) :
-                                                baseValueLoaded.getValue(),
-                                        baseValueLoaded.isClosed(),
-                                        false
-                                );
-                                baseValueLast.setBaseContainer(baseEntity);
-                                baseValueLast.setMetaAttribute(metaAttribute);
-                                baseEntityManager.registerAsUpdated(baseValueLast);
-                            }
-
-                            IBaseValue baseValueClosed = BaseValueFactory.create(
-                                    MetaContainerTypes.META_CLASS,
-                                    metaType,
-                                    baseValueSaving.getBatch(),
-                                    baseValueSaving.getIndex(),
-                                    new Date(baseValueSaving.getRepDate().getTime()),
-                                    metaValue.getTypeCode() == DataTypes.DATE ?
-                                            new Date(((Date)baseValueLoaded.getValue()).getTime()) :
-                                            baseValueLoaded.getValue(),
-                                    true,
-                                    baseValueLoaded.isLast()
-                            );
-                            baseValueClosed.setBaseContainer(baseEntity);
-                            baseValueClosed.setMetaAttribute(metaAttribute);
-                            baseEntityManager.registerAsInserted(baseValueClosed);
-                        }
-                        return;
+                        throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
+                                baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
                     }
+                    baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
+                }
+                else
+                {
+                    baseEntityApplied = metaClass.isSearchable() ?
+                            apply(baseEntitySaving, baseEntityManager) :
+                            applyBaseEntityAdvanced(baseEntitySaving, baseEntityLoaded, baseEntityManager);
+                }
 
-                    if (baseValueSaving.equalsByValue(baseValueLoaded))
+                Date reportDateSaving = baseValueSaving.getRepDate();
+                Date reportDateLoaded = baseValueLoaded.getRepDate();
+                boolean reportDateEquals =
+                        DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded) == 0;
+                if (reportDateEquals)
+                {
+                    IBaseValue baseValueApplied = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueLoaded.getId(),
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueLoaded.getRepDate().getTime()),
+                            baseEntityApplied,
+                            baseValueLoaded.isClosed(),
+                            baseValueLoaded.isLast()
+                    );
+                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityManager.registerAsUpdated(baseValueApplied);
+                }
+                else
+                {
+                    IBaseValue baseValueApplied = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueSaving.getRepDate().getTime()),
+                            baseEntityApplied,
+                            false,
+                            baseValueLoaded.isLast()
+                    );
+                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityManager.registerAsInserted(baseValueApplied);
+
+                    if (baseValueLoaded.isLast())
                     {
-                        IBaseValue baseValueApplied = BaseValueFactory.create(
+                        IBaseValue baseValuePrevious = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
                                 baseValueLoaded.getId(),
-                                baseValueLoaded.getBatch(),
-                                baseValueLoaded.getIndex(),
+                                baseValueSaving.getBatch(),
+                                baseValueSaving.getIndex(),
                                 new Date(baseValueLoaded.getRepDate().getTime()),
-                                metaValue.getTypeCode() == DataTypes.DATE ?
-                                        new Date(((Date)baseValueLoaded.getValue()).getTime()) :
-                                        baseValueLoaded.getValue(),
+                                baseValueLoaded.getValue(),
                                 baseValueLoaded.isClosed(),
-                                baseValueLoaded.isLast()
-                        );
-                        baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                                false);
+                        baseValuePrevious.setBaseContainer(baseEntity);
+                        baseValuePrevious.setMetaAttribute(metaAttribute);
+                        baseEntityManager.registerAsUpdated(baseValuePrevious);
+                    }
+                }
+            }
+        }
+        else
+        {
+            IBaseEntity baseEntitySaving = (IBaseEntity)baseValueSaving.getValue();
+            if (baseEntitySaving == null)
+            {
+                return;
+            }
+
+            IBeValueDao valueDao = persistableDaoPool
+                    .getPersistableDao(baseValueSaving.getClass(), IBeValueDao.class);
+            IBaseValue baseValueClosed = valueDao.getClosedBaseValue(baseValueSaving);
+            baseValueClosed.setMetaAttribute(metaAttribute);
+
+            if (baseValueClosed != null)
+            {
+                IBaseEntity baseEntityClosed = (IBaseEntity)baseValueClosed.getValue();
+                if (baseValueClosed.equalsByValue(baseValueSaving))
+                {
+                    baseValueClosed.setBaseContainer(baseEntity);
+                    baseEntityManager.registerAsDeleted(baseValueClosed);
+
+                    IBaseValue baseValuePrevious = valueDao.getPreviousBaseValue(baseValueClosed);
+
+                    IBaseEntity baseEntityApplied;
+                    if (metaAttribute.isImmutable())
+                    {
+                        if (baseEntitySaving.getId() < 1)
+                        {
+                            throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
+                                    baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                        }
+                        baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(),
+                                baseEntitySaving.getReportDate());
                     }
                     else
                     {
-                        Date reportDateSaving = baseValueSaving.getRepDate();
-                        Date reportDateLoaded = baseValueLoaded.getRepDate();
-                        boolean reportDateEquals =
-                                DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded) == 0;
-                        if (reportDateEquals)
-                        {
-                            IBaseValue baseValueApplied = BaseValueFactory.create(
-                                    MetaContainerTypes.META_CLASS,
-                                    metaType,
-                                    baseValueLoaded.getId(),
-                                    baseValueSaving.getBatch(),
-                                    baseValueSaving.getIndex(),
-                                    new Date(baseValueLoaded.getRepDate().getTime()),
-                                    metaValue.getTypeCode() == DataTypes.DATE ?
-                                            new Date(((Date)baseValueSaving.getValue()).getTime()) :
-                                            baseValueSaving.getValue(),
-                                    baseValueLoaded.isClosed(),
-                                    baseValueLoaded.isLast()
-                            );
-                            baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                            baseEntityManager.registerAsUpdated(baseValueApplied);
-                        }
-                        else
-                        {
-                            IBaseValue baseValueApplied = BaseValueFactory.create(
-                                    MetaContainerTypes.META_CLASS,
-                                    metaType,
-                                    baseValueSaving.getBatch(),
-                                    baseValueSaving.getIndex(),
-                                    new Date(baseValueSaving.getRepDate().getTime()),
-                                    metaValue.getTypeCode() == DataTypes.DATE ?
-                                            new Date(((Date)baseValueSaving.getValue()).getTime()) :
-                                            baseValueSaving.getValue(),
-                                    false,
-                                    baseValueLoaded.isLast()
-                            );
-                            baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                            baseEntityManager.registerAsInserted(baseValueApplied);
+                        baseEntityApplied = metaClass.isSearchable() ?
+                                apply(baseEntitySaving, baseEntityManager) :
+                                applyBaseEntityAdvanced(baseEntitySaving, baseEntityClosed, baseEntityManager);
+                    }
+                    baseValuePrevious.setValue(baseEntityApplied);
 
-                            if (baseValueLoaded.isLast())
-                            {
-                                IBaseValue baseValuePrevious = BaseValueFactory.create(
-                                        MetaContainerTypes.META_CLASS,
-                                        metaType,
-                                        baseValueLoaded.getId(),
-                                        baseValueSaving.getBatch(),
-                                        baseValueSaving.getIndex(),
-                                        new Date(baseValueLoaded.getRepDate().getTime()),
-                                        metaValue.getTypeCode() == DataTypes.DATE ?
-                                                new Date(((Date)baseValueLoaded.getValue()).getTime()) :
-                                                baseValueLoaded.getValue(),
-                                        baseValueLoaded.isClosed(),
-                                        false);
-                                baseValuePrevious.setBaseContainer(baseEntity);
-                                baseValuePrevious.setMetaAttribute(metaAttribute);
-                                baseEntityManager.registerAsUpdated(baseValuePrevious);
-                            }
-                        }
+                    if (baseValueClosed.isLast())
+                    {
+                        baseValuePrevious.setIndex(baseValueSaving.getIndex());
+                        baseValuePrevious.setBatch(baseValueSaving.getBatch());
+                        baseValuePrevious.setLast(true);
+
+                        baseEntity.put(metaAttribute.getName(), baseValuePrevious);
+                        baseEntityManager.registerAsUpdated(baseValuePrevious);
+                    }
+                    else
+                    {
+                        baseEntity.put(metaAttribute.getName(), baseValuePrevious);
                     }
                 }
                 else
                 {
-                    if (baseValueSaving.getValue() == null)
+                    IBaseEntity baseEntityApplied;
+                    if (metaAttribute.isImmutable())
                     {
-                        return;
-                    }
-
-                    IBeValueDao valueDao = persistableDaoPool
-                            .getPersistableDao(baseValueSaving.getClass(), IBeValueDao.class);
-                    IBaseValue baseValueClosed = valueDao.getClosedBaseValue(baseValueSaving);
-                    baseValueClosed.setMetaAttribute(metaAttribute);
-
-                    if (baseValueClosed != null)
-                    {
-                        if (baseValueClosed.equalsByValue(baseValueSaving))
+                        if (baseEntitySaving.getId() < 1)
                         {
-                            baseValueClosed.setBaseContainer(baseEntity);
-                            baseEntityManager.registerAsDeleted(baseValueClosed);
-
-                            IBaseValue baseValuePrevious = valueDao.getPreviousBaseValue(baseValueClosed);
-                            if (baseValueClosed.isLast())
-                            {
-                                baseValuePrevious.setIndex(baseValueSaving.getIndex());
-                                baseValuePrevious.setBatch(baseValueSaving.getBatch());
-                                baseValuePrevious.setLast(true);
-
-                                baseEntity.put(metaAttribute.getName(), baseValuePrevious);
-                                baseEntityManager.registerAsUpdated(baseValuePrevious);
-                            }
-                            else
-                            {
-                                baseEntity.put(metaAttribute.getName(), baseValuePrevious);
-                            }
+                            throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
+                                    baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
                         }
-                        else
-                        {
-                            baseValueClosed.setIndex(baseValueSaving.getIndex());
-                            baseValueClosed.setBatch(baseValueSaving.getBatch());
-                            baseValueClosed.setValue(metaValue.getTypeCode() == DataTypes.DATE ?
-                                    new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue());
-                            baseValueClosed.setClosed(false);
-                            baseEntity.put(metaAttribute.getName(), baseValueClosed);
-                            baseEntityManager.registerAsUpdated(baseValueClosed);
-                        }
+                        baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(),
+                                baseEntitySaving.getReportDate());
                     }
                     else
                     {
-                        IBaseValue baseValueLast = valueDao.getLastBaseValue(baseValueSaving);
-                        if (baseValueLast == null)
-                        {
-                            IBaseValue baseValueApplied = BaseValueFactory.create(
-                                    MetaContainerTypes.META_CLASS,
-                                    metaType,
-                                    baseValueSaving.getBatch(),
-                                    baseValueSaving.getIndex(),
-                                    new Date(baseValueSaving.getRepDate().getTime()),
-                                    metaValue.getTypeCode() == DataTypes.DATE ?
-                                            new Date(((Date)baseValueSaving.getValue()).getTime()) :
-                                            baseValueSaving.getValue(),
-                                    false,
-                                    true
-                            );
-                            baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                            baseEntityManager.registerAsInserted(baseValueApplied);
-                        }
-                        else
-                        {
-                            Date reportDateSaving = baseValueSaving.getRepDate();
-                            Date reportDateLast = baseValueLast.getRepDate();
-                            int reportDateCompare =
-                                    DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLast);
-                            boolean last = reportDateCompare == -1 ? false : true;
-
-                            if (last)
-                            {
-                                baseValueLast.setBaseContainer(baseEntity);
-                                baseValueLast.setLast(false);
-                                baseEntityManager.registerAsUpdated(baseValueLast);
-                            }
-
-                            IBaseValue baseValueApplied = BaseValueFactory.create(
-                                    MetaContainerTypes.META_CLASS,
-                                    metaType,
-                                    baseValueSaving.getBatch(),
-                                    baseValueSaving.getIndex(),
-                                    new Date(baseValueSaving.getRepDate().getTime()),
-                                    metaValue.getTypeCode() == DataTypes.DATE ?
-                                            new Date(((Date)baseValueSaving.getValue()).getTime()) :
-                                            baseValueSaving.getValue(),
-                                    false,
-                                    last
-                            );
-                            baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                            baseEntityManager.registerAsInserted(baseValueApplied);
-                        }
+                        baseEntityApplied = metaClass.isSearchable() ?
+                                apply(baseEntitySaving, baseEntityManager) :
+                                applyBaseEntityAdvanced(baseEntitySaving, baseEntityClosed, baseEntityManager);
                     }
+
+                    baseValueClosed.setIndex(baseValueSaving.getIndex());
+                    baseValueClosed.setBatch(baseValueSaving.getBatch());
+                    baseValueClosed.setValue(baseEntityApplied);
+                    baseValueClosed.setClosed(false);
+                    baseEntity.put(metaAttribute.getName(), baseValueClosed);
+                    baseEntityManager.registerAsUpdated(baseValueClosed);
+                }
+            }
+            else
+            {
+                IBaseValue baseValueLast = valueDao.getLastBaseValue(baseValueSaving);
+                IBaseEntity baseEntityApplied;
+                if (metaAttribute.isImmutable())
+                {
+                    if (baseEntitySaving.getId() < 1)
+                    {
+                        throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
+                                baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                    }
+                    baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(),
+                            baseEntitySaving.getReportDate());
+                }
+                else
+                {
+                    baseEntityApplied = apply(baseEntitySaving, baseEntityManager);
+                }
+
+                if (baseValueLast == null)
+                {
+                    IBaseValue baseValueApplied = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueSaving.getRepDate().getTime()),
+                            baseEntityApplied,
+                            false,
+                            true
+                    );
+                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityManager.registerAsInserted(baseValueApplied);
+                }
+                else
+                {
+                    Date reportDateSaving = baseValueSaving.getRepDate();
+                    Date reportDateLast = baseValueLast.getRepDate();
+                    int reportDateCompare =
+                            DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLast);
+                    boolean last = reportDateCompare == -1 ? false : true;
+
+                    if (last)
+                    {
+                        baseValueLast.setBaseContainer(baseEntity);
+                        baseValueLast.setLast(false);
+                        baseEntityManager.registerAsUpdated(baseValueLast);
+                    }
+
+                    IBaseValue baseValueApplied = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueSaving.getRepDate().getTime()),
+                            baseEntityApplied,
+                            false,
+                            last
+                    );
+                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityManager.registerAsInserted(baseValueApplied);
                 }
             }
         }
@@ -2172,7 +2442,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
 
         logger.debug(select.toString());
-        System.out.println(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         Iterator<Map<String, Object>> it = rows.iterator();
@@ -2555,7 +2824,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    private void loadSimpleSetValues(IBaseSet baseSet, Date baseEntityReportDate)
+    public void loadSimpleSetValues(IBaseSet baseSet, Date baseEntityReportDate)
     {
         IMetaType metaType = baseSet.getMemberType();
         if (metaType.isComplex())
@@ -2585,7 +2854,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 }
                 case STRING:
                 {
-                    loadStringSetValues(baseSet);
+                    loadStringSetValues(baseSet, baseEntityReportDate, false);
                     break;
                 }
                 case BOOLEAN:
@@ -2664,15 +2933,55 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    private void loadStringSetValues(IBaseSet baseSet)
+    private void loadStringSetValues(IBaseSet baseSet, Date baseEntityReportDate, boolean lastReportDate)
     {
-        SelectForUpdateStep select = context
-                .select(EAV_BE_STRING_SET_VALUES.BATCH_ID,
-                        EAV_BE_STRING_SET_VALUES.INDEX_,
-                        EAV_BE_STRING_SET_VALUES.VALUE,
-                        EAV_BE_STRING_SET_VALUES.REPORT_DATE)
-                .from(EAV_BE_STRING_SET_VALUES)
-                .where(EAV_BE_STRING_SET_VALUES.SET_ID.equal(baseSet.getId()));
+        Table tableOfValues = EAV_BE_STRING_SET_VALUES.as("v");
+        Select select;
+        if (lastReportDate)
+        {
+            select = context
+                    .select(tableOfValues.field(EAV_BE_STRING_SET_VALUES.ID),
+                            tableOfValues.field(EAV_BE_STRING_SET_VALUES.BATCH_ID),
+                            tableOfValues.field(EAV_BE_STRING_SET_VALUES.INDEX_),
+                            tableOfValues.field(EAV_BE_STRING_SET_VALUES.REPORT_DATE),
+                            tableOfValues.field(EAV_BE_STRING_SET_VALUES.VALUE),
+                            tableOfValues.field(EAV_BE_STRING_SET_VALUES.IS_CLOSED),
+                            tableOfValues.field(EAV_BE_STRING_SET_VALUES.IS_LAST))
+                    .from(tableOfValues)
+                    .where(tableOfValues.field(EAV_BE_STRING_SET_VALUES.SET_ID).equal(baseSet.getId()))
+                    .and(tableOfValues.field(EAV_BE_STRING_SET_VALUES.IS_LAST).equal(true)
+                            .and(tableOfValues.field(EAV_BE_STRING_SET_VALUES.IS_CLOSED).equal(false)));
+        }
+        else
+        {
+            Table tableNumbering = context
+                    .select(DSL.rank().over()
+                            .partitionBy(tableOfValues.field(EAV_BE_STRING_SET_VALUES.VALUE))
+                            .orderBy(tableOfValues.field(EAV_BE_STRING_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
+                            tableOfValues.field(EAV_BE_STRING_SET_VALUES.ID),
+                            tableOfValues.field(EAV_BE_STRING_SET_VALUES.VALUE),
+                            tableOfValues.field(EAV_BE_STRING_SET_VALUES.BATCH_ID),
+                            tableOfValues.field(EAV_BE_STRING_SET_VALUES.INDEX_),
+                            tableOfValues.field(EAV_BE_STRING_SET_VALUES.REPORT_DATE),
+                            tableOfValues.field(EAV_BE_STRING_SET_VALUES.IS_CLOSED),
+                            tableOfValues.field(EAV_BE_STRING_SET_VALUES.IS_LAST))
+                    .from(tableOfValues)
+                    .where(tableOfValues.field(EAV_BE_STRING_SET_VALUES.SET_ID).eq(baseSet.getId()))
+                    .and(tableOfValues.field(EAV_BE_STRING_SET_VALUES.REPORT_DATE)
+                            .lessOrEqual(DataUtils.convert(baseEntityReportDate)))
+                    .asTable("vn");
+
+            select = context
+                    .select(tableNumbering.field(EAV_BE_STRING_SET_VALUES.ID),
+                            tableNumbering.field(EAV_BE_STRING_SET_VALUES.BATCH_ID),
+                            tableNumbering.field(EAV_BE_STRING_SET_VALUES.INDEX_),
+                            tableNumbering.field(EAV_BE_STRING_SET_VALUES.REPORT_DATE),
+                            tableNumbering.field(EAV_BE_STRING_SET_VALUES.VALUE),
+                            tableNumbering.field(EAV_BE_STRING_SET_VALUES.IS_LAST))
+                    .from(tableNumbering)
+                    .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
+                    .and(tableNumbering.field(EAV_BE_STRING_SET_VALUES.IS_CLOSED).equal(false));
+        }
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -2680,17 +2989,19 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         Iterator<Map<String, Object>> it = rows.iterator();
         while (it.hasNext())
         {
-            Map<String, Object> rowValue = it.next();
+            Map<String, Object> row = it.next();
 
-            Batch batch = batchRepository.getBatch(((BigDecimal)rowValue.get(EAV_BE_STRING_SET_VALUES.BATCH_ID.getName())).longValue());
+            long id = ((BigDecimal) row.get(EAV_BE_STRING_SET_VALUES.ID.getName())).longValue();
+            long batchId = ((BigDecimal)row.get(EAV_BE_STRING_SET_VALUES.BATCH_ID.getName())).longValue();
+            long index = ((BigDecimal) row.get(EAV_BE_STRING_SET_VALUES.INDEX_.getName())).longValue();
+            boolean last = ((BigDecimal)row.get(EAV_BE_STRING_SET_VALUES.IS_LAST.getName())).longValue() == 1;
+            String value = (String)row.get(EAV_BE_STRING_SET_VALUES.VALUE.getName());
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
+
+            Batch batch = batchRepository.getBatch(batchId);
             baseSet.put(
                     BaseValueFactory.create(
-                            MetaContainerTypes.META_SET,
-                            baseSet.getMemberType(),
-                            batch,
-                            ((BigDecimal)rowValue.get(EAV_BE_STRING_SET_VALUES.INDEX_.getName())).longValue(),
-                            DataUtils.convertToSQLDate((Timestamp) rowValue.get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName())),
-                            rowValue.get(EAV_BE_STRING_SET_VALUES.VALUE.getName())));
+                            MetaContainerTypes.META_SET, baseSet.getMemberType(), id, batch, index, reportDate, value, false, last));
         }
     }
 

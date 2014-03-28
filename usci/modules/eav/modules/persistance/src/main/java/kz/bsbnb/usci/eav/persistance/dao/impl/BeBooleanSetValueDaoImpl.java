@@ -138,11 +138,17 @@ public class BeBooleanSetValueDaoImpl extends JDBCSupport implements IBeBooleanS
 
         IBaseValue previousBaseValue = null;
 
-        String tableAlias = "bv";
-        String subqueryAlias = "bvn";
+        String tableAlias = "bsv";
+        String subqueryAlias = "bsvn";
         Table subqueryTable = context
-                .select(
-                        DSL.rank().over().orderBy(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"))
+                .select(DSL.rank().over()
+                        .orderBy(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).BATCH_ID,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).INDEX_,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(DataUtils.convert((Boolean) baseValue.getValue())))
@@ -154,7 +160,6 @@ public class BeBooleanSetValueDaoImpl extends JDBCSupport implements IBeBooleanS
                         subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.BATCH_ID),
                         subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.INDEX_),
                         subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.VALUE),
                         subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED),
                         subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST))
                 .from(subqueryTable)
@@ -183,15 +188,13 @@ public class BeBooleanSetValueDaoImpl extends JDBCSupport implements IBeBooleanS
                     .get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
             boolean closed = ((BigDecimal)row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
-            boolean value = ((BigDecimal)row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.VALUE.getName())).longValue() == 1;
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
 
             Batch batch = batchRepository.getBatch(batchId);
 
             previousBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
-                    id, batch, index, reportDate, value, closed, last);
+                    id, batch, index, reportDate, baseValue.getValue(), closed, last);
         }
 
         return previousBaseValue;
@@ -206,11 +209,17 @@ public class BeBooleanSetValueDaoImpl extends JDBCSupport implements IBeBooleanS
 
         IBaseValue nextBaseValue = null;
 
-        String tableAlias = "bv";
-        String subqueryAlias = "bvn";
+        String tableAlias = "bsv";
+        String subqueryAlias = "bsvn";
         Table subqueryTable = context
-                .select(
-                        DSL.rank().over().orderBy(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"))
+                .select(DSL.rank()
+                        .over().orderBy(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).BATCH_ID,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).INDEX_,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(DataUtils.convert((Boolean) baseValue.getValue())))
@@ -222,7 +231,6 @@ public class BeBooleanSetValueDaoImpl extends JDBCSupport implements IBeBooleanS
                         subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.BATCH_ID),
                         subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.INDEX_),
                         subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.VALUE),
                         subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED),
                         subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST))
                 .from(subqueryTable)
@@ -251,15 +259,13 @@ public class BeBooleanSetValueDaoImpl extends JDBCSupport implements IBeBooleanS
                     .get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
             boolean closed = ((BigDecimal)row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
-            boolean value = ((BigDecimal)row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.VALUE.getName())).longValue() == 1;
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
 
             Batch batch = batchRepository.getBatch(batchId);
 
             nextBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
-                    id, batch, index, reportDate, value, closed, last);
+                    id, batch, index, reportDate, baseValue.getValue(), closed, last);
         }
 
         return nextBaseValue;
@@ -274,10 +280,12 @@ public class BeBooleanSetValueDaoImpl extends JDBCSupport implements IBeBooleanS
 
         IBaseValue closedBaseValue = null;
 
-        String tableAlias = "bv";
+        String tableAlias = "bsv";
         Select select = context
-                .select(
-                        DSL.rank().over().orderBy(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"))
+                .select(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).BATCH_ID,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).INDEX_,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.equal(DataUtils.convert(baseValue.getRepDate())))
@@ -304,20 +312,66 @@ public class BeBooleanSetValueDaoImpl extends JDBCSupport implements IBeBooleanS
                     .get(EAV_BE_BOOLEAN_SET_VALUES.BATCH_ID.getName())).longValue();
             boolean last = ((BigDecimal)row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
+
+            Batch batch = batchRepository.getBatch(batchId);
+
+            closedBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
+                    id, batch, index, baseValue.getRepDate(), baseValue.getValue(), true, last);
+        }
+
+        return closedBaseValue;
+    }
+
+    @Override
+    public IBaseValue getLastBaseValue(IBaseValue baseValue) {
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        IMetaType metaType = metaAttribute.getMetaType();
+
+        IBaseValue lastBaseValue = null;
+
+        String tableAlias = "bsv";
+        Select select = context
+                .select(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).BATCH_ID,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).INDEX_,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED)
+                .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
+                .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(DataUtils.convert((Boolean) baseValue.getValue())))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST.equal(DataUtils.convert(true)));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+        {
+            throw new RuntimeException("Query for get last instance of BaseValue return more than one row.");
+        }
+
+        if (rows.size() == 1)
+        {
+            Map<String, Object> row = rows.iterator().next();
+
+            long id = ((BigDecimal) row
+                    .get(EAV_BE_BOOLEAN_SET_VALUES.ID.getName())).longValue();
+            long index = ((BigDecimal) row
+                    .get(EAV_BE_BOOLEAN_SET_VALUES.INDEX_.getName())).longValue();
+            long batchId = ((BigDecimal)row
+                    .get(EAV_BE_BOOLEAN_SET_VALUES.BATCH_ID.getName())).longValue();
             boolean closed = ((BigDecimal)row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
-            boolean value = ((BigDecimal)row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.VALUE.getName())).longValue() == 1;
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
 
             Batch batch = batchRepository.getBatch(batchId);
 
-            closedBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
-                    id, batch, index, reportDate, value, closed, last);
+            lastBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
+                    id, batch, index, reportDate, baseValue.getValue(), closed, true);
         }
 
-        return closedBaseValue;
+        return lastBaseValue;
     }
 
 }

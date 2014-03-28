@@ -3,6 +3,7 @@ package kz.bsbnb.usci.eav.persistance.dao;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
@@ -66,4 +67,8 @@ public interface IBaseEntityProcessorDao
     public boolean isApproved(long id);
 
     public int batchCount(long id, String className);
+
+
+    public void loadSimpleSetValues(IBaseSet baseSet, Date baseEntityReportDate);
+
 }
