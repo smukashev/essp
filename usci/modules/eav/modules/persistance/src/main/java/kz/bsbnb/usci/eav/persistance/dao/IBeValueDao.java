@@ -1,24 +1,18 @@
 package kz.bsbnb.usci.eav.persistance.dao;
 
-import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 
-import java.util.Map;
-import java.util.Set;
-
 /**
- * @author a.motov
+ * Created by Alexandr.Motov on 20.03.14.
  */
-public interface IBeValueDao {
+public interface IBeValueDao extends IPersistableDao {
 
-    public IBaseValue save(IBaseEntity baseEntity, String attribute);
+    public IBaseValue getNextBaseValue(IBaseValue baseValue);
 
-    public Map<String, IBaseValue> save(IBaseEntity baseEntity, Set<String> attributes);
+    public IBaseValue getPreviousBaseValue(IBaseValue baseValue);
 
-    public IBaseValue update(IBaseEntity baseEntityLoaded, IBaseEntity baseEntityForSave, String attribute);
+    public IBaseValue getClosedBaseValue(IBaseValue baseValue);
 
-    public boolean presentInFuture(IBaseEntity baseEntity, String attribute);
-
-    void remove(IBaseEntity baseEntity, String attribute);
+    public IBaseValue getLastBaseValue(IBaseValue baseValue);
 
 }

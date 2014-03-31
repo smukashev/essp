@@ -4,7 +4,7 @@ import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcher;
@@ -38,7 +38,7 @@ public class BaseEntitySearcherStressExecutor {
 
         IStorage storage = ctx.getBean(IStorage.class);
         IMetaClassDao metaClassDao = ctx.getBean(IMetaClassDao.class);
-        IBaseEntityDao baseEntityDao = ctx.getBean(IBaseEntityDao.class);
+        IBaseEntityProcessorDao baseEntityProcessorDao = ctx.getBean(IBaseEntityProcessorDao.class);
         IBatchDao batchDao = ctx.getBean(IBatchDao.class);
 
         ArrayList<MetaClass> data = new ArrayList<MetaClass>();

@@ -53,18 +53,20 @@ public abstract class BaseContainer extends BaseObject implements IBaseContainer
         }
     }
 
-
+    private BaseContainerType baseContainerType;
     private Set<String> modifiedIdentifiers = new HashSet<String>();
     private boolean listening;
 
-    public BaseContainer()
+    public BaseContainer(BaseContainerType baseContainerType)
     {
-
+        this.baseContainerType = baseContainerType;
     }
 
-    public BaseContainer(long id)
+    public BaseContainer(long id, BaseContainerType baseContainerType)
     {
         super(id);
+
+        this.baseContainerType = baseContainerType;
     }
 
     @Override
@@ -125,6 +127,16 @@ public abstract class BaseContainer extends BaseObject implements IBaseContainer
     protected void addModifiedIdentifier(String identifier)
     {
         modifiedIdentifiers.add(identifier);
+    }
+
+    @Override
+    public BaseContainerType getBaseContainerType() {
+        return baseContainerType;
+    }
+
+    @Override
+    public void setBaseContainerType(BaseContainerType baseContainerType) {
+        this.baseContainerType = baseContainerType;
     }
 
 }

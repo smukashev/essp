@@ -2,6 +2,8 @@ package kz.bsbnb.usci.eav.model.base;
 
 
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 
 import java.util.Date;
@@ -14,13 +16,24 @@ import java.util.UUID;
  *
  * @author a.motov
  */
-public interface IBaseValue extends IPersistable, Cloneable
+public interface IBaseValue<T> extends IPersistable, Cloneable
 {
+
+    public IBaseContainer getBaseContainer();
+
+    public void setBaseContainer(IBaseContainer baseContainer);
+
+    public IMetaAttribute getMetaAttribute();
+
+    public void setMetaAttribute(IMetaAttribute metaAttribute);
+
     /**
      * Returns the <code>Batch</code> that contains information about the origin of this value.
      * @return <code>Batch</code> that contains information about the origin of this value.
      */
     public Batch getBatch();
+
+    public void setBatch(Batch batch);
 
     /**
      * Returns the index of the value.
@@ -41,11 +54,13 @@ public interface IBaseValue extends IPersistable, Cloneable
      * @see kz.bsbnb.usci.eav.model.type.DataTypes
      * @see kz.bsbnb.usci.eav.model.base.impl.BaseEntity
      */
-    public Object getValue();
+    public T getValue();
 
-    public void setValue(Object value);
+    public void setValue(T value);
 
     public Date getRepDate();
+
+    public void setRepDate(Date reportDate);
 
     public void setLast(boolean last);
 
@@ -56,5 +71,9 @@ public interface IBaseValue extends IPersistable, Cloneable
     public boolean isClosed();
 
     public UUID getUuid();
+
+    public boolean equalsByValue(IBaseValue baseValue);
+
+    public boolean equalsByValue(IMetaType metaType, IBaseValue baseValue);
 
 }

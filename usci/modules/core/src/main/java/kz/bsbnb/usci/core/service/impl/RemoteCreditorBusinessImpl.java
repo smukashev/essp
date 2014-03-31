@@ -6,7 +6,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.util.List;
 public class RemoteCreditorBusinessImpl implements RemoteCreditorBusiness
 {
     @Autowired
-    IBaseEntityDao baseEntityDao;
+    IBaseEntityProcessorDao baseEntityProcessorDao;
 
     @Autowired
     IMetaClassRepository metaClassRepository;
@@ -26,7 +26,7 @@ public class RemoteCreditorBusinessImpl implements RemoteCreditorBusiness
     @Override
     public List<Creditor> findMainOfficeCreditors()
     {
-        List<BaseEntity> entities = baseEntityDao.getEntityByMetaclass(
+        List<BaseEntity> entities = baseEntityProcessorDao.getEntityByMetaclass(
                 metaClassRepository.getMetaClass("ref_creditor"));
 
         ArrayList<Creditor> creditors = new ArrayList<Creditor>();
@@ -80,12 +80,12 @@ public class RemoteCreditorBusinessImpl implements RemoteCreditorBusiness
 
     @Override
     public boolean creditorApproved(Creditor cred) {
-        return baseEntityDao.isApproved(cred.getId());
+        return baseEntityProcessorDao.isApproved(cred.getId());
     }
 
     @Override
     public int contractCount(Creditor cred) {
-        int c_count = baseEntityDao.batchCount(cred.getId(), "ct_package");
+        int c_count = baseEntityProcessorDao.batchCount(cred.getId(), "ct_package");
 
         System.out.println("### " + cred.getId() + " - " + c_count);
 

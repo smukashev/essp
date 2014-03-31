@@ -1,8 +1,6 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
-import kz.bsbnb.usci.eav.model.base.ContainerTypes;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
@@ -13,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MetaSet  extends Persistable implements IMetaType, IMetaSet
+public class MetaSet extends MetaContainer implements IMetaSet
 {
     IMetaType metaType;
 
@@ -21,10 +19,13 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaSet
 
     public MetaSet()
     {
+        super(MetaContainerTypes.META_SET);
     }
 
     public MetaSet(IMetaType metaType)
     {
+        super(MetaContainerTypes.META_SET);
+
         if (metaType == null)
         {
             throw new IllegalArgumentException("MetaType can not be null.");
@@ -127,7 +128,7 @@ public class MetaSet  extends Persistable implements IMetaType, IMetaSet
     @Override
     public int getType()
     {
-        return ContainerTypes.SET;
+        return MetaContainerTypes.META_SET;
     }
 
     public String toString(String prefix)

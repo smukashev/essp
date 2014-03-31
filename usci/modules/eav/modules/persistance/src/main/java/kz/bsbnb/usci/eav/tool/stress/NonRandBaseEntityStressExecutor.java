@@ -3,7 +3,7 @@ package kz.bsbnb.usci.eav.tool.stress;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
@@ -51,7 +51,7 @@ public class NonRandBaseEntityStressExecutor {
 
         IStorage storage = ctx.getBean(IStorage.class);
         IMetaClassDao metaClassDao = ctx.getBean(IMetaClassDao.class);
-        IBaseEntityDao baseEntityDao = ctx.getBean(IBaseEntityDao.class);
+        IBaseEntityProcessorDao baseEntityProcessorDao = ctx.getBean(IBaseEntityProcessorDao.class);
         IBatchDao batchDao = ctx.getBean(IBatchDao.class);
         SQLQueriesStats stats = ctx.getBean(SQLQueriesStats.class);
 
@@ -128,14 +128,14 @@ public class NonRandBaseEntityStressExecutor {
 
                 t1 = System.nanoTime();
                 // TODO: Fix this block
-                //long baseEntityId = baseEntityDao.save(baseEntityCreate);
+                //long baseEntityId = baseEntityProcessorDao.save(baseEntityCreate);
                 t2 = (System.nanoTime() - t1) / 1000000;
 
                 stats.put("_BASE_ENTITY_SAVE", t2);
 
                 t1 = System.nanoTime();
                 // TODO: Fix this block
-                //BaseEntity baseEntityLoad = baseEntityDao.load(baseEntityId);
+                //BaseEntity baseEntityLoad = baseEntityProcessorDao.load(baseEntityId);
                 t2 = (System.nanoTime() - t1) / 1000000;
 
                 stats.put("_BASE_ENTITY_LOAD", t2);

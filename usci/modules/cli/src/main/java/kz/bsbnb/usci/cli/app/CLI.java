@@ -6,22 +6,16 @@ import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
-import kz.bsbnb.usci.core.service.IBatchEntryService;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
-import kz.bsbnb.usci.eav.model.base.IBaseSet;
-import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
@@ -30,9 +24,8 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.impl.searcher.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
@@ -50,7 +43,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.jooq.SelectConditionStep;
 import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -97,7 +89,7 @@ public class CLI
     private MainParser crParser;
 
     @Autowired
-    private IBaseEntityDao baseEntityDao;
+    private IBaseEntityProcessorDao baseEntityProcessorDao;
 
     @Autowired
     private ImprovedBaseEntitySearcher searcher;
@@ -131,7 +123,7 @@ public class CLI
             if (i > offset) {
                 entity = crParser.getCurrentBaseEntity();
                 System.out.println(entity);
-                long id = baseEntityDao.process(entity).getId();
+                long id = baseEntityProcessorDao.process(entity).getId();
                 System.out.println("Saved with id: " + id);
             }
 
@@ -327,7 +319,7 @@ public class CLI
     }
 
     public void showEntity(long id) {
-        IBaseEntity entity = baseEntityDao.load(id);
+        IBaseEntity entity = baseEntityProcessorDao.load(id);
 
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
@@ -342,7 +334,7 @@ public class CLI
 
         while (st.hasMoreTokens()) {
             long id = Long.parseLong(st.nextToken());
-            IBaseEntity entity = baseEntityDao.load(id);
+            IBaseEntity entity = baseEntityProcessorDao.load(id);
             if (entity != null) {
                 entities.add((BaseEntity)entity);
             }
@@ -365,7 +357,7 @@ public class CLI
             CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
             BaseEntity entity;
             while((entity = reader.read()) != null) {
-                long id = baseEntityDao.process(entity).getId();
+                long id = baseEntityProcessorDao.process(entity).getId();
                 System.out.println("Saved with id: " + id);
             }
         } catch (FileNotFoundException e)
@@ -378,7 +370,7 @@ public class CLI
     }
 
     public void showEntityAttr(String path, long id) {
-        IBaseEntity entity = baseEntityDao.load(id);
+        IBaseEntity entity = baseEntityProcessorDao.load(id);
 
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
@@ -394,8 +386,8 @@ public class CLI
     }
 
     public void showEntityInter(long id1, long id2) {
-        IBaseEntity entity1 = baseEntityDao.load(id1);
-        IBaseEntity entity2 = baseEntityDao.load(id2);
+        IBaseEntity entity1 = baseEntityProcessorDao.load(id1);
+        IBaseEntity entity2 = baseEntityProcessorDao.load(id2);
 
         if (entity1 == null) {
             System.out.println("No such entity with id: " + id1);
@@ -411,7 +403,7 @@ public class CLI
     }
 
     public void showEntitySQ(long id) {
-        IBaseEntity entity = baseEntityDao.load(id);
+        IBaseEntity entity = baseEntityProcessorDao.load(id);
 
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
@@ -427,7 +419,7 @@ public class CLI
     }
 
     public void execEntitySQ(long id) {
-        IBaseEntity entity = baseEntityDao.load(id);
+        IBaseEntity entity = baseEntityProcessorDao.load(id);
 
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
@@ -449,7 +441,7 @@ public class CLI
             return;
         }
 
-        List<BaseEntity> entities = baseEntityDao.getEntityByMetaclass(meta);
+        List<BaseEntity> entities = baseEntityProcessorDao.getEntityByMetaclass(meta);
 
         if (entities.size() == 0) {
             System.out.println("No such entities with class: " + name);
@@ -810,6 +802,7 @@ public class CLI
             System.out.println("Argument needed: <credits_db_url> <user> <password> <receiver_url> <temp_files_folder>");
             System.out.println("Example: import jdbc:oracle:thin:@srv-scan.corp.nb.rk:1521/DBM01 core ***** rmi://127.0.0.1:1097/batchProcessService D:\\usci\\temp_xml_folder");
             System.out.println("Example: import jdbc:oracle:thin:@192.168.0.44:1521/CREDITS core core_feb_2013 rmi://127.0.0.1:1097/batchProcessService /home/a.tkachenko/temp_files");
+            System.out.println("Example: import jdbc:oracle:thin:@192.168.0.44:1521/CREDITS core core_mar_2014 rmi://127.0.0.1:1097/batchProcessService D:\\USCI\\Temp");
         }
     }
 
@@ -1238,7 +1231,7 @@ public class CLI
 
             entityServiceFactoryBean = new RmiProxyFactoryBean();
             entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
-            entityServiceFactoryBean.setServiceInterface(IBaseEntityDao.class);
+            entityServiceFactoryBean.setServiceInterface(IBaseEntityProcessorDao.class);
 
             entityServiceFactoryBean.afterPropertiesSet();
 

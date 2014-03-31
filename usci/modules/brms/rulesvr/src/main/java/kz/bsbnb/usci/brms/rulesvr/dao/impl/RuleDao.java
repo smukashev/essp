@@ -59,7 +59,7 @@ public class RuleDao implements IRuleDao {
         if (rule.getId() < 1){
             throw new IllegalArgumentException("Rule has no id.");
         }
-        String SQL = "UPDATE rules SET title=?,rule=? WHERE id=?";
+        String SQL = "UPDATE rules META_SET title=?,rule=? WHERE id=?";
         jdbcTemplate.update(SQL,rule.getTitle(),rule.getRule(),rule.getId());
         return rule.getId();
     }
@@ -140,7 +140,7 @@ public class RuleDao implements IRuleDao {
 
     @Override
     public void updateBody(Long ruleId, String body) {
-        String sql = "UPDATE rules SET rule = ? WHERE id=?";
+        String sql = "UPDATE rules META_SET rule = ? WHERE id=?";
         jdbcTemplate.update(sql, new Object[]{body, ruleId});
     }
 

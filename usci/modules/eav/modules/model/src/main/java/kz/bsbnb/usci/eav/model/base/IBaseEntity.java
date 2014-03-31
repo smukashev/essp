@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.model.base;
 
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
 import java.util.Date;
@@ -13,21 +14,13 @@ public interface IBaseEntity extends IBaseContainer {
 
     public IMetaAttribute getMetaAttribute(String attribute);
 
+    public IBaseEntityReportDate getBaseEntityReportDate();
+
+    public void setBaseEntityReportDate(IBaseEntityReportDate baseEntityReportDate);
+
     public Date getReportDate();
 
     public void setReportDate(Date reportDate);
-
-    public Date getMaxReportDate();
-
-    public Date getMinReportDate();
-
-    public Set<Date> getAvailableReportDates();
-
-    public void setAvailableReportDates(Set<Date> availableReportDates);
-
-    public boolean isWithClosedValues();
-
-    public void setWithClosedValues(boolean withClosedValues);
 
     public MetaClass getMeta();
 
@@ -37,8 +30,6 @@ public interface IBaseEntity extends IBaseContainer {
 
     public IBaseValue safeGetValue(String name);
 
-    public boolean isMaxReportDate();
-
-    public boolean isMinReportDate();
+    public void calculateValueCount();
 
 }

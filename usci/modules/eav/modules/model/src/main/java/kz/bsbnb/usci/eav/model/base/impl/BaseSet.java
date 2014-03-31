@@ -3,6 +3,8 @@ package kz.bsbnb.usci.eav.model.base.impl;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
@@ -27,7 +29,9 @@ public class BaseSet extends BaseContainer implements IBaseSet
 
     private Map<String, IBaseValue> values = new HashMap<String, IBaseValue>();
 
-    private Set<String> modifiedObjects = new HashSet<String>();
+    private long level = 1;
+
+    private boolean last = true;
 
     /**
      * Initializes entity with a class name.
@@ -36,12 +40,13 @@ public class BaseSet extends BaseContainer implements IBaseSet
      */
     public BaseSet(IMetaType metaType)
     {
+        super(BaseContainerType.BASE_SET);
         this.metaType = metaType;
     }
 
     public BaseSet(long id, IMetaType metaType)
     {
-        super(id);
+        super(id, BaseContainerType.BASE_SET);
         this.metaType = metaType;
     }
 
@@ -66,6 +71,26 @@ public class BaseSet extends BaseContainer implements IBaseSet
     }
 
     @Override
+    public long getLevel() {
+        return level;
+    }
+
+    @Override
+    public void setLevel(long level) {
+        this.level = level;
+    }
+
+    @Override
+    public boolean isLast() {
+        return last;
+    }
+
+    @Override
+    public void setLast(boolean last) {
+        this.last = last;
+    }
+
+    @Override
     public void put(String name, IBaseValue value)
     {
         if (name == null)
@@ -73,11 +98,15 @@ public class BaseSet extends BaseContainer implements IBaseSet
             UUID uuid = UUID.randomUUID();
             put(uuid.toString(), value);
         }
+        value.setBaseContainer(this);
+
         values.put(name, value);
     }
 
     public BaseSet put(IBaseValue value)
     {
+        value.setBaseContainer(this);
+
         UUID uuid = UUID.randomUUID();
         put(uuid.toString(), value);
 
@@ -266,14 +295,19 @@ public class BaseSet extends BaseContainer implements IBaseSet
 
                     if (date)
                     {
-                        DataUtils.toBeginningOfTheDay((Date) thisObject);
-                        DataUtils.toBeginningOfTheDay((Date) thatObject);
+                        if (DataUtils.compareBeginningOfTheDay((Date) thisObject, (Date) thatObject) == 0)
+                        {
+                            uuids.add(thatBaseValue.getUuid());
+                            found = true;
+                        }
                     }
-
-                    if (thisObject.equals(thatObject))
+                    else
                     {
-                        uuids.add(thatBaseValue.getUuid());
-                        found = true;
+                        if (thisObject.equals(thatObject))
+                        {
+                            uuids.add(thatBaseValue.getUuid());
+                            found = true;
+                        }
                     }
                 }
             }
@@ -330,6 +364,8 @@ public class BaseSet extends BaseContainer implements IBaseSet
         try {
             BaseSet baseSet = (BaseSet)super.clone();
 
+
+
             return baseSet;
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("BaseSet class does not implement interface Cloneable.");
@@ -359,4 +395,9 @@ public class BaseSet extends BaseContainer implements IBaseSet
     public boolean isSet() {
         return true;
     }
+
+    /*@Override
+    public IMetaContainer getMetaContainer() {
+        return new MetaSet(metaType);
+    }*/
 }

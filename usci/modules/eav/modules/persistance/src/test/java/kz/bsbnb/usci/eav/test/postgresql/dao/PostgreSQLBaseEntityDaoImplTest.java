@@ -5,7 +5,6 @@
 package kz.bsbnb.usci.eav.test.postgresql.dao;
 
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
@@ -15,10 +14,10 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLBaseEntityDaoImpl;
+import kz.bsbnb.usci.eav.persistance.dao.impl.BaseEntityProcessorDaoImpl;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.test.GenericTestCase;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -57,11 +56,11 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
     @Autowired
     IMetaClassDao postgreSQLMetaClassDaoImpl;
     @Autowired
-    IBaseEntityDao postgreSQLBaseEntityDaoImpl;
+    IBaseEntityProcessorDao baseEntityProcessorDao;
     @Autowired
     IBatchDao postgreSQLBatchEntityDaoImpl;
 
-    private final Logger logger = LoggerFactory.getLogger(PostgreSQLBaseEntityDaoImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
 
     public PostgreSQLBaseEntityDaoImplTest() {
     }
@@ -76,7 +75,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
     }
 
-    @Test
+    /*@Test
     public void prepareAndApplyFirst() throws Exception
     {
         MetaClass childMetaCreate = new MetaClass("child_meta_class");
@@ -109,7 +108,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         parentEntityForSave.put("name", new BaseValue(batchFirst, 1L, "parent_meta_class_name"));
         parentEntityForSave.put("child_meta_class", new BaseValue(batchFirst, 1L, childEntityForSave));
 
-        BaseEntity parentEntitySaved = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(parentEntityForSave.clone());
+        BaseEntity parentEntitySaved = (BaseEntity)baseEntityProcessorDao.process(parentEntityForSave.clone());
 
         // Second batch
         BaseEntity childEntityForUpdate = new BaseEntity(childMetaLoad, batchSecond.getRepDate());
@@ -120,13 +119,13 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         parentEntityForUpdate.put("name", new BaseValue(batchSecond, 2L, "parent_meta_class_name_updated"));
         parentEntityForUpdate.put("child_meta_class", new BaseValue(batchSecond, 2L, childEntityForUpdate));
 
-        BaseEntity parentEntityPrepared = (BaseEntity)postgreSQLBaseEntityDaoImpl.prepare(parentEntityForUpdate);
+        BaseEntity parentEntityPrepared = (BaseEntity)baseEntityProcessorDao.prepare(parentEntityForUpdate);
         BaseEntity childEntityPrepared = (BaseEntity)parentEntityPrepared.getBaseValue("child_meta_class").getValue();
 
         assertEquals("", parentEntitySaved.getId(), parentEntityPrepared.getId());
         assertEquals("", 0, childEntityPrepared.getId());
 
-        IBaseEntity parentEntityApplied = postgreSQLBaseEntityDaoImpl.apply(parentEntityPrepared.clone());
+        IBaseEntity parentEntityApplied = baseEntityProcessorDao.apply(parentEntityPrepared.clone());
 
         assertEquals("", parentEntityForUpdate.getBaseValue("name").getValue(),
                 parentEntityApplied.getBaseValue("name").getValue());
@@ -142,7 +141,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         assertFalse("", DataUtils.compareBeginningOfTheDay(
                 parentEntitySaved.getBaseValue("child_meta_class").getRepDate(),
                 parentEntityApplied.getBaseValue("child_meta_class").getRepDate()) == 0);
-    }
+    }*/
 
     /*@Test
     public void prepareAndApplySecond() throws Exception
@@ -177,8 +176,8 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         parentEntityForSave.put("uuid", new BaseValue(batchFirst, 1L, UUID.randomUUID().toString()));
         parentEntityForSave.put("child_meta_class", new BaseValue(batchFirst, 1L, childEntityForSave));
 
-        long parentEntitySavedId = postgreSQLBaseEntityDaoImpl.saveOrUpdate(parentEntityForSave);
-        BaseEntity parentEntitySaved = postgreSQLBaseEntityDaoImpl.load(parentEntitySavedId);
+        long parentEntitySavedId = baseEntityProcessorDao.saveOrUpdate(parentEntityForSave);
+        BaseEntity parentEntitySaved = baseEntityProcessorDao.load(parentEntitySavedId);
         BaseEntity childEntitySaved = (BaseEntity)parentEntitySaved.getBaseValue("child_meta_class").getValue();
 
         // Second batch
@@ -190,13 +189,13 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         parentEntityForUpdate.put("uuid", new BaseValue(batchSecond, 2L, parentEntityForSave.getBaseValue("uuid").getValue()));
         parentEntityForUpdate.put("child_meta_class", new BaseValue(batchSecond, 2L, childEntityForUpdate));
 
-        BaseEntity parentEntityPrepared = postgreSQLBaseEntityDaoImpl.prepare(parentEntityForUpdate);
+        BaseEntity parentEntityPrepared = baseEntityProcessorDao.prepare(parentEntityForUpdate);
         BaseEntity childEntityPrepared = (BaseEntity)parentEntityPrepared.getBaseValue("child_meta_class").getValue();
 
         assertEquals("", parentEntitySaved.getId(), parentEntityPrepared.getId());
         assertEquals("", childEntitySaved.getId(), childEntityPrepared.getId());
 
-        IBaseEntity parentEntityApplied = postgreSQLBaseEntityDaoImpl.apply(parentEntityPrepared);
+        IBaseEntity parentEntityApplied = baseEntityProcessorDao.apply(parentEntityPrepared);
         IBaseEntity childEntityApplied = (BaseEntity)parentEntityApplied.getBaseValue("child_meta_class").getValue();
 
         assertEquals("", childEntityForUpdate.getBaseValue("name").getValue(),
@@ -252,8 +251,8 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityCreated.put("name", new BaseValue(batchFirst, 1L, "meta_class_name"));
         entityCreated.put("set_of_meta_class", new BaseValue(batchFirst, 1L, setCreated));
 
-        long entitySavedId = postgreSQLBaseEntityDaoImpl.saveOrUpdate(entityCreated);
-        BaseEntity entitySaved = postgreSQLBaseEntityDaoImpl.load(entitySavedId);
+        long entitySavedId = baseEntityProcessorDao.saveOrUpdate(entityCreated);
+        BaseEntity entitySaved = baseEntityProcessorDao.load(entitySavedId);
 
         BaseEntity entityFirstForSetForUpdate = new BaseEntity(metaForSetLoaded, batchSecond.getRepDate());
         entityFirstForSetForUpdate.put("uuid", new BaseValue(batchSecond, 2L, entityForSetCreated.getBaseValue("uuid").getValue()));
@@ -272,11 +271,11 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityForUpdate.put("set_of_meta_class", new BaseValue(batchSecond, 2L, setForUpdate));
 
 
-        IBaseEntity entityPrepared = postgreSQLBaseEntityDaoImpl.prepare(entityForUpdate);
-        IBaseEntity entityApplied = postgreSQLBaseEntityDaoImpl.apply(entityPrepared);
+        IBaseEntity entityPrepared = baseEntityProcessorDao.prepare(entityForUpdate);
+        IBaseEntity entityApplied = baseEntityProcessorDao.apply(entityPrepared);
 
         // TODO: Remove cast IBaseEntity to BaseEntity
-        long entityUpdatedId = postgreSQLBaseEntityDaoImpl.saveOrUpdate((BaseEntity)entityApplied);
+        long entityUpdatedId = baseEntityProcessorDao.saveOrUpdate((BaseEntity)entityApplied);
     }*/
 
 
@@ -408,7 +407,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
         entityCreated.put("date_set", new BaseValue(batch, 1L, baseSetForDate));
 
-        BaseEntity entitySaved = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entityCreated.clone());
+        BaseEntity entitySaved = (BaseEntity) baseEntityProcessorDao.process(entityCreated.clone());
 
         // simple values
         for (DataTypes dataType: DataTypes.values())
@@ -507,8 +506,8 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
         entityCreate.put("set_of_date_sets", new BaseValue(batch, 1L, baseSetParentCreate));
 
-        long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
-        BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
+        long entityId = baseEntityProcessorDao.save(entityCreate);
+        BaseEntity entityLoad = baseEntityProcessorDao.load(entityId);
 
         long countCreate = entityCreate.getValueCount();
         long countLoad = entityLoad.getValueCount();
@@ -536,8 +535,8 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
         entityCreate.put("date_set", new BaseValue(batch, 1L, baseSetForDate));
 
-        long entityId = postgreSQLBaseEntityDaoImpl.save(entityCreate);
-        BaseEntity entityLoad = postgreSQLBaseEntityDaoImpl.load(entityId);
+        long entityId = baseEntityProcessorDao.save(entityCreate);
+        BaseEntity entityLoad = baseEntityProcessorDao.load(entityId);
 
         long countCreate = entityCreate.getValueCount();
         long countLoad = entityLoad.getValueCount();
@@ -569,8 +568,8 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
         entityCreated.put("complex_set", new BaseValue(batch, 1L, baseSetForComplex));
 
-        BaseEntity entityProcessed = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entityCreated.clone());
-        BaseEntity entityLoaded = (BaseEntity)postgreSQLBaseEntityDaoImpl.load(entityProcessed.getId());
+        BaseEntity entityProcessed = (BaseEntity) baseEntityProcessorDao.process(entityCreated.clone());
+        BaseEntity entityLoaded = (BaseEntity) baseEntityProcessorDao.load(entityProcessed.getId());
 
         long countCreate = entityCreated.getValueCount();
         long countLoad = entityLoaded.getValueCount();
@@ -617,7 +616,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityFirstForSave.put("date_third",
                 new BaseValue(batchFirst, 1L, DataUtils.nowPlus(Calendar.DATE, 3)));
 
-        BaseEntity entityFirstSaved = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entityFirstForSave.clone());
+        BaseEntity entityFirstSaved = (BaseEntity) baseEntityProcessorDao.process(entityFirstForSave.clone());
 
         assertEquals("Incorrect number of attribute values in the saved BaseEntity after processing first batch,",
                 4, entityFirstSaved.getValueCount());
@@ -641,7 +640,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entitySecondForUpdate.put("date_fourth",
                 new BaseValue(batchSecond, 2L, DataUtils.nowPlus(Calendar.DATE, 5)));
 
-        BaseEntity entitySecondUpdated = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entitySecondForUpdate.clone());
+        BaseEntity entitySecondUpdated = (BaseEntity) baseEntityProcessorDao.process(entitySecondForUpdate.clone());
 
         assertEquals("Incorrect number of attribute values in the updated BaseEntity after processing second batch,",
                 5, entitySecondUpdated.getValueCount());
@@ -679,7 +678,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entitySecondForUpdate.put("date_second",
                 new BaseValue(batchThird, 3L, DataUtils.nowPlus(Calendar.DATE, 6)));
 
-        BaseEntity entityThirdUpdated = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entityThirdForUpdate.clone());
+        BaseEntity entityThirdUpdated = (BaseEntity) baseEntityProcessorDao.process(entityThirdForUpdate.clone());
 
         assertEquals("Incorrect number of attribute values in the updated BaseEntity after processing third batch,",
                 5, entityThirdUpdated.getValueCount());
@@ -732,7 +731,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityForSave.put("inner_meta_class_third",
                 new BaseValue(batchFirst, 1L, entityThirdForSave));
 
-        BaseEntity entitySaved = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entityForSave.clone());
+        BaseEntity entitySaved = (BaseEntity) baseEntityProcessorDao.process(entityForSave.clone());
 
         BaseEntity entityForUpdate = new BaseEntity(metaLoad, batchSecond.getRepDate());
         BaseEntity entitySecondForUpdate =
@@ -748,8 +747,8 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityForUpdate.put("inner_meta_class_fourth",
                 new BaseValue(batchSecond, 2L, entityFourthForUpdate));
 
-        BaseEntity entityUpdated = (BaseEntity)postgreSQLBaseEntityDaoImpl.process(entityForUpdate.clone());
-        BaseEntity entityLoaded = (BaseEntity)postgreSQLBaseEntityDaoImpl.load(entityUpdated.getId(), false);
+        BaseEntity entityUpdated = (BaseEntity) baseEntityProcessorDao.process(entityForUpdate.clone());
+        BaseEntity entityLoaded = (BaseEntity) baseEntityProcessorDao.load(entityUpdated.getId(), false);
 
         assertEquals("Incorrect number of attribute values in the saved BaseEntity,",
                 4, entitySaved.getValueCount());
@@ -811,8 +810,8 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityParentForSave.put("uuid", new BaseValue(batchFirst, 1L, uuid.toString()));
         entityParentForSave.put("complex_set", new BaseValue(batchFirst, 1L, baseSetForSave));
 
-        long entityParentSavedId = postgreSQLBaseEntityDaoImpl.save(entityParentForSave);
-        BaseEntity entityParentSaved = postgreSQLBaseEntityDaoImpl.load(entityParentSavedId);
+        long entityParentSavedId = baseEntityProcessorDao.save(entityParentForSave);
+        BaseEntity entityParentSaved = baseEntityProcessorDao.load(entityParentSavedId);
 
         BaseEntity entityParentForUpdate = new BaseEntity(metaParentLoad, batchSecond.getRepDate());
         BaseSet baseSetForUpdate = new BaseSet(metaChildLoad);
@@ -820,7 +819,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityParentForUpdate.put("uuid", new BaseValue(batchSecond, 2L, uuid.toString()));
         entityParentForUpdate.put("complex_set", new BaseValue(batchSecond, 2L, baseSetForUpdate));
 
-        IBaseEntity baseEntityUpdated = postgreSQLBaseEntityDaoImpl.process(entityParentForUpdate);
+        IBaseEntity baseEntityUpdated = baseEntityProcessorDao.process(entityParentForUpdate);
 
         assertEquals("Incorrect number of attribute values in the saved BaseEntity,",
                 2, entityParentSaved.getValueCount());
@@ -865,7 +864,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
         try
         {
-            BaseEntity entityChildSearched = postgreSQLBaseEntityDaoImpl.load(entityChildSaved.getId());
+            BaseEntity entityChildSearched = baseEntityProcessorDao.load(entityChildSaved.getId());
             fail("Expected an illegal state exception.");
         }
         catch(Exception e)
@@ -892,14 +891,14 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityForSave.put("uuid",
                 new BaseValue(batch, 1L, uuid.toString()));
 
-        long entitySavedId = postgreSQLBaseEntityDaoImpl.save(entityForSave);
-        BaseEntity entitySaved = postgreSQLBaseEntityDaoImpl.load(entitySavedId);
+        long entitySavedId = baseEntityProcessorDao.save(entityForSave);
+        BaseEntity entitySaved = baseEntityProcessorDao.load(entitySavedId);
 
         BaseEntity entityForSearch = new BaseEntity(metaLoad, batch.getRepDate());
         entityForSearch.put("uuid",
                 new BaseValue(batch, 1L, uuid.toString()));
 
-        long entitySearchedId = postgreSQLBaseEntityDaoImpl.search(entityForSearch);
+        long entitySearchedId = baseEntityProcessorDao.search(entityForSearch);
         assertFalse("Search engine was not found necessary BaseEntity.", entitySearchedId == 0);
         assertEquals("Search engine was found BaseEntity with incorrect id,",
                 entitySearchedId, entitySaved.getId());

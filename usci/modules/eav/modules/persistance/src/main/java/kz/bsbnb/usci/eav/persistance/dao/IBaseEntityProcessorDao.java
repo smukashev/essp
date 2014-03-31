@@ -1,7 +1,9 @@
 package kz.bsbnb.usci.eav.persistance.dao;
 
+import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
@@ -15,7 +17,7 @@ import java.util.Set;
  * @since 1.0
  * @version 1.0
  */
-public interface IBaseEntityDao
+public interface IBaseEntityProcessorDao
 {
 
     /**
@@ -34,25 +36,19 @@ public interface IBaseEntityDao
 
     public List<Long> search(String className);
 
+    public IBaseEntity loadByMaxReportDate(long id, Date reportDate);
+
     public IBaseEntity load(long id);
 
-    public IBaseEntity load(long id, boolean closed);
+    public IBaseEntity load(long id, boolean caching);
 
-    public BaseEntity load(long id, Date reportDate);
+    public IBaseEntity load(long id, Date reportDate);
 
-    public BaseEntity load(long id, Date reportDate, boolean closed);
+    public IBaseEntity load(long id, Date reportDate, boolean caching);
 
     public IBaseEntity prepare(IBaseEntity baseEntity);
 
-    public IBaseEntity apply(IBaseEntity baseEntity);
-
     public IBaseEntity process(IBaseEntity baseEntity);
-
-    public IBaseEntity saveOrUpdate(IBaseEntity baseEntity);
-
-    public IBaseEntity update(IBaseEntity baseEntityForSave, IBaseEntity baseEntityLoaded);
-
-    public boolean isUsed(long baseEntityId);
 
     public Set<Date> getAvailableReportDates(long baseEntityId);
 
@@ -62,10 +58,6 @@ public interface IBaseEntityDao
 
     public Date getMaxReportDate(long baseEntityId, Date reportDate);
 
-    public IBaseEntity save(IBaseEntity baseEntity);
-
-    public void remove(IBaseEntity baseEntity);
-
     public List<Long> getEntityIDsByMetaclass(long metaClassId);
 
     public List<RefListItem> getRefsByMetaclass(long metaClassId);
@@ -73,5 +65,12 @@ public interface IBaseEntityDao
     public List<BaseEntity> getEntityByMetaclass(MetaClass meta);
 
     public boolean isApproved(long id);
+
     public int batchCount(long id, String className);
+
+
+    public void loadSimpleSetValues(IBaseSet baseSet, Date baseEntityReportDate, boolean lastReportDate);
+
+    public void loadComplexSetValues(IBaseSet baseSet, Date baseEntityReportDate, boolean lastReportDate);
+
 }

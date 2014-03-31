@@ -4,9 +4,7 @@ import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -169,7 +167,14 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     hasMembers = true;
                 }
 
-                currentContainer.put(localName, new BaseValue(batch, index, o));
+                String memberName = localName;
+                if (currentContainer.getBaseContainerType() == BaseContainerType.BASE_SET) {
+                    memberName += "_" + currentContainer.getValueCount();
+                }
+
+                currentContainer.put(memberName, BaseValueFactory
+                        .create(currentContainer.getBaseContainerType(), metaType, batch, index, o));
+
                 level++;
             }
         }
@@ -244,7 +249,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
                 if (currentContainer.isSet()) {
                     if (hasMembers) {
-                        ((BaseSet)currentContainer).put(new BaseValue(batch, index, o));
+                        ((BaseSet)currentContainer).put(BaseValueFactory
+                                .create(currentContainer.getBaseContainerType(), metaType, batch, index, o));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
@@ -252,11 +258,13 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     }
                 } else {
                     if (hasMembers) {
-                        currentContainer.put(localName, new BaseValue(batch, index, o));
+                        currentContainer.put(localName, BaseValueFactory
+                                .create(currentContainer.getBaseContainerType(), metaType, batch, index, o));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
-                        currentContainer.put(localName, new BaseValue(batch, index, null));
+                        currentContainer.put(localName, BaseValueFactory
+                                .create(currentContainer.getBaseContainerType(), metaType, batch, index, null));
                         hasMembers = flagsStack.pop();
                     }
                 }

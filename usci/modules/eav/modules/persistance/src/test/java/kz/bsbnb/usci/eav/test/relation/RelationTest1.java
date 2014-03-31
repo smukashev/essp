@@ -7,7 +7,7 @@ import kz.bsbnb.usci.eav.factory.IMetaFactory;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -41,7 +41,7 @@ public class RelationTest1  extends GenericTestCase
     IBatchDao batchDao;
 
     @Autowired
-    IBaseEntityDao baseEntityDao;
+    IBaseEntityProcessorDao baseEntityProcessorDao;
 
     @Autowired
     IMetaFactory metaFactory;
@@ -60,9 +60,9 @@ public class RelationTest1  extends GenericTestCase
         BaseEntity contractEntity = generateBaseEntity(batch, metaFactory);
 
         // TODO: Fix this block
-        //long id = baseEntityDao.save(contractEntity);
+        //long id = baseEntityProcessorDao.save(contractEntity);
 
-        //BaseEntity contractEntityTest = baseEntityDao.load(id);
+        //BaseEntity contractEntityTest = baseEntityProcessorDao.load(id);
 
         //TODO: fix this
         //Assert.assertTrue(contractEntity.equals(contractEntityTest));

@@ -1,20 +1,30 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.*;
+import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
+import kz.bsbnb.usci.eav.model.persistable.IPersistable;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeComplexValueDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
+import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_VALUES;
@@ -32,42 +42,31 @@ public class BeComplexValueDaoImpl extends JDBCSupport implements IBeComplexValu
     private DSLContext context;
 
     @Autowired
-    private IBaseEntityDao baseEntityDao;
+    IBatchRepository batchRepository;
+
+    @Autowired
+    IBaseEntityProcessorDao baseEntityProcessorDao;
 
     @Override
-    public IBaseValue save(IBaseEntity baseEntity, String attribute)
-    {
-        IMetaAttribute metaAttribute = baseEntity.getMetaAttribute(attribute);
-        IBaseValue baseValue = baseEntity.getBaseValue(attribute);
-
-        if (baseValue.getValue() == null)
-        {
-            throw new IllegalArgumentException("Instance of BaseValue should not contain null values.");
-        }
-
-        IBaseEntity childBaseEntity = (BaseEntity) baseValue.getValue();
-        childBaseEntity = baseEntityDao.saveOrUpdate(childBaseEntity);
-
-        long baseValueId = save( baseEntity.getId(), baseValue.getBatch().getId(),
-                metaAttribute.getId(), baseValue.getIndex(), baseValue.getRepDate(),
-                childBaseEntity.getId(), baseValue.isClosed(), baseValue.isLast());
+    public long insert(IPersistable persistable) {
+        IBaseValue baseValue = (IBaseValue)persistable;
+        IBaseEntity baseEntity = (IBaseEntity)baseValue.getValue();
+        long baseValueId = save(
+                baseValue.getBaseContainer().getId(),
+                baseValue.getBatch().getId(),
+                baseValue.getMetaAttribute().getId(),
+                baseValue.getIndex(),
+                baseValue.getRepDate(),
+                baseEntity.getId(),
+                baseValue.isClosed(),
+                baseValue.isLast()
+        );
         baseValue.setId(baseValueId);
 
-        return baseValue;
+        return baseValueId;
     }
 
-    @Override
-    public Map<String, IBaseValue> save(IBaseEntity baseEntity, Set<String> attributes) {
-        Map<String, IBaseValue> values = new HashMap<String, IBaseValue>();
-        for (String attribute: attributes)
-        {
-            IBaseValue baseValue = save(baseEntity, attribute);
-            values.put(attribute, baseValue);
-        }
-        return values;
-    }
-
-    private long save(long baseEntityId, long batchId, long metaAttributeId, long index,
+    protected long save(long baseEntityId, long batchId, long metaAttributeId, long index,
                       Date reportDate, long childBaseEntityId, boolean closed, boolean last)
     {
         Insert insert = context
@@ -86,217 +85,325 @@ public class BeComplexValueDaoImpl extends JDBCSupport implements IBeComplexValu
     }
 
     @Override
-    public IBaseValue update(IBaseEntity baseEntityLoaded, IBaseEntity baseEntityForSave, String attribute)
+    public void update(IPersistable persistable) {
+        IBaseValue baseValue = (IBaseValue)persistable;
+        IBaseEntity baseEntity = (IBaseEntity)baseValue.getValue();
+        update(baseValue.getId(), baseValue.getBaseContainer().getId(), baseValue.getBatch().getId(),
+                baseValue.getMetaAttribute().getId(), baseValue.getIndex(), baseValue.getRepDate(),
+                baseEntity.getId(), baseValue.isClosed(), baseValue.isLast()
+        );
+    }
+
+    protected void update(long id, long baseEntityId, long batchId, long metaAttributeId, long index,
+                        Date reportDate, long childBaseEntityId, boolean closed, boolean last)
     {
-        MetaClass metaClass = baseEntityLoaded.getMeta();
-        IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
+        String tableAlias = "cv";
+        Update update = context
+                .update(EAV_BE_COMPLEX_VALUES.as(tableAlias))
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID, baseEntityId)
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).BATCH_ID, batchId)
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID, metaAttributeId)
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).INDEX_, index)
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE, DataUtils.convert(reportDate))
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID, childBaseEntityId)
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_CLOSED, DataUtils.convert(closed))
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST, DataUtils.convert(last))
+                .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ID.equal(id));
 
-        IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
-        IBaseValue baseValueForSave = baseEntityForSave.getBaseValue(attribute);
-
-        IBaseEntity baseEntity = baseEntityDao.saveOrUpdate((IBaseEntity)baseValueForSave.getValue());
-
-        if (baseValueLoaded == null)
+        logger.debug(update.toString());
+        int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
+        if (count != 1)
         {
-            if (baseValueForSave == null)
-            {
-                logger.warn(String.format("An attempt was made to remove a missing value for the " +
-                        "attribute {0} of BaseEntity instance with identifier {1}.", baseEntityLoaded.getId(), attribute));
-            }
-            else
-            {
-                //TODO: Check this attribute in the future, if exist then isLast = false
-                long baseValueId = save(baseEntityForSave.getId(), baseValueForSave.getBatch().getId(),
-                        metaAttribute.getId(), baseValueForSave.getIndex(),
-                        baseValueForSave.getRepDate(), baseEntity.getId(), false, true);
-                baseValueForSave.setId(baseValueId);
-            }
+            throw new RuntimeException("UPDATE operation should be update only one record.");
         }
-        else
-        {
-            int compare = DataUtils.compareBeginningOfTheDay(baseValueForSave.getRepDate(), baseValueLoaded.getRepDate());
-            switch(compare)
-            {
-                case 1:
-                {
-                    long baseValueId = save(baseEntityForSave.getId(), baseValueForSave.getBatch().getId(),
-                            metaAttribute.getId(), baseValueForSave.getIndex(), baseValueForSave.getRepDate(),
-                            baseEntity.getId(), baseValueForSave.isClosed(), baseValueForSave.isLast());
-                    baseValueForSave.setId(baseValueId);
-
-                    if (baseValueLoaded.isLast())
-                    {
-                        Map<String, Object> fields = new HashMap<String, Object>();
-                        fields.put("is_last", false);
-
-                        Map<String, Object> conditions = new HashMap<String, Object>();
-                        conditions.put("id", baseValueLoaded.getId());
-
-                        updateByCondition(fields, conditions);
-                    }
-                    break;
-                }
-                case 0:
-                    Map<String, Object> fields = new HashMap<String, Object>();
-                    fields.put("batch_id", baseValueForSave.getBatch().getId());
-                    fields.put("index_", baseValueForSave.getIndex());
-                    fields.put("entityValueId", baseEntity.getId());
-                    if (baseValueForSave.isClosed())
-                    {
-                        fields.put("is_closed", true);
-                    }
-
-                    Map<String, Object> conditions = new HashMap<String, Object>();
-                    conditions.put("id", baseValueLoaded.getId());
-
-                    updateByCondition(fields, conditions);
-
-                    break;
-                case -1:
-                {
-                    long baseValueId = save(baseEntityForSave.getId(), baseValueForSave.getBatch().getId(),
-                            metaAttribute.getId(), baseValueForSave.getIndex(), baseValueForSave.getRepDate(),
-                            baseEntity.getId(), baseValueForSave.isClosed(), false);
-                    baseValueForSave.setId(baseValueId);
-                    break;
-                }
-                default:
-                    throw new RuntimeException("Method Comparable<T>.compareTo(T o) " +
-                            "can not return a value other than -1, 0, 1.");
-            }
-        }
-
-        return baseValueForSave;
     }
 
     @Override
-    public boolean presentInFuture(IBaseEntity baseEntity, String attribute) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    public void delete(IPersistable persistable) {
+        delete(persistable.getId());
     }
 
-    private int updateByCondition(Map<String, Object> fields,
-                                              Map<String, Object> conditions)
-    {
-        if (fields.size() == 0)
-        {
-            throw new IllegalArgumentException("To implement the changes to the record must have at least one field.");
-        }
-
-        Table tableOfIntegerValues = EAV_BE_COMPLEX_VALUES.as("v");
-        UpdateSetStep updateSetStep = context.update(tableOfIntegerValues);
-
-        UpdateSetMoreStep updateSetMoreStep = null;
-        if (fields.containsKey("batch_id"))
-        {
-            updateSetMoreStep = updateSetMoreStep == null ?
-                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.BATCH_ID),
-                            fields.get("batch_id")) :
-                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.BATCH_ID),
-                            fields.get("batch_id"));
-        }
-        if (fields.containsKey("index_"))
-        {
-            updateSetMoreStep = updateSetMoreStep == null ?
-                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.INDEX_),
-                            fields.get("index_")) :
-                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.INDEX_),
-                            fields.get("index_"));
-        }
-        if (fields.containsKey("entityValueId"))
-        {
-            updateSetMoreStep = updateSetMoreStep == null ?
-                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID),
-                            fields.get("entityValueId")) :
-                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID),
-                            fields.get("entityValueId"));
-        }
-        if (fields.containsKey("is_closed"))
-        {
-            updateSetMoreStep = updateSetMoreStep == null ?
-                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED),
-                            fields.get("is_closed")) :
-                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED),
-                            fields.get("is_closed"));
-        }
-        if (fields.containsKey("is_last"))
-        {
-            updateSetMoreStep = updateSetMoreStep == null ?
-                    updateSetStep.set(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.IS_LAST),
-                            fields.get("is_last")) :
-                    updateSetMoreStep.set(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.IS_LAST),
-                            fields.get("is_last"));
-        }
-
-        UpdateConditionStep updateConditionStep = null;
-        if (conditions.containsKey("id"))
-        {
-            updateConditionStep = updateConditionStep == null ?
-                    updateSetMoreStep.where(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.ID)
-                            .equal(conditions.get("id"))) :
-                    updateConditionStep.and(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.ID)
-                            .equal(conditions.get("id")));
-        }
-        if (conditions.containsKey("entity_id"))
-        {
-            updateConditionStep = updateConditionStep == null ?
-                    updateSetMoreStep.where(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.ENTITY_ID)
-                            .equal(conditions.get("entity_id"))) :
-                    updateConditionStep.and(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.ENTITY_ID)
-                            .equal(conditions.get("entity_id")));
-        }
-        if (conditions.containsKey("attribute_id"))
-        {
-            updateConditionStep = updateConditionStep == null ?
-                    updateSetMoreStep.where(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID)
-                            .equal(conditions.get("attribute_id"))) :
-                    updateConditionStep.and(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID)
-                            .equal(conditions.get("attribute_id")));
-        }
-        if (conditions.containsKey("report_date"))
-        {
-            updateConditionStep = updateConditionStep == null ?
-                    updateSetMoreStep.where(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE)
-                            .equal(DataUtils.convert((Date) conditions.get("report_date")))) :
-                    updateConditionStep.and(tableOfIntegerValues.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE)
-                            .equal(DataUtils.convert((Date) conditions.get("report_date"))));
-        }
-
-        logger.debug(updateConditionStep.toString());
-        return updateWithStats(updateConditionStep.getSQL(), updateConditionStep.getBindValues().toArray());
-    }
-
-    @Override
-    public void remove(IBaseEntity baseEntity, String attribute)
-    {
-        MetaClass meta = baseEntity.getMeta();
-        IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
-
-        if (metaAttribute == null) {
-            throw new IllegalArgumentException("Attribute " + attribute + " not found in the MetaClass. " +
-                    "Removing a complex value is not possible.");
-        }
-
-        long metaAttributeId =  metaAttribute.getId();
-        long baseEntityId = baseEntity.getId();
-
-        if (baseEntityId < 1)
-        {
-            throw new IllegalArgumentException("BaseEntity does not contain id. " +
-                    "Removing a complex value is not possible.");
-        }
-        if (metaAttributeId < 1)
-        {
-            throw new IllegalArgumentException("MetaAttribute does not contain id. " +
-                    "Removing a complex value is not possible.");
-        }
-
-        DeleteConditionStep delete = context
-                .delete(EAV_BE_COMPLEX_VALUES)
-                .where(EAV_BE_COMPLEX_VALUES.ENTITY_ID.eq(baseEntityId))
-                .and(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID.eq(metaAttributeId));
+    protected void delete(long id) {
+        String tableAlias = "cv";
+        Delete delete = context
+                .delete(EAV_BE_COMPLEX_VALUES.as(tableAlias))
+                .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ID.equal(id));
 
         logger.debug(delete.toString());
-        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+        int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+        if (count != 1)
+        {
+            throw new RuntimeException("DELETE operation should be delete only one record.");
+        }
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public IBaseValue getNextBaseValue(IBaseValue baseValue)
+    {
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+        IBaseEntity parentBaseEntity = (IBaseEntity)baseContainer;
+        IMetaClass metaClass = parentBaseEntity.getMeta();
+
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        IMetaType metaType = metaAttribute.getMetaType();
+
+        IBaseValue nextBaseValue = null;
+
+        String tableAlias = "bv";
+        String subqueryAlias = "bvn";
+
+        Table subqueryTable = context
+                .select(DSL.rank().over()
+                        .orderBy(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).ID,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).BATCH_ID,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).INDEX_,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST)
+                .from(EAV_BE_COMPLEX_VALUES.as(tableAlias))
+                .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID.equal(parentBaseEntity.getId()))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(baseValue.getRepDate())))
+                .asTable(subqueryAlias);
+
+        Select select = context
+                .select(subqueryTable.field(EAV_BE_COMPLEX_VALUES.ID),
+                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.BATCH_ID),
+                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.INDEX_),
+                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE),
+                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID),
+                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED),
+                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.IS_LAST))
+                .from(subqueryTable)
+                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+        {
+            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
+        }
+
+        if (rows.size() == 1)
+        {
+            Map<String, Object> row = rows.iterator().next();
+
+            long id = ((BigDecimal) row
+                    .get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
+            long index = ((BigDecimal) row
+                    .get(EAV_BE_COMPLEX_VALUES.INDEX_.getName())).longValue();
+            boolean closed = ((BigDecimal)row
+                    .get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName())).longValue() == 1;
+            boolean last = ((BigDecimal)row
+                    .get(EAV_BE_COMPLEX_VALUES.IS_LAST.getName())).longValue() == 1;
+            long entityValueId = ((BigDecimal)row
+                    .get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
+                    .get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
+            Batch batch = batchRepository.getBatch(((BigDecimal)row
+                    .get(EAV_BE_COMPLEX_VALUES.BATCH_ID.getName())).longValue());
+            IBaseEntity childBaseEntity = baseEntityProcessorDao
+                    .loadByMaxReportDate(entityValueId, reportDate);
+
+            nextBaseValue = BaseValueFactory.create(metaClass.getType(), metaType,
+                    id, batch, index, reportDate, childBaseEntity, closed, last);
+        }
+
+        return nextBaseValue;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public IBaseValue getPreviousBaseValue(IBaseValue baseValue)
+    {
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+        IBaseEntity parentBaseEntity = (IBaseEntity)baseContainer;
+        IMetaClass metaClass = parentBaseEntity.getMeta();
+
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        IMetaType metaType = metaAttribute.getMetaType();
+
+        IBaseValue previousBaseValue = null;
+
+        String tableAlias = "bv";
+        String subqueryAlias = "bvn";
+
+        Table subqueryTable = context
+                .select(DSL.rank().over()
+                        .orderBy(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.desc()).as("num_pp"),
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).ID,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).BATCH_ID,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).INDEX_,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST)
+                .from(EAV_BE_COMPLEX_VALUES.as(tableAlias))
+                .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID.equal(parentBaseEntity.getId()))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(baseValue.getRepDate())))
+                .asTable(subqueryAlias);
+
+        Select select = context
+                .select(subqueryTable.field(EAV_BE_COMPLEX_VALUES.ID),
+                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.BATCH_ID),
+                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.INDEX_),
+                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE),
+                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID),
+                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED),
+                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.IS_LAST))
+                .from(subqueryTable)
+                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+        {
+            throw new RuntimeException("Query for get previous instance of BaseValue return more than one row.");
+        }
+
+        if (rows.size() == 1)
+        {
+            Map<String, Object> row = rows.iterator().next();
+
+            long id = ((BigDecimal) row
+                    .get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
+            long index = ((BigDecimal) row
+                    .get(EAV_BE_COMPLEX_VALUES.INDEX_.getName())).longValue();
+            boolean closed = ((BigDecimal)row
+                    .get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName())).longValue() == 1;
+            boolean last = ((BigDecimal)row
+                    .get(EAV_BE_COMPLEX_VALUES.IS_LAST.getName())).longValue() == 1;
+            long entityValueId = ((BigDecimal)row
+                    .get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
+                    .get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
+            Batch batch = batchRepository.getBatch(((BigDecimal)row
+                    .get(EAV_BE_COMPLEX_VALUES.BATCH_ID.getName())).longValue());
+            IBaseEntity childBaseEntity = baseEntityProcessorDao
+                    .loadByMaxReportDate(entityValueId, reportDate);
+
+            previousBaseValue = BaseValueFactory.create(metaClass.getType(), metaType,
+                    id, batch, index, reportDate, childBaseEntity, closed, last);
+        }
+
+        return previousBaseValue;
+    }
+
+    @Override
+    public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        IMetaType metaType = metaAttribute.getMetaType();
+
+        IBaseValue closedBaseValue = null;
+
+        String tableAlias = "cv";
+        Select select = context
+                .select(EAV_BE_COMPLEX_VALUES.as(tableAlias).ID,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).BATCH_ID,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).INDEX_,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST)
+                .from(EAV_BE_COMPLEX_VALUES.as(tableAlias))
+                .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.equal(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+        {
+            throw new RuntimeException("Query for get closed instance of BaseValue return more than one row.");
+        }
+
+        if (rows.size() == 1)
+        {
+            Map<String, Object> row = rows.iterator().next();
+
+            long id = ((BigDecimal) row
+                    .get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
+            long index = ((BigDecimal) row
+                    .get(EAV_BE_COMPLEX_VALUES.INDEX_.getName())).longValue();
+            boolean last = ((BigDecimal)row
+                    .get(EAV_BE_COMPLEX_VALUES.IS_LAST.getName())).longValue() == 1;
+            long entityValueId = ((BigDecimal)row
+                    .get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
+            Batch batch = batchRepository.getBatch(((BigDecimal)row
+                    .get(EAV_BE_COMPLEX_VALUES.BATCH_ID.getName())).longValue());
+
+            IBaseEntity childBaseEntity = baseEntityProcessorDao
+                    .loadByMaxReportDate(entityValueId, baseValue.getRepDate());
+
+            closedBaseValue = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
+                    id, batch, index, baseValue.getRepDate(), childBaseEntity, true, last);
+        }
+
+        return closedBaseValue;
+    }
+
+    @Override
+    public IBaseValue getLastBaseValue(IBaseValue baseValue) {
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        IMetaType metaType = metaAttribute.getMetaType();
+
+        IBaseValue lastBaseValue = null;
+
+        String tableAlias = "bv";
+        Select select = context
+                .select(EAV_BE_COMPLEX_VALUES.as(tableAlias).ID,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).BATCH_ID,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).INDEX_,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST)
+                .from(EAV_BE_COMPLEX_VALUES.as(tableAlias))
+                .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST.equal(DataUtils.convert(true)));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+        {
+            throw new RuntimeException("Query for get last instance of BaseValue return more than one row.");
+        }
+
+        if (rows.size() == 1)
+        {
+            Map<String, Object> row = rows.iterator().next();
+
+            long id = ((BigDecimal) row
+                    .get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
+            long index = ((BigDecimal) row
+                    .get(EAV_BE_COMPLEX_VALUES.INDEX_.getName())).longValue();
+            boolean closed = ((BigDecimal)row
+                    .get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName())).longValue() == 1;
+            long entityValueId = ((BigDecimal)row
+                    .get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
+                    .get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
+            Batch batch = batchRepository.getBatch(((BigDecimal)row
+                    .get(EAV_BE_COMPLEX_VALUES.BATCH_ID.getName())).longValue());
+
+            IBaseEntity childBaseEntity = baseEntityProcessorDao
+                    .loadByMaxReportDate(entityValueId, reportDate);
+
+            lastBaseValue = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
+                    id, batch, index, reportDate, childBaseEntity, closed, true);
+        }
+
+        return lastBaseValue;
+    }
 }

@@ -13,4 +13,12 @@ public interface IBaseSet extends IBaseContainer {
 
     public void remove(String identifier);
 
+    public long getLevel();
+
+    public void setLevel(long level);
+
+    public boolean isLast();
+
+    public void setLast(boolean last);
+
 }

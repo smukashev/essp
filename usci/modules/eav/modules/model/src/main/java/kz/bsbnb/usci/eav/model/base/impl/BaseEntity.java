@@ -2,8 +2,10 @@ package kz.bsbnb.usci.eav.model.base.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -37,26 +39,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     protected DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
-     * Reporting date on which instance of BaseEntity was loaded.
-     */
-    private Date reportDate;
-
-    private boolean withClosedValues = false;
-
-    private Date maxReportDate;
-
-    private Date minReportDate;
-
-    /**
-     * The list of available reporting dates for this instance BaseEntity.
-     */
-    private Set<Date> availableReportDates = new HashSet<Date>();
-
-    /**
      * Holds data about entity structure
      * @see MetaClass
      */
     private MetaClass meta;
+
+    private IBaseEntityReportDate baseEntityReportDate;
     
     /**
      * Holds attributes values
@@ -70,7 +58,30 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      */
     public BaseEntity()
     {
+        super(BaseContainerType.BASE_ENTITY);
+    }
 
+    public BaseEntity(IBaseEntity baseEntity, Date reportDate)
+    {
+        super(baseEntity.getId(), BaseContainerType.BASE_ENTITY);
+
+        IBaseEntityReportDate thatBaseEntityReportDate = baseEntity.getBaseEntityReportDate();
+        IBaseEntityReportDate thisBaseEntityReportDate = new BaseEntityReportDate(
+                thatBaseEntityReportDate.getId(),
+                reportDate,
+                thatBaseEntityReportDate.getIntegerValuesCount(),
+                thatBaseEntityReportDate.getDateValuesCount(),
+                thatBaseEntityReportDate.getStringValuesCount(),
+                thatBaseEntityReportDate.getBooleanValuesCount(),
+                thatBaseEntityReportDate.getDoubleValuesCount(),
+                thatBaseEntityReportDate.getComplexValuesCount(),
+                thatBaseEntityReportDate.getSimpleSetsCount(),
+                thatBaseEntityReportDate.getComplexSetsCount()
+        );
+        thisBaseEntityReportDate.setBaseEntity(this);
+
+        this.meta = baseEntity.getMeta();
+        this.baseEntityReportDate = thisBaseEntityReportDate;
     }
 
     /**
@@ -80,38 +91,26 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      */
     public BaseEntity(MetaClass meta, Date reportDate)
     {
-        Date newReportDate = (Date)reportDate.clone();
-        DataUtils.toBeginningOfTheDay(newReportDate);
+        super(BaseContainerType.BASE_ENTITY);
 
-        this.reportDate = newReportDate;
         this.meta = meta;
-        this.availableReportDates.add(newReportDate);
+        this.baseEntityReportDate = new BaseEntityReportDate(this, reportDate);
     }
 
-    public BaseEntity(long id, MetaClass meta, Date reportDate, Set<Date> availableReportDates)
+    public BaseEntity(long id, MetaClass meta, Date reportDate)
     {
-        this(id, meta, reportDate, availableReportDates, false);
+        super(id, BaseContainerType.BASE_ENTITY);
+        this.meta = meta;
+        this.baseEntityReportDate = new BaseEntityReportDate(this, reportDate);
     }
 
-    public BaseEntity(long id, MetaClass meta, Date reportDate, Set<Date> availableReportDates, boolean withClosedValues)
+    public BaseEntity(long id, MetaClass meta, IBaseEntityReportDate baseEntityReportDate)
     {
-        super(id);
+        super(id, BaseContainerType.BASE_ENTITY);
         this.meta = meta;
-        this.availableReportDates = availableReportDates;
-        this.withClosedValues = withClosedValues;
 
-        if (reportDate == null)
-        {
-            throw new IllegalArgumentException("Can not create instance of BaseEntity " +
-                    "with report date equal to null.");
-        }
-        else
-        {
-            Date newReportDate = (Date)reportDate.clone();
-            DataUtils.toBeginningOfTheDay(newReportDate);
-
-            this.reportDate = newReportDate;
-        }
+        baseEntityReportDate.setBaseEntity(this);
+        this.baseEntityReportDate = baseEntityReportDate;
     }
 
     /**
@@ -122,87 +121,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     public MetaClass getMeta()
     {
         return meta;
-    }
-
-    @Override
-    public Set<Date> getAvailableReportDates() {
-        return availableReportDates;
-    }
-
-    @Override
-    public void setAvailableReportDates(Set<Date> availableReportDates) {
-        this.availableReportDates = availableReportDates;
-        this.maxReportDate = null;
-        this.minReportDate = null;
-    }
-
-    @Override
-    public Date getMaxReportDate()
-    {
-        if (maxReportDate == null)
-        {
-            if (availableReportDates.size() != 0)
-            {
-                maxReportDate = Collections.max(availableReportDates);
-            }
-        }
-        return maxReportDate;
-    }
-
-    @Override
-    public Date getMinReportDate()
-    {
-        if (minReportDate == null)
-        {
-            if (availableReportDates.size() != 0)
-            {
-                minReportDate = Collections.min(availableReportDates);
-            }
-        }
-        return minReportDate;
-    }
-
-    public boolean isWithClosedValues()
-    {
-        return withClosedValues;
-    }
-
-    public void setWithClosedValues(boolean withClosedValues)
-    {
-        this.withClosedValues = withClosedValues;
-    }
-
-
-    @Override
-    public boolean isMaxReportDate()
-    {
-        if (this.reportDate == null)
-        {
-            throw new IllegalStateException("The report date can not be equal to null.");
-        }
-
-        Date maxReportDate = getMaxReportDate();
-        if (maxReportDate == null)
-        {
-            throw new IllegalStateException("The maximum report date can not be equal to null.");
-        }
-        return DataUtils.compareBeginningOfTheDay(reportDate, maxReportDate) == 0;
-    }
-
-    @Override
-    public boolean isMinReportDate()
-    {
-        if (this.reportDate == null)
-        {
-            throw new IllegalStateException("The report date can not be equal to null.");
-        }
-
-        Date minReportDate = getMinReportDate();
-        if (minReportDate == null)
-        {
-            throw new IllegalStateException("The minimum report date can not be equal to null.");
-        }
-        return DataUtils.compareBeginningOfTheDay(reportDate, minReportDate) == 0;
     }
 
     /**
@@ -280,7 +198,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     @Override
     public void put(final String attribute, IBaseValue baseValue)
     {
-        IMetaType type = meta.getMemberType(attribute);
+        IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
+        IMetaType type = metaAttribute.getMetaType();
 
         if(type == null)
             throw new IllegalArgumentException("Type: " + attribute +
@@ -336,6 +255,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                         valueClass);
         }
 
+        baseValue.setBaseContainer(this);
+        baseValue.setMetaAttribute(metaAttribute);
+
         boolean listening = isListening();
         if (listening)
         {
@@ -369,7 +291,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     public void remove(String name) {
         fireValueChange(name);
-        values.remove(name);
+
+        IBaseValue baseValue = values.remove(name);
+        baseValue.setBaseContainer(null);
+        baseValue.setMetaAttribute(null);
     }
 
     @Override
@@ -464,18 +389,104 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     }
 
     public Date getReportDate() {
-        return reportDate;
+        if (baseEntityReportDate != null)
+        {
+            return baseEntityReportDate.getReportDate();
+        }
+        return null;
     }
 
     public void setReportDate(Date reportDate) {
         Date newReportDate = (Date)reportDate.clone();
         DataUtils.toBeginningOfTheDay(newReportDate);
 
-        this.reportDate = newReportDate;
-        this.availableReportDates.add(newReportDate);
+        if (baseEntityReportDate == null)
+        {
+            this.baseEntityReportDate = new BaseEntityReportDate(this, newReportDate);
+        }
+        else
+        {
+            this.baseEntityReportDate.setReportDate(newReportDate);
+        }
+    }
 
-        this.minReportDate = null;
-        this.maxReportDate = null;
+    @Override
+    public IBaseEntityReportDate getBaseEntityReportDate() {
+        return baseEntityReportDate;
+    }
+
+    @Override
+    public void setBaseEntityReportDate(IBaseEntityReportDate baseEntityReportDate) {
+        this.baseEntityReportDate = baseEntityReportDate;
+    }
+
+    public void calculateValueCount()
+    {
+        long integerValuesCount = 0;
+        long dateValuesCount = 0;
+        long stringValuesCount = 0;
+        long booleanValuesCount = 0;
+        long doubleValuesCount = 0;
+        long complexValuesCount = 0;
+        long simpleSetsCount = 0;
+        long complexSetsCount = 0;
+
+        for (String attribute: values.keySet())
+        {
+            IMetaType metaType = meta.getMemberType(attribute);
+            if (metaType.isSet())
+            {
+                if (metaType.isComplex())
+                {
+                    complexSetsCount++;
+                }
+                else
+                {
+                    simpleSetsCount++;
+                }
+            }
+            else
+            {
+                if (metaType.isComplex())
+                {
+                    complexValuesCount++;
+                }
+                else
+                {
+                    MetaValue metaValue = (MetaValue)metaType;
+                    switch (metaValue.getTypeCode())
+                    {
+                        case INTEGER:
+                            integerValuesCount++;
+                            break;
+                        case DATE:
+                            dateValuesCount++;
+                            break;
+                        case STRING:
+                            stringValuesCount++;
+                            break;
+                        case BOOLEAN:
+                            booleanValuesCount++;
+                            break;
+                        case DOUBLE:
+                            doubleValuesCount++;
+                            break;
+                        default:
+                            throw new RuntimeException("Unknown data type.");
+                    }
+
+                }
+            }
+        }
+
+        baseEntityReportDate.setIntegerValuesCount(integerValuesCount);
+        baseEntityReportDate.setDateValuesCount(dateValuesCount);
+        baseEntityReportDate.setStringValuesCount(stringValuesCount);
+        baseEntityReportDate.setBooleanValuesCount(booleanValuesCount);
+        baseEntityReportDate.setDoubleValuesCount(doubleValuesCount);
+        baseEntityReportDate.setComplexValuesCount(complexValuesCount);
+        baseEntityReportDate.setSimpleSetsCount(simpleSetsCount);
+        baseEntityReportDate.setComplexSetsCount(complexSetsCount);
     }
 
     @Override
@@ -496,6 +507,15 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         }
 
         BaseEntity that = (BaseEntity) obj;
+
+        if (meta.isSearchable())
+        {
+            if (this.getId() > 0 && that.getId() > 0 && this.getId() == that.getId())
+            {
+                return true;
+            }
+            return false;
+        }
 
         int thisValueCount = this.getValueCount();
         int thatValueCount = that.getValueCount();
@@ -526,9 +546,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                 MetaValue metaValue = (MetaValue)metaType;
                 if (metaValue.getTypeCode().equals(DataTypes.DATE))
                 {
-                    DataUtils.toBeginningOfTheDay((Date) thisObject);
-                    DataUtils.toBeginningOfTheDay((Date) thatObject);
+                    if (DataUtils.compareBeginningOfTheDay((Date)thisObject, (Date)thatObject) != 0)
+                    {
+                        return false;
+                    }
                 }
+
             }
 
             if (!thisObject.equals(thatObject))
@@ -539,6 +562,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
         return true;
     }
+
+
 
     public IBaseValue safeGetValue(String name)
     {
@@ -986,19 +1011,14 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     @Override
     public BaseEntity clone()
     {
-        BaseEntity baseEntity = null;
+        BaseEntity baseEntityCloned = null;
         try
         {
-            baseEntity = (BaseEntity)super.clone();
-            baseEntity.setReportDate((Date)reportDate.clone());
+            baseEntityCloned = (BaseEntity)super.clone();
 
-            HashSet<Date> availableReportDatesCloned = new HashSet<Date>();
-            Iterator<Date> availableReportDatesIt = availableReportDates.iterator();
-            while(availableReportDatesIt.hasNext())
-            {
-                availableReportDatesCloned.add((Date)availableReportDatesIt.next().clone());
-            }
-            baseEntity.setAvailableReportDates(availableReportDatesCloned);
+            BaseEntityReportDate baseEntityReportDateCloned = ((BaseEntityReportDate)baseEntityReportDate).clone();
+            baseEntityReportDateCloned.setBaseEntity(baseEntityCloned);
+            baseEntityCloned.setBaseEntityReportDate(baseEntityReportDateCloned);
 
             HashMap<String, IBaseValue> valuesCloned = new HashMap<String, IBaseValue>();
             Iterator<String> attributesIt = values.keySet().iterator();
@@ -1007,17 +1027,17 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                 String attribute = attributesIt.next();
 
                 IBaseValue baseValue = values.get(attribute);
-                IBaseValue baseValueCloned = (IBaseValue)((BaseValue)baseValue).clone();
+                IBaseValue baseValueCloned = ((BaseValue)baseValue).clone();
+                baseValueCloned.setBaseContainer(baseEntityCloned);
                 valuesCloned.put(attribute, baseValueCloned);
             }
-            baseEntity.setAvailableReportDates(availableReportDatesCloned);
-
+            baseEntityCloned.values = valuesCloned;
         }
         catch(CloneNotSupportedException ex)
         {
             throw new RuntimeException("BaseEntity class does not implement interface Cloneable.");
         }
-        return baseEntity;
+        return baseEntityCloned;
     }
 
     public boolean applyKeyFilter(HashMap<String, ArrayList<String>> arrayKeyFilter) throws ParseException
