@@ -411,11 +411,11 @@
       <index name="eav_ind_005_03">
         <index-column name="entity_id"/>
       </index>
-      <unique name="eav_ind_005_04">
-        <unique-column name="attribute_id"/>
-        <unique-column name="entity_value_id"/>
-        <unique-column name="entity_id"/>
-      </unique>
+      <index name="eav_ind_005_04">
+        <index-column name="attribute_id"/>
+        <index-column name="entity_value_id"/>
+        <index-column name="entity_id"/>
+      </index>
     </table>
     <!-- EAV_BE_DATE_SET_VALUES -->
     <table name="eav_be_date_set_values">

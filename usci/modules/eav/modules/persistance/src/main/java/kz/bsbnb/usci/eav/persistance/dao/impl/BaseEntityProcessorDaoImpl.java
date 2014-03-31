@@ -1935,10 +1935,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             IBeValueDao valueDao = persistableDaoPool
                     .getPersistableDao(baseValueSaving.getClass(), IBeValueDao.class);
             IBaseValue baseValueClosed = valueDao.getClosedBaseValue(baseValueSaving);
-            baseValueClosed.setMetaAttribute(metaAttribute);
-
             if (baseValueClosed != null)
             {
+                baseValueClosed.setMetaAttribute(metaAttribute);
                 if (baseValueClosed.equalsByValue(baseValueSaving))
                 {
                     baseValueClosed.setBaseContainer(baseEntity);
@@ -2213,10 +2212,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             IBeValueDao valueDao = persistableDaoPool
                     .getPersistableDao(baseValueSaving.getClass(), IBeValueDao.class);
             IBaseValue baseValueClosed = valueDao.getClosedBaseValue(baseValueSaving);
-            baseValueClosed.setMetaAttribute(metaAttribute);
-
             if (baseValueClosed != null)
             {
+                baseValueClosed.setMetaAttribute(metaAttribute);
                 IBaseEntity baseEntityClosed = (IBaseEntity)baseValueClosed.getValue();
                 if (baseValueClosed.equalsByValue(baseValueSaving))
                 {
