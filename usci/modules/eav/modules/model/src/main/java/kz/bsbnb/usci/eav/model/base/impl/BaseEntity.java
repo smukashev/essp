@@ -508,6 +508,15 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
         BaseEntity that = (BaseEntity) obj;
 
+        if (meta.isSearchable())
+        {
+            if (this.getId() > 0 && that.getId() > 0 && this.getId() == that.getId())
+            {
+                return true;
+            }
+            return false;
+        }
+
         int thisValueCount = this.getValueCount();
         int thatValueCount = that.getValueCount();
 
@@ -537,9 +546,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                 MetaValue metaValue = (MetaValue)metaType;
                 if (metaValue.getTypeCode().equals(DataTypes.DATE))
                 {
-                    DataUtils.toBeginningOfTheDay((Date) thisObject);
-                    DataUtils.toBeginningOfTheDay((Date) thatObject);
+                    if (DataUtils.compareBeginningOfTheDay((Date)thisObject, (Date)thatObject) != 0)
+                    {
+                        return false;
+                    }
                 }
+
             }
 
             if (!thisObject.equals(thatObject))
@@ -550,6 +562,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
         return true;
     }
+
+
 
     public IBaseValue safeGetValue(String name)
     {

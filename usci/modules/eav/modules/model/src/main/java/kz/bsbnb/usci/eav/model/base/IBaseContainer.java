@@ -75,4 +75,6 @@ public interface IBaseContainer extends IBaseObject
     public void setBaseContainerType(BaseContainerType baseContainerType);
 
     //public IMetaContainer getMetaContainer();
+
+
 }

@@ -295,14 +295,19 @@ public class BaseSet extends BaseContainer implements IBaseSet
 
                     if (date)
                     {
-                        DataUtils.toBeginningOfTheDay((Date) thisObject);
-                        DataUtils.toBeginningOfTheDay((Date) thatObject);
+                        if (DataUtils.compareBeginningOfTheDay((Date) thisObject, (Date) thatObject) == 0)
+                        {
+                            uuids.add(thatBaseValue.getUuid());
+                            found = true;
+                        }
                     }
-
-                    if (thisObject.equals(thatObject))
+                    else
                     {
-                        uuids.add(thatBaseValue.getUuid());
-                        found = true;
+                        if (thisObject.equals(thatObject))
+                        {
+                            uuids.add(thatBaseValue.getUuid());
+                            found = true;
+                        }
                     }
                 }
             }

@@ -206,21 +206,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
         else
         {
             BaseValue that = (BaseValue)obj;
-
-            boolean res = index == that.index && batch.equals(that.batch) &&
-                    !(value != null ? !value.equals(that.value) : that.value != null) &&
-                    reportDate.equals(that.reportDate);
-
-            logger.debug("Values: " + this.value + ", " + that.value);
-            logger.debug("BaseValue Equals main expression: " + res);
-            logger.debug("index == that.index: " + (index == that.index));
-            logger.debug("batch.equals(that.batch): " + (batch.equals(that.batch)));
-            logger.debug("!(value != null ? !value.equals(that.value) : that.value != null): " +
-                    !(value != null ? !value.equals(that.value) : that.value != null));
-            logger.debug("reportDate.equals(that.reportDate): " + (reportDate.equals(that.reportDate)));
-
-            return res;
-
+            return value != null ? value.equals(that.value) : that.value == null;
         }
     }
 
