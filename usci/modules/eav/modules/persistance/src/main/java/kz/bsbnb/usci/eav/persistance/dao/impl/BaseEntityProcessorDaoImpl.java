@@ -574,7 +574,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         int reportDateCompare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
         if (reportDateCompare == 0)
         {
-            //baseEntityManager.registerAsUpdated(baseEntityReportDate);
+            baseEntityManager.registerAsUpdated(baseEntityReportDate);
         }
         else
         {
