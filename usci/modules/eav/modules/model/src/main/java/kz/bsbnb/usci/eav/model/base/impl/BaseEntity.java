@@ -831,6 +831,106 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         return valueOut;
     }
 
+    public List<Object> getElWithArrays(String path)
+    {
+        StringTokenizer tokenizer = new StringTokenizer(path, ".");
+
+        BaseEntity entity = this;
+        MetaClass theMeta = meta;
+        ArrayList<Object> valueOut = new ArrayList<Object>();
+        Object currentValue = null;
+
+        try {
+            while (tokenizer.hasMoreTokens())
+            {
+                String token = tokenizer.nextToken();
+                String arrayIndexes = null;
+
+                if (token.contains("["))
+                {
+                    arrayIndexes = token.substring(token.indexOf("[") + 1, token.length() - 1);
+                    token = token.substring(0, token.indexOf("["));
+                }
+
+                IMetaAttribute attribute = theMeta.getMetaAttribute(token);
+                IMetaType type = attribute.getMetaType();
+
+                if (entity == null)
+                    return valueOut;
+
+                IBaseValue value = entity.getBaseValue(token);
+
+                if (value == null || value.getValue() == null) {
+                    return valueOut;
+                }
+
+                currentValue = value.getValue();
+
+                if (type.isSet())
+                {
+                    BaseSet set = (BaseSet)currentValue;
+                    if (arrayIndexes != null) {
+                        currentValue = set.getEl(arrayIndexes.replaceAll("->", "."));
+                        type = ((MetaSet)type).getMemberType();
+                    } else {
+                        if (tokenizer.hasMoreTokens())
+                        {
+                            if(!set.getMemberType().isComplex()) {
+                                throw new IllegalArgumentException("Simple sets not supported");
+                            }
+
+                            if(set.getMemberType().isSet()) {
+                                throw new IllegalArgumentException("Set of sets not supported");
+                            }
+
+                            String restOfPath = "";
+                            boolean first = true;
+                            while(tokenizer.hasMoreTokens()) {
+                                if (first) {
+                                    restOfPath += tokenizer.nextToken();
+                                    first = false;
+                                } else {
+                                    restOfPath += "." + tokenizer.nextToken();
+                                }
+                            }
+
+                            for (IBaseValue obj : set.get()) {
+                                BaseEntity currentEntity = (BaseEntity)(obj.getValue());
+                                if (currentEntity != null)
+                                    valueOut.addAll(currentEntity.getElWithArrays(restOfPath));
+                                else
+                                    logger.warn("Null in set");
+                            }
+
+                            return valueOut;
+                        }
+                    }
+                }
+
+                if (type.isComplex() && !type.isSet())
+                {
+                    entity = (BaseEntity)currentValue;
+                    theMeta = (MetaClass)type;
+                } else {
+                    if (tokenizer.hasMoreTokens())
+                    {
+                        throw new IllegalArgumentException("Path can't have intermediate simple values");
+                    }
+                }
+
+                if (!tokenizer.hasMoreTokens()) {
+                    valueOut.add(currentValue);
+                    return valueOut;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Entity: " + this.toString());
+            System.out.println("path: " + path);
+        }
+
+        return valueOut;
+    }
+
     public boolean equalsToString(HashMap<String, String> params)
     {
         for (String fieldName : params.keySet())

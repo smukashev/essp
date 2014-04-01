@@ -198,6 +198,10 @@ public final class DataJob extends AbstractDataJob {
         }
         System.out.println("---------------------------------------------------");*/
 
+        /*if (interList.size() < 1) {
+            System.out.println("Error in comparator");
+        } */
+
         if (interList.size() > 0)
             return true;
         return false;

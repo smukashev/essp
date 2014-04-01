@@ -188,51 +188,55 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
 
             logger.debug("Path: " + path);
 
-            if (c2.getMeta().arrayInPath(path))
-                continue;
+            /*if (c2.getMeta().arrayInPath(path))
+                continue;*/
 
             IMetaType innerMetaType = c2.getMeta().getEl(path);
 
-            if (!innerMetaType.isSet()) {
-                logger.debug("Is not set");
-                BaseEntity entity2 = null;
-                try {
-                    entity2 = (BaseEntity)c2.getEl(path);
-                } catch(ClassCastException e) {
-                    System.out.println("============= " + path);
-                    e.printStackTrace();
-                }
+            List<Object> childValues = c2.getElWithArrays(path);
 
-                if (entity1 != null && entity2 != null && compare(entity1, entity2)) {
-                    paths.add(path);
-                    logger.debug("Is equal");
-                }
-                paths.addAll(intersect(entity1, c2));
-            } else {
-                logger.debug("Is set");
-                MetaSet innerSet = (MetaSet)innerMetaType;
-
-                if (!innerSet.getMemberType().isSet()) {
-                    BaseSet set2 = (BaseSet)c2.getEl(path);
-
-                    if (set2 == null) {
-                        continue;
+            for(Object currentChildValue : childValues) {
+                if (!innerMetaType.isSet()) {
+                    logger.debug("Is not set");
+                    BaseEntity entity2 = null;
+                    try {
+                        entity2 = (BaseEntity)currentChildValue;
+                    } catch(ClassCastException e) {
+                        System.out.println("============= " + path);
+                        e.printStackTrace();
                     }
 
-                    for (String identifier : set2.getAttributes()) {
-                        IBaseValue value2 = set2.getBaseValue(identifier);
-                        if (value2 != null) {
-                            BaseEntity entity2 = (BaseEntity)value2.getValue();
+                    if (entity1 != null && entity2 != null && compare(entity1, entity2)) {
+                        paths.add(path);
+                        logger.debug("Is equal");
+                    }
+                    //paths.addAll(intersect(entity1, c2));
+                } else {
+                    logger.debug("Is set");
+                    MetaSet innerSet = (MetaSet)innerMetaType;
 
-                            if (entity1 != null && entity2 != null && compare(entity1, entity2)) {
-                                paths.add(path + "[" + identifier + "]");
+                    if (!innerSet.getMemberType().isSet()) {
+                        BaseSet set2 = (BaseSet)currentChildValue;
+
+                        if (set2 == null) {
+                            continue;
+                        }
+
+                        for (String identifier : set2.getAttributes()) {
+                            IBaseValue value2 = set2.getBaseValue(identifier);
+                            if (value2 != null) {
+                                BaseEntity entity2 = (BaseEntity)value2.getValue();
+
+                                if (entity1 != null && entity2 != null && compare(entity1, entity2)) {
+                                    paths.add(path + "[" + identifier + "]");
+                                }
                             }
                         }
-                    }
 
-                    paths.addAll(intersect(entity1, c2));
-                } else {
-                    throw new IllegalStateException("Unimplemented");
+                        //paths.addAll(intersect(entity1, c2));
+                    } else {
+                        throw new IllegalStateException("Unimplemented");
+                    }
                 }
             }
         }
@@ -272,6 +276,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
                     BaseEntity entity1 = (BaseEntity)(value1.getValue());
 
                     paths.addAll(findBaseEntity(entity1, c2, (MetaClass)type));
+                    paths.addAll(intersect(entity1, c2));
                 }
             } else {
                 MetaSet set = (MetaSet)type;
@@ -290,6 +295,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
                                 BaseEntity entity1 = (BaseEntity)(value11.getValue());
 
                                 paths.addAll(findBaseEntity(entity1, c2, (MetaClass)(set.getMemberType())));
+                                paths.addAll(intersect(entity1, c2));
                             }
                         }
                     }
