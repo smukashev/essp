@@ -20,4 +20,5 @@ public interface IEntityService {
     public List<RefListItem> getRefsByMetaclass(long metaClassId);
     public HashMap<String, QueryEntry> getSQLStats();
     public void clearSQLStats();
+    public void remove(long id);
 }

@@ -81,11 +81,11 @@ public class RulesSingleton
 
     private ArrayList<RulePackageError> rulePackageErrors = new ArrayList<RulePackageError>();
 
-    @Autowired//(required = false)
+    @Autowired(required = false)
     private IBatchService remoteRuleBatchService;
-    @Autowired//(required = false)
+    @Autowired(required = false)
     private IRuleService remoteRuleService;
-    @Autowired//(required = false)
+    @Autowired(required = false)
     private IBatchVersionService remoteRuleBatchVersionService;
 
     public StatelessKnowledgeSession getSession()

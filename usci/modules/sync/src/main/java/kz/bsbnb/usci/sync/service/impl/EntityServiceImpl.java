@@ -86,4 +86,10 @@ public class EntityServiceImpl implements IEntityService {
     {
         return syncStatusSingleton.getStatus();
     }
+
+    @Override
+    public void remove(long id)
+    {
+        remoteEntityService.remove(id);
+    }
 }

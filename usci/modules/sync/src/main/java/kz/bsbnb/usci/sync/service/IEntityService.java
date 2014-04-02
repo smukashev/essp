@@ -21,4 +21,5 @@ public interface IEntityService {
     public void setThreadsCount(int threadsCount, boolean allowAutoIncrement);
 
     public SyncStatus getStatus();
+    public void remove(long id);
 }

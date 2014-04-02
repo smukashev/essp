@@ -126,4 +126,10 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     public void clearSQLStats() {
         stats.clear();
     }
+
+    @Override
+    public void remove(long id)
+    {
+        //TODO: implement
+    }
 }

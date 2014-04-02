@@ -328,6 +328,27 @@ public class CLI
         }
     }
 
+    public void removeEntityById(long id, String url) {
+        RmiProxyFactoryBean serviceFactory = null;
+
+        IEntityService entityServiceCore = null;
+
+        try {
+            serviceFactory = new RmiProxyFactoryBean();
+            //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+            serviceFactory.setServiceUrl(args.get(2));
+            serviceFactory.setServiceInterface(IEntityService.class);
+            serviceFactory.setRefreshStubOnConnectFailure(true);
+
+            serviceFactory.afterPropertiesSet();
+            entityServiceCore = (IEntityService) serviceFactory.getObject();
+        } catch (Exception e) {
+            System.out.println("Can't connect to receiver service: " + e.getMessage());
+        }
+
+        entityServiceCore.remove(id);
+    }
+
     public void dumpEntityToXML(String ids, String fileName) {
         StringTokenizer st = new StringTokenizer(ids, ",");
         ArrayList<BaseEntity> entities = new ArrayList<BaseEntity>();
@@ -1155,6 +1176,13 @@ public class CLI
                     dumpEntityToXML(args.get(1), args.get(2));
                 } else {
                     System.out.println("Argument needed: <xml> <id> <fileName>");
+                }
+            } else if(args.get(0).equals("rm")) {
+                if (args.size() > 2) {
+                    removeEntityById(Long.parseLong(args.get(1)), args.get(2));
+                } else {
+                    System.out.println("Argument needed: <rm> <id> <service_url>");
+                    System.out.println("Example: rm 100 rmi://127.0.0.1:1099/batchEntryService");
                 }
             } else if(args.get(0).equals("read")) {
                 if (args.size() > 2) {
