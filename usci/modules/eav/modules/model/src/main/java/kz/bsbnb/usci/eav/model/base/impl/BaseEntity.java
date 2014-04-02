@@ -1221,4 +1221,61 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
             value.setIndex(index);
         }
     }
+
+    public int getSearchableChildrenCount() {
+        int count = 0;
+
+        for (String attribute: values.keySet())
+        {
+            IMetaType metaType = meta.getMemberType(attribute);
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
+            IBaseValue value = getBaseValue(attribute);
+
+            if (value == null)
+                continue;
+
+            if (value.getValue() == null)
+                continue;
+
+            if (metaAttribute.isImmutable())
+                continue;
+
+            if (metaType.isSet())
+            {
+                MetaSet metaSet = (MetaSet)metaType;
+
+                if (metaSet.getMemberType().isComplex() && !metaSet.getMemberType().isSet())
+                {
+                    BaseSet baseSet = (BaseSet)(value.getValue());
+                    MetaClass metaClass = (MetaClass)(baseSet.getMemberType());
+
+                    for (IBaseValue setValue : baseSet.get()) {
+                        if (setValue.getValue() == null)
+                            continue;
+
+                        BaseEntity baseEntity = (BaseEntity)(setValue.getValue());
+
+                        if (metaClass.isSearchable())
+                            count++;
+
+                        count += baseEntity.getSearchableChildrenCount();
+                    }
+                }
+            }
+            else
+            {
+                if (metaType.isComplex())
+                {
+                    MetaClass metaClass = (MetaClass)metaType;
+                    BaseEntity baseEntity = (BaseEntity)(value.getValue());
+                    if (metaClass.isSearchable())
+                        count++;
+
+                    count += baseEntity.getSearchableChildrenCount();
+                }
+            }
+        }
+
+        return count;
+    }
 }

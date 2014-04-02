@@ -390,6 +390,33 @@ public class CLI
 
     }
 
+    public void testEntityFromXML(String fileName, String repDate) {
+        try {
+            Date reportDate = sdfout.parse(repDate);
+            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
+            BaseEntity entity;
+            while((entity = reader.read()) != null) {
+                BaseEntity clonedEntity = entity.clone();
+
+                List<String> intersectionList = comparator.intersect(entity, clonedEntity);
+
+                System.out.println("Intersection count: " + intersectionList.size() + ", actual count: " + entity.getSearchableChildrenCount());
+                if (intersectionList.size() != entity.getSearchableChildrenCount()) {
+                    System.out.println("Error");
+                    for (String path : intersectionList) {
+                        System.out.println(path);
+                    }
+                }
+            }
+        } catch (FileNotFoundException e)
+        {
+            System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
+        } catch (ParseException e) {
+            System.out.println("Can't parse date " + repDate + " must be in format "+ sdfout.toString());
+        }
+
+    }
+
     public void showEntityAttr(String path, long id) {
         IBaseEntity entity = baseEntityProcessorDao.load(id);
 
@@ -1189,6 +1216,12 @@ public class CLI
                     readEntityFromXML(args.get(1), args.get(2));
                 } else {
                     System.out.println("Argument needed: <read> <fileName> <rep_date>");
+                }
+            } else if(args.get(0).equals("test")) {
+                if (args.size() > 2) {
+                    testEntityFromXML(args.get(1), args.get(2));
+                } else {
+                    System.out.println("Argument needed: <test> <fileName> <rep_date>");
                 }
             } else {
                 System.out.println("No such operation: " + args.get(0));

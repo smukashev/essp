@@ -361,15 +361,29 @@ public class BaseSet extends BaseContainer implements IBaseSet
 
     public BaseSet clone()
     {
-        try {
-            BaseSet baseSet = (BaseSet)super.clone();
+        BaseSet baseSetCloned = null;
+        try
+        {
+            baseSetCloned = (BaseSet)super.clone();
 
+            HashMap<String, IBaseValue> valuesCloned = new HashMap<String, IBaseValue>();
+            Iterator<String> items = values.keySet().iterator();
+            while(items.hasNext())
+            {
+                String attribute = items.next();
 
-
-            return baseSet;
-        } catch (CloneNotSupportedException e) {
+                IBaseValue baseValue = values.get(attribute);
+                IBaseValue baseValueCloned = ((BaseValue)baseValue).clone();
+                baseValueCloned.setBaseContainer(baseSetCloned);
+                valuesCloned.put(attribute, baseValueCloned);
+            }
+            baseSetCloned.values = valuesCloned;
+        }
+        catch(CloneNotSupportedException ex)
+        {
             throw new RuntimeException("BaseSet class does not implement interface Cloneable.");
         }
+        return baseSetCloned;
     }
 
     public int sizeWithFilter(HashMap<String, ArrayList<String>> arrayKeyFilter) throws ParseException
