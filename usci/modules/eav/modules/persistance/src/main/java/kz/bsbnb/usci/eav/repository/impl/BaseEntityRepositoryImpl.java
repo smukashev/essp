@@ -105,7 +105,8 @@ public class BaseEntityRepositoryImpl implements IBaseEntityRepository {
             .build(
                     new CacheLoader<BaseEntityKey, IBaseEntity>() {
                         public IBaseEntity load(BaseEntityKey key) throws Exception {
-                            return baseEntityProcessorDao.load(key.getId(), key.getReportDate());
+                            //TODO: Dates messed up
+                            return baseEntityProcessorDao.load(key.getId(), key.getReportDate(), key.getReportDate());
                         }
                     });
     }
@@ -133,7 +134,8 @@ public class BaseEntityRepositoryImpl implements IBaseEntityRepository {
         }
         else
         {
-            return baseEntityProcessorDao.load(id, reportDate);
+            //TODO: Dates messed up
+            return baseEntityProcessorDao.load(id, reportDate, reportDate);
         }
     }
 

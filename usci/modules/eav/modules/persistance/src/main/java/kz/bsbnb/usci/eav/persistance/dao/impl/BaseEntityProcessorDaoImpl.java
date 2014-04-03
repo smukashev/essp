@@ -59,14 +59,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Autowired
     private BasicBaseEntitySearcherPool searcherPool;
 
-    public IBaseEntity loadByMaxReportDate(long id, Date reportDate, boolean caching)
+    public IBaseEntity loadByMaxReportDate(long id, Date actualReportDate, boolean caching)
     {
-        Date maxReportDate = getMaxReportDate(id, reportDate);
+        Date maxReportDate = getMaxReportDate(id, actualReportDate);
         if (maxReportDate == null)
         {
-            throw new RuntimeException("No data found on report date " + reportDate + ".");
+            throw new RuntimeException("No data found on report date " + actualReportDate + ".");
         }
-        return load(id, maxReportDate, caching);
+        return load(id, maxReportDate, actualReportDate, caching);
     }
 
     public IBaseEntity loadByMaxReportDate(long id, Date reportDate)
@@ -94,28 +94,28 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             return baseEntityCacheDao.getBaseEntity(id, maxReportDate);
         }
 
-        return load(id, maxReportDate);
+        return load(id, maxReportDate, maxReportDate);
     }
 
     @Override
-    public IBaseEntity load(long id, Date reportDate, boolean caching)
+    public IBaseEntity load(long id, Date maxReportDate, Date actualReportDate, boolean caching)
     {
-        if (caching)
+        /*if (caching)
         {
-            return baseEntityCacheDao.getBaseEntity(id, reportDate);
-        }
+            return baseEntityCacheDao.getBaseEntity(id, maxReportDate);
+        }*/
 
-        return load(id, reportDate);
+        return load(id, maxReportDate, actualReportDate);
     }
 
-    public IBaseEntity load(long id, Date reportDate)
+    public IBaseEntity load(long id, Date maxReportDate, Date actualReportDate)
     {
         if(id < 1)
         {
             throw new IllegalArgumentException("Does not have id. Can't load.");
         }
 
-        if (reportDate == null)
+        if (maxReportDate == null)
         {
             throw new IllegalArgumentException("To load instance of BaseEntity must always " +
                     "be specified report date.");
@@ -144,10 +144,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         if(row != null)
         {
             long classId = ((BigDecimal)row.get(EAV_BE_ENTITIES.as(tableAlias).CLASS_ID.getName())).longValue();
-            boolean last = DataTypeUtil.compareBeginningOfTheDay(getMaxReportDate(id), reportDate) == 0;
+            boolean last = DataTypeUtil.compareBeginningOfTheDay(getMaxReportDate(id), maxReportDate) == 0;
 
             MetaClass meta = metaClassRepository.getMetaClass(classId);
-            IBaseEntityReportDate baseEntityReportDate = loadBaseEntityReportDate(id, reportDate);
+            IBaseEntityReportDate baseEntityReportDate = loadBaseEntityReportDate(id, maxReportDate);
             IBaseEntity baseEntity = new BaseEntity(id, meta, baseEntityReportDate);
 
             if (baseEntityReportDate.getIntegerValuesCount() != 0)
@@ -166,13 +166,13 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 loadDoubleValues(baseEntity, last);
 
             if (baseEntityReportDate.getComplexValuesCount() != 0)
-                loadComplexValues(baseEntity, last);
+                loadComplexValues(baseEntity, actualReportDate, last);
 
             if (baseEntityReportDate.getSimpleSetsCount() != 0)
                 loadEntitySimpleSets(baseEntity, last);
 
             if (baseEntityReportDate.getComplexSetsCount() != 0)
-                loadEntityComplexSets(baseEntity, last);
+                loadEntityComplexSets(baseEntity, actualReportDate, last);
 
             return baseEntity;
         }
@@ -440,8 +440,20 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             }
             else
             {
-                IBaseEntity baseEntityLoaded = load(baseEntityForSave.getId(), maxReportDate);
-                return applyBaseEntityAdvanced(baseEntityForSave, baseEntityLoaded, baseEntityManager);
+                IBaseEntity baseEntityLoaded = load(baseEntityForSave.getId(), maxReportDate, reportDate);
+                try {
+                    return applyBaseEntityAdvanced(baseEntityForSave, baseEntityLoaded, baseEntityManager);
+                } catch (IllegalStateException ex) {
+                    logger.error("ILLEGAL_STATE_ERROR in applyBaseEntityAdvanced " + ex.getMessage() + "\n" +
+                            "REPORT_DATE_EXISTS ERROR:\n" +
+                            "DATA DUMP\n" +
+                            "baseEntityForSave: \n" +
+                            baseEntityForSave +
+                            "baseEntityLoaded: \n" +
+                            baseEntityLoaded);
+
+                    throw ex;
+                }
             }
         }
     }
@@ -584,7 +596,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             if (reportDateExists) {
                 logger.error("REPORT_DATE_EXISTS ERROR:\n" +
                         "DATA DUMP\n" +
-                        "baseValueSaving: \n" +
+                        "baseEntitySaving: \n" +
                         baseEntitySaving +
                         "baseEntityLoaded: \n" +
                         baseEntityLoaded +
@@ -2923,7 +2935,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    private void loadComplexValues(IBaseEntity baseEntity, boolean lastReportDate)
+    private void loadComplexValues(IBaseEntity baseEntity, Date actualReportDate, boolean lastReportDate)
     {
         IMetaClass metaClass = baseEntity.getMeta();
 
@@ -3007,7 +3019,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             Batch batch = batchRepository.getBatch(batchId);
             IMetaType metaType = metaClass.getMemberType(attribute);
-            IBaseEntity childBaseEntity = loadByMaxReportDate(entityValueId, baseEntity.getReportDate(), metaType.isReference());
+            IBaseEntity childBaseEntity = loadByMaxReportDate(entityValueId, actualReportDate, metaType.isReference());
 
             baseEntity.put(attribute,
                     BaseValueFactory.create(
@@ -3111,7 +3123,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    private void loadEntityComplexSets(IBaseEntity baseEntity, boolean lastReportDate)
+    private void loadEntityComplexSets(IBaseEntity baseEntity, Date actualReportDate, boolean lastReportDate)
     {
         Table tableOfComplexSets = EAV_M_COMPLEX_SET.as("cs");
         Table tableOfEntityComplexSets = EAV_BE_ENTITY_COMPLEX_SETS.as("ecs");
@@ -3194,7 +3206,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             if (metaType.isComplex())
             {
-                loadComplexSetValues(baseSet, baseEntity.getReportDate(), lastReportDate);
+                loadComplexSetValues(baseSet, actualReportDate, lastReportDate);
             }
             else
             {

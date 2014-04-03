@@ -32,6 +32,7 @@ import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
+import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
@@ -318,8 +319,21 @@ public class CLI
         }
     }
 
-    public void showEntity(long id) {
-        IBaseEntity entity = baseEntityProcessorDao.load(id);
+    public void showEntity(long id, String reportDateStr) {
+        IBaseEntity entity;
+
+        if (reportDateStr != null) {
+            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+
+            try {
+                entity = baseEntityProcessorDao.loadByMaxReportDate(id, dateFormat.parse(reportDateStr));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return;
+            }
+        } else {
+            entity = baseEntityProcessorDao.load(id);
+        }
 
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
@@ -1164,7 +1178,7 @@ public class CLI
         if (args.size() > 1) {
             if (args.get(0).equals("show")) {
                 if (args.get(1).equals("id")) {
-                    showEntity(Long.parseLong(args.get(2)));
+                    showEntity(Long.parseLong(args.get(2)), args.size() > 3 ? args.get(3) : null);
                 } else if (args.get(1).equals("attr")) {
                     if (args.size() > 3) {
                         showEntityAttr(args.get(3), Long.parseLong(args.get(2)));

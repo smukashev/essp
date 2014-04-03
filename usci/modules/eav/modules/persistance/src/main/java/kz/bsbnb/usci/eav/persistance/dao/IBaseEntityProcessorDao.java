@@ -42,9 +42,9 @@ public interface IBaseEntityProcessorDao
 
     public IBaseEntity load(long id, boolean caching);
 
-    public IBaseEntity load(long id, Date reportDate);
+    public IBaseEntity load(long id, Date maxReportDate, Date actualReportDate);
 
-    public IBaseEntity load(long id, Date reportDate, boolean caching);
+    public IBaseEntity load(long id, Date maxReportDate, Date actualReportDate, boolean caching);
 
     public IBaseEntity prepare(IBaseEntity baseEntity);
 
