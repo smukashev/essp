@@ -106,7 +106,7 @@ public class BaseEntityRepositoryImpl implements IBaseEntityRepository {
                     new CacheLoader<BaseEntityKey, IBaseEntity>() {
                         public IBaseEntity load(BaseEntityKey key) throws Exception {
                             //TODO: Dates messed up
-                            return baseEntityProcessorDao.load(key.getId(), key.getReportDate(), key.getReportDate());
+                            return baseEntityProcessorDao.loadByMaxReportDate(key.getId(), key.getReportDate());
                         }
                     });
     }
@@ -135,7 +135,7 @@ public class BaseEntityRepositoryImpl implements IBaseEntityRepository {
         else
         {
             //TODO: Dates messed up
-            return baseEntityProcessorDao.load(id, reportDate, reportDate);
+            return baseEntityProcessorDao.loadByMaxReportDate(id, reportDate);
         }
     }
 

@@ -100,10 +100,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     public IBaseEntity load(long id, Date maxReportDate, Date actualReportDate, boolean caching)
     {
-        /*if (caching)
+        if (caching)
         {
-            return baseEntityCacheDao.getBaseEntity(id, maxReportDate);
-        }*/
+            return baseEntityCacheDao.getBaseEntity(id, actualReportDate);
+        }
 
         return load(id, maxReportDate, actualReportDate);
     }
