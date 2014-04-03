@@ -578,6 +578,22 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
         else
         {
+            boolean reportDateExists = checkReportDateExists(baseEntityLoaded.getId(),
+                    baseEntityReportDate.getReportDate());
+
+            if (reportDateExists) {
+                logger.error("REPORT_DATE_EXISTS ERROR:\n" +
+                        "DATA DUMP\n" +
+                        "baseValueSaving: \n" +
+                        baseEntitySaving +
+                        "baseEntityLoaded: \n" +
+                        baseEntityLoaded +
+                        "baseEntityApplied: \n" +
+                        baseEntityApplied);
+
+                throw new IllegalStateException("Report date " + baseEntityReportDate.getReportDate() + " already exists");
+            }
+
             baseEntityManager.registerAsInserted(baseEntityReportDate);
         }
 
@@ -2410,6 +2426,20 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         return DataUtils.convert((Timestamp) rows.get(0).get("min_report_date"));
+    }
+
+    public boolean checkReportDateExists(long baseEntityId, Date reportDate)
+    {
+        Select select = context
+                .select(DSL.count().as("report_dates_count"))
+                .from(EAV_BE_ENTITY_REPORT_DATES)
+                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId))
+                .and(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.equal(DataUtils.convert(reportDate)));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        return ((BigDecimal)rows.get(0).get("report_dates_count")).longValue() > 0;
     }
 
     public Date getMaxReportDate(long baseEntityId)

@@ -9,8 +9,13 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 public class BaseEntityOutput
 {
+    protected static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+
     public static String toString(BaseEntity entity)
     {
         return toString(entity, "");
@@ -18,7 +23,7 @@ public class BaseEntityOutput
 
     public static String toString(BaseEntity entity, String prefix)
     {
-        String str = "baseEntity(" + entity.getId() + ");";
+        String str = "baseEntity(" + entity.getId() + ", " + dateFormat.format(entity.getReportDate()) + ");";
         MetaClass meta = entity.getMeta();
 
         for (String memberName : meta.getMemberNames())
