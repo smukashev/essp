@@ -435,7 +435,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             if (maxReportDate == null)
             {
-                throw new UnsupportedOperationException("Not yet implemented.");
+                throw new UnsupportedOperationException("Not yet implemented. Entity ID: " + baseEntityForSave.getId());
                 //return applyBaseEntityAdvanced(baseEntityForSave, baseEntityManager);
             }
             else
@@ -1016,6 +1016,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             if (childBaseSetSaving == null || childBaseSetSaving.getValueCount() <= 0)
             {
+                childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+
                 Date reportDateSaving = baseValueSaving.getRepDate();
                 Date reportDateLoaded = baseValueLoaded.getRepDate();
                 boolean reportDateEquals = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded) == 0;
@@ -1408,6 +1410,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             if (childBaseSetSaving == null || childBaseSetSaving.getValueCount() <= 0)
             {
+                childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
                 //set deletion
                 Date reportDateSaving = baseValueSaving.getRepDate();
                 Date reportDateLoaded = baseValueLoaded.getRepDate();

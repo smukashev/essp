@@ -639,10 +639,10 @@
       <foreign-key foreignTable="eav_be_entities" name="eav_fk_012_00">
         <reference local="entity_id" foreign="id"/>
       </foreign-key>
-      <index name="eav_ind_012_00">
-        <index-column name="entity_id"/>
-        <index-column name="report_date"/>
-      </index>
+      <unique name="eav_ind_012_00">
+        <unique-column name="entity_id"/>
+        <unique-column name="report_date"/>
+      </unique>
     </table>
     <table name="eav_be_entity_simple_sets">
       <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>

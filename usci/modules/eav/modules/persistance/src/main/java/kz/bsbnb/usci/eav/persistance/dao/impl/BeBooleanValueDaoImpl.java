@@ -355,7 +355,8 @@ public class BeBooleanValueDaoImpl extends JDBCSupport implements IBeBooleanValu
                         EAV_BE_BOOLEAN_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_BOOLEAN_VALUES.as(tableAlias).VALUE,
-                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_LAST)
+                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_LAST,
+                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_CLOSED)
                 .from(EAV_BE_BOOLEAN_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))

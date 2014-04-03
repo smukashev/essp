@@ -5,6 +5,7 @@ import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.model.json.*;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.receiver.common.Global;
@@ -14,6 +15,7 @@ import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -40,6 +42,7 @@ import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -76,7 +79,7 @@ public class ZipFilesMonitor{
     //private static Gson gson = new Gson();
 
     public static final int ZIP_BUFFER_SIZE = 1024;
-    public static final int MAX_SYNC_QUEUE_SIZE = 128;
+    public static final int MAX_SYNC_QUEUE_SIZE = 256;
 
     private static final long WAIT_TIMEOUT = 360; //in 10 sec units
 
@@ -138,6 +141,13 @@ public class ZipFilesMonitor{
         } catch (Exception e) {
             logger.error("Error connecting to Couchbase: " + e.getMessage());
         }
+
+        IBatchService batchService = serviceFactory.getBatchService();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(0);
+        cal.set(2013, 4, 1, 0, 0, 0);
+
         while(true) {
             try {
                 View view = couchbaseClient.getView("batch", "batch_pending");
@@ -163,12 +173,32 @@ public class ZipFilesMonitor{
 
                         System.out.println("batchId: " + batchId + ", status: " + viewRowNoDocs.getValue());
 
-                        String batchInfoStr = couchbaseClient.get("manifest:" + batchId).toString();
+                        Object batchObject = couchbaseClient.get("batch:" + batchId);
+                        Object manifestObject = couchbaseClient.get("manifest:" + batchId);
 
-                        System.out.println(batchInfoStr);
+                        if (batchObject == null || manifestObject == null) {
+                            System.out.println("Batch with id: " + batchId + " has no manifest or batch. Restart failed.");
+                            break;
+                        }
+
+                        System.out.println(manifestObject.toString());
                         System.out.println("-------------------------------------------------------------------------");
 
-                        BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
+                        BatchInfo batchInfo = gson.fromJson(manifestObject.toString(), BatchInfo.class);
+                        try {
+                            batchService.load(batchId);
+                        } catch(Exception e) {
+                            System.out.println("Can't get batch from eav DB. Skipped.");
+                        }
+
+
+
+                        if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), cal.getTime()) != 0)
+                        {
+                            System.out.println("Skipping wrone dates: " + batchInfo.getRepDate());
+                            System.out.println("Must be: " + cal.getTime());
+                            continue;
+                        }
 
                         sender.addJob(batchId, batchInfo);
                         receiverStatusSingleton.batchReceived();
@@ -331,15 +361,15 @@ public class ZipFilesMonitor{
             }
         }
 
-        private Stack<JobInfo> ids = new Stack<JobInfo>();
+        private ConcurrentLinkedQueue<JobInfo> ids = new ConcurrentLinkedQueue<JobInfo>();
 
         private synchronized void addJob(long id, BatchInfo batchInfo) {
-            ids.push(new JobInfo(id, batchInfo));
+            ids.add(new JobInfo(id, batchInfo));
         }
 
         private synchronized JobInfo getNextJob() {
             if (ids.size() > 0)
-                return ids.pop();
+                return ids.poll();
             return null;
         }
 
