@@ -38,6 +38,8 @@ public interface IBaseEntityProcessorDao
 
     public IBaseEntity loadByMaxReportDate(long id, Date reportDate);
 
+    public IBaseEntity loadByMaxReportDate(long id, Date reportDate, boolean caching);
+
     public IBaseEntity load(long id);
 
     public IBaseEntity load(long id, boolean caching);
@@ -67,10 +69,5 @@ public interface IBaseEntityProcessorDao
     public boolean isApproved(long id);
 
     public int batchCount(long id, String className);
-
-
-    public void loadSimpleSetValues(IBaseSet baseSet, Date baseEntityReportDate, boolean lastReportDate);
-
-    public void loadComplexSetValues(IBaseSet baseSet, Date baseEntityReportDate, boolean lastReportDate);
 
 }

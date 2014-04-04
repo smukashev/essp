@@ -3,6 +3,6 @@ package kz.bsbnb.usci.eav.persistance.dao;
 /**
  *
  */
-public interface IBeComplexSetValueDao extends IBeSetValueDao {
+public interface IBeComplexSetValueDao extends IBaseSetValueDao {
 
 }

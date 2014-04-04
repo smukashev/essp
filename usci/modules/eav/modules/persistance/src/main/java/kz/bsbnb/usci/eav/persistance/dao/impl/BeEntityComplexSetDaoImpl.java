@@ -12,8 +12,10 @@ import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBeComplexSetValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBeEntityComplexSetDao;
 import kz.bsbnb.usci.eav.persistance.impl.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +52,7 @@ public class BeEntityComplexSetDaoImpl extends JDBCSupport implements IBeEntityC
     IBatchRepository batchRepository;
 
     @Autowired
-    IBaseEntityProcessorDao baseEntityProcessorDao;
+    IBeComplexSetValueDao beComplexSetValueDao;
 
     @Override
     public long insert(IPersistable persistable) {
@@ -212,7 +215,7 @@ public class BeEntityComplexSetDaoImpl extends JDBCSupport implements IBeEntityC
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue());
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-            baseEntityProcessorDao.loadComplexSetValues(baseSet, reportDate, false);
+            beComplexSetValueDao.loadBaseValues(baseSet, reportDate, false);
 
             nextBaseValue = BaseValueFactory.create(metaClass.getType(), metaType,
                     id, batch, index, reportDate, baseSet, closed, last);
@@ -293,7 +296,7 @@ public class BeEntityComplexSetDaoImpl extends JDBCSupport implements IBeEntityC
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue());
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-            baseEntityProcessorDao.loadComplexSetValues(baseSet, reportDate, false);
+            beComplexSetValueDao.loadBaseValues(baseSet, reportDate, false);
 
             previousBaseValue = BaseValueFactory.create(metaClass.getType(), metaType,
                     id, batch, index, reportDate, baseSet, closed, last);
@@ -348,7 +351,7 @@ public class BeEntityComplexSetDaoImpl extends JDBCSupport implements IBeEntityC
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue());
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-            baseEntityProcessorDao.loadComplexSetValues(baseSet, baseValue.getRepDate(), false);
+            beComplexSetValueDao.loadBaseValues(baseSet, baseValue.getRepDate(), false);
 
             closedBaseValue = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
                     id, batch, index, baseValue.getRepDate(), baseSet, true, last);
@@ -405,13 +408,111 @@ public class BeEntityComplexSetDaoImpl extends JDBCSupport implements IBeEntityC
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue());
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-            baseEntityProcessorDao.loadComplexSetValues(baseSet, baseValue.getRepDate(), false);
+            beComplexSetValueDao.loadBaseValues(baseSet, baseValue.getRepDate(), false);
 
             lastBaseValue = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
                     id, batch, index, reportDate, baseSet, closed, true);
         }
 
         return lastBaseValue;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate, boolean lastReportDate)
+    {
+        Table tableOfComplexSets = EAV_M_COMPLEX_SET.as("cs");
+        Table tableOfEntityComplexSets = EAV_BE_ENTITY_COMPLEX_SETS.as("ecs");
+
+        Select select;
+        if (lastReportDate)
+        {
+            select = context
+                    .select(tableOfComplexSets.field(EAV_M_COMPLEX_SET.NAME),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ID),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST))
+                    .from(tableOfEntityComplexSets)
+                    .join(tableOfComplexSets)
+                    .on(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID)
+                            .eq(tableOfComplexSets.field(EAV_M_COMPLEX_SET.ID)))
+                    .where(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID).equal(baseEntity.getId()))
+                    .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST).equal(true)
+                            .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED).equal(false)));
+        }
+        else
+        {
+            Table tableNumbering = context
+                    .select(DSL.rank().over()
+                            .partitionBy(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID))
+                            .orderBy(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE)).as("num_pp"),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ID),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED),
+                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST))
+                    .from(tableOfEntityComplexSets)
+                    .where(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID).eq(baseEntity.getId()))
+                    .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE)
+                            .lessOrEqual(DataUtils.convert(actualReportDate)))
+                    .asTable("essn");
+
+            select = context
+                    .select(tableOfComplexSets.field(EAV_M_COMPLEX_SET.NAME),
+                            tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.ID),
+                            tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID),
+                            tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_),
+                            tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE),
+                            tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID),
+                            tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED),
+                            tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST))
+                    .from(tableNumbering)
+                    .join(tableOfComplexSets)
+                    .on(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID)
+                            .eq(tableOfComplexSets.field(EAV_M_COMPLEX_SET.ID)))
+                    .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
+                    .and(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED).equal(false));
+        }
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        Iterator<Map<String, Object>> it = rows.iterator();
+        while (it.hasNext())
+        {
+            Map<String, Object> row = it.next();
+
+            String attribute = (String)row.get(EAV_M_COMPLEX_SET.NAME.getName());
+            long setId = ((BigDecimal)row.get(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.getName())).longValue();
+
+            long baseValueId = ((BigDecimal)row.get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();
+            long batchId = ((BigDecimal)row.get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue();
+            long index = ((BigDecimal)row.get(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_.getName())).longValue();
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE.getName()));
+
+            IMetaType metaType = baseEntity.getMemberType(attribute);
+            IMetaSet metaSet = (MetaSet)metaType;
+            IMetaType metaSetMemberType = metaSet.getMemberType();
+            IBaseSet baseSet = new BaseSet(setId, metaSetMemberType);
+
+            if (metaSetMemberType.isSet())
+            {
+                throw new UnsupportedOperationException("Not yet implemented.");
+            }
+
+            beComplexSetValueDao.loadBaseValues(baseSet, actualReportDate, lastReportDate);
+
+            Batch batch = batchRepository.getBatch(batchId);
+            baseEntity.put(attribute, BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
+                    baseValueId, batch, index, reportDate, baseSet));
+        }
     }
 
 }

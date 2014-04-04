@@ -24,11 +24,13 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_DOUBLE_VALUES;
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_DOUBLE_VALUES;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_M_SIMPLE_ATTRIBUTES;
 
 /**
  *
@@ -390,4 +392,95 @@ public class BeDoubleValueDaoImpl extends JDBCSupport implements IBeDoubleValueD
 
         return lastBaseValue;
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate, boolean lastReportDate)
+    {
+        Table tableOfAttributes = EAV_M_SIMPLE_ATTRIBUTES.as("a");
+        Table tableOfValues = EAV_BE_DOUBLE_VALUES.as("v");
+        Select select = null;
+
+        if (lastReportDate)
+        {
+            select = context
+                    .select(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.NAME),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.ID),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.BATCH_ID),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.INDEX_),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.VALUE),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.IS_LAST))
+                    .from(tableOfValues)
+                    .join(tableOfAttributes)
+                    .on(tableOfValues.field(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID)
+                            .eq(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.ID)))
+                    .where(tableOfValues.field(EAV_BE_DOUBLE_VALUES.ENTITY_ID).equal(baseEntity.getId()))
+                    .and(tableOfValues.field(EAV_BE_DOUBLE_VALUES.IS_LAST).equal(true)
+                            .and(tableOfValues.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED).equal(false)));
+        }
+        else
+        {
+            Table tableNumbering = context
+                    .select(DSL.rank().over()
+                            .partitionBy(tableOfValues.field(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID))
+                            .orderBy(tableOfValues.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE).desc()).as("num_pp"),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.ID),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.ENTITY_ID),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.VALUE),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.BATCH_ID),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.INDEX_),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.IS_LAST))
+                    .from(tableOfValues)
+                    .where(tableOfValues.field(EAV_BE_DOUBLE_VALUES.ENTITY_ID).eq(baseEntity.getId()))
+                    .and(tableOfValues.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE)
+                            .lessOrEqual(DataUtils.convert(actualReportDate)))
+                    .asTable("vn");
+
+            select = context
+                    .select(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.NAME),
+                            tableNumbering.field(EAV_BE_DOUBLE_VALUES.ID),
+                            tableNumbering.field(EAV_BE_DOUBLE_VALUES.BATCH_ID),
+                            tableNumbering.field(EAV_BE_DOUBLE_VALUES.INDEX_),
+                            tableNumbering.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE),
+                            tableNumbering.field(EAV_BE_DOUBLE_VALUES.VALUE),
+                            tableNumbering.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED),
+                            tableNumbering.field(EAV_BE_DOUBLE_VALUES.IS_LAST))
+                    .from(tableNumbering)
+                    .join(tableOfAttributes)
+                    .on(tableNumbering.field(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID)
+                            .eq(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.ID)))
+                    .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
+                    .and(tableNumbering.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED).equal(false));
+        }
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        Iterator<Map<String, Object>> it = rows.iterator();
+        while (it.hasNext())
+        {
+            Map<String, Object> row = it.next();
+
+            long id = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.ID.getName())).longValue();
+            long index = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.INDEX_.getName())).longValue();
+            boolean closed = ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.IS_CLOSED.getName())).longValue() == 1;
+            boolean last = ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.IS_LAST.getName())).longValue() == 1;
+            double value = ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_DOUBLE_VALUES.REPORT_DATE.getName()));
+            String attribute = (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
+            Batch batch = batchRepository.getBatch(((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.BATCH_ID.getName())).longValue());
+
+            IMetaType metaType = baseEntity.getMemberType(attribute);
+            baseEntity.put(
+                    attribute,
+                    BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS, metaType, id, batch, index, reportDate, value, closed, last));
+        }
+    }
+
 }
