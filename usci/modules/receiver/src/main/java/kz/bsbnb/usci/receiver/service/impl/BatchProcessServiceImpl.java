@@ -40,4 +40,9 @@ public class BatchProcessServiceImpl implements IBatchProcessService {
     {
         return receiverStatusSingleton.getStatus();
     }
+
+    @Override
+    public boolean restartBatch(long id) {
+        return zipFilesMonitor.restartBatch(id);
+    }
 }
