@@ -699,12 +699,18 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
           char c = path.charAt(i);
           if( c=='[' || c==']'){
               if(str.length() > 0){
-                  String[] arr = str.toString().split("\\.");
-                  for(int j = 0;j<arr.length;j++){
+                  if(c==']'){
+                      operations[yk] = str.toString();
+                      isFilter[yk] = true;
+                      yk++;
+                  }else{
+                      String[] arr = str.toString().split("\\.");
+                      for(int j = 0;j<arr.length;j++){
                       //operations[yk] = str.toString();
                       operations[yk] = arr[j];
-                      isFilter[yk] = c==']';
+                      isFilter[yk] = false;
                       yk++;
+                      }
                   }
                   str.setLength(0);
               }
@@ -741,7 +747,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
            if(!isFilter[step]){
                  IMetaAttribute nextAttribute = curMeta.getMetaAttribute(operations[step]);
 
-               if(nextAttribute == null){ // transition to BASIC type
+               if(!nextAttribute.getMetaType().isComplex()){ // transition to BASIC type
                    enQueue(curBE.getEl(operations[step]));
                    enQueue(step + 1);
                } else if(nextAttribute.getMetaType().isSet()){ //transition to array
