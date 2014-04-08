@@ -26,23 +26,23 @@ public class PersistableDaoPool implements IPersistableDaoPool {
             new HashMap<Class<? extends IPersistable>, Class<? extends IPersistableDao>>();
 
     public PersistableDaoPool() {
-        persistableDaoMap.put(BaseEntity.class, IBeEntityDao.class);
-        persistableDaoMap.put(BaseEntityReportDate.class, IBeEntityReportDateDao.class);
-        persistableDaoMap.put(BaseEntityBooleanValue.class, IBeBooleanValueDao.class);
-        persistableDaoMap.put(BaseEntityDateValue.class, IBeDateValueDao.class);
-        persistableDaoMap.put(BaseEntityDoubleValue.class, IBeDoubleValueDao.class);
-        persistableDaoMap.put(BaseEntityIntegerValue.class, IBeIntegerValueDao.class);
-        persistableDaoMap.put(BaseEntityStringValue.class, IBeStringValueDao.class);
-        persistableDaoMap.put(BaseEntityComplexValue.class, IBeComplexValueDao.class);
-        persistableDaoMap.put(BaseSet.class, IBeSetDao.class);
-        persistableDaoMap.put(BaseEntitySimpleSet.class, IBeEntitySimpleSetDao.class);
-        persistableDaoMap.put(BaseEntityComplexSet.class, IBeEntityComplexSetDao.class);
-        persistableDaoMap.put(BaseSetBooleanValue.class, IBeBooleanSetValueDao.class);
-        persistableDaoMap.put(BaseSetDateValue.class, IBeDateSetValueDao.class);
-        persistableDaoMap.put(BaseSetDoubleValue.class, IBeDoubleSetValueDao.class);
-        persistableDaoMap.put(BaseSetIntegerValue.class, IBeIntegerSetValueDao.class);
-        persistableDaoMap.put(BaseSetStringValue.class, IBeStringSetValueDao.class);
-        persistableDaoMap.put(BaseSetComplexValue.class, IBeComplexSetValueDao.class);
+        persistableDaoMap.put(BaseEntity.class, IBaseEntityDao.class);
+        persistableDaoMap.put(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+        persistableDaoMap.put(BaseEntityBooleanValue.class, IBaseEntityBooleanValueDao.class);
+        persistableDaoMap.put(BaseEntityDateValue.class, IBaseEntityDateValueDao.class);
+        persistableDaoMap.put(BaseEntityDoubleValue.class, IBaseEntityDoubleValueDao.class);
+        persistableDaoMap.put(BaseEntityIntegerValue.class, IBaseEntityIntegerValueDao.class);
+        persistableDaoMap.put(BaseEntityStringValue.class, IBaseEntityStringValueDao.class);
+        persistableDaoMap.put(BaseEntityComplexValue.class, IBaseEntityComplexValueDao.class);
+        persistableDaoMap.put(BaseSet.class, IBaseSetDao.class);
+        persistableDaoMap.put(BaseEntitySimpleSet.class, IBaseEntitySimpleSetDao.class);
+        persistableDaoMap.put(BaseEntityComplexSet.class, IBaseEntityComplexSetDao.class);
+        persistableDaoMap.put(BaseSetBooleanValue.class, IBaseSetBooleanValueDao.class);
+        persistableDaoMap.put(BaseSetDateValue.class, IBaseSetDateValueDao.class);
+        persistableDaoMap.put(BaseSetDoubleValue.class, IBaseSetDoubleValueDao.class);
+        persistableDaoMap.put(BaseSetIntegerValue.class, IBaseSetIntegerValueDao.class);
+        persistableDaoMap.put(BaseSetStringValue.class, IBaseSetStringValueDao.class);
+        persistableDaoMap.put(BaseSetComplexValue.class, IBaseSetComplexValueDao.class);
     }
 
     public IPersistableDao getPersistableDao(Class<? extends IPersistable> persistableClass)
