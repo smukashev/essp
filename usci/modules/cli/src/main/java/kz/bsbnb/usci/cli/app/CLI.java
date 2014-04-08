@@ -1343,7 +1343,6 @@ public class CLI
     private boolean started = false;
     private BatchVersion currentBatchVersion;
     private String defaultDumpFile = "c:/rules/pledge2.cli";
-    private String defaultEntityFile = "c:/rules/baseEntityId.txt";
     private BaseEntity currentBaseEntity;
 
 
