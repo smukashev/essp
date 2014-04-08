@@ -11,7 +11,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLMetaClassDaoImpl;
+import kz.bsbnb.usci.eav.persistance.dao.impl.MetaClassDaoImpl;
 import kz.bsbnb.usci.eav.test.GenericTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +42,7 @@ public class PostgreSQLMetaClassDaoImplTest extends GenericTestCase
 	@Autowired
     IMetaClassDao postgreSQLMetaClassDaoImpl;
 	
-	private final Logger logger = LoggerFactory.getLogger(PostgreSQLMetaClassDaoImpl.class);
+	private final Logger logger = LoggerFactory.getLogger(MetaClassDaoImpl.class);
 	
 	public PostgreSQLMetaClassDaoImplTest() {
     }

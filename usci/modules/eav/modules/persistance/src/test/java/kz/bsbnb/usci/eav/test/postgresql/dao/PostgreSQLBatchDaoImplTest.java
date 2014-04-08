@@ -2,7 +2,7 @@ package kz.bsbnb.usci.eav.test.postgresql.dao;
 
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
-import kz.bsbnb.usci.eav.postgresql.dao.PostgreSQLBatchDaoImpl;
+import kz.bsbnb.usci.eav.persistance.dao.impl.BatchDaoImpl;
 import kz.bsbnb.usci.eav.test.GenericTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +31,7 @@ public class PostgreSQLBatchDaoImplTest  extends GenericTestCase
     @Autowired
     IBatchDao postgreSQLBatchDaoImpl;
 
-	private final Logger logger = LoggerFactory.getLogger(PostgreSQLBatchDaoImpl.class);
+	private final Logger logger = LoggerFactory.getLogger(BatchDaoImpl.class);
 
 	public PostgreSQLBatchDaoImplTest() {
     }

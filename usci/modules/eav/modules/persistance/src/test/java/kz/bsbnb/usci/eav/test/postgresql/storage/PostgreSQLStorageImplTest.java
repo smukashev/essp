@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.test.postgresql.storage;
 
-import kz.bsbnb.usci.eav.postgresql.storage.PostgreSQLStorageImpl;
+import kz.bsbnb.usci.eav.persistance.storage.impl.StorageImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ import static org.junit.Assert.fail;
 public class PostgreSQLStorageImplTest {
 	
 	@Autowired
-    PostgreSQLStorageImpl postgreSQLStorageImpl;
+    StorageImpl postgreSQLStorageImpl;
 	
 	private final Logger logger = LoggerFactory.getLogger(PostgreSQLStorageImplTest.class);
 	

@@ -19,9 +19,6 @@
     </parent>
 
     <modules>
-        <module>drools_portlet</module>
-        <module>batch_portlet</module>
-        <module>baseentity_portlet</module>
         <module>vaadin-messagebox</module>
         <module>vaadin-filterable-selector</module>
         <module>credit-registry-administration-portlet</module>
@@ -31,10 +28,10 @@
         <module>credit-registry-report-portlet</module>
         <module>credit-registry-audit-portlet</module>
         <module>credit-registry-signing-portlet</module>
+        <module>translit-util</module>
+
         <module>meta_editor</module>
         <module>entity_editor</module>
-        <module>batch_entry_list</module>
-        <module>translit-util</module>
         <module>rules_portlet</module>
     </modules>
 
