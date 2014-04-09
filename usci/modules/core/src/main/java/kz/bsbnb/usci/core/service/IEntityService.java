@@ -2,11 +2,13 @@ package kz.bsbnb.usci.core.service;
 
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author k.tulbassiyev
@@ -21,4 +23,6 @@ public interface IEntityService {
     public HashMap<String, QueryEntry> getSQLStats();
     public void clearSQLStats();
     public void remove(long id);
+    public void removeAllByMetaClass(IMetaClass metaClass);
+    public Set<Long> getChildBaseEntityIds(long parentBaseEntityIds);
 }

@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityComplexValueDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
@@ -26,8 +27,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_VALUES;
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_M_COMPLEX_ATTRIBUTES;
+import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 /**
  * @author a.motov
@@ -44,6 +44,8 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     @Autowired
     IBatchRepository batchRepository;
 
+    @Autowired
+    IBaseEntityDao baseEntityDao;
     @Autowired
     IBaseEntityProcessorDao baseEntityProcessorDao;
 
@@ -338,7 +340,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                     .get(EAV_BE_COMPLEX_VALUES.IS_LAST.getName())).longValue() == 1;
             long entityValueId = ((BigDecimal)row
                     .get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
-            Batch batch = batchRepository.getBatch(((BigDecimal)row
+            Batch batch = batchRepository.getBatch(((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.BATCH_ID.getName())).longValue());
 
             IBaseEntity childBaseEntity = baseEntityProcessorDao
@@ -394,7 +396,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                     .get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
-            Batch batch = batchRepository.getBatch(((BigDecimal)row
+            Batch batch = batchRepository.getBatch(((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.BATCH_ID.getName())).longValue());
 
             IBaseEntity childBaseEntity = baseEntityProcessorDao
@@ -499,6 +501,94 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                     BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS, metaType, id, batch, index, reportDate, childBaseEntity, isClosed, isLast));
         }
+    }
+
+    @Override
+    public void deleteAll(long baseEntityId) {
+        Set<Long> childBaseEntityIds = getChildBaseEntityIds(baseEntityId);
+
+        String tableAlias = "cv";
+        Delete delete = context
+                .delete(EAV_BE_COMPLEX_VALUES.as(tableAlias))
+                .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntityId));
+
+        logger.debug(delete.toString());
+        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+
+        for (long childBaseEntityId: childBaseEntityIds)
+        {
+            baseEntityDao.deleteRecursive(childBaseEntityId);
+        }
+    }
+
+    @Override
+    public Set<Long> getChildBaseEntityIds(long parentBaseEntityId)
+    {
+        Set<Long> baseEntityIds = new HashSet<Long>();
+
+        String tableAlias = "bv";
+        Select select = context
+                .select(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID)
+                .from(EAV_BE_COMPLEX_VALUES.as(tableAlias))
+                .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID.equal(parentBaseEntityId))
+                .groupBy(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID);
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 0)
+        {
+            Iterator<Map<String, Object>> it = rows.iterator();
+            while (it.hasNext())
+            {
+                Map<String, Object> row = it.next();
+
+                long childBaseEntityId = ((BigDecimal) row
+                        .get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
+                baseEntityIds.add(childBaseEntityId);
+            }
+        }
+
+        return baseEntityIds;
+    }
+
+    @Override
+    public Set<Long> getChildBaseEntityIdsWithoutRefs(long parentBaseEntityId)
+    {
+        Set<Long> baseEntityIds = new HashSet<Long>();
+
+        String entitiesTableAlias = "e";
+        String classesTableAlias = "c";
+        String complexValuesTableAlias = "cv";
+        Select select = context
+                .select(EAV_BE_ENTITIES.as(entitiesTableAlias).ID)
+                .from(EAV_BE_ENTITIES.as(entitiesTableAlias))
+                .join(EAV_M_CLASSES.as(classesTableAlias))
+                .on(EAV_BE_ENTITIES.as(entitiesTableAlias).CLASS_ID.equal(EAV_M_CLASSES.as(classesTableAlias).ID))
+                .join(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
+                .on(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID
+                        .equal(EAV_BE_ENTITIES.as(entitiesTableAlias).ID))
+                .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.equal(parentBaseEntityId))
+                .and(EAV_M_CLASSES.as(classesTableAlias).IS_REFERENCE.equal(DataUtils.convert(false)))
+                .groupBy(EAV_BE_ENTITIES.as(entitiesTableAlias).ID);
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 0)
+        {
+            Iterator<Map<String, Object>> it = rows.iterator();
+            while (it.hasNext())
+            {
+                Map<String, Object> row = it.next();
+
+                long childBaseEntityId = ((BigDecimal) row
+                        .get(EAV_BE_ENTITIES.ID.getName())).longValue();
+                baseEntityIds.add(childBaseEntityId);
+            }
+        }
+
+        return baseEntityIds;
     }
 
 }

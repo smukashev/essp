@@ -4,6 +4,7 @@ import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.IBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -19,10 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author k.tulbassiyev
@@ -130,6 +128,26 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Override
     public void remove(long id)
     {
-        //TODO: implement
+        baseEntityProcessorDao.remove(id);
+    }
+
+    @Override
+    public Set<Long> getChildBaseEntityIds(long parentBaseEntityIds)
+    {
+        return baseEntityProcessorDao.getChildBaseEntityIds(parentBaseEntityIds);
+    }
+
+    @Override
+    public void removeAllByMetaClass(IMetaClass metaClass) {
+        while(true)
+        {
+            long baseEntityId = baseEntityProcessorDao.getRandomBaseEntityId(metaClass);
+            if (baseEntityId <= 0)
+            {
+                break;
+            }
+
+            baseEntityProcessorDao.remove(baseEntityId);
+        }
     }
 }

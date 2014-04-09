@@ -452,4 +452,15 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         }
     }
 
+    @Override
+    public void deleteAll(long baseSetId) {
+        String tableAlias = "ssv";
+        Delete delete = context
+                .delete(EAV_BE_STRING_SET_VALUES.as(tableAlias))
+                .where(EAV_BE_STRING_SET_VALUES.as(tableAlias).SET_ID.equal(baseSetId));
+
+        logger.debug(delete.toString());
+        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+    }
+
 }

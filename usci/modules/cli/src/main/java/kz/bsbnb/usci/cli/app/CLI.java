@@ -23,6 +23,7 @@ import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.eav.model.json.ContractStatusArrayJModel;
 import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
@@ -39,7 +40,9 @@ import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
+import kz.bsbnb.usci.sync.job.impl.DataJob;
 import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 import kz.bsbnb.usci.tool.status.SyncStatus;
@@ -52,6 +55,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -69,6 +73,7 @@ import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Component
 public class CLI
@@ -111,6 +116,244 @@ public class CLI
 
     private CouchbaseClient couchbaseClient;
 
+    RmiProxyFactoryBean serviceFactory = null;
+
+    IEntityService entityServiceCore = null;
+
+    public IEntityService getEntityService(String url) {
+        if (entityServiceCore == null)
+        {
+            try {
+                serviceFactory = new RmiProxyFactoryBean();
+                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+                serviceFactory.setServiceUrl(url);
+                serviceFactory.setServiceInterface(IEntityService.class);
+                serviceFactory.setRefreshStubOnConnectFailure(true);
+
+                serviceFactory.afterPropertiesSet();
+                entityServiceCore = (IEntityService) serviceFactory.getObject();
+            } catch (Exception e) {
+                System.out.println("Can't connect to receiver service: " + e.getMessage());
+            }
+        }
+
+        return entityServiceCore;
+    }
+
+    class JobDispatcher extends Thread {
+        private ConcurrentLinkedQueue<DispatcherJob> threadsQueue = new ConcurrentLinkedQueue<DispatcherJob>();
+        private ConcurrentLinkedQueue<DispatcherJob> preparedThreadsQueue = new ConcurrentLinkedQueue<DispatcherJob>();
+        private ArrayList<ThreadPreparator> activePreparingThreads = new ArrayList<ThreadPreparator>();
+        private ArrayList<DispatcherJob> activeThreads = new ArrayList<DispatcherJob>();
+
+        private final int MAX_ACTIVE_THREADS = 32;
+        private final int MAX_PREPARING_THREADS = 32;
+        private long jobsEnded = 0;
+
+        public synchronized void addThread(DispatcherJob thread) {
+            threadsQueue.add(thread);
+        }
+
+        public synchronized void addPreparedThread(DispatcherJob thread) {
+            preparedThreadsQueue.add(thread);
+        }
+
+        public synchronized DispatcherJob getNextThread() {
+            return threadsQueue.poll();
+        }
+
+        public synchronized DispatcherJob getNextPeparedThread() {
+            return preparedThreadsQueue.poll();
+        }
+
+        public void clearDeadThreads () {
+            Iterator<DispatcherJob> threadsIterator = activeThreads.iterator();
+
+            while(threadsIterator.hasNext()) {
+                DispatcherJob thread = threadsIterator.next();
+
+                if (!thread.isAlive()) {
+                    threadsIterator.remove();
+                    jobsEnded++;
+                }
+            }
+        }
+
+        public void clearDeadPreparingThreads () {
+            Iterator<ThreadPreparator> threadsIterator = activePreparingThreads.iterator();
+
+            while(threadsIterator.hasNext()) {
+                ThreadPreparator preparator = threadsIterator.next();
+
+                if (!preparator.isAlive()) {
+                    threadsIterator.remove();
+                    addPreparedThread(preparator.getThread());
+                }
+            }
+        }
+
+        @Override
+        public void run() {
+            long t1 = System.currentTimeMillis();
+            while(true) {
+                clearDeadPreparingThreads();
+                clearDeadThreads();
+
+                if (System.currentTimeMillis() - t1 > 5000) {
+                    t1 = System.currentTimeMillis();
+                    System.out.println("Active: " + activeThreads.size() + ", queue: " + threadsQueue.size() +
+                            ", ended: " + jobsEnded + ", preparing: " + activePreparingThreads.size());
+                }
+
+                if (activePreparingThreads.size() < MAX_PREPARING_THREADS) {
+                    DispatcherJob newThread = getNextThread();
+                    if (newThread != null) {
+                        ThreadPreparator preparator = new ThreadPreparator(newThread);
+                        preparator.start();
+                        activePreparingThreads.add(preparator);
+                    }
+                }
+
+                if (activeThreads.size() < MAX_ACTIVE_THREADS) {
+                    DispatcherJob newThread = getNextPeparedThread();
+                    if (newThread != null) {
+                        boolean intersectionFound = false;
+                        for (DispatcherJob job : activeThreads) {
+                            if (job.intersects(newThread)) {
+                                intersectionFound = true;
+                                break;
+                            }
+                        }
+
+                        if(intersectionFound) {
+                            addThread(newThread);
+                        } else {
+                            newThread.start();
+                            activeThreads.add(newThread);
+                        }
+                    } else {
+                        try {
+                            sleep(1000L);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    try {
+                        sleep(100L);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    interface DispatcherJob {
+        public boolean intersects(DispatcherJob job);
+        public boolean isAlive();
+        public void start();
+        public void prepare();
+    }
+
+    class ThreadPreparator extends Thread {
+        DispatcherJob thread;
+
+        ThreadPreparator(DispatcherJob thread) {
+            this.thread = thread;
+        }
+
+        public DispatcherJob getThread() {
+            return thread;
+        }
+
+        @Override
+        public void run() {
+            thread.prepare();
+        }
+    }
+
+    class DeleteJob extends Thread implements DispatcherJob {
+
+        private IEntityService entityServiceCore = null;
+        private long id;
+        private Set<Long> ids = null;
+
+        DeleteJob(IEntityService entityServiceCore, long id) {
+            this.entityServiceCore = entityServiceCore;
+            this.id = id;
+            this.ids = ids;
+        }
+
+        @Override
+        public void run() {
+            entityServiceCore.remove(id);
+            System.out.println("Deleted entity with id: " + id);
+        }
+
+
+        @Override
+        public boolean intersects(DispatcherJob job) {
+            if (job instanceof DeleteJob) {
+                if (ids == null || ((DeleteJob)job).ids == null) {
+                    throw new RuntimeException("Unprepared thread");
+                }
+
+                Set<Long> inter = SetUtils.intersection(ids, ((DeleteJob)job).ids);
+
+                /*String thisSout = "";
+                String thatSout = "";
+                String sout = "";
+                boolean first = true;
+
+                for(Long id : ids) {
+                    if(first) {
+                        thisSout += id;
+                        first = false;
+                    } else
+                        thisSout += "," + id;
+                }
+
+                first = true;
+
+                for(Long id : ((DeleteJob) job).ids) {
+                    if(first) {
+                        thatSout += id;
+                        first = false;
+                    } else
+                        thatSout += "," + id;
+                }
+
+                first = true;
+
+
+                for(Long id : inter) {
+                    if(first) {
+                        sout += id;
+                        first = false;
+                    } else
+                        sout += "," + id;
+                }
+
+                System.out.println(
+                        "============== this id " + id + " that id " + ((DeleteJob) job).id + "\n" +
+                        "This ids: " + thisSout + "\n" +
+                        "That ids: " + thatSout + "\n" +
+                        "Intersection size: " + inter.size() + "\n" +
+                        "Intersection values: " + sout + "\n");*/
+                return inter.size() > 0;
+            }
+            return false;
+        }
+
+        @Override
+        public void prepare() {
+            ids = entityServiceCore.getChildBaseEntityIds(id);
+        }
+    }
+
+    private JobDispatcher jobDispatcher = new JobDispatcher();
+
     @PostConstruct
     public void initBean() {
         System.setProperty("viewmode", "production");
@@ -124,6 +367,8 @@ public class CLI
         } catch (Exception e) {
             System.out.println("Error connecting to Couchbase: " + e.getMessage());
         }
+
+        jobDispatcher.start();
     }
 
     private void shutdown() {
@@ -744,7 +989,12 @@ public class CLI
         }
     }
 
+
     public void removeEntityById(long id, String url) {
+        jobDispatcher.addThread(new DeleteJob(getEntityService(url), id));
+    }
+
+    public void removeAllEntityById(long metaClassId, String url) {
         RmiProxyFactoryBean serviceFactory = null;
 
         IEntityService entityServiceCore = null;
@@ -762,7 +1012,9 @@ public class CLI
             System.out.println("Can't connect to receiver service: " + e.getMessage());
         }
 
-        entityServiceCore.remove(id);
+        IMetaClass metaClass = metaClassDao.load(metaClassId);
+
+        entityServiceCore.removeAllByMetaClass(metaClass);
     }
 
     public void dumpEntityToXML(String ids, String fileName) {
@@ -1626,6 +1878,13 @@ public class CLI
                 } else {
                     System.out.println("Argument needed: <rm> <id> <service_url>");
                     System.out.println("Example: rm 100 rmi://127.0.0.1:1099/batchEntryService");
+                }
+            } else if(args.get(0).equals("rmall")) {
+                if (args.size() > 2) {
+                    removeAllEntityById(Long.parseLong(args.get(1)), args.get(2));
+                } else {
+                    System.out.println("Argument needed: <rmall> <id> <service_url>");
+                    System.out.println("Example: rmall 100 rmi://127.0.0.1:1099/batchEntryService");
                 }
             } else if(args.get(0).equals("read")) {
                 if (args.size() > 2) {

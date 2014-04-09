@@ -97,6 +97,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         this.baseEntityReportDate = new BaseEntityReportDate(this, reportDate);
     }
 
+    public BaseEntity(long id, MetaClass meta)
+    {
+        super(id, BaseContainerType.BASE_ENTITY);
+        this.meta = meta;
+    }
+
     public BaseEntity(long id, MetaClass meta, Date reportDate)
     {
         super(id, BaseContainerType.BASE_ENTITY);
@@ -389,11 +395,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     }
 
     public Date getReportDate() {
-        if (baseEntityReportDate != null)
+        if (baseEntityReportDate == null)
         {
-            return baseEntityReportDate.getReportDate();
+            throw new RuntimeException("Instance of BaseEntityReportDate is null. " +
+                    "Check the correctness of instance creation");
         }
-        return null;
+        return baseEntityReportDate.getReportDate();
     }
 
     public void setReportDate(Date reportDate) {
@@ -412,6 +419,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     @Override
     public IBaseEntityReportDate getBaseEntityReportDate() {
+        if (baseEntityReportDate == null)
+        {
+            throw new RuntimeException("Instance of BaseEntityReportDate is null. " +
+                    "Check the correctness of instance creation");
+        }
         return baseEntityReportDate;
     }
 
