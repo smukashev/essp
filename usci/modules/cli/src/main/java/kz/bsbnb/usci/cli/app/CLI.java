@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.cli.app;
 
+import com.couchbase.client.CouchbaseClient;
+import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
@@ -16,6 +18,10 @@ import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
+import kz.bsbnb.usci.eav.model.json.BatchInfo;
+import kz.bsbnb.usci.eav.model.json.ContractStatusArrayJModel;
+import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
@@ -26,13 +32,13 @@ import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav.persistance.impl.searcher.ImprovedBaseEntitySearcher;
+import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
-import kz.bsbnb.usci.receiver.common.Global;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
@@ -53,9 +59,10 @@ import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import javax.sound.sampled.AudioFormat;
+import javax.annotation.PostConstruct;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
+import java.net.URI;
 import java.sql.*;
 import java.text.DateFormat;
 import java.util.*;
@@ -101,6 +108,27 @@ public class CLI
     private BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
 
     private InputStream inputStream = null;
+
+    private CouchbaseClient couchbaseClient;
+
+    @PostConstruct
+    public void initBean() {
+        System.setProperty("viewmode", "production");
+        //System.setProperty("viewmode", "development");
+
+        ArrayList<URI> nodes = new ArrayList<URI>();
+        nodes.add(URI.create("http://127.0.0.1:8091/pools"));
+
+        try {
+            couchbaseClient = new CouchbaseClient(nodes, "test", "");
+        } catch (Exception e) {
+            System.out.println("Error connecting to Couchbase: " + e.getMessage());
+        }
+    }
+
+    private void shutdown() {
+        couchbaseClient.shutdown();
+    }
 
     public void processCRBatch(String fname, int count, int offset, Date repDate) throws SAXException, IOException, XMLStreamException
     {
@@ -339,6 +367,380 @@ public class CLI
             System.out.println("No such entity with id: " + id);
         } else {
             System.out.println(entity.toString());
+        }
+    }
+
+    public void batchStat() {
+        if (args.size() < 5) {
+            System.out.println("Usage: <report_date> <output_file>");
+            System.out.println("Example: batchstat 01.05.2013 D:\\usci\\out.txt jdbc:oracle:thin:@170.7.15.15:1521:ESSP core CORE_2013");
+            return;
+        }
+
+        String reportDateStr = args.get(0);
+        String fileNameStr = args.get(1);
+
+        Gson gson = new Gson();
+
+        if (reportDateStr != null) {
+            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            Date reportDate = null;
+            try {
+                reportDate = dateFormat.parse(reportDateStr);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            File f = new File(fileNameStr);
+            FileOutputStream fout = null;
+            try {
+                f.createNewFile();
+
+                fout = new FileOutputStream(f);
+
+                while(true) {
+                    try {
+                        Connection conn = null;
+
+                        try
+                        {
+                            conn = connectToDB(args.get(2), args.get(3), args.get(4));
+                        } catch (ClassNotFoundException e)
+                        {
+                            System.out.println("Error can't load driver: oracle.jdbc.OracleDriver");
+                            return;
+                        } catch (SQLException e)
+                        {
+                            System.out.println("Can't connect to DB: " + e.getMessage());
+                            return;
+                        }
+
+                        PreparedStatement preparedStatement = null;
+                        try
+                        {
+                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b");
+                        } catch (SQLException e)
+                        {
+                            System.out.println("Can't create prepared statement: " + e.getMessage());
+                            try
+                            {
+                                conn.close();
+                            } catch (SQLException e1)
+                            {
+                                e1.printStackTrace();
+                            }
+                            return;
+                        }
+
+                        ResultSet result = preparedStatement.executeQuery();
+
+                        while(result.next()) {
+                            long batchId = result.getLong("id");
+
+                            System.out.println("Processing id: " + batchId);
+
+                            Object batchObject = couchbaseClient.get("batch:" + batchId);
+                            Object manifestObject = couchbaseClient.get("manifest:" + batchId);
+                            Object batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
+
+                            if (batchObject == null || manifestObject == null) {
+                                System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
+
+                                if (batchObject != null) {
+                                    couchbaseClient.delete("batch:" + batchId);
+                                }
+                                if (manifestObject != null) {
+                                    couchbaseClient.delete("manifest:" + batchId);
+                                }
+                                if (batchStatusObject != null) {
+                                    couchbaseClient.delete("batch_status:" + batchId);
+                                }
+                                continue;
+                            }
+
+                            String batchStr = batchObject.toString();
+
+                            BatchFullJModel batchFull = gson.fromJson(batchStr, BatchFullJModel.class);
+
+                            String batchInfoStr = manifestObject.toString();
+
+                            BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
+
+                            if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), reportDate) != 0)
+                            {
+                                continue;
+                            }
+
+                            View view = couchbaseClient.getView("batch", "contract_status");
+                            Query query = new Query();
+                            query.setDescending(true);
+                            query.setRangeEnd("[" + batchId + ", 0]");
+                            query.setRangeStart("[" + batchId + ", 999999999999999]");
+
+                            ViewResponse response = couchbaseClient.query(view, query);
+
+                            Iterator<ViewRow> rows = response.iterator();
+
+                            int row_count = 0;
+                            int error_count = 0;
+                            while(rows.hasNext()) {
+                                ViewRow viewRowNoDocs = rows.next();
+
+                                row_count++;
+
+                                ContractStatusArrayJModel batchFullStatusJModel =
+                                        gson.fromJson(viewRowNoDocs.getValue(), ContractStatusArrayJModel.class);
+
+                                boolean errorFound = false;
+                                boolean completedFound = false;
+                                for (ContractStatusJModel csajm : batchFullStatusJModel.getContractStatuses()) {
+                                    if (csajm.getProtocol().equals("ERROR"))
+                                    {
+                                        errorFound = true;
+                                    }
+                                    if (csajm.getProtocol().equals("COMPLETED"))
+                                    {
+                                        completedFound = true;
+                                    }
+                                }
+                                if (errorFound && !completedFound)
+                                    error_count++;
+                            }
+
+//                        if (error_count > 0 || row_count != batchInfo.getSize()) {
+//                            System.out.println(batchId + " - " + batchInfo.getSize() + "/" + row_count + " - " + error_count);
+//                            sender.addJob(batchId, batchInfo);
+//                            receiverStatusSingleton.batchReceived();
+//                        }
+
+                            fout.write((batchId + "," +
+                                    batchFull.getFileName() + "," +
+                                    batchInfo.getSize() + "," + row_count + "," + error_count + "\n").getBytes());
+                        }
+                        break;
+                    } catch (Exception e) {
+                        System.out.println("Error in pending batches view: " + e.getMessage());
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+                System.out.println("Done");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if(fout != null) {
+                    try {
+                        fout.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else {
+            System.out.println("Report date needed.");
+            return;
+        }
+    }
+
+    public void restartBatchesWithErrors() {
+        if (args.size() < 5) {
+            System.out.println("Usage: <report_date> <output_file> <db_url> <db_logn> <db_password> <batch_service_url>");
+            System.out.println("Example: batchstat 01.05.2013 D:\\usci\\out.txt jdbc:oracle:thin:@170.7.15.15:1521:ESSP " +
+                    "core CORE_2013 rmi://127.0.0.1:1099/batchEntryService");
+            return;
+        }
+
+        String reportDateStr = args.get(0);
+        String fileNameStr = args.get(1);
+
+        Gson gson = new Gson();
+
+        if (reportDateStr != null) {
+            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            Date reportDate = null;
+            try {
+                reportDate = dateFormat.parse(reportDateStr);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            RmiProxyFactoryBean batchProcessServiceFactoryBean = null;
+
+            IBatchProcessService batchProcessService = null;
+
+            try {
+                batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+                batchProcessServiceFactoryBean.setServiceUrl(args.get(5));
+                batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+                batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+                batchProcessServiceFactoryBean.afterPropertiesSet();
+                batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+            } catch (Exception e) {
+                System.out.println("Can't connect to receiver service: " + e.getMessage());
+            }
+
+            File f = new File(fileNameStr);
+            FileOutputStream fout = null;
+            try {
+                f.createNewFile();
+
+                fout = new FileOutputStream(f);
+
+                while(true) {
+                    try {
+                        Connection conn = null;
+
+                        try
+                        {
+                            conn = connectToDB(args.get(2), args.get(3), args.get(4));
+                        } catch (ClassNotFoundException e)
+                        {
+                            System.out.println("Error can't load driver: oracle.jdbc.OracleDriver");
+                            return;
+                        } catch (SQLException e)
+                        {
+                            System.out.println("Can't connect to DB: " + e.getMessage());
+                            return;
+                        }
+
+                        PreparedStatement preparedStatement = null;
+                        try
+                        {
+                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b");
+                        } catch (SQLException e)
+                        {
+                            System.out.println("Can't create prepared statement: " + e.getMessage());
+                            try
+                            {
+                                conn.close();
+                            } catch (SQLException e1)
+                            {
+                                e1.printStackTrace();
+                            }
+                            return;
+                        }
+
+                        ResultSet result = preparedStatement.executeQuery();
+
+                        while(result.next()) {
+                            long batchId = result.getLong("id");
+
+                            System.out.println("Processing id: " + batchId);
+
+                            Object batchObject = couchbaseClient.get("batch:" + batchId);
+                            Object manifestObject = couchbaseClient.get("manifest:" + batchId);
+                            Object batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
+
+                            if (batchObject == null || manifestObject == null) {
+                                System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
+
+                                if (batchObject != null) {
+                                    couchbaseClient.delete("batch:" + batchId);
+                                }
+                                if (manifestObject != null) {
+                                    couchbaseClient.delete("manifest:" + batchId);
+                                }
+                                if (batchStatusObject != null) {
+                                    couchbaseClient.delete("batch_status:" + batchId);
+                                }
+                                continue;
+                            }
+
+                            String batchStr = batchObject.toString();
+
+                            BatchFullJModel batchFull = gson.fromJson(batchStr, BatchFullJModel.class);
+
+                            String batchInfoStr = manifestObject.toString();
+
+                            BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
+
+                            if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), reportDate) != 0)
+                            {
+                                continue;
+                            }
+
+                            View view = couchbaseClient.getView("batch", "contract_status");
+                            Query query = new Query();
+                            query.setDescending(true);
+                            query.setRangeEnd("[" + batchId + ", 0]");
+                            query.setRangeStart("[" + batchId + ", 999999999999999]");
+
+                            ViewResponse response = couchbaseClient.query(view, query);
+
+                            Iterator<ViewRow> rows = response.iterator();
+
+                            int row_count = 0;
+                            int error_count = 0;
+                            while(rows.hasNext()) {
+                                ViewRow viewRowNoDocs = rows.next();
+
+                                row_count++;
+
+                                ContractStatusArrayJModel batchFullStatusJModel =
+                                        gson.fromJson(viewRowNoDocs.getValue(), ContractStatusArrayJModel.class);
+
+                                boolean errorFound = false;
+                                boolean completedFound = false;
+                                for (ContractStatusJModel csajm : batchFullStatusJModel.getContractStatuses()) {
+                                    if (csajm.getProtocol().equals("ERROR"))
+                                    {
+                                        errorFound = true;
+                                    }
+                                    if (csajm.getProtocol().equals("COMPLETED"))
+                                    {
+                                        completedFound = true;
+                                    }
+                                }
+                                if (errorFound && !completedFound)
+                                    error_count++;
+                            }
+
+                            if (error_count > 0 || row_count != batchInfo.getSize()) {
+                                fout.write((batchId + "," +
+                                        batchFull.getFileName() + "," +
+                                        batchInfo.getSize() + "," + row_count + "," + error_count + "\n").getBytes());
+
+                                if(batchProcessService.restartBatch(batchId)) {
+                                    fout.write((batchId + "," +
+                                            batchFull.getFileName() + "," +
+                                            batchInfo.getSize() + "," + row_count + "," + error_count + ", restarted\n").getBytes());
+                                } else {
+                                    fout.write((batchId + "," +
+                                            batchFull.getFileName() + "," +
+                                            batchInfo.getSize() + "," + row_count + "," + error_count + ", failed\n").getBytes());
+                                }
+                            }
+                        }
+                        break;
+                    } catch (Exception e) {
+                        System.out.println("Error in pending batches view: " + e.getMessage());
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+                System.out.println("Done");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if(fout != null) {
+                    try {
+                        fout.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else {
+            System.out.println("Report date needed.");
+            return;
         }
     }
 
@@ -1566,6 +1968,10 @@ public class CLI
                 commandSQLStat();
             } else if(command.equals("remotestat")) {
                 commandRemoteStat();
+            } else if(command.equals("batchstat")) {
+                batchStat();
+            } else if(command.equals("batchrestart")) {
+                restartBatchesWithErrors();
             } else if(command.equals("stc")) {
                 commandSTC();
             } else {
@@ -1621,6 +2027,8 @@ public class CLI
                 inputStream = null;
             }
         }
+
+        shutdown();
     }
 
     public InputStream getInputStream()

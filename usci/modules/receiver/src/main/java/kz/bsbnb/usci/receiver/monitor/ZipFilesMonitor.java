@@ -91,33 +91,38 @@ public class ZipFilesMonitor{
         sender.start();
     }
 
-    public void restartBatch(long batchId) {
+    public boolean restartBatch(long batchId) {
         Gson gson = new Gson();
-        while(true) {
-            try {
-                Object batchObject = couchbaseClient.get("batch:" + batchId);
-                Object manifestObject = couchbaseClient.get("manifest:" + batchId);
+        IBatchService batchService = serviceFactory.getBatchService();
 
-                if (batchObject == null || manifestObject == null) {
-                    System.out.println("Batch with id: " + batchId + " has no manifest or batch. Restart failed.");
-                    break;
-                }
+        try {
+            Object batchObject = couchbaseClient.get("batch:" + batchId);
+            Object manifestObject = couchbaseClient.get("manifest:" + batchId);
 
-                String batchInfoStr = manifestObject.toString();
-                BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
-
-                System.out.println(batchId + " - restarted");
-                sender.addJob(batchId, batchInfo);
-                receiverStatusSingleton.batchReceived();
-
-                break;
-            } catch (Exception e) {
-                System.out.println("Error in pending batches view: " + e.getMessage());
-                e.printStackTrace();
-                System.out.println("Retrying...");
+            if (batchObject == null || manifestObject == null) {
+                System.out.println("Batch with id: " + batchId + " has no manifest or batch. Restart failed.");
+                return false;
             }
+
+            try {
+                batchService.load(batchId);
+            } catch(Exception e) {
+                System.out.println("Can't get batch from eav DB. Skipped.");
+                return false;
+            }
+
+            String batchInfoStr = manifestObject.toString();
+            BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
+
+            System.out.println(batchId + " - restarted");
+            sender.addJob(batchId, batchInfo);
+            receiverStatusSingleton.batchReceived();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        System.out.println("Done");
+
+        return false;
     }
 
     @PostConstruct

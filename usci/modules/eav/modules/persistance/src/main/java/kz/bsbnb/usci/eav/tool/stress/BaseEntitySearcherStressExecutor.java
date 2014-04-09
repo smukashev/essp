@@ -7,7 +7,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
-import kz.bsbnb.usci.eav.persistance.impl.searcher.BasicBaseEntitySearcher;
+import kz.bsbnb.usci.eav.persistance.searcher.impl.BasicBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.tool.generator.random.data.impl.BaseEntityGenerator;
 import kz.bsbnb.usci.eav.tool.generator.random.data.impl.MetaClassGenerator;

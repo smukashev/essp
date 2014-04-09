@@ -9,4 +9,5 @@ public interface IBatchProcessService {
     public void processBatch(String fileName, Long userId);
     public void processBatchWithoutUser(String fileName);
     public ReceiverStatus getStatus();
+    public boolean restartBatch(long id);
 }
