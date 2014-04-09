@@ -685,6 +685,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
               break;
           }
           if(path.charAt(i) == '=') eqCnt++;
+          if(path.charAt(i) =='!' && ( i+1 == path.length() || path.charAt(i+1) != '='))
+              throw new RuntimeException("equal sign must be present after exlaim");
+
           if(path.charAt(i) == '[') open++;
           if(path.charAt(i) == ']') {
               open--;
@@ -776,13 +779,25 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                      enQueue(step+1);
                  }
            }else{
-               String[] parts = operations[step].split("=");
+               String [] parts;
+               boolean inv = false;
+
+               if(operations[step].contains("!")){
+                   parts = operations[step].split("!=");
+                   inv = true;
+               }
+               else
+                   parts = operations[step].split("=");
+
                Object o = curBE.getEl(parts[0]);
 
-               if( (o==null && parts[1].equals("null")) || o.toString().equals(parts[1]))
-               {
+               boolean expr = (o==null && parts[1].equals("null")) || (o!=null && o.toString().equals(parts[1]));
+               if(inv) expr = !expr;
+
+               if(expr){
                    enQueue(curO);
                    enQueue(step+1);
+
                }
            }
         }
