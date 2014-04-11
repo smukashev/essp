@@ -7,6 +7,8 @@ public class CoreStatus implements Serializable
     double avgProcessed;
     double avgInserts;
     double avgSelects;
+    double avgDeletes;
+    double avgUpdates;
     long totalProcessed;
 
     public double getAvgProcessed()
@@ -49,13 +51,30 @@ public class CoreStatus implements Serializable
         this.totalProcessed = totalProcessed;
     }
 
+    public double getAvgDeletes() {
+        return avgDeletes;
+    }
+
+    public void setAvgDeletes(double avgDeletes) {
+        this.avgDeletes = avgDeletes;
+    }
+
+    public double getAvgUpdates() {
+        return avgUpdates;
+    }
+
+    public void setAvgUpdates(double avgUpdates) {
+        this.avgUpdates = avgUpdates;
+    }
+
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "CoreStatus{" +
                 "avgProcessed=" + avgProcessed +
                 ", avgInserts=" + avgInserts +
                 ", avgSelects=" + avgSelects +
+                ", avgDeletes=" + avgDeletes +
+                ", avgUpdates=" + avgUpdates +
                 ", totalProcessed=" + totalProcessed +
                 '}';
     }

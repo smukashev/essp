@@ -147,7 +147,7 @@ public class CLI
         private ArrayList<DispatcherJob> activeThreads = new ArrayList<DispatcherJob>();
 
         private final int MAX_ACTIVE_THREADS = 32;
-        private final int MAX_PREPARING_THREADS = 32;
+        private final int MAX_PREPARING_THREADS = 8;
         private long jobsEnded = 0;
 
         public synchronized void addThread(DispatcherJob thread) {
@@ -196,54 +196,62 @@ public class CLI
         public void run() {
             long t1 = System.currentTimeMillis();
             while(true) {
-                clearDeadPreparingThreads();
-                clearDeadThreads();
+                try {
+                    clearDeadPreparingThreads();
+                    clearDeadThreads();
 
-                if (System.currentTimeMillis() - t1 > 5000) {
-                    t1 = System.currentTimeMillis();
-                    System.out.println("Active: " + activeThreads.size() + ", queue: " + threadsQueue.size() +
-                            ", ended: " + jobsEnded + ", preparing: " + activePreparingThreads.size());
-                }
-
-                if (activePreparingThreads.size() < MAX_PREPARING_THREADS) {
-                    DispatcherJob newThread = getNextThread();
-                    if (newThread != null) {
-                        ThreadPreparator preparator = new ThreadPreparator(newThread);
-                        preparator.start();
-                        activePreparingThreads.add(preparator);
-                    }
-                }
-
-                if (activeThreads.size() < MAX_ACTIVE_THREADS) {
-                    DispatcherJob newThread = getNextPeparedThread();
-                    if (newThread != null) {
-                        boolean intersectionFound = false;
-                        for (DispatcherJob job : activeThreads) {
-                            if (job.intersects(newThread)) {
-                                intersectionFound = true;
-                                break;
-                            }
+                    if (System.currentTimeMillis() - t1 > 5000) {
+                        t1 = System.currentTimeMillis();
+                        if(activeThreads.size() > 0 || activePreparingThreads.size() > 0 ||
+                                threadsQueue.size() > 0) {
+                            System.out.println("Active: " + activeThreads.size() + ", queue: " + threadsQueue.size() +
+                                    ", ended: " + jobsEnded + ", preparing: " + activePreparingThreads.size() +
+                                    ", prepared: " + preparedThreadsQueue.size());
                         }
+                    }
 
-                        if(intersectionFound) {
-                            addThread(newThread);
+                    if (activePreparingThreads.size() < MAX_PREPARING_THREADS) {
+                        DispatcherJob newThread = getNextThread();
+                        if (newThread != null) {
+                            ThreadPreparator preparator = new ThreadPreparator(newThread);
+                            preparator.start();
+                            activePreparingThreads.add(preparator);
+                        }
+                    }
+
+                    if (activeThreads.size() < MAX_ACTIVE_THREADS) {
+                        DispatcherJob newThread = getNextPeparedThread();
+                        if (newThread != null) {
+                            boolean intersectionFound = false;
+                            for (DispatcherJob job : activeThreads) {
+                                if (job.intersects(newThread)) {
+                                    intersectionFound = true;
+                                    break;
+                                }
+                            }
+
+                            if(intersectionFound) {
+                                addThread(newThread);
+                            } else {
+                                newThread.start();
+                                activeThreads.add(newThread);
+                            }
                         } else {
-                            newThread.start();
-                            activeThreads.add(newThread);
+                            try {
+                                sleep(1000L);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     } else {
                         try {
-                            sleep(1000L);
+                            sleep(100L);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
-                } else {
-                    try {
-                        sleep(100L);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -269,7 +277,11 @@ public class CLI
 
         @Override
         public void run() {
-            thread.prepare();
+            try {
+                thread.prepare();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -282,13 +294,17 @@ public class CLI
         DeleteJob(IEntityService entityServiceCore, long id) {
             this.entityServiceCore = entityServiceCore;
             this.id = id;
-            this.ids = ids;
         }
 
         @Override
         public void run() {
-            entityServiceCore.remove(id);
-            System.out.println("Deleted entity with id: " + id);
+            try {
+                System.out.println("Deleting entity with id: " + id);
+                entityServiceCore.remove(id);
+                System.out.println("Deleted entity with id: " + id);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
 
@@ -790,11 +806,29 @@ public class CLI
         }
     }
 
-    public void restartBatchesWithErrors() {
-        if (args.size() < 5) {
-            System.out.println("Usage: <report_date> <output_file> <db_url> <db_logn> <db_password> <batch_service_url>");
-            System.out.println("Example: batchstat 01.05.2013 D:\\usci\\out.txt jdbc:oracle:thin:@170.7.15.15:1521:ESSP " +
-                    "core CORE_2013 rmi://127.0.0.1:1099/batchEntryService");
+    public void batchRestart() {
+        if (args.size() < 6) {
+            System.out.println("Usage: <report_date> <output_file>");
+            System.out.println("Example: batchrestart 01.05.2013 D:\\usci\\out.txt jdbc:oracle:thin:@170.7.15.15:1521:ESSP " +
+                    "core CORE_2013 rmi://127.0.0.1:1097/batchProcessService");
+            return;
+        }
+
+        RmiProxyFactoryBean batchProcessServiceFactoryBean = null;
+
+        IBatchProcessService batchProcessService = null;
+
+        try {
+            batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+            batchProcessServiceFactoryBean.setServiceUrl(args.get(5));
+            batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+            batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+            batchProcessServiceFactoryBean.afterPropertiesSet();
+            batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+        } catch (Exception e) {
+            System.out.println("Can't connect to receiver service: " + e.getMessage());
+            e.printStackTrace();
             return;
         }
 
@@ -811,23 +845,6 @@ public class CLI
             } catch (ParseException e) {
                 e.printStackTrace();
                 return;
-            }
-
-            RmiProxyFactoryBean batchProcessServiceFactoryBean = null;
-
-            IBatchProcessService batchProcessService = null;
-
-            try {
-                batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
-                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
-                batchProcessServiceFactoryBean.setServiceUrl(args.get(5));
-                batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
-                batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
-
-                batchProcessServiceFactoryBean.afterPropertiesSet();
-                batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
-            } catch (Exception e) {
-                System.out.println("Can't connect to receiver service: " + e.getMessage());
             }
 
             File f = new File(fileNameStr);
@@ -857,7 +874,8 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b");
+                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b  where b.rep_date = to_date('" +
+                                    reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e)
                         {
                             System.out.println("Can't create prepared statement: " + e.getMessage());
@@ -946,21 +964,21 @@ public class CLI
                                     error_count++;
                             }
 
-                            if (error_count > 0 || row_count != batchInfo.getSize()) {
-                                fout.write((batchId + "," +
-                                        batchFull.getFileName() + "," +
-                                        batchInfo.getSize() + "," + row_count + "," + error_count + "\n").getBytes());
+                        if (error_count > 0 || row_count != batchInfo.getSize()) {
+                            fout.write((batchId + "," +
+                                    batchFull.getFileName() + "," +
+                                    batchInfo.getSize() + "," + row_count + "," + error_count + ",restarted\n").getBytes());
 
-                                if(batchProcessService.restartBatch(batchId)) {
-                                    fout.write((batchId + "," +
-                                            batchFull.getFileName() + "," +
-                                            batchInfo.getSize() + "," + row_count + "," + error_count + ", restarted\n").getBytes());
-                                } else {
-                                    fout.write((batchId + "," +
-                                            batchFull.getFileName() + "," +
-                                            batchInfo.getSize() + "," + row_count + "," + error_count + ", failed\n").getBytes());
-                                }
-                            }
+                            //sender.addJob(batchId, batchInfo);
+                            //receiverStatusSingleton.batchReceived();
+                            batchProcessService.restartBatch(batchId);
+                        } else {
+                            fout.write((batchId + "," +
+                                    batchFull.getFileName() + "," +
+                                    batchInfo.getSize() + "," + row_count + "," + error_count + ",skipped\n").getBytes());
+                        }
+
+
                         }
                         break;
                     } catch (Exception e) {
@@ -988,7 +1006,6 @@ public class CLI
             return;
         }
     }
-
 
     public void removeEntityById(long id, String url) {
         jobDispatcher.addThread(new DeleteJob(getEntityService(url), id));
@@ -1619,17 +1636,25 @@ public class CLI
 
                 double totalInserts = 0;
                 double totalSelects = 0;
+                double totalUpdates = 0;
+                double totalDeletes = 0;
                 double totalProcess = 0;
                 int totalProcessCount = 0;
 
                 for (String query : map.keySet()) {
                     QueryEntry qe = map.get(query);
 
-                    if (query.startsWith("insert")) {
+                    if (query.trim().toLowerCase().startsWith("insert")) {
                         totalInserts += qe.totalTime;
                     }
-                    if (query.startsWith("select")) {
+                    if (query.trim().toLowerCase().startsWith("select")) {
                         totalSelects += qe.totalTime;
+                    }
+                    if (query.trim().toLowerCase().startsWith("update")) {
+                        totalUpdates += qe.totalTime;
+                    }
+                    if (query.trim().toLowerCase().startsWith("delete")) {
+                        totalDeletes += qe.totalTime;
                     }
                     if (query.startsWith("coreService")) {
                         totalProcess += qe.totalTime;
@@ -1645,6 +1670,8 @@ public class CLI
                     coreStatus.setAvgProcessed(totalProcess / totalProcessCount);
                     coreStatus.setAvgInserts(totalInserts / totalProcessCount);
                     coreStatus.setAvgSelects(totalSelects / totalProcessCount);
+                    coreStatus.setAvgDeletes(totalDeletes / totalProcessCount);
+                    coreStatus.setAvgUpdates(totalUpdates / totalProcessCount);
                 }
 
                 entityServiceCore.clearSQLStats();
@@ -2211,6 +2238,8 @@ public class CLI
                 commandMeta();
             } else if (command.equals("entity")) {
                 commandEntity();
+            } else if (command.equals("include")) {
+                commandInclude();
             } else if(command.equals("refs")){
                 commandRefs();
             } else if(command.equals("sql")){
@@ -2230,7 +2259,7 @@ public class CLI
             } else if(command.equals("batchstat")) {
                 batchStat();
             } else if(command.equals("batchrestart")) {
-                restartBatchesWithErrors();
+                batchRestart();
             } else if(command.equals("stc")) {
                 commandSTC();
             } else {
@@ -2288,6 +2317,28 @@ public class CLI
         }
 
         shutdown();
+    }
+
+    public void commandInclude()
+    {
+        if (args.size() > 0) {
+            String fileName = args.get(0);
+
+            System.out.println("Using file: " + fileName);
+
+            try {
+                Scanner in = new Scanner(new FileInputStream(new File(fileName)));
+
+                while ( !(line = in.nextLine()).equals("quit")) {
+                    processCommand(line, in);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Argument needed: <sync_url>");
+            System.out.println("Example: sstat rmi://127.0.0.1:1098/entityService");
+        }
     }
 
     public InputStream getInputStream()

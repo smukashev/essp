@@ -354,7 +354,8 @@ public class BaseEntityDateValueDaoImpl extends JDBCSupport implements IBaseEnti
                         EAV_BE_DATE_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_DATE_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_DATE_VALUES.as(tableAlias).VALUE,
-                        EAV_BE_DATE_VALUES.as(tableAlias).IS_LAST)
+                        EAV_BE_DATE_VALUES.as(tableAlias).IS_LAST,
+                        EAV_BE_DATE_VALUES.as(tableAlias).IS_CLOSED)
                 .from(EAV_BE_DATE_VALUES.as(tableAlias))
                 .where(EAV_BE_DATE_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_DATE_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
