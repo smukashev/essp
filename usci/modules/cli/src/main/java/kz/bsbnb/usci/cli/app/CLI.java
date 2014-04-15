@@ -47,6 +47,7 @@ import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 import kz.bsbnb.usci.tool.status.SyncStatus;
 import kz.bsbnb.usci.tool.status.SystemStatus;
+import net.spy.memcached.OperationTimeoutException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -680,7 +681,8 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b");
+                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b  where b.rep_date = to_date('" +
+                                    reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e)
                         {
                             System.out.println("Can't create prepared statement: " + e.getMessage());
@@ -701,9 +703,45 @@ public class CLI
 
                             System.out.println("Processing id: " + batchId);
 
-                            Object batchObject = couchbaseClient.get("batch:" + batchId);
-                            Object manifestObject = couchbaseClient.get("manifest:" + batchId);
-                            Object batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
+                            Object batchObject = null;
+                            Object manifestObject = null;
+                            Object batchStatusObject = null;
+
+                            int counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    batchObject = couchbaseClient.get("batch:" + batchId);
+                                    break;
+                                } catch(OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting...");
+                                    counter++;
+                                }
+                            }
+
+                            counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    manifestObject = couchbaseClient.get("manifest:" + batchId);
+                                    break;
+                                } catch(OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting...");
+                                    counter++;
+                                }
+                            }
+
+                            counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
+                                    break;
+                                } catch(OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting...");
+                                    counter++;
+                                }
+                            }
 
                             if (batchObject == null || manifestObject == null) {
                                 System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
@@ -896,9 +934,45 @@ public class CLI
 
                             System.out.println("Processing id: " + batchId);
 
-                            Object batchObject = couchbaseClient.get("batch:" + batchId);
-                            Object manifestObject = couchbaseClient.get("manifest:" + batchId);
-                            Object batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
+                            Object batchObject = null;
+                            Object manifestObject = null;
+                            Object batchStatusObject = null;
+
+                            int counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    batchObject = couchbaseClient.get("batch:" + batchId);
+                                    break;
+                                } catch (OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting.");
+                                    counter++;
+                                }
+                            }
+
+                            counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    manifestObject = couchbaseClient.get("manifest:" + batchId);
+                                    break;
+                                } catch (OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting.");
+                                    counter++;
+                                }
+                            }
+
+                            counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
+                                    break;
+                                } catch (OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting.");
+                                    counter++;
+                                }
+                            }
 
                             if (batchObject == null || manifestObject == null) {
                                 System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
@@ -1065,6 +1139,33 @@ public class CLI
             while((entity = reader.read()) != null) {
                 long id = baseEntityProcessorDao.process(entity).getId();
                 System.out.println("Saved with id: " + id);
+            }
+        } catch (FileNotFoundException e)
+        {
+            System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
+        } catch (ParseException e) {
+            System.out.println("Can't parse date " + repDate + " must be in format "+ sdfout.toString());
+        }
+
+    }
+
+    public void findEntityFromXML(String fileName, String repDate) {
+        try {
+            Date reportDate = sdfout.parse(repDate);
+            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
+            BaseEntity entity;
+            while((entity = reader.read()) != null) {
+                //long id = baseEntityProcessorDao.process(entity).getId();
+                ArrayList<Long> ids = searcher.findAll(entity);
+                if (ids.size() < 1) {
+                    System.out.println("Entity: \n" + entity.toString() + "\nNot found.");
+                } else {
+                    System.out.println("Entity: \n" + entity.toString() + "\nFound with ids: ");
+                    for (Long id : ids) {
+                        System.out.println(id + " ");
+                    }
+                }
+
             }
         } catch (FileNotFoundException e)
         {
@@ -1539,6 +1640,60 @@ public class CLI
         }
     }
 
+    public void commandCollectIds()
+    {
+        if (args.size() > 1) {
+            String inFileName = args.get(0);
+            String outFileName = args.get(1);
+
+            ArrayList<Long> ids = new ArrayList<Long>();
+
+            try {
+                Scanner inputScanner = new Scanner(new FileInputStream(inFileName));
+                FileOutputStream fout = new FileOutputStream(outFileName);
+
+                while(inputScanner.hasNextLine()) {
+                    String nextLine = inputScanner.nextLine();
+
+                    int idIndex = nextLine.indexOf("Not yet implemented. Entity ID:");
+
+                    if (idIndex > 0) {
+                        String idString = nextLine.substring(idIndex + "Not yet implemented. Entity ID:".length()).trim();
+                        Long id = Long.parseLong(idString);
+                        ids.add(id);
+                    }
+
+                    if (nextLine.indexOf("ERROR") > 0)
+                        fout.write((nextLine + "\n").getBytes());
+                }
+
+                boolean first = true;
+                String idsStr = "";
+                for (Long id : ids) {
+                    if (first) {
+                        idsStr += id;
+                        first = false;
+                    } else {
+                        idsStr += "," + id;
+                    }
+                }
+
+                fout.write(idsStr.getBytes());
+
+                fout.close();
+                inputScanner.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            System.out.println("Argument needed: <input_file_name> <output_file_name>");
+            System.out.println("Example: collectids D:\\distr\\usci\\core.log D:\\distr\\usci\\out_core.log");
+        }
+    }
+
     public void commandRStat()
     {
         if (args.size() > 0) {
@@ -1919,6 +2074,12 @@ public class CLI
                 } else {
                     System.out.println("Argument needed: <read> <fileName> <rep_date>");
                 }
+            } else if(args.get(0).equals("find")) {
+                if (args.size() > 2) {
+                    findEntityFromXML(args.get(1), args.get(2));
+                } else {
+                    System.out.println("Argument needed: <find> <fileName> <rep_date>");
+                }
             } else if(args.get(0).equals("test")) {
                 if (args.size() > 2) {
                     testEntityFromXML(args.get(1), args.get(2));
@@ -2248,6 +2409,8 @@ public class CLI
                 commandRule(in);
             } else if(command.equals("import")) {
                 commandImport();
+            } else if(command.equals("collectids")) {
+                commandCollectIds();
             } else if(command.equals("rstat")) {
                 commandRStat();
             } else if(command.equals("sstat")) {

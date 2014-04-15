@@ -248,7 +248,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         if (rows.size() > 1)
         {
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
+            throw new RuntimeException("Query for get next instance of BaseValue return more than one row. Query: " +
+                    select.toString());
         }
 
         if (rows.size() == 1)

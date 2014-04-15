@@ -1478,7 +1478,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     }
                 }
 
-                if (baseValueSaving.getId() > 0)
+                if (childBaseEntitySaving.getId() > 0)
                 {
                     IBaseSetValueDao setValueDao = persistableDaoPool
                             .getPersistableDao(childBaseValueSaving.getClass(), IBaseSetValueDao.class);

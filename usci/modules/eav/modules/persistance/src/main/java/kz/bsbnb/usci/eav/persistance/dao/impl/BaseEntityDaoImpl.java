@@ -95,7 +95,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         }
         if (count < 1)
         {
-            throw new RuntimeException("DELETE operation should delete a record. ID: " + id);
+            logger.warn("DELETE operation should delete a record. ID: " + id);
         }
     }
 
