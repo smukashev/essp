@@ -38,6 +38,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     protected DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
+    private UUID uuid = UUID.randomUUID();
+
     /**
      * Holds data about entity structure
      * @see MetaClass
@@ -1310,5 +1312,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         }
 
         return count;
+    }
+
+    public UUID getUuid() {
+        return uuid;
     }
 }

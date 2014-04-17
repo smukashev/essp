@@ -1081,6 +1081,152 @@ public class CLI
         }
     }
 
+    public void batchRestartSingle() {
+        if (args.size() < 2) {
+            System.out.println("Usage: <report_date> <output_file>");
+            System.out.println("Example: sbatchrestart <batch_id> rmi://127.0.0.1:1097/batchProcessService");
+            return;
+        }
+
+        RmiProxyFactoryBean batchProcessServiceFactoryBean = null;
+
+        IBatchProcessService batchProcessService = null;
+
+        try {
+            batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+            batchProcessServiceFactoryBean.setServiceUrl(args.get(1));
+            batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+            batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+            batchProcessServiceFactoryBean.afterPropertiesSet();
+            batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+        } catch (Exception e) {
+            System.out.println("Can't connect to receiver service: " + e.getMessage());
+            e.printStackTrace();
+            return;
+        }
+
+        Gson gson = new Gson();
+
+        long batchId = Long.parseLong(args.get(0));
+
+        System.out.println("Processing id: " + batchId);
+
+        Object batchObject = null;
+        Object manifestObject = null;
+        Object batchStatusObject = null;
+
+        int counter = 0;
+
+        while(counter < 100) {
+            try {
+                batchObject = couchbaseClient.get("batch:" + batchId);
+                break;
+            } catch (OperationTimeoutException ex) {
+                System.out.println("Timeout. Restarting.");
+                counter++;
+            }
+        }
+
+        counter = 0;
+
+        while(counter < 100) {
+            try {
+                manifestObject = couchbaseClient.get("manifest:" + batchId);
+                break;
+            } catch (OperationTimeoutException ex) {
+                System.out.println("Timeout. Restarting.");
+                counter++;
+            }
+        }
+
+        counter = 0;
+
+        while(counter < 100) {
+            try {
+                batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
+                break;
+            } catch (OperationTimeoutException ex) {
+                System.out.println("Timeout. Restarting.");
+                counter++;
+            }
+        }
+
+        if (batchObject == null || manifestObject == null) {
+            System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
+
+            if (batchObject != null) {
+                couchbaseClient.delete("batch:" + batchId);
+            }
+            if (manifestObject != null) {
+                couchbaseClient.delete("manifest:" + batchId);
+            }
+            if (batchStatusObject != null) {
+                couchbaseClient.delete("batch_status:" + batchId);
+            }
+            return;
+        }
+
+        String batchStr = batchObject.toString();
+
+        BatchFullJModel batchFull = gson.fromJson(batchStr, BatchFullJModel.class);
+
+        String batchInfoStr = manifestObject.toString();
+
+        BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
+
+        View view = couchbaseClient.getView("batch", "contract_status");
+        Query query = new Query();
+        query.setDescending(true);
+        query.setRangeEnd("[" + batchId + ", 0]");
+        query.setRangeStart("[" + batchId + ", 999999999999999]");
+
+        ViewResponse response = couchbaseClient.query(view, query);
+
+        Iterator<ViewRow> rows = response.iterator();
+
+        int row_count = 0;
+        int error_count = 0;
+        while(rows.hasNext()) {
+            ViewRow viewRowNoDocs = rows.next();
+
+            row_count++;
+
+            ContractStatusArrayJModel batchFullStatusJModel =
+                    gson.fromJson(viewRowNoDocs.getValue(), ContractStatusArrayJModel.class);
+
+            boolean errorFound = false;
+            boolean completedFound = false;
+            for (ContractStatusJModel csajm : batchFullStatusJModel.getContractStatuses()) {
+                if (csajm.getProtocol().equals("ERROR"))
+                {
+                    errorFound = true;
+                }
+                if (csajm.getProtocol().equals("COMPLETED"))
+                {
+                    completedFound = true;
+                }
+            }
+            if (errorFound && !completedFound)
+                error_count++;
+        }
+
+        if (error_count > 0 || row_count != batchInfo.getSize()) {
+            System.out.println(batchId + "," +
+                    batchFull.getFileName() + "," +
+                    batchInfo.getSize() + "," + row_count + "," + error_count + ",restarted");
+
+            //sender.addJob(batchId, batchInfo);
+            //receiverStatusSingleton.batchReceived();
+            batchProcessService.restartBatch(batchId);
+        } else {
+            System.out.println(batchId + "," +
+                    batchFull.getFileName() + "," +
+                    batchInfo.getSize() + "," + row_count + "," + error_count +
+                    ",skipped because it has no errors");
+        }
+    }
+
     public void removeEntityById(long id, String url) {
         jobDispatcher.addThread(new DeleteJob(getEntityService(url), id));
     }
@@ -2423,6 +2569,8 @@ public class CLI
                 batchStat();
             } else if(command.equals("batchrestart")) {
                 batchRestart();
+            } else if(command.equals("sbatchrestart")) {
+                batchRestartSingle();
             } else if(command.equals("stc")) {
                 commandSTC();
             } else {

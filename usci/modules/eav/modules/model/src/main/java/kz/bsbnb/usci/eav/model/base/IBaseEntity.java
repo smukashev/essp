@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
 import java.util.Date;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author a.motov
@@ -31,5 +32,7 @@ public interface IBaseEntity extends IBaseContainer {
     public IBaseValue safeGetValue(String name);
 
     public void calculateValueCount();
+
+    public UUID getUuid();
 
 }

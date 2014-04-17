@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.manager.impl;
 
+import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -46,6 +47,7 @@ public class BaseEntityManager implements IBaseEntityManager {
     private Map<Class, List<IPersistable>> deletedObjects = new HashMap<Class, List<IPersistable>>();
 
     private Set<IBaseEntity> unusedBaseEntities = new HashSet<IBaseEntity>();
+    private HashMap<String, List<IBaseEntity>> processedEntities = new HashMap<String, List<IBaseEntity>>();
 
     public void registerAsInserted(IPersistable insertedObject)
     {
@@ -122,6 +124,18 @@ public class BaseEntityManager implements IBaseEntityManager {
     }
 
     @Override
+    public void registerProcessedBaseEntity(IBaseEntity processedBaseEntity) {
+        List<IBaseEntity> entityList = processedEntities.get(processedBaseEntity.getMeta().getClassName());
+
+        if (entityList == null) {
+            entityList = new ArrayList<IBaseEntity>();
+        }
+
+        entityList.add(processedBaseEntity);
+        processedEntities.put(processedBaseEntity.getMeta().getClassName(), entityList);
+    }
+
+    @Override
     public List<IPersistable> getInsertedObjects(Class objectClass) {
         return insertedObjects.get(objectClass);
     }
@@ -141,4 +155,22 @@ public class BaseEntityManager implements IBaseEntityManager {
         return unusedBaseEntities;
     }
 
+    @Override
+    public IBaseEntity getProcessed(IBaseEntity baseEntity) {
+        List<IBaseEntity> entityList = processedEntities.get(baseEntity.getMeta().getClassName());
+
+        if (entityList == null) {
+            return null;
+        }
+
+        BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
+
+        for (IBaseEntity currentBaseEntity : entityList) {
+            if (comparator.compare((BaseEntity)baseEntity, (BaseEntity)currentBaseEntity)) {
+                return currentBaseEntity;
+            }
+        }
+
+        return null;
+    }
 }

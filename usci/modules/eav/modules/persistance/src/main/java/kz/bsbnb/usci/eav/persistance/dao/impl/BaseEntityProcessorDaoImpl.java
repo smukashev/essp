@@ -313,6 +313,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     private IBaseEntity applyBaseEntityBasic(IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager)
     {
+        IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
+        if (foundProcessedBaseEntity != null) {
+            return foundProcessedBaseEntity;
+        }
+
         IBaseEntity baseEntityApplied =
                 new BaseEntity(
                         baseEntitySaving.getMeta(),
@@ -333,6 +338,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         IBaseEntityReportDate baseEntityReportDate =
                 baseEntityApplied.getBaseEntityReportDate();
         baseEntityManager.registerAsInserted(baseEntityReportDate);
+
+        baseEntityManager.registerProcessedBaseEntity(baseEntityApplied);
 
         return baseEntityApplied;
     }
@@ -364,6 +371,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private IBaseEntity applyBaseEntityAdvanced(IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded,
                                                 IBaseEntityManager baseEntityManager)
     {
+        IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
+        if (foundProcessedBaseEntity != null) {
+            return foundProcessedBaseEntity;
+        }
+
         IMetaClass metaClass = baseEntitySaving.getMeta();
         IBaseEntity baseEntityApplied = new BaseEntity(baseEntityLoaded, baseEntitySaving.getReportDate());
 
@@ -462,8 +474,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             baseEntityManager.registerAsInserted(baseEntityReportDate);
         }
 
-        //Remove unused instances of BaseEntity
+        //TODO:Remove unused instances of BaseEntity
 
+        baseEntityManager.registerProcessedBaseEntity(baseEntityApplied);
 
         return baseEntityApplied;
     }
