@@ -419,7 +419,7 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b");
+                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b");
                         } catch (SQLException e)
                         {
                             System.out.println("Can't create prepared statement: " + e.getMessage());
@@ -612,7 +612,7 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b");
+                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b");
                         } catch (SQLException e)
                         {
                             System.out.println("Can't create prepared statement: " + e.getMessage());
@@ -1842,7 +1842,11 @@ public class CLI
             Date reportDate = dateFormatter.parse("01.03.2014");
 
             try {
-                CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, reportDate);
+                CLIXMLReader reader;
+                if(args.size() == 1)
+                  reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, reportDate);
+                else
+                  reader = new CLIXMLReader(args.get(1),metaClassRepository,batchRepository,reportDate);
                 currentBaseEntity = reader.read();
                 rulesSingleton.runRules(currentBaseEntity,currentPackageName,currentDate);
 

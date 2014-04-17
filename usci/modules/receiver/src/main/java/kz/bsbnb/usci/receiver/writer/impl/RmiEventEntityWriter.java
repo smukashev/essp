@@ -3,6 +3,7 @@ package kz.bsbnb.usci.receiver.writer.impl;
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
+import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
@@ -40,6 +41,9 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
     @Autowired
     protected StatusSingleton statusSingleton;
 
+    @Autowired
+    protected SQLQueriesStats sqlStats;
+
     @PostConstruct
     public void init() {
         logger.info("Writer init");
@@ -75,22 +79,25 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                     EntityStatuses.CHECK_IN_PARSER, null, new Date(),
                     contractNo,
                     contractDate));
-            /*try {
+            try {
+                long t1 = System.currentTimeMillis();
                 rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());
+                sqlStats.put(entity.getMeta().getClassName() + "_parser", System.currentTimeMillis() - t1);
             } catch(Exception e) {
                 logger.error("Can't run rules: " + e.getMessage());
             }
 
             if (entity.getValidationErrors().size() > 0) {
                 for (String errorMsg : entity.getValidationErrors()) {
+                    System.out.println(errorMsg);
                     //TODO: check for error with Index
                     statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
                             entity.getBatchIndex() - 1,
-                            Global.CONTRACT_STATUS_ERROR, errorMsg, new Date(),
+                            EntityStatuses.ERROR, errorMsg, new Date(),
                             contractNo,
                             contractDate));
                 }
-            } else {*/
+            } else {
                 statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
                     entity.getBatchIndex() - 1,
                     EntityStatuses.WAITING, null, new Date(),
@@ -98,7 +105,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                     contractDate));
 
                 entitiesToSave.add(entity);
-            /*}*/
+            }
         }
 
         entityService.process(entitiesToSave);
