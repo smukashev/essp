@@ -196,7 +196,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             Batch batch = batchRepository.getBatch(batchId);
             IBaseEntity childBaseEntityLoaded = baseEntityProcessorDao
-                    .loadByMaxReportDate(childBaseEntity.getId(), reportDate);
+                    .loadByMaxReportDate(childBaseEntity.getId(), baseValue.getRepDate());
 
             previousBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
                     id, batch, index, reportDate, childBaseEntityLoaded, closed, last);

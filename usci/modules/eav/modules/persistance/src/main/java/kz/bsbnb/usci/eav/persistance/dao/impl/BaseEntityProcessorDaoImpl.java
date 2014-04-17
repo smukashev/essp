@@ -1502,23 +1502,24 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         baseEntityManager.registerAsDeleted(childBaseValueClosed);
 
                         IBaseValue childBaseValuePrevious = setValueDao.getPreviousBaseValue(childBaseValueClosed);
-                        IBaseEntity childBaseEntityPrevious =  (IBaseEntity)childBaseValuePrevious.getValue();
-                        childBaseValuePrevious.setValue(applyBaseEntityAdvanced(childBaseEntitySaving,
-                                childBaseEntityPrevious, baseEntityManager));
-                        if (childBaseValueClosed.isLast())
-                        {
-                            childBaseValuePrevious.setIndex(childBaseValueSaving.getIndex());
-                            childBaseValuePrevious.setBatch(childBaseValueSaving.getBatch());
-                            childBaseValuePrevious.setLast(true);
+                        if(childBaseValuePrevious != null && childBaseValuePrevious.getValue() != null) {
+                            IBaseEntity childBaseEntityPrevious =  (IBaseEntity)childBaseValuePrevious.getValue();
+                            childBaseValuePrevious.setValue(applyBaseEntityAdvanced(childBaseEntitySaving,
+                                    childBaseEntityPrevious, baseEntityManager));
+                            if (childBaseValueClosed.isLast())
+                            {
+                                childBaseValuePrevious.setIndex(childBaseValueSaving.getIndex());
+                                childBaseValuePrevious.setBatch(childBaseValueSaving.getBatch());
+                                childBaseValuePrevious.setLast(true);
 
-                            childBaseSetApplied.put(childBaseValuePrevious);
-                            baseEntityManager.registerAsUpdated(childBaseValuePrevious);
+                                childBaseSetApplied.put(childBaseValuePrevious);
+                                baseEntityManager.registerAsUpdated(childBaseValuePrevious);
+                            }
+                            else
+                            {
+                                childBaseSetApplied.put(childBaseValuePrevious);
+                            }
                         }
-                        else
-                        {
-                            childBaseSetApplied.put(childBaseValuePrevious);
-                        }
-
                         continue;
                     }
 
