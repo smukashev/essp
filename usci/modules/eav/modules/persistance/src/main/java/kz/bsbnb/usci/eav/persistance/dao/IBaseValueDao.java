@@ -20,4 +20,6 @@ public interface IBaseValueDao<T extends IBaseContainer> extends IPersistableDao
 
     public void loadBaseValues(T baseContainer, Date actualReportDate, boolean lastReportDate);
 
+    public void deleteAll(long baseContainerId);
+
 }

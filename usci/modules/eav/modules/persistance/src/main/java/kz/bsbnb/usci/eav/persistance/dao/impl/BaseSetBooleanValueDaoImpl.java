@@ -448,4 +448,15 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         }
     }
 
+    @Override
+    public void deleteAll(long baseSetId) {
+        String tableAlias = "bsv";
+        Delete delete = context
+                .delete(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
+                .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseSetId));
+
+        logger.debug(delete.toString());
+        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+    }
+
 }

@@ -1,9 +1,13 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseSetDao;
+import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseValueDao;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Delete;
@@ -13,6 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_SETS;
 
@@ -27,6 +34,9 @@ public class BaseSetDaoImpl extends JDBCSupport implements IBaseSetDao {
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
+
+    @Autowired
+    IPersistableDaoPool persistableDaoPool;
 
     @Override
     public long insert(IPersistable persistable) {
@@ -86,6 +96,29 @@ public class BaseSetDaoImpl extends JDBCSupport implements IBaseSetDao {
         {
             throw new RuntimeException("DELETE operation should be delete only one record.");
         }
+    }
+
+    public boolean deleteRecursive(long baseSetId)
+    {
+        Set<Class<? extends IBaseValue>> baseValueClasses =
+                new HashSet<Class<? extends IBaseValue>>();
+        baseValueClasses.add(BaseSetBooleanValue.class);
+        baseValueClasses.add(BaseSetDateValue.class);
+        baseValueClasses.add(BaseSetDoubleValue.class);
+        baseValueClasses.add(BaseSetIntegerValue.class);
+        baseValueClasses.add(BaseSetStringValue.class);
+        baseValueClasses.add(BaseSetComplexValue.class);
+
+        for (Class<? extends IBaseValue> baseValueClass: baseValueClasses)
+        {
+            IBaseValueDao baseValueDao = persistableDaoPool
+                    .getPersistableDao(baseValueClass, IBaseValueDao.class);
+            baseValueDao.deleteAll(baseSetId);
+        }
+
+        delete(baseSetId);
+
+        return true;
     }
 
 }

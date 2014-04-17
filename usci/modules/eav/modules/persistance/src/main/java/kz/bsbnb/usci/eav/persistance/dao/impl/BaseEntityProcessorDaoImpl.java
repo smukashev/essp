@@ -61,7 +61,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     public IBaseEntity loadByMaxReportDate(long id, Date actualReportDate, boolean caching)
     {
-        Date maxReportDate = getMaxReportDate(id, actualReportDate);
+        IBaseEntityReportDateDao baseEntityReportDateDao =
+                persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+        Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id, actualReportDate);
         if (maxReportDate == null)
         {
             throw new RuntimeException("No data found on report date " + actualReportDate + ".");
@@ -83,7 +85,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     public IBaseEntity load(long id, boolean caching)
     {
-        Date maxReportDate = getMaxReportDate(id);
+        IBaseEntityReportDateDao baseEntityReportDateDao =
+                persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+        Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id);
         if (maxReportDate == null)
         {
             throw new UnsupportedOperationException("Not found appropriate report date.");
@@ -108,164 +112,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return load(id, maxReportDate, actualReportDate);
     }
 
-    public IBaseEntity load(long id, Date maxReportDate, Date actualReportDate)
+    public IBaseEntity load(long id, Date reportDate, Date actualReportDate)
     {
-        if(id < 1)
-        {
-            throw new IllegalArgumentException("Does not have id. Can't load.");
-        }
-
-        if (maxReportDate == null)
-        {
-            throw new IllegalArgumentException("To load instance of BaseEntity must always " +
-                    "be specified report date.");
-        }
-
-        String tableAlias = "e";
-        Select select = context
-                .select(EAV_BE_ENTITIES.as(tableAlias).CLASS_ID)
-                .from(EAV_BE_ENTITIES.as(tableAlias))
-                .where(EAV_BE_ENTITIES.as(tableAlias).ID.equal(id));
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        if (rows.size() > 1)
-        {
-            throw new IllegalArgumentException("More then one instance of BaseEntity found.");
-        }
-
-        if (rows.size() < 1)
-        {
-            throw new IllegalStateException("Instance of BaseEntity was not found.");
-        }
-
-        Map<String, Object> row = rows.get(0);
-        if(row != null)
-        {
-            long classId = ((BigDecimal)row.get(EAV_BE_ENTITIES.as(tableAlias).CLASS_ID.getName())).longValue();
-            boolean last = DataTypeUtil.compareBeginningOfTheDay(getMaxReportDate(id), maxReportDate) == 0;
-
-            MetaClass meta = metaClassRepository.getMetaClass(classId);
-            IBaseEntityReportDate baseEntityReportDate = loadBaseEntityReportDate(id, maxReportDate);
-            IBaseEntity baseEntity = new BaseEntity(id, meta, baseEntityReportDate);
-
-            Map<Class<? extends IBaseValue>, Long> baseValueCounts =
-                    new HashMap<Class<? extends IBaseValue>, Long>();
-            baseValueCounts.put(BaseEntityIntegerValue.class, baseEntityReportDate.getIntegerValuesCount());
-            baseValueCounts.put(BaseEntityDateValue.class, baseEntityReportDate.getDateValuesCount());
-            baseValueCounts.put(BaseEntityStringValue.class, baseEntityReportDate.getStringValuesCount());
-            baseValueCounts.put(BaseEntityBooleanValue.class, baseEntityReportDate.getBooleanValuesCount());
-            baseValueCounts.put(BaseEntityDoubleValue.class, baseEntityReportDate.getDoubleValuesCount());
-            baseValueCounts.put(BaseEntityComplexValue.class, baseEntityReportDate.getComplexValuesCount());
-            baseValueCounts.put(BaseEntitySimpleSet.class, baseEntityReportDate.getSimpleSetsCount());
-            baseValueCounts.put(BaseEntityComplexSet.class, baseEntityReportDate.getComplexSetsCount());
-
-            for (Class<? extends IBaseValue> baseValueClass: baseValueCounts.keySet())
-            {
-                long baseValuesCount = baseValueCounts.get(baseValueClass);
-                if (baseValuesCount > 0)
-                {
-                    IBaseEntityValueDao baseEntityValueDao = persistableDaoPool
-                            .getPersistableDao(baseValueClass, IBaseEntityValueDao.class);
-                    baseEntityValueDao.loadBaseValues(baseEntity, actualReportDate, last);
-                }
-            }
-
-            return baseEntity;
-        }
-        else
-        {
-            logger.error("Can't load instance of BaseEntity, empty data set.");
-        }
-
-        return null;
-    }
-
-    public IBaseEntityReportDate loadBaseEntityReportDate(long baseEntityId, Date reportDate)
-    {
-        if(baseEntityId < 1)
-        {
-            throw new IllegalArgumentException("To load instance of BaseEntityReportDate must always " +
-                    "be specified entity ID.");
-        }
-
-        if (reportDate == null)
-        {
-            throw new IllegalArgumentException("To load instance of BaseEntityReportDate must always " +
-                    "be specified report date.");
-        }
-
-        String tableAlias = "rd";
-        Select select = context
-                .select(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ID,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).INTEGER_VALUES_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).DATE_VALUES_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).STRING_VALUES_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).BOOLEAN_VALUES_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).DOUBLE_VALUES_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).COMPLEX_VALUES_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).SIMPLE_SETS_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).COMPLEX_SETS_COUNT)
-                .from(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias))
-                .where(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ENTITY_ID.equal(baseEntityId))
-                .and(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).REPORT_DATE.eq(DataUtils.convert(reportDate)));
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        if (rows.size() > 1)
-        {
-            throw new IllegalArgumentException("More then one instance of BaseEntityReportDate found.");
-        }
-
-        if (rows.size() < 1)
-        {
-            throw new IllegalStateException("Instance of BaseEntityReportDate was not found.");
-        }
-
-        Map<String, Object> row = rows.get(0);
-        if(row != null)
-        {
-            long id = ((BigDecimal)row.get(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ID.getName())).longValue();
-            long integerValuesCount = ((BigDecimal)row
-                    .get(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).INTEGER_VALUES_COUNT.getName())).longValue();
-            long dateValuesCount = ((BigDecimal)row
-                    .get(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).DATE_VALUES_COUNT.getName())).longValue();
-            long stringValuesCount = ((BigDecimal)row
-                    .get(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).STRING_VALUES_COUNT.getName())).longValue();
-            long booleanValuesCount = ((BigDecimal)row
-                    .get(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).BOOLEAN_VALUES_COUNT.getName())).longValue();
-            long doubleValuesCount = ((BigDecimal)row
-                    .get(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).DOUBLE_VALUES_COUNT.getName())).longValue();
-            long complexValuesCount = ((BigDecimal)row
-                    .get(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).COMPLEX_VALUES_COUNT.getName())).longValue();
-            long simpleSetsCount = ((BigDecimal)row
-                    .get(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).SIMPLE_SETS_COUNT.getName())).longValue();
-            long complexSetsCount = ((BigDecimal)row
-                    .get(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).COMPLEX_SETS_COUNT.getName())).longValue();
-
-            IBaseEntityReportDate baseEntityReportDate =
-                    new BaseEntityReportDate(
-                            id,
-                            reportDate,
-                            integerValuesCount,
-                            dateValuesCount,
-                            stringValuesCount,
-                            booleanValuesCount,
-                            doubleValuesCount,
-                            complexValuesCount,
-                            simpleSetsCount,
-                            complexSetsCount);
-
-            return baseEntityReportDate;
-        }
-        else
-        {
-            logger.error("Can't load instance of BaseEntityReportDate, empty data set.");
-        }
-
-        return null;
+        IBaseEntityDao baseEntityDao =
+                persistableDaoPool.getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
+        return baseEntityDao.load(id, reportDate, actualReportDate);
     }
 
     /**
@@ -277,12 +128,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         IMetaClass metaClass = baseEntity.getMeta();
         Long baseEntityId = searcherPool.getSearcher(metaClass.getClassName())
                 .findSingle((BaseEntity)baseEntity);
-
-        /*if (metaClass.isReference() && metaClass.isImmutable())
-        {
-            throw new RuntimeException(
-                    String.format("MetaClass with name {0} marked as immutable reference.", metaClass.getClassName()));
-        }*/
 
         return baseEntityId == null ? 0 : baseEntityId;
     }
@@ -418,6 +263,13 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 }
             }
         }
+
+        for (IBaseEntity unusedBaseEntity: baseEntityManager.getUnusedBaseEntities())
+        {
+            IBaseEntityDao baseEntityDao = persistableDaoPool
+                    .getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
+            baseEntityDao.deleteRecursive(unusedBaseEntity.getId(), unusedBaseEntity.getMeta());
+        }
     }
 
     private IBaseEntity apply(IBaseEntity baseEntityForSave, IBaseEntityManager baseEntityManager)
@@ -429,7 +281,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         else
         {
             Date reportDate = baseEntityForSave.getReportDate();
-            Date maxReportDate = getMaxReportDate(baseEntityForSave.getId(), reportDate);
+            IBaseEntityReportDateDao baseEntityReportDateDao =
+                    persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+            Date maxReportDate = baseEntityReportDateDao
+                    .getMaxReportDate(baseEntityForSave.getId(), reportDate);
 
             if (maxReportDate == null)
             {
@@ -606,6 +461,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             baseEntityManager.registerAsInserted(baseEntityReportDate);
         }
+
+        //Remove unused instances of BaseEntity
+
 
         return baseEntityApplied;
     }
@@ -1730,12 +1588,23 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 if (reportDateEquals)
                 {
                     baseEntityManager.registerAsDeleted(childBaseValueLoaded);
+
+                    IBaseEntity childBaseEntityLoaded = (IBaseEntity)childBaseValueLoaded.getValue();
+                    if (childBaseEntityLoaded != null)
+                    {
+                        baseEntityManager.registerUnusedBaseEntity(childBaseEntityLoaded);
+                    }
                     boolean last = childBaseValueLoaded.isLast();
 
                     IBaseValue childBaseValueNext = setValueDao.getNextBaseValue(childBaseValueLoaded);
                     if (childBaseValueNext != null && childBaseValueNext.isClosed())
                     {
                         baseEntityManager.registerAsDeleted(childBaseValueNext);
+                        IBaseEntity childBaseEntityNext = (IBaseEntity)childBaseValueNext.getValue();
+                        if (childBaseEntityNext != null)
+                        {
+                            baseEntityManager.registerUnusedBaseEntity(childBaseEntityNext);
+                        }
 
                         last = childBaseValueNext.isLast();
                     }
@@ -2392,55 +2261,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return baseEntityApplied;
     }
 
-    public Set<Date> getAvailableReportDates(long baseEntityId)
-    {
-        Set<Date> reportDates = new HashSet<Date>();
-
-        Select select = context
-                .select(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE)
-                .from(EAV_BE_ENTITY_REPORT_DATES)
-                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId));
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        Iterator<Map<String, Object>> it = rows.iterator();
-        while (it.hasNext())
-        {
-            Map<String, Object> row = it.next();
-            reportDates.add(DataUtils.convert((Timestamp) row.get(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.getName())));
-        }
-
-        return reportDates;
-    }
-
-    public Date getMinReportDate(long baseEntityId)
-    {
-        Select select = context
-                .select(DSL.min(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE).as("min_report_date"))
-                .from(EAV_BE_ENTITY_REPORT_DATES)
-                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId));
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        return DataUtils.convert((Timestamp) rows.get(0).get("min_report_date"));
-    }
-
-    public Date getMaxReportDate(long baseEntityId, Date reportDate)
-    {
-        Select select = context
-                .select(DSL.max(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE).as("min_report_date"))
-                .from(EAV_BE_ENTITY_REPORT_DATES)
-                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId))
-                .and(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.lessOrEqual(DataUtils.convert(reportDate)));
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        return DataUtils.convert((Timestamp) rows.get(0).get("min_report_date"));
-    }
-
     public boolean checkReportDateExists(long baseEntityId, Date reportDate)
     {
         Select select = context
@@ -2455,19 +2275,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return ((BigDecimal)rows.get(0).get("report_dates_count")).longValue() > 0;
     }
 
-    public Date getMaxReportDate(long baseEntityId)
-    {
-        String tableAlias = "rd";
-        Select select = context
-                .select(DSL.max(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).REPORT_DATE).as("max_report_date"))
-                .from(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias))
-                .where(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ENTITY_ID.eq(baseEntityId));
 
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        return DataUtils.convert((Timestamp) rows.get(0).get("max_report_date"));
-    }
 
     private Set<BaseEntity> collectComplexSetValues(BaseSet baseSet)
     {
@@ -2697,16 +2505,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     public int batchCount(long id, String className) {
-        /*
-        select cu.creditor_id, count(e.id) from eav_be_entities e
-left join eav_m_classes c on e.class_id = c.id
-left join eav_be_complex_values cval on e.id = cval.entity_value_id
-left join eav_batches b on cval.batch_id = b.id
-left join creditor_user cu on b.user_id = cu.user_id
-where c.name = 'primary_contract' and cu.creditor_id is not null
-group by cu.creditor_id;
-        */
-        Select select = context
+        throw new UnsupportedOperationException("Not yet implemented.");
+
+        /*Select select = context
                 .select(EAV_A_CREDITOR_USER.CREDITOR_ID, EAV_BE_ENTITIES.ID.count().as("cr_count"))
                 .from(EAV_BE_ENTITIES)
                 .leftOuterJoin(EAV_M_CLASSES).on(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
@@ -2725,6 +2526,40 @@ group by cu.creditor_id;
             return ((BigDecimal)rows.get(0).get("cr_count")).intValue();
         }
 
-        return 0;
+        return 0;*/
     }
+
+    @Override
+    @Transactional
+    public boolean remove(long baseEntityId)
+    {
+        IBaseEntityDao baseEntityDao = persistableDaoPool
+                .getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
+        return baseEntityDao.deleteRecursive(baseEntityId);
+    }
+
+    @Override
+    public long getRandomBaseEntityId(IMetaClass metaClass)
+    {
+        IBaseEntityDao baseEntityDao = persistableDaoPool
+                .getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
+        return baseEntityDao.getRandomBaseEntityId(metaClass);
+    }
+
+    @Override
+    public long getRandomBaseEntityId(long metaClassId)
+    {
+        IBaseEntityDao baseEntityDao = persistableDaoPool
+                .getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
+        return baseEntityDao.getRandomBaseEntityId(metaClassId);
+    }
+
+    @Override
+    public Set<Long> getChildBaseEntityIds(long parentBaseEntityIds)
+    {
+        IBaseEntityDao baseEntityDao = persistableDaoPool
+                .getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
+        return baseEntityDao.getChildBaseEntityIds(parentBaseEntityIds);
+    }
+
 }

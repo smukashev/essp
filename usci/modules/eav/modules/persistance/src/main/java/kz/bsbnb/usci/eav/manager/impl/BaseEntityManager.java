@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.manager.impl;
 
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
@@ -43,6 +44,8 @@ public class BaseEntityManager implements IBaseEntityManager {
     private Map<Class, List<IPersistable>> insertedObjects = new HashMap<Class, List<IPersistable>>();
     private Map<Class, List<IPersistable>> updatedObjects = new HashMap<Class, List<IPersistable>>();
     private Map<Class, List<IPersistable>> deletedObjects = new HashMap<Class, List<IPersistable>>();
+
+    private Set<IBaseEntity> unusedBaseEntities = new HashSet<IBaseEntity>();
 
     public void registerAsInserted(IPersistable insertedObject)
     {
@@ -108,6 +111,17 @@ public class BaseEntityManager implements IBaseEntityManager {
     }
 
     @Override
+    public void registerUnusedBaseEntity(IBaseEntity unusedBaseEntity)
+    {
+        if (unusedBaseEntity == null)
+        {
+            throw new RuntimeException("Unused instance of BaseEntity can not be null;");
+        }
+
+        unusedBaseEntities.add(unusedBaseEntity);
+    }
+
+    @Override
     public List<IPersistable> getInsertedObjects(Class objectClass) {
         return insertedObjects.get(objectClass);
     }
@@ -120,6 +134,11 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public List<IPersistable> getDeletedObjects(Class objectClass) {
         return deletedObjects.get(objectClass);
+    }
+
+    @Override
+    public Set<IBaseEntity> getUnusedBaseEntities() {
+        return unusedBaseEntities;
     }
 
 }
