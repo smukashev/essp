@@ -218,5 +218,16 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
                             MetaContainerTypes.META_SET, baseSet.getMemberType(), id, batch, index, reportDate, value, false, last));
         }
     }
-    
+
+    @Override
+    public void deleteAll(long baseSetId) {
+        String tableAlias = "isv";
+        Delete delete = context
+                .delete(EAV_BE_INTEGER_SET_VALUES.as(tableAlias))
+                .where(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).SET_ID.equal(baseSetId));
+
+        logger.debug(delete.toString());
+        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+    }
+
 }

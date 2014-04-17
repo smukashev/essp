@@ -483,4 +483,15 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         }
     }
 
+    @Override
+    public void deleteAll(long baseEntityId) {
+        String tableAlias = "sv";
+        Delete delete = context
+                .delete(EAV_BE_STRING_VALUES.as(tableAlias))
+                .where(EAV_BE_STRING_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntityId));
+
+        logger.debug(delete.toString());
+        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+    }
+
 }

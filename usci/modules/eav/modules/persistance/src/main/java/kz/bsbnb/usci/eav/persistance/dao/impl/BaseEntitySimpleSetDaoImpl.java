@@ -25,10 +25,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITY_SIMPLE_SETS;
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_M_SIMPLE_SET;
@@ -49,7 +46,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
     IBatchRepository batchRepository;
 
     @Autowired
-    IBaseEntityProcessorDao baseEntityProcessorDao;
+    IBaseSetDao baseSetDao;
 
     @Autowired
     IBaseSetBooleanValueDao baseSetBooleanValueDao;
@@ -558,6 +555,55 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
             default:
                 throw new IllegalArgumentException("Unknown type.");
         }
+    }
+
+    @Override
+    public void deleteAll(long baseEntityId) {
+        Set<Long> childBaseSetIds = getChildBaseSetIds(baseEntityId);
+
+        String tableAlias = "cv";
+        Delete delete = context
+                .delete(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias))
+                .where(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ENTITY_ID.equal(baseEntityId));
+
+        logger.debug(delete.toString());
+        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+
+        for (long childBaseSetId: childBaseSetIds)
+        {
+            baseSetDao.deleteRecursive(childBaseSetId);
+        }
+    }
+
+    @Override
+    public Set<Long> getChildBaseSetIds(long parentBaseEntityId)
+    {
+        Set<Long> baseSetIds = new HashSet<Long>();
+
+        String tableAlias = "bv";
+        Select select = context
+                .select(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).SET_ID)
+                .from(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias))
+                .where(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ENTITY_ID.equal(parentBaseEntityId))
+                .groupBy(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).SET_ID);
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 0)
+        {
+            Iterator<Map<String, Object>> it = rows.iterator();
+            while (it.hasNext())
+            {
+                Map<String, Object> row = it.next();
+
+                long childBaseSetId = ((BigDecimal) row
+                        .get(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID.getName())).longValue();
+                baseSetIds.add(childBaseSetId);
+            }
+        }
+
+        return baseSetIds;
     }
 
 }

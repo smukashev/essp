@@ -482,4 +482,15 @@ public class BaseEntityDateValueDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
+    @Override
+    public void deleteAll(long baseEntityId) {
+        String tableAlias = "dv";
+        Delete delete = context
+                .delete(EAV_BE_DATE_VALUES.as(tableAlias))
+                .where(EAV_BE_DATE_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntityId));
+
+        logger.debug(delete.toString());
+        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+    }
+
 }

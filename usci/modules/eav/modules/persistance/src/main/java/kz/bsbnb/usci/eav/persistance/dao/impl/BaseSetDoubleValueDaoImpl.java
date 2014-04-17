@@ -219,4 +219,15 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
         }
     }
 
+    @Override
+    public void deleteAll(long baseSetId) {
+        String tableAlias = "dsv";
+        Delete delete = context
+                .delete(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
+                .where(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).SET_ID.equal(baseSetId));
+
+        logger.debug(delete.toString());
+        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+    }
+
 }

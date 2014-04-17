@@ -484,4 +484,15 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
         }
     }
 
+    @Override
+    public void deleteAll(long baseEntityId) {
+        String tableAlias = "bv";
+        Delete delete = context
+                .delete(EAV_BE_BOOLEAN_VALUES.as(tableAlias))
+                .where(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntityId));
+
+        logger.debug(delete.toString());
+        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+    }
+
 }

@@ -5,6 +5,7 @@ import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
 import java.util.Date;
@@ -52,14 +53,6 @@ public interface IBaseEntityProcessorDao
 
     public IBaseEntity process(IBaseEntity baseEntity);
 
-    public Set<Date> getAvailableReportDates(long baseEntityId);
-
-    public Date getMinReportDate(long baseEntityId);
-
-    public Date getMaxReportDate(long baseEntityId);
-
-    public Date getMaxReportDate(long baseEntityId, Date reportDate);
-
     public List<Long> getEntityIDsByMetaclass(long metaClassId);
 
     public List<RefListItem> getRefsByMetaclass(long metaClassId);
@@ -69,5 +62,13 @@ public interface IBaseEntityProcessorDao
     public boolean isApproved(long id);
 
     public int batchCount(long id, String className);
+
+    public boolean remove(long baseEntityId);
+
+    public long getRandomBaseEntityId(long metaClassId);
+
+    public long getRandomBaseEntityId(IMetaClass metaClass);
+
+    public Set<Long> getChildBaseEntityIds(long parentBaseEntityIds);
 
 }
