@@ -46,7 +46,7 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
             //throw new RuntimeException("Found more than one instance of BaseEntity. Needed one.");
         }
 
-        Long id = ids.size() == 1 ? ids.get(0) : null;
+        Long id = ids.size() >= 1 ? ids.get(0) : null;
 
         if (id != null)
             entity.setId(id);

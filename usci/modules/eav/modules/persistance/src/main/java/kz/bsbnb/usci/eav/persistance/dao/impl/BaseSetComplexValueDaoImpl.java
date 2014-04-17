@@ -196,7 +196,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             Batch batch = batchRepository.getBatch(batchId);
             IBaseEntity childBaseEntityLoaded = baseEntityProcessorDao
-                    .loadByMaxReportDate(childBaseEntity.getId(), reportDate);
+                    .loadByMaxReportDate(childBaseEntity.getId(), baseValue.getRepDate());
 
             previousBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
                     id, batch, index, reportDate, childBaseEntityLoaded, closed, last);
@@ -248,7 +248,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         if (rows.size() > 1)
         {
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
+            throw new RuntimeException("Query for get next instance of BaseValue return more than one row. Query: " +
+                    select.toString());
         }
 
         if (rows.size() == 1)

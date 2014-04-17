@@ -368,7 +368,8 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID,
-                        EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST)
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_CLOSED)
                 .from(EAV_BE_COMPLEX_VALUES.as(tableAlias))
                 .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))

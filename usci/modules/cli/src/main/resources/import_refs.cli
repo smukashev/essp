@@ -1,6 +1,7 @@
 entity read  usci/modules/cli/src/main/resources/refs/ref_subject_type.xml 01.04.2013
 entity read  usci/modules/cli/src/main/resources/refs/ref_doc_type.xml 01.04.2013
 entity read  usci/modules/cli/src/main/resources/refs/ref_balance_account.xml 01.04.2013
+entity read  usci/modules/cli/src/main/resources/refs/ref_balance_account_05.xml 01.05.2013
 entity read  usci/modules/cli/src/main/resources/refs/ref_bank_relation.xml 01.04.2013
 entity read  usci/modules/cli/src/main/resources/refs/ref_classification.xml 01.04.2013
 entity read  usci/modules/cli/src/main/resources/refs/ref_contact_type.xml 01.04.2013

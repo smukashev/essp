@@ -127,6 +127,11 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
             return false;
         }
 
+        if (c1.getId() > 0 && c2.getId() > 0 && c1.getId() == c2.getId())
+        {
+            return true;
+        }
+
         MetaClass meta = c1.getMeta();
 
         boolean result = (meta.getComplexKeyType() == ComplexKeyTypes.ALL);

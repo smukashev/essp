@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+        <entity class="ref_balance_account">
+            <name_kz>Краткосрочные займы в тенге, предоставленные  государственным нефинансовым организациям-резидентам</name_kz>
+            <display_no></display_no>
+            <fifth_sign></fifth_sign>
+            <first_fourth_signs></first_fourth_signs>
+            <is_in_balance></is_in_balance>
+            <name_ru>Краткосрочные займы в тенге, предоставленные  государственным нефинансовым организациям-резидентам</name_ru>
+            <no_>1322161</no_>
+            <seventh_sign></seventh_sign>
+            <sixth_sign></sixth_sign>
+        </entity>
+    </entities>
+</batch>
