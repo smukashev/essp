@@ -313,6 +313,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     private IBaseEntity applyBaseEntityBasic(IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager)
     {
+        IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
+        if (foundProcessedBaseEntity != null) {
+            return foundProcessedBaseEntity;
+        }
+
         IBaseEntity baseEntityApplied =
                 new BaseEntity(
                         baseEntitySaving.getMeta(),
@@ -333,6 +338,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         IBaseEntityReportDate baseEntityReportDate =
                 baseEntityApplied.getBaseEntityReportDate();
         baseEntityManager.registerAsInserted(baseEntityReportDate);
+
+        baseEntityManager.registerProcessedBaseEntity(baseEntityApplied);
 
         return baseEntityApplied;
     }
@@ -364,6 +371,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private IBaseEntity applyBaseEntityAdvanced(IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded,
                                                 IBaseEntityManager baseEntityManager)
     {
+        IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
+        if (foundProcessedBaseEntity != null) {
+            return foundProcessedBaseEntity;
+        }
+
         IMetaClass metaClass = baseEntitySaving.getMeta();
         IBaseEntity baseEntityApplied = new BaseEntity(baseEntityLoaded, baseEntitySaving.getReportDate());
 
@@ -462,8 +474,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             baseEntityManager.registerAsInserted(baseEntityReportDate);
         }
 
-        //Remove unused instances of BaseEntity
+        //TODO:Remove unused instances of BaseEntity
 
+        baseEntityManager.registerProcessedBaseEntity(baseEntityApplied);
 
         return baseEntityApplied;
     }
@@ -1478,7 +1491,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     }
                 }
 
-                if (baseValueSaving.getId() > 0)
+                if (childBaseEntitySaving.getId() > 0)
                 {
                     IBaseSetValueDao setValueDao = persistableDaoPool
                             .getPersistableDao(childBaseValueSaving.getClass(), IBaseSetValueDao.class);
@@ -1502,23 +1515,24 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         baseEntityManager.registerAsDeleted(childBaseValueClosed);
 
                         IBaseValue childBaseValuePrevious = setValueDao.getPreviousBaseValue(childBaseValueClosed);
-                        IBaseEntity childBaseEntityPrevious =  (IBaseEntity)childBaseValuePrevious.getValue();
-                        childBaseValuePrevious.setValue(applyBaseEntityAdvanced(childBaseEntitySaving,
-                                childBaseEntityPrevious, baseEntityManager));
-                        if (childBaseValueClosed.isLast())
-                        {
-                            childBaseValuePrevious.setIndex(childBaseValueSaving.getIndex());
-                            childBaseValuePrevious.setBatch(childBaseValueSaving.getBatch());
-                            childBaseValuePrevious.setLast(true);
+                        if(childBaseValuePrevious != null && childBaseValuePrevious.getValue() != null) {
+                            IBaseEntity childBaseEntityPrevious =  (IBaseEntity)childBaseValuePrevious.getValue();
+                            childBaseValuePrevious.setValue(applyBaseEntityAdvanced(childBaseEntitySaving,
+                                    childBaseEntityPrevious, baseEntityManager));
+                            if (childBaseValueClosed.isLast())
+                            {
+                                childBaseValuePrevious.setIndex(childBaseValueSaving.getIndex());
+                                childBaseValuePrevious.setBatch(childBaseValueSaving.getBatch());
+                                childBaseValuePrevious.setLast(true);
 
-                            childBaseSetApplied.put(childBaseValuePrevious);
-                            baseEntityManager.registerAsUpdated(childBaseValuePrevious);
+                                childBaseSetApplied.put(childBaseValuePrevious);
+                                baseEntityManager.registerAsUpdated(childBaseValuePrevious);
+                            }
+                            else
+                            {
+                                childBaseSetApplied.put(childBaseValuePrevious);
+                            }
                         }
-                        else
-                        {
-                            childBaseSetApplied.put(childBaseValuePrevious);
-                        }
-
                         continue;
                     }
 

@@ -15,10 +15,7 @@ import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
-import org.jooq.DSLContext;
-import org.jooq.Delete;
-import org.jooq.Insert;
-import org.jooq.Select;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,9 +89,13 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
         logger.debug(delete.toString());
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-        if (count != 1)
+        if (count > 1)
         {
-            throw new RuntimeException("DELETE operation should be delete only one record.");
+            throw new RuntimeException("DELETE operation should be delete only one record. ID: " + id);
+        }
+        if (count < 1)
+        {
+            logger.warn("DELETE operation should delete a record. ID: " + id);
         }
     }
 
@@ -192,32 +193,26 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     @Override
     public boolean isUsed(long baseEntityId)
     {
-        Select select;
-        List<Map<String, Object>> rows;
-
         String complexValuesTableAlias = "cv";
-        select = context
-                .select(DSL.count().as("VALUE_COUNT"))
-                .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
-                .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId));
-
-        logger.debug(select.toString());
-        rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        long complexValuesCount = ((BigDecimal)rows.get(0).get("VALUE_COUNT")).longValue();
-
         String complexSetValuesTableAlias = "csv";
-        select = context
-                .select(DSL.count().as("VALUE_COUNT"))
-                .from(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias))
-                .where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId));
+
+        //TODO: refactor, remove dual, make selectOne()
+        Select select = context
+                .select(DSL.val(1L).as("ex_flag"))
+                .from("dual")
+                .where(DSL.exists(context
+                        .select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID)
+                        .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
+                        .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))))
+                .or(DSL.exists(context
+                        .select(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID)
+                        .from(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias))
+                        .where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))));
 
         logger.debug(select.toString());
-        rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        long complexSetValuesCount = ((BigDecimal)rows.get(0).get("VALUE_COUNT")).longValue();
-
-        return complexValuesCount != 0 || complexSetValuesCount != 0;
+        return rows.size() > 0;
     }
 
     @Override

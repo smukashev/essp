@@ -95,6 +95,18 @@ public class ZipFilesMonitor{
         Gson gson = new Gson();
         IBatchService batchService = serviceFactory.getBatchService();
 
+        System.setProperty("viewmode", "production");
+        //System.setProperty("viewmode", "development");
+
+        ArrayList<URI> nodes = new ArrayList<URI>();
+        nodes.add(URI.create("http://127.0.0.1:8091/pools"));
+
+        try {
+            couchbaseClient = new CouchbaseClient(nodes, "test", "");
+        } catch (Exception e) {
+            logger.error("Error connecting to Couchbase: " + e.getMessage());
+        }
+
         try {
             Object batchObject = couchbaseClient.get("batch:" + batchId);
             Object manifestObject = couchbaseClient.get("manifest:" + batchId);
@@ -120,6 +132,8 @@ public class ZipFilesMonitor{
             return true;
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            couchbaseClient.shutdown();
         }
 
         return false;
@@ -216,7 +230,7 @@ public class ZipFilesMonitor{
             }
         }
 
-        //restartBatch(3853);
+        //restartBatch(5564);
 
         //////////////////////////
 

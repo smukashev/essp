@@ -47,6 +47,7 @@ import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 import kz.bsbnb.usci.tool.status.SyncStatus;
 import kz.bsbnb.usci.tool.status.SystemStatus;
+import net.spy.memcached.OperationTimeoutException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -147,7 +148,7 @@ public class CLI
         private ArrayList<DispatcherJob> activeThreads = new ArrayList<DispatcherJob>();
 
         private final int MAX_ACTIVE_THREADS = 32;
-        private final int MAX_PREPARING_THREADS = 32;
+        private final int MAX_PREPARING_THREADS = 8;
         private long jobsEnded = 0;
 
         public synchronized void addThread(DispatcherJob thread) {
@@ -196,54 +197,62 @@ public class CLI
         public void run() {
             long t1 = System.currentTimeMillis();
             while(true) {
-                clearDeadPreparingThreads();
-                clearDeadThreads();
+                try {
+                    clearDeadPreparingThreads();
+                    clearDeadThreads();
 
-                if (System.currentTimeMillis() - t1 > 5000) {
-                    t1 = System.currentTimeMillis();
-                    System.out.println("Active: " + activeThreads.size() + ", queue: " + threadsQueue.size() +
-                            ", ended: " + jobsEnded + ", preparing: " + activePreparingThreads.size());
-                }
-
-                if (activePreparingThreads.size() < MAX_PREPARING_THREADS) {
-                    DispatcherJob newThread = getNextThread();
-                    if (newThread != null) {
-                        ThreadPreparator preparator = new ThreadPreparator(newThread);
-                        preparator.start();
-                        activePreparingThreads.add(preparator);
-                    }
-                }
-
-                if (activeThreads.size() < MAX_ACTIVE_THREADS) {
-                    DispatcherJob newThread = getNextPeparedThread();
-                    if (newThread != null) {
-                        boolean intersectionFound = false;
-                        for (DispatcherJob job : activeThreads) {
-                            if (job.intersects(newThread)) {
-                                intersectionFound = true;
-                                break;
-                            }
+                    if (System.currentTimeMillis() - t1 > 5000) {
+                        t1 = System.currentTimeMillis();
+                        if(activeThreads.size() > 0 || activePreparingThreads.size() > 0 ||
+                                threadsQueue.size() > 0) {
+                            System.out.println("Active: " + activeThreads.size() + ", queue: " + threadsQueue.size() +
+                                    ", ended: " + jobsEnded + ", preparing: " + activePreparingThreads.size() +
+                                    ", prepared: " + preparedThreadsQueue.size());
                         }
+                    }
 
-                        if(intersectionFound) {
-                            addThread(newThread);
+                    if (activePreparingThreads.size() < MAX_PREPARING_THREADS) {
+                        DispatcherJob newThread = getNextThread();
+                        if (newThread != null) {
+                            ThreadPreparator preparator = new ThreadPreparator(newThread);
+                            preparator.start();
+                            activePreparingThreads.add(preparator);
+                        }
+                    }
+
+                    if (activeThreads.size() < MAX_ACTIVE_THREADS) {
+                        DispatcherJob newThread = getNextPeparedThread();
+                        if (newThread != null) {
+                            boolean intersectionFound = false;
+                            for (DispatcherJob job : activeThreads) {
+                                if (job.intersects(newThread)) {
+                                    intersectionFound = true;
+                                    break;
+                                }
+                            }
+
+                            if(intersectionFound) {
+                                addThread(newThread);
+                            } else {
+                                newThread.start();
+                                activeThreads.add(newThread);
+                            }
                         } else {
-                            newThread.start();
-                            activeThreads.add(newThread);
+                            try {
+                                sleep(1000L);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     } else {
                         try {
-                            sleep(1000L);
+                            sleep(100L);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
-                } else {
-                    try {
-                        sleep(100L);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -269,7 +278,11 @@ public class CLI
 
         @Override
         public void run() {
-            thread.prepare();
+            try {
+                thread.prepare();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -282,13 +295,17 @@ public class CLI
         DeleteJob(IEntityService entityServiceCore, long id) {
             this.entityServiceCore = entityServiceCore;
             this.id = id;
-            this.ids = ids;
         }
 
         @Override
         public void run() {
-            entityServiceCore.remove(id);
-            System.out.println("Deleted entity with id: " + id);
+            try {
+                System.out.println("Deleting entity with id: " + id);
+                entityServiceCore.remove(id);
+                System.out.println("Deleted entity with id: " + id);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
 
@@ -664,7 +681,8 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b");
+                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b  where b.rep_date = to_date('" +
+                                    reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e)
                         {
                             System.out.println("Can't create prepared statement: " + e.getMessage());
@@ -685,9 +703,45 @@ public class CLI
 
                             System.out.println("Processing id: " + batchId);
 
-                            Object batchObject = couchbaseClient.get("batch:" + batchId);
-                            Object manifestObject = couchbaseClient.get("manifest:" + batchId);
-                            Object batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
+                            Object batchObject = null;
+                            Object manifestObject = null;
+                            Object batchStatusObject = null;
+
+                            int counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    batchObject = couchbaseClient.get("batch:" + batchId);
+                                    break;
+                                } catch(OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting...");
+                                    counter++;
+                                }
+                            }
+
+                            counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    manifestObject = couchbaseClient.get("manifest:" + batchId);
+                                    break;
+                                } catch(OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting...");
+                                    counter++;
+                                }
+                            }
+
+                            counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
+                                    break;
+                                } catch(OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting...");
+                                    counter++;
+                                }
+                            }
 
                             if (batchObject == null || manifestObject == null) {
                                 System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
@@ -790,11 +844,29 @@ public class CLI
         }
     }
 
-    public void restartBatchesWithErrors() {
-        if (args.size() < 5) {
-            System.out.println("Usage: <report_date> <output_file> <db_url> <db_logn> <db_password> <batch_service_url>");
-            System.out.println("Example: batchstat 01.05.2013 D:\\usci\\out.txt jdbc:oracle:thin:@170.7.15.15:1521:ESSP " +
-                    "core CORE_2013 rmi://127.0.0.1:1099/batchEntryService");
+    public void batchRestart() {
+        if (args.size() < 6) {
+            System.out.println("Usage: <report_date> <output_file>");
+            System.out.println("Example: batchrestart 01.05.2013 D:\\usci\\out.txt jdbc:oracle:thin:@170.7.15.15:1521:ESSP " +
+                    "core CORE_2013 rmi://127.0.0.1:1097/batchProcessService");
+            return;
+        }
+
+        RmiProxyFactoryBean batchProcessServiceFactoryBean = null;
+
+        IBatchProcessService batchProcessService = null;
+
+        try {
+            batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+            batchProcessServiceFactoryBean.setServiceUrl(args.get(5));
+            batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+            batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+            batchProcessServiceFactoryBean.afterPropertiesSet();
+            batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+        } catch (Exception e) {
+            System.out.println("Can't connect to receiver service: " + e.getMessage());
+            e.printStackTrace();
             return;
         }
 
@@ -811,23 +883,6 @@ public class CLI
             } catch (ParseException e) {
                 e.printStackTrace();
                 return;
-            }
-
-            RmiProxyFactoryBean batchProcessServiceFactoryBean = null;
-
-            IBatchProcessService batchProcessService = null;
-
-            try {
-                batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
-                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
-                batchProcessServiceFactoryBean.setServiceUrl(args.get(5));
-                batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
-                batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
-
-                batchProcessServiceFactoryBean.afterPropertiesSet();
-                batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
-            } catch (Exception e) {
-                System.out.println("Can't connect to receiver service: " + e.getMessage());
             }
 
             File f = new File(fileNameStr);
@@ -857,7 +912,8 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b");
+                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b  where b.rep_date = to_date('" +
+                                    reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e)
                         {
                             System.out.println("Can't create prepared statement: " + e.getMessage());
@@ -878,9 +934,45 @@ public class CLI
 
                             System.out.println("Processing id: " + batchId);
 
-                            Object batchObject = couchbaseClient.get("batch:" + batchId);
-                            Object manifestObject = couchbaseClient.get("manifest:" + batchId);
-                            Object batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
+                            Object batchObject = null;
+                            Object manifestObject = null;
+                            Object batchStatusObject = null;
+
+                            int counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    batchObject = couchbaseClient.get("batch:" + batchId);
+                                    break;
+                                } catch (OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting.");
+                                    counter++;
+                                }
+                            }
+
+                            counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    manifestObject = couchbaseClient.get("manifest:" + batchId);
+                                    break;
+                                } catch (OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting.");
+                                    counter++;
+                                }
+                            }
+
+                            counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
+                                    break;
+                                } catch (OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting.");
+                                    counter++;
+                                }
+                            }
 
                             if (batchObject == null || manifestObject == null) {
                                 System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
@@ -946,21 +1038,21 @@ public class CLI
                                     error_count++;
                             }
 
-                            if (error_count > 0 || row_count != batchInfo.getSize()) {
-                                fout.write((batchId + "," +
-                                        batchFull.getFileName() + "," +
-                                        batchInfo.getSize() + "," + row_count + "," + error_count + "\n").getBytes());
+                        if (error_count > 0 || row_count != batchInfo.getSize()) {
+                            fout.write((batchId + "," +
+                                    batchFull.getFileName() + "," +
+                                    batchInfo.getSize() + "," + row_count + "," + error_count + ",restarted\n").getBytes());
 
-                                if(batchProcessService.restartBatch(batchId)) {
-                                    fout.write((batchId + "," +
-                                            batchFull.getFileName() + "," +
-                                            batchInfo.getSize() + "," + row_count + "," + error_count + ", restarted\n").getBytes());
-                                } else {
-                                    fout.write((batchId + "," +
-                                            batchFull.getFileName() + "," +
-                                            batchInfo.getSize() + "," + row_count + "," + error_count + ", failed\n").getBytes());
-                                }
-                            }
+                            //sender.addJob(batchId, batchInfo);
+                            //receiverStatusSingleton.batchReceived();
+                            batchProcessService.restartBatch(batchId);
+                        } else {
+                            fout.write((batchId + "," +
+                                    batchFull.getFileName() + "," +
+                                    batchInfo.getSize() + "," + row_count + "," + error_count + ",skipped\n").getBytes());
+                        }
+
+
                         }
                         break;
                     } catch (Exception e) {
@@ -989,6 +1081,151 @@ public class CLI
         }
     }
 
+    public void batchRestartSingle() {
+        if (args.size() < 2) {
+            System.out.println("Usage: <report_date> <output_file>");
+            System.out.println("Example: sbatchrestart <batch_id> rmi://127.0.0.1:1097/batchProcessService");
+            return;
+        }
+
+        RmiProxyFactoryBean batchProcessServiceFactoryBean = null;
+
+        IBatchProcessService batchProcessService = null;
+
+        try {
+            batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+            batchProcessServiceFactoryBean.setServiceUrl(args.get(1));
+            batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+            batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+            batchProcessServiceFactoryBean.afterPropertiesSet();
+            batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+        } catch (Exception e) {
+            System.out.println("Can't connect to receiver service: " + e.getMessage());
+            e.printStackTrace();
+            return;
+        }
+
+        Gson gson = new Gson();
+
+        long batchId = Long.parseLong(args.get(0));
+
+        System.out.println("Processing id: " + batchId);
+
+        Object batchObject = null;
+        Object manifestObject = null;
+        Object batchStatusObject = null;
+
+        int counter = 0;
+
+        while(counter < 100) {
+            try {
+                batchObject = couchbaseClient.get("batch:" + batchId);
+                break;
+            } catch (OperationTimeoutException ex) {
+                System.out.println("Timeout. Restarting.");
+                counter++;
+            }
+        }
+
+        counter = 0;
+
+        while(counter < 100) {
+            try {
+                manifestObject = couchbaseClient.get("manifest:" + batchId);
+                break;
+            } catch (OperationTimeoutException ex) {
+                System.out.println("Timeout. Restarting.");
+                counter++;
+            }
+        }
+
+        counter = 0;
+
+        while(counter < 100) {
+            try {
+                batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
+                break;
+            } catch (OperationTimeoutException ex) {
+                System.out.println("Timeout. Restarting.");
+                counter++;
+            }
+        }
+
+        if (batchObject == null || manifestObject == null) {
+            System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
+
+            if (batchObject != null) {
+                couchbaseClient.delete("batch:" + batchId);
+            }
+            if (manifestObject != null) {
+                couchbaseClient.delete("manifest:" + batchId);
+            }
+            if (batchStatusObject != null) {
+                couchbaseClient.delete("batch_status:" + batchId);
+            }
+            return;
+        }
+
+        String batchStr = batchObject.toString();
+
+        BatchFullJModel batchFull = gson.fromJson(batchStr, BatchFullJModel.class);
+
+        String batchInfoStr = manifestObject.toString();
+
+        BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
+
+        View view = couchbaseClient.getView("batch", "contract_status");
+        Query query = new Query();
+        query.setDescending(true);
+        query.setRangeEnd("[" + batchId + ", 0]");
+        query.setRangeStart("[" + batchId + ", 999999999999999]");
+
+        ViewResponse response = couchbaseClient.query(view, query);
+
+        Iterator<ViewRow> rows = response.iterator();
+
+        int row_count = 0;
+        int error_count = 0;
+        while(rows.hasNext()) {
+            ViewRow viewRowNoDocs = rows.next();
+
+            row_count++;
+
+            ContractStatusArrayJModel batchFullStatusJModel =
+                    gson.fromJson(viewRowNoDocs.getValue(), ContractStatusArrayJModel.class);
+
+            boolean errorFound = false;
+            boolean completedFound = false;
+            for (ContractStatusJModel csajm : batchFullStatusJModel.getContractStatuses()) {
+                if (csajm.getProtocol().equals("ERROR"))
+                {
+                    errorFound = true;
+                }
+                if (csajm.getProtocol().equals("COMPLETED"))
+                {
+                    completedFound = true;
+                }
+            }
+            if (errorFound && !completedFound)
+                error_count++;
+        }
+
+        if (error_count > 0 || row_count != batchInfo.getSize()) {
+            System.out.println(batchId + "," +
+                    batchFull.getFileName() + "," +
+                    batchInfo.getSize() + "," + row_count + "," + error_count + ",restarted");
+
+            //sender.addJob(batchId, batchInfo);
+            //receiverStatusSingleton.batchReceived();
+            batchProcessService.restartBatch(batchId);
+        } else {
+            System.out.println(batchId + "," +
+                    batchFull.getFileName() + "," +
+                    batchInfo.getSize() + "," + row_count + "," + error_count +
+                    ",skipped because it has no errors");
+        }
+    }
 
     public void removeEntityById(long id, String url) {
         jobDispatcher.addThread(new DeleteJob(getEntityService(url), id));
@@ -1048,6 +1285,33 @@ public class CLI
             while((entity = reader.read()) != null) {
                 long id = baseEntityProcessorDao.process(entity).getId();
                 System.out.println("Saved with id: " + id);
+            }
+        } catch (FileNotFoundException e)
+        {
+            System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
+        } catch (ParseException e) {
+            System.out.println("Can't parse date " + repDate + " must be in format "+ sdfout.toString());
+        }
+
+    }
+
+    public void findEntityFromXML(String fileName, String repDate) {
+        try {
+            Date reportDate = sdfout.parse(repDate);
+            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
+            BaseEntity entity;
+            while((entity = reader.read()) != null) {
+                //long id = baseEntityProcessorDao.process(entity).getId();
+                ArrayList<Long> ids = searcher.findAll(entity);
+                if (ids.size() < 1) {
+                    System.out.println("Entity: \n" + entity.toString() + "\nNot found.");
+                } else {
+                    System.out.println("Entity: \n" + entity.toString() + "\nFound with ids: ");
+                    for (Long id : ids) {
+                        System.out.println(id + " ");
+                    }
+                }
+
             }
         } catch (FileNotFoundException e)
         {
@@ -1522,6 +1786,60 @@ public class CLI
         }
     }
 
+    public void commandCollectIds()
+    {
+        if (args.size() > 1) {
+            String inFileName = args.get(0);
+            String outFileName = args.get(1);
+
+            ArrayList<Long> ids = new ArrayList<Long>();
+
+            try {
+                Scanner inputScanner = new Scanner(new FileInputStream(inFileName));
+                FileOutputStream fout = new FileOutputStream(outFileName);
+
+                while(inputScanner.hasNextLine()) {
+                    String nextLine = inputScanner.nextLine();
+
+                    int idIndex = nextLine.indexOf("Not yet implemented. Entity ID:");
+
+                    if (idIndex > 0) {
+                        String idString = nextLine.substring(idIndex + "Not yet implemented. Entity ID:".length()).trim();
+                        Long id = Long.parseLong(idString);
+                        ids.add(id);
+                    }
+
+                    if (nextLine.indexOf("ERROR") > 0)
+                        fout.write((nextLine + "\n").getBytes());
+                }
+
+                boolean first = true;
+                String idsStr = "";
+                for (Long id : ids) {
+                    if (first) {
+                        idsStr += id;
+                        first = false;
+                    } else {
+                        idsStr += "," + id;
+                    }
+                }
+
+                fout.write(idsStr.getBytes());
+
+                fout.close();
+                inputScanner.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            System.out.println("Argument needed: <input_file_name> <output_file_name>");
+            System.out.println("Example: collectids D:\\distr\\usci\\core.log D:\\distr\\usci\\out_core.log");
+        }
+    }
+
     public void commandRStat()
     {
         if (args.size() > 0) {
@@ -1619,17 +1937,25 @@ public class CLI
 
                 double totalInserts = 0;
                 double totalSelects = 0;
+                double totalUpdates = 0;
+                double totalDeletes = 0;
                 double totalProcess = 0;
                 int totalProcessCount = 0;
 
                 for (String query : map.keySet()) {
                     QueryEntry qe = map.get(query);
 
-                    if (query.startsWith("insert")) {
+                    if (query.trim().toLowerCase().startsWith("insert")) {
                         totalInserts += qe.totalTime;
                     }
-                    if (query.startsWith("select")) {
+                    if (query.trim().toLowerCase().startsWith("select")) {
                         totalSelects += qe.totalTime;
+                    }
+                    if (query.trim().toLowerCase().startsWith("update")) {
+                        totalUpdates += qe.totalTime;
+                    }
+                    if (query.trim().toLowerCase().startsWith("delete")) {
+                        totalDeletes += qe.totalTime;
                     }
                     if (query.startsWith("coreService")) {
                         totalProcess += qe.totalTime;
@@ -1645,6 +1971,8 @@ public class CLI
                     coreStatus.setAvgProcessed(totalProcess / totalProcessCount);
                     coreStatus.setAvgInserts(totalInserts / totalProcessCount);
                     coreStatus.setAvgSelects(totalSelects / totalProcessCount);
+                    coreStatus.setAvgDeletes(totalDeletes / totalProcessCount);
+                    coreStatus.setAvgUpdates(totalUpdates / totalProcessCount);
                 }
 
                 entityServiceCore.clearSQLStats();
@@ -1892,6 +2220,12 @@ public class CLI
                 } else {
                     System.out.println("Argument needed: <read> <fileName> <rep_date>");
                 }
+            } else if(args.get(0).equals("find")) {
+                if (args.size() > 2) {
+                    findEntityFromXML(args.get(1), args.get(2));
+                } else {
+                    System.out.println("Argument needed: <find> <fileName> <rep_date>");
+                }
             } else if(args.get(0).equals("test")) {
                 if (args.size() > 2) {
                     testEntityFromXML(args.get(1), args.get(2));
@@ -2101,11 +2435,7 @@ public class CLI
             Date reportDate = dateFormatter.parse("01.03.2014");
 
             try {
-                CLIXMLReader reader;
-                if(args.size() == 1)
-                  reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, reportDate);
-                else
-                  reader = new CLIXMLReader(args.get(1),metaClassRepository,batchRepository,reportDate);
+                CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, reportDate);
                 currentBaseEntity = reader.read();
                 rulesSingleton.runRules(currentBaseEntity,currentPackageName,currentDate);
 
@@ -2215,6 +2545,8 @@ public class CLI
                 commandMeta();
             } else if (command.equals("entity")) {
                 commandEntity();
+            } else if (command.equals("include")) {
+                commandInclude();
             } else if(command.equals("refs")){
                 commandRefs();
             } else if(command.equals("sql")){
@@ -2223,6 +2555,8 @@ public class CLI
                 commandRule(in);
             } else if(command.equals("import")) {
                 commandImport();
+            } else if(command.equals("collectids")) {
+                commandCollectIds();
             } else if(command.equals("rstat")) {
                 commandRStat();
             } else if(command.equals("sstat")) {
@@ -2234,7 +2568,9 @@ public class CLI
             } else if(command.equals("batchstat")) {
                 batchStat();
             } else if(command.equals("batchrestart")) {
-                restartBatchesWithErrors();
+                batchRestart();
+            } else if(command.equals("sbatchrestart")) {
+                batchRestartSingle();
             } else if(command.equals("stc")) {
                 commandSTC();
             } else {
@@ -2292,6 +2628,28 @@ public class CLI
         }
 
         shutdown();
+    }
+
+    public void commandInclude()
+    {
+        if (args.size() > 0) {
+            String fileName = args.get(0);
+
+            System.out.println("Using file: " + fileName);
+
+            try {
+                Scanner in = new Scanner(new FileInputStream(new File(fileName)));
+
+                while ( !(line = in.nextLine()).equals("quit")) {
+                    processCommand(line, in);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Argument needed: <sync_url>");
+            System.out.println("Example: sstat rmi://127.0.0.1:1098/entityService");
+        }
     }
 
     public InputStream getInputStream()

@@ -11,6 +11,7 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -157,7 +158,12 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
                 .set(EAV_BE_ENTITY_REPORT_DATES.COMPLEX_SETS_COUNT, complexSetsCount);
 
         logger.debug(insert.toString());
-        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        try {
+            return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        } catch (DuplicateKeyException e) {
+            logger.error("Report date exists in DB! Query: " + insert.toString());
+            throw e;
+        }
     }
 
     @Override

@@ -19,6 +19,8 @@ public interface IBaseEntityManager {
 
     public void registerUnusedBaseEntity(IBaseEntity unusedBaseEntity);
 
+    public void registerProcessedBaseEntity(IBaseEntity processedBaseEntity);
+
     public List<IPersistable> getInsertedObjects(Class objectClass);
 
     public List<IPersistable> getUpdatedObjects(Class objectClass);
@@ -26,5 +28,7 @@ public interface IBaseEntityManager {
     public List<IPersistable> getDeletedObjects(Class objectClass);
 
     public Set<IBaseEntity> getUnusedBaseEntities();
+
+    public IBaseEntity getProcessed(IBaseEntity baseEntity);
 
 }
