@@ -49,6 +49,7 @@ with ba_path as (select 'change.remains.debt.current.balance_account.no_' as pat
                    from dual)
   select *
     from (select 'rule read rule_end' || chr(13) ||
+                 'title: '  || ba.no_ || '_by_ct_for_'  || p.name || chr(13) ||
                  'rule "rule_ba_'  || ba.no_ || '_by_ct_for_'  || p.name || '" ' || chr(13) ||
                  '  when $entity : BaseEntity(' || chr(13) ||
                  '    getEl("' || p.path || '") != null ' || chr(38) || chr(38) || ' ' || chr(13) ||
