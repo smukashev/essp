@@ -121,8 +121,8 @@ meta add --name=ref_contact_type --attribute=name_ru --type=string
 #====================================
 
 meta create --name=provision
-meta add --name=provision --attribute=value --type=double
-meta add --name=provision --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+meta add --name=provision --attribute=value --type=double --final
+meta add --name=provision --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable --final
 
 #====================================
 #= HEAD
@@ -154,68 +154,68 @@ meta add --name=contact --attribute=contact_type --type=meta_class --childname=r
 #====================================
 
 meta create --name=remains_debt_pastdue
-meta add --name=remains_debt_pastdue --attribute=close_date --type=date
-meta add --name=remains_debt_pastdue --attribute=open_date --type=date
-meta add --name=remains_debt_pastdue --attribute=value --type=double
-meta add --name=remains_debt_pastdue --attribute=value_currency --type=double
-meta add --name=remains_debt_pastdue --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+meta add --name=remains_debt_pastdue --attribute=close_date --type=date --final
+meta add --name=remains_debt_pastdue --attribute=open_date --type=date --final
+meta add --name=remains_debt_pastdue --attribute=value --type=double --final
+meta add --name=remains_debt_pastdue --attribute=value_currency --type=double --final
+meta add --name=remains_debt_pastdue --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable --final
 
 #====================================
 #= REMAINS_DEBT_CURRENT
 #====================================
 
 meta create --name=remains_debt_current
-meta add --name=remains_debt_current --attribute=value --type=double
-meta add --name=remains_debt_current --attribute=value_currency --type=double
-meta add --name=remains_debt_current --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+meta add --name=remains_debt_current --attribute=value --type=double --final
+meta add --name=remains_debt_current --attribute=value_currency --type=double --final
+meta add --name=remains_debt_current --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable --final
 
 #====================================
 #= REMAINS_DEBT_WRITE_OFF
 #====================================
 
 meta create --name=remains_debt_write_off
-meta add --name=remains_debt_write_off --attribute=value --type=double
-meta add --name=remains_debt_write_off --attribute=value_currency --type=double
-meta add --name=remains_debt_write_off --attribute=date --type=date
-meta add --name=remains_debt_write_off --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+meta add --name=remains_debt_write_off --attribute=value --type=double --final
+meta add --name=remains_debt_write_off --attribute=value_currency --type=double --final
+meta add --name=remains_debt_write_off --attribute=date --type=date --final
+meta add --name=remains_debt_write_off --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable --final
 
 #====================================
 #= REMAINS_INTEREST_PASTDUE
 #====================================
 
 meta create --name=remains_interest_pastdue
-meta add --name=remains_interest_pastdue --attribute=close_date --type=date
-meta add --name=remains_interest_pastdue --attribute=open_date --type=date
-meta add --name=remains_interest_pastdue --attribute=value --type=double
-meta add --name=remains_interest_pastdue --attribute=value_currency --type=double
-meta add --name=remains_interest_pastdue --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+meta add --name=remains_interest_pastdue --attribute=close_date --type=date --final
+meta add --name=remains_interest_pastdue --attribute=open_date --type=date --final
+meta add --name=remains_interest_pastdue --attribute=value --type=double --final
+meta add --name=remains_interest_pastdue --attribute=value_currency --type=double --final
+meta add --name=remains_interest_pastdue --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable --final
 
 #====================================
 #= REMAINS_INTEREST_CURRENT
 #====================================
 
 meta create --name=remains_interest_current
-meta add --name=remains_interest_current --attribute=value --type=double
-meta add --name=remains_interest_current --attribute=value_currency --type=double
-meta add --name=remains_interest_current --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+meta add --name=remains_interest_current --attribute=value --type=double --final
+meta add --name=remains_interest_current --attribute=value_currency --type=double --final
+meta add --name=remains_interest_current --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable --final
 
 #====================================
 #= REMAINS_INTEREST_WRITE_OFF
 #====================================
 
 meta create --name=remains_interest_write_off
-meta add --name=remains_interest_write_off --attribute=date --type=date
-meta add --name=remains_interest_write_off --attribute=value --type=double
-meta add --name=remains_interest_write_off --attribute=value_currency --type=double
+meta add --name=remains_interest_write_off --attribute=date --type=date --final
+meta add --name=remains_interest_write_off --attribute=value --type=double --final
+meta add --name=remains_interest_write_off --attribute=value_currency --type=double --final
 
 #====================================
 #= REMAINS_LIMIT
 #====================================
 
 meta create --name=remains_limit
-meta add --name=remains_limit --attribute=value --type=double
-meta add --name=remains_limit --attribute=value_currency --type=double
-meta add --name=remains_limit --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+meta add --name=remains_limit --attribute=value --type=double --final
+meta add --name=remains_limit --attribute=value_currency --type=double --final
+meta add --name=remains_limit --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable --final
 
 #====================================
 #= REMAINS_DEBT
@@ -240,41 +240,41 @@ meta add --name=remains_interest --attribute=write_off --type=meta_class --child
 #====================================
 
 meta create --name=remains_correction
-meta add --name=remains_correction --attribute=value --type=double
-meta add --name=remains_correction --attribute=value_currency --type=double
-meta add --name=remains_correction --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+meta add --name=remains_correction --attribute=value --type=double --final
+meta add --name=remains_correction --attribute=value_currency --type=double --final
+meta add --name=remains_correction --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable --final
 
 #====================================
 #= REMAINS_DISCOUNT
 #====================================
 
 meta create --name=remains_discount
-meta add --name=remains_discount --attribute=value --type=double
-meta add --name=remains_discount --attribute=value_currency --type=double
-meta add --name=remains_discount --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+meta add --name=remains_discount --attribute=value --type=double --final
+meta add --name=remains_discount --attribute=value_currency --type=double --final
+meta add --name=remains_discount --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable --final
 
 #====================================
 #= REMAINS_DISCOUNTED_VALUE
 #====================================
 
 meta create --name=remains_discounted_value
-meta add --name=remains_discounted_value --attribute=value --type=double
+meta add --name=remains_discounted_value --attribute=value --type=double --final
 
 #====================================
 #= TURNOVER_ISSUE_DEBT
 #====================================
 
 meta create --name=turnover_issue_debt
-meta add --name=turnover_issue_debt --attribute=amount --type=double
-meta add --name=turnover_issue_debt --attribute=amount_currency --type=double
+meta add --name=turnover_issue_debt --attribute=amount --type=double --final
+meta add --name=turnover_issue_debt --attribute=amount_currency --type=double --final
 
 #====================================
 #= TURNOVER_ISSUE_INTEREST
 #====================================
 
 meta create --name=turnover_issue_interest
-meta add --name=turnover_issue_interest --attribute=amount --type=double
-meta add --name=turnover_issue_interest --attribute=amount_currency --type=double
+meta add --name=turnover_issue_interest --attribute=amount --type=double --final
+meta add --name=turnover_issue_interest --attribute=amount_currency --type=double --final
 
 #====================================
 #= PROVISION_GROUP
@@ -617,6 +617,42 @@ meta add --name=credit --attribute=subjects --type=meta_class --array --childnam
 meta add --name=credit --attribute=pledges --type=meta_class --array --childname=pledge
 meta add --name=credit --attribute=primary_contract --type=meta_class --childname=primary_contract
 meta key --name=credit --attribute=primary_contract
+
+#====================================
+#= PORTFOLIO_FLOW_DETAIL
+#====================================
+
+meta create --name=portfolio_flow_detail
+meta add --name=portfolio_flow_detail --attribute=value --type=double
+meta add --name=portfolio_flow_detail --attribute=balance_account --type=meta_class --childname=ref_balance_account
+
+#====================================
+#= PORTFOLIO_FLOW_KFN
+#====================================
+
+meta create --name=portfolio_flow_kfn
+meta add --name=portfolio_flow_kfn --attribute=portfolio --type=meta_class --childname=ref_portfolio
+meta add --name=portfolio_flow_kfn --attribute=creditor --type=meta_class --childname=ref_creditor --keytype=any --immutable
+meta add --name=portfolio_flow_kfn --attribute=details --type=meta_class --childname=portfolio_flow_detail
+
+#====================================
+#= PORTFOLIO_FLOW_MSFO
+#====================================
+
+meta create --name=portfolio_flow_msfo
+meta add --name=portfolio_flow_msfo --attribute=portfolio --type=meta_class --childname=ref_portfolio
+meta add --name=portfolio_flow_msfo --attribute=creditor --type=meta_class --childname=ref_creditor --keytype=any --immutable
+meta add --name=portfolio_flow_msfo --attribute=details --type=meta_class --childname=portfolio_flow_detail
+meta add --name=portfolio_flow_msfo --attribute=discounted_value --type=double
+
+#====================================
+#= PORTFOLIO_DATA
+#====================================
+
+meta create --name=portfolio_data
+meta add --name=portfolio_data --attribute=creditor --type=meta_class --childname=ref_creditor --keytype=any --immutable
+meta add --name=portfolio_data --attribute=portfolio_flows_kfn --type=meta_class --childname=portfolio_flow_kfn --array --final
+meta add --name=portfolio_data --attribute=portfolio_flows_msfo --type=meta_class --childname=portfolio_flow_msfo --array --final
 
 #====================================
 # Clear metadata cache
