@@ -71,65 +71,6 @@ meta add --name=person_name --attribute=middlename --type=string
 meta add --name=person_name --attribute=middlename --type=string
 
 #====================================
-#= REMAINS_DEBT_PASTDUE
-#====================================
-
-meta create --name=remains_debt_pastdue
-meta add --name=remains_debt_pastdue --attribute=close_date --type=date
-meta add --name=remains_debt_pastdue --attribute=open_date --type=date
-meta add --name=remains_debt_pastdue --attribute=value --type=double
-meta add --name=remains_debt_pastdue --attribute=value_currency --type=double
-meta add --name=remains_debt_pastdue --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
-
-#====================================
-#= REMAINS_DEBT_CURRENT
-#====================================
-
-meta create --name=remains_debt_current
-meta add --name=remains_debt_current --attribute=value --type=double
-meta add --name=remains_debt_current --attribute=value_currency --type=double
-meta add --name=remains_debt_current --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
-
-#====================================
-#= REMAINS_DEBT_WRITE_OFF
-#====================================
-
-meta create --name=remains_debt_write_off
-meta add --name=remains_debt_write_off --attribute=value --type=double
-meta add --name=remains_debt_write_off --attribute=value_currency --type=double
-meta add --name=remains_debt_write_off --attribute=date --type=date
-meta add --name=remains_debt_write_off --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
-
-#====================================
-#= REMAINS_INTEREST_PASTDUE
-#====================================
-
-meta create --name=remains_interest_pastdue
-meta add --name=remains_interest_pastdue --attribute=close_date --type=date
-meta add --name=remains_interest_pastdue --attribute=open_date --type=date
-meta add --name=remains_interest_pastdue --attribute=value --type=double
-meta add --name=remains_interest_pastdue --attribute=value_currency --type=double
-meta add --name=remains_interest_pastdue --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
-
-#====================================
-#= REMAINS_INTEREST_CURRENT
-#====================================
-
-meta create --name=remains_interest_current
-meta add --name=remains_interest_current --attribute=value --type=double
-meta add --name=remains_interest_current --attribute=value_currency --type=double
-meta add --name=remains_interest_current --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
-
-#====================================
-#= REMAINS_INTEREST_WRITE_OFF
-#====================================
-
-meta create --name=remains_interest_write_off
-meta add --name=remains_interest_write_off --attribute=date --type=date
-meta add --name=remains_interest_write_off --attribute=value --type=double
-meta add --name=remains_interest_write_off --attribute=value_currency --type=double
-
-#====================================
 #= REF_COUNTRY
 #====================================
 
@@ -207,6 +148,65 @@ meta add --name=address --attribute=region --type=meta_class --childname=ref_reg
 meta create --name=contact
 meta add --name=contact --attribute=details --type=string --array
 meta add --name=contact --attribute=contact_type --type=meta_class --childname=ref_contact_type --keytype=any --immutable
+
+#====================================
+#= REMAINS_DEBT_PASTDUE
+#====================================
+
+meta create --name=remains_debt_pastdue
+meta add --name=remains_debt_pastdue --attribute=close_date --type=date
+meta add --name=remains_debt_pastdue --attribute=open_date --type=date
+meta add --name=remains_debt_pastdue --attribute=value --type=double
+meta add --name=remains_debt_pastdue --attribute=value_currency --type=double
+meta add --name=remains_debt_pastdue --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+
+#====================================
+#= REMAINS_DEBT_CURRENT
+#====================================
+
+meta create --name=remains_debt_current
+meta add --name=remains_debt_current --attribute=value --type=double
+meta add --name=remains_debt_current --attribute=value_currency --type=double
+meta add --name=remains_debt_current --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+
+#====================================
+#= REMAINS_DEBT_WRITE_OFF
+#====================================
+
+meta create --name=remains_debt_write_off
+meta add --name=remains_debt_write_off --attribute=value --type=double
+meta add --name=remains_debt_write_off --attribute=value_currency --type=double
+meta add --name=remains_debt_write_off --attribute=date --type=date
+meta add --name=remains_debt_write_off --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+
+#====================================
+#= REMAINS_INTEREST_PASTDUE
+#====================================
+
+meta create --name=remains_interest_pastdue
+meta add --name=remains_interest_pastdue --attribute=close_date --type=date
+meta add --name=remains_interest_pastdue --attribute=open_date --type=date
+meta add --name=remains_interest_pastdue --attribute=value --type=double
+meta add --name=remains_interest_pastdue --attribute=value_currency --type=double
+meta add --name=remains_interest_pastdue --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+
+#====================================
+#= REMAINS_INTEREST_CURRENT
+#====================================
+
+meta create --name=remains_interest_current
+meta add --name=remains_interest_current --attribute=value --type=double
+meta add --name=remains_interest_current --attribute=value_currency --type=double
+meta add --name=remains_interest_current --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+
+#====================================
+#= REMAINS_INTEREST_WRITE_OFF
+#====================================
+
+meta create --name=remains_interest_write_off
+meta add --name=remains_interest_write_off --attribute=date --type=date
+meta add --name=remains_interest_write_off --attribute=value --type=double
+meta add --name=remains_interest_write_off --attribute=value_currency --type=double
 
 #====================================
 #= REMAINS_LIMIT
