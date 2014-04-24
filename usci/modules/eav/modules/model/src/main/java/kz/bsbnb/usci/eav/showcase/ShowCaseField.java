@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.showcase;
 
-import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 
 /**
@@ -88,5 +87,39 @@ public class ShowCaseField extends Persistable
     public void setAttributePath(String attributePath)
     {
         this.attributePath = attributePath;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        ShowCaseField that = (ShowCaseField) o;
+
+        if (attributeId != that.attributeId) return false;
+        if (attributeName != null ? !attributeName.equals(that.attributeName) : that.attributeName != null)
+            return false;
+        if (attributePath != null ? !attributePath.equals(that.attributePath) : that.attributePath != null)
+            return false;
+        if (columnName != null ? !columnName.equals(that.columnName) : that.columnName != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (title != null ? !title.equals(that.title) : that.title != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (columnName != null ? columnName.hashCode() : 0);
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (int) (attributeId ^ (attributeId >>> 32));
+        result = 31 * result + (attributeName != null ? attributeName.hashCode() : 0);
+        result = 31 * result + (attributePath != null ? attributePath.hashCode() : 0);
+        return result;
     }
 }

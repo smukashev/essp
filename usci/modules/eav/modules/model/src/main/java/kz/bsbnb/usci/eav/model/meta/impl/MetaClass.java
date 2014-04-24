@@ -673,6 +673,53 @@ public class MetaClass extends MetaContainer implements IMetaClass
         return valueOut;
     }
 
+    public IMetaAttribute getElAttribute(String path)
+    {
+        StringTokenizer tokenizer = new StringTokenizer(path, ".");
+
+        MetaClass meta = this;
+        IMetaType valueOut = null;
+        IMetaAttribute attribute = null;
+
+        while (tokenizer.hasMoreTokens())
+        {
+            String token = tokenizer.nextToken();
+
+            attribute = meta.getMetaAttribute(token);
+
+            if (attribute == null)
+                return null;
+
+            IMetaType type = attribute.getMetaType();
+
+            valueOut = type;
+
+            if (type.isSet())
+            {
+                while(type.isSet()) {
+                    valueOut = type;
+                    type = ((MetaSet)type).getMemberType();
+                }
+            }
+
+            if (valueOut.isComplex())
+            {
+                if (!valueOut.isSet()) {
+                    meta = (MetaClass)valueOut;
+                } else {
+                    meta = (MetaClass)type;
+                }
+            } else {
+                if (tokenizer.hasMoreTokens())
+                {
+                    throw new IllegalArgumentException("Path can't have intermediate simple values");
+                }
+            }
+        }
+
+        return attribute;
+    }
+
     public boolean arrayInPath(String path)
     {
         StringTokenizer tokenizer = new StringTokenizer(path, ".");
