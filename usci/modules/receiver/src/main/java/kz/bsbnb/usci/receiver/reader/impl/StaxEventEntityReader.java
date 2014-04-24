@@ -75,51 +75,70 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         batchService = serviceRepository.getBatchService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
         couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
-        batchFullJModel = gson.fromJson(couchbaseClient.get("batch:" + batchId).toString(), BatchFullJModel.class);
 
-        couchbaseClient.shutdown();
-
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(batchFullJModel.getContent());
-        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-        inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
-
-        ZipInputStream zis = new ZipInputStream(inputStream);
-        ZipEntry entry;
-        byte[] buffer = new byte[4096];
-        ByteArrayOutputStream out = null;
         try {
-            while ((entry = zis.getNextEntry()) != null)
-            {
-                if (entry.getName().equals("manifest.xml"))
-                    continue;
 
-                int len;
-                out = new ByteArrayOutputStream((int)entry.getSize());
-                int size = (int)entry.getSize();
-                while ((len = zis.read(buffer, 0, Math.min(buffer.length, size))) > 0)
-                {
-                    size -= len;
-                    out.write(buffer, 0, len);
-                    if (size <= 0)
-                        break;
-                }
-                break;
+            Object batchStr = null;
+            int counter = 0;
+
+            while (counter < 100 && batchStr == null) {
+                counter++;
+                batchStr = couchbaseClient.get("batch:" + batchId);
             }
-        } catch (IOException e) {
-            statusSingleton.addBatchStatus(batchId,
-                    new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
-            throw new RuntimeException(e);
-        }
 
-        try {
-            xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
-        } catch (XMLStreamException e) {
-            statusSingleton.addBatchStatus(batchId,
-                    new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
-            throw new RuntimeException(e);
-        }
+            if (batchStr == null) {
+                logger.error("Can't get batch with id: " + batchId);
+                throw new RuntimeException("Can't get batch with id: " + batchId);
+            }
 
-        batch = batchService.load(batchId);
+            batchFullJModel = gson.fromJson(batchStr.toString(), BatchFullJModel.class);
+
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(batchFullJModel.getContent());
+            XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+            inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
+
+            ZipInputStream zis = new ZipInputStream(inputStream);
+            ZipEntry entry;
+            byte[] buffer = new byte[4096];
+            ByteArrayOutputStream out = null;
+            try {
+                while ((entry = zis.getNextEntry()) != null)
+                {
+                    if (entry.getName().equals("manifest.xml"))
+                        continue;
+
+                    int len;
+                    out = new ByteArrayOutputStream((int)entry.getSize());
+                    int size = (int)entry.getSize();
+                    while ((len = zis.read(buffer, 0, Math.min(buffer.length, size))) > 0)
+                    {
+                        size -= len;
+                        out.write(buffer, 0, len);
+                        if (size <= 0)
+                            break;
+                    }
+                    break;
+                }
+            } catch (IOException e) {
+                logger.error("Batch: " + batchId + " error in entity reader.");
+                statusSingleton.addBatchStatus(batchId,
+                        new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
+                throw new RuntimeException(e);
+            }
+
+            try {
+                xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
+            } catch (XMLStreamException e) {
+                statusSingleton.addBatchStatus(batchId,
+                        new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
+                throw new RuntimeException(e);
+            }
+
+            batch = batchService.load(batchId);
+        } finally {
+            if (couchbaseClient != null)
+                couchbaseClient.shutdown();
+        }
     }
 
     public void startElement(XMLEvent event, StartElement startElement, String localName) {

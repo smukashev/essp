@@ -1,11 +1,12 @@
 package kz.bsbnb.usci.cli.app;
 
+import com.couchbase.client.CouchbaseClient;
+import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
+import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
 import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
@@ -14,7 +15,14 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
+import kz.bsbnb.usci.receiver.repository.IServiceRepository;
+import kz.bsbnb.usci.sync.service.IBatchService;
+import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import org.apache.log4j.Logger;
+import org.springframework.batch.item.NonTransientResourceException;
+import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,54 +34,26 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Stack;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 //TODO: merge with StaxEventEntityReader from receiver
 public class CLIXMLReader
 {
-    private Logger logger = Logger.getLogger(CLIXMLReader.class);
-    private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
-    private IBaseContainer currentContainer;
-    private Batch batch;
-    private Long index = 1L, level = 0L;
+    /////////////////////////
+    public static final String DATE_FORMAT = "dd.MM.yyyy";
+    protected DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 
     private IMetaClassRepository metaClassRepository;
 
     protected XMLEventReader xmlEventReader;
     private Date reportDate;
-
-    //public static final String DATE_FORMAT = "yyyy-MM-dd";
-    public static final String DATE_FORMAT = "dd.MM.yyyy";
-    protected DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-
-    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchRepository batchRepository, Date repDate) throws FileNotFoundException
-    {
-        logger.info("Reader init.");
-        metaClassRepository = metaRepo;
-
-        FileInputStream inputStream = new FileInputStream(fileName);
-        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-        inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
-
-        try {
-            xmlEventReader = inputFactory.createXMLEventReader(inputStream);
-        } catch (XMLStreamException e) {
-            e.printStackTrace();
-        }
-
-        this.reportDate = repDate;
-
-        batch = new Batch(reportDate, 1L);
-
-        batchRepository.addBatch(batch);
-    }
 
     public Object getCastObject(DataTypes typeCode, String value) {
         switch(typeCode) {
@@ -101,28 +81,62 @@ public class CLIXMLReader
         }
     }
 
+    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchRepository batchRepository, Date repDate) throws FileNotFoundException
+    {
+        logger.info("Reader init.");
+        metaClassRepository = metaRepo;
+
+        FileInputStream inputStream = new FileInputStream(fileName);
+        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
+
+        try {
+            xmlEventReader = inputFactory.createXMLEventReader(inputStream);
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+        }
+
+        this.reportDate = repDate;
+
+        batch = new Batch(reportDate, 1L);
+
+        batchRepository.addBatch(batch);
+    }
+    /////////////////////////
+    private Logger logger = Logger.getLogger(CLIXMLReader.class);
+    private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
+    private Stack<Boolean> flagsStack = new Stack<Boolean>();
+    private IBaseContainer currentContainer;
+    private Batch batch;
+    private Long index = 1L, level = 0L;
+
+    private boolean hasMembers = false;
+
     public void startElement(XMLEvent event, StartElement startElement, String localName) {
         if(localName.equals("batch")) {
-            logger.info("batch");
+            //logger.info("batch");
         } else if(localName.equals("entities")) {
-            logger.info("entities");
+            //logger.info("entities");
         } else if(localName.equals("entity")) {
-            logger.info("entity");
-            currentContainer =
-                    new BaseEntity(
-                            metaClassRepository.getMetaClass(startElement.getAttributeByName(
-                                    new QName("class")).getValue()), reportDate);
+            //logger.info("entity");
+            currentContainer = new BaseEntity(metaClassRepository.getMetaClass(
+                    startElement.getAttributeByName(new QName("class")).getValue()), batch.getRepDate());
         } else {
-            logger.info("other: " + localName);
+            //logger.info("other: " + localName);
             IMetaType metaType = currentContainer.getMemberType(localName);
 
             if(metaType.isSet()) {
                 stack.push(currentContainer);
+                flagsStack.push(hasMembers);
+                hasMembers = false;
                 currentContainer = new BaseSet(((MetaSet)metaType).getMemberType());
                 level++;
             } else if(metaType.isComplex() && !metaType.isSet()) {
                 stack.push(currentContainer);
-                currentContainer = new BaseEntity((MetaClass)metaType, reportDate);
+                currentContainer = new BaseEntity((MetaClass)metaType, batch.getRepDate());
+                flagsStack.push(hasMembers);
+                hasMembers = false;
+                //metaFactoryService.getBaseEntity((MetaClass)metaType, batch.getRepDate());
                 level++;
             } else if(!metaType.isComplex() && !metaType.isSet()) {
                 Object o = null;
@@ -139,19 +153,29 @@ public class CLIXMLReader
                     level--;
                 }
 
-                currentContainer.put(localName, new BaseValue(batch, index, o));
+                if (o != null) {
+                    hasMembers = true;
+                }
+
+                String memberName = localName;
+                if (currentContainer.getBaseContainerType() == BaseContainerType.BASE_SET) {
+                    memberName += "_" + currentContainer.getValueCount();
+                }
+
+                currentContainer.put(memberName, BaseValueFactory
+                        .create(currentContainer.getBaseContainerType(), metaType, batch, index, o));
+
                 level++;
             }
         }
     }
 
-    public BaseEntity read() {
-        logger.info("Read called");
+    public BaseEntity read() throws UnexpectedInputException, org.springframework.batch.item.ParseException, NonTransientResourceException {
         while(xmlEventReader.hasNext()) {
             XMLEvent event = (XMLEvent) xmlEventReader.next();
 
             if(event.isStartDocument()) {
-                logger.info("start document");
+                //logger.info("start document");
             } else if(event.isStartElement()) {
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
@@ -161,11 +185,12 @@ public class CLIXMLReader
                 EndElement endElement = event.asEndElement();
                 String localName = endElement.getName().getLocalPart();
 
-                if(endElement(localName)) return (BaseEntity) currentContainer;
+                if(endElement(localName)) return (BaseEntity)currentContainer;
             } else if(event.isEndDocument()) {
-                logger.info("end document");
+                //logger.info("end document");
+                //couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
             } else {
-                logger.info(event);
+                //logger.info(event);
             }
         }
 
@@ -174,9 +199,9 @@ public class CLIXMLReader
 
     public boolean endElement(String localName) {
         if(localName.equals("batch")) {
-            logger.info("batch");
+            //logger.info("batch");
         } else if(localName.equals("entities")) {
-            logger.info("entities");
+            //logger.info("entities");
             currentContainer = null;
             return true;
         } else if(localName.equals("entity")) {
@@ -195,12 +220,29 @@ public class CLIXMLReader
                 currentContainer = stack.pop();
 
                 if (currentContainer.isSet()) {
-                    ((BaseSet)currentContainer).put(new BaseValue(batch, index, o));
+                    if (hasMembers) {
+                        ((BaseSet)currentContainer).put(BaseValueFactory
+                                .create(currentContainer.getBaseContainerType(), metaType, batch, index, o));
+                        flagsStack.pop();
+                        hasMembers = true;
+                    } else {
+                        hasMembers = flagsStack.pop();
+                    }
                 } else {
-                    currentContainer.put(localName, new BaseValue(batch, index, o));
+                    if (hasMembers) {
+                        currentContainer.put(localName, BaseValueFactory
+                                .create(currentContainer.getBaseContainerType(), metaType, batch, index, o));
+                        flagsStack.pop();
+                        hasMembers = true;
+                    } else {
+                        currentContainer.put(localName, BaseValueFactory
+                                .create(currentContainer.getBaseContainerType(), metaType, batch, index, null));
+                        hasMembers = flagsStack.pop();
+                    }
                 }
-            }
 
+                //hasMembers = flagsStack.pop();
+            }
             level--;
         }
 

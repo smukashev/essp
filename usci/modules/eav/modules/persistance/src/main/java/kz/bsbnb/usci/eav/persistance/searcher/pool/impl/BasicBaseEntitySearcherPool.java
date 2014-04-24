@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.searcher.pool.impl;
 
 import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
+import kz.bsbnb.usci.eav.persistance.searcher.impl.CreditSearcher;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.DocumentSearcher;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.IBaseEntitySearcherPool;
@@ -19,11 +20,15 @@ public class BasicBaseEntitySearcherPool implements IBaseEntitySearcherPool
     private ImprovedBaseEntitySearcher baseEntitySearcher;
 
     @Autowired
-    private DocumentSearcher ds;
+    private DocumentSearcher documentSearcher;
+
+    @Autowired
+    private CreditSearcher creditSearcher;
 
     @PostConstruct
     public void init() {
-        searchersByName.put(ds.getClassName(), ds);
+        searchersByName.put(documentSearcher.getClassName(), documentSearcher);
+        searchersByName.put(creditSearcher.getClassName(), creditSearcher);
     }
 
     @Override

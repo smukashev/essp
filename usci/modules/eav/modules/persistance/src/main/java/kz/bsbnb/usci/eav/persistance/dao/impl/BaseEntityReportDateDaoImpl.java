@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
 
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITIES;
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITY_REPORT_DATES;
 
 /**
@@ -309,6 +310,26 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         return DataUtils.convert((Timestamp) rows.get(0).get("max_report_date"));
+    }
+
+    @Override
+    public boolean exists(long baseEntityId, Date reportDate)
+    {
+        String entityTableAlias = "e";
+        String reportDateTableAlias = "rd";
+        Select select = context
+                .select(EAV_BE_ENTITIES.as(entityTableAlias).ID)
+                .from(EAV_BE_ENTITIES.as(entityTableAlias))
+                .where(EAV_BE_ENTITIES.as(entityTableAlias).ID.eq(baseEntityId))
+                .and(DSL.exists(context.select(EAV_BE_ENTITY_REPORT_DATES.as(reportDateTableAlias).ID)
+                    .from(EAV_BE_ENTITY_REPORT_DATES.as(reportDateTableAlias))
+                    .where(EAV_BE_ENTITY_REPORT_DATES.as(reportDateTableAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityTableAlias).ID))
+                    .and(EAV_BE_ENTITY_REPORT_DATES.as(reportDateTableAlias).REPORT_DATE.equal(DataUtils.convert(reportDate)))));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        return rows.size() > 0;
     }
 
 }
