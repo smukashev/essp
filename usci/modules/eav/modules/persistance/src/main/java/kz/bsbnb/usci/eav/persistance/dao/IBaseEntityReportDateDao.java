@@ -22,4 +22,6 @@ public interface IBaseEntityReportDateDao extends IPersistableDao {
 
     public Date getMaxReportDate(long baseEntityId, Date reportDate);
 
+    public boolean exists(long baseEntityId, Date reportDate);
+
 }
