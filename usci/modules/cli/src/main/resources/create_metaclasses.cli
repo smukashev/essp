@@ -222,18 +222,18 @@ meta add --name=remains_limit --attribute=balance_account --type=meta_class --ch
 #====================================
 
 meta create --name=remains_debt
-meta add --name=remains_debt --attribute=current --type=meta_class --childname=remains_debt_current
-meta add --name=remains_debt --attribute=pastdue --type=meta_class --childname=remains_debt_pastdue
-meta add --name=remains_debt --attribute=write_off --type=meta_class --childname=remains_debt_write_off
+meta add --name=remains_debt --attribute=current --type=meta_class --childname=remains_debt_current --final
+meta add --name=remains_debt --attribute=pastdue --type=meta_class --childname=remains_debt_pastdue --final
+meta add --name=remains_debt --attribute=write_off --type=meta_class --childname=remains_debt_write_off --final
 
 #====================================
 #= REMAINS_INTEREST
 #====================================
 
 meta create --name=remains_interest
-meta add --name=remains_interest --attribute=current --type=meta_class --childname=remains_interest_current
-meta add --name=remains_interest --attribute=pastdue --type=meta_class --childname=remains_interest_pastdue
-meta add --name=remains_interest --attribute=write_off --type=meta_class --childname=remains_interest_write_off
+meta add --name=remains_interest --attribute=current --type=meta_class --childname=remains_interest_current --final
+meta add --name=remains_interest --attribute=pastdue --type=meta_class --childname=remains_interest_pastdue --final
+meta add --name=remains_interest --attribute=write_off --type=meta_class --childname=remains_interest_write_off --final
 
 #====================================
 #= REMAINS_CORRECTION
@@ -281,9 +281,9 @@ meta add --name=turnover_issue_interest --attribute=amount_currency --type=doubl
 #====================================
 
 meta create --name=provision_group
-meta add --name=provision_group --attribute=provision_kfn --type=meta_class --childname=provision
-meta add --name=provision_group --attribute=provision_msfo --type=meta_class --childname=provision
-meta add --name=provision_group --attribute=provision_msfo_over_balance --type=meta_class --childname=provision
+meta add --name=provision_group --attribute=provision_kfn --type=meta_class --childname=provision --final
+meta add --name=provision_group --attribute=provision_msfo --type=meta_class --childname=provision --final
+meta add --name=provision_group --attribute=provision_msfo_over_balance --type=meta_class --childname=provision --final
 
 #====================================
 #= REF_BANK_RELATION
@@ -429,35 +429,35 @@ meta add --name=creditor --attribute=docs --type=meta_class --childname=document
 #====================================
 
 meta create --name=remains
-meta add --name=remains --attribute=discounted_value --type=meta_class --childname=remains_discounted_value
-meta add --name=remains --attribute=correction --type=meta_class --childname=remains_correction
-meta add --name=remains --attribute=debt --type=meta_class --childname=remains_debt
-meta add --name=remains --attribute=discount --type=meta_class --childname=remains_discount
-meta add --name=remains --attribute=interest --type=meta_class --childname=remains_interest
-meta add --name=remains --attribute=limit --type=meta_class --childname=remains_limit
+meta add --name=remains --attribute=discounted_value --type=meta_class --childname=remains_discounted_value --final
+meta add --name=remains --attribute=correction --type=meta_class --childname=remains_correction --final
+meta add --name=remains --attribute=debt --type=meta_class --childname=remains_debt --final
+meta add --name=remains --attribute=discount --type=meta_class --childname=remains_discount --final
+meta add --name=remains --attribute=interest --type=meta_class --childname=remains_interest --final
+meta add --name=remains --attribute=limit --type=meta_class --childname=remains_limit --final
 
 #====================================
 #= TURNOVER_ISSUE
 #====================================
 
 meta create --name=turnover_issue
-meta add --name=turnover_issue --attribute=debt --type=meta_class --childname=turnover_issue_debt
-meta add --name=turnover_issue --attribute=interest --type=meta_class --childname=turnover_issue_interest
+meta add --name=turnover_issue --attribute=debt --type=meta_class --childname=turnover_issue_debt --final
+meta add --name=turnover_issue --attribute=interest --type=meta_class --childname=turnover_issue_interest --final
 
 #====================================
 #= TURNOVER
 #====================================
 
 meta create --name=turnover
-meta add --name=turnover --attribute=issue --type=meta_class --childname=turnover_issue
+meta add --name=turnover --attribute=issue --type=meta_class --childname=turnover_issue --final
 
 #====================================
 #= CREDIT_FLOW
 #====================================
 
 meta create --name=credit_flow
-meta add --name=credit_flow --attribute=classification --type=meta_class --childname=ref_classification --keytype=any --immutable
-meta add --name=credit_flow --attribute=provision --type=meta_class --childname=provision_group
+meta add --name=credit_flow --attribute=classification --type=meta_class --childname=ref_classification --keytype=any --immutable --final
+meta add --name=credit_flow --attribute=provision --type=meta_class --childname=provision_group --final
 
 #====================================
 #= CONTRACT
@@ -578,9 +578,9 @@ meta add --name=subject --attribute=person --type=meta_class --childname=person
 meta create --name=change
 meta add --name=change --attribute=maturity_date --type=date
 meta add --name=change --attribute=prolongation_date --type=date
-meta add --name=change --attribute=credit_flow --type=meta_class --childname=credit_flow
-meta add --name=change --attribute=remains --type=meta_class --childname=remains
-meta add --name=change --attribute=turnover --type=meta_class --childname=turnover
+meta add --name=change --attribute=credit_flow --type=meta_class --childname=credit_flow --final
+meta add --name=change --attribute=remains --type=meta_class --childname=remains --final
+meta add --name=change --attribute=turnover --type=meta_class --childname=turnover --final
 
 #====================================
 #= PRIMARY_CONTRACT
@@ -610,7 +610,7 @@ meta add --name=credit --attribute=credit_type --type=meta_class --childname=ref
 meta add --name=credit --attribute=currency --type=meta_class --childname=ref_currency --keytype=any --immutable
 meta add --name=credit --attribute=finance_source --type=meta_class --childname=ref_finance_source --keytype=any --immutable
 meta add --name=credit --attribute=portfolio --type=meta_class --childname=portfolio
-meta add --name=credit --attribute=change --type=meta_class --childname=change
+meta add --name=credit --attribute=change --type=meta_class --childname=change --final
 meta add --name=credit --attribute=creditor --type=meta_class --childname=ref_creditor --keytype=any --immutable
 meta key --name=credit --attribute=creditor
 meta add --name=credit --attribute=subjects --type=meta_class --array --childname=subject

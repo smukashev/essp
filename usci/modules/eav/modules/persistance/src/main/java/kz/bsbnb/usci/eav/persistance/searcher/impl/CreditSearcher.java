@@ -80,7 +80,7 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher
                         getClassName()).findSingle(creditor);
             }
 
-            if (primaryContractId > 0) {
+            if (primaryContractId != null && creditorId != null && primaryContractId > 0 && creditorId > 0) {
                 String complexValuesTableAlias = "cv";
                 SelectConditionStep select = context
                         .select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.as("inner_id"))

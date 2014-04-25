@@ -1285,8 +1285,13 @@ public class CLI
             CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
             BaseEntity entity;
             while((entity = reader.read()) != null) {
-                long id = baseEntityProcessorDao.process(entity).getId();
-                System.out.println("Saved with id: " + id);
+                try {
+                    long id = baseEntityProcessorDao.process(entity).getId();
+                    System.out.println("Instance of BaseEntity saved with id: " + id);
+                } catch(Exception ex) {
+                    lastException = ex;
+                    System.out.println("While processing instance of BaseEntity unexpected error occurred: " + ex.getMessage());
+                }
             }
         } catch (FileNotFoundException e)
         {

@@ -138,12 +138,33 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
     public IBaseValue getNextBaseValue(IBaseValue baseValue)
     {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
+        if (baseContainer == null)
+        {
+            throw new RuntimeException("Can not find next instance of BaseEntityDoubleValue. " +
+                    "Instance of BaseContainer is null.");
+        }
+        if (baseContainer.getId() < 1)
+        {
+            throw new RuntimeException("Can not find next instance of BaseEntityDoubleValue. " +
+                    "Instance of BaseContainer not contain ID.");
+        }
+
         IBaseEntity baseEntity = (IBaseEntity)baseContainer;
         IMetaClass metaClass = baseEntity.getMeta();
 
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        IMetaType metaType = metaAttribute.getMetaType();
+        if (metaAttribute == null)
+        {
+            throw new RuntimeException("Can not find next instance of BaseEntityDoubleValue. " +
+                    "Instance of MetaAttribute is null.");
+        }
+        if (metaAttribute.getId() < 1)
+        {
+            throw new RuntimeException("Can not find next instance of BaseEntityDoubleValue. " +
+                    "Instance of MetaAttribute not contain ID.");
+        }
 
+        IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue nextBaseValue = null;
 
         String tableAlias = "bv";
@@ -215,12 +236,33 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
+        if (baseContainer == null)
+        {
+            throw new RuntimeException("Can not find previous instance of BaseEntityDoubleValue. " +
+                    "Instance of BaseContainer is null.");
+        }
+        if (baseContainer.getId() < 1)
+        {
+            throw new RuntimeException("Can not find previous instance of BaseEntityDoubleValue. " +
+                    "Instance of BaseContainer not contain ID.");
+        }
+
         IBaseEntity baseEntity = (IBaseEntity)baseContainer;
         IMetaClass metaClass = baseEntity.getMeta();
 
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        IMetaType metaType = metaAttribute.getMetaType();
+        if (metaAttribute == null)
+        {
+            throw new RuntimeException("Can not find previous instance of BaseEntityDoubleValue. " +
+                    "Instance of MetaAttribute is null.");
+        }
+        if (metaAttribute.getId() < 1)
+        {
+            throw new RuntimeException("Can not find previous instance of BaseEntityDoubleValue. " +
+                    "Instance of MetaAttribute not contain ID.");
+        }
 
+        IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue previousBaseValue = null;
 
         String tableAlias = "bv";
@@ -291,9 +333,30 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
     @Override
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        IMetaType metaType = metaAttribute.getMetaType();
+        if (baseContainer == null)
+        {
+            throw new RuntimeException("Can not find closed instance of BaseEntityDoubleValue. " +
+                    "Instance of BaseContainer is null.");
+        }
+        if (baseContainer.getId() < 1)
+        {
+            throw new RuntimeException("Can not find closed instance of BaseEntityDoubleValue. " +
+                    "Instance of BaseContainer not contain ID.");
+        }
 
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        if (metaAttribute == null)
+        {
+            throw new RuntimeException("Can not find closed instance of BaseEntityDoubleValue. " +
+                    "Instance of MetaAttribute is null.");
+        }
+        if (metaAttribute.getId() < 1)
+        {
+            throw new RuntimeException("Can not find closed instance of BaseEntityDoubleValue. " +
+                    "Instance of MetaAttribute not contain ID.");
+        }
+
+        IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue closedBaseValue = null;
 
         String tableAlias = "bv";
@@ -342,9 +405,30 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        IMetaType metaType = metaAttribute.getMetaType();
+        if (baseContainer == null)
+        {
+            throw new RuntimeException("Can not find last instance of BaseEntityDoubleValue. " +
+                    "Instance of BaseContainer is null.");
+        }
+        if (baseContainer.getId() < 1)
+        {
+            throw new RuntimeException("Can not find last instance of BaseEntityDoubleValue. " +
+                    "Instance of BaseContainer not contain ID.");
+        }
 
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        if (metaAttribute == null)
+        {
+            throw new RuntimeException("Can not find last instance of BaseEntityDoubleValue. " +
+                    "Instance of MetaAttribute is null.");
+        }
+        if (metaAttribute.getId() < 1)
+        {
+            throw new RuntimeException("Can not find last instance of BaseEntityDoubleValue. " +
+                    "Instance of MetaAttribute not contain ID.");
+        }
+
+        IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue lastBaseValue = null;
 
         String tableAlias = "bv";
@@ -354,6 +438,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).VALUE,
+                        EAV_BE_DOUBLE_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_DOUBLE_VALUES.as(tableAlias))
                 .where(EAV_BE_DOUBLE_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
@@ -416,8 +501,11 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
                     .on(tableOfValues.field(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID)
                             .eq(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.ID)))
                     .where(tableOfValues.field(EAV_BE_DOUBLE_VALUES.ENTITY_ID).equal(baseEntity.getId()))
-                    .and(tableOfValues.field(EAV_BE_DOUBLE_VALUES.IS_LAST).equal(true)
-                            .and(tableOfValues.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED).equal(false)));
+                    .and((tableOfValues.field(EAV_BE_DOUBLE_VALUES.IS_LAST).equal(true)
+                            .and(tableOfValues.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED).equal(false))
+                            .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))
+                            .or(tableOfValues.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE).equal(DataUtils.convert(actualReportDate))
+                                    .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(true))));
         }
         else
         {
@@ -454,7 +542,10 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
                     .on(tableNumbering.field(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID)
                             .eq(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.ID)))
                     .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
-                    .and(tableNumbering.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED).equal(false));
+                    .and((tableNumbering.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED).equal(false)
+                            .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))
+                            .or(tableNumbering.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE).equal(actualReportDate)
+                                    .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(true))));
         }
 
         logger.debug(select.toString());

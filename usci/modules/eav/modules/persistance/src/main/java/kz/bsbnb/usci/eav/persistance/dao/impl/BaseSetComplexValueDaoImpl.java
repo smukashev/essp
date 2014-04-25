@@ -37,6 +37,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
     private final Logger logger = LoggerFactory.getLogger(BaseSetComplexValueDaoImpl.class);
 
+    public static final boolean DEFAULT_CURRENT_REPORT_DATE = true;
+
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
@@ -133,7 +135,15 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
     @Override
     @SuppressWarnings("unchecked")
-    public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
+    public IBaseValue getPreviousBaseValue(IBaseValue baseValue)
+    {
+        return getPreviousBaseValue(baseValue, DEFAULT_CURRENT_REPORT_DATE);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public IBaseValue getPreviousBaseValue(IBaseValue baseValue, boolean currentReportDate)
+    {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IBaseSet baseSet = (IBaseSet)baseContainer;
         IBaseEntity childBaseEntity = (IBaseEntity)baseValue.getValue();
@@ -196,7 +206,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             Batch batch = batchRepository.getBatch(batchId);
             IBaseEntity childBaseEntityLoaded = baseEntityProcessorDao
-                    .loadByMaxReportDate(childBaseEntity.getId(), baseValue.getRepDate());
+                    .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate ? baseValue.getRepDate() : reportDate);
 
             previousBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
                     id, batch, index, reportDate, childBaseEntityLoaded, closed, last);
@@ -206,8 +216,14 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     }
 
     @Override
+    public IBaseValue getNextBaseValue(IBaseValue baseValue)
+    {
+        return getNextBaseValue(baseValue, DEFAULT_CURRENT_REPORT_DATE);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
-    public IBaseValue getNextBaseValue(IBaseValue baseValue) {
+    public IBaseValue getNextBaseValue(IBaseValue baseValue, boolean currentReportDate) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IBaseSet baseSet = (IBaseSet)baseContainer;
         IMetaType metaType = baseSet.getMemberType();
@@ -271,7 +287,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             Batch batch = batchRepository.getBatch(batchId);
             IBaseEntity childBaseEntityLoaded = baseEntityProcessorDao
-                    .loadByMaxReportDate(childBaseEntity.getId(), reportDate);
+                    .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate ? baseValue.getRepDate() : reportDate);
 
             nextBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
                     id, batch, index, reportDate, childBaseEntityLoaded, closed, last);
@@ -340,7 +356,13 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     }
 
     @Override
-    public IBaseValue getLastBaseValue(IBaseValue baseValue) {
+    public IBaseValue getLastBaseValue(IBaseValue baseValue)
+    {
+        return getLastBaseValue(baseValue, DEFAULT_CURRENT_REPORT_DATE);
+    }
+
+    @Override
+    public IBaseValue getLastBaseValue(IBaseValue baseValue, boolean currentReportDate) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IBaseSet baseSet = (IBaseSet)baseContainer;
         IBaseEntity childBaseEntity = (IBaseEntity)baseValue.getValue();
@@ -385,7 +407,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             Batch batch = batchRepository.getBatch(batchId);
             IBaseEntity childBaseEntityLoaded = baseEntityProcessorDao
-                    .loadByMaxReportDate(childBaseEntity.getId(), reportDate);
+                    .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate ? baseValue.getRepDate() : reportDate);
 
             lastBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
                     id, batch, index, reportDate, childBaseEntityLoaded, closed, true);

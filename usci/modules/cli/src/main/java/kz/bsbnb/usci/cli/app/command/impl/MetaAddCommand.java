@@ -254,7 +254,10 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
                 if (keyType != null) {
                     setToAdd.setArrayKeyType(keyType.getComplexKeyType());
                 }
-                metaClass.setMetaAttribute(attribute, new MetaAttribute(false, false, setToAdd));
+                MetaAttribute metaAttribute = new MetaAttribute(false, false, setToAdd);
+                metaAttribute.setImmutable(isImmutable);
+                metaAttribute.setFinal(isFinal);
+                metaClass.setMetaAttribute(attribute, metaAttribute);
             } else {
                 MetaAttribute metaAttribute = new MetaAttribute(false, false, childMetaClass);
                 metaAttribute.setImmutable(isImmutable);
@@ -269,7 +272,10 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
                 if (keyType != null) {
                     setToAdd.setArrayKeyType(keyType.getComplexKeyType());
                 }
-                metaClass.setMetaAttribute(attribute, new MetaAttribute(false, false, setToAdd));
+                MetaAttribute metaAttribute = new MetaAttribute(false, false, setToAdd);
+                metaAttribute.setImmutable(isImmutable);
+                metaAttribute.setFinal(isFinal);
+                metaClass.setMetaAttribute(attribute, metaAttribute);
             } else {
                 MetaAttribute metaAttribute = new MetaAttribute(false, false, metaValue);
                 metaAttribute.setImmutable(isImmutable);

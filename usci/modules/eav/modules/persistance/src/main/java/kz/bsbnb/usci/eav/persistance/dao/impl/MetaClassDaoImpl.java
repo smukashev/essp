@@ -320,6 +320,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         .set(EAV_M_COMPLEX_SET.TITLE, metaAttribute.getTitle())
                         .set(EAV_M_COMPLEX_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
                         .set(EAV_M_COMPLEX_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
+                        .set(EAV_M_COMPLEX_SET.IS_FINAL, DataUtils.convert(metaAttribute.isFinal()))
                         .set(EAV_M_COMPLEX_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
                         .set(EAV_M_COMPLEX_SET.CLASS_ID, innerId)
                         .set(EAV_M_COMPLEX_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
@@ -336,6 +337,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         .set(EAV_M_SIMPLE_SET.TYPE_CODE, metaSet.getTypeCode().toString())
                         .set(EAV_M_SIMPLE_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
                         .set(EAV_M_SIMPLE_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
+                        .set(EAV_M_SIMPLE_SET.IS_FINAL, DataUtils.convert(metaAttribute.isFinal()))
                         .set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
                         .set(EAV_M_SIMPLE_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
                         .set(EAV_M_SIMPLE_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()));
