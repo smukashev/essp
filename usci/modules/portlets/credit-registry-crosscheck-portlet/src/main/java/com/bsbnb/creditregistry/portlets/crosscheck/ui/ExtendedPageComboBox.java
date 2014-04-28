@@ -1,5 +1,6 @@
 package com.bsbnb.creditregistry.portlets.crosscheck.ui;
-import com.bsbnb.creditregistry.portlets.crosscheck.model.Creditor;
+
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.Creditor;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.ComboBox;
 

@@ -76,6 +76,7 @@ public class CrossCheckApplication extends Application {
                 Window mainWindow = new Window(portletData.getResourceString("CrossCheckApplication"));
                 try {
                     mainWindow.addComponent(new CrossCheckLayout(viewType, portletData, new BeanDataProvider(portletData)));
+                    
                 } catch (DataException de) {
                     mainWindow.addComponent(new Label(de.getMessage().replaceAll("\n", "<br/>")));
                 }
@@ -104,12 +105,12 @@ public class CrossCheckApplication extends Application {
     }
 
     /**
-     * Показывает краткую страницу JSP для не-максимального режима просмотра
+     * ���������� ������� �������� JSP ��� ��-������������� ������ ���������
      */
     public void writeViewPageHtml(RenderRequest request, RenderResponse response, Window window, String path)
             throws IOException, PortletException {
         PortletContext context = null;
-        // только portlet 2.0
+        // ������ portlet 2.0
         if (getContext() instanceof PortletApplicationContext2) {
             PortletApplicationContext2 ctx = (PortletApplicationContext2) getContext();
             context = ctx.getPortletSession().getPortletContext();

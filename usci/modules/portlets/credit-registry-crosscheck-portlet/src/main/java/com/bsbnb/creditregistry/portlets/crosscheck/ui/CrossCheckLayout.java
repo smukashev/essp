@@ -6,9 +6,9 @@ import com.bsbnb.creditregistry.portlets.crosscheck.PortletEnvironmentFacade;
 import com.bsbnb.creditregistry.portlets.crosscheck.data.CrossCheckExecutor;
 import com.bsbnb.creditregistry.portlets.crosscheck.data.CrossCheckMessageDisplayWrapper;
 import com.bsbnb.creditregistry.portlets.crosscheck.data.DataProvider;
-import com.bsbnb.creditregistry.portlets.crosscheck.model.Creditor;
-import com.bsbnb.creditregistry.portlets.crosscheck.model.CrossCheck;
-import com.bsbnb.creditregistry.portlets.crosscheck.model.SubjectType;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.Creditor;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.CrossCheck;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.SubjectType;
 import com.bsbnb.util.translit.Transliterator;
 import com.bsbnb.vaadin.filterableselector.FilterableSelect;
 import com.bsbnb.vaadin.filterableselector.SelectionCallback;
@@ -97,7 +97,7 @@ public class CrossCheckLayout extends VerticalLayout {
         this.provider = provider;
         log.log(Level.INFO, "User ID: {0}", facade.getUserID());
     }
-
+   
     @Override
     public void attach() {
         creditorsList = provider.getCreditorsList();
@@ -167,7 +167,7 @@ public class CrossCheckLayout extends VerticalLayout {
 
                     public void selected(List<Creditor> selectedItems) {
                         exportCrossCheckToExcel(selectedItems);
-                    }
+                     }
                 });
             }
         });
@@ -237,7 +237,7 @@ public class CrossCheckLayout extends VerticalLayout {
                 if (event != null && event.getProperty() != null && event.getProperty().getValue() != null) {
                     updatePackageErrorsTable((CrossCheck) event.getProperty().getValue());
                 }
-            }
+              }
         });
         //fileInfoLayout
         crossCheckLayout = new VerticalLayout();
@@ -251,7 +251,7 @@ public class CrossCheckLayout extends VerticalLayout {
         exportMessagesTableButton = new Button(Localization.EXPORT_TABLE_TO_XLS.getValue(), new Button.ClickListener() {
 
             public void buttonClick(ClickEvent event) {
-                if (lastCrossCheck != null) {
+                 if (lastCrossCheck != null) {
                     exportToExcel(Arrays.asList(lastCrossCheck));
                 }
             }
@@ -391,6 +391,7 @@ public class CrossCheckLayout extends VerticalLayout {
 
     private void exportCrossCheckToExcel(List<Creditor> selectedItems) {
         Date reportDate = (Date) dateField.getValue();
+        
         if (reportDate == null) {
             MessageBox.Show(Localization.EMPTY_DATE_FIELD.getValue(), getWindow());
         }
@@ -398,10 +399,11 @@ public class CrossCheckLayout extends VerticalLayout {
         Set<String> creditorNames = new HashSet<String>();
         List<CrossCheck> uniqueCreditorsCrossChecks = new ArrayList<CrossCheck>();
         for (CrossCheck crossCheck : crossChecks) {
-            if (!creditorNames.contains(crossCheck.getCreditorName())) {
-                creditorNames.add(crossCheck.getCreditorName());
+            if (!creditorNames.contains(crossCheck.getCreditor().getName())) {
+                creditorNames.add(crossCheck.getCreditor().getName());
                 uniqueCreditorsCrossChecks.add(crossCheck);
             }
+            
         }
         exportToExcel(uniqueCreditorsCrossChecks);
     }
@@ -422,13 +424,14 @@ public class CrossCheckLayout extends VerticalLayout {
 
     private String getFilenameXLS(List<CrossCheck> uniqueCreditorsCrossChecks) {
         StringBuilder filename;
+   
         Date reportDate = uniqueCreditorsCrossChecks.isEmpty() ? null : uniqueCreditorsCrossChecks.get(0).getReportDate();
         if (uniqueCreditorsCrossChecks.size() != 1) {
             filename = new StringBuilder(Localization.XLS_BATCH_MESSAGES_EXPORT_FILENAME_PREFIX.getValue());
         } else {
             filename = new StringBuilder(Localization.XLS_MESSAGES_EXPORT_FILENAME_PREFIX.getValue());
             CrossCheck crossCheck = uniqueCreditorsCrossChecks.get(0);
-            filename.append(Transliterator.transliterate(crossCheck.getCreditorName()));
+            filename.append(Transliterator.transliterate(crossCheck.getCreditor().getName()));
         }
         if (filename.length() > 25) {
             filename.setLength(25);
@@ -530,13 +533,13 @@ public class CrossCheckLayout extends VerticalLayout {
 
     private void downloadXLS(final byte[] bytes, String filename) {
         StreamResource.StreamSource streamSource = new StreamResource.StreamSource() {
-
+    
             public InputStream getStream() {
                 return new ByteArrayInputStream(bytes);
             }
         };
         StreamResource resource = new StreamResource(streamSource, filename, getApplication()) {
-
+            
             @Override
             public DownloadStream getStream() {
                 DownloadStream downloadStream = super.getStream();
@@ -546,7 +549,7 @@ public class CrossCheckLayout extends VerticalLayout {
                 return downloadStream;
             }
         };
-        (getWindow()).open(resource);
+          (getWindow()).open(resource);
     }
     private WritableFont times12Font;
     private WritableCellFormat headerFormat;
@@ -559,6 +562,7 @@ public class CrossCheckLayout extends VerticalLayout {
 
     private void exportToExcel(List<CrossCheck> uniqueCreditorsCrossChecks) {
         try {
+            
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             WorkbookSettings settings = new WorkbookSettings();
             //settings.setUseTemporaryFileDuringWrite(true); NEW
@@ -582,7 +586,7 @@ public class CrossCheckLayout extends VerticalLayout {
             groupedCellFormatRed.setBackground(Colour.RED);
             groupedCellFormatRed.setBorder(Border.ALL, BorderLineStyle.THIN);
             autoSizeCellView = new jxl.CellView();
-            //autoSizeCellView.setAutosize(true); NEW
+            //autoSizeCellView.setAutosize(true);
             WritableWorkbook workbook = jxl.Workbook.createWorkbook(baos, settings);
             for (CrossCheck crossCheck : uniqueCreditorsCrossChecks) {
                 writeCrossCheckOnSheet(crossCheck, workbook);
@@ -600,10 +604,10 @@ public class CrossCheckLayout extends VerticalLayout {
     }
 
     private WritableSheet writeCrossCheckOnSheet(CrossCheck crossCheck, WritableWorkbook workbook) throws WriteException {
-        WritableSheet sheet = workbook.createSheet(crossCheck.getCreditorName(), 0);
+        WritableSheet sheet = workbook.createSheet(crossCheck.getCreditor().getName(), 0);
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
         int rowCounter = 1;
-        sheet.addCell(new jxl.write.Label(1, rowCounter++, String.format(Localization.EXCEL_HEADER_ORGANIZATION.getValue(), crossCheck.getCreditorName()), headerFormat));
+        sheet.addCell(new jxl.write.Label(1, rowCounter++, String.format(Localization.EXCEL_HEADER_ORGANIZATION.getValue(), crossCheck.getCreditor().getName()), headerFormat));
         sheet.addCell(new jxl.write.Label(1, rowCounter++, String.format(Localization.EXCEL_HEADER_REPORT_DATE.getValue(), sdf.format(crossCheck.getReportDate())), headerFormat));
         String[] columnNames = Localization.CROSS_CHECK_MESSAGE_TABLE_HEADERS.getValue().split(",");
         for (int columnIndex = 0; columnIndex < columnNames.length; columnIndex++) {

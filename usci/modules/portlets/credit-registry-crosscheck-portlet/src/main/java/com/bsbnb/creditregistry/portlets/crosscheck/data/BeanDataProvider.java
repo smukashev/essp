@@ -1,25 +1,32 @@
 package com.bsbnb.creditregistry.portlets.crosscheck.data;
 
 import com.bsbnb.creditregistry.portlets.crosscheck.PortletEnvironmentFacade;
-import com.bsbnb.creditregistry.portlets.crosscheck.api.CrossCheckBeanRemoteBusiness;
-import com.bsbnb.creditregistry.portlets.crosscheck.api.CrossCheckMessageBeanRemoteBusiness;
-import com.bsbnb.creditregistry.portlets.crosscheck.api.PortalUserBeanRemoteBusiness;
-import com.bsbnb.creditregistry.portlets.crosscheck.api.ReportBeanRemoteBusiness;
-import com.bsbnb.creditregistry.portlets.crosscheck.impl.CrossCheckBean;
-import com.bsbnb.creditregistry.portlets.crosscheck.impl.CrossCheckMessageBean;
-import com.bsbnb.creditregistry.portlets.crosscheck.impl.PortalUserBean;
-import com.bsbnb.creditregistry.portlets.crosscheck.impl.ReportBean;
-import com.bsbnb.creditregistry.portlets.crosscheck.model.Creditor;
-import com.bsbnb.creditregistry.portlets.crosscheck.model.CrossCheck;
-import com.bsbnb.creditregistry.portlets.crosscheck.model.CrossCheckMessage;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.Creditor;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.Creditor_;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.CrossCheck;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.CrossCheckMessage;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.CrossCheckMessage_;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.CrossCheck_;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.DataTypeUtil;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.PortalUser_;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.Report;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.Report_;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.SharedIds;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.Shared_;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import static com.bsbnb.creditregistry.portlets.crosscheck.CrossCheckApplication.log;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 /**
  *
@@ -27,126 +34,177 @@ import static com.bsbnb.creditregistry.portlets.crosscheck.CrossCheckApplication
  */
 public class BeanDataProvider implements DataProvider {
 
-    private PortalUserBeanRemoteBusiness portalUserBusiness;
-    private CrossCheckBeanRemoteBusiness crossCheckBusiness;
-    private CrossCheckMessageBeanRemoteBusiness messageBusiness;
-    private ReportBeanRemoteBusiness reportBusiness;
-    private PortletEnvironmentFacade facade;
+    private EntityManagerFactory emf;
 
-    InitialContext contextInit = null;
-
-    private InitialContext getInitialContext() {
-        /*
-         Properties props = new Properties();
-         props.setProperty("java.naming.factory.initial", "com.sun.enterprise.naming.SerialInitContextFactory");
-         props.setProperty("java.naming.factory.url.pkgs", "com.sun.enterprise.naming");
-         props.setProperty("java.naming.factory.state", "com.sun.corba.ee.impl.presentation.rmi.JNDIStateFactoryImpl");
-         props.setProperty("org.omg.CORBA.ORBInitialHost", "localhost");
-         props.setProperty("org.omg.CORBA.ORBInitialPort", "3800");
-         InitialContext initialContext = null;
-         try {
-         initialContext = new InitialContext(props);
-
-         } catch (NamingException ne) {
-         log.log(Level.WARNING, "", ne);
-         }
-         return initialContext;
-         */
-
-        //Тестовый контекст
-        if (contextInit != null)
-            return contextInit;
-
-        try {
-            contextInit = new InitialContext();
-            contextInit.bind(PortalUserBeanRemoteBusiness.class.getName(), new PortalUserBean());
-            contextInit.bind(CrossCheckBeanRemoteBusiness.class.getName(), new CrossCheckBean());
-            contextInit.bind(CrossCheckMessageBeanRemoteBusiness.class.getName(), new CrossCheckMessageBean());
-            contextInit.bind(ReportBeanRemoteBusiness.class.getName(), new ReportBean());
-            return contextInit;
-        } catch (NamingException ne) {
-            try {
-                contextInit = new InitialContext();
-                contextInit.rebind(PortalUserBeanRemoteBusiness.class.getName(), new PortalUserBean());
-                contextInit.rebind(CrossCheckBeanRemoteBusiness.class.getName(), new CrossCheckBean());
-                contextInit.rebind(CrossCheckMessageBeanRemoteBusiness.class.getName(), new CrossCheckMessageBean());
-                contextInit.rebind(ReportBeanRemoteBusiness.class.getName(), new ReportBean());
-                return contextInit;
-            } catch (NamingException e) {
-                log.log(Level.SEVERE, "", e);
-            }
+    private EntityManager getEntityManager() {
+        if (emf == null) {
+            emf = Persistence.createEntityManagerFactory("eav-crosscheck-pu");
         }
-        return null;
+        return emf.createEntityManager();
     }
-
-    public static String namingExceptionString(NamingException ne) {
-        StringBuilder sb = new StringBuilder("Naming exception: \n");
-        sb.append("Message: ").append(ne.getMessage()).append("\n");
-        sb.append("Explanation: ").append(ne.getExplanation()).append("\n");
-        sb.append("Remaining name: ").append(ne.getRemainingName()).append("\n");
-        sb.append("Resolved name: ").append(ne.getResolvedName()).append("\n");
-        sb.append("Resolved object: ").append(ne.getResolvedObj()).append("\n");
-        sb.append("Cause: ").append(ne.getCause() == null ? "" : ne.getCause().getMessage()).append("\n");
-        return sb.toString();
-    }
+    private PortletEnvironmentFacade facade;
 
     public BeanDataProvider(PortletEnvironmentFacade facade) throws DataException {
         this.facade = facade;
-        InitialContext context = getInitialContext();
-        if (context != null) {
-            StringBuilder exceptionString = new StringBuilder();
-            try {
-                portalUserBusiness = (PortalUserBeanRemoteBusiness) context.lookup(PortalUserBeanRemoteBusiness.class.getName());
-            } catch (NamingException ne) {
-                exceptionString.append(namingExceptionString(ne));
-            }
-            try {
-                crossCheckBusiness = (CrossCheckBeanRemoteBusiness) context.lookup(CrossCheckBeanRemoteBusiness.class.getName());
-            } catch (NamingException ne) {
-                exceptionString.append(namingExceptionString(ne));
-            }
-            try {
-                messageBusiness = (CrossCheckMessageBeanRemoteBusiness) context.lookup(CrossCheckMessageBeanRemoteBusiness.class.getName());
-            } catch (NamingException ne) {
-                exceptionString.append(namingExceptionString(ne));
-            }
-
-            try {
-                reportBusiness = (ReportBeanRemoteBusiness) context.lookup(ReportBeanRemoteBusiness.class.getName());
-            } catch (NamingException ne) {
-                exceptionString.append(namingExceptionString(ne));
-            }
-            if (exceptionString.length() > 0) {
-                throw new DataException(exceptionString.toString());
-            }
-        } else {
-            throw new DataException("Context is null");
-        }
     }
 
     @Override
     public List<Creditor> getCreditorsList() {
-        return portalUserBusiness.getMainCreditorsInAlphabeticalOrder(facade.getUserID());
+        EntityManager em = getEntityManager();
+        try {
+            em.clear();
+
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<Creditor> cq = cb.createQuery(Creditor.class);
+            Root<Creditor> creditorRoot = cq.from(Creditor.class);
+
+            Path<BigInteger> userIdPath = creditorRoot.join(Creditor_.portalUserList).get(PortalUser_.userId);
+            cq.where(cb.equal(userIdPath, BigInteger.valueOf(facade.getUserID())));
+            cq.orderBy(cb.asc(creditorRoot.get(Creditor_.name)));
+
+            return em.createQuery(cq).getResultList();
+        } finally {
+            em.close();
+        }
     }
 
     @Override
     public List<CrossCheck> getCrossChecks(Creditor[] creditors, Date date) {
-        List<BigInteger> ids = new ArrayList<BigInteger>();
-        for (Creditor creditor : creditors) {
-            ids.add(creditor.getId());
+        for(Creditor creditor: creditors) {
+            System.out.println(creditor);
         }
-        return crossCheckBusiness.loadCrossCheck(ids, date);
+        EntityManager em = getEntityManager();
+        try {
+            em.clear();
+            BigInteger[] creditorIds = new BigInteger[creditors.length];
+            for (int creditorIndex = 0; creditorIndex < creditors.length; creditorIndex++) {
+                creditorIds[creditorIndex] = creditors[creditorIndex].getId();
+            }
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<CrossCheck> cq = cb.createQuery(CrossCheck.class);
+            Root<CrossCheck> root = cq.from(CrossCheck.class);
+            Predicate creditorsPredicate = root.get(CrossCheck_.creditor).get(Creditor_.id).in(creditorIds);
+            Predicate datePredicate = cb.equal(root.get(CrossCheck_.reportDate), date);
+            cq.where(cb.and(creditorsPredicate, datePredicate));
+            cq.orderBy(cb.desc(root.get(CrossCheck_.dateBegin)), cb.asc(root.get(CrossCheck_.id)));
+
+            return em.createQuery(cq).getResultList();
+        } finally {
+            em.close();
+        }
     }
 
     public List<CrossCheckMessageDisplayWrapper> getMessages(CrossCheck crossCheck) {
-        List<CrossCheckMessageDisplayWrapper> result = new ArrayList<CrossCheckMessageDisplayWrapper>();
-        for (CrossCheckMessage message : messageBusiness.getMessagesByCrossCheck(crossCheck)) {
-            result.add(new CrossCheckMessageDisplayWrapper(message));
+        EntityManager em = getEntityManager();
+        try {
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<CrossCheckMessage> cq = cb.createQuery(CrossCheckMessage.class);
+            Root<CrossCheckMessage> root = cq.from(CrossCheckMessage.class);
+
+            Predicate crossCheckPredicate = cb.equal(root.get(CrossCheckMessage_.crossCheck).get(CrossCheck_.id), crossCheck.getId());
+
+            cq.where(crossCheckPredicate);
+            cq.orderBy(cb.asc(root.get(CrossCheckMessage_.id)));
+
+            List<CrossCheckMessage> list = em.createQuery(cq).getResultList();
+            ArrayList<CrossCheckMessageDisplayWrapper> result = new ArrayList<CrossCheckMessageDisplayWrapper>(list.size());
+            for (CrossCheckMessage crossCheckMessage : list) {
+                result.add(new CrossCheckMessageDisplayWrapper(crossCheckMessage));
+            }
+            return result;
+        } finally {
+            em.close();
         }
-        return result;
     }
 
+    private Date getFirstNotApprovedDate(BigInteger creditorId) {
+        EntityManager em = getEntityManager();
+        try {
+            em.clear();
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<Date> cq = cb.createQuery(Date.class);
+            Root<Creditor> root = cq.from(Creditor.class);
+
+            cq.select(cb.greatest(root.get(Creditor_.changeDate)));
+            /*Root<Report> root = cq.from(Report.class);
+
+            cq.select(cb.least(root.get(Report_.reportDate)));
+            cq.where(
+                    cb.and(
+                    cb.equal(root.get(Report_.creditor).get(Creditor_.id), creditorId),
+                    cb.not(cb.equal(root.get(Report_.status).get(Shared_.id), SharedIds.REPORT_STATUS_COMPLETED)),
+                    cb.not(cb.equal(root.get(Report_.status).get(Shared_.id), SharedIds.REPORT_STATUS_ORGANIZATION_APPROVED))));
+*/
+            return em.createQuery(cq).getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
+
+    private Date getLastApprovedDate(BigInteger creditorId) {
+        EntityManager em = getEntityManager();
+        try {
+            em.clear();
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<Date> cq = cb.createQuery(Date.class);
+            Root<Creditor> root = cq.from(Creditor.class);
+
+            cq.select(cb.greatest(root.get(Creditor_.changeDate)));
+           
+            
+            /* Root<Report> root = cq.from(Report.class);
+
+            cq.select(cb.greatest(root.get(Report_.reportDate)));
+            cq.where(
+                    cb.and(
+                    cb.equal(root.get(Report_.creditor).get(Creditor_.id), creditorId),
+                    cb.or(
+                    cb.equal(root.get(Report_.status).get(Shared_.id), SharedIds.REPORT_STATUS_COMPLETED),
+                    cb.equal(root.get(Report_.status).get(Shared_.id), SharedIds.REPORT_STATUS_ORGANIZATION_APPROVED))));
+*/
+            return em.createQuery(cq).getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
     public Date getCreditorsReportDate(Creditor creditor) {
-        return reportBusiness.getReportDate(creditor.getId());
+        EntityManager em = getEntityManager();
+        try {
+            em.clear();
+            BigInteger creditorId = creditor.getId();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+            Date firstNotApprovedDate = getFirstNotApprovedDate(creditorId);
+
+            if (firstNotApprovedDate != null) {
+                return firstNotApprovedDate;
+            }
+
+            Date lastApprovedDate = getLastApprovedDate(creditorId);
+
+            if (lastApprovedDate != null) {
+                Creditor targetCreditor = em.find(Creditor.class, creditorId);
+                if (targetCreditor == null) {
+                    throw new RuntimeException("No creditor");
+                }
+
+                if (targetCreditor.getSubjectType() == null) {
+                    throw new RuntimeException(String.format("Subject type of the creditor with ID {0} is null", creditorId));
+                }
+
+                return DataTypeUtil.plus(lastApprovedDate, Calendar.MONTH, targetCreditor.getSubjectType().getReportPeriodDurationMonths());
+            }
+
+            // TODO Пока что начальная дата как константа, нужно сделать настройку
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.clear();
+            calendar.set(2014, Calendar.JANUARY, 13);
+            return calendar.getTime();
+        } finally {
+            em.close();
+        }
     }
 }
