@@ -1081,6 +1081,197 @@ public class CLI
         }
     }
 
+    public void batchRestartAll() {
+        if (args.size() < 6) {
+            System.out.println("Usage: <report_date> <output_file>");
+            System.out.println("Example: batchrestartall 01.05.2013 D:\\usci\\out.txt jdbc:oracle:thin:@170.7.15.15:1521:ESSP " +
+                    "core CORE_2013 rmi://127.0.0.1:1097/batchProcessService");
+            return;
+        }
+
+        RmiProxyFactoryBean batchProcessServiceFactoryBean = null;
+
+        IBatchProcessService batchProcessService = null;
+
+        try {
+            batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+            batchProcessServiceFactoryBean.setServiceUrl(args.get(5));
+            batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+            batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+            batchProcessServiceFactoryBean.afterPropertiesSet();
+            batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+        } catch (Exception e) {
+            System.out.println("Can't connect to receiver service: " + e.getMessage());
+            e.printStackTrace();
+            return;
+        }
+
+        String reportDateStr = args.get(0);
+        String fileNameStr = args.get(1);
+
+        Gson gson = new Gson();
+
+        if (reportDateStr != null) {
+            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            Date reportDate = null;
+            try {
+                reportDate = dateFormat.parse(reportDateStr);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            File f = new File(fileNameStr);
+            FileOutputStream fout = null;
+            try {
+                f.createNewFile();
+
+                fout = new FileOutputStream(f);
+
+                while(true) {
+                    try {
+                        Connection conn = null;
+
+                        try
+                        {
+                            conn = connectToDB(args.get(2), args.get(3), args.get(4));
+                        } catch (ClassNotFoundException e)
+                        {
+                            System.out.println("Error can't load driver: oracle.jdbc.OracleDriver");
+                            return;
+                        } catch (SQLException e)
+                        {
+                            System.out.println("Can't connect to DB: " + e.getMessage());
+                            return;
+                        }
+
+                        PreparedStatement preparedStatement = null;
+                        try
+                        {
+                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b  where b.rep_date = to_date('" +
+                                    reportDateStr.trim() + "', 'dd.MM.yyyy')");
+                        } catch (SQLException e)
+                        {
+                            System.out.println("Can't create prepared statement: " + e.getMessage());
+                            try
+                            {
+                                conn.close();
+                            } catch (SQLException e1)
+                            {
+                                e1.printStackTrace();
+                            }
+                            return;
+                        }
+
+                        ResultSet result = preparedStatement.executeQuery();
+
+                        while(result.next()) {
+                            long batchId = result.getLong("id");
+
+                            System.out.println("Processing id: " + batchId);
+
+                            Object batchObject = null;
+                            Object manifestObject = null;
+                            Object batchStatusObject = null;
+
+                            int counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    batchObject = couchbaseClient.get("batch:" + batchId);
+                                    break;
+                                } catch (OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting.");
+                                    counter++;
+                                }
+                            }
+
+                            counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    manifestObject = couchbaseClient.get("manifest:" + batchId);
+                                    break;
+                                } catch (OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting.");
+                                    counter++;
+                                }
+                            }
+
+                            counter = 0;
+
+                            while(counter < 100) {
+                                try {
+                                    batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
+                                    break;
+                                } catch (OperationTimeoutException ex) {
+                                    System.out.println("Timeout. Restarting.");
+                                    counter++;
+                                }
+                            }
+
+                            if (batchObject == null || manifestObject == null) {
+                                System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
+
+                                if (batchObject != null) {
+                                    couchbaseClient.delete("batch:" + batchId);
+                                }
+                                if (manifestObject != null) {
+                                    couchbaseClient.delete("manifest:" + batchId);
+                                }
+                                if (batchStatusObject != null) {
+                                    couchbaseClient.delete("batch_status:" + batchId);
+                                }
+                                continue;
+                            }
+
+                            String batchStr = batchObject.toString();
+
+                            BatchFullJModel batchFull = gson.fromJson(batchStr, BatchFullJModel.class);
+
+                            String batchInfoStr = manifestObject.toString();
+
+                            BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
+
+                            if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), reportDate) != 0)
+                            {
+                                continue;
+                            }
+
+                            fout.write((batchId + "," +
+                                    batchFull.getFileName() + "," +
+                                    batchInfo.getSize() + ",restarted\n").getBytes());
+
+                            batchProcessService.restartBatch(batchId);
+                        }
+                        break;
+                    } catch (Exception e) {
+                        System.out.println("Error in pending batches view: " + e.getMessage());
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+                System.out.println("Done");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if(fout != null) {
+                    try {
+                        fout.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else {
+            System.out.println("Report date needed.");
+            return;
+        }
+    }
+
     public void batchRestartSingle() {
         if (args.size() < 2) {
             System.out.println("Usage: <report_date> <output_file>");
@@ -1207,11 +1398,11 @@ public class CLI
                     completedFound = true;
                 }
             }
-            if (errorFound && !completedFound)
+            if (errorFound)// && !completedFound)
                 error_count++;
         }
 
-        if (error_count > 0 || row_count != batchInfo.getSize()) {
+        //if (error_count > 0 || row_count != batchInfo.getSize()) {
             System.out.println(batchId + "," +
                     batchFull.getFileName() + "," +
                     batchInfo.getSize() + "," + row_count + "," + error_count + ",restarted");
@@ -1219,12 +1410,12 @@ public class CLI
             //sender.addJob(batchId, batchInfo);
             //receiverStatusSingleton.batchReceived();
             batchProcessService.restartBatch(batchId);
-        } else {
+        /*} else {
             System.out.println(batchId + "," +
                     batchFull.getFileName() + "," +
                     batchInfo.getSize() + "," + row_count + "," + error_count +
                     ",skipped because it has no errors");
-        }
+        } */
     }
 
     public void removeEntityById(long id, String url) {
@@ -2569,6 +2760,8 @@ public class CLI
                 batchStat();
             } else if(command.equals("batchrestart")) {
                 batchRestart();
+            } else if(command.equals("batchrestartall")) {
+                batchRestartAll();
             } else if(command.equals("sbatchrestart")) {
                 batchRestartSingle();
             } else if(command.equals("stc")) {

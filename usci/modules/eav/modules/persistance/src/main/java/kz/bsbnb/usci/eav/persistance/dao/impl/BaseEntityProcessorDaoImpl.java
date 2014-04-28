@@ -2268,6 +2268,24 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     {
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
         IBaseEntity baseEntityPrepared = prepare(((BaseEntity) baseEntity).clone());
+
+        /*if (baseEntityPrepared.getId() > 0)
+        {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(0);
+            calendar.set(2013, 4, 1, 0, 0, 0);
+
+            IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool
+                    .getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+            if (baseEntityReportDateDao.exists(baseEntityPrepared.getId(), calendar.getTime()))
+            {
+                logger.error("Instance of BaseEntity with ID " + baseEntityPrepared.getId() + " skipped.");
+                return baseEntityPrepared;
+            }
+        }
+
+        logger.error("Instance of BaseEntity with ID " + baseEntityPrepared.getId() + " processing started."); */
+
         IBaseEntity baseEntityApplied = apply(baseEntityPrepared, baseEntityManager);
 
         applyToDb(baseEntityManager);

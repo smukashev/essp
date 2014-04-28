@@ -62,8 +62,8 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
             //System.out.println("[core][save] : " + contractNo + " - " + contractDate + " : " + t2);
 
-            statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
-                    entity.getBatchIndex() - 1,
+            statusSingleton.addContractStatus(baseEntity.getBatchId(), new ContractStatusJModel(
+                    baseEntity.getBatchIndex() - 1,
                     EntityStatuses.COMPLETED, "" + entity.getId(), new Date(),
                     contractNo,
                     contractDate));
