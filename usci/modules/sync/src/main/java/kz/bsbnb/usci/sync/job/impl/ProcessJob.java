@@ -6,7 +6,6 @@ import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
 import kz.bsbnb.usci.sync.job.AbstractJob;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
@@ -28,8 +27,14 @@ public class ProcessJob extends AbstractJob {
 
     @Override
     public void run() {
-        Date contractDate = (Date)baseEntity.getEl("primary_contract.date");
-        String contractNo = (String)baseEntity.getEl("primary_contract.no");
+        //TODO: Remove hardcode (credit specific attributes)
+        Date contractDate = null;
+        String contractNo = null;
+        if (baseEntity.getMeta().getClassName().equals("credit"))
+        {
+            contractDate = (Date)baseEntity.getEl("primary_contract.date");
+            contractNo = (String)baseEntity.getEl("primary_contract.no");
+        }
 
         statusSingleton.addContractStatus(baseEntity.getBatchId(), new ContractStatusJModel(
                 baseEntity.getBatchIndex() - 1,
@@ -38,7 +43,7 @@ public class ProcessJob extends AbstractJob {
                 contractDate));
 
         long t1 = System.currentTimeMillis();
-        entityService.save(baseEntity);
+        entityService.process(baseEntity);
         timeSpent = System.currentTimeMillis() - t1;
     }
 

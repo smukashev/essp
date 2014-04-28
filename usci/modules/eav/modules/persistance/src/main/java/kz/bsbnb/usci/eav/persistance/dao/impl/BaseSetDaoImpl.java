@@ -24,7 +24,7 @@ import java.util.Set;
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_SETS;
 
 /**
- * Created by Alexandr.Motov on 16.03.14.
+ * @author alexandr.motov
  */
 @Repository
 public class BaseSetDaoImpl extends JDBCSupport implements IBaseSetDao {

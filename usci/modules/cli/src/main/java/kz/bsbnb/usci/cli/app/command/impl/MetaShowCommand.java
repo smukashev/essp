@@ -10,7 +10,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 /**
- * Created by Alexandr.Motov on 22.04.14.
+ * @author alexandr.motov
  */
 public class MetaShowCommand extends AbstractCommand implements IMetaCommand {
 

@@ -623,26 +623,24 @@ meta key --name=credit --attribute=primary_contract
 #====================================
 
 meta create --name=portfolio_flow_detail
-meta add --name=portfolio_flow_detail --attribute=value --type=double
-meta add --name=portfolio_flow_detail --attribute=balance_account --type=meta_class --childname=ref_balance_account
+meta add --name=portfolio_flow_detail --attribute=value --type=double --final
+meta add --name=portfolio_flow_detail --attribute=balance_account --type=meta_class --childname=ref_balance_account --final
 
 #====================================
 #= PORTFOLIO_FLOW_KFN
 #====================================
 
 meta create --name=portfolio_flow_kfn
-meta add --name=portfolio_flow_kfn --attribute=portfolio --type=meta_class --childname=ref_portfolio
-meta add --name=portfolio_flow_kfn --attribute=creditor --type=meta_class --childname=ref_creditor --keytype=any --immutable
-meta add --name=portfolio_flow_kfn --attribute=details --type=meta_class --childname=portfolio_flow_detail
+meta add --name=portfolio_flow_kfn --attribute=portfolio --type=meta_class --childname=ref_portfolio --immutable --final
+meta add --name=portfolio_flow_kfn --attribute=details --type=meta_class --childname=portfolio_flow_detail --array --final
 
 #====================================
 #= PORTFOLIO_FLOW_MSFO
 #====================================
 
 meta create --name=portfolio_flow_msfo
-meta add --name=portfolio_flow_msfo --attribute=portfolio --type=meta_class --childname=ref_portfolio
-meta add --name=portfolio_flow_msfo --attribute=creditor --type=meta_class --childname=ref_creditor --keytype=any --immutable
-meta add --name=portfolio_flow_msfo --attribute=details --type=meta_class --childname=portfolio_flow_detail
+meta add --name=portfolio_flow_msfo --attribute=portfolio --type=meta_class --childname=ref_portfolio --immutable --final
+meta add --name=portfolio_flow_msfo --attribute=details --type=meta_class --childname=portfolio_flow_detail --array --final
 meta add --name=portfolio_flow_msfo --attribute=discounted_value --type=double
 
 #====================================
@@ -651,6 +649,7 @@ meta add --name=portfolio_flow_msfo --attribute=discounted_value --type=double
 
 meta create --name=portfolio_data
 meta add --name=portfolio_data --attribute=creditor --type=meta_class --childname=ref_creditor --keytype=any --immutable
+meta key --name=portfolio_data --attribute=creditor
 meta add --name=portfolio_data --attribute=portfolio_flows_kfn --type=meta_class --childname=portfolio_flow_kfn --array --final
 meta add --name=portfolio_data --attribute=portfolio_flows_msfo --type=meta_class --childname=portfolio_flow_msfo --array --final
 

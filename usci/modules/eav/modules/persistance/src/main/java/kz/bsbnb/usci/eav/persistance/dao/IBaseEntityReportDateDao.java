@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Set;
 
 /**
- * Created by Alexandr.Motov on 16.03.14.
+ * @author alexandr.motov
  */
 public interface IBaseEntityReportDateDao extends IPersistableDao {
 

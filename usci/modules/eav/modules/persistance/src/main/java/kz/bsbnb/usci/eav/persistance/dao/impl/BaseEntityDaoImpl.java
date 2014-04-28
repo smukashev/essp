@@ -32,7 +32,7 @@ import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_VALUES;
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITIES;
 
 /**
- * Created by Alexandr.Motov on 16.03.14.
+ * @author alexandr.motov
  */
 @Repository
 public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {

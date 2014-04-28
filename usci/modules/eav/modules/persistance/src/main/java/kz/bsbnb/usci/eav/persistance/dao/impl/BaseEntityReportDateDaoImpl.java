@@ -22,7 +22,7 @@ import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITIES;
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITY_REPORT_DATES;
 
 /**
- * Created by Alexandr.Motov on 16.03.14.
+ * @author alexandr.motov
  */
 @Repository
 public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEntityReportDateDao {

@@ -49,18 +49,24 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     @Override
-    public void save(BaseEntity baseEntity) {
+    public void process(BaseEntity baseEntity) {
         try {
             long t1 = System.currentTimeMillis();
             BaseEntity entity = (BaseEntity) baseEntityProcessorDao.process(baseEntity);
             long t2 = System.currentTimeMillis() - t1;
 
-            Date contractDate = (Date)entity.getEl("primary_contract.date");
-            String contractNo = (String)entity.getEl("primary_contract.no");
+            //TODO: Remove hardcode (credit specific attributes)
+            Date contractDate = null;
+            String contractNo = null;
+            if (baseEntity.getMeta().getClassName().equals("credit"))
+            {
+                contractDate = (Date)baseEntity.getEl("primary_contract.date");
+                contractNo = (String)baseEntity.getEl("primary_contract.no");
+            }
 
             stats.put("coreService", t2);
 
-            //System.out.println("[core][save] : " + contractNo + " - " + contractDate + " : " + t2);
+            //System.out.println("[core][process] : " + contractNo + " - " + contractDate + " : " + t2);
 
             statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
                     entity.getBatchIndex() - 1,
@@ -68,10 +74,14 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
                     contractNo,
                     contractDate));
         } catch (Exception e) {
-            Date contractDate = (Date)baseEntity.getEl("primary_contract.date");
-            String contractNo = (String)baseEntity.getEl("primary_contract.no");
-
-
+            //TODO: Remove hardcode (credit specific attributes)
+            Date contractDate = null;
+            String contractNo = null;
+            if (baseEntity.getMeta().getClassName().equals("credit"))
+            {
+                contractDate = (Date)baseEntity.getEl("primary_contract.date");
+                contractNo = (String)baseEntity.getEl("primary_contract.no");
+            }
 
             logger.error("Batch id: " + baseEntity.getBatchId() + ", index: " + (baseEntity.getBatchIndex() - 1) +
                     ExceptionUtils.getStackTrace(e));
