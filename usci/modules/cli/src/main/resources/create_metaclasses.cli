@@ -576,8 +576,6 @@ meta add --name=subject --attribute=person --type=meta_class --childname=person
 #====================================
 
 meta create --name=change
-meta add --name=change --attribute=maturity_date --type=date
-meta add --name=change --attribute=prolongation_date --type=date
 meta add --name=change --attribute=credit_flow --type=meta_class --childname=credit_flow --final
 meta add --name=change --attribute=remains --type=meta_class --childname=remains --final
 meta add --name=change --attribute=turnover --type=meta_class --childname=turnover --final
@@ -617,6 +615,8 @@ meta add --name=credit --attribute=subjects --type=meta_class --array --childnam
 meta add --name=credit --attribute=pledges --type=meta_class --array --childname=pledge
 meta add --name=credit --attribute=primary_contract --type=meta_class --childname=primary_contract
 meta key --name=credit --attribute=primary_contract
+meta add --name=credit --attribute=maturity_date --type=date
+meta add --name=credit --attribute=prolongation_date --type=date
 
 #====================================
 #= PORTFOLIO_FLOW_DETAIL
