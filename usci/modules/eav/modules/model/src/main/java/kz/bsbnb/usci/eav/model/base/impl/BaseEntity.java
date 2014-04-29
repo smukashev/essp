@@ -769,12 +769,14 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                    enQueue(step + 1);
                } else if(nextAttribute.getMetaType().isSet()){ //transition to array
                    BaseSet next = (BaseSet)curBE.getEl(operations[step]);
+                   if(next!=null){
                      for(Object o: next.get()){
                          {
                              enQueue(((BaseValue) o).getValue());
                              enQueue(step+1);
                          }
                      }
+                   }
                } else{ //transition to simple
                    BaseEntity next =  (BaseEntity) curBE.getEl(operations[step]);
                      enQueue(next);

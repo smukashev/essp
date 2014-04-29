@@ -1,148 +1,367 @@
-#rule set date 01.04.2013
-rule create package afk
+#rule set date 01.04.2001
+#rule create package afk
 rule rc
 rule set package afk
 rule set version
 
+#dogovor start
+
 rule read $$$
-title: nat_person doc_type
-rule "nat_person doc_type"
+title: pledgeType_hm
+rule "pledge type for homogenous zaem"
 when
-    $entity: BaseEntity(getMeta().getClassName() == "credit"
-    && getEl("credit_type.code") != "18"
-    && getEls("{count}subjects[person!=null]person[docs!=null]docs[doc_type.code=null]") > 0 ) 
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
+            && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+            && getEls("{count}pledges[pledge_type=null]") > 0 )
 then
-  System.out.println("Тип документа должен указваться для физ. лица");
+  $entity.addValidationError("Вид обеспечения должен указываться для однородных кредитов" );
 end
 $$$
 
 rule save
 
 rule read $$$
-title: nat_person doc_no
-rule "nat_person doc_no"
-when
-    $entity: BaseEntity(getMeta().getClassName() == "credit"
-    && getEl("credit_type.code") != "19"
-    && getEls("{count}subjects[person!=null]person[docs!=null]docs[no=null]") > 0 ) 
+title: contract_no
+rule "contract number check"
+when: 
+ $entity: BaseEntity( getMeta().getClassName == "credit" && getEls("{count}[primary_contract.no=null]") > 0 )
 then
-  System.out.println("Номер документа должен указваться для физ. лица");
+ $entity.addValidationError("Отсутствует номер соглашения");
 end
 $$$
 
 rule save
 
 rule read $$$
-title: nat_perons region
-rule "nat_person region"
+title: pledge_contract_no
+rule "pledge contract number for invest zaem, overdraft i overnait"
 when
-    $entity: BaseEntity(getMeta().getClassName() == "credit"
-    && getEl("credit_type.code") != "19"
-    && getEls("{count}subjects[person!=null]person[country.code_numeric=398]addresses[region.code=null]") > 0 ) 
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0
+                                                           && getEls("{setString(01,02,03,09,10,11,12,13,14,15,25,26)}credit_type.code") > 0
+                                                           && (getEl("pledges")==null || getEls("{count}pledges[contract=null]") > 0) )
 then
-  System.out.println("Регион должен указваться для Казахстана");
+  $entity.addValidationError("Номер залога должен указываться для данного типа кредита при наличии обеспечения");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: pledge_value_hm
+rule "pledge value for homogenous zaem"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0 
+                                                           && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                                                           && getEls("{count}pledges[value=null]") > 0)
+then
+  $entity.addValidationError("Сумма залога должна указываться для однородных кредитов при наличии обеспечения");
 end
 $$$
 
 rule save
 
 rule read $$$
-title: nat_person address detail
-rule "nat_person address detail"
-when
-    $entity: BaseEntity(getMeta().getClassName() == "credit"
-    && getEl("credit_type.code") != "19"
-    && getEls("{count}subjects[person!=null]person[addresses!=null]addresses[details=null]") > 0 ) 
+title: actual_issue_date >= contract_date
+rule "credit.actual_issue_date must not be earlier than contrat_date"
+when: 
+ $entity: BaseEntity( getMeta().getClassName == "credit" 
+                            && getEl("actual_issue_date")!=null
+                            && getEl("actual_issue_date") < getEl("primary_contract.date")
+                     )
 then
-  System.out.println("Адрес должен указываться для физ. лица");
+ $entity.addValidationError("Дата фактической выдачи  не может быть ранее даты договора");
 end
 $$$
 
 rule save
 
 rule read $$$
-title: nat_person address type
-rule "nat_person address_type"
-when
-    $entity: BaseEntity(getMeta().getClassName() == "credit"
-    && getEl("credit_type.code") != "19"
-    && getEls("{count}subjects[person!=null]person[addresses!=null]addresses[type=null]") > 0 ) 
+title: actual_issue_date_hm
+rule "actual issue date must be present for homegenous credit"
+when: 
+ $entity: BaseEntity( getMeta().getClassName == "credit" 
+                                && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                                && getEl("actual_issue_date") == null)
 then
-  System.out.println("Тип адреса должен указываться для физ. лица");
+   $entity.addValidationError("Фактическая дата выдачи должна быть указана для однородного займа");
 end
 $$$
 
 rule save
 
 rule read $$$
-title: nat_person address
-rule "nat_person address"
-when
-    $entity: BaseEntity(getMeta().getClassName() == "credit"
-    && getEl("credit_type.code") != "19"
-    && getEls("{count}subjects[person!=null]person[addresses=null]") > 0 ) 
+title: contract_date
+rule "contract date check"
+when: 
+ $entity: BaseEntity( getMeta().getClassName == "credit" && getEls("{count}[primary_contract.date=null]") > 0 )
 then
-  System.out.println("Адрес должен указываться для физ. лица");
+ $entity.addValidationError("Отсутствует дата соглашения");
 end
 $$$
 
 rule save
 
 rule read $$$
-title: nat_person country
-rule "nat_person country"
+title: credit code 2 digits
+rule "credit type code must be xx format"
 when
-    $entity: BaseEntity(getMeta().getClassName() == "credit"
-    && getEls("{count}subjects[person!=null]person[country=null]") > 0 ) 
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && (getEl("credit_type.code") not matches ("[\\d]{2}") ) ) 
 then
-  System.out.println("Страна должна указываться для физ. лица");
+  $entity.addValidationError("код кредита должен быть 2х значным числом ");
 end
 $$$
 
 rule save
 
 rule read $$$
-title: nat_person offshore
-rule "nat_person offshore"
+title: pledge_contract_no_hm
+rule "pledge contract number for homogenous zaem"
 when
-    $entity: BaseEntity(getMeta().getClassName() == "credit"
-    && getEls("{count}subjects[person!=null]person[offshore!=null][offshore.code=null]") > 0 ) 
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0
+                                                           && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                                                           && getEls("{count}pledges[contract=null]") > 0)
 then
-  System.out.println("Код оффшора должнен указываться если входит в перечень оффшорных зон");
+  $entity.addValidationError("Номер залога должен указываться для однородного кредита при наличии обеспечения");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: pledgeType
+rule "pledge type for zaem"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{setString(01,02,03,09,10,11,12,13,14,15,16,17,18,24,25,26)}credit_type.code") > 0  
+                                                           && getEls("{count}pledges[pledge_type=null]") > 0 )
+then
+  $entity.addValidationError("Вид обеспечения должен указываться для данного типа кредита");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: credit_type
+rule "credit Type check"
+when: 
+ $entity: BaseEntity( getMeta().getClassName == "credit" && getEls("{count}[credit_type=null]") > 0 )
+then
+ $entity.addValidationError("Не указан справочник вид займа и условных обязательств ");
 end
 $$$
 
 rule save
 
 rule read $$$
-title: nat_person bank_relations
-rule "nat_person bank_relations"
-when
-    $entity: BaseEntity(getMeta().getClassName() == "credit"
-    && getEls("{count}subjects[person!=null]person[bank_relations=null]") > 0 ) 
+title: credit.contract_date >= contract_date
+rule "contract_date must not be earlier primary_contract.date"
+when: 
+ $entity: BaseEntity( getMeta().getClassName == "credit" 
+                    && getEl("contract.date")!=null
+                    && getEl("contract.date") < getEl("primary_contract.date"))
 then
-  System.out.println("Признак связанности с банком обязателен для физ. лиц");
+   $entity.addValidationError("Дата дополнительного соглашения не может быть ранее даты договора");
 end
 $$$
 
 rule save
 
 rule read $$$
-title: nat_person subject_person cnt(doc) > 0
-rule "nat_person subject_person cnt(doc) > 0"
+title: maturity_date_contract
+rule "maturity date contract"
 when
-    $entity: BaseEntity(getMeta().getClassName() == "credit"
-    && getEl("credit_type.code") != "18"
-    && ( getEls("{count}subjects[person!=null]person[docs=null]") > 0  
-        || getEls("{count}subjects[person!=null]person[docs!=null]docs") == 0  )
-        )
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{setString(01,02,03,09,11,12,13,14,16,17,18,24,26)}credit_type.code") > 0  
+                                                           && getEl("contract_maturity_date") == null )
 then
-  System.out.println("Хотя бы 1 документ указывается для физ. лица");
+  $entity.addValidationError("Дата погашения по условиям договора должна указываться для данного типа займа");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: actual_issue_date
+rule "actual issue date must be present for some credits"
+when: 
+ $entity: BaseEntity( getMeta().getClassName == "credit" 
+                                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,24,26)}credit_type.code") > 0
+                                && getEl("actual_issue_date") == null)
+then
+   $entity.addValidationError("Фактическая дата выдачи должна быть указана для данного типа займа");
 end
 $$$
 
 rule save
 
+rule read $$$
+title: maturity_date_contract_hm
+rule "maturity date contract homogenous credit"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                                                           && getEl("contract_maturity_date") == null )
+then
+  $entity.addValidationError("Дата погашения по условиям договора должна указываться для однородного займа");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: pledge_value_check
+rule "pledge value for invest zaem"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0 
+                                                           && getEls("{setString(01,02,03,09,10,11,12,13,14,15,25,26)}credit_type.code") > 0
+                                                           && getEls("{count}pledges[value=null]") > 0)
+then
+  $entity.addValidationError("Сумма залога должна указываться для данного типа кредита при наличии обеспечения");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: currency
+rule "currency"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,24,26)}credit_type.code") > 0
+                && getEl("currency") == null)
+then
+  $entity.addValidationError("Валюта должна указываться для данного типа кредита");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: currency_hm
+rule "currency for homogenous credit"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                && getEl("currency") == null)
+then
+  $entity.addValidationError("Валюта должна указываться для однородного типа кредита");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: amount
+rule "amount"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                    && getEl("amount") == null)
+then
+  $entity.addValidationError("Не указана сумма займа/УО в валюте договора");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: amount > 0
+rule "amount > 0"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                                            && getEl("amount") < 0)
+then
+  $entity.addValidationError("Сумма займа/УО в валюте договора не может быть отрицательным числом");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: interest yearly
+rule "interest yearly"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                                            && getEls("{setString(01,02,03,09,10,11,16,17,18)}credit_type.code") > 0
+                                            && getEl("interest_rate_yearly") == null )
+then
+  $entity.addValidationError("не указана годовая ставка вознаграждения по договору");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: credit purpose
+rule "credit purpose"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                                            && getEls("{setString(01,09,11)}credit_type.code") > 0
+                                            && getEl("credit_purpose") == null )
+then
+  $entity.addValidationError("не указан цель кредитования");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: credit object
+rule "credit object"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                                            && getEls("{setString(01,09,11)}credit_type.code") > 0
+                                            && getEl("credit_object") == null )
+then
+  $entity.addValidationError("не указан объект кредитования");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: finance resource
+rule "finance_source"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                                            && getEls("{setString(01,09,11,16)}credit_type.code") > 0
+                                            && getEl("finance_source") == null )
+then
+  $entity.addValidationError("не указан источник финансирования банка");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: has currency earn
+rule "has currency earn"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                                            && getEls("{setString(01,09,11,16)}credit_type.code") > 0
+                                            && getEl("has_currency_earn") == null )
+then
+  $entity.addValidationError("не указано наличие валютной выручки у заемщика");
+end 
+$$$
+
+rule save
+
+rule read $$$
+title: creditor_branch code
+rule "creditor branch code"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                                            && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,26)}credit_type.code") > 0
+                                            && getEl("creditor_branch.code") == null )
+then
+  $entity.addValidationError("не указан код/БИК филиала банка");
+end 
+$$$
+
+rule save
+
+
+#end of dogovor 
+
+#change start
 rule read $$$
 title: turnover_issue_interest_amount
 rule "turnover issue interest"
@@ -740,361 +959,13 @@ $$$
 
 rule save
 
-rule read $$$
-title: pledgeType_hm
-rule "pledge type for homogenous zaem"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" 
-            && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
-            && getEls("{count}pledges[pledge_type=null]") > 0 )
-then
-  $entity.addValidationError("Вид обеспечения должен указываться для однородных кредитов" );
-end
-$$$
+#end of change
+#jur start
 
-rule save
-
-rule read $$$
-title: contract_no
-rule "contract number check"
-when: 
- $entity: BaseEntity( getMeta().getClassName == "credit" && getEls("{count}[primary_contract.no=null]") > 0 )
-then
- $entity.addValidationError("Отсутствует номер соглашения");
-end
-$$$
-
-rule save
-
-rule read $$$
-title: pledge_contract_no
-rule "pledge contract number for invest zaem, overdraft i overnait"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0
-                                                           && getEls("{setString(01,02,03,09,10,11,12,13,14,15,25,26)}credit_type.code") > 0
-                                                           && getEls("{count}pledges[contract=null]") > 0)
-then
-  $entity.addValidationError("Номер залога должен указываться для данного типа кредита при наличии обеспечения");
-end 
-$$$
-
-rule save
-
-rule read $$$
-title: pledge_value_hm
-rule "pledge value for homogenous zaem"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0 
-                                                           && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
-                                                           && getEls("{count}pledges[value=null]") > 0)
-then
-  $entity.addValidationError("Сумма залога должна указываться для однородных кредитов при наличии обеспечения");
-end
-$$$
-
-rule save
-
-rule read $$$
-title: actual_issue_date >= contract_date
-rule "credit.actual_issue_date must not be earlier than contrat_date"
-when: 
- $entity: BaseEntity( getMeta().getClassName == "credit" 
-                            && getEl("actual_issue_date")!=null
-                            && getEl("actual_issue_date") < getEl("primary_contract.date")
-                     )
-then
- $entity.addValidationError("Дата фактической выдачи  не может быть ранее даты договора");
-end
-$$$
-
-rule save
-
-rule read $$$
-title: actual_issue_date_hm
-rule "actual issue date must be present for homegenous credit"
-when: 
- $entity: BaseEntity( getMeta().getClassName == "credit" 
-                                && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
-                                && getEl("actual_issue_date") == null)
-then
-   $entity.addValidationError("Фактическая дата выдачи должна быть указана для однородного займа");
-end
-$$$
-
-rule save
-
-rule read $$$
-title: contract_date
-rule "contract date check"
-when: 
- $entity: BaseEntity( getMeta().getClassName == "credit" && getEls("{count}[primary_contract.date=null]") > 0 )
-then
- $entity.addValidationError("Отсутствует дата соглашения");
-end
-$$$
-
-rule save
-
-rule read $$$
-title: credit code 2 digits
-rule "credit type code must be xx format"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && (getEl("credit_type.code") not matches ("[\\d]{2}") ) ) 
-then
-  $entity.addValidationError("код кредита должен быть 2х значным числом ");
-end
-$$$
-
-rule save
-
-rule read $$$
-title: pledge_contract_no_hm
-rule "pledge contract number for homogenous zaem"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0
-                                                           && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
-                                                           && getEls("{count}pledges[contract=null]") > 0)
-then
-  $entity.addValidationError("Номер залога должен указываться для однородного кредита при наличии обеспечения");
-end 
-$$$
-
-rule save
-
-rule read $$$
-title: pledgeType
-rule "pledge type for zaem"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{setString(01,02,03,09,10,11,12,13,14,15,16,17,18,24,25,26)}credit_type.code") > 0  
-                                                           && getEls("{count}pledges[pledge_type=null]") > 0 )
-then
-  $entity.addValidationError("Вид обеспечения должен указываться для данного типа кредита");
-end 
-$$$
-
-rule save
-
-rule read $$$
-title: credit_type
-rule "credit Type check"
-when: 
- $entity: BaseEntity( getMeta().getClassName == "credit" && getEls("{count}[credit_type=null]") > 0 )
-then
- $entity.addValidationError("Не указан справочник вид займа и условных обязательств ");
-end
-$$$
-
-rule save
-
-rule read $$$
-title: credit.contract_date >= contract_date
-rule "contract_date must not be earlier primary_contract.date"
-when: 
- $entity: BaseEntity( getMeta().getClassName == "credit" 
-                    && getEl("contract.date")!=null
-                    && getEl("contract.date") < getEl("primary_contract.date"))
-then
-   $entity.addValidationError("Дата дополнительного соглашения не может быть ранее даты договора");
-end
-$$$
-
-rule save
-
-rule read $$$
-title: maturity_date_contract
-rule "maturity date contract"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{setString(01,02,03,09,11,12,13,14,16,17,18,24,26)}credit_type.code") > 0  
-                                                           && getEl("contract_maturity_date") == null )
-then
-  $entity.addValidationError("Дата погашения по условиям договора должна указываться для данного типа займа");
-end 
-$$$
-
-rule save
-
-rule read $$$
-title: actual_issue_date
-rule "actual issue date must be present for some credits"
-when: 
- $entity: BaseEntity( getMeta().getClassName == "credit" 
-                                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,24,26)}credit_type.code") > 0
-                                && getEl("actual_issue_date") == null)
-then
-   $entity.addValidationError("Фактическая дата выдачи должна быть указана для данного типа займа");
-end
-$$$
-
-rule save
-
-rule read $$$
-title: maturity_date_contract_hm
-rule "maturity date contract homogenous credit"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
-                                                           && getEl("contract_maturity_date") == null )
-then
-  $entity.addValidationError("Дата погашения по условиям договора должна указываться для однородного займа");
-end
-$$$
-
-rule save
-
-rule read $$$
-title: pledge_value_check
-rule "pledge value for invest zaem"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0 
-                                                           && getEls("{setString(01,02,03,09,10,11,12,13,14,15,25,26)}credit_type.code") > 0
-                                                           && getEls("{count}pledges[value=null]") > 0)
-then
-  $entity.addValidationError("Сумма залога должна указываться для данного типа кредита при наличии обеспечения");
-end 
-$$$
-
-rule save
-
-rule read $$$
-title: currency
-rule "currency"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,24,26)}credit_type.code") > 0
-                && getEl("currency") == null)
-then
-  $entity.addValidationError("Валюта должна указываться для данного типа кредита");
-end 
-$$$
-
-rule save
-
-rule read $$$
-title: currency_hm
-rule "currency for homogenous credit"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-                && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
-                && getEl("currency") == null)
-then
-  $entity.addValidationError("Валюта должна указываться для однородного типа кредита");
-end 
-$$$
-
-rule save
-
-rule read $$$
-title: amount
-rule "amount"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-                    && getEl("amount") == null)
-then
-  $entity.addValidationError("Не указана сумма займа/УО в валюте договора");
-end 
-$$$
-
-rule save
-
-rule read $$$
-title: amount > 0
-rule "amount > 0"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-                                            && getEl("amount") < 0)
-then
-  $entity.addValidationError("Сумма займа/УО в валюте договора не может быть отрицательным числом");
-end 
-$$$
-
-rule save
-
-rule read $$$
-title: interest yearly
-rule "interest yearly"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-                                            && getEls("{setString(01,02,03,09,10,11,16,17,18)}credit_type.code") > 0
-                                            && getEl("interest_rate_yearly") == null )
-then
-  $entity.addValidationError("не указана годовая ставка вознаграждения по договору");
-end 
-$$$
-
-rule save
-
-rule read $$$
-title: credit purpose
-rule "credit purpose"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-                                            && getEls("{setString(01,09,11)}credit_type.code") > 0
-                                            && getEl("credit_purpose") == null )
-then
-  $entity.addValidationError("не указан цель кредитования");
-end 
-$$$
-
-rule save
-
-rule read $$$
-title: credit object
-rule "credit object"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-                                            && getEls("{setString(01,09,11)}credit_type.code") > 0
-                                            && getEl("credit_object") == null )
-then
-  $entity.addValidationError("не указан объект кредитования");
-end 
-$$$
-
-rule save
-
-rule read $$$
-title: finance resource
-rule "finance_source"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-                                            && getEls("{setString(01,09,11,16)}credit_type.code") > 0
-                                            && getEl("finance_source") == null )
-then
-  $entity.addValidationError("не указан источник финансирования банка");
-end 
-$$$
-
-rule save
-
-rule read $$$
-title: has currency earn
-rule "has currency earn"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-                                            && getEls("{setString(01,09,11,16)}credit_type.code") > 0
-                                            && getEl("has_currency_earn") == null )
-then
-  $entity.addValidationError("не указано наличие валютной выручки у заемщика");
-end 
-$$$
-
-rule save
-
-rule read $$$
-title: creditor_branch code
-rule "creditor branch code"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-                                            && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,26)}credit_type.code") > 0
-                                            && getEl("creditor_branch.code") == null )
-then
-  $entity.addValidationError("не указан код/БИК филиала банка");
-end 
-$$$
-
-rule save
 
 rule read $$$
 title: jur_name
-rule "jur_name"
+rule "jur jur_name"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEl("credit_type.code") != "18"
@@ -1108,8 +979,8 @@ $$$
 rule save
 
 rule read $$$
-title: legal_form
-rule "legal_form"
+title: jur legal_form
+rule "jur legal_form"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{count}subjects[organization!=null]organization[country.code_numeric=398][legal_form=null]") > 0 
@@ -1122,8 +993,8 @@ $$$
 rule save
 
 rule read $$$
-title: legal_form[SE]
-rule "legal_form[SE]"
+title: jur_legal_form[SE]
+rule "jur legal_form[SE]"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{count}subjects[organization!=null]organization[is_se=true]legal_form") > 0 )
@@ -1135,8 +1006,8 @@ $$$
 rule save
 
 rule read $$$
-title: doc_type
-rule "doc_type"
+title: jur_doc_type
+rule "jur doc_type"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{setString(17,18,19)}credit_type.code") == 0
@@ -1150,8 +1021,8 @@ $$$
 rule save
 
 rule read $$$
-title: doc_no
-rule "doc_no"
+title: jur_doc_no
+rule "jur doc_no"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{setString(17,18,19)}credit_type.code") == 0
@@ -1165,8 +1036,8 @@ $$$
 rule save
 
 rule read $$$
-title: address doc type
-rule "address doc type"
+title: jur_address doc type
+rule "jur address doc type"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{count}subjects[organization!=null]organization[addresses!=null]addresses[type=null]") > 0
@@ -1179,8 +1050,8 @@ $$$
 rule save
 
 rule read $$$
-title: address region
-rule "address region"
+title: jur_address region
+rule "jur address region"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{count}subjects[organization!=null]organization[country.code_numeric=398][addresses!=null]addresses[region.code=null]") > 0 
@@ -1193,8 +1064,8 @@ $$$
 rule save
 
 rule read $$$
-title: address
-rule "address must be present"
+title: jur_address
+rule "jur address must be present"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{count}subjects[organization!=null]organization[addresses!=null]addresses[details=null]") > 0 
@@ -1207,8 +1078,8 @@ $$$
 rule save
 
 rule read $$$
-title: address country
-rule "address country"
+title: jur_address country
+rule "jur address country"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{count}subjects[organization!=null]organization[country.code_numeric=null]") > 0 )
@@ -1220,8 +1091,8 @@ $$$
 rule save
 
 rule read $$$
-title: offshore
-rule "offshore zone code"
+title: jur_offshore
+rule "jur offshore zone code"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{setString(18,19)}credit_type.code") == 0
@@ -1234,8 +1105,8 @@ $$$
 rule save
 
 rule read $$$
-title: econ_trade
-rule "econ_trade"
+title: jur_econ_trade
+rule "jur econ_trade"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{setString(18,19)}credit_type.code") == 0
@@ -1248,8 +1119,8 @@ $$$
 rule save
 
 rule read $$$
-title: bank_relations
-rule "bank_relations"
+title: jur_bank_relations
+rule "jur bank_relations"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{setString(18)}credit_type.code") == 0
@@ -1262,12 +1133,12 @@ $$$
 rule save
 
 rule read $$$
-title: head name
-rule "head name"
+title: jur_head name
+rule "jur head name"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{setString(17,18,19)}credit_type.code") == 0
-            && getEls("{count}subjects[organization!=null]organization[is_se=false]head[names!=null]names[firstname=null]") > 0)
+            && getEls("{count}subjects[organization!=null]organization[is_se=false][head!=null]head[names!=null]names[firstname=null]") > 0)
 then
   $entity.addValidationError("Имя руководителя юридического лица дожен указываться для данного типа кредита");
 end
@@ -1276,12 +1147,12 @@ $$$
 rule save
 
 rule read $$$
-title: head lastname
-rule "head lastname"
+title: jur_head lastname
+rule "jur head lastname"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{setString(17,18,19)}credit_type.code") == 0
-            && getEls("{count}subjects[organization!=null]organization[is_se=false]head[names!=null]names[lastname=null]") > 0)
+            && getEls("{count}subjects[organization!=null]organization[is_se=false][head!=null]head[names!=null]names[lastname=null]") > 0)
 then
   $entity.addValidationError("Фамилия руководителя юридического лица дожен указываться для данного типа кредита");
 end
@@ -1290,8 +1161,8 @@ $$$
 rule save
 
 rule read $$$
-title: head[SE]
-rule "head[SE]"
+title: jur_head[SE]
+rule "jur head[SE]"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{setString(17,18,19)}credit_type.code") == 0
@@ -1304,8 +1175,8 @@ $$$
 rule save
 
 rule read $$$
-title: enterprise_type
-rule "enterprise_type"
+title: jur_enterprise_type
+rule "jur enterprise_type"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{setString(17,18,19)}credit_type.code") == 0
@@ -1318,8 +1189,8 @@ $$$
 rule save
 
 rule read $$$
-title: cnt(doc) > 0
-rule "at least 1 doc"
+title: jur_cnt(doc) > 0
+rule "jur at least 1 doc"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{setString(17,18,19)}credit_type.code") == 0
@@ -1334,12 +1205,12 @@ $$$
 rule save
 
 rule read $$$
-title: cnt(head) > 0
-rule "head cnt > 1"
+title: jur_cnt(head) > 0
+rule "jur head cnt > 1"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{setString(17,18,19)}credit_type.code") == 0
-            && getEls("{count}subjects[organization!=null]organization[is_se=false]head[names=null]") > 0)
+            && getEls("{count}subjects[organization!=null]organization[is_se=false]head") == 0)
 then
   $entity.addValidationError("Хотя бы один руководитель обязателен для данного типа кредита (не ИП)");
 end
@@ -1347,4 +1218,147 @@ $$$
 
 rule save
 
+#end jur
+#start nat
+
+rule read $$$
+title: nat_doc_type
+rule "nat doc_type"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("credit_type.code") != "18"
+    && getEls("{count}subjects[person!=null]person[docs!=null]docs[doc_type.code=null]") > 0 ) 
+then
+  $entity.addValidationError("Тип документа должен указваться для физ. лица");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_doc_no
+rule "nat doc_no"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("credit_type.code") != "19"
+    && getEls("{count}subjects[person!=null]person[docs!=null]docs[no=null]") > 0 ) 
+then
+  $entity.addValidationError("Номер документа должен указваться для физ. лица");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_region
+rule "nat region"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("credit_type.code") != "19"
+    && getEls("{count}subjects[person!=null]person[country.code_numeric=398]addresses[region.code=null]") > 0 ) 
+then
+  $entity.addValidationError("Регион должен указваться для Казахстана");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_address detail
+rule "nat address detail"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("credit_type.code") != "19"
+    && getEls("{count}subjects[person!=null]person[addresses!=null]addresses[details=null]") > 0 ) 
+then
+  $entity.addValidationError("Адрес должен указываться для физ. лица");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_address type
+rule "nat address_type"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("credit_type.code") != "19"
+    && getEls("{count}subjects[person!=null]person[addresses!=null]addresses[type=null]") > 0 ) 
+then
+  $entity.addValidationError("Тип адреса должен указываться для физ. лица");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_address
+rule "nat address"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("credit_type.code") != "19"
+    && getEls("{count}subjects[person!=null]person[addresses=null]") > 0 ) 
+then
+  $entity.addValidationError("Адрес должен указываться для физ. лица");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_country
+rule "nat country"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEls("{count}subjects[person!=null]person[country=null]") > 0 ) 
+then
+  $entity.addValidationError("Страна должна указываться для физ. лица");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_offshore
+rule "nat offshore"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEls("{count}subjects[person!=null]person[offshore!=null][offshore.code=null]") > 0 ) 
+then
+  $entity.addValidationError("Код оффшора должнен указываться если входит в перечень оффшорных зон");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_bank_relations
+rule "nat bank_relations"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEls("{count}subjects[person!=null]person[bank_relations=null]") > 0 ) 
+then
+  $entity.addValidationError("Признак связанности с банком обязателен для физ. лиц");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat subject_person cnt(doc) > 0
+rule "nat subject_person cnt(doc) > 0"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("credit_type.code") != "18"
+    && ( getEls("{count}subjects[person!=null]person[docs=null]") > 0  
+        || getEls("{count}subjects[person!=null]person[docs!=null]docs") == 0  )
+        )
+then
+  $entity.addValidationError("Хотя бы 1 документ указывается для физ. лица");
+end
+$$$
+
+rule save
+
+#nat end
 quit

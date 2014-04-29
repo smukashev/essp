@@ -12,7 +12,6 @@ public class ConditionExceptionIntercepter
     @Around("execution(* org.drools.rule.constraint.MvelConstraint.isAllowed(..))")
     public Object advice(ProceedingJoinPoint pjp) throws Throwable
     {
-        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         try {
             return pjp.proceed();
         } catch (Exception e) {

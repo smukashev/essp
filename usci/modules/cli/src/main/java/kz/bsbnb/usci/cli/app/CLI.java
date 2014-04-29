@@ -2307,7 +2307,7 @@ public class CLI
             try {
                 CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, date);
                 BaseEntity baseEntity = reader.read();
-                System.out.println(baseEntity);
+                System.out.println(ma);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -2436,7 +2436,7 @@ public class CLI
             System.out.println("Parse exception day format must be: dd.MM.yyyy");
             return;
         }  catch (IncorrectResultSizeDataAccessException e){
-            System.out.println("Such rule already exists");
+            System.out.println("no packages(maybe on that date)");
             return;
         }
 
