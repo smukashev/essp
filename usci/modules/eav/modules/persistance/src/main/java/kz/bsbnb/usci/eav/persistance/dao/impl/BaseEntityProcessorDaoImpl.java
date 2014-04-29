@@ -1731,6 +1731,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             if (baseValuePrevious != null)
                             {
                                 baseValuePrevious.setBaseContainer(baseEntity);
+                                baseValuePrevious.setMetaAttribute(metaAttribute);
                                 baseValuePrevious.setLast(true);
                                 baseEntityManager.registerAsUpdated(baseValuePrevious);
                             }
@@ -2005,16 +2006,52 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 {
                     if (metaAttribute.isFinal())
                     {
-                        boolean hasNotFinal = false;
                         IBaseEntity baseEntityLoaded = (IBaseEntity)baseValueLoaded.getValue();
-                        IBaseEntity baseEntitySaving = new BaseEntity(baseEntityLoaded, baseValueSaving.getRepDate());
                         IMetaClass childMetaClass = (IMetaClass)metaType;
-                        for (String attributeName: childMetaClass.getAttributeNames())
+
+                        if (childMetaClass.hasNotFinalAttributes() && !childMetaClass.isSearchable())
                         {
-                            IMetaAttribute childMetaAttribute = childMetaClass.getMetaAttribute(attributeName);
-                            IMetaType childMetaType = childMetaAttribute.getMetaType();
-                            if (childMetaAttribute.isFinal())
+                            throw new RuntimeException("Detected situation where one or more attributes " +
+                                    "without final flag contains in attribute with final flag. Class name: " +
+                                    baseEntity.getMeta().getClassName() + ", attribute: " + metaAttribute.getName());
+                        }
+
+                        // TODO: Clone child instance of BaseEntity or maybe use variable baseEntityLoaded to registration as deleted
+                        IBaseValue baseValueDeleted = BaseValueFactory.create(
+                                MetaContainerTypes.META_CLASS,
+                                metaType,
+                                baseValueLoaded.getId(),
+                                baseValueLoaded.getBatch(),
+                                baseValueLoaded.getIndex(),
+                                new Date(baseValueLoaded.getRepDate().getTime()),
+                                baseValueLoaded.getValue(),
+                                baseValueLoaded.isClosed(),
+                                baseValueLoaded.isLast()
+                        );
+                        baseValueDeleted.setBaseContainer(baseEntity);
+                        baseEntityManager.registerAsDeleted(baseValueDeleted);
+
+                        if (baseValueLoaded.isLast())
+                        {
+                            IBaseValueDao valueDao = persistableDaoPool
+                                    .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
+                            IBaseValue baseValuePrevious = valueDao.getPreviousBaseValue(baseValueLoaded);
+                            if (baseValuePrevious != null)
                             {
+                                baseValuePrevious.setBaseContainer(baseEntity);
+                                baseValuePrevious.setMetaAttribute(metaAttribute);
+                                baseValuePrevious.setLast(true);
+                                baseEntityManager.registerAsUpdated(baseValuePrevious);
+                            }
+                        }
+
+                        if (!childMetaClass.isSearchable() && !metaAttribute.isImmutable())
+                        {
+                            IBaseEntity baseEntitySaving = new BaseEntity(baseEntityLoaded, baseValueSaving.getRepDate());
+                            for (String attributeName: childMetaClass.getAttributeNames())
+                            {
+                                IMetaAttribute childMetaAttribute = childMetaClass.getMetaAttribute(attributeName);
+                                IMetaType childMetaType = childMetaAttribute.getMetaType();
                                 baseEntitySaving.put(attributeName,
                                         BaseValueFactory.create(
                                                 MetaContainerTypes.META_CLASS,
@@ -2024,51 +2061,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                                 new Date(baseValueSaving.getRepDate().getTime()),
                                                 null));
                             }
-                            else
+                            applyBaseEntityAdvanced(baseEntitySaving, baseEntityLoaded, baseEntityManager);
+
+                            IBaseEntityComplexValueDao baseEntityComplexValueDao = persistableDaoPool
+                                    .getPersistableDao(baseValueSaving.getClass(), IBaseEntityComplexValueDao.class);
+                            boolean singleBaseValue = baseEntityComplexValueDao.isSingleBaseValue(baseValueLoaded);
+                            if (singleBaseValue)
                             {
-                                hasNotFinal = true;
-                            }
-                        }
-
-                        if (baseEntitySaving.getValueCount() != 0)
-                        {
-                            apply(baseEntitySaving, baseEntityManager);
-                        }
-
-                        if (hasNotFinal)
-                        {
-                            logger.warn("Detected situation where one or more attributes " +
-                                    "without final flag contains in attribute with final flag.");
-                        }
-                        else
-                        {
-                            // TODO: Clone chile instance of BaseEntity or maybe use variable baseEntityLoaded to registration as deleted
-                            IBaseValue baseValueDeleted = BaseValueFactory.create(
-                                    MetaContainerTypes.META_CLASS,
-                                    metaType,
-                                    baseValueLoaded.getId(),
-                                    baseValueLoaded.getBatch(),
-                                    baseValueLoaded.getIndex(),
-                                    new Date(baseValueLoaded.getRepDate().getTime()),
-                                    baseValueLoaded.getValue(),
-                                    baseValueLoaded.isClosed(),
-                                    baseValueLoaded.isLast()
-                            );
-                            baseValueDeleted.setBaseContainer(baseEntity);
-                            baseEntityManager.registerAsDeleted(baseValueDeleted);
-
-                            if (baseValueLoaded.isLast())
-                            {
-                                IBaseValueDao valueDao = persistableDaoPool
-                                        .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
-                                IBaseValue baseValuePrevious = valueDao.getPreviousBaseValue(baseValueLoaded);
-                                if (baseValuePrevious != null)
-                                {
-                                    baseValuePrevious.setBaseContainer(baseEntity);
-                                    baseValuePrevious.setMetaAttribute(metaAttribute);
-                                    baseValuePrevious.setLast(true);
-                                    baseEntityManager.registerAsUpdated(baseValuePrevious);
-                                }
+                                baseEntityManager.registerAsDeleted(baseEntityLoaded);
                             }
                         }
                     }

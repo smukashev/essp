@@ -4,7 +4,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 
 /**
- * Created by Alexandr.Motov on 18.03.14.
+ * @author alexandr.motov
  */
 public abstract class MetaType extends Persistable implements IMetaType {
 

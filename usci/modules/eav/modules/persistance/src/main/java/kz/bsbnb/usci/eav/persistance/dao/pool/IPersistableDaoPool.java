@@ -4,7 +4,7 @@ import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IPersistableDao;
 
 /**
- * Created by Alexandr.Motov on 18.03.14.
+ * @author alexandr.motov
  */
 public interface IPersistableDaoPool {
 

@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Alexandr.Motov on 18.03.14.
+ * @author alexandr.motov
  */
 @Repository
 public class PersistableDaoPool implements IPersistableDaoPool

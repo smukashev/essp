@@ -4,7 +4,6 @@ import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
-import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import kz.bsbnb.usci.receiver.writer.IWriter;
@@ -64,8 +63,14 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
             BaseEntity entity = (BaseEntity)iter.next();
             //System.out.println(entity.toString());
 
-            Date contractDate = (Date)entity.getEl("primary_contract.date");
-            String contractNo = (String)entity.getEl("primary_contract.no");
+            //TODO: Remove hardcode (credit specific attributes)
+            Date contractDate = null;
+            String contractNo = null;
+            if (entity.getMeta().getClassName().equals("credit"))
+            {
+                contractDate = (Date)entity.getEl("primary_contract.date");
+                contractNo = (String)entity.getEl("primary_contract.no");
+            }
 
             if (statusSingleton.isEntityCompleted(entity.getBatchId(), entity.getBatchIndex() - 1)) {
                 //System.out.println("Contract no " + contractNo + " with date " + contractDate + " skipped because it " +
@@ -73,7 +78,6 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                 continue;
             }
 
-            //TODO: uncomment!!!
             statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
                     entity.getBatchIndex() - 1,
                     EntityStatuses.CHECK_IN_PARSER, null, new Date(),
@@ -99,10 +103,10 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                 }
             } else {
                 statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
-                    entity.getBatchIndex() - 1,
-                    EntityStatuses.WAITING, null, new Date(),
-                    contractNo,
-                    contractDate));
+                        entity.getBatchIndex() - 1,
+                        EntityStatuses.WAITING, null, new Date(),
+                        contractNo,
+                        contractDate));
 
                 entitiesToSave.add(entity);
             }

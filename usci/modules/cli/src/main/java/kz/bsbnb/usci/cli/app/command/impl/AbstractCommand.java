@@ -6,7 +6,7 @@ import org.apache.commons.cli.*;
 import java.util.List;
 
 /**
- * Created by Alexandr.Motov on 22.04.14.
+ * @author alexandr.motov
  */
 public abstract class AbstractCommand implements ICommand {
 

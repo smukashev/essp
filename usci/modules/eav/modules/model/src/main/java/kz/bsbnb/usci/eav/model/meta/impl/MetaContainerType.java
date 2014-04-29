@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
 /**
- * Created by Alexandr.Motov on 18.03.14.
+ * @author alexandr.motov
  */
 public enum MetaContainerType {
 

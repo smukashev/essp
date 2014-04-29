@@ -12,7 +12,7 @@ import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import java.util.*;
 
 /**
- * Created by Alexandr.Motov on 09.03.14.
+ * @author alexandr.motov
  */
 public class BaseEntityManager implements IBaseEntityManager {
 

@@ -7,7 +7,7 @@ import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import org.apache.commons.cli.*;
 
 /**
- * Created by Alexandr.Motov on 22.04.14.
+ * @author alexandr.motov
  */
 public class MetaCreateCommand extends AbstractCommand implements IMetaCommand {
 

@@ -2,8 +2,10 @@ package kz.bsbnb.usci.eav.model.meta.impl;
 
 import java.util.*;
 
+import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
+import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
@@ -792,4 +794,56 @@ public class MetaClass extends MetaContainer implements IMetaClass
     {
         this.parentIsKey = parentIsKey;
     }
+
+    @Override
+    public boolean hasNotFinalAttributes() {
+        for (String attribute: getAttributeNames())
+        {
+            IMetaAttribute metaAttribute = getMetaAttribute(attribute);
+            IMetaType metaType = metaAttribute.getMetaType();
+
+            if (metaAttribute.isImmutable())
+                continue;
+
+            if (!metaAttribute.isFinal())
+                return true;
+
+            boolean hasNotFinalAttribites = false;
+            if (metaType.isComplex())
+            {
+                if (metaType.isSet())
+                {
+                    if (metaType.isSetOfSets())
+                    {
+                        throw new UnsupportedOperationException("Not yet implemented.");
+                    }
+
+                    IMetaSet childMetaSet = (IMetaSet)metaType;
+                    IMetaClass childMetaClass = (IMetaClass)childMetaSet.getMemberType();
+                    if (childMetaClass.isSearchable())
+                    {
+                        continue;
+                    }
+                    hasNotFinalAttribites = childMetaClass.hasNotFinalAttributes();
+                }
+                else
+                {
+                    IMetaClass childMetaClass = (IMetaClass)metaType;
+                    if (childMetaClass.isSearchable())
+                    {
+                        continue;
+                    }
+                    hasNotFinalAttribites =  childMetaClass.hasNotFinalAttributes();
+                }
+            }
+
+            if (hasNotFinalAttribites)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.cli.app.command;
 
 /**
- * Created by Alexandr.Motov on 22.04.14.
+ * @author alexandr.motov
  */
 public interface ICommand {
 

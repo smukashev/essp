@@ -7,7 +7,7 @@ import java.math.BigInteger;
 
 /**
  * Сущность для работы со служебным справочником
- * @author Alexandr.Motov
+ * @author alexandr.motov
  */
 public class Shared implements Serializable {
     private long id;
