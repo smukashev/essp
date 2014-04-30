@@ -1794,6 +1794,7 @@ public class CLI
                 preparedStatement = conn.prepareStatement("SELECT xf.id, xf.file_name, xf.file_content\n" +
                         "  FROM core.xml_file xf\n" +
                         " WHERE xf.status = 'COMPLETED'\n" +
+                        "   AND xf.report_date = to_date('01.05.2013', 'dd.MM.yyyy')" +
                         "   AND xf.sent = 0 ORDER BY xf.id ASC");
 
                 preparedStatementDone = conn.prepareStatement("UPDATE core.xml_file xf \n" +
@@ -2498,7 +2499,7 @@ public class CLI
             try {
                 CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, date);
                 BaseEntity baseEntity = reader.read();
-                System.out.println(ma);
+                //System.out.println(ma);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
