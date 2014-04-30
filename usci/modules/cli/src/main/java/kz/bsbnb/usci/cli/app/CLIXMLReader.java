@@ -1,13 +1,8 @@
 package kz.bsbnb.usci.cli.app;
 
-import com.couchbase.client.CouchbaseClient;
-import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.impl.*;
-import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
-import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
-import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -15,18 +10,10 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
-import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
-import kz.bsbnb.usci.receiver.repository.IServiceRepository;
-import kz.bsbnb.usci.sync.service.IBatchService;
-import kz.bsbnb.usci.sync.service.IMetaFactoryService;
-import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -40,8 +27,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Stack;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 //TODO: merge with StaxEventEntityReader from receiver
 public class CLIXMLReader

@@ -1,27 +1,25 @@
 package kz.bsbnb.usci.eav.model.json;
 
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * @author k.tulbassiyev
  */
-public class ContractStatusJModel {
+public class EntityStatusJModel
+{
     private Long index;
     private String protocol;
     private String description;
     private Date received;
-    private String contractNo;
-    private Date contractDate;
+    private HashMap<String, Object> properties = new HashMap<String, Object>();
 
-    public ContractStatusJModel(Long index, String protocol, String description, Date received,
-                                String contractNo, Date contractDate)
+    public EntityStatusJModel(Long index, String protocol, String description, Date received)
     {
         this.index = index;
         this.protocol = protocol;
         this.description = description;
         this.received = received;
-        this.contractNo = contractNo;
-        this.contractDate = contractDate;
     }
 
     public Long getIndex() {
@@ -56,23 +54,11 @@ public class ContractStatusJModel {
         this.received = received;
     }
 
-    public String getContractNo()
-    {
-        return contractNo;
+    public void addProperty(String name, Object value) {
+        properties.put(name, value);
     }
 
-    public void setContractNo(String contractNo)
-    {
-        this.contractNo = contractNo;
-    }
-
-    public Date getContractDate()
-    {
-        return contractDate;
-    }
-
-    public void setContractDate(Date contractDate)
-    {
-        this.contractDate = contractDate;
+    public Object getProperty(String name) {
+        return properties.get(name);
     }
 }

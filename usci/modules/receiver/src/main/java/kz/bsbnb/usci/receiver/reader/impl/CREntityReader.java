@@ -7,7 +7,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
-import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
+import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
@@ -113,8 +113,10 @@ public class CREntityReader<T> extends CommonReader<T> {
                 crParser.parseNextPackage();
             } catch (SAXException e)
             {
-                statusSingleton.addContractStatus(batchId, new ContractStatusJModel(index,
-                        EntityStatuses.ERROR, "Can't parse", new Date(), null, null));
+                EntityStatusJModel entityStatusJModel = new EntityStatusJModel(index,
+                        EntityStatuses.ERROR, "Can't parse", new Date());
+
+                statusSingleton.addContractStatus(batchId, entityStatusJModel);
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 return null;
             }
@@ -128,7 +130,7 @@ public class CREntityReader<T> extends CommonReader<T> {
         //statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
                 //Global.BATCH_STATUS_COMPLETED, null, new Date(), userId));
 
-        //ContractStatusArrayJModel statusJModel = statusSingleton.endBatch(batchId);
+        //EntityStatusArrayJModel statusJModel = statusSingleton.endBatch(batchId);
         //statusSingleton.endBatch(batchId);
         //batchFullJModel.setStatus(statusJModel);
 

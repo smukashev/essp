@@ -34,14 +34,14 @@ public class StatusSingleton {
     }
 
     public boolean isEntityCompleted(long batchId, long index) {
-        Object contractStatus = client.get("contract_status:" + batchId + ":" + index);
+        Object contractStatus = client.get("entity_status:" + batchId + ":" + index);
 
-        ContractStatusArrayJModel cStatuses;
+        EntityStatusArrayJModel cStatuses;
 
         if (contractStatus != null) {
-            cStatuses = gson.fromJson(contractStatus.toString(), ContractStatusArrayJModel.class);
+            cStatuses = gson.fromJson(contractStatus.toString(), EntityStatusArrayJModel.class);
 
-            for (ContractStatusJModel status : cStatuses.getContractStatuses()) {
+            for (EntityStatusJModel status : cStatuses.getEntityStatuses()) {
                 if (status.getProtocol().equals(EntityStatuses.COMPLETED)) {
                     return true;
                 }
@@ -58,7 +58,7 @@ public class StatusSingleton {
         BatchSign batchSign = new BatchSign();
 
         batchSign.setUserId(batchInfo.getUserId());
-        batchSign.setFileName(batchInfo.getBatchName());
+        batchSign.setFileName(batchFullJModel.getFileName());
         batchSign.setBatchId(batchId);
 
         try
@@ -83,6 +83,20 @@ public class StatusSingleton {
         OperationFuture<Boolean> result2 = client.set("sign:" + batchId, 0, gson.toJson(batchSign));
 
         while(true) if(result2.isDone()) break; // must be completed
+
+        createBatchStatus(batchId, batchFullJModel.getFileName());
+    }
+
+    public synchronized void createBatchStatus(Long batchId, String fileName) {
+        if (readOnly)
+            return;
+
+        Object batchStatus = client.get("batch_status:" + batchId);
+
+        BatchStatusArrayJModel bStatuses = new BatchStatusArrayJModel();
+        bStatuses.setFileName(fileName);
+
+        client.set("batch_status:" + batchId, 0, gson.toJson(bStatuses));
     }
 
     public synchronized void addBatchStatus(Long batchId, BatchStatusJModel batchStatusJModel) {
@@ -118,23 +132,23 @@ public class StatusSingleton {
         return bStatuses;
     }
 
-    public synchronized void addContractStatus(Long batchId, ContractStatusJModel contractStatusJModel) {
+    public synchronized void addContractStatus(Long batchId, EntityStatusJModel contractStatusJModel) {
         if (readOnly)
             return;
 
-        Object contractStatus = client.get("contract_status:" + batchId + ":" + contractStatusJModel.getIndex());
+        Object contractStatus = client.get("entity_status:" + batchId + ":" + contractStatusJModel.getIndex());
 
-        ContractStatusArrayJModel cStatuses;
+        EntityStatusArrayJModel cStatuses;
 
         if (contractStatus == null) {
-            cStatuses = new ContractStatusArrayJModel(batchId, contractStatusJModel.getIndex());
+            cStatuses = new EntityStatusArrayJModel(batchId, contractStatusJModel.getIndex());
         } else {
-            cStatuses = gson.fromJson(contractStatus.toString(), ContractStatusArrayJModel.class);//(BatchStatusArrayJModel)batchStatus;
+            cStatuses = gson.fromJson(contractStatus.toString(), EntityStatusArrayJModel.class);//(BatchStatusArrayJModel)batchStatus;
         }
 
-        cStatuses.getContractStatuses().add(contractStatusJModel);
+        cStatuses.getEntityStatuses().add(contractStatusJModel);
 
-        client.set("contract_status:" + batchId + ":" + contractStatusJModel.getIndex(), 0, gson.toJson(cStatuses));
+        client.set("entity_status:" + batchId + ":" + contractStatusJModel.getIndex(), 0, gson.toJson(cStatuses));
     }
 
     public synchronized void endBatch(Long batchId, Long userId) {

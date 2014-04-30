@@ -97,6 +97,11 @@ public class GenericTestCase
         return metaContractHolder;
     }
 
+    protected BaseEntity generateBaseEntity(Batch batch, IMetaFactory metaFactory)
+    {
+        throw new RuntimeException("TODO: Fix me!");
+    }
+
     protected BaseEntity generateBaseEntity(Batch batch, IMetaClassRepository metaFactory)
     {
         BaseEntity streetEntity = new BaseEntity(metaFactory.getMetaClass("street"), batch.getRepDate());
