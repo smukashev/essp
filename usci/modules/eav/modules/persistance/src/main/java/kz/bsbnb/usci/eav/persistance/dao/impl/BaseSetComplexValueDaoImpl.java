@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
@@ -28,6 +29,7 @@ import java.sql.Timestamp;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_SET_VALUES;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITIES;
 
 /**
  * @author a.motov
@@ -36,6 +38,8 @@ import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_SET_VALUE
 public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetComplexValueDao {
 
     private final Logger logger = LoggerFactory.getLogger(BaseSetComplexValueDaoImpl.class);
+
+    public static final boolean DEFAULT_CURRENT_REPORT_DATE = true;
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -133,7 +137,15 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
     @Override
     @SuppressWarnings("unchecked")
-    public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
+    public IBaseValue getPreviousBaseValue(IBaseValue baseValue)
+    {
+        return getPreviousBaseValue(baseValue, DEFAULT_CURRENT_REPORT_DATE);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public IBaseValue getPreviousBaseValue(IBaseValue baseValue, boolean currentReportDate)
+    {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IBaseSet baseSet = (IBaseSet)baseContainer;
         IBaseEntity childBaseEntity = (IBaseEntity)baseValue.getValue();
@@ -196,7 +208,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             Batch batch = batchRepository.getBatch(batchId);
             IBaseEntity childBaseEntityLoaded = baseEntityProcessorDao
-                    .loadByMaxReportDate(childBaseEntity.getId(), baseValue.getRepDate());
+                    .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate ? baseValue.getRepDate() : reportDate);
 
             previousBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
                     id, batch, index, reportDate, childBaseEntityLoaded, closed, last);
@@ -206,8 +218,14 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     }
 
     @Override
+    public IBaseValue getNextBaseValue(IBaseValue baseValue)
+    {
+        return getNextBaseValue(baseValue, DEFAULT_CURRENT_REPORT_DATE);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
-    public IBaseValue getNextBaseValue(IBaseValue baseValue) {
+    public IBaseValue getNextBaseValue(IBaseValue baseValue, boolean currentReportDate) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IBaseSet baseSet = (IBaseSet)baseContainer;
         IMetaType metaType = baseSet.getMemberType();
@@ -271,7 +289,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             Batch batch = batchRepository.getBatch(batchId);
             IBaseEntity childBaseEntityLoaded = baseEntityProcessorDao
-                    .loadByMaxReportDate(childBaseEntity.getId(), reportDate);
+                    .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate ? baseValue.getRepDate() : reportDate);
 
             nextBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
                     id, batch, index, reportDate, childBaseEntityLoaded, closed, last);
@@ -340,7 +358,13 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     }
 
     @Override
-    public IBaseValue getLastBaseValue(IBaseValue baseValue) {
+    public IBaseValue getLastBaseValue(IBaseValue baseValue)
+    {
+        return getLastBaseValue(baseValue, DEFAULT_CURRENT_REPORT_DATE);
+    }
+
+    @Override
+    public IBaseValue getLastBaseValue(IBaseValue baseValue, boolean currentReportDate) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IBaseSet baseSet = (IBaseSet)baseContainer;
         IBaseEntity childBaseEntity = (IBaseEntity)baseValue.getValue();
@@ -385,7 +409,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             Batch batch = batchRepository.getBatch(batchId);
             IBaseEntity childBaseEntityLoaded = baseEntityProcessorDao
-                    .loadByMaxReportDate(childBaseEntity.getId(), reportDate);
+                    .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate ? baseValue.getRepDate() : reportDate);
 
             lastBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
                     id, batch, index, reportDate, childBaseEntityLoaded, closed, true);
@@ -519,6 +543,30 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         }
 
         return childBaseEntityIds;
+    }
+
+    public boolean isSingleBaseValue(IBaseValue baseValue)
+    {
+        IBaseEntity childBaseEntity = (IBaseEntity)baseValue.getValue();
+
+        String entitiesTableAlias = "e";
+        String complexSetValuesTableAlias = "csv";
+        Select select = context
+                .select(EAV_BE_ENTITIES.as(entitiesTableAlias).ID)
+                .from(EAV_BE_ENTITIES.as(entitiesTableAlias))
+                .where(EAV_BE_ENTITIES.as(entitiesTableAlias).ID.equal(childBaseEntity.getId()))
+                .and(DSL.exists(context
+                        .select(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID)
+                        .from(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias))
+                        .where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID
+                                .equal(EAV_BE_ENTITIES.as(entitiesTableAlias).ID))
+                        .and(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID.notEqual(baseValue.getId()))
+                ));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        return rows.size() == 0;
     }
 
 }

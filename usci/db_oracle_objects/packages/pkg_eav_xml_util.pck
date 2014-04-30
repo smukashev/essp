@@ -7,7 +7,7 @@ create or replace package PKG_EAV_XML_UTIL is
   c_job_wait_timeout constant number := 36000; -- IN SECOND
   c_default_batch_size constant number := 10000;
   c_default_job_max_count constant number := 20;
-  
+
   c_drt_debt_current constant number := 55;
   c_drt_debt_pastdue constant number := 56;
   c_drt_debt_write_off constant number := 57;
@@ -21,10 +21,10 @@ create or replace package PKG_EAV_XML_UTIL is
   c_drt_provision_kfn constant number := 103;
   c_drt_provision_msfo constant number := 104;
   c_drt_provision_msfo_ob constant number := 129;
-  
+
   c_tt_issue_debt constant number := 18;
   c_tt_issue_interest constant number := 19;
-  
+
   PROCEDURE remove_by_rd
   (
     p_report_date  IN DATE
@@ -35,7 +35,9 @@ create or replace package PKG_EAV_XML_UTIL is
     p_report_date  IN DATE,
     p_batch_size IN NUMBER DEFAULT c_default_batch_size,
     p_job_max_count IN NUMBER DEFAULT c_default_job_max_count,
-    p_version IN NUMBER DEFAULT 2
+    p_version IN NUMBER DEFAULT 2,
+    p_extract_credit IN NUMBER DEFAULT 1,
+    p_extract_portfolio IN NUMBER DEFAULT 1
   );
 
   PROCEDURE generate_by_rd
@@ -43,7 +45,9 @@ create or replace package PKG_EAV_XML_UTIL is
     p_report_date  IN DATE,
     p_batch_size IN NUMBER DEFAULT c_default_batch_size,
     p_job_max_count IN NUMBER DEFAULT c_default_job_max_count,
-    p_version IN NUMBER DEFAULT 2
+    p_version IN NUMBER DEFAULT 2,
+    p_extract_credit IN NUMBER DEFAULT 1,
+    p_extract_portfolio IN NUMBER DEFAULT 1
   );
 
   PROCEDURE generate_by_cid_rd_as_job
@@ -52,7 +56,9 @@ create or replace package PKG_EAV_XML_UTIL is
     p_report_date  IN DATE,
     p_batch_size IN NUMBER DEFAULT c_default_batch_size,
     p_job_max_count IN NUMBER DEFAULT c_default_job_max_count,
-    p_version IN NUMBER DEFAULT 2
+    p_version IN NUMBER DEFAULT 2,
+    p_extract_credit IN NUMBER DEFAULT 1,
+    p_extract_portfolio IN NUMBER DEFAULT 1
   );
 
   PROCEDURE generate_by_cid_rd
@@ -61,15 +67,22 @@ create or replace package PKG_EAV_XML_UTIL is
     p_report_date  IN DATE,
     p_batch_size IN NUMBER DEFAULT c_default_batch_size,
     p_job_max_count IN NUMBER DEFAULT c_default_job_max_count,
-    p_version IN NUMBER DEFAULT 2
+    p_version IN NUMBER DEFAULT 2,
+    p_extract_credit IN NUMBER DEFAULT 1,
+    p_extract_portfolio IN NUMBER DEFAULT 1
   );
 
   PROCEDURE generate_xml_v1
   (
     p_xml_file_id IN NUMBER
   );
-  
+
   PROCEDURE generate_xml_v2
+  (
+    p_xml_file_id IN NUMBER
+  );
+  
+  PROCEDURE generate_portfolio_xml
   (
     p_xml_file_id IN NUMBER
   );
@@ -80,160 +93,160 @@ create or replace package PKG_EAV_XML_UTIL is
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'balance_account'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_credit_object_xml
   (
     p_credit_object_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'credit_object'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_credit_type_xml
   (
     p_credit_type_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'credit_type'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_credit_purpose_xml
   (
     p_credit_purpose_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'credit_purpose'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_currency_xml
   (
     p_currency_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'currency'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_portfolio_xml
   (
     p_portfolio_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'portfolio'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_finance_source_xml
   (
     p_finance_source_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'finance_source'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_doc_type_xml
   (
     p_doc_type_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'doc_type'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_classification_xml
   (
     p_classification_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'classification'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_country_xml
   (
     p_country_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'country'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_legal_form_xml
   (
     p_legal_form_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'legal_form'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_offshore_xml
   (
     p_offshore_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'offshore'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_econ_trade_xml
   (
     p_econ_trade_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'econ_trade'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_enterprise_type_xml
   (
     p_enterprise_type_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'enterprise_type'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_contact_type_xml
   (
     p_contact_type_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'contact_type'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_region_xml
   (
     p_region_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'region'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_bank_relation_xml
   (
     p_bank_relation_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'bank_relation'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_pledge_type_xml
   (
     p_pledge_type_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'pledge_type'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_creditor_xml
   (
     p_creditor_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'creditor'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_debt_remains_xml
   (
     p_credit_id IN NUMBER,
     p_debt_remains_type_id IN NUMBER,
     p_report_date IN DATE
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_turnover_xml
   (
     p_credit_id IN NUMBER,
     p_turnover_type_id IN NUMBER,
     p_report_date IN DATE
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_credit_flow_xml
   (
     p_credit_id IN NUMBER,
     p_report_date IN DATE
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_organization_xml
   (
     p_organization_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'organization'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_person_xml
   (
     p_person_id IN NUMBER,
@@ -241,7 +254,7 @@ create or replace package PKG_EAV_XML_UTIL is
     p_tag_name IN VARCHAR2 DEFAULT 'person',
     p_type IN NUMBER DEFAULT 0 -- 0 - PERSON, 1 - HEAD
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_documents_xml
   (
     p_person_id IN NUMBER,
@@ -249,7 +262,7 @@ create or replace package PKG_EAV_XML_UTIL is
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'docs'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_contacts_xml
   (
     p_person_id IN NUMBER,
@@ -257,21 +270,21 @@ create or replace package PKG_EAV_XML_UTIL is
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'contacts'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_person_names_xml
   (
     p_person_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'names'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_organization_names_xml
   (
     p_organization_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'names'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_addresses_xml
   (
     p_person_id IN NUMBER,
@@ -279,7 +292,7 @@ create or replace package PKG_EAV_XML_UTIL is
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'addresses'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_bank_relations_xml
   (
     p_person_id IN NUMBER,
@@ -287,7 +300,7 @@ create or replace package PKG_EAV_XML_UTIL is
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'bank_relations'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_pledges_xml
   (
     p_credit_id IN NUMBER,
@@ -310,7 +323,49 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     COMMIT;
   END;
 
-  core_
+  PROCEDURE generate_by_rd_as_job
+  (
+    p_report_date  IN DATE,
+    p_batch_size IN NUMBER DEFAULT c_default_batch_size,
+    p_job_max_count IN NUMBER DEFAULT c_default_job_max_count,
+    p_version IN NUMBER DEFAULT 2,
+    p_extract_credit IN NUMBER DEFAULT 1,
+    p_extract_portfolio IN NUMBER DEFAULT 1
+  )
+  IS
+    v_job_name   VARCHAR2(200 CHAR);
+    v_job_action VARCHAR2(1000 CHAR);
+  BEGIN
+    v_job_name := 'XML_GEN_BY_RD_' || to_char(p_report_date, 'yyyyMMdd');
+    v_job_action := 'BEGIN ' ||
+                      'PKG_EAV_XML_UTIL.GENERATE_BY_RD(P_REPORT_DATE => TO_DATE(''' || to_char(p_report_date, 'dd.MM.yyyy') || ''', ''dd.MM.yyyy''), ' ||
+                                                      'P_BATCH_SIZE => ' || p_batch_size || ', ' ||
+                                                      'P_JOB_MAX_COUNT => ' || p_job_max_count || ', ' ||
+                                                      'P_VERSION => ' || p_version || 
+                                                      'P_EXTRACT_CREDIT => ' || p_extract_credit || ', ' ||
+                                                      'P_EXTRACT_PORTFOLIO => ' || p_extract_portfolio || '); ' ||
+                    'END;';
+    dbms_scheduler.create_job(job_name        => v_job_name,
+                              job_type        => 'PLSQL_BLOCK',
+                              job_action      => v_job_action,
+                              start_date      => SYSTIMESTAMP,
+                              repeat_interval => NULL,
+                              enabled         => TRUE,
+                              auto_drop       => TRUE);
+  END;
+
+  PROCEDURE generate_by_rd
+  (
+    p_report_date DATE,
+    p_batch_size NUMBER,
+    p_job_max_count NUMBER,
+    p_version NUMBER,
+    p_extract_credit IN NUMBER DEFAULT 1,
+    p_extract_portfolio IN NUMBER DEFAULT 1
+  )
+  IS
+    v_status NUMBER;
+  BEGIN
     FOR rec_creditor IN (SELECT r.creditor_id as id
                            FROM core.report r
                           where r.report_date = p_report_date
@@ -320,16 +375,18 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
         INTO v_status
         FROM XML_CONFIG xc
        WHERE xc.code = 'XML_GENERATION_STATUS';
-        
+
       IF (v_status = 0) THEN
         RETURN;
-      END IF;  
-    
+      END IF;
+
       generate_by_cid_rd(p_creditor_id => rec_creditor.id,
                          p_report_date => p_report_date,
                          p_batch_size => p_batch_size,
                          p_job_max_count => p_job_max_count,
-                         p_version => p_version);
+                         p_version => p_version,
+                         p_extract_credit => p_extract_credit,
+                         p_extract_portfolio => p_extract_portfolio);                     
     END LOOP;
   END;
 
@@ -339,7 +396,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     p_report_date  IN DATE,
     p_batch_size IN NUMBER DEFAULT c_default_batch_size,
     p_job_max_count IN NUMBER DEFAULT c_default_job_max_count,
-    p_version IN NUMBER DEFAULT 2
+    p_version IN NUMBER DEFAULT 2,
+    p_extract_credit IN NUMBER DEFAULT 1,
+    p_extract_portfolio IN NUMBER DEFAULT 1
   )
   IS
     v_job_name   VARCHAR2(200 CHAR);
@@ -351,7 +410,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                           'P_REPORT_DATE => TO_DATE(''' || to_char(p_report_date, 'dd.MM.yyyy') || ''', ''dd.MM.yyyy''), ' ||
                                                           'P_BATCH_SIZE => ' || p_batch_size || ', ' ||
                                                           'P_JOB_MAX_COUNT => ' || p_job_max_count || ', ' ||
-                                                          'P_VERSION => ' || p_version || '); ' ||
+                                                          'P_VERSION => ' || p_version || 
+                                                          'P_EXTRACT_CREDIT => ' || p_extract_credit || ', ' ||
+                                                          'P_EXTRACT_PORTFOLIO => ' || p_extract_portfolio || '); ' ||
                     'END;';
     dbms_scheduler.create_job(job_name        => v_job_name,
                               job_type        => 'PLSQL_BLOCK',
@@ -368,7 +429,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     p_report_date  IN DATE,
     p_batch_size IN NUMBER DEFAULT c_default_batch_size,
     p_job_max_count IN NUMBER DEFAULT c_default_job_max_count,
-    p_version IN NUMBER DEFAULT 2
+    p_version IN NUMBER DEFAULT 2,
+    p_extract_credit IN NUMBER DEFAULT 1,
+    p_extract_portfolio IN NUMBER DEFAULT 1
   )
   IS
     v_previous_report_date DATE;
@@ -381,6 +444,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_now                  DATE;
     v_job_count            NUMBER;
     v_status               NUMBER(1);
+    
+    v_portfolio_exists     NUMBER;
   BEGIN
     SELECT add_months(p_report_date, -st.report_period_duration_months)
       INTO v_previous_report_date
@@ -427,15 +492,27 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
           COMMIT;
 
           v_job_name := 'XML_GEN_' || dbms_random.string('X', 10);
-          dbms_scheduler.create_job(job_name        => v_job_name,
-                                    job_type        => 'PLSQL_BLOCK',
-                                    job_action      => 'BEGIN
-                                                           PKG_EAV_XML_UTIL.GENERATE_XML_V' || p_version || '(' || 'P_XML_FILE_ID => ' || rec_xml_file.id || ');
-                                                        END;',
-                                    start_date      => SYSTIMESTAMP,
-                                    repeat_interval => NULL,
-                                    enabled         => TRUE,
-                                    auto_drop       => TRUE);
+          IF (rec_xml_file.type = 0) THEN
+            dbms_scheduler.create_job(job_name        => v_job_name,
+                                      job_type        => 'PLSQL_BLOCK',
+                                      job_action      => 'BEGIN
+                                                             PKG_EAV_XML_UTIL.GENERATE_XML_V' || p_version || '(' || 'P_XML_FILE_ID => ' || rec_xml_file.id || ');
+                                                          END;',
+                                      start_date      => SYSTIMESTAMP,
+                                      repeat_interval => NULL,
+                                      enabled         => TRUE,
+                                      auto_drop       => TRUE);
+          ELSE
+            dbms_scheduler.create_job(job_name        => v_job_name,
+                                      job_type        => 'PLSQL_BLOCK',
+                                      job_action      => 'BEGIN
+                                                             PKG_EAV_XML_UTIL.GENERATE_PORTFOLIO_XML(' || 'P_XML_FILE_ID => ' || rec_xml_file.id || ');
+                                                          END;',
+                                      start_date      => SYSTIMESTAMP,
+                                      repeat_interval => NULL,
+                                      enabled         => TRUE,
+                                      auto_drop       => TRUE);
+          END IF;   
           EXIT;
         ELSE
           IF (v_wait_end_date < sysdate) THEN
@@ -457,115 +534,159 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
     END LOOP;
 
-    LOOP
-      IF (v_credit_ids.count <> 0) THEN
-        v_credit_ids.delete;
-      END IF;
-      
-      FOR rec_credit IN (SELECT c.id
-                           FROM (SELECT vch.id,
-                                        rank() over(order by vch.primary_contract_no, vch.primary_contract_date) AS num_pp
-                                   FROM v_credit_his vch
-                                  WHERE vch.creditor_id = p_creditor_id
-                                    AND vch.primary_contract_date < p_report_date
-                                    AND (vch.maturity_date >= v_previous_report_date OR vch.maturity_date IS NULL)
-                                    AND vch.open_date <= p_report_date
-                                    AND (vch.close_date > p_report_date OR vch.close_date IS NULL)
-                                    AND vch.id NOT IN (SELECT xci.credit_id
-                                                         FROM core.xml_credit_id xci,
-                                                              core.xml_file xf
-                                                        WHERE xci.xml_file_id = xf.id
-                                                          AND xf.creditor_id = p_creditor_id
-                                                          AND xf.report_date = p_report_date)) c
-                          WHERE c.num_pp <= p_batch_size
-                          ORDER BY c.num_pp)
+    IF (p_extract_credit = 1) THEN
       LOOP
-        v_credit_ids.extend();
-        v_credit_ids(v_credit_ids.last) := rec_credit.id;
-      END LOOP;
+        IF (v_credit_ids.count <> 0) THEN
+          v_credit_ids.delete;
+        END IF;
 
-      IF (v_credit_ids.count = 0) THEN
-        EXIT;
-      ELSE
-
-        v_wait_begin_date := sysdate;
-        v_wait_end_date := v_wait_begin_date + (c_job_wait_timeout * (1/86400));
-
+        FOR rec_credit IN (SELECT c.id
+                             FROM (SELECT vch.id,
+                                          rank() over(order by vch.primary_contract_no, vch.primary_contract_date) AS num_pp
+                                     FROM v_credit_his vch
+                                    WHERE vch.creditor_id = p_creditor_id
+                                      AND vch.primary_contract_date < p_report_date
+                                      AND (vch.maturity_date >= v_previous_report_date OR vch.maturity_date IS NULL)
+                                      AND vch.open_date <= p_report_date
+                                      AND (vch.close_date > p_report_date OR vch.close_date IS NULL)
+                                      AND vch.id NOT IN (SELECT xci.credit_id
+                                                           FROM core.xml_credit_id xci,
+                                                                core.xml_file xf
+                                                          WHERE xci.xml_file_id = xf.id
+                                                            AND xf.creditor_id = p_creditor_id
+                                                            AND xf.report_date = p_report_date)) c
+                            WHERE c.num_pp <= p_batch_size
+                            ORDER BY c.num_pp)
         LOOP
-          SELECT to_number(xc.value)
-            INTO v_status
-            FROM XML_CONFIG xc
-           WHERE xc.code = 'XML_GENERATION_STATUS';
-        
-          IF (v_status = 0) THEN
-            RETURN;
-          END IF;
-        
-          SELECT count(*)
-            INTO v_job_count
-            FROM core.xml_file xf
-           WHERE /*xf.creditor_id = p_creditor_id
-             AND*/ xf.report_date = p_report_date
-             AND (xf.status IN ('RUNNING', 'STARTING'));
+          v_credit_ids.extend();
+          v_credit_ids(v_credit_ids.last) := rec_credit.id;
+        END LOOP;
 
-          IF (v_job_count < p_job_max_count) THEN
-            EXIT;
-          ELSE
-            IF (v_wait_end_date < sysdate) THEN
-              SELECT seq_xml_file.nextval
-                INTO v_xml_file_id
-                FROM dual;
+        IF (v_credit_ids.count = 0) THEN
+          EXIT;
+        ELSE
 
-              INSERT INTO xml_file (id, creditor_id, report_date, begin_date, end_date, file_name, status, sent)
-                VALUES (v_xml_file_id, p_creditor_id, p_report_date, sysdate, sysdate, 'XML_DATA_BY_CID_' || p_creditor_id || '_RD_' || to_char(p_report_date, 'yyyyMMdd') || '_' || ltrim(to_char(v_xml_file_id, '00000')), 'TIMEOUT_EXPIRED', 0);
+          v_wait_begin_date := sysdate;
+          v_wait_end_date := v_wait_begin_date + (c_job_wait_timeout * (1/86400));
 
-              INSERT INTO xml_credit_id
-                (SELECT seq_xml_credit_id.nextval,
-                        v_xml_file_id,
-                        i.column_value
-                   FROM TABLE(CAST(v_credit_ids AS t_number_table)) i);
+          LOOP
+            SELECT to_number(xc.value)
+              INTO v_status
+              FROM XML_CONFIG xc
+             WHERE xc.code = 'XML_GENERATION_STATUS';
 
-              COMMIT;
-
+            IF (v_status = 0) THEN
               RETURN;
             END IF;
 
-            v_now := sysdate;
-            LOOP
-              EXIT WHEN v_now + (c_job_check_timeout * (1/86400)) = sysdate;
-            END LOOP;
-            
-            
-          END IF;
-        END LOOP;
+            SELECT count(*)
+              INTO v_job_count
+              FROM core.xml_file xf
+             WHERE /*xf.creditor_id = p_creditor_id
+               AND*/ xf.report_date = p_report_date
+               AND (xf.status IN ('RUNNING', 'STARTING'));
 
-        SELECT seq_xml_file.nextval
+            IF (v_job_count < p_job_max_count) THEN
+              EXIT;
+            ELSE
+              IF (v_wait_end_date < sysdate) THEN
+                SELECT seq_xml_file.nextval
+                  INTO v_xml_file_id
+                  FROM dual;
+
+                INSERT INTO xml_file (id, creditor_id, report_date, begin_date, end_date, file_name, status, sent)
+                  VALUES (v_xml_file_id, p_creditor_id, p_report_date, sysdate, sysdate, 'XML_DATA_BY_CID_' || p_creditor_id || '_RD_' || to_char(p_report_date, 'yyyyMMdd') || '_' || ltrim(to_char(v_xml_file_id, '00000')), 'TIMEOUT_EXPIRED', 0);
+
+                INSERT INTO xml_credit_id
+                  (SELECT seq_xml_credit_id.nextval,
+                          v_xml_file_id,
+                          i.column_value
+                     FROM TABLE(CAST(v_credit_ids AS t_number_table)) i);
+
+                COMMIT;
+
+                RETURN;
+              END IF;
+
+              v_now := sysdate;
+              LOOP
+                EXIT WHEN v_now + (c_job_check_timeout * (1/86400)) = sysdate;
+              END LOOP;
+
+
+            END IF;
+          END LOOP;
+
+          SELECT seq_xml_file.nextval
+            INTO v_xml_file_id
+            FROM dual;
+
+          INSERT INTO xml_file (id, creditor_id, report_date, begin_date, file_name, status, sent)
+            VALUES (v_xml_file_id, p_creditor_id, p_report_date, sysdate, 'XML_DATA_BY_CID_' || p_creditor_id || '_RD_' || to_char(p_report_date, 'yyyyMMdd') || '_' || ltrim(to_char(v_xml_file_id, '00000')), 'STARTING', 0);
+
+          INSERT INTO xml_credit_id
+            (SELECT seq_xml_credit_id.nextval,
+                    v_xml_file_id,
+                    i.column_value
+               FROM TABLE(CAST(v_credit_ids AS t_number_table)) i);
+
+          COMMIT;
+
+          v_job_name := 'XML_GEN_' || dbms_random.string('X', 10);
+          dbms_scheduler.create_job(job_name        => v_job_name,
+                                    job_type        => 'PLSQL_BLOCK',
+                                    job_action      => 'BEGIN
+                                                           PKG_EAV_XML_UTIL.GENERATE_XML_V' || p_version || '(' || 'P_XML_FILE_ID => ' || v_xml_file_id || ');
+                                                        END;',
+                                    start_date      => SYSTIMESTAMP,
+                                    repeat_interval => NULL,
+                                    enabled         => TRUE,
+                                    auto_drop       => TRUE);
+        END IF;
+      END LOOP;
+    END IF;
+      
+    IF (p_extract_portfolio = 1) THEN
+      v_xml_file_id := NULL;
+      BEGIN
+        SELECT xf.id
           INTO v_xml_file_id
-          FROM dual;
+          FROM core.xml_file xf
+         WHERE xf.creditor_id = p_creditor_id
+           AND xf.report_date = p_report_date
+           AND xf.type = 1;
+      EXCEPTION
+        WHEN others THEN
+          v_xml_file_id := NULL;
+      END;
+      
+      IF (v_xml_file_id IS NOT NULL) THEN
+        generate_portfolio_xml(v_xml_file_id);         
+      ELSE
+        SELECT count(*)
+            INTO v_portfolio_exists
+            FROM dual
+           WHERE EXISTS (SELECT pf.*
+                           FROM core.portfolio_flow pf
+                          WHERE pf.creditor_id = p_creditor_id
+                            AND pf.rep_date = p_report_date)
+              OR EXISTS (SELECT pfm.*
+                           FROM core.portfolio_flow_msfo_old pfm
+                          WHERE pfm.creditor_id = p_creditor_id
+                            AND pfm.rep_date = p_report_date);
+                            
+          IF (v_portfolio_exists = 1) THEN
+            SELECT seq_xml_file.nextval
+              INTO v_xml_file_id
+              FROM dual;
 
-        INSERT INTO xml_file (id, creditor_id, report_date, begin_date, file_name, status, sent)
-          VALUES (v_xml_file_id, p_creditor_id, p_report_date, sysdate, 'XML_DATA_BY_CID_' || p_creditor_id || '_RD_' || to_char(p_report_date, 'yyyyMMdd') || '_' || ltrim(to_char(v_xml_file_id, '00000')), 'STARTING', 0);
-
-        INSERT INTO xml_credit_id
-          (SELECT seq_xml_credit_id.nextval,
-                  v_xml_file_id,
-                  i.column_value
-             FROM TABLE(CAST(v_credit_ids AS t_number_table)) i);
-
-        COMMIT;
-
-        v_job_name := 'XML_GEN_' || dbms_random.string('X', 10);
-        dbms_scheduler.create_job(job_name        => v_job_name,
-                                  job_type        => 'PLSQL_BLOCK',
-                                  job_action      => 'BEGIN
-                                                         PKG_EAV_XML_UTIL.GENERATE_XML_V' || p_version || '(' || 'P_XML_FILE_ID => ' || v_xml_file_id || ');
-                                                      END;',
-                                  start_date      => SYSTIMESTAMP,
-                                  repeat_interval => NULL,
-                                  enabled         => TRUE,
-                                  auto_drop       => TRUE);
-      END IF;
-    END LOOP;
+            INSERT INTO xml_file (id, creditor_id, report_date, begin_date, file_name, status, sent, type)
+              VALUES (v_xml_file_id, p_creditor_id, p_report_date, sysdate, 'XML_PORTFOLIO_DATA_BY_CID_' || p_creditor_id || '_RD_' || to_char(p_report_date, 'yyyyMMdd') || '_' || ltrim(to_char(v_xml_file_id, '00000')), 'STARTING', 0, 1);
+          
+            generate_portfolio_xml(v_xml_file_id); 
+          END IF; 
+      END IF;  
+    END IF;
 
   END;
 
@@ -736,7 +857,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                          AND dr.value <> 0
                                          AND dr.account_id = ref_ba.id (+)),
                                      -- DISCOUNTED_VALUE
-                                     (SELECT xmlelement("discounted_value", 
+                                     (SELECT xmlelement("discounted_value",
                                                xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
                                              )
                                         FROM core.debt_remains dr,
@@ -1095,7 +1216,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    xmlelement("no", vch.primary_contract_no),
                    -- DATE
                    xmlelement("date", to_char(vch.primary_contract_date, c_date_format))
-                 ),                
+                 ),
                  -- SUBJECTS
                  (SELECT xmlelement("subjects",
                            xmlagg(
@@ -1798,7 +1919,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
          WHERE xf.id = p_xml_file_id;
       END;
   END;
-  
+
   PROCEDURE generate_xml_v2
   (
     p_xml_file_id IN NUMBER
@@ -1843,7 +1964,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                          -- PASTDUE
                          get_debt_remains_xml(vch.id, c_drt_debt_pastdue, v_report_date),
                          -- WRITE_OFF
-                         get_debt_remains_xml(vch.id, c_drt_debt_write_off, v_report_date)        
+                         get_debt_remains_xml(vch.id, c_drt_debt_write_off, v_report_date)
                        ),
                        -- DISCOUNT
                        get_debt_remains_xml(vch.id, c_drt_discount, v_report_date),
@@ -1856,7 +1977,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                          -- PASTDUE
                          get_debt_remains_xml(vch.id, c_drt_interest_pastdue, v_report_date),
                          -- WRITE_OFF
-                         get_debt_remains_xml(vch.id, c_drt_interest_write_off, v_report_date)        
+                         get_debt_remains_xml(vch.id, c_drt_interest_write_off, v_report_date)
                        ),
                        -- LIMIT
                        get_debt_remains_xml(vch.id, c_drt_limit, v_report_date)
@@ -2022,6 +2143,146 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
          WHERE xf.id = p_xml_file_id;
       END;*/
   END;
+  
+  PROCEDURE generate_portfolio_xml
+  (
+    p_xml_file_id IN NUMBER
+  )
+  IS
+    v_creditor_id  NUMBER;
+    v_report_date  DATE;
+    v_data_xml     XMLTYPE;
+    v_manifest_xml XMLTYPE;
+    v_zip          BLOB;
+    v_zip_comment  VARCHAR2(4000 CHAR);
+  BEGIN
+    SELECT xf.creditor_id, xf.report_date
+      INTO v_creditor_id, v_report_date
+      FROM core.xml_file xf
+     WHERE xf.id = p_xml_file_id;
+
+    UPDATE core.xml_file xf
+       SET xf.status = 'RUNNING'
+     WHERE xf.id = p_xml_file_id;
+    COMMIT;
+
+    SELECT xmlroot(xmlelement("entities",
+               xmlelement("entity",
+                 xmlattributes('portfolio_data' AS "class"),
+                   pkg_eav_xml_util.get_ref_creditor_xml(v_creditor_id, v_report_date, 'creditor'),
+                   (select xmlelement("portfolio_flows_kfn",
+                             xmlagg(
+                               xmlelement("item",
+                                 pkg_eav_xml_util.get_ref_portfolio_xml(pfg.portfolio_id, v_report_date, 'portfolio'),
+                                 (select xmlelement("details",
+                                           xmlagg(
+                                             xmlelement("item",
+                                               pkg_eav_xml_util.get_ref_balance_account_xml(pfv.provision_account_id, v_report_date, 'balance_account'),
+                                               xmlelement("value", pfv.provision_value)
+                                             )
+                                           )
+                                         )
+                                    from portfolio_flow pfv
+                                   where pfv.creditor_id = pfg.creditor_id
+                                     and pfv.rep_date = pfg.rep_date
+                                     and pfv.portfolio_id = pfg.portfolio_id)
+                               )
+                             )
+                           )
+                      from (select pf.creditor_id, pf.portfolio_id, pf.rep_date from portfolio_flow pf group by pf.creditor_id, pf.portfolio_id, pf.rep_date) pfg
+                     where pfg.creditor_id = v_creditor_id
+                       and pfg.rep_date = v_report_date),
+                   (select xmlelement("portfolio_flows_msfo",
+                             xmlagg(
+                               xmlelement("item",
+                                 pkg_eav_xml_util.get_ref_portfolio_xml(pfmg.portfolio_id, v_report_date, 'portfolio'),
+                                 xmlelement("discounted_value", pfmg.discounted_value),
+                                 (select xmlelement("details",
+                                           xmlagg(
+                                             xmlelement("item",
+                                               pkg_eav_xml_util.get_ref_balance_account_xml(pfmv.provision_account_id, v_report_date, 'balance_account'),
+                                               xmlelement("value", pfmv.provision_value)
+                                             )
+                                           )
+                                         )
+                                    from portfolio_flow_msfo_old pfmv
+                                   where pfmv.creditor_id = pfmg.creditor_id
+                                     and pfmv.rep_date = pfmg.rep_date
+                                     and pfmv.portfolio_id = pfmg.portfolio_id
+                                     and pfmv.discounted_value = pfmg.discounted_value)
+                               )
+                             )
+                           )
+                      from (select pfm.creditor_id, pfm.portfolio_id, pfm.rep_date, pfm.discounted_value from portfolio_flow_msfo_old pfm group by pfm.creditor_id, pfm.portfolio_id, pfm.rep_date, pfm.discounted_value) pfmg
+                     where pfmg.creditor_id = v_creditor_id
+                       and pfmg.rep_date = v_report_date) 
+                 )
+               )
+           , version '1.0" encoding="utf-8')
+          INTO v_data_xml
+          FROM dual;
+
+    SELECT xmlroot(xmlelement("manifest",
+             xmlelement("type", '1'),
+             xmlelement("name", 'data.xml'),
+             xmlelement("userid", '100500'),
+             xmlelement("size", 1),
+             xmlelement("date", to_char(v_report_date, 'dd.MM.yyyy')),
+             xmlelement("properties",
+               decode(vch.code, null, null, xmlelement("property", xmlelement("name", 'CODE'), xmlelement("value", vch.code))),
+               decode(vch.name, null, null, xmlelement("property", xmlelement("name", 'NAME'), xmlelement("value", vch.name))),
+               (SELECT xmlelement("property",
+                         xmlelement("name", 'BIN'),
+                         xmlelement("value", cd.no_)
+                       )
+                  FROM ref.creditor_doc cd
+                 WHERE cd.creditor_id = vch.id
+                   AND cd.type_id = 7),
+               (SELECT xmlelement("property",
+                         xmlelement("name", 'BIK'),
+                         xmlelement("value", cd.no_)
+                       )
+                  FROM ref.creditor_doc cd
+                 WHERE cd.creditor_id = vch.id
+                   AND cd.type_id = 15)
+             )
+           ), version '1.0" encoding="utf-8'),
+           'XML files generated for USCI project by Alexandr Motov.' || chr(13) ||
+           'Creditor ID in CR: ' || vch.id || chr(13) ||
+           'Report date: ' || to_char(v_report_date, 'dd.MM.yyyy') || chr(13) ||
+           'Generation date: ' || to_char(sysdate, 'dd.MM.yyyy')
+      INTO v_manifest_xml, v_zip_comment
+      FROM ref.v_creditor_his vch
+     WHERE vch.id = v_creditor_id
+       AND vch.open_date <= v_report_date
+       AND (vch.close_date > v_report_date OR vch.close_date IS NULL);
+
+    -- <manifest>
+    --   <type>T</type>
+    --   <name>FILE_NAME.XML</name>
+    --   <userid>USER</userid>
+    --   <size>S</size>
+    --   <date>DD.MM.YYYY</date>
+    --   <properties>
+    --     <property>
+    --       <name>XXX</name>
+    --       <value>YYY</value>
+    --     </property>
+    --   </properties>
+    -- </manifest>
+
+    pkg_zip_util.add_file(v_zip, 'data.xml', v_data_xml.getBlobVal(nls_charset_id('UTF8')));
+    pkg_zip_util.add_file(v_zip, 'manifest.xml', v_manifest_xml.getBlobVal(nls_charset_id('UTF8')));
+    pkg_zip_util.finish_zip(v_zip, v_zip_comment);
+
+    UPDATE xml_file xf
+       SET xf.end_date = sysdate,
+           xf.file_content = v_zip,
+           xf.status = 'COMPLETED'
+     WHERE xf.id = p_xml_file_id;
+
+    COMMIT;
+  END;
 
   FUNCTION get_ref_balance_account_xml
   (
@@ -2040,14 +2301,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("no_", t.no_))
         INTO v_xml
         FROM ref.balance_account t
-       WHERE t.parent_id = p_balance_account_id 
+       WHERE t.parent_id = p_balance_account_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_credit_object_xml
   (
     p_credit_object_id IN NUMBER,
@@ -2065,14 +2326,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.credit_object t
-       WHERE t.parent_id = p_credit_object_id 
+       WHERE t.parent_id = p_credit_object_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_credit_type_xml
   (
     p_credit_type_id IN NUMBER,
@@ -2090,14 +2351,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.credit_type t
-       WHERE t.parent_id = p_credit_type_id 
+       WHERE t.parent_id = p_credit_type_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_credit_purpose_xml
   (
     p_credit_purpose_id IN NUMBER,
@@ -2115,14 +2376,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.credit_purpose t
-       WHERE t.parent_id = p_credit_purpose_id 
+       WHERE t.parent_id = p_credit_purpose_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_currency_xml
   (
     p_currency_id IN NUMBER,
@@ -2140,14 +2401,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.currency t
-       WHERE t.parent_id = p_currency_id 
+       WHERE t.parent_id = p_currency_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_portfolio_xml
   (
     p_portfolio_id IN NUMBER,
@@ -2165,14 +2426,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.portfolio t
-       WHERE t.parent_id = p_portfolio_id 
+       WHERE t.parent_id = p_portfolio_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_finance_source_xml
   (
     p_finance_source_id IN NUMBER,
@@ -2190,14 +2451,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.finance_source t
-       WHERE t.parent_id = p_finance_source_id 
+       WHERE t.parent_id = p_finance_source_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_doc_type_xml
   (
     p_doc_type_id IN NUMBER,
@@ -2215,14 +2476,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.doc_type t
-       WHERE t.parent_id = p_doc_type_id 
+       WHERE t.parent_id = p_doc_type_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_classification_xml
   (
     p_classification_id IN NUMBER,
@@ -2240,14 +2501,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.classification t
-       WHERE t.parent_id = p_classification_id 
+       WHERE t.parent_id = p_classification_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_country_xml
   (
     p_country_id IN NUMBER,
@@ -2265,14 +2526,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code_numeric", t.code_numeric))
         INTO v_xml
         FROM ref.country t
-       WHERE t.parent_id = p_country_id 
+       WHERE t.parent_id = p_country_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_legal_form_xml
   (
     p_legal_form_id IN NUMBER,
@@ -2290,14 +2551,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.legal_form t
-       WHERE t.parent_id = p_legal_form_id 
+       WHERE t.parent_id = p_legal_form_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_offshore_xml
   (
     p_offshore_id IN NUMBER,
@@ -2315,14 +2576,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.offshore t
-       WHERE t.parent_id = p_offshore_id 
+       WHERE t.parent_id = p_offshore_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_econ_trade_xml
   (
     p_econ_trade_id IN NUMBER,
@@ -2340,14 +2601,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.econ_trade t
-       WHERE t.parent_id = p_econ_trade_id 
+       WHERE t.parent_id = p_econ_trade_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_enterprise_type_xml
   (
     p_enterprise_type_id IN NUMBER,
@@ -2365,14 +2626,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.enterprise_type t
-       WHERE t.parent_id = p_enterprise_type_id 
+       WHERE t.parent_id = p_enterprise_type_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_contact_type_xml
   (
     p_contact_type_id IN NUMBER,
@@ -2390,14 +2651,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.contact_type t
-       WHERE t.parent_id = p_contact_type_id 
+       WHERE t.parent_id = p_contact_type_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_region_xml
   (
     p_region_id IN NUMBER,
@@ -2415,14 +2676,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.region t
-       WHERE t.parent_id = p_region_id 
+       WHERE t.parent_id = p_region_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_bank_relation_xml
   (
     p_bank_relation_id IN NUMBER,
@@ -2440,14 +2701,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.bank_relation t
-       WHERE t.parent_id = p_bank_relation_id 
+       WHERE t.parent_id = p_bank_relation_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_pledge_type_xml
   (
     p_pledge_type_id IN NUMBER,
@@ -2465,14 +2726,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
         FROM ref.pledge_type t
-       WHERE t.parent_id = p_pledge_type_id 
+       WHERE t.parent_id = p_pledge_type_id
          AND t.open_date <= p_report_date
          AND (t.close_date > p_report_date OR t.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_creditor_xml
   (
     p_creditor_id IN NUMBER,
@@ -2487,7 +2748,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
         INTO v_xml
         FROM dual;
     ELSE
-      SELECT xmlelement(evalname(p_tag_name), 
+      SELECT xmlelement(evalname(p_tag_name),
                xmlelement("code", vch.code),
                xmlelement("docs",
                  (SELECT xmlagg(
@@ -2505,14 +2766,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
              )
         INTO v_xml
         FROM ref.v_creditor_his vch
-       WHERE vch.id = p_creditor_id 
+       WHERE vch.id = p_creditor_id
          AND vch.open_date <= p_report_date
          AND (vch.close_date > p_report_date OR vch.close_date IS NULL);
     END IF;
-    
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_debt_remains_xml
   (
     p_credit_id IN NUMBER,
@@ -2540,8 +2801,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
              ELSE null
            END
       INTO v_tag_name
-      FROM dual;  
-  
+      FROM dual;
+
     BEGIN
       SELECT CASE
                -- DEBT_CURRENT
@@ -2552,7 +2813,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))
                  )
                -- DEBT_PASTDUE
-               WHEN dr.type_id = c_drt_debt_pastdue THEN 
+               WHEN dr.type_id = c_drt_debt_pastdue THEN
                  xmlelement("pastdue",
                    get_ref_balance_account_xml(dr.account_id, p_report_date),
                    xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
@@ -2561,7 +2822,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    xmlelement("close_date", to_char(dr.pastdue_close_date, 'dd.MM.yyyy'))
                  )
                -- DEBT_WRITE_OFF
-               WHEN dr.type_id = c_drt_debt_write_off THEN 
+               WHEN dr.type_id = c_drt_debt_write_off THEN
                  xmlelement("write_off",
                    get_ref_balance_account_xml(dr.account_id, p_report_date),
                    xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
@@ -2599,7 +2860,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))
                  )
                -- CORRECTION
-               WHEN dr.type_id = c_drt_correction THEN 
+               WHEN dr.type_id = c_drt_correction THEN
                  xmlelement("correction",
                    get_ref_balance_account_xml(dr.account_id, p_report_date),
                    xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
@@ -2645,10 +2906,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
           INTO v_xml
           FROM dual;
     END;
-          
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_turnover_xml
   (
     p_credit_id IN NUMBER,
@@ -2660,15 +2921,15 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     SELECT CASE
-             WHEN p_turnover_type_id = c_tt_issue_debt THEN 
+             WHEN p_turnover_type_id = c_tt_issue_debt THEN
                'debt'
-             WHEN p_turnover_type_id = c_tt_issue_interest THEN 
+             WHEN p_turnover_type_id = c_tt_issue_interest THEN
                'interest'
              ELSE null
            END
       INTO v_tag_name
-      FROM dual;  
-  
+      FROM dual;
+
     BEGIN
       SELECT xmlelement(evalname(v_tag_name),
                xmlelement("amount", ltrim(to_char(t.amount, c_number_format, c_nls_numeric_characters))),
@@ -2685,10 +2946,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
           INTO v_xml
           FROM dual;
     END;
-          
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_credit_flow_xml
   (
     p_credit_id IN NUMBER,
@@ -2729,10 +2990,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
           INTO v_xml
           FROM dual;
     END;
-          
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_organization_xml
   (
     p_organization_id IN NUMBER,
@@ -2780,16 +3041,16 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
           v_xml := null;
       END;
     END IF;
-        
+
     IF (v_xml IS NULL) THEN
       SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
-      
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_person_xml
   (
     p_person_id IN NUMBER,
@@ -2842,16 +3103,16 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
           v_xml := null;
       END;
     END IF;
-    
+
     IF (v_xml IS NULL) THEN
       SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
-          
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_documents_xml
   (
     p_person_id IN NUMBER,
@@ -2884,16 +3145,16 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       WHEN no_data_found THEN
         v_xml := null;
     END;
-    
+
     IF (v_xml IS NULL) THEN
       SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
-          
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_contacts_xml
   (
     p_person_id IN NUMBER,
@@ -2924,16 +3185,16 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       WHEN no_data_found THEN
         v_xml := null;
     END;
-    
+
     IF (v_xml IS NULL) THEN
       SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
-          
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_person_names_xml
   (
     p_person_id IN NUMBER,
@@ -2970,13 +3231,13 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       WHEN no_data_found THEN
         v_xml := null;
     END;
-    
+
     IF (v_xml IS NULL) THEN
       SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
-          
+
     RETURN v_xml;
   END;
 
@@ -3012,16 +3273,16 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       WHEN no_data_found THEN
         v_xml := null;
     END;
-    
+
     IF (v_xml IS NULL) THEN
       SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
-          
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_addresses_xml
   (
     p_person_id IN NUMBER,
@@ -3056,16 +3317,16 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       WHEN no_data_found THEN
         v_xml := null;
     END;
-    
+
     IF (v_xml IS NULL) THEN
       SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
-          
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_bank_relations_xml
   (
     p_person_id IN NUMBER,
@@ -3098,16 +3359,16 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       WHEN no_data_found THEN
         v_xml := null;
     END;
-    
+
     IF (v_xml IS NULL) THEN
       SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
-          
+
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_pledges_xml
   (
     p_credit_id IN NUMBER,
@@ -3141,15 +3402,15 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       WHEN no_data_found THEN
         v_xml := null;
     END;
-    
+
     IF (v_xml IS NULL) THEN
       SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
-          
+
     RETURN v_xml;
   END;
-  
+
 end PKG_EAV_XML_UTIL;
 /

@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public interface IEntityService {
     public BaseEntity load(long id);
-    public void save(BaseEntity baseEntity);
+    public void process(BaseEntity baseEntity);
     public BaseEntity search(BaseEntity baseEntity);
     public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
     public List<Long> getEntityIDsByMetaclass(long id);

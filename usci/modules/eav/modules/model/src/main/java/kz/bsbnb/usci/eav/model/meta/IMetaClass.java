@@ -19,4 +19,6 @@ public interface IMetaClass extends IMetaContainer {
 
     public Set<String> getAttributeNames();
 
+    public boolean hasNotFinalAttributes();
+
 }

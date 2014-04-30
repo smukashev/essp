@@ -6,7 +6,7 @@ import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import java.util.Date;
 
 /**
- * Created by Alexandr.Motov on 16.03.14.
+ * @author alexandr.motov
  */
 public interface IBaseEntityReportDate extends IBaseObject {
 

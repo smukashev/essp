@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by Alexandr.Motov on 09.03.14.
+ * @author alexandr.motov
  */
 public interface IBaseEntityManager {
 

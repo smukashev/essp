@@ -11,6 +11,10 @@ import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
+import kz.bsbnb.usci.cli.app.command.impl.MetaAddCommand;
+import kz.bsbnb.usci.cli.app.command.impl.MetaCreateCommand;
+import kz.bsbnb.usci.cli.app.command.impl.MetaKeyCommand;
+import kz.bsbnb.usci.cli.app.command.impl.MetaShowCommand;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.core.service.IEntityService;
@@ -42,7 +46,6 @@ import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerato
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
-import kz.bsbnb.usci.sync.job.impl.DataJob;
 import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 import kz.bsbnb.usci.tool.status.SyncStatus;
@@ -56,7 +59,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -1474,8 +1476,13 @@ public class CLI
             CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
             BaseEntity entity;
             while((entity = reader.read()) != null) {
-                long id = baseEntityProcessorDao.process(entity).getId();
-                System.out.println("Saved with id: " + id);
+                try {
+                    long id = baseEntityProcessorDao.process(entity).getId();
+                    System.out.println("Instance of BaseEntity saved with id: " + id);
+                } catch(Exception ex) {
+                    lastException = ex;
+                    System.out.println("While processing instance of BaseEntity unexpected error occurred: " + ex.getMessage());
+                }
             }
         } catch (FileNotFoundException e)
         {
@@ -1664,43 +1671,7 @@ public class CLI
         metaClassRepository.saveMetaClass(meta);
     }
 
-    public void addAttributeToMeta(String metaName, String attrName, String type, String className, boolean arrayFlag,
-                                   ComplexKeyTypes keyType, boolean isImmutable) {
-        MetaClass meta = metaClassRepository.getMetaClass(metaName);
 
-        if (type.equals("MetaClass")) {
-            MetaClass toAdd = metaClassRepository.getMetaClass(className);
-
-            if (!arrayFlag) {
-                MetaAttribute metaAttr = new MetaAttribute(false, false, toAdd);
-                metaAttr.setImmutable(isImmutable);
-                meta.setMetaAttribute(attrName, metaAttr);
-            } else {
-                MetaSet setToAdd = new MetaSet(toAdd);
-                if (keyType != null) {
-                    setToAdd.setArrayKeyType(keyType);
-                }
-                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, setToAdd));
-            }
-        } else {
-            MetaValue value = new MetaValue(DataTypes.valueOf(type));
-
-            if (!arrayFlag) {
-                MetaAttribute metaAttr = new MetaAttribute(false, false, value);
-                metaAttr.setImmutable(isImmutable);
-
-                meta.setMetaAttribute(attrName, metaAttr);
-            } else {
-                MetaSet setToAdd = new MetaSet(value);
-                if (keyType != null) {
-                    setToAdd.setArrayKeyType(keyType);
-                }
-                meta.setMetaAttribute(attrName, new MetaAttribute(false, false, setToAdd));
-            }
-        }
-
-        metaClassRepository.saveMetaClass(meta);
-    }
 
     public void removeAttributeFromMeta(String metaName, String attrName) {
         MetaClass meta = metaClassRepository.getMetaClass(metaName);
@@ -1714,53 +1685,27 @@ public class CLI
     {
         if (args.size() > 1) {
             if (args.get(0).equals("show")) {
-                if (args.get(1).equals("id")) {
-                    showMetaClass(Long.parseLong(args.get(2)));
-                } else if (args.get(1).equals("name")) {
-                    showMetaClass(args.get(2));
-                } else {
-                    System.out.println("No such metaClass identification method: " + args.get(1));
-                }
+                MetaShowCommand metaShowCommand = new MetaShowCommand();
+                metaShowCommand.setMetaClassRepository(metaClassRepository);
+                metaShowCommand.run(args.toArray(new String[args.size()]));
             } else if (args.get(0).equals("add")) {
-                if (args.size() > 4) {
-                    if(args.get(3).equals("MetaClass")) {
-                        addAttributeToMeta(args.get(1), args.get(2), args.get(3), args.get(4),
-                                args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false,
-                                args.size() > 6 ? ComplexKeyTypes.valueOf(args.get(6)) : null,
-                                args.size() > 7 ? Boolean.parseBoolean(args.get(7)) : false);
-                    } else {
-                        addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
-                                args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false,
-                                args.size() > 5 ? ComplexKeyTypes.valueOf(args.get(5)) : null,
-                                args.size() > 6 ? Boolean.parseBoolean(args.get(6)) : false);
-                    }
-                } else {
-                    addAttributeToMeta(args.get(1), args.get(2), args.get(3), null,
-                            args.size() > 4 ? Boolean.parseBoolean(args.get(4)) : false, null,
-                            args.size() > 5 ? Boolean.parseBoolean(args.get(5)) : false);
-                }
+                MetaAddCommand metaAddCommand = new MetaAddCommand();
+                metaAddCommand.setMetaClassRepository(metaClassRepository);
+                metaAddCommand.run(args.toArray(new String[args.size()]));
             } else if (args.get(0).equals("remove")) {
                 if (args.size() > 2) {
                     removeAttributeFromMeta(args.get(1), args.get(2));
                 }
             } else if (args.get(0).equals("create")) {
-                createMetaClass(args.get(1),
-                        args.size() > 2 ? Boolean.parseBoolean(args.get(2)) : false,
-                        args.size() > 3 ? Boolean.parseBoolean(args.get(3)) : false);
+                MetaCreateCommand metaCreateCommand = new MetaCreateCommand();
+                metaCreateCommand.setMetaClassRepository(metaClassRepository);
+                metaCreateCommand.run(args.toArray(new String[args.size()]));
             } else if (args.get(0).equals("delete")) {
                 System.out.println("Unimplemented stub in cli");
             } else if (args.get(0).equals("key")) {
-                if (args.size() > 3) {
-                    if (args.get(1).equals("id")) {
-                        toggleMetaClassKey(Long.parseLong(args.get(2)), args.get(3));
-                    } else if (args.get(1).equals("name")) {
-                        toggleMetaClassKey(args.get(2), args.get(3));
-                    } else {
-                        System.out.println("No such metaClass identification method: " + args.get(1));
-                    }
-                } else {
-                    System.out.println("Argument needed: <key> <id, name> <id or name> <attributeName>");
-                }
+                MetaKeyCommand metaKeyCommand = new MetaKeyCommand();
+                metaKeyCommand.setMetaClassRepository(metaClassRepository);
+                metaKeyCommand.run(args.toArray(new String[args.size()]));
             } else if (args.get(0).equals("keytype")) {
                 if (args.size() > 2) {
                     setMetaClassKeyType(args.get(1), ComplexKeyTypes.valueOf(args.get(2)));
@@ -2553,7 +2498,7 @@ public class CLI
             try {
                 CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, date);
                 BaseEntity baseEntity = reader.read();
-                System.out.println(baseEntity);
+                System.out.println(ma);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -2682,7 +2627,7 @@ public class CLI
             System.out.println("Parse exception day format must be: dd.MM.yyyy");
             return;
         }  catch (IncorrectResultSizeDataAccessException e){
-            System.out.println("Such rule already exists");
+            System.out.println("no packages(maybe on that date)");
             return;
         }
 

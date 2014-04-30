@@ -3,7 +3,7 @@ package kz.bsbnb.usci.eav.model.meta.impl;
 import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
 
 /**
- * Created by Alexandr.Motov on 18.03.14.
+ * @author alexandr.motov
  */
 public abstract class MetaContainer extends MetaType implements IMetaContainer {
 

@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.receiver.service.impl;
 
+import kz.bsbnb.usci.eav.stats.QueryEntry;
+import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
 
 /**
  * @author k.tulbassiyev
@@ -20,6 +23,9 @@ public class BatchProcessServiceImpl implements IBatchProcessService {
 
     @Autowired
     private ReceiverStatusSingleton receiverStatusSingleton;
+
+    @Autowired
+    protected SQLQueriesStats sqlStats;
 
     @PostConstruct
     public void init() {
@@ -38,7 +44,26 @@ public class BatchProcessServiceImpl implements IBatchProcessService {
     @Override
     public ReceiverStatus getStatus()
     {
-        return receiverStatusSingleton.getStatus();
+        ReceiverStatus rs = receiverStatusSingleton.getStatus();
+
+        HashMap<String, QueryEntry> stats = sqlStats.getStats();
+
+        long time = 0;
+        long count = 0;
+
+        for (String query : stats.keySet()) {
+            if (stats.get(query).count < 1)
+                continue;
+
+            time += stats.get(query).totalTime / stats.get(query).count;
+            count++;
+        }
+
+        if (count > 0) {
+            rs.setRulesEvaluationTimeAvg(time / count);
+        }
+
+        return rs;
     }
 
     @Override

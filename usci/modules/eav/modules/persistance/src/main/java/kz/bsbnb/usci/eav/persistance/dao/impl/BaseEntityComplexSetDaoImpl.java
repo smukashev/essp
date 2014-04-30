@@ -440,8 +440,11 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
                     .on(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID)
                             .eq(tableOfComplexSets.field(EAV_M_COMPLEX_SET.ID)))
                     .where(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID).equal(baseEntity.getId()))
-                    .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST).equal(true)
-                            .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED).equal(false)));
+                    .and((tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST).equal(true)
+                            .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED).equal(false))
+                            .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).equal(false)))
+                            .or(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE).equal(DataUtils.convert(actualReportDate))
+                                    .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).equal(true))));
         }
         else
         {
@@ -477,7 +480,10 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
                     .on(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID)
                             .eq(tableOfComplexSets.field(EAV_M_COMPLEX_SET.ID)))
                     .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
-                    .and(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED).equal(false));
+                    .and((tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED).equal(false)
+                            .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).equal(false)))
+                            .or(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE).equal(actualReportDate)
+                                    .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).equal(true))));
         }
 
         logger.debug(select.toString());

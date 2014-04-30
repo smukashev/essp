@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
 /**
- * Created by Alexandr.Motov on 20.03.14.
+ * @author alexandr.motov
  */
 public class BaseContainerTypes {
 

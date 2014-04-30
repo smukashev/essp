@@ -171,6 +171,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         Map<String, Object> row = rows.get(0);
 
         if(row != null) {
+
+
             metaClass.setDisabled(((BigDecimal)row.get("is_disabled")).longValue() == 1);
             metaClass.setBeginDate(DataUtils.convert((Timestamp)row.get("begin_date")));
             metaClass.setId(((BigDecimal)row.get("id")).longValue());
@@ -320,6 +322,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         .set(EAV_M_COMPLEX_SET.TITLE, metaAttribute.getTitle())
                         .set(EAV_M_COMPLEX_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
                         .set(EAV_M_COMPLEX_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
+                        .set(EAV_M_COMPLEX_SET.IS_FINAL, DataUtils.convert(metaAttribute.isFinal()))
                         .set(EAV_M_COMPLEX_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
                         .set(EAV_M_COMPLEX_SET.CLASS_ID, innerId)
                         .set(EAV_M_COMPLEX_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
@@ -336,6 +339,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         .set(EAV_M_SIMPLE_SET.TYPE_CODE, metaSet.getTypeCode().toString())
                         .set(EAV_M_SIMPLE_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
                         .set(EAV_M_SIMPLE_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
+                        .set(EAV_M_SIMPLE_SET.IS_FINAL, DataUtils.convert(metaAttribute.isFinal()))
                         .set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
                         .set(EAV_M_SIMPLE_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
                         .set(EAV_M_SIMPLE_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()));
@@ -848,6 +852,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 EAV_M_COMPLEX_SET.IS_NULLABLE,
                 EAV_M_COMPLEX_SET.IS_IMMUTABLE,
                 EAV_M_COMPLEX_SET.IS_KEY,
+                EAV_M_COMPLEX_SET.IS_FINAL,
                 EAV_M_COMPLEX_SET.NAME,
                 EAV_M_COMPLEX_SET.TITLE,
                 EAV_M_COMPLEX_SET.CLASS_ID,
@@ -883,6 +888,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     ((BigDecimal)row.get("is_nullable")).longValue() == 1);
 
             metaAttribute.setImmutable(((BigDecimal) row.get("is_immutable")).longValue() == 1);
+            metaAttribute.setFinal(((BigDecimal) row.get("is_final")).longValue() == 1);
 
             MetaSet metaSet = new MetaSet(metaClass);
             metaSet.setId(((BigDecimal)row.get("id")).longValue());

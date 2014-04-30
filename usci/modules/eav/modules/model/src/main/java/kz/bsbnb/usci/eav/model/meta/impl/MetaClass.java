@@ -2,8 +2,10 @@ package kz.bsbnb.usci.eav.model.meta.impl;
 
 import java.util.*;
 
+import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
+import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
@@ -673,6 +675,53 @@ public class MetaClass extends MetaContainer implements IMetaClass
         return valueOut;
     }
 
+    public IMetaAttribute getElAttribute(String path)
+    {
+        StringTokenizer tokenizer = new StringTokenizer(path, ".");
+
+        MetaClass meta = this;
+        IMetaType valueOut = null;
+        IMetaAttribute attribute = null;
+
+        while (tokenizer.hasMoreTokens())
+        {
+            String token = tokenizer.nextToken();
+
+            attribute = meta.getMetaAttribute(token);
+
+            if (attribute == null)
+                return null;
+
+            IMetaType type = attribute.getMetaType();
+
+            valueOut = type;
+
+            if (type.isSet())
+            {
+                while(type.isSet()) {
+                    valueOut = type;
+                    type = ((MetaSet)type).getMemberType();
+                }
+            }
+
+            if (valueOut.isComplex())
+            {
+                if (!valueOut.isSet()) {
+                    meta = (MetaClass)valueOut;
+                } else {
+                    meta = (MetaClass)type;
+                }
+            } else {
+                if (tokenizer.hasMoreTokens())
+                {
+                    throw new IllegalArgumentException("Path can't have intermediate simple values");
+                }
+            }
+        }
+
+        return attribute;
+    }
+
     public boolean arrayInPath(String path)
     {
         StringTokenizer tokenizer = new StringTokenizer(path, ".");
@@ -745,4 +794,56 @@ public class MetaClass extends MetaContainer implements IMetaClass
     {
         this.parentIsKey = parentIsKey;
     }
+
+    @Override
+    public boolean hasNotFinalAttributes() {
+        for (String attribute: getAttributeNames())
+        {
+            IMetaAttribute metaAttribute = getMetaAttribute(attribute);
+            IMetaType metaType = metaAttribute.getMetaType();
+
+            if (metaAttribute.isImmutable())
+                continue;
+
+            if (!metaAttribute.isFinal())
+                return true;
+
+            boolean hasNotFinalAttribites = false;
+            if (metaType.isComplex())
+            {
+                if (metaType.isSet())
+                {
+                    if (metaType.isSetOfSets())
+                    {
+                        throw new UnsupportedOperationException("Not yet implemented.");
+                    }
+
+                    IMetaSet childMetaSet = (IMetaSet)metaType;
+                    IMetaClass childMetaClass = (IMetaClass)childMetaSet.getMemberType();
+                    if (childMetaClass.isSearchable())
+                    {
+                        continue;
+                    }
+                    hasNotFinalAttribites = childMetaClass.hasNotFinalAttributes();
+                }
+                else
+                {
+                    IMetaClass childMetaClass = (IMetaClass)metaType;
+                    if (childMetaClass.isSearchable())
+                    {
+                        continue;
+                    }
+                    hasNotFinalAttribites =  childMetaClass.hasNotFinalAttributes();
+                }
+            }
+
+            if (hasNotFinalAttribites)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

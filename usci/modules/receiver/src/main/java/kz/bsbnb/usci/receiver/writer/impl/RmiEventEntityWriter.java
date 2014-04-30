@@ -3,7 +3,7 @@ package kz.bsbnb.usci.receiver.writer.impl;
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
-import kz.bsbnb.usci.receiver.common.Global;
+import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import kz.bsbnb.usci.receiver.writer.IWriter;
@@ -40,6 +40,9 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
     @Autowired
     protected StatusSingleton statusSingleton;
 
+    @Autowired
+    protected SQLQueriesStats sqlStats;
+
     @PostConstruct
     public void init() {
         logger.info("Writer init");
@@ -60,8 +63,14 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
             BaseEntity entity = (BaseEntity)iter.next();
             //System.out.println(entity.toString());
 
-            Date contractDate = (Date)entity.getEl("primary_contract.date");
-            String contractNo = (String)entity.getEl("primary_contract.no");
+            //TODO: Remove hardcode (credit specific attributes)
+            Date contractDate = null;
+            String contractNo = null;
+            if (entity.getMeta().getClassName().equals("credit"))
+            {
+                contractDate = (Date)entity.getEl("primary_contract.date");
+                contractNo = (String)entity.getEl("primary_contract.no");
+            }
 
             //TODO: UNCOMMENT
             /*if (statusSingleton.isEntityCompleted(entity.getBatchId(), entity.getBatchIndex() - 1)) {
@@ -70,36 +79,38 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                 continue;
             }*/
 
-            //TODO: uncomment!!!
             statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
                     entity.getBatchIndex() - 1,
                     EntityStatuses.CHECK_IN_PARSER, null, new Date(),
                     contractNo,
                     contractDate));
-            /*try {
+            try {
+                long t1 = System.currentTimeMillis();
                 rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());
+                sqlStats.put(entity.getMeta().getClassName() + "_parser", System.currentTimeMillis() - t1);
             } catch(Exception e) {
                 logger.error("Can't run rules: " + e.getMessage());
             }
 
             if (entity.getValidationErrors().size() > 0) {
                 for (String errorMsg : entity.getValidationErrors()) {
+                    System.out.println(errorMsg);
                     //TODO: check for error with Index
                     statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
                             entity.getBatchIndex() - 1,
-                            Global.CONTRACT_STATUS_ERROR, errorMsg, new Date(),
+                            EntityStatuses.ERROR, errorMsg, new Date(),
                             contractNo,
                             contractDate));
                 }
-            } else {*/
+            } else {
                 statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
-                    entity.getBatchIndex() - 1,
-                    EntityStatuses.WAITING, null, new Date(),
-                    contractNo,
-                    contractDate));
+                        entity.getBatchIndex() - 1,
+                        EntityStatuses.WAITING, null, new Date(),
+                        contractNo,
+                        contractDate));
 
                 entitiesToSave.add(entity);
-            /*}*/
+            }
         }
 
         entityService.process(entitiesToSave);

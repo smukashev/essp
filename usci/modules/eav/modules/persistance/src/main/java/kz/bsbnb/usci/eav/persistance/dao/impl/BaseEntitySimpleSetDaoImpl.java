@@ -31,7 +31,7 @@ import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITY_SIMPLE_SET
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_M_SIMPLE_SET;
 
 /**
- * Created by Alexandr.Motov on 16.03.14.
+ * @author alexandr.motov
  */
 @Repository
 public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEntitySimpleSetDao {

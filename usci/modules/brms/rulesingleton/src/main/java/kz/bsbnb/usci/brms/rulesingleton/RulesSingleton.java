@@ -94,6 +94,7 @@ public class RulesSingleton
     }
 
     public RulesSingleton() {
+        reloadCache();
         kbase = KnowledgeBaseFactory.newKnowledgeBase();
     }
 

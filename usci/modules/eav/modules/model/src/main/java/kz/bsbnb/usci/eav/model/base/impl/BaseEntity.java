@@ -1,9 +1,6 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
-import kz.bsbnb.usci.eav.model.base.IBaseContainer;
-import kz.bsbnb.usci.eav.model.base.IBaseEntity;
-import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
-import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.base.*;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -769,12 +766,14 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                    enQueue(step + 1);
                } else if(nextAttribute.getMetaType().isSet()){ //transition to array
                    BaseSet next = (BaseSet)curBE.getEl(operations[step]);
+                   if(next!=null){
                      for(Object o: next.get()){
                          {
                              enQueue(((BaseValue) o).getValue());
                              enQueue(step+1);
                          }
                      }
+                   }
                } else{ //transition to simple
                    BaseEntity next =  (BaseEntity) curBE.getEl(operations[step]);
                      enQueue(next);
@@ -1317,4 +1316,5 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     public UUID getUuid() {
         return uuid;
     }
+
 }
