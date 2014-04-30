@@ -171,6 +171,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         Map<String, Object> row = rows.get(0);
 
         if(row != null) {
+
+
             metaClass.setDisabled(((BigDecimal)row.get("is_disabled")).longValue() == 1);
             metaClass.setBeginDate(DataUtils.convert((Timestamp)row.get("begin_date")));
             metaClass.setId(((BigDecimal)row.get("id")).longValue());

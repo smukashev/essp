@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav.showcase;
 
 import kz.bsbnb.usci.eav.factory.IMetaFactory;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
@@ -63,6 +64,11 @@ public class ShowCaseHolderTest extends GenericTestCase
 
         metaClassRepository.saveMetaClass(metaClass);
 
+        // 1 january 2013
+        Batch batch = batchRepository.addBatch(new Batch(new Date(new Long("1356976800000"))));
+
+        IBaseEntity entity = generateBaseEntity(batch, metaClassRepository);
+
         System.out.println(metaClass.toString());
 
         showCase.setName("TestShowCase");
@@ -79,7 +85,10 @@ public class ShowCaseHolderTest extends GenericTestCase
 
         scHolder.setShowCaseMeta(showCase);
 
-        //scHolder.createTables();
-        scHolder.calculateIdxPaths();
+        scHolder.createTables();
+        //scHolder.calculateIdxPaths();
+
+        entity = baseEntityProcessorDao.process(entity);
+        System.out.println(entity.toString());
     }
 }

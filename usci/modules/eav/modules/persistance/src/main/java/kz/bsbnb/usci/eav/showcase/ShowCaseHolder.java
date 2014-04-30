@@ -235,10 +235,10 @@ public class ShowCaseHolder extends JDBCSupport
 
         idxPaths = root.getPaths();
 
-        System.out.println("################");
-        for (String cPath : idxPaths) {
-            System.out.println(cPath);
-        }
+//        System.out.println("################");
+//        for (String cPath : idxPaths) {
+//            System.out.println(cPath);
+//        }
     }
 
     public void createTables() {
@@ -266,6 +266,17 @@ public class ShowCaseHolder extends JDBCSupport
         idColumn.setAutoIncrement(true);
 
         dataTable.addColumn(idColumn);
+
+        Column idxColumn = new Column();
+
+        idxColumn.setName("IDX_ID");
+        idxColumn.setPrimaryKey(true);
+        idxColumn.setRequired(true);
+        idxColumn.setType("NUMERIC");
+        idxColumn.setSize("14,0");
+        idxColumn.setAutoIncrement(true);
+
+        dataTable.addColumn(idxColumn);
 
         for (ShowCaseField field : showCaseMeta.getFieldsList()) {
             Column column = new Column();
@@ -310,10 +321,16 @@ public class ShowCaseHolder extends JDBCSupport
 
         idxTable.addColumn(idColumn);
 
-        for (ShowCaseField field : showCaseMeta.getFieldsList()) {
+        calculateIdxPaths();
+
+        int i = 1;
+
+        for (String cPath : idxPaths) {
+            //System.out.println(cPath);
             Column column = new Column();
 
-            column.setName(COLUMN_PREFIX + field.getColumnName().toUpperCase());
+            column.setName(COLUMN_PREFIX + cPath.replace(".", "_").substring(0,
+                    Math.max(32 - COLUMN_PREFIX.length() - 5, cPath.length())) + i++);
             column.setPrimaryKey(false);
             column.setRequired(false);
 
