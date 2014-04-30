@@ -681,7 +681,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
               FROM dual;
 
             INSERT INTO xml_file (id, creditor_id, report_date, begin_date, file_name, status, sent, type)
-              VALUES (v_xml_file_id, p_creditor_id, p_report_date, sysdate, 'XML_DATA_BY_CID_' || p_creditor_id || '_RD_' || to_char(p_report_date, 'yyyyMMdd') || '_' || ltrim(to_char(v_xml_file_id, '00000')), 'STARTING', 0, 1);
+              VALUES (v_xml_file_id, p_creditor_id, p_report_date, sysdate, 'XML_PORTFOLIO_DATA_BY_CID_' || p_creditor_id || '_RD_' || to_char(p_report_date, 'yyyyMMdd') || '_' || ltrim(to_char(v_xml_file_id, '00000')), 'STARTING', 0, 1);
           
             generate_portfolio_xml(v_xml_file_id); 
           END IF; 

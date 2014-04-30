@@ -17,4 +17,6 @@ public interface IBaseSetComplexValueDao extends IBaseSetValueDao {
 
     public IBaseValue getLastBaseValue(IBaseValue baseValue, boolean currentReportDate);
 
+    public boolean isSingleBaseValue(IBaseValue baseValue);
+
 }

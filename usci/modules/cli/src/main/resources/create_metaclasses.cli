@@ -4,6 +4,16 @@ clear
 init
 
 #====================================
+#= REF_DEBTOR_TYPE
+#====================================
+
+meta create --name=ref_debtor_type --reference
+meta add --name=ref_debtor_type --attribute=code --type=string
+meta key --name=ref_debtor_type --attribute=code
+meta add --name=ref_debtor_type --attribute=name_kz --type=string
+meta add --name=ref_debtor_type --attribute=name_ru --type=string
+
+#====================================
 #= REF_DOC_TYPE
 #====================================
 
@@ -567,9 +577,14 @@ meta add --name=pledge --attribute=pledge_type --type=meta_class --childname=ref
 #====================================
 
 meta create --name=subject
+meta add --name=subject --attribute=type --type=meta_class --childname=ref_debtor_type --immutable
+#meta key --name=subject --attribute=creditor
 meta add --name=subject --attribute=creditor --type=meta_class --childname=creditor
+#meta key --name=subject --attribute=creditor
 meta add --name=subject --attribute=organization --type=meta_class --childname=organization
+#meta key --name=subject --attribute=organization
 meta add --name=subject --attribute=person --type=meta_class --childname=person
+#meta key --name=subject --attribute=person
 
 #====================================
 #= CHANGE
@@ -624,7 +639,7 @@ meta add --name=credit --attribute=prolongation_date --type=date
 
 meta create --name=portfolio_flow_detail
 meta add --name=portfolio_flow_detail --attribute=value --type=double --final
-meta add --name=portfolio_flow_detail --attribute=balance_account --type=meta_class --childname=ref_balance_account --final
+meta add --name=portfolio_flow_detail --attribute=balance_account --type=meta_class --childname=ref_balance_account --final --immutable
 
 #====================================
 #= PORTFOLIO_FLOW_KFN
@@ -641,7 +656,7 @@ meta add --name=portfolio_flow_kfn --attribute=details --type=meta_class --child
 meta create --name=portfolio_flow_msfo
 meta add --name=portfolio_flow_msfo --attribute=portfolio --type=meta_class --childname=ref_portfolio --immutable --final
 meta add --name=portfolio_flow_msfo --attribute=details --type=meta_class --childname=portfolio_flow_detail --array --final
-meta add --name=portfolio_flow_msfo --attribute=discounted_value --type=double
+meta add --name=portfolio_flow_msfo --attribute=discounted_value --type=double --final
 
 #====================================
 #= PORTFOLIO_DATA
