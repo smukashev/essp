@@ -97,7 +97,8 @@ public class GenericTestCase
         return metaContractHolder;
     }
 
-    protected BaseEntity generateBaseEntity(Batch batch, IMetaFactory metaFactory) {
+    protected BaseEntity generateBaseEntity(Batch batch, IMetaFactory metaFactory)
+    {
         throw new RuntimeException("TODO: Fix me!");
     }
 

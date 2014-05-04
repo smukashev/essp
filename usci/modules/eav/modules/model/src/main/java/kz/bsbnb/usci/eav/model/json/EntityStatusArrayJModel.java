@@ -6,33 +6,33 @@ import java.util.List;
 /**
  * @author k.tulbassiyev
  */
-public class ContractStatusArrayJModel
+public class EntityStatusArrayJModel
 {
-    private String type = "contract_status";
+    private String type = "entity_status";
 
     private Long batchId;
     private Long index;
 
-    private List<ContractStatusJModel> contractStatuses = new ArrayList<ContractStatusJModel>();
+    private List<EntityStatusJModel> entityStatuses = new ArrayList<EntityStatusJModel>();
 
-    public ContractStatusArrayJModel(Long batchId, Long index)
+    public EntityStatusArrayJModel(Long batchId, Long index)
     {
         this.batchId = batchId;
         this.index = index;
     }
 
-    public List<ContractStatusJModel> getContractStatuses() {
-        return contractStatuses;
+    public List<EntityStatusJModel> getEntityStatuses() {
+        return entityStatuses;
     }
 
-    public void setContractStatuses(List<ContractStatusJModel> contractStatuses) {
-        this.contractStatuses = contractStatuses;
+    public void setEntityStatuses(List<EntityStatusJModel> entityStatuses) {
+        this.entityStatuses = entityStatuses;
     }
 
     @Override
     public String toString() {
-        return "ContractStatusArrayJModel{" +
-                "contractStatuses=" + contractStatuses +
+        return "EntityStatusArrayJModel{" +
+                "entityStatuses=" + entityStatuses +
                 '}';
     }
 

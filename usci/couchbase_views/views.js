@@ -31,10 +31,10 @@
               }
             }"
       },
-      "contract_status":{
+      "entity_status":{
          "map":"function (doc, meta) {
-  if(doc.type == \"contract_status\") {
-    emit([doc.batchId, doc.index], {index: doc.index, contractStatuses: doc.contractStatuses});
+  if(doc.type == \"entity_status\") {
+    emit([doc.batchId, doc.index], {index: doc.index, entityStatuses: doc.entityStatuses});
   }
 }"
       }

@@ -24,17 +24,14 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
-import kz.bsbnb.usci.eav.model.json.ContractStatusArrayJModel;
-import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
+import kz.bsbnb.usci.eav.model.json.EntityStatusArrayJModel;
+import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
-import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
@@ -773,7 +770,7 @@ public class CLI
                                 continue;
                             }
 
-                            View view = couchbaseClient.getView("batch", "contract_status");
+                            View view = couchbaseClient.getView("batch", "entity_status");
                             Query query = new Query();
                             query.setDescending(true);
                             query.setRangeEnd("[" + batchId + ", 0]");
@@ -790,12 +787,12 @@ public class CLI
 
                                 row_count++;
 
-                                ContractStatusArrayJModel batchFullStatusJModel =
-                                        gson.fromJson(viewRowNoDocs.getValue(), ContractStatusArrayJModel.class);
+                                EntityStatusArrayJModel batchFullStatusJModel =
+                                        gson.fromJson(viewRowNoDocs.getValue(), EntityStatusArrayJModel.class);
 
                                 boolean errorFound = false;
                                 boolean completedFound = false;
-                                for (ContractStatusJModel csajm : batchFullStatusJModel.getContractStatuses()) {
+                                for (EntityStatusJModel csajm : batchFullStatusJModel.getEntityStatuses()) {
                                     if (csajm.getProtocol().equals("ERROR"))
                                     {
                                         errorFound = true;
@@ -1004,7 +1001,7 @@ public class CLI
                                 continue;
                             }
 
-                            View view = couchbaseClient.getView("batch", "contract_status");
+                            View view = couchbaseClient.getView("batch", "entity_status");
                             Query query = new Query();
                             query.setDescending(true);
                             query.setRangeEnd("[" + batchId + ", 0]");
@@ -1021,12 +1018,12 @@ public class CLI
 
                                 row_count++;
 
-                                ContractStatusArrayJModel batchFullStatusJModel =
-                                        gson.fromJson(viewRowNoDocs.getValue(), ContractStatusArrayJModel.class);
+                                EntityStatusArrayJModel batchFullStatusJModel =
+                                        gson.fromJson(viewRowNoDocs.getValue(), EntityStatusArrayJModel.class);
 
                                 boolean errorFound = false;
                                 boolean completedFound = false;
-                                for (ContractStatusJModel csajm : batchFullStatusJModel.getContractStatuses()) {
+                                for (EntityStatusJModel csajm : batchFullStatusJModel.getEntityStatuses()) {
                                     if (csajm.getProtocol().equals("ERROR"))
                                     {
                                         errorFound = true;
@@ -1368,7 +1365,7 @@ public class CLI
 
         BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
 
-        View view = couchbaseClient.getView("batch", "contract_status");
+        View view = couchbaseClient.getView("batch", "entity_status");
         Query query = new Query();
         query.setDescending(true);
         query.setRangeEnd("[" + batchId + ", 0]");
@@ -1385,12 +1382,12 @@ public class CLI
 
             row_count++;
 
-            ContractStatusArrayJModel batchFullStatusJModel =
-                    gson.fromJson(viewRowNoDocs.getValue(), ContractStatusArrayJModel.class);
+            EntityStatusArrayJModel batchFullStatusJModel =
+                    gson.fromJson(viewRowNoDocs.getValue(), EntityStatusArrayJModel.class);
 
             boolean errorFound = false;
             boolean completedFound = false;
-            for (ContractStatusJModel csajm : batchFullStatusJModel.getContractStatuses()) {
+            for (EntityStatusJModel csajm : batchFullStatusJModel.getEntityStatuses()) {
                 if (csajm.getProtocol().equals("ERROR"))
                 {
                     errorFound = true;

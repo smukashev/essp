@@ -273,7 +273,7 @@ public class ZipFilesMonitor{
 
                         BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
 
-                        View view = couchbaseClient.getView("batch", "contract_status");
+                        View view = couchbaseClient.getView("batch", "entity_status");
                         Query query = new Query();
                         query.setDescending(true);
                         query.setRangeEnd("[" + batchId + ", 0]");
@@ -291,12 +291,12 @@ public class ZipFilesMonitor{
 
                             row_count++;
 
-                            ContractStatusArrayJModel batchFullStatusJModel =
-                                    gson.fromJson(viewRowNoDocs.getValue(), ContractStatusArrayJModel.class);
+                            EntityStatusArrayJModel batchFullStatusJModel =
+                                    gson.fromJson(viewRowNoDocs.getValue(), EntityStatusArrayJModel.class);
 
                             boolean errorFound = false;
                             boolean completedFound = false;
-                            for (ContractStatusJModel csajm : batchFullStatusJModel.getContractStatuses()) {
+                            for (EntityStatusJModel csajm : batchFullStatusJModel.getEntityStatuses()) {
                                 if (csajm.getProtocol().equals("ERROR"))
                                 {
                                     errorFound = true;

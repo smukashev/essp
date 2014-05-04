@@ -8,9 +8,9 @@ import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.cr.model.Message;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.Shared;
-import kz.bsbnb.usci.eav.model.json.BatchFullStatusJModel;
-import kz.bsbnb.usci.eav.model.json.ContractStatusArrayJModel;
-import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
+import kz.bsbnb.usci.eav.model.json.EntityStatusArrayJModel;
+import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
+import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +51,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         String batchId = "" + inputInfoId.getId();
 
         if(batchId != null) {
-            View view = couchbaseClient.getView("batch", "contract_status");
+            View view = couchbaseClient.getView("batch", "entity_status");
             Query query = new Query();
             query.setDescending(true);
             query.setRangeEnd("[" + batchId + ",0]");
@@ -62,16 +62,16 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
 
             Iterator<ViewRow> rows = response.iterator();
 
-            ArrayList<ContractStatusArrayJModel> csList = new ArrayList<ContractStatusArrayJModel>();
+            ArrayList<EntityStatusArrayJModel> csList = new ArrayList<EntityStatusArrayJModel>();
             while(rows.hasNext()) {
                 ViewRow viewRowNoDocs = rows.next();
 
-                ContractStatusArrayJModel batchFullStatusJModel =
-                        gson.fromJson(viewRowNoDocs.getValue(), ContractStatusArrayJModel.class);
+                EntityStatusArrayJModel batchFullStatusJModel =
+                        gson.fromJson(viewRowNoDocs.getValue(), EntityStatusArrayJModel.class);
 
                 //csList.add(batchFullStatusJModel);
 
-                for (ContractStatusJModel csajm : batchFullStatusJModel.getContractStatuses()) {
+                for (EntityStatusJModel csajm : batchFullStatusJModel.getEntityStatuses()) {
                     Protocol prot = new Protocol();
                     prot.setId(1L);
                     Message m = new Message();
@@ -90,11 +90,11 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
 
                     prot.setNote("присвоено " + csajm.getReceived());
                     prot.setPackNo(csajm.getIndex());
-                    prot.setPrimaryContractDate(csajm.getContractDate());
+                    prot.setPrimaryContractDate((Date) csajm.getProperty(StatusProperties.CONTRACT_DATE));
                     prot.setProtocolType(s);
 
 
-                    prot.setTypeDescription(csajm.getContractNo());
+                    prot.setTypeDescription((String)csajm.getProperty(StatusProperties.CONTRACT_NO));
 
                     list.add(prot);
                 }

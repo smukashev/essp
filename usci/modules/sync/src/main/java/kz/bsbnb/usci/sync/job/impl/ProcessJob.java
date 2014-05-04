@@ -2,9 +2,10 @@ package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
+import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.sync.job.AbstractJob;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
+import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 
 import java.util.Date;
@@ -36,11 +37,14 @@ public class ProcessJob extends AbstractJob {
             contractNo = (String)baseEntity.getEl("primary_contract.no");
         }
 
-        statusSingleton.addContractStatus(baseEntity.getBatchId(), new ContractStatusJModel(
+        EntityStatusJModel entityStatusJModel = new EntityStatusJModel(
                 baseEntity.getBatchIndex() - 1,
-                EntityStatuses.PROCESSING, null, new Date(),
-                contractNo,
-                contractDate));
+                EntityStatuses.PROCESSING, null, new Date());
+
+        entityStatusJModel.addProperty(StatusProperties.CONTRACT_NO, contractNo);
+        entityStatusJModel.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
+
+        statusSingleton.addContractStatus(baseEntity.getBatchId(), entityStatusJModel);
 
         long t1 = System.currentTimeMillis();
         entityService.process(baseEntity);

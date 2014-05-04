@@ -2,9 +2,10 @@ package kz.bsbnb.usci.receiver.writer.impl;
 
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
+import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
+import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import kz.bsbnb.usci.receiver.writer.IWriter;
 import kz.bsbnb.usci.sync.service.IEntityService;
@@ -79,11 +80,14 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                 continue;
             }*/
 
-            statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
+            EntityStatusJModel entityStatusJModel = new EntityStatusJModel(
                     entity.getBatchIndex() - 1,
-                    EntityStatuses.CHECK_IN_PARSER, null, new Date(),
-                    contractNo,
-                    contractDate));
+                    EntityStatuses.CHECK_IN_PARSER, null, new Date());
+
+            entityStatusJModel.addProperty(StatusProperties.CONTRACT_NO, contractNo);
+            entityStatusJModel.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
+
+            statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
             try {
                 long t1 = System.currentTimeMillis();
                 rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());
@@ -96,18 +100,24 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                 for (String errorMsg : entity.getValidationErrors()) {
                     System.out.println(errorMsg);
                     //TODO: check for error with Index
-                    statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
+                    entityStatusJModel = new EntityStatusJModel(
                             entity.getBatchIndex() - 1,
-                            EntityStatuses.ERROR, errorMsg, new Date(),
-                            contractNo,
-                            contractDate));
+                            EntityStatuses.ERROR, errorMsg, new Date());
+
+                    entityStatusJModel.addProperty(StatusProperties.CONTRACT_NO, contractNo);
+                    entityStatusJModel.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
+
+                    statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
                 }
             } else {
-                statusSingleton.addContractStatus(entity.getBatchId(), new ContractStatusJModel(
+                entityStatusJModel = new EntityStatusJModel(
                         entity.getBatchIndex() - 1,
-                        EntityStatuses.WAITING, null, new Date(),
-                        contractNo,
-                        contractDate));
+                        EntityStatuses.WAITING, null, new Date());
+
+                entityStatusJModel.addProperty(StatusProperties.CONTRACT_NO, contractNo);
+                entityStatusJModel.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
+
+                statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
 
                 entitiesToSave.add(entity);
             }

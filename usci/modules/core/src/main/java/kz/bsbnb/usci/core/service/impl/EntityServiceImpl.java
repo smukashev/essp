@@ -3,7 +3,7 @@ package kz.bsbnb.usci.core.service.impl;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.json.ContractStatusJModel;
+import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.IBaseEntitySearcherPool;
@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
+import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -68,11 +69,14 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
             //System.out.println("[core][process] : " + contractNo + " - " + contractDate + " : " + t2);
 
-            statusSingleton.addContractStatus(baseEntity.getBatchId(), new ContractStatusJModel(
-                    baseEntity.getBatchIndex() - 1,
-                    EntityStatuses.COMPLETED, "" + entity.getId(), new Date(),
-                    contractNo,
-                    contractDate));
+            EntityStatusJModel entityStatus = new EntityStatusJModel(
+                    entity.getBatchIndex() - 1,
+                    EntityStatuses.COMPLETED, "" + entity.getId(), new Date());
+
+            entityStatus.addProperty(StatusProperties.CONTRACT_NO, contractNo);
+            entityStatus.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
+
+            statusSingleton.addContractStatus(entity.getBatchId(), entityStatus);
         } catch (Exception e) {
             //TODO: Remove hardcode (credit specific attributes)
             Date contractDate = null;
@@ -86,11 +90,14 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             logger.error("Batch id: " + baseEntity.getBatchId() + ", index: " + (baseEntity.getBatchIndex() - 1) +
                     ExceptionUtils.getStackTrace(e));
 
-            statusSingleton.addContractStatus(baseEntity.getBatchId(), new ContractStatusJModel(
+            EntityStatusJModel entityStatus = new EntityStatusJModel(
                     baseEntity.getBatchIndex() - 1,
-                    EntityStatuses.ERROR, e.getMessage(), new Date(),
-                    contractNo,
-                    contractDate));
+                    EntityStatuses.ERROR, e.getMessage(), new Date());
+
+            entityStatus.addProperty(StatusProperties.CONTRACT_NO, contractNo);
+            entityStatus.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
+
+            statusSingleton.addContractStatus(baseEntity.getBatchId(), entityStatus);
         }
     }
 

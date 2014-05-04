@@ -11,10 +11,10 @@ public class BatchNormalJModel {
     private Long id;
     private String type = "batch";
     private String fileName;
-    private ContractStatusArrayJModel status;
+    private EntityStatusArrayJModel status;
     private Date received;
 
-    public BatchNormalJModel(Long id, String fileName, ContractStatusArrayJModel status, Date received) {
+    public BatchNormalJModel(Long id, String fileName, EntityStatusArrayJModel status, Date received) {
         this.id = id;
         this.fileName = fileName;
         this.status = status;
@@ -37,11 +37,11 @@ public class BatchNormalJModel {
         this.fileName = fileName;
     }
 
-    public ContractStatusArrayJModel getStatus() {
+    public EntityStatusArrayJModel getStatus() {
         return status;
     }
 
-    public void setStatus(ContractStatusArrayJModel status) {
+    public void setStatus(EntityStatusArrayJModel status) {
         this.status = status;
     }
 
