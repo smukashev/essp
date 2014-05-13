@@ -14,7 +14,8 @@ import java.util.List;
 public class PledgeTypeRepository extends BaseRepository {
     private static HashMap repository;
     private static HashSet columns;
-    private static String QUERY = "SELECT * FROM ref.PLEDGE_TYPE";
+    private static String QUERY = "SELECT * FROM ref.PLEDGE_TYPE t" + " where t.open_date <= to_date('" + repDate + "', 'dd.MM.yyyy')\n"+
+            "   and (t.close_date > to_date('" + repDate + "', 'dd.MM.yyyy') or t.close_date is null)";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='PLEDGE_TYPE'";
 
     public static HashMap getRepository() {
@@ -78,3 +79,4 @@ public class PledgeTypeRepository extends BaseRepository {
         return null;
     }
 }
+

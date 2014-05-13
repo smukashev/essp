@@ -14,7 +14,8 @@ import java.util.List;
 public class CreditorBranchRepository extends BaseRepository {
     private static HashMap repository;
     private static HashSet columns;
-    private static String QUERY = "SELECT * FROM ref.CREDITOR WHERE main_office_id is not null";
+    private static String QUERY = "SELECT c.* FROM ref.v_CREDITOR_his t, ref.creditor c WHERE c.id = t.id"  + " and t.open_date <= to_date('" + repDate + "', 'dd.MM.yyyy')\n"+
+            "   and (t.close_date > to_date('" + repDate + "', 'dd.MM.yyyy') or t.close_date is null)";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDITOR'";
 
     public static HashMap getRepository() {
@@ -37,7 +38,11 @@ public class CreditorBranchRepository extends BaseRepository {
                     tmp.put((String)s,rows.getString((String)s));
                 }
                 tmp.put("docs",CreditorDocRepository.getByProperty("CREDITOR_ID",(String) tmp.get("ID")));
-                tmp.put("main_office",CreditorRepository.getById((String) tmp.get("MAIN_OFFICE_ID")));
+                if (tmp.get("MAIN_OFFICE_ID") == null) {
+                    tmp.put("main_office",CreditorRepository.getById((String) tmp.get("ID")));
+                } else {
+                    tmp.put("main_office",CreditorRepository.getById((String) tmp.get("MAIN_OFFICE_ID")));
+                }
 
                 CreditorBranch dt = new CreditorBranch(tmp);
                 hm.put(dt.get(dt.getKeyName()),dt);
@@ -81,3 +86,4 @@ public class CreditorBranchRepository extends BaseRepository {
         return null;
     }
 }
+

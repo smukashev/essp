@@ -32,3 +32,4 @@ public class LegalForm extends BaseRef {
         appendToElement(root,"short_name_ru",hm.get("SHORT_NAME_RU"));
     }
 }
+

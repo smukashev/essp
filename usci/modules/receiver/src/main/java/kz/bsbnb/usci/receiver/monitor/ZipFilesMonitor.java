@@ -163,9 +163,9 @@ public class ZipFilesMonitor{
 
         IBatchService batchService = serviceFactory.getBatchService();
 
-        Calendar cal = Calendar.getInstance();
+        /*Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(0);
-        cal.set(2013, 4, 1, 0, 0, 0);
+        cal.set(2013, 4, 1, 0, 0, 0);*/
 
         while(true) {
             try {
@@ -212,12 +212,12 @@ public class ZipFilesMonitor{
 
 
 
-                        if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), cal.getTime()) != 0)
+                        /*if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), cal.getTime()) != 0)
                         {
                             System.out.println("Skipping wrone dates: " + batchInfo.getRepDate());
                             System.out.println("Must be: " + cal.getTime());
                             continue;
-                        }
+                        }   */
 
                         sender.addJob(batchId, batchInfo);
                         receiverStatusSingleton.batchReceived();

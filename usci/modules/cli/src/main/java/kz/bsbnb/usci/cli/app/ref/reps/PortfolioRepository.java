@@ -14,7 +14,9 @@ import java.util.List;
 public class PortfolioRepository extends BaseRepository {
     private static HashMap repository;
     private static HashSet columns;
-    private static String QUERY = "SELECT * FROM ref.PORTFOLIO where creditor_id is not null";
+    private static String QUERY = "SELECT * FROM ref.PORTFOLIO t where " +
+                        " t.open_date <= to_date('" + repDate + "', 'dd.MM.yyyy')\n"+
+                        " and (t.close_date > to_date('" + repDate + "', 'dd.MM.yyyy') or t.close_date is null)";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='PORTFOLIO'";
 
     public static HashMap getRepository() {
@@ -80,3 +82,4 @@ public class PortfolioRepository extends BaseRepository {
         return null;
     }
 }
+

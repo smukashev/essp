@@ -13,7 +13,8 @@ import java.util.List;
 public class BankRelationRepository extends BaseRepository {
     private static HashMap repository;
     private static HashSet columns;
-    private static String QUERY = "SELECT * FROM ref.BANK_RELATION";
+    private static String QUERY = "SELECT * FROM ref.BANK_RELATION t" + " where t.open_date <= to_date('" + repDate + "', 'dd.MM.yyyy')\n"+
+            "   and (t.close_date > to_date('" + repDate + "', 'dd.MM.yyyy') or t.close_date is null)";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='BANK_RELATION'";
 
     public static HashMap getRepository() {
@@ -77,3 +78,4 @@ public class BankRelationRepository extends BaseRepository {
         return null;
     }
 }
+

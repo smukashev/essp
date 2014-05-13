@@ -32,3 +32,4 @@ public class PledgeType extends BaseRef {
         appendToElement(root,"name_ru",hm.get("NAME_RU"));
     }
 }
+

@@ -1,8 +1,11 @@
 package kz.bsbnb.usci.cli.app.ref;
 
+import kz.bsbnb.usci.cli.app.ref.refs.Creditor;
+import kz.bsbnb.usci.cli.app.ref.reps.CreditorRepository;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,7 +30,8 @@ public class BaseCrawler {
 
 
     public static Document document;
-    public static String fileName = "C:\\entity_show\\test";
+    public static String fileName;
+
     public static Document getDocument(){
 
         if(document==null){
@@ -61,7 +65,11 @@ public class BaseCrawler {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(getDocument());
-            StreamResult result = new StreamResult(new File(fileName+"\\" + getClassName()+".xml"));
+            StreamResult result = new StreamResult(new File(fileName + getClassName() +
+                    "_" + BaseRepository.repDate.replaceAll("\\.", "_") + ".xml"));
+
+            //Output to console for testing
+            //StreamResult result = new StreamResult(System.out);
 
             transformer.transform(source, result);
 
@@ -118,14 +126,14 @@ public class BaseCrawler {
 
 
     public String getClassName(){
-        throw new RuntimeException("not implemented");
+        throw new NotImplementedException();
     }
 
     public HashMap getRepository(){
-        throw new RuntimeException("not implemented");
+        throw new  NotImplementedException();
     }
 
     public Class  getRef(){
-        throw new RuntimeException("not implemented");
+        throw new NotImplementedException();
     }
 }

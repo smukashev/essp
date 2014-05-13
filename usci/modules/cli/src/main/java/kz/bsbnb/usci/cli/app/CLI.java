@@ -1791,7 +1791,7 @@ public class CLI
                 preparedStatement = conn.prepareStatement("SELECT xf.id, xf.file_name, xf.file_content\n" +
                         "  FROM core.xml_file xf\n" +
                         " WHERE xf.status = 'COMPLETED'\n" +
-                        "   AND xf.report_date = to_date('01.05.2013', 'dd.MM.yyyy')" +
+                        "   AND xf.report_date = to_date('" + args.get(5) + "', 'dd.MM.yyyy')" +
                         "   AND xf.sent = 0 ORDER BY xf.id ASC");
 
                 preparedStatementDone = conn.prepareStatement("UPDATE core.xml_file xf \n" +
@@ -1822,18 +1822,9 @@ public class CLI
                 return;
             }
 
-            int fileLimit = -1;
-            if (args.size() > 5) {
-                fileLimit = Integer.parseInt(args.get(5));
-            }
             int fileNumber = 0;
 
             while(true) {
-                if (fileLimit > 0) {
-                    if (fileNumber >= fileLimit) {
-                        break;
-                    }
-                }
                 fileNumber++;
 
                 ResultSet result2 = null;
@@ -1914,9 +1905,9 @@ public class CLI
 
         } else {
             System.out.println("Argument needed: <credits_db_url> <user> <password> <receiver_url> <temp_files_folder>");
-            System.out.println("Example: import jdbc:oracle:thin:@srv-scan.corp.nb.rk:1521/DBM01 core ***** rmi://127.0.0.1:1097/batchProcessService D:\\usci\\temp_xml_folder");
-            System.out.println("Example: import jdbc:oracle:thin:@192.168.0.44:1521/CREDITS core core_feb_2013 rmi://127.0.0.1:1097/batchProcessService /home/a.tkachenko/temp_files");
-            System.out.println("Example: import jdbc:oracle:thin:@192.168.0.44:1521/CREDITS core core_mar_2014 rmi://127.0.0.1:1097/batchProcessService D:\\USCI\\Temp");
+            System.out.println("Example: import jdbc:oracle:thin:@srv-scan.corp.nb.rk:1521/DBM01 core ***** rmi://127.0.0.1:1097/batchProcessService D:\\usci\\temp_xml_folder 01.05.2013");
+            System.out.println("Example: import jdbc:oracle:thin:@192.168.0.44:1521/CREDITS core core_feb_2013 rmi://127.0.0.1:1097/batchProcessService /home/a.tkachenko/temp_files 01.05.2013");
+            System.out.println("Example: import jdbc:oracle:thin:@192.168.0.44:1521/CREDITS core core_mar_2014 rmi://127.0.0.1:1097/batchProcessService D:\\USCI\\Temp 01.05.2013");
         }
     }
 
@@ -2409,7 +2400,7 @@ public class CLI
             if(args.size() > 1)
                 BaseCrawler.fileName = args.get(1);
             else {
-                BaseCrawler.fileName = "C:\\entity_show\\mine";
+                BaseCrawler.fileName = "D:\\refs\\";
                 System.out.println("using default file " + BaseCrawler.fileName);
             }
             new BaseRepository().run();
