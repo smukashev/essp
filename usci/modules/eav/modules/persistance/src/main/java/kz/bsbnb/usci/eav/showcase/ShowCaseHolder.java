@@ -360,13 +360,8 @@ public class ShowCaseHolder extends JDBCSupport
     class IdsHolder {
         private ArrayList<Long> idsApplied = new ArrayList<Long>();
         private ArrayList<Long> idsLoaded = new ArrayList<Long>();
-        private ArrayList<Long> idsSaving = new ArrayList<Long>();
         private ArrayList<Object> valuesLoaded = new ArrayList<Object>();
         private ArrayList<Object> valuesApplied = new ArrayList<Object>();
-
-        public void addSavingId(Long id) {
-            idsSaving.add(id);
-        }
 
         public void addLoadedId(Long id) {
             idsLoaded.add(id);
@@ -388,14 +383,6 @@ public class ShowCaseHolder extends JDBCSupport
         public String toString()
         {
             String result = "IdsHolder: \n";
-
-            result += "idsSaving: ";
-
-            for (Long id : idsSaving) {
-                result += id + " ";
-            }
-
-            result += "\n";
 
             result += "idsLoaded: ";
 
@@ -452,6 +439,18 @@ public class ShowCaseHolder extends JDBCSupport
         IdsHolder curHolder = new IdsHolder();
         for (String cPath : idxPaths) {
             if (cPath.equals("root")) {
+                if (baseEntityLoaded != null) {
+                    curHolder.addLoadedId(baseEntityLoaded.getId());
+                } else {
+                    curHolder.addLoadedId(0L);
+                }
+
+                if (baseEntityApplied != null) {
+                    curHolder.addAppliedId(baseEntityApplied.getId());
+                } else {
+                    curHolder.addAppliedId(0L);
+                }
+
                 continue;
             }
 
@@ -475,13 +474,8 @@ public class ShowCaseHolder extends JDBCSupport
                 childBaseEntityApplied = (IBaseEntity)baseEntityApplied.getEl(cPath);
             }
 
-            long childBaseEntitySavingId = 0;
             long childBaseEntityLoadedId = 0;
             long childBaseEntityAppliedId = 0;
-
-            if (childBaseEntitySaving != null) {
-                childBaseEntitySavingId = childBaseEntitySaving.getId();
-            }
 
             if (childBaseEntityLoaded != null) {
                 childBaseEntityLoadedId = childBaseEntityLoaded.getId();
@@ -491,7 +485,6 @@ public class ShowCaseHolder extends JDBCSupport
                 childBaseEntityAppliedId = childBaseEntityApplied.getId();
             }
 
-            curHolder.addSavingId(childBaseEntitySavingId);
             curHolder.addLoadedId(childBaseEntityLoadedId);
             curHolder.addAppliedId(childBaseEntityAppliedId);
         }
