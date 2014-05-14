@@ -5,6 +5,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,6 +29,8 @@ public interface IBaseEntity extends IBaseContainer {
     public void remove(String attribute);
 
     public Object getEl(String path);
+
+    public List<Object> getElWithArrays(String path);
 
     public IBaseValue safeGetValue(String name);
 

@@ -5,6 +5,8 @@ import kz.bsbnb.ddlutils.PlatformFactory;
 import kz.bsbnb.ddlutils.model.Column;
 import kz.bsbnb.ddlutils.model.Database;
 import kz.bsbnb.ddlutils.model.Table;
+import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -329,8 +332,8 @@ public class ShowCaseHolder extends JDBCSupport
             //System.out.println(cPath);
             Column column = new Column();
 
-            column.setName(COLUMN_PREFIX + cPath.replace(".", "_").substring(0,
-                    Math.max(32 - COLUMN_PREFIX.length() - 5, cPath.length())) + i++);
+            column.setName(COLUMN_PREFIX + cPath.replace(".", "_").substring(
+                    Math.max(COLUMN_PREFIX.length() + 5 - 32, 0), cPath.length()) + i++);
             column.setPrimaryKey(false);
             column.setRequired(false);
 
@@ -352,5 +355,172 @@ public class ShowCaseHolder extends JDBCSupport
         Platform platform = PlatformFactory.createNewPlatformInstance(jdbcTemplate.getDataSource());
 
         platform.createModel(model, false, true);
+    }
+
+    class IdsHolder {
+        private ArrayList<Long> idsApplied = new ArrayList<Long>();
+        private ArrayList<Long> idsLoaded = new ArrayList<Long>();
+        private ArrayList<Long> idsSaving = new ArrayList<Long>();
+        private ArrayList<Object> valuesLoaded = new ArrayList<Object>();
+        private ArrayList<Object> valuesApplied = new ArrayList<Object>();
+
+        public void addSavingId(Long id) {
+            idsSaving.add(id);
+        }
+
+        public void addLoadedId(Long id) {
+            idsLoaded.add(id);
+        }
+
+        public void addAppliedId(Long id) {
+            idsApplied.add(id);
+        }
+
+        public void addAppliedValue(Object value) {
+            valuesApplied.add(value);
+        }
+
+        public void addLoadedValue(Object value) {
+            valuesLoaded.add(value);
+        }
+
+        @Override
+        public String toString()
+        {
+            String result = "IdsHolder: \n";
+
+            result += "idsSaving: ";
+
+            for (Long id : idsSaving) {
+                result += id + " ";
+            }
+
+            result += "\n";
+
+            result += "idsLoaded: ";
+
+            for (Long id : idsLoaded) {
+                result += id + " ";
+            }
+
+            result += "\n";
+
+            result += "idsApplied: ";
+
+            for (Long id : idsApplied) {
+                result += id + " ";
+            }
+
+            result += "\n";
+
+            result += "valuesLoaded: \n";
+
+            int i = 0;
+
+            for (Object value : valuesLoaded) {
+                result += showCaseMeta.getFieldsList().get(i++).getColumnName() + ": ";
+                if (value != null) {
+                    result += "\"" + value.toString() + "\"\n";
+                } else {
+                    result += "null\n";
+                }
+            }
+
+            result += "valuesApplied: \n";
+
+            i = 0;
+
+            for (Object value : valuesApplied) {
+                result += showCaseMeta.getFieldsList().get(i++).getColumnName() + ": ";
+                if (value != null) {
+                    result += "\"" + value.toString() + "\"\n";
+                } else {
+                    result += "null\n";
+                }
+            }
+
+            result += "\n";
+
+            return result;
+        }
+    }
+
+    private List<IdsHolder> prepare(IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntity baseEntityApplied,
+                                    IBaseEntityManager entityManager) {
+        ArrayList<IdsHolder> result = new ArrayList<IdsHolder>();
+
+        IdsHolder curHolder = new IdsHolder();
+        for (String cPath : idxPaths) {
+            if (cPath.equals("root")) {
+                continue;
+            }
+
+            cPath = cPath.substring(5);
+
+            System.out.println("CurPath: " + cPath);
+
+            IBaseEntity childBaseEntitySaving = null;
+            IBaseEntity childBaseEntityLoaded = null;
+            IBaseEntity childBaseEntityApplied = null;
+
+            if (baseEntitySaving != null) {
+                childBaseEntitySaving = (IBaseEntity)baseEntitySaving.getEl(cPath);
+            }
+
+            if (baseEntityLoaded != null) {
+                childBaseEntityLoaded = (IBaseEntity)baseEntityLoaded.getEl(cPath);
+            }
+
+            if (baseEntityApplied != null) {
+                childBaseEntityApplied = (IBaseEntity)baseEntityApplied.getEl(cPath);
+            }
+
+            long childBaseEntitySavingId = 0;
+            long childBaseEntityLoadedId = 0;
+            long childBaseEntityAppliedId = 0;
+
+            if (childBaseEntitySaving != null) {
+                childBaseEntitySavingId = childBaseEntitySaving.getId();
+            }
+
+            if (childBaseEntityLoaded != null) {
+                childBaseEntityLoadedId = childBaseEntityLoaded.getId();
+            }
+
+            if (childBaseEntityApplied != null) {
+                childBaseEntityAppliedId = childBaseEntityApplied.getId();
+            }
+
+            curHolder.addSavingId(childBaseEntitySavingId);
+            curHolder.addLoadedId(childBaseEntityLoadedId);
+            curHolder.addAppliedId(childBaseEntityAppliedId);
+        }
+
+        for(ShowCaseField field : showCaseMeta.getFieldsList()) {
+            if (baseEntityApplied != null) {
+                curHolder.addAppliedValue(baseEntityApplied.getEl(field.getAttributePath() +
+                        "." + field.getAttributeName()));
+            } else {
+                curHolder.addAppliedValue(null);
+            }
+
+            if (baseEntityLoaded != null) {
+                curHolder.addLoadedValue(baseEntityLoaded.getEl(field.getAttributePath() +
+                        "." + field.getAttributeName()));
+            } else {
+                curHolder.addLoadedValue(null);
+            }
+        }
+
+        result.add(curHolder);
+
+        System.out.println(curHolder.toString());
+
+        return result;
+    }
+
+    public void process(IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntity baseEntityApplied,
+                      IBaseEntityManager entityManager) {
+        List<IdsHolder> idsHolders = prepare(baseEntitySaving, baseEntityLoaded, baseEntityApplied, entityManager);
     }
 }

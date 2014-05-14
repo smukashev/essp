@@ -86,7 +86,11 @@ public class ShowCaseHolderTest extends GenericTestCase
         scHolder.setShowCaseMeta(showCase);
 
         scHolder.createTables();
-        //scHolder.calculateIdxPaths();
+
+        EntityProcessorListenerImpl entityProcessorListener = new EntityProcessorListenerImpl();
+        entityProcessorListener.addShowCaseHolder(scHolder);
+
+        baseEntityProcessorDao.setApplyListener(entityProcessorListener);
 
         entity = baseEntityProcessorDao.process(entity);
         System.out.println(entity.toString());

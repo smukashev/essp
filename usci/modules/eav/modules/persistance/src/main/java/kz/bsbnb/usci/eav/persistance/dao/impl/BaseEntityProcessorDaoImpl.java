@@ -6,11 +6,11 @@ import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.*;
 import kz.bsbnb.usci.eav.model.base.impl.*;
-import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.meta.impl.*;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
@@ -28,7 +28,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
@@ -58,6 +57,18 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Autowired
     private BasicBaseEntitySearcherPool searcherPool;
+
+    private IDaoListener applyListener;
+
+    public IDaoListener getApplyListener()
+    {
+        return applyListener;
+    }
+
+    public void setApplyListener(IDaoListener applyListener)
+    {
+        this.applyListener = applyListener;
+    }
 
     public IBaseEntity loadByMaxReportDate(long id, Date actualReportDate, boolean caching)
     {
@@ -272,11 +283,18 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    private IBaseEntity apply(IBaseEntity baseEntityForSave, IBaseEntityManager baseEntityManager)
+    private IBaseEntity apply(IBaseEntity baseEntityForSave, IBaseEntityManager baseEntityManager) {
+        return apply(baseEntityForSave, baseEntityManager, null);
+    }
+
+    private IBaseEntity apply(IBaseEntity baseEntityForSave, IBaseEntityManager baseEntityManager, EntityHolder entityHolder)
     {
+        IBaseEntity baseEntityLoaded = null;
+        IBaseEntity baseEntityApplied = null;
+
         if (baseEntityForSave.getId() < 1 || baseEntityForSave.getMeta().isSearchable() == false)
         {
-            return applyBaseEntityBasic(baseEntityForSave, baseEntityManager);
+            baseEntityApplied = applyBaseEntityBasic(baseEntityForSave, baseEntityManager);
         }
         else
         {
@@ -293,9 +311,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             }
             else
             {
-                IBaseEntity baseEntityLoaded = load(baseEntityForSave.getId(), maxReportDate, reportDate);
+                baseEntityLoaded = load(baseEntityForSave.getId(), maxReportDate, reportDate);
                 //try {
-                    return applyBaseEntityAdvanced(baseEntityForSave, baseEntityLoaded, baseEntityManager);
+                baseEntityApplied = applyBaseEntityAdvanced(baseEntityForSave, baseEntityLoaded, baseEntityManager);
                 /*} catch (IllegalStateException ex) {
                     logger.error("ILLEGAL_STATE_ERROR in applyBaseEntityAdvanced " + ex.getMessage() + "\n" +
                             "REPORT_DATE_EXISTS ERROR:\n" +
@@ -309,6 +327,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 }*/
             }
         }
+
+        if (entityHolder != null) {
+            entityHolder.saving = baseEntityForSave;
+            entityHolder.loaded = baseEntityLoaded;
+            entityHolder.applied = baseEntityApplied;
+        }
+
+        return baseEntityApplied;
     }
 
     private IBaseEntity applyBaseEntityBasic(IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager)
@@ -2542,15 +2568,25 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
+    class EntityHolder {
+        IBaseEntity saving;
+        IBaseEntity loaded;
+        IBaseEntity applied;
+    }
+
     @Override
     @Transactional
     public IBaseEntity process(IBaseEntity baseEntity)
     {
+        EntityHolder entityHolder = new EntityHolder();
+
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
         IBaseEntity baseEntityPrepared = prepare(((BaseEntity) baseEntity).clone());
-        IBaseEntity baseEntityApplied = apply(baseEntityPrepared, baseEntityManager);
+        IBaseEntity baseEntityApplied = apply(baseEntityPrepared, baseEntityManager, entityHolder);
 
         applyToDb(baseEntityManager);
+
+        applyListener.applyToDBEnded(entityHolder.saving, entityHolder.loaded, entityHolder.applied, baseEntityManager);
 
         return baseEntityApplied;
     }

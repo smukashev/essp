@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 
 import java.util.Date;
 import java.util.List;
@@ -70,5 +71,9 @@ public interface IBaseEntityProcessorDao
     public long getRandomBaseEntityId(IMetaClass metaClass);
 
     public Set<Long> getChildBaseEntityIds(long parentBaseEntityIds);
+
+    public IDaoListener getApplyListener();
+
+    public void setApplyListener(IDaoListener applyListener);
 
 }
