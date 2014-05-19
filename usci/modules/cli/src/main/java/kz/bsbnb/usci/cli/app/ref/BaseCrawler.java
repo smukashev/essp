@@ -68,6 +68,9 @@ public class BaseCrawler {
             StreamResult result = new StreamResult(new File(fileName + getClassName() +
                     "_" + BaseRepository.repDate.replaceAll("\\.", "_") + ".xml"));
 
+            System.out.println("entity read  " + fileName + getClassName() +
+                    "_" + BaseRepository.repDate.replaceAll("\\.", "_") + ".xml " + BaseRepository.repDate);
+
             //Output to console for testing
             //StreamResult result = new StreamResult(System.out);
 

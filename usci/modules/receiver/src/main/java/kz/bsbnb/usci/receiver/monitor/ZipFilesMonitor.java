@@ -180,6 +180,8 @@ public class ZipFilesMonitor{
                     System.out.println("Found pending jobs: ");
                     System.out.println("-------------------------------------------------------------------------");
 
+                    int jobsRestarted = 0;
+
                     while(rows.hasNext()) {
                         ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) rows.next();
                         long batchId = Long.parseLong(viewRowNoDocs.getKey());
@@ -221,6 +223,7 @@ public class ZipFilesMonitor{
 
                         sender.addJob(batchId, batchInfo);
                         receiverStatusSingleton.batchReceived();
+                        System.out.println("Restarted job #" + ++jobsRestarted);
                     }
                 }
                 break;
