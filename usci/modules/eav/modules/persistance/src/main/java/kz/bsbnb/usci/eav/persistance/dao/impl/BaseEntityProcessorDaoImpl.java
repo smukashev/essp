@@ -19,6 +19,7 @@ import kz.bsbnb.usci.eav.repository.IBaseEntityRepository;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.tool.Quote;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -2586,7 +2587,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         applyToDb(baseEntityManager);
 
-        applyListener.applyToDBEnded(entityHolder.saving, entityHolder.loaded, entityHolder.applied, baseEntityManager);
+        if (applyListener != null) {
+            applyListener.applyToDBEnded(entityHolder.saving, entityHolder.loaded, entityHolder.applied, baseEntityManager);
+        }
 
         return baseEntityApplied;
     }
@@ -2771,7 +2774,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             RefListItem rli = new RefListItem();
 
             Map<String, Object> row = i.next();
-            long id = (Long)row.get("ID");
+            long id = ((BigDecimal)row.get("ID")).longValue();
             long old_id = id;
 
             logger.debug("#####################");
@@ -2779,9 +2782,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             rli.setId(id);
             while (old_id == id) {
                 if (((String)row.get("NAME")).equals("code")) {
-                    rli.setCode((String)row.get("VALUE"));
+                    rli.setCode(Quote.addSlashes((String)row.get("VALUE")));
                 } else if (((String)row.get("NAME")).startsWith("name_")) {
-                    rli.setTitle((String)row.get("VALUE"));
+                    rli.setTitle(Quote.addSlashes((String)row.get("VALUE")));
+                } else if (((String)row.get("NAME")).startsWith("name")) {
+                    rli.setTitle(Quote.addSlashes((String)row.get("VALUE")));
                 }
 
                 for (String key : row.keySet()) {
@@ -2789,12 +2794,19 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         continue;
                     }
 
-                    rli.addValue(key, row.get(key));
+                    String value = Quote.addSlashes(row.get(key).toString());
+
+                    //System.out.println("###% " + value);
+
+                    rli.addValue(key, value);
                 }
+
+                if (!i.hasNext())
+                    break;
 
                 row = i.next();
                 old_id = id;
-                id = (Long)row.get("ID");
+                id = ((BigDecimal)row.get("ID")).longValue();
             }
 
             entityIds.add(rli);

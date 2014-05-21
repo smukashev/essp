@@ -458,13 +458,8 @@ public class ShowCaseHolder extends JDBCSupport
 
             System.out.println("CurPath: " + cPath);
 
-            IBaseEntity childBaseEntitySaving = null;
             IBaseEntity childBaseEntityLoaded = null;
             IBaseEntity childBaseEntityApplied = null;
-
-            if (baseEntitySaving != null) {
-                childBaseEntitySaving = (IBaseEntity)baseEntitySaving.getEl(cPath);
-            }
 
             if (baseEntityLoaded != null) {
                 childBaseEntityLoaded = (IBaseEntity)baseEntityLoaded.getEl(cPath);

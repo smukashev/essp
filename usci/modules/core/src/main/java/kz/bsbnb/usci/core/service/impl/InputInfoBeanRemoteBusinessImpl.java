@@ -98,8 +98,8 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
         View view = couchbaseClient.getView("batch", "batch");
         Query query = new Query();
         //query.setLimit(20);
-        query.setGroup(true);
-        query.setGroupLevel(1);
+        //query.setGroup(true);
+        //query.setGroupLevel(1);
 
         ViewResponse viewResponse = couchbaseClient.query(view, query);
 
@@ -113,7 +113,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
         if(viewResponse != null) {
             for(ViewRow row : viewResponse) {
-                ViewRowReduced viewRowNoDocs = (ViewRowReduced) row;
+                ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) row;
 
                 BatchFullStatusJModel batchFullStatusJModel =
                         gson.fromJson(viewRowNoDocs.getValue(), BatchFullStatusJModel.class);
