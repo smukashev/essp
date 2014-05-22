@@ -42,7 +42,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 {
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
 
-    private static final boolean exceptionOnImmutableWrite = true;
+    private static final boolean exceptionOnImmutableWrite = false;
 
     @Autowired
     IBatchRepository batchRepository;
@@ -2791,7 +2791,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             RefListItem rli = new RefListItem();
 
             Map<String, Object> row = i.next();
-            long id = (Long)row.get("ID");
+            long id = ((BigDecimal)row.get("ID")).longValue();
             long old_id = id;
 
             logger.debug("#####################");
@@ -2814,7 +2814,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                 row = i.next();
                 old_id = id;
-                id = (Long)row.get("ID");
+                id = ((BigDecimal)row.get("ID")).longValue();
             }
 
             entityIds.add(rli);

@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -27,6 +30,8 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
     private CouchbaseClient couchbaseClient;
     private Logger logger = Logger.getLogger(ProtocolBeanRemoteBusinessImpl.class);
     private Gson gson = new Gson();
+
+    private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
     @PostConstruct
     public void init() {
@@ -90,7 +95,12 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
 
                     prot.setNote("присвоено " + csajm.getReceived());
                     prot.setPackNo(csajm.getIndex());
-                    prot.setPrimaryContractDate((Date) csajm.getProperty(StatusProperties.CONTRACT_DATE));
+                    try {
+                        prot.setPrimaryContractDate(dateFormat.parse(
+                                (String) csajm.getProperty(StatusProperties.CONTRACT_DATE)));
+                    } catch (ParseException e) {
+                        prot.setPrimaryContractDate(null);
+                    }
                     prot.setProtocolType(s);
 
 

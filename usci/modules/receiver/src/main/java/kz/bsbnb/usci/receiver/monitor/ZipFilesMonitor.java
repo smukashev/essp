@@ -79,7 +79,7 @@ public class ZipFilesMonitor{
     //private static Gson gson = new Gson();
 
     public static final int ZIP_BUFFER_SIZE = 1024;
-    public static final int MAX_SYNC_QUEUE_SIZE = 256;
+    public static final int MAX_SYNC_QUEUE_SIZE = 1024;
 
     private static final long WAIT_TIMEOUT = 360; //in 10 sec units
 
