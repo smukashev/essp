@@ -14,7 +14,8 @@ import java.util.List;
 public class EconTradeRepository extends BaseRepository {
     private static HashMap repository;
     private static HashSet columns;
-    private static String QUERY = "SELECT * FROM ref.ECON_TRADE";
+    private static String QUERY = "SELECT * FROM ref.ECON_TRADE t" + " where t.open_date <= to_date('" + repDate + "', 'dd.MM.yyyy')\n"+
+            "   and (t.close_date > to_date('" + repDate + "', 'dd.MM.yyyy') or t.close_date is null)";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='ECON_TRADE'";
 
     public static HashMap getRepository() {
@@ -78,3 +79,4 @@ public class EconTradeRepository extends BaseRepository {
         return null;
     }
 }
+

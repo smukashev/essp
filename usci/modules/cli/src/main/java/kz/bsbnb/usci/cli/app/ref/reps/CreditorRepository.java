@@ -13,7 +13,10 @@ import java.util.List;
 public class CreditorRepository extends BaseRepository {
     private static HashMap repository;
     private static HashSet columns;
-    private static String QUERY = "SELECT * FROM ref.CREDITOR WHERE main_office_id IS NULL";
+    //private static String QUERY = "SELECT t.* FROM ref.CREDITOR_HIS WHERE main_office_id IS NULL";
+    private static String QUERY = "SELECT c.* FROM ref.v_Creditor_His t, ref.creditor c WHERE c.id = t.id and t.main_office_id IS NULL\n" +
+            " and t.open_date <= to_date('" + repDate + "', 'dd.MM.yyyy')\n" +
+            " and (t.close_date > to_date('" + repDate + "', 'dd.MM.yyyy') or t.close_date is null)";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDITOR'";
 
     public static HashMap getRepository() {
@@ -80,3 +83,4 @@ public class CreditorRepository extends BaseRepository {
         return null;
     }
 }
+

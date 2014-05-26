@@ -1,10 +1,9 @@
 package com.bsbnb.creditregistry.portlets.crosscheck.data;
 
-import com.bsbnb.creditregistry.portlets.crosscheck.model.Creditor;
-import com.bsbnb.creditregistry.portlets.crosscheck.model.CrossCheck;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.Creditor;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.CrossCheck;
 import java.util.Date;
 import java.util.List;
-
 
 /**
  *

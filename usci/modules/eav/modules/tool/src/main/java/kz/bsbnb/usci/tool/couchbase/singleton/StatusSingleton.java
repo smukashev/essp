@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 import kz.bsbnb.usci.tool.couchbase.factory.ICouchbaseClientFactory;
+import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.internal.OperationFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -136,19 +137,37 @@ public class StatusSingleton {
         if (readOnly)
             return;
 
-        Object contractStatus = client.get("entity_status:" + batchId + ":" + contractStatusJModel.getIndex());
+        int i = 0;
 
-        EntityStatusArrayJModel cStatuses;
+        for(i = 0; i < 10; i++) {
+            try {
+                Object contractStatus = client.get("entity_status:" + batchId + ":" + contractStatusJModel.getIndex());
 
-        if (contractStatus == null) {
-            cStatuses = new EntityStatusArrayJModel(batchId, contractStatusJModel.getIndex());
-        } else {
-            cStatuses = gson.fromJson(contractStatus.toString(), EntityStatusArrayJModel.class);//(BatchStatusArrayJModel)batchStatus;
+                EntityStatusArrayJModel cStatuses;
+
+                if (contractStatus == null) {
+                    cStatuses = new EntityStatusArrayJModel(batchId, contractStatusJModel.getIndex());
+                } else {
+                    cStatuses = gson.fromJson(contractStatus.toString(), EntityStatusArrayJModel.class);//(BatchStatusArrayJModel)batchStatus;
+                }
+
+                cStatuses.getEntityStatuses().add(contractStatusJModel);
+
+                client.set("entity_status:" + batchId + ":" + contractStatusJModel.getIndex(), 0, gson.toJson(cStatuses));
+
+                break;
+            } catch (OperationTimeoutException ex) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
-        cStatuses.getEntityStatuses().add(contractStatusJModel);
-
-        client.set("entity_status:" + batchId + ":" + contractStatusJModel.getIndex(), 0, gson.toJson(cStatuses));
+        if (i >= 10) {
+            throw new IllegalStateException("Couchbase is unreachable.");
+        }
     }
 
     public synchronized void endBatch(Long batchId, Long userId) {

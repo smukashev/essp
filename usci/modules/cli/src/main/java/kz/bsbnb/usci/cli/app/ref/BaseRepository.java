@@ -1,9 +1,9 @@
 package kz.bsbnb.usci.cli.app.ref;
 
 import kz.bsbnb.usci.cli.app.ref.craw.*;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import kz.bsbnb.usci.cli.app.ref.refs.CreditorDoc;
+import kz.bsbnb.usci.cli.app.ref.refs.DocType;
+import kz.bsbnb.usci.cli.app.ref.reps.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -32,10 +32,9 @@ public class BaseRepository implements  Runnable
 
       private static Connection connection;
       private static Statement statement;
+      protected static String repDate = "01.06.2013";
 
-    private String fileName = "C:\\entity_show\\mine";
-
-    public void saveXml(String[] lookup, ResultSet rows, String path){
+     public void saveXml(String[] lookup, ResultSet rows, String path){
          try {
              DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
              DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -77,6 +76,24 @@ public class BaseRepository implements  Runnable
 
     @Override
     public void run() {
+        //DocTypeRepository.getById("1043").print(0);
+        //SubjectTypeRepository.getById("8").print();
+        //CreditorRepository.getById("127").print(0);
+        //CreditorDocRepository.getById("118").print();
+        //BalanceAccountRepository.getById("322").
+
+        //CreditorDoc[] arr = CreditorDocRepository.getByProperty("CREDITOR_ID","126");
+
+            /*for(int i=0;i<arr.length;i++)
+            {
+                arr[i].print();
+                System.out.println("------------");
+            } */
+
+            /*for(int i=103;i<=127;i++)
+                if(CreditorRepository.getById(i+"")!=null)
+                    System.out.print(CreditorRepository.getById(i+"").asXml(0));
+             */
 
         (new CreditorCrawler()).work();
         (new SubjectTypeCrawler()).work();
@@ -86,7 +103,7 @@ public class BaseRepository implements  Runnable
         (new ClassificationCrawler()).work();
         (new CountryCrawler()).work();
         (new CreditObjectCrawler()).work();
-        (new CreditPurposeCrawler()).work();
+        (new CreditPurposeCrawler()).work();  //here
         (new CurrencyCrawler()).work();
         (new EconTradeCrawler()).work();
         (new EnterpriseTypeCrawler()).work();
@@ -94,37 +111,33 @@ public class BaseRepository implements  Runnable
         (new LegalFormCrawler()).work();
         (new OffshoreCrawler()).work();
         (new PledgeTypeCrawler()).work();
-        (new OffshoreCrawler()).work();
-        (new PledgeTypeCrawler()).work();
         (new PortfolioCrawler()).work();
         (new RegionCrawler()).work();
         (new ContactTypeCrawler()).work();
         (new CreditTypeCrawler()).work();
         (new DocTypeCrawler()).work();
-        (new SharedCrawler()).work();
+        //(new SharedCrawler()).work();
         (new CreditorBranchCrawler()).work();
         (new NokbdbCrawler()).work();
 
 
     }
 
-//    public static void main( String[] args )
-//    {
-//        new BaseRepository().run();
-//    }
+    public static void main( String[] args )
+    {
+        new BaseRepository().run();
+    }
 
     public static Statement getStatement(){
         try {
             if(connection == null){
-                ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
-                DriverManagerDataSource dm = (DriverManagerDataSource)ctx.getBean("dataSourceRef");
-                connection = dm.getConnection();
-                return statement = connection.createStatement();
+                    connection = DriverManager.getConnection("jdbc:oracle:thin:@srv-scan.corp.nb.rk:1521/DBM01", "core","core_oct_2013");
+                    return statement = connection.createStatement();
             }
 
             return statement = connection.createStatement();
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
         return null;

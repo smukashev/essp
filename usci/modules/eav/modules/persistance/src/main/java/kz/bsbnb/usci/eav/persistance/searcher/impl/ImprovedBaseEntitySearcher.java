@@ -147,8 +147,11 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             if(metaAttribute.isKey()) {
                 IBaseValue baseValue = entity.safeGetValue(name);
                 if((baseValue == null || baseValue.getValue() == null) && (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)) {
-                    throw new IllegalArgumentException("Key attribute " + name + " can't be null. MetaClass: " +
+                    /*throw new IllegalArgumentException("Key attribute " + name + " can't be null. MetaClass: " +
+                            entity.getMeta().getClassName());*/
+                    logger.warn("Key attribute " + name + " can't be null. MetaClass: " +
                             entity.getMeta().getClassName());
+                    continue;
                 }
 
                 if((baseValue == null || baseValue.getValue() == null) && (metaClass.getComplexKeyType() == ComplexKeyTypes.ANY)) {

@@ -3,7 +3,6 @@ package kz.bsbnb.usci.cli.app.ref.reps;
 
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.cli.app.ref.refs.CreditType;
-import kz.bsbnb.usci.cli.app.ref.refs.Shared;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,7 +14,8 @@ import java.util.List;
 public class CreditTypeRepository extends BaseRepository {
     private static HashMap repository;
     private static HashSet columns;
-    private static String QUERY = "SELECT * FROM ref.CREDIT_TYPE";
+    private static String QUERY = "SELECT * FROM ref.CREDIT_TYPE t" + " where t.open_date <= to_date('" + repDate + "', 'dd.MM.yyyy')\n"+
+            "   and (t.close_date > to_date('" + repDate + "', 'dd.MM.yyyy') or t.close_date is null)";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDIT_TYPE'";
 
     public static HashMap getRepository() {
@@ -37,10 +37,6 @@ public class CreditTypeRepository extends BaseRepository {
                     //System.out.println(s);
                     tmp.put((String)s,rows.getString((String)s));
                 }
-                tmp.put("shared",SharedRepository.getById((String) tmp.get("KIND_ID")));
-                tmp.put("debtor_type",DebtorTypeRepository.getByCode((String) tmp.get("CODE")));
-
-                //System.out.println( ((Shared)SharedRepository.getById((String) tmp.get("KIND_ID")) ).get("CODE") );
                 CreditType dt = new CreditType(tmp);
                 hm.put(dt.get(dt.getKeyName()),dt);
             }
@@ -83,3 +79,4 @@ public class CreditTypeRepository extends BaseRepository {
         return null;
     }
 }
+

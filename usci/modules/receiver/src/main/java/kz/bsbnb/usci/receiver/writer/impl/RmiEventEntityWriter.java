@@ -73,11 +73,12 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                 contractNo = (String)entity.getEl("primary_contract.no");
             }
 
-            if (statusSingleton.isEntityCompleted(entity.getBatchId(), entity.getBatchIndex() - 1)) {
+            //TODO: UNCOMMENT
+            /*if (statusSingleton.isEntityCompleted(entity.getBatchId(), entity.getBatchIndex() - 1)) {
                 //System.out.println("Contract no " + contractNo + " with date " + contractDate + " skipped because it " +
                         //"has status \"" + EntityStatuses.COMPLETED + "\"");
                 continue;
-            }
+            }*/
 
             EntityStatusJModel entityStatusJModel = new EntityStatusJModel(
                     entity.getBatchIndex() - 1,

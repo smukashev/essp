@@ -1,8 +1,8 @@
 package com.bsbnb.creditregistry.portlets.crosscheck.data;
 
 import com.bsbnb.creditregistry.portlets.crosscheck.CrossCheckPortletEnvironmentFacade;
-import com.bsbnb.creditregistry.portlets.crosscheck.model.CrossCheckMessage;
-import com.bsbnb.creditregistry.portlets.crosscheck.model.Message;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.CrossCheckMessage;
+import com.bsbnb.creditregistry.portlets.crosscheck.dm.Message;
 
 /**
  *
@@ -52,10 +52,10 @@ public class CrossCheckMessageDisplayWrapper {
     }
 
     public String getDifference() {
-        return crossCheckMessage.getDifference();
+        return crossCheckMessage.getDiff();
     }
 
     public int getIsError() {
-        return crossCheckMessage.getIsError();
+        return crossCheckMessage.getIsError() ? 1 : 0;
     }
 }

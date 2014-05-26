@@ -42,6 +42,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 {
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
 
+    private static final boolean exceptionOnImmutableWrite = false;
+
     @Autowired
     IBatchRepository batchRepository;
     @Autowired
@@ -105,10 +107,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             throw new UnsupportedOperationException("Not found appropriate report date.");
         }
 
-        if (caching)
+        /*if (caching)
         {
             return baseEntityCacheDao.getBaseEntity(id, maxReportDate);
-        }
+        }*/
 
         return load(id, maxReportDate, maxReportDate);
     }
@@ -116,10 +118,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     public IBaseEntity load(long id, Date maxReportDate, Date actualReportDate, boolean caching)
     {
-        if (caching)
+        /*if (caching)
         {
             return baseEntityCacheDao.getBaseEntity(id, actualReportDate);
-        }
+        } */
 
         return load(id, maxReportDate, actualReportDate);
     }
@@ -605,8 +607,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     {
                         if (childBaseEntity.getId() < 1)
                         {
-                            throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
+                            if (exceptionOnImmutableWrite) {
+                                throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                     childBaseEntity.getMeta().getClassName() + "\n" + childBaseEntity.toString());
+                            } else {
+                                logger.warn("Attempt to write immutable instance of BaseEntity with classname: " +
+                                    childBaseEntity.getMeta().getClassName() + "\n" + childBaseEntity.toString());
+                                return;
+                            }
                         }
 
                         IBaseEntity childBaseEntityImmutable = loadByMaxReportDate(childBaseEntity.getId(),                                childBaseEntity.getReportDate(), childMetaClass.isReference());
@@ -2284,8 +2292,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 {
                     if (baseEntitySaving.getId() < 1)
                     {
-                        throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
+                        if (exceptionOnImmutableWrite) {
+                            throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                 baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                        } else {
+                            logger.warn("Attempt to write immutable instance of BaseEntity with classname: " +
+                                baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                            return;
+                        }
                     }
                     baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
                 }
@@ -2317,8 +2331,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 {
                     if (baseEntitySaving.getId() < 1)
                     {
-                        throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
+                        if (exceptionOnImmutableWrite) {
+                            throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                 baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                        } else {
+                            logger.warn("Attempt to write immutable instance of BaseEntity with classname: " +
+                                baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                            return;
+                        }
                     }
                     baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
                 }
@@ -2419,8 +2439,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         {
                             if (baseEntitySaving.getId() < 1)
                             {
-                                throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
+                                if (exceptionOnImmutableWrite) {
+                                    throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                         baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                                } else {
+                                    logger.warn("Attempt to write immutable instance of BaseEntity with classname: " +
+                                        baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                                    return;
+                                }
                             }
                             baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(),
                                     baseEntitySaving.getReportDate());
@@ -2454,8 +2480,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         {
                             if (baseEntitySaving.getId() < 1)
                             {
-                                throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
+                                if (exceptionOnImmutableWrite) {
+                                    throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                         baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                                } else {
+                                    logger.warn("Attempt to write immutable instance of BaseEntity with classname: " +
+                                        baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                                    return;
+                                }
                             }
                             baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(),
                                     baseEntitySaving.getReportDate());
@@ -2485,8 +2517,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 {
                     if (baseEntitySaving.getId() < 1)
                     {
-                        throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
+                        if (exceptionOnImmutableWrite) {
+                            throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                 baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                        } else {
+                            logger.warn("Attempt to write immutable instance of BaseEntity with classname: " +
+                                baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                            return;
+                        }
                     }
                     baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
@@ -2584,6 +2622,23 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
         IBaseEntity baseEntityPrepared = prepare(((BaseEntity) baseEntity).clone());
         IBaseEntity baseEntityApplied = apply(baseEntityPrepared, baseEntityManager, entityHolder);
+
+        /*if (baseEntityPrepared.getId() > 0)
+        {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(0);
+            calendar.set(2013, 4, 1, 0, 0, 0);
+
+            IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool
+                    .getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+            if (baseEntityReportDateDao.exists(baseEntityPrepared.getId(), calendar.getTime()))
+            {
+                logger.error("Instance of BaseEntity with ID " + baseEntityPrepared.getId() + " skipped.");
+                return baseEntityPrepared;
+            }
+        }
+
+        logger.error("Instance of BaseEntity with ID " + baseEntityPrepared.getId() + " processing started."); */
 
         applyToDb(baseEntityManager);
 

@@ -32,3 +32,4 @@ public class EnterpriseType extends BaseRef {
         appendToElement(root,"name_ru",hm.get("NAME_RU"));
     }
 }
+

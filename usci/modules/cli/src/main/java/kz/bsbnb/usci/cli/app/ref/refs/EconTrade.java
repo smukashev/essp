@@ -30,3 +30,4 @@ public class EconTrade extends BaseRef {
         appendToElement(root,"name_ru",hm.get("NAME_RU"));
     }
 }
+

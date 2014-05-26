@@ -120,7 +120,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
                 if (batchFullStatusJModel == null) {
                     batchFullStatusJModel =
-                            gson.fromJson(viewRowNoDocs.getValue(), BatchFullStatusJModel.class);
+                        gson.fromJson(viewRowNoDocs.getValue(), BatchFullStatusJModel.class);
                 } else {
                     Long id = batchFullStatusJModel.getId();
 

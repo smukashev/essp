@@ -79,7 +79,7 @@ public class ZipFilesMonitor{
     //private static Gson gson = new Gson();
 
     public static final int ZIP_BUFFER_SIZE = 1024;
-    public static final int MAX_SYNC_QUEUE_SIZE = 256;
+    public static final int MAX_SYNC_QUEUE_SIZE = 1024;
 
     private static final long WAIT_TIMEOUT = 360; //in 10 sec units
 
@@ -163,9 +163,9 @@ public class ZipFilesMonitor{
 
         IBatchService batchService = serviceFactory.getBatchService();
 
-        Calendar cal = Calendar.getInstance();
+        /*Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(0);
-        cal.set(2013, 4, 1, 0, 0, 0);
+        cal.set(2013, 4, 1, 0, 0, 0);*/
 
         while(true) {
             try {
@@ -179,6 +179,8 @@ public class ZipFilesMonitor{
                 if (response.size() > 0) {
                     System.out.println("Found pending jobs: ");
                     System.out.println("-------------------------------------------------------------------------");
+
+                    int jobsRestarted = 0;
 
                     while(rows.hasNext()) {
                         ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) rows.next();
@@ -212,15 +214,16 @@ public class ZipFilesMonitor{
 
 
 
-                        if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), cal.getTime()) != 0)
+                        /*if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), cal.getTime()) != 0)
                         {
                             System.out.println("Skipping wrone dates: " + batchInfo.getRepDate());
                             System.out.println("Must be: " + cal.getTime());
                             continue;
-                        }
+                        }   */
 
                         sender.addJob(batchId, batchInfo);
                         receiverStatusSingleton.batchReceived();
+                        System.out.println("Restarted job #" + ++jobsRestarted);
                     }
                 }
                 break;

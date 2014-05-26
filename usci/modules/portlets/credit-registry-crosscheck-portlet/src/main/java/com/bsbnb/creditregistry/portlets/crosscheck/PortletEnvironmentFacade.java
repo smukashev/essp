@@ -1,5 +1,7 @@
 package com.bsbnb.creditregistry.portlets.crosscheck;
 
+import com.bsbnb.creditregistry.portlets.crosscheck.ui.Localization;
+
 /**
  *
  * @author Aidar.Myrzahanov
@@ -20,7 +22,7 @@ public abstract class PortletEnvironmentFacade {
     public abstract String getCurrentLanguage();
 
     public abstract String getResourceString(String key);
-
+   
     public abstract long getUserID();
     
     public abstract String getBusinessRulesUrl();

@@ -33,3 +33,4 @@ public class Currency extends BaseRef {
         appendToElement(root,"short_name",hm.get("SHORT_NAME"));
     }
 }
+

@@ -538,8 +538,15 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
         for (String attribute : values.keySet())
         {
-            Object thisObject = this.safeGetValue(attribute).getValue();
-            Object thatObject = that.safeGetValue(attribute).getValue();
+            Object thisObject = null;
+            if (this.safeGetValue(attribute) != null) {
+                thisObject = this.safeGetValue(attribute).getValue();
+            }
+
+            Object thatObject = null;
+            if (that.safeGetValue(attribute) != null) {
+                thatObject = that.safeGetValue(attribute).getValue();
+            }
 
             if (thisObject == null && thatObject == null)
             {

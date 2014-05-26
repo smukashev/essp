@@ -34,4 +34,39 @@ public class CreditorCrawler extends BaseCrawler{
         return "ref_creditor";
     }
 
+    //    @Override
+//    public void buildElement(Element root) {
+//
+//          int i = 0;
+//         for( Object o: CreditorRepository.getRepository().values()){
+//
+//             if(i>5) break;
+//             Creditor creditor = (Creditor) o;
+//
+//             Element entity = getDocument().createElement("entity");
+//             root.appendChild(entity);
+//
+//             Attr attr = getDocument().createAttribute("class");
+//             attr.setValue("ref_creditor");
+//             entity.setAttributeNode(attr);
+//
+//             creditor.buildElement(entity);
+//
+//             /*appendToElement(entity,"name",creditor.get("NAME"));
+//             appendToElement(entity,"short_name",creditor.get("SHORT_NAME"));*/
+//
+//             i++;
+//          }
+//
+////         Element firstname = getDocument().createElement("firstname");
+////         firstname.appendChild(getDocument().createTextNode("Bauyrzan"));
+////         root.appendChild(firstname);
+////
+////         Element lastname = getDocument().createElement("lastname");
+////         lastname.appendChild(getDocument().createTextNode("Makhambetov"));
+////         root.appendChild(lastname);
+//
+//
+//
+//    }
 }
