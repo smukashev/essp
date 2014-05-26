@@ -9,6 +9,7 @@ import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.cr.model.Shared;
 import kz.bsbnb.usci.eav.model.json.BatchFullStatusJModel;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
+import kz.bsbnb.usci.eav.model.json.BatchStatusArrayJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -111,61 +112,70 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
             inputCreditors.put(cred.getId(), cred);
         }
 
+        BatchFullStatusJModel batchFullStatusJModel = null;
+
         if(viewResponse != null) {
             for(ViewRow row : viewResponse) {
                 ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) row;
 
-                BatchFullStatusJModel batchFullStatusJModel =
-                        gson.fromJson(viewRowNoDocs.getValue(), BatchFullStatusJModel.class);
+                if (batchFullStatusJModel == null) {
+                    batchFullStatusJModel =
+                            gson.fromJson(viewRowNoDocs.getValue(), BatchFullStatusJModel.class);
+                } else {
+                    Long id = batchFullStatusJModel.getId();
 
-                Long id = batchFullStatusJModel.getId();
+                    Long creditorId = getCreditorId(id);
 
-                Long creditorId = getCreditorId(id);
+                    Creditor currentCreditor = inputCreditors.get(creditorId);
 
-                Creditor currentCreditor = inputCreditors.get(creditorId);
+                    if (currentCreditor == null)
+                        continue;
 
-                if (currentCreditor == null)
-                    continue;
+                    BatchStatusArrayJModel statusArrayJModel =
+                            gson.fromJson(viewRowNoDocs.getValue(), BatchStatusArrayJModel.class);
 
-                List<BatchStatusJModel> statusesList = batchFullStatusJModel.getStatus().getBatchStatuses();
+                    List<BatchStatusJModel> statusesList = statusArrayJModel.getBatchStatuses();
 
-                InputInfo ii = new InputInfo();
+                    InputInfo ii = new InputInfo();
 
-                String lastStatus = "";
+                    String lastStatus = "";
 
-                for (BatchStatusJModel statusModel : statusesList) {
-                    lastStatus = statusModel.getProtocol();
-                    if (statusModel.getProtocol().equals("PROCESSING")) {
-                        ii.setStartedDate(statusModel.getReceived());
-                    } else if(statusModel.getProtocol().equals("COMPLETED")) {
-                        ii.setCompletionDate(statusModel.getReceived());
-                    } else if(statusModel.getProtocol().equals("WAITING")) {
-                        ii.setReceiverDate(statusModel.getReceived());
+                    for (BatchStatusJModel statusModel : statusesList) {
+                        lastStatus = statusModel.getProtocol();
+                        if (statusModel.getProtocol().equals("PROCESSING")) {
+                            ii.setStartedDate(statusModel.getReceived());
+                        } else if(statusModel.getProtocol().equals("COMPLETED")) {
+                            ii.setCompletionDate(statusModel.getReceived());
+                        } else if(statusModel.getProtocol().equals("WAITING")) {
+                            ii.setReceiverDate(statusModel.getReceived());
+                        }
                     }
+
+                    BatchInfo manifest = getManifest(id);
+
+                    ii.setUserId(manifest.getUserId());
+                    ii.setReportDate(manifest.getRepDate());
+
+                    ii.setTotal(10L);
+
+
+                    ii.setId(BigInteger.valueOf(id));
+
+                    ii.setCreditor(currentCreditor);
+                    ii.setFileName(batchFullStatusJModel.getFileName());
+
+                    Shared s = new Shared();
+                    s.setCode("S");
+                    s.setNameRu(lastStatus);
+                    s.setNameKz(lastStatus);
+
+                    ii.setReceiverType(s);
+                    ii.setStatus(s);
+
+                    list.add(ii);
+
+                    batchFullStatusJModel = null;
                 }
-
-                BatchInfo manifest = getManifest(id);
-
-                ii.setUserId(manifest.getUserId());
-                ii.setReportDate(manifest.getRepDate());
-
-                ii.setTotal(10L);
-
-
-                ii.setId(BigInteger.valueOf(id));
-
-                ii.setCreditor(currentCreditor);
-                ii.setFileName(batchFullStatusJModel.getFileName());
-
-                Shared s = new Shared();
-                s.setCode("S");
-                s.setNameRu(lastStatus);
-                s.setNameKz(lastStatus);
-
-                ii.setReceiverType(s);
-                ii.setStatus(s);
-
-                list.add(ii);
             }
         }
 
