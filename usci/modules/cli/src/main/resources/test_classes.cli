@@ -1,7 +1,7 @@
 # Warning this line clears DB!
-clear
+#clear
 # Recreate DB
-init
+#init
 
 #====================================
 #= report_row
@@ -22,6 +22,8 @@ meta add --name=report_row --attribute=value --type=double --final
 
 meta create --name=report_4 --reference
 meta add --name=report_4 --attribute=acc_date --type=date --final
+meta add --name=report_4 --attribute=code --type=string
+meta key --name=report_4 --attribute=code
 meta add --name=report_4 --attribute=rows --type=meta_class --childname=report_row --array --keytype=any
 
 
