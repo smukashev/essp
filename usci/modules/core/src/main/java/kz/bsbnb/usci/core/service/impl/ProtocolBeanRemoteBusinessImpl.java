@@ -98,7 +98,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
                     try {
                         prot.setPrimaryContractDate(dateFormat.parse(
                                 (String) csajm.getProperty(StatusProperties.CONTRACT_DATE)));
-                    } catch (ParseException e) {
+                    } catch (Exception e) {
                         prot.setPrimaryContractDate(null);
                     }
                     prot.setProtocolType(s);

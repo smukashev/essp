@@ -128,8 +128,8 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
                     Creditor currentCreditor = inputCreditors.get(creditorId);
 
-                    if (currentCreditor == null)
-                        continue;
+                    //if (currentCreditor == null)
+                        //continue;
 
                     BatchStatusArrayJModel statusArrayJModel =
                             gson.fromJson(viewRowNoDocs.getValue(), BatchStatusArrayJModel.class);
