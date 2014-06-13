@@ -580,7 +580,6 @@ public class ShowCaseHolder extends JDBCSupport
     }
 
     public void persistMap(HashMap map){
-        showCaseMeta.getName();
         StringBuilder sql = new StringBuilder("insert into ")
                 .append(TABLES_PREFIX + showCaseMeta.getTableName().toUpperCase() + "_IDX").append("(");
         StringBuilder placeholders = new StringBuilder();
@@ -601,8 +600,6 @@ public class ShowCaseHolder extends JDBCSupport
         KeyHolder holder = new GeneratedKeyHolder();
         final String sql1 = sql.toString();
         System.out.println(sql1);
-//        jdbcTemplate.update(sql.toString(),new Prepared);
-//        System.out.println(holder.getKey().longValue());
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
@@ -610,7 +607,6 @@ public class ShowCaseHolder extends JDBCSupport
                 return ps;
             }
         }, holder);
-
 
         long lid = holder.getKey().longValue();
 
@@ -632,11 +628,7 @@ public class ShowCaseHolder extends JDBCSupport
 
         sql.append(" ) values (").append(placeholders).append(")");
 
-        //System.out.println(sql);
-        //jdbcTemplate.update(sql.toString());
         jdbcTemplate.update(sql.toString(), vals);
-
-        //sql = new StringBuilder("");
     }
 
     boolean compatible(HashMap a, HashMap b){
@@ -661,8 +653,27 @@ public class ShowCaseHolder extends JDBCSupport
         return false;
     }
 
-    public void print(IBaseEntity entity){
-        int n = showCaseMeta.getFieldsList().size();
+   public void dbCarteageGenerate(IBaseEntity entity){
+
+       if(entity.getId() <=0 )
+           throw new IllegalArgumentException("id is not correct");
+
+
+       String del1 = "delete from " + TABLES_PREFIX + showCaseMeta.getTableName().toUpperCase() + "_DAT where IDX_ID in " +
+               "(select id from " + TABLES_PREFIX + showCaseMeta.getTableName().toUpperCase() + "_IDX where " +
+               COLUMN_PREFIX+"ROOT_ID = " + entity.getId() +")";
+       String del2 = "delete from "  + TABLES_PREFIX + showCaseMeta.getTableName().toUpperCase() +"_IDX where " +
+               COLUMN_PREFIX + "ROOT_ID =" +  entity.getId();
+
+       jdbcTemplate.update(del1);
+       jdbcTemplate.update(del2);
+
+
+       //StringBuilder sql = new StringBuilder("insert into ")
+       //        .append(TABLES_PREFIX + showCaseMeta.getTableName().toUpperCase() + "_IDX").append("(");
+
+
+       int n = showCaseMeta.getFieldsList().size();
         ShowCaseEntries[] showCases = new ShowCaseEntries[n];
         int i = 0;
         for(ShowCaseField field: showCaseMeta.getFieldsList()){
@@ -705,18 +716,9 @@ public class ShowCaseHolder extends JDBCSupport
                        was[j] = true;
                        usedGroup[id[j]] = true;
                    }
-               printMap(map);
                persistMap(map);
             }
         }
-        /*for(i=0;i<n;i++){
-            for(Object o : colSet){
-                String path = (String) o;
-                for(int j=0;j<showCases[i].getEntriesSize();j++)
-
-            }
-        }*/
-
     }
 
     private List<IdsHolder> prepare(IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntity baseEntityApplied,

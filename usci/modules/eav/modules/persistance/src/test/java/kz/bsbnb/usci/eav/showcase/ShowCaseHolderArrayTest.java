@@ -61,7 +61,7 @@ public class ShowCaseHolderArrayTest {
 
         scHolder.createTables();
         scHolder.generatePaths();
-        scHolder.print(entity);
+        scHolder.dbCarteageGenerate(entity);
 
         System.out.println(entity);
     }
@@ -89,7 +89,7 @@ public class ShowCaseHolderArrayTest {
 
         scHolder.createTables();
         scHolder.generatePaths();
-        scHolder.print(entity);
+        scHolder.dbCarteageGenerate(entity);
 
         System.out.println(entity);
     }
