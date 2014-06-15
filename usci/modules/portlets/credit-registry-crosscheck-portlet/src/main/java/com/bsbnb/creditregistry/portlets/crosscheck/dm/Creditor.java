@@ -72,7 +72,7 @@ public class Creditor implements Serializable {
             joinColumns =
             @JoinColumn(name = "CREDITOR_ID"),
             inverseJoinColumns =
-            @JoinColumn(name = "USER_ID"))
+            @JoinColumn(name = "USER_ID", referencedColumnName="USER_ID"))
     private List<PortalUser> portalUserList;
 
     public Creditor() {

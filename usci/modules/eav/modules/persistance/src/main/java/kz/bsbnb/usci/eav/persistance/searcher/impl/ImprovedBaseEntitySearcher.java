@@ -53,7 +53,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         if (entity.getId() > 0)
             return entity.getId();
 
-        List<Long> ids = searcherPool.getSearcher(entity.getMeta().
+        /*List<Long> ids = searcherPool.getSearcher(entity.getMeta().
                 getClassName()).findAll(entity);
 
         if (ids.size() > 1) {
@@ -65,7 +65,26 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         if (id != null)
             entity.setId(id);
 
-        return id;
+        return id;*/
+
+        if (entity.getValueCount() == 0)
+        {
+            return null;
+        }
+
+        SelectConditionStep select = generateSQL(entity, null);
+
+        if (select != null)
+        {
+            //orderBy(EAV_BE_ENTITIES.as("root").ID)
+            List<Map<String, Object>> rows = queryForListWithStats(select.limit(1).getSQL(), select.getBindValues().toArray());
+            for (Map<String, Object> row : rows)
+            {
+                return (((BigDecimal)row.get("inner_id")).longValue());
+            }
+        }
+
+        return null;
     }
 
     public SelectConditionStep generateSQL(IBaseEntity entity, String entityName) {
@@ -472,6 +491,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         }
 
         logger.debug("Result size: " + result.size());
+
+        Collections.sort(result);
 
         return result;
     }

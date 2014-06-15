@@ -34,6 +34,8 @@ public final class DataJob extends AbstractDataJob {
     private double avgTimeCur = 0;
     private long entityCounter = 0;
 
+    private int clearJobsIndex = 0;
+
     @Autowired
     protected StatusSingleton statusSingleton;
 
@@ -46,7 +48,9 @@ public final class DataJob extends AbstractDataJob {
             try {
                 if(entities.size() > 0 && entitiesInProcess.size() < currentThread) {
                     //System.out.println("Number of threads: " + entitiesInProcess.size());
+                    long t1 = System.currentTimeMillis();
                     processNewEntities();
+                    System.out.println("New job in " + (System.currentTimeMillis() - t1));
                 }
 
                 if(processingJobs.size() > 0)
@@ -57,8 +61,10 @@ public final class DataJob extends AbstractDataJob {
                     Thread.sleep(SLEEP_TIME_NORMAL);
                 }
 
-                if(skip_count > SKIP_TIME_MAX)
+                if(skip_count > SKIP_TIME_MAX) {
                     Thread.sleep(SLEEP_TIME_LONG);
+                    skip_count = 0;
+                }
 
                 syncStatusSingleton.put(entities.size(), entitiesInProcess.size(), currentThread, avgTimeCur);
 
@@ -155,18 +161,42 @@ public final class DataJob extends AbstractDataJob {
     }
 
     private synchronized BaseEntity getClearEntity() {
-        Iterator<BaseEntity> iterator = entities.iterator();
+        /*Iterator<BaseEntity> iterator = entities.iterator();
 
+        int i = 0;
         while(iterator.hasNext()) {
             BaseEntity entity = iterator.next();
 
             if(!isInProcess(entity)) {
                 iterator.remove();
+                System.out.println("Watched entities " + (++i));
                 return entity;
             } else {
                 logger.debug("Entity in process.");
             }
+            i++;
+        }      */
+
+        if(clearJobsIndex >= entities.size()) {
+            clearJobsIndex = 0;
         }
+
+        int i = 0;
+        Iterator<BaseEntity> iterator = entities.listIterator(clearJobsIndex);
+        while(iterator.hasNext()) {
+            BaseEntity entity = iterator.next();
+
+            if(!isInProcess(entity)) {
+                iterator.remove();
+                System.out.println("Watched entities " + (++i));
+                return entity;
+            } else {
+                logger.debug("Entity in process.");
+            }
+            i++;
+            clearJobsIndex++;
+        }
+
 
         return null;
     }
@@ -180,7 +210,7 @@ public final class DataJob extends AbstractDataJob {
     }
 
     private boolean hasCrossLine(BaseEntity entity1, BaseEntity entity2) {
-        List<String> interList = comparator.intersect(entity1, entity2);
+        //List<String> interList = comparator.intersect(entity1, entity2);
 
         /*logger.debug("###################################################");
         logger.debug(entity1.toString());
@@ -202,7 +232,8 @@ public final class DataJob extends AbstractDataJob {
             System.out.println("Error in comparator");
         } */
 
-        if (interList.size() > 0)
+        //if (interList.size() > 0)
+        if (comparator.hasIntersect(entity1, entity2))
             return true;
         return false;
     }
