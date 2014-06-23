@@ -529,7 +529,7 @@ public class ShowCaseHolder extends JDBCSupport
             return entries.size();
         }
         public void gen(IBaseEntity entity,String curPath, HashMap map, String parent, String prefix){
-            if(curPath == null || curPath.equals("")) return;
+            if(curPath == null || curPath.equals("") || entity == null) return;
 
             MetaClass curMeta = entity.getMeta();
             String path = (curPath.indexOf('.') == -1 ) ? curPath: curPath.substring(0, curPath.indexOf('.'));
@@ -635,7 +635,8 @@ public class ShowCaseHolder extends JDBCSupport
         for(Object o : a.keySet()){
             String key = (String) o;
             if(key.endsWith("_id"))
-              if(b.containsKey(key) && a.get(key) != b.get(key)) return false;
+                //if(b.containsKey(key) && a.get(key) != b.get(key)) return false;
+                if(b.containsKey(key) && !a.get(key).equals(b.get(key))) return false;
         }
         return true;
     }

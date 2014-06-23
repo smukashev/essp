@@ -68,6 +68,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return applyListener;
     }
 
+    @Autowired
     public void setApplyListener(IDaoListener applyListener)
     {
         this.applyListener = applyListener;
