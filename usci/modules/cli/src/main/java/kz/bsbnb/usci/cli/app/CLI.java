@@ -3,6 +3,8 @@ package kz.bsbnb.usci.cli.app;
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+import com.sun.scenario.effect.Merge;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
@@ -19,6 +21,9 @@ import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
+import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
+import kz.bsbnb.usci.eav.manager.impl.BaseEntityMergeManager;
+import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -2700,6 +2705,8 @@ public class CLI
                 batchRestartSingle();
             } else if(command.equals("stc")) {
                 commandSTC();
+            } else if(command.equals("merge")){
+                mergeEntity();
             } else {
                 System.out.println("No such command: " + command);
             }
@@ -2788,4 +2795,163 @@ public class CLI
     {
         this.inputStream = in;
     }
+
+    public void mergeEntity()
+    {
+        if (args.size() == 3)
+        {
+            String fileName = args.get(0);
+            String repDate = args.get(1);
+            String mergeManagerFileName = args.get(2);
+            List<BaseEntity> entityList = new ArrayList<BaseEntity>();
+            try {
+                Date reportDate = sdfout.parse(repDate);
+                CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
+                BaseEntity entity;
+                while((entity = reader.read()) != null) {
+                    try {
+                        long id = baseEntityProcessorDao.process(entity).getId();
+                        System.out.println("Instance of BaseEntity saved with id: " + id);
+                        entityList.add(entity);
+
+                    } catch(Exception ex) {
+                        lastException = ex;
+                        System.out.println("While processing instance of BaseEntity unexpected error occurred: " + ex.getMessage());
+                    }
+                }
+            } catch (FileNotFoundException e)
+            {
+                System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
+            } catch (ParseException e) {
+                System.out.println("Can't parse date " + repDate + " must be in format "+ sdfout.toString());
+            }
+            IBaseEntityMergeManager mergeManager = constructMergeManagerFromJson(mergeManagerFileName);
+        }
+        else
+        {
+            System.out.println("Wrong number of arguments!");
+        }
+    }
+
+    public IBaseEntityMergeManager constructMergeManagerFromJson(String jsonFilePath)
+    {
+        IBaseEntityMergeManager mergeManager = new BaseEntityMergeManager();
+        try {
+            FileReader fileReader = new FileReader(jsonFilePath);
+            JsonReader jsonReader = new JsonReader(fileReader);
+            mergeManager = jsonToMergeManager(jsonReader);
+
+        } catch (FileNotFoundException e) {
+            System.out.println("File " + jsonFilePath + " not found, with error: " + e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return mergeManager;
+    }
+
+    public IBaseEntityMergeManager jsonToMergeManager(JsonReader jsonReader) throws IOException
+    {
+        IBaseEntityMergeManager mergeManager = new BaseEntityMergeManager();
+        jsonReader.beginObject();
+        while (jsonReader.hasNext())
+        {
+            String name = jsonReader.nextName();
+            if (name.equals("action"))
+            {
+               System.out.println(jsonReader.nextString());
+            } else if (name.equals("childMap"))
+            {
+                System.out.println("MAP!");
+            }
+        }
+        jsonReader.endObject();
+        return mergeManager;
+    }
+
+  /*  public IBaseEntityMergeManager jsonToMergeManager(JsonReader jsonReader) throws IOException
+    {
+        IBaseEntityMergeManager mergeManager = new BaseEntityMergeManager();
+        jsonReader.beginObject();
+        while (jsonReader.hasNext())
+        {
+            String name = jsonReader.nextName();
+            if (name.equals("action"))
+            {
+                if(jsonReader.nextString().equals("keep_left"))
+                    mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_LEFT);
+                if(jsonReader.nextString().equals("keep_right"))
+                    mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_RIGHT);
+                if(jsonReader.nextString().equals("merge"))
+                    mergeManager.setAction(IBaseEntityMergeManager.Action.TO_MERGE);
+                System.out.println(jsonReader.nextString());
+            }
+            else if (name.equals("childMap"))
+            {
+                System.out.println(jsonReader.nextString());
+                jsonReader.beginArray();
+                while(jsonReader.hasNext())
+                {
+                    MergeManagerKey key =  null;
+                    IBaseEntityMergeManager childManager = null;
+                    jsonReader.beginObject();
+                    while(jsonReader.hasNext())
+                    {
+                        if(jsonReader.nextString().equals("id")){
+                            jsonReader.beginObject();
+                            key = getKeyFromJson(jsonReader);
+                            jsonReader.endObject();
+                        } else if(jsonReader.nextString().equals("map")){
+                            childManager = jsonToMergeManager(jsonReader);
+                        }
+
+                    }
+                    jsonReader.endObject();
+                    mergeManager.setChildManager(key, childManager);
+                }
+                jsonReader.endArray();
+            }
+        }
+        jsonReader.endObject();
+        return mergeManager;
+    }*/
+
+    private MergeManagerKey getKeyFromJson(JsonReader jsonReader)
+    {
+        String type = null;
+        String left =  null;
+        String right =  null;
+        String attr =  null;
+        try {
+            while(jsonReader.hasNext())
+            {
+                String name = jsonReader.nextName();
+                if(name.equals("type"))
+                {
+                    type = jsonReader.nextString();
+                } else if(name.equals("left")){
+                    left = jsonReader.nextString();
+                } else if(name.equals("right")){
+                    right = jsonReader.nextString();
+                } else if(name.equals("attr")){
+                    attr = jsonReader.nextString();
+                }
+            }
+            if(type.equals("attribute"))
+            {
+                MergeManagerKey<String> key = new MergeManagerKey<String>(attr);
+                return key;
+            }
+            if(type.equals("long")){
+                MergeManagerKey<Long> key = new MergeManagerKey<Long>(Long.parseLong(left), Long.parseLong(right));
+            }
+            if(type.equals("UUID")){
+                MergeManagerKey<UUID> key = new MergeManagerKey<UUID>(UUID.fromString(left), UUID.fromString(right));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

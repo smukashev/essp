@@ -2,7 +2,9 @@ package kz.bsbnb.usci.eav.persistance.dao.impl;
 
 import kz.bsbnb.usci.cr.model.DataTypeUtil;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
+import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
+import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.*;
 import kz.bsbnb.usci.eav.model.base.impl.*;
@@ -2926,6 +2928,838 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         return 0;*/
     }
+
+
+
+    /**
+     * @author dakkuliyev
+     */
+    enum MergeResultChoice
+    {
+        RIGHT,
+        LEFT
+    }
+
+
+    /**
+     * @author dakkuliyev
+     */
+    public IBaseEntity mergeBaseEntity(IBaseEntity baseEntityLeft, IBaseEntity baseEntityRight, IBaseEntityMergeManager mergeManager,
+                                       IBaseEntityManager baseEntityManager, MergeResultChoice choice)
+    {
+
+        // although it is safe to assume that both entities exist in DB, it is still worth checking
+        if (baseEntityLeft.getId() < 1 && baseEntityRight.getId() < 1)
+        {
+            throw new RuntimeException("Merging two BaseEntity objects requires " +
+                    "for both objects to exits in DB.");
+        }
+
+        IMetaClass metaClass = baseEntityLeft.getMeta();
+        IBaseEntity baseEntityApplied = new BaseEntity();
+
+        for (String attribute: metaClass.getAttributeNames())
+        {
+            IBaseValue baseValueLeft = baseEntityLeft.getBaseValue(attribute);
+            IBaseValue baseValueRight = baseEntityRight.getBaseValue(attribute);
+
+            IMetaAttribute metaAttribute = baseValueLeft.getMetaAttribute();
+            IMetaType metaType = metaAttribute.getMetaType();
+            MergeManagerKey attrKey = new MergeManagerKey(attribute);
+
+            // all attributes must be present in mergeManager
+            if(mergeManager.containsKey(attrKey)){
+
+                if(metaType.isComplex())
+                {
+                    if (metaType.isSetOfSets())
+                    {
+                        throw new UnsupportedOperationException("Not yet implemented.");
+                    }
+
+                    if (metaType.isSet())
+                    {
+                        // merge complex set
+                        mergeComplexSet(baseEntityApplied, baseValueLeft, baseValueRight,
+                                mergeManager.getChildManager(attrKey), baseEntityManager, choice);
+                    }
+                    else
+                    {
+                        // merge complex value
+                        mergeComplexValue(baseEntityApplied, baseValueLeft, baseValueRight,
+                                mergeManager.getChildManager(attrKey), baseEntityManager, choice);
+                    }
+
+                }
+                else
+                {
+                    if (metaType.isSetOfSets())
+                    {
+                        throw new UnsupportedOperationException("Not yet implemented.");
+                    }
+
+                    if (metaType.isSet())
+                    {
+                        // merge simple set
+                        mergeSimpleSet(baseEntityApplied, baseValueLeft, baseValueRight,
+                                mergeManager.getChildManager(attrKey),baseEntityManager, choice);
+
+                    }
+                    else
+                    {
+                        // merge simple value
+                        mergeSimpleValue(baseEntityApplied, baseValueLeft, baseValueRight,
+                                mergeManager.getChildManager(attrKey),baseEntityManager, choice);
+                    }
+
+                }
+
+            }
+        }
+        return baseEntityApplied;
+    }
+
+    private void mergeComplexSet(IBaseEntity baseEntity, IBaseValue baseValueLeft, IBaseValue baseValueRight, IBaseEntityMergeManager mergeManager,
+                                 IBaseEntityManager baseEntityManager, MergeResultChoice choice)
+    {
+        IMetaAttribute metaAttribute = baseValueLeft.getMetaAttribute();
+        IMetaType metaType = metaAttribute.getMetaType();
+
+        IMetaSet childMetaSet = (IMetaSet)metaType;
+        IMetaType childMetaType = childMetaSet.getMemberType();
+        IMetaClass childMetaClass = (IMetaClass)childMetaType;
+
+        IBaseSet childBaseSetLeft = (IBaseSet)baseValueLeft.getValue();
+        IBaseSet childBaseSetRight = (IBaseSet)baseValueRight.getValue();
+        IBaseSet childBaseSetApplied = null;
+        IBaseSet childBaseSetAppliedRight = null;
+        IBaseSet childBaseSetAppliedLeft = null;
+
+        // we have reached the base case
+        if(mergeManager.getChildMap() == null)
+        {
+            if(mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_LEFT){
+                // copy from left to right
+                IBaseValue newBaseValueRight = BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        baseValueLeft.getId(),
+                        baseValueLeft.getBatch(),
+                        baseValueLeft.getIndex(),
+                        new Date(baseValueLeft.getRepDate().getTime()),
+                        childBaseSetLeft,
+                        baseValueLeft.isClosed(),
+                        baseValueLeft.isLast());
+
+                if(choice == MergeResultChoice.RIGHT)
+                {
+                    baseEntity.put(metaAttribute.getName(), newBaseValueRight);
+                }
+                else
+                {
+                    baseEntity.put(metaAttribute.getName(), baseValueLeft);
+
+                    newBaseValueRight.setBaseContainer(baseEntity);
+                    newBaseValueRight.setMetaAttribute(metaAttribute);
+                }
+
+                // update baseValueRight
+                baseEntityManager.registerAsUpdated(newBaseValueRight);
+
+                IBaseValue oldBaseValueRight =  BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        baseValueRight.getId(),
+                        baseValueRight.getBatch(),
+                        baseValueRight.getIndex(),
+                        new Date(baseValueRight.getRepDate().getTime()),
+                        childBaseSetRight,
+                        baseValueRight.isClosed(),
+                        baseValueRight.isLast());
+                // delete old baseValueRight
+                oldBaseValueRight.setBaseContainer(baseEntity);
+                oldBaseValueRight.setMetaAttribute(metaAttribute);
+                baseEntityManager.registerAsDeleted(oldBaseValueRight);
+
+
+                return;
+            }
+            if(mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_RIGHT){
+                // copy from right to left and return
+                IBaseValue newBaseValueLeft = BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        baseValueRight.getId(),
+                        baseValueRight.getBatch(),
+                        baseValueRight.getIndex(),
+                        new Date(baseValueRight.getRepDate().getTime()),
+                        childBaseSetRight,
+                        baseValueRight.isClosed(),
+                        baseValueRight.isLast());
+
+                if(choice == MergeResultChoice.LEFT)
+                {
+                    baseEntity.put(metaAttribute.getName(), newBaseValueLeft);
+                }
+                else
+                {
+                    baseEntity.put(metaAttribute.getName(), baseValueRight);
+
+                    newBaseValueLeft.setBaseContainer(baseEntity);
+                    newBaseValueLeft.setMetaAttribute(metaAttribute);
+                }
+
+                // update baseValueLeft
+                baseEntityManager.registerAsUpdated(newBaseValueLeft);
+
+                IBaseValue oldBaseValueLeft = BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        baseValueLeft.getId(),
+                        baseValueLeft.getBatch(),
+                        baseValueLeft.getIndex(),
+                        new Date(baseValueLeft.getRepDate().getTime()),
+                        childBaseSetLeft,
+                        baseValueLeft.isClosed(),
+                        baseValueLeft.isLast());
+                // delete old baseValueLeft
+                oldBaseValueLeft.setBaseContainer(baseEntity);
+                oldBaseValueLeft.setMetaAttribute(metaAttribute);
+                baseEntityManager.registerAsDeleted(oldBaseValueLeft);
+
+                return;
+            }
+            if(mergeManager.getAction() == IBaseEntityMergeManager.Action.TO_MERGE)
+            {
+                childBaseSetApplied= new BaseSet(childBaseSetLeft.getId(), childMetaType);
+
+                // merge two sets
+                for(IBaseValue childBaseValueRight : childBaseSetRight.get())
+                {
+                    childBaseSetApplied.put(childBaseValueRight);
+                }
+                for(IBaseValue childBaseValueLeft : childBaseSetLeft.get())
+                {
+                    boolean contains = false;
+                    for(IBaseValue appliedSetValue : childBaseSetApplied.get())
+                    {
+                        if(childBaseValueLeft.equals(appliedSetValue)){
+                            contains = true;
+                        }
+                    }
+                    if(!contains)
+                    {
+                        childBaseSetApplied.put(childBaseValueLeft);
+                    }
+                }
+                IBaseValue newBaseValueLeft = BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        baseValueLeft.getId(),
+                        baseValueLeft.getBatch(),
+                        baseValueLeft.getIndex(),
+                        new Date(baseValueLeft.getRepDate().getTime()),
+                        childBaseSetApplied,
+                        baseValueLeft.isClosed(),
+                        baseValueLeft.isLast());
+
+                IBaseValue newBaseValueRight =  BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        baseValueRight.getId(),
+                        baseValueRight.getBatch(),
+                        baseValueRight.getIndex(),
+                        new Date(baseValueRight.getRepDate().getTime()),
+                        childBaseSetApplied,
+                        baseValueRight.isClosed(),
+                        baseValueRight.isLast());
+
+                if(choice == MergeResultChoice.LEFT)
+                {
+                    baseEntity.put(metaAttribute.getName(), newBaseValueLeft);
+
+                    newBaseValueRight.setBaseContainer(baseEntity);
+                    newBaseValueRight.setMetaAttribute(metaAttribute);
+
+                }
+                else
+                {
+                    baseEntity.put(metaAttribute.getName(), newBaseValueRight);
+
+                    newBaseValueLeft.setBaseContainer(baseEntity);
+                    newBaseValueLeft.setMetaAttribute(metaAttribute);
+                }
+                // update baseValueLeft
+                baseEntityManager.registerAsUpdated(newBaseValueLeft);
+                // update baseValueRight
+                baseEntityManager.registerAsUpdated(newBaseValueRight);
+
+                return;
+            }
+        }
+        else
+        {
+            Set<UUID> processedUuidsLeft = new HashSet<UUID>();
+            Set<UUID> processedUuidsRight = new HashSet<UUID>();
+
+            childBaseSetAppliedLeft = new BaseSet(childBaseSetLeft.getId(), childMetaType);
+            childBaseSetAppliedRight = new BaseSet(childBaseSetRight.getId(), childMetaType);
+            // we haven't reached the base case - do recursion
+            for(IBaseValue childBaseValueLeft : childBaseSetLeft.get())
+            {
+                IBaseEntity childBaseEntityLeft = (IBaseEntity) childBaseValueLeft.getValue();
+
+                for(IBaseValue childBaseValueRight : childBaseSetRight.get())
+                {
+                    IBaseEntity childBaseEntityRight = (IBaseEntity) childBaseValueRight.getValue();
+
+                    MergeManagerKey uidKey = new MergeManagerKey(childBaseValueLeft.getUuid(),
+                            childBaseValueRight.getUuid());
+                    if(mergeManager.containsKey(uidKey) && (mergeManager.getChildManager(uidKey) != null))
+                    {
+                        if(processedUuidsLeft.contains(childBaseValueLeft.getUuid()) ||
+                                processedUuidsRight.contains(childBaseValueRight.getUuid()))
+                        {
+                            throw new RuntimeException("Two BaseValue objects can be paired only once");
+                        }
+                        else
+                        {
+                            processedUuidsLeft.add(childBaseValueLeft.getUuid());
+                            processedUuidsRight.add(childBaseValueRight.getUuid());
+                        }
+                        // we have child mergeManager object for this pair of IBaseValue instances
+                        // hence we can proceed with the recursion
+                        IBaseValue newChildBaseValueLeft = BaseValueFactory.create(
+                                MetaContainerTypes.META_SET,
+                                childMetaType,
+                                childBaseValueLeft.getBatch(),
+                                childBaseValueLeft.getIndex(),
+                                new Date(childBaseValueLeft.getRepDate().getTime()),
+                                mergeBaseEntity(childBaseEntityLeft, childBaseEntityRight,
+                                        mergeManager.getChildManager(uidKey), baseEntityManager, choice),
+                                childBaseValueLeft.isClosed(),
+                                childBaseValueLeft.isLast());
+                        childBaseSetAppliedLeft.put(newChildBaseValueLeft);
+
+                        IBaseValue newChildBaseValueRight = BaseValueFactory.create(
+                                MetaContainerTypes.META_SET,
+                                childMetaType,
+                                childBaseValueRight.getBatch(),
+                                childBaseValueRight.getIndex(),
+                                new Date(childBaseValueRight.getRepDate().getTime()),
+                                mergeBaseEntity(childBaseEntityLeft, childBaseEntityRight,
+                                        mergeManager.getChildManager(uidKey),baseEntityManager, choice),
+                                childBaseValueRight.isClosed(),
+                                childBaseValueRight.isLast());
+                        childBaseSetAppliedRight.put(newChildBaseValueRight);
+                    }
+
+                }
+
+            }
+            // add remaining BaseValues
+            for(IBaseValue childBaseValueLeft : childBaseSetLeft.get())
+            {
+                if(!processedUuidsLeft.contains(childBaseValueLeft.getUuid()))
+                {
+                    childBaseSetAppliedLeft.put(childBaseValueLeft);
+                }
+            }
+
+            for(IBaseValue childBaseValueRight : childBaseSetRight.get())
+            {
+                if(!processedUuidsRight.contains(childBaseValueRight.getUuid()))
+                {
+                    childBaseSetAppliedRight.put(childBaseValueRight);
+                }
+            }
+
+            IBaseValue baseValueLeftApplied = BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    childMetaType,
+                    baseValueLeft.getBatch(),
+                    baseValueLeft.getIndex(),
+                    new Date(baseValueLeft.getRepDate().getTime()),
+                    childBaseSetAppliedLeft,
+                    baseValueLeft.isClosed(),
+                    baseValueLeft.isLast());
+
+            IBaseValue baseValueRightApplied = BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    childMetaType,
+                    baseValueRight.getBatch(),
+                    baseValueRight.getIndex(),
+                    new Date(baseValueRight.getRepDate().getTime()),
+                    childBaseSetAppliedLeft,
+                    baseValueRight.isClosed(),
+                    baseValueRight.isLast());
+
+            if(choice == MergeResultChoice.LEFT)
+            {
+                baseEntity.put(metaAttribute.getName(), baseValueLeftApplied);
+
+                baseValueRightApplied.setBaseContainer(baseEntity);
+                baseValueRightApplied.setMetaAttribute(metaAttribute);
+            }
+            else
+            {
+                baseEntity.put(metaAttribute.getName(), baseValueRightApplied);
+
+                baseValueLeftApplied.setBaseContainer(baseEntity);
+                baseValueRightApplied.setMetaAttribute(metaAttribute);
+            }
+
+            baseEntityManager.registerAsUpdated(baseValueLeftApplied);
+            baseEntityManager.registerAsUpdated(baseValueRightApplied);
+        }
+
+    }
+
+    public void mergeComplexValue(IBaseEntity baseEntity, IBaseValue baseValueLeft, IBaseValue baseValueRight,
+                                  IBaseEntityMergeManager mergeManager, IBaseEntityManager baseEntityManager,
+                                  MergeResultChoice choice)
+    {
+        IMetaAttribute metaAttribute = baseValueLeft.getMetaAttribute();
+        IMetaType metaType = metaAttribute.getMetaType();
+        IMetaClass metaClass = (IMetaClass)metaType;
+
+        // we have reached the base case
+        if(mergeManager.getChildMap() == null)
+        {
+            if(mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_LEFT)
+            {
+                // copy from left to right
+                IBaseValue newBaseValueRight = BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        baseValueLeft.getId(),
+                        baseValueLeft.getBatch(),
+                        baseValueLeft.getIndex(),
+                        new Date(baseValueLeft.getRepDate().getTime()),
+                        baseValueLeft.getValue(),
+                        baseValueLeft.isClosed(),
+                        baseValueLeft.isLast());
+
+                if(choice == MergeResultChoice.RIGHT)
+                {
+                    baseEntity.put(metaAttribute.getName(), newBaseValueRight);
+                }
+                else
+                {
+                    baseEntity.put(metaAttribute.getName(), baseValueLeft);
+
+                    newBaseValueRight.setBaseContainer(baseEntity);
+                    newBaseValueRight.setMetaAttribute(metaAttribute);
+                }
+
+                // update baseValueRight
+                baseEntityManager.registerAsUpdated(newBaseValueRight);
+
+                IBaseValue oldBaseValueRight =  BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        baseValueRight.getId(),
+                        baseValueRight.getBatch(),
+                        baseValueRight.getIndex(),
+                        new Date(baseValueRight.getRepDate().getTime()),
+                        baseValueRight.getValue(),
+                        baseValueRight.isClosed(),
+                        baseValueRight.isLast());
+                // delete old baseValueRight
+                oldBaseValueRight.setBaseContainer(baseEntity);
+                oldBaseValueRight.setMetaAttribute(metaAttribute);
+                baseEntityManager.registerAsDeleted(oldBaseValueRight);
+
+                return;
+            }
+            if(mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_RIGHT)
+            {
+                // copy from right to left and return
+                IBaseValue newBaseValueLeft = BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        baseValueRight.getId(),
+                        baseValueRight.getBatch(),
+                        baseValueRight.getIndex(),
+                        new Date(baseValueRight.getRepDate().getTime()),
+                        baseValueRight.getValue(),
+                        baseValueRight.isClosed(),
+                        baseValueRight.isLast());
+
+                if(choice == MergeResultChoice.LEFT)
+                {
+                    baseEntity.put(metaAttribute.getName(), newBaseValueLeft);
+                }
+                else
+                {
+                    baseEntity.put(metaAttribute.getName(), baseValueRight);
+
+                    newBaseValueLeft.setBaseContainer(baseEntity);
+                    newBaseValueLeft.setMetaAttribute(metaAttribute);
+                }
+
+                // update baseValueLeft
+                baseEntityManager.registerAsUpdated(newBaseValueLeft);
+
+                IBaseValue oldBaseValueLeft = BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        baseValueLeft.getId(),
+                        baseValueLeft.getBatch(),
+                        baseValueLeft.getIndex(),
+                        new Date(baseValueLeft.getRepDate().getTime()),
+                        baseValueLeft.getValue(),
+                        baseValueLeft.isClosed(),
+                        baseValueLeft.isLast());
+                // delete old baseValueLeft
+                oldBaseValueLeft.setBaseContainer(baseEntity);
+                oldBaseValueLeft.setMetaAttribute(metaAttribute);
+                baseEntityManager.registerAsDeleted(oldBaseValueLeft);
+
+                return;
+            }
+            if(mergeManager.getAction() == IBaseEntityMergeManager.Action.TO_MERGE)
+            {
+                throw new RuntimeException("Invalid structure of MergeManager");
+            }
+
+        }
+        else
+        {
+            // we haven't reached the base case - do recursion
+            IBaseEntity baseEntityLeft = (IBaseEntity)baseValueLeft.getValue();
+            IBaseEntity baseEntityRight = (IBaseEntity)baseValueRight.getValue();
+
+
+            MergeManagerKey<Long> idKey = new MergeManagerKey<Long>(new Long(baseValueLeft.getId()), new Long(baseValueRight.getId()));
+            IBaseEntityMergeManager childMergeManager = mergeManager.getChildManager(idKey);
+
+            IBaseValue baseValueLeftApplied = BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    baseValueLeft.getId(),
+                    baseValueLeft.getBatch(),
+                    baseValueLeft.getIndex(),
+                    new Date(baseValueLeft.getRepDate().getTime()),
+                    mergeBaseEntity(baseEntityLeft, baseEntityRight, childMergeManager, baseEntityManager, choice),
+                    baseValueLeft.isClosed(),
+                    baseValueLeft.isLast());
+
+            IBaseValue baseValueRightApplied = BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    baseValueLeft.getId(),
+                    baseValueLeft.getBatch(),
+                    baseValueLeft.getIndex(),
+                    new Date(baseValueLeft.getRepDate().getTime()),
+                    mergeBaseEntity(baseEntityLeft, baseEntityRight, childMergeManager, baseEntityManager, choice),
+                    baseValueLeft.isClosed(),
+                    baseValueLeft.isLast());
+
+            if(choice == MergeResultChoice.LEFT)
+            {
+                baseEntity.put(metaAttribute.getName(), baseValueLeftApplied);
+
+                baseValueRightApplied.setBaseContainer(baseEntity);
+                baseValueRightApplied.setMetaAttribute(metaAttribute);
+            }
+            else
+            {
+                baseEntity.put(metaAttribute.getName(), baseValueRightApplied);
+
+                baseValueLeftApplied.setBaseContainer(baseEntity);
+                baseValueRightApplied.setMetaAttribute(metaAttribute);
+            }
+            baseEntityManager.registerAsUpdated(baseValueLeftApplied);
+            baseEntityManager.registerAsUpdated(baseValueRightApplied);
+        }
+
+    }
+
+
+    public void mergeSimpleSet(IBaseEntity baseEntity, IBaseValue baseValueLeft, IBaseValue baseValueRight, IBaseEntityMergeManager mergeManager,
+                               IBaseEntityManager baseEntityManager, MergeResultChoice choice)
+    {
+        IMetaAttribute metaAttribute = baseValueLeft.getMetaAttribute();
+        IMetaType metaType = metaAttribute.getMetaType();
+
+        IMetaSet childMetaSet = (IMetaSet)metaType;
+        IMetaType childMetaType = childMetaSet.getMemberType();
+        IMetaClass childMetaClass = (IMetaClass)childMetaType;
+
+        IBaseSet childBaseSetLeft = (IBaseSet)baseValueLeft.getValue();
+        IBaseSet childBaseSetRight = (IBaseSet)baseValueRight.getValue();
+        IBaseSet childBaseSetApplied = null;
+
+        if(mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_LEFT)
+        {
+            // copy from left to right
+            IBaseValue newBaseValueRight = BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    baseValueLeft.getId(),
+                    baseValueLeft.getBatch(),
+                    baseValueLeft.getIndex(),
+                    new Date(baseValueLeft.getRepDate().getTime()),
+                    childBaseSetLeft,
+                    baseValueLeft.isClosed(),
+                    baseValueLeft.isLast());
+
+            if(choice == MergeResultChoice.RIGHT)
+            {
+                baseEntity.put(metaAttribute.getName(), newBaseValueRight);
+            }
+            else
+            {
+                baseEntity.put(metaAttribute.getName(), baseValueLeft);
+
+                newBaseValueRight.setBaseContainer(baseEntity);
+                newBaseValueRight.setMetaAttribute(metaAttribute);
+            }
+            // update baseValueRight
+            baseEntityManager.registerAsUpdated(newBaseValueRight);
+
+            IBaseValue oldBaseValueRight =  BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    baseValueRight.getId(),
+                    baseValueRight.getBatch(),
+                    baseValueRight.getIndex(),
+                    new Date(baseValueRight.getRepDate().getTime()),
+                    childBaseSetRight,
+                    baseValueRight.isClosed(),
+                    baseValueRight.isLast());
+            // delete old baseValueRight
+            oldBaseValueRight.setBaseContainer(baseEntity);
+            oldBaseValueRight.setMetaAttribute(metaAttribute);
+            baseEntityManager.registerAsDeleted(oldBaseValueRight);
+
+
+            return;
+        }
+        if(mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_RIGHT)
+        {
+            // copy from right to left and return
+            IBaseValue newBaseValueLeft = BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    baseValueRight.getId(),
+                    baseValueRight.getBatch(),
+                    baseValueRight.getIndex(),
+                    new Date(baseValueRight.getRepDate().getTime()),
+                    childBaseSetRight,
+                    baseValueRight.isClosed(),
+                    baseValueRight.isLast());
+
+            if(choice == MergeResultChoice.LEFT)
+            {
+                baseEntity.put(metaAttribute.getName(), newBaseValueLeft);
+            }
+            else
+            {
+                baseEntity.put(metaAttribute.getName(), baseValueRight);
+
+                newBaseValueLeft.setBaseContainer(baseEntity);
+                newBaseValueLeft.setMetaAttribute(metaAttribute);
+            }
+
+            // update baseValueLeft
+            baseEntityManager.registerAsUpdated(newBaseValueLeft);
+
+            IBaseValue oldBaseValueLeft = BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    baseValueLeft.getId(),
+                    baseValueLeft.getBatch(),
+                    baseValueLeft.getIndex(),
+                    new Date(baseValueLeft.getRepDate().getTime()),
+                    childBaseSetLeft,
+                    baseValueLeft.isClosed(),
+                    baseValueLeft.isLast());
+            // delete old baseValueLeft
+            oldBaseValueLeft.setBaseContainer(baseEntity);
+            oldBaseValueLeft.setMetaAttribute(metaAttribute);
+            baseEntityManager.registerAsDeleted(oldBaseValueLeft);
+
+            return;
+
+        }
+        if(mergeManager.getAction() == IBaseEntityMergeManager.Action.TO_MERGE){
+
+            childBaseSetApplied= new BaseSet(childBaseSetLeft.getId(), childMetaType);
+
+            // merge two sets
+            for(IBaseValue childBaseValueRight : childBaseSetRight.get())
+            {
+                childBaseSetApplied.put(childBaseValueRight);
+            }
+            for(IBaseValue childBaseValueLeft : childBaseSetLeft.get())
+            {
+                boolean contains = false;
+                for(IBaseValue appliedSetValue : childBaseSetApplied.get())
+                {
+                    if(childBaseValueLeft.equals(appliedSetValue)){
+                        contains = true;
+                    }
+                }
+                if(!contains)
+                {
+                    childBaseSetApplied.put(childBaseValueLeft);
+                }
+            }
+            IBaseValue newBaseValueLeft = BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    baseValueLeft.getId(),
+                    baseValueLeft.getBatch(),
+                    baseValueLeft.getIndex(),
+                    new Date(baseValueLeft.getRepDate().getTime()),
+                    childBaseSetApplied,
+                    baseValueLeft.isClosed(),
+                    baseValueLeft.isLast());
+
+
+            IBaseValue newBaseValueRight =  BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    baseValueRight.getId(),
+                    baseValueRight.getBatch(),
+                    baseValueRight.getIndex(),
+                    new Date(baseValueRight.getRepDate().getTime()),
+                    childBaseSetApplied,
+                    baseValueRight.isClosed(),
+                    baseValueRight.isLast());
+
+            if(choice == MergeResultChoice.LEFT)
+            {
+                baseEntity.put(metaAttribute.getName(), newBaseValueLeft);
+
+                newBaseValueRight.setBaseContainer(baseEntity);
+                newBaseValueRight.setMetaAttribute(metaAttribute);
+
+            }
+            else
+            {
+                baseEntity.put(metaAttribute.getName(), newBaseValueRight);
+
+                newBaseValueLeft.setBaseContainer(baseEntity);
+                newBaseValueLeft.setMetaAttribute(metaAttribute);
+            }
+            // update baseValueLeft
+            baseEntityManager.registerAsUpdated(newBaseValueLeft);
+            // update baseValueRight
+            baseEntityManager.registerAsUpdated(newBaseValueRight);
+
+            return;
+        }
+    }
+
+
+
+    public void mergeSimpleValue(IBaseEntity baseEntity, IBaseValue baseValueLeft, IBaseValue baseValueRight, IBaseEntityMergeManager mergeManager,
+                               IBaseEntityManager baseEntityManager, MergeResultChoice choice)
+    {
+        IMetaAttribute metaAttribute = baseValueLeft.getMetaAttribute();
+        IMetaType metaType = metaAttribute.getMetaType();
+
+        if(mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_LEFT)
+        {
+            // copy from left to right
+            IBaseValue newBaseValueRight = BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    baseValueLeft.getId(),
+                    baseValueLeft.getBatch(),
+                    baseValueLeft.getIndex(),
+                    new Date(baseValueLeft.getRepDate().getTime()),
+                    baseValueLeft.getValue(),
+                    baseValueLeft.isClosed(),
+                    baseValueLeft.isLast());
+
+            if(choice == MergeResultChoice.RIGHT)
+            {
+                baseEntity.put(metaAttribute.getName(), newBaseValueRight);
+            }
+            else
+            {
+                baseEntity.put(metaAttribute.getName(), baseValueLeft);
+
+                newBaseValueRight.setBaseContainer(baseEntity);
+                newBaseValueRight.setMetaAttribute(metaAttribute);
+            }
+            // update baseValueRight
+            baseEntityManager.registerAsUpdated(newBaseValueRight);
+
+            IBaseValue oldBaseValueRight =  BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    baseValueRight.getId(),
+                    baseValueRight.getBatch(),
+                    baseValueRight.getIndex(),
+                    new Date(baseValueRight.getRepDate().getTime()),
+                    baseValueRight.getValue(),
+                    baseValueRight.isClosed(),
+                    baseValueRight.isLast());
+            // delete old baseValueRight
+            oldBaseValueRight.setBaseContainer(baseEntity);
+            oldBaseValueRight.setMetaAttribute(metaAttribute);
+            baseEntityManager.registerAsDeleted(oldBaseValueRight);
+
+            return;
+
+        }
+        if(mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_RIGHT)
+        {
+            // copy from right to left and return
+            IBaseValue newBaseValueLeft = BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    baseValueRight.getId(),
+                    baseValueRight.getBatch(),
+                    baseValueRight.getIndex(),
+                    new Date(baseValueRight.getRepDate().getTime()),
+                    baseValueRight.getValue(),
+                    baseValueRight.isClosed(),
+                    baseValueRight.isLast());
+
+            if(choice == MergeResultChoice.LEFT)
+            {
+                baseEntity.put(metaAttribute.getName(), newBaseValueLeft);
+            }
+            else
+            {
+                baseEntity.put(metaAttribute.getName(), baseValueRight);
+
+                newBaseValueLeft.setBaseContainer(baseEntity);
+                newBaseValueLeft.setMetaAttribute(metaAttribute);
+            }
+
+            // update baseValueLeft
+            baseEntityManager.registerAsUpdated(newBaseValueLeft);
+
+            IBaseValue oldBaseValueLeft = BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    baseValueLeft.getId(),
+                    baseValueLeft.getBatch(),
+                    baseValueLeft.getIndex(),
+                    new Date(baseValueLeft.getRepDate().getTime()),
+                    baseValueLeft.getValue(),
+                    baseValueLeft.isClosed(),
+                    baseValueLeft.isLast());
+            // delete old baseValueLeft
+            oldBaseValueLeft.setBaseContainer(baseEntity);
+            oldBaseValueLeft.setMetaAttribute(metaAttribute);
+            baseEntityManager.registerAsDeleted(oldBaseValueLeft);
+
+            return;
+        }
+        if(mergeManager.getAction() == IBaseEntityMergeManager.Action.TO_MERGE)
+        {
+            throw new RuntimeException("Wrong action in mergeManager");
+        }
+    }
+
 
     @Override
     @Transactional
