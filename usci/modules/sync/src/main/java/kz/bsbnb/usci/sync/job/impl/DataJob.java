@@ -48,9 +48,9 @@ public final class DataJob extends AbstractDataJob {
             try {
                 if(entities.size() > 0 && entitiesInProcess.size() < currentThread) {
                     //System.out.println("Number of threads: " + entitiesInProcess.size());
-                    long t1 = System.currentTimeMillis();
+                    //long t1 = System.currentTimeMillis();
                     processNewEntities();
-                    System.out.println("New job in " + (System.currentTimeMillis() - t1));
+                    //System.out.println("New job in " + (System.currentTimeMillis() - t1));
                 }
 
                 if(processingJobs.size() > 0)
@@ -188,7 +188,7 @@ public final class DataJob extends AbstractDataJob {
 
             if(!isInProcess(entity)) {
                 iterator.remove();
-                System.out.println("Watched entities " + (++i));
+                //System.out.println("Watched entities " + (++i));
                 return entity;
             } else {
                 logger.debug("Entity in process.");

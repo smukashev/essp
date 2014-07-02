@@ -1631,7 +1631,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 childBaseValueSaving.isLast());
                         baseValueForSearch.setBaseContainer(childBaseSetApplied);
 
-                        IBaseValue childBaseValueClosed = setValueDao.getClosedBaseValue(baseValueForSearch);
+                        IBaseValue childBaseValueClosed = null;
+
+                        if (childBaseSetApplied != null && childBaseSetApplied.getId() > 0) {
+                            childBaseValueClosed = setValueDao.getClosedBaseValue(baseValueForSearch);
+                        } //TODO: add code for not existing container
+
                         if (childBaseValueClosed != null)
                         {
                             childBaseValueClosed.setBaseContainer(childBaseSetApplied);
@@ -2430,20 +2435,23 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                     apply(baseEntitySaving, baseEntityManager) :
                                     applyBaseEntityAdvanced(baseEntitySaving, baseEntityClosed, baseEntityManager);
                         }
-                        baseValuePrevious.setValue(baseEntityApplied);
 
-                        if (baseValueClosed.isLast())
-                        {
-                            baseValuePrevious.setIndex(baseValueSaving.getIndex());
-                            baseValuePrevious.setBatch(baseValueSaving.getBatch());
-                            baseValuePrevious.setLast(true);
+                        if(baseValuePrevious != null) {
+                            baseValuePrevious.setValue(baseEntityApplied);
 
-                            baseEntity.put(metaAttribute.getName(), baseValuePrevious);
-                            baseEntityManager.registerAsUpdated(baseValuePrevious);
-                        }
-                        else
-                        {
-                            baseEntity.put(metaAttribute.getName(), baseValuePrevious);
+                            if (baseValueClosed.isLast())
+                            {
+                                baseValuePrevious.setIndex(baseValueSaving.getIndex());
+                                baseValuePrevious.setBatch(baseValueSaving.getBatch());
+                                baseValuePrevious.setLast(true);
+
+                                baseEntity.put(metaAttribute.getName(), baseValuePrevious);
+                                baseEntityManager.registerAsUpdated(baseValuePrevious);
+                            }
+                            else
+                            {
+                                baseEntity.put(metaAttribute.getName(), baseValuePrevious);
+                            }
                         }
                     }
                     else
