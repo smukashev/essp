@@ -19,15 +19,19 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -36,8 +40,7 @@ public class ShowCaseHolder extends JDBCSupport
 {
     private final static String TABLES_PREFIX = "EAV_SCH_";
     private final static String COLUMN_PREFIX = "SC_";
-    private final static String DATA_TABLES_POSTFIX = "_DAT";
-    private final static String IDX_TABLES_POSTFIX = "_IDX";
+    private final static String HISTORY_POSTFIX = "_HIS";
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -268,18 +271,25 @@ public class ShowCaseHolder extends JDBCSupport
 //        }
     }
 
-    public void createTables() {
-        if (showCaseMeta == null) {
-            throw new IllegalStateException("Can't create tables without ShowCase meta information.");
-        }
+    public void createTables(){
+        createTable(HistoryState.ACTUAL);
+        createTable(HistoryState.HISTORY);
+    }
 
-        String dataTableName = TABLES_PREFIX + showCaseMeta.getTableName().toUpperCase() + DATA_TABLES_POSTFIX;
-        String idxTableName = TABLES_PREFIX + showCaseMeta.getTableName().toUpperCase() + IDX_TABLES_POSTFIX;
+    public void createTable(HistoryState historyState){
+        String tableName = null;
+        switch (historyState){
+            case ACTUAL:
+                tableName = getActualTableName();
+                break;
+            default:
+                tableName = getHistoryTableName();
+        }
         Database model = new Database();
         model.setName("model");
 
-        Table dataTable = new Table();
-        dataTable.setName(dataTableName);
+        Table table = new Table();
+        table.setName(tableName);
         //table.setDescription();
 
         Column idColumn = new Column();
@@ -291,18 +301,26 @@ public class ShowCaseHolder extends JDBCSupport
         idColumn.setSize("14,0");
         idColumn.setAutoIncrement(true);
 
-        dataTable.addColumn(idColumn);
+        table.addColumn(idColumn);
 
-        Column idxColumn = new Column();
+        //calculateIdxPaths();
+        if(prefixToColumn == null)
+           generatePaths();
 
-        idxColumn.setName("IDX_ID");
-        idxColumn.setPrimaryKey(true);
-        idxColumn.setRequired(true);
-        idxColumn.setType("NUMERIC");
-        idxColumn.setSize("14,0");
-        idxColumn.setAutoIncrement(true);
+        for(String prefix : prefixToColumn.keySet()){
+            Column column = new Column();
+            column.setName(COLUMN_PREFIX + prefixToColumn.get(prefix) + "_ID");
 
-        dataTable.addColumn(idxColumn);
+            column.setPrimaryKey(false);
+            column.setRequired(false);
+
+            column.setType("NUMERIC");
+            column.setSize("14,0");
+
+            column.setAutoIncrement(false);
+
+            table.addColumn(column);
+        }
 
         for (ShowCaseField field : showCaseMeta.getFieldsList()) {
             Column column = new Column();
@@ -320,79 +338,30 @@ public class ShowCaseHolder extends JDBCSupport
             if (columnSize != null) {
                 column.setSize(columnSize);
             }
-
             //column.setDefaultValue(xmlReader.getAttributeValue(idx));
             column.setAutoIncrement(false);
             //column.setDescription(xmlReader.getAttributeValue(idx));
             //column.setJavaName(xmlReader.getAttributeValue(idx));
-
-            dataTable.addColumn(column);
+            table.addColumn(column);
         }
 
-        model.addTable(dataTable);
+        Column column = new Column();
+        column.setName("OPEN_DATE");
+        column.setPrimaryKey(false);
+        column.setRequired(false);
+        column.setType("DATE");
+        table.addColumn(column);
 
+        column = new Column();
+        column.setName("CLOSE_DATE");
+        column.setPrimaryKey(false);
+        column.setRequired(false);
+        column.setType("DATE");
+        table.addColumn(column);
 
-        Table idxTable = new Table();
-        idxTable.setName(idxTableName);
-        //table.setDescription();
-
-        idColumn = new Column();
-
-        idColumn.setName("ID");
-        idColumn.setPrimaryKey(true);
-        idColumn.setRequired(true);
-        idColumn.setType("NUMERIC");
-        idColumn.setSize("14,0");
-        idColumn.setAutoIncrement(true);
-
-        idxTable.addColumn(idColumn);
-
-        //calculateIdxPaths();
-        generatePaths();
-
-        for(String prefix : prefixToColumn.keySet()){
-            Column column = new Column();
-            column.setName(COLUMN_PREFIX + prefixToColumn.get(prefix) + "_ID");
-
-            column.setPrimaryKey(false);
-            column.setRequired(false);
-
-            column.setType("NUMERIC");
-            column.setSize("14,0");
-
-            column.setAutoIncrement(false);
-
-            idxTable.addColumn(column);
-        }
-
-        /*int i = 1;
-
-        for (String cPath : idxPaths) {
-            //System.out.println(cPath);
-            Column column = new Column();
-
-            column.setName(COLUMN_PREFIX + cPath.replace(".", "_").substring(
-                    Math.max(COLUMN_PREFIX.length() + 5 - 32, 0), cPath.length()) + i++);
-            column.setPrimaryKey(false);
-            column.setRequired(false);
-
-            column.setType("NUMERIC");
-            column.setSize("14,0");
-
-            //column.setDefaultValue(xmlReader.getAttributeValue(idx));
-            column.setAutoIncrement(false);
-            //column.setDescription(xmlReader.getAttributeValue(idx));
-            //column.setJavaName(xmlReader.getAttributeValue(idx));
-
-            idxTable.addColumn(column);
-        } */
-
-        model.addTable(idxTable);
-
-        System.out.println(model.toVerboseString());
+        model.addTable(table);
 
         Platform platform = PlatformFactory.createNewPlatformInstance(jdbcTemplate.getDataSource());
-
         platform.createModel(model, false, true);
     }
 
@@ -471,8 +440,33 @@ public class ShowCaseHolder extends JDBCSupport
         }
     }
 
+    /**
+     * Map that maps path to corresponding column in table <br/>
+     * helps to create Tables and carteage Maps <br/>
+     * if path has several appearance it appends number i.e: <br/>
+     *
+     * <b>Example: </b> <br/>
+     * credit: <br/>
+     * &nbsp; person<br/>
+     * &nbsp;&nbsp; country<br/>
+     * &nbsp;&nbsp;&nbsp; name_ru<br/>
+     * &nbsp;   organization<br/>
+     * &nbsp;&nbsp;      country<br/>
+     * &nbsp;&nbsp;&nbsp; name_ru<br/>
+     *
+     * prefixToColumn will keep as : <br/>
+     * ... <br/>
+     * credit.person: person<br/>
+     * credit.organization: organization<br/>
+     * credit.person.country: country1:<br/>
+     * credit.organization.country country2: <br/>
+     * ...
+     */
     Map<String,String> prefixToColumn;
 
+    /**
+     * fills prefixToColumn = generates all possible columns from all carteage paths
+     */
     public void generatePaths(){
         prefixToColumn = new HashMap<String, String>();
         Map<String,Integer> nextNumber = new HashMap<String,Integer>();
@@ -516,6 +510,8 @@ public class ShowCaseHolder extends JDBCSupport
 
         ShowCaseEntries(IBaseEntity entity, String path, String columnName){
             this.columnName = columnName;
+            if(path.startsWith("."))
+                path = path.substring(1);
             gen(entity, path, new HashMap(), "", "root");
         }
         public List<HashMap> getEntries(){
@@ -579,54 +575,46 @@ public class ShowCaseHolder extends JDBCSupport
         System.out.println("]");
     }
 
-    public void persistMap(HashMap map){
-        StringBuilder sql = new StringBuilder("insert into ")
-                .append(TABLES_PREFIX + showCaseMeta.getTableName().toUpperCase() + "_IDX").append("(");
-        StringBuilder placeholders = new StringBuilder();
+    /**
+     * Save Map to db historically, used by dbCarteageGenerate <br/>
+     * Map = merged version of several carteage rows   <br/>
+     * <b>Example of map </b>: <br/>
+     * &nbsp;  root_id : 15 <br/>
+     * &nbsp;  subject_id: 13 <br/>
+     * &nbsp;  person_id: 7 <br/>
+     * &nbsp;  organization_id: 6 <br/>
+     * &nbsp;  Org_name: Telecom <br/>
+     * &nbsp;  Person_name: JOHN <br/>
+     */
+    public void persistMap(HashMap<String,Object> map, Date openDate, Date closeDate){
+        StringBuilder sql;
+        StringBuilder values = new StringBuilder("(");
+        String tableName;
 
-        for (Iterator<String> iter = prefixToColumn.keySet().iterator(); iter.hasNext();) {
-            String columnName = prefixToColumn.get(iter.next());
-            sql.append( COLUMN_PREFIX + columnName + "_id");
-            placeholders.append(map.get(columnName + "_id"));
+        if(closeDate == null)
+            tableName = getActualTableName();
+        else
+            tableName = getHistoryTableName();
 
-            if (iter.hasNext()) {
-                sql.append(",");
-                placeholders.append(",");
-            }
-        }
+        sql = new StringBuilder("insert into ").append(tableName).append("(");
 
-        sql.append(") values (").append(placeholders).append(")");
-
-        KeyHolder holder = new GeneratedKeyHolder();
-        final String sql1 = sql.toString();
-        System.out.println(sql1);
-        jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement( sql1.toString(), new String[]{"ID"});
-                return ps;
-            }
-        }, holder);
-
-        long lid = holder.getKey().longValue();
-
-        sql = new StringBuilder("insert into ")
-                .append(TABLES_PREFIX + showCaseMeta.getTableName().toUpperCase() + "_DAT").append("(");
-        placeholders = new StringBuilder();
-
-        Object[] vals = new Object[showCaseMeta.getFieldsList().size()];
+        Object[] vals = new Object[map.size() + 2];
         int i = 0;
 
-        for(ShowCaseField field : showCaseMeta.getFieldsList()){
-            sql.append( COLUMN_PREFIX + field.getColumnName() + ",");
-            placeholders.append("?,");
-            vals[i++] = map.get(field.getColumnName());
+        for(Map.Entry<String,Object> entry: map.entrySet()){
+            sql.append(COLUMN_PREFIX).append(entry.getKey()).append(",");
+            values.append("? ,");
+            vals[i++] = entry.getValue();
         }
 
-        sql.append("IDX_ID");
-        placeholders.append(lid);
+        sql.append("OPEN_DATE, CLOSE_DATE");
+        values.append("?, ? )");
+        vals[i++] = openDate;
+        vals[i++] = closeDate;
 
-        sql.append(" ) values (").append(placeholders).append(")");
+        sql.append(") values ").append(values);
+
+        System.out.println(sql.toString());
 
         jdbcTemplate.update(sql.toString(), vals);
     }
@@ -654,62 +642,147 @@ public class ShowCaseHolder extends JDBCSupport
         return false;
     }
 
-   public void dbCarteageGenerate(IBaseEntity entity){
+    public enum HistoryState{
+        ACTUAL,
+        HISTORY
+    }
 
-       if(entity.getId() <=0 )
-           throw new IllegalArgumentException("id is not correct");
+    /**
+     * handles left part of invterval i.e [0-100) and rep_date = 50 <br/>
+     * result: [0-50) [50-100) Original interval is now left part, right part is gap <br/>
+     * handles degenerate cases i.e performs delete of interval if start = end
+     */
+    @Transactional
+    public void updateLeftRange(HistoryState historyState, IBaseEntity entity){
+        String tableName;
 
-
-       String del1 = "delete from " + TABLES_PREFIX + showCaseMeta.getTableName().toUpperCase() + "_DAT where IDX_ID in " +
-               "(select id from " + TABLES_PREFIX + showCaseMeta.getTableName().toUpperCase() + "_IDX where " +
-               COLUMN_PREFIX+"ROOT_ID = " + entity.getId() +")";
-       String del2 = "delete from "  + TABLES_PREFIX + showCaseMeta.getTableName().toUpperCase() +"_IDX where " +
-               COLUMN_PREFIX + "ROOT_ID =" +  entity.getId();
-
-       jdbcTemplate.update(del1);
-       jdbcTemplate.update(del2);
-
-
-       //StringBuilder sql = new StringBuilder("insert into ")
-       //        .append(TABLES_PREFIX + showCaseMeta.getTableName().toUpperCase() + "_IDX").append("(");
-
-
-       int n = showCaseMeta.getFieldsList().size();
-        ShowCaseEntries[] showCases = new ShowCaseEntries[n];
-        int i = 0;
-        for(ShowCaseField field: showCaseMeta.getFieldsList()){
-            showCases[i] = new ShowCaseEntries(entity,
-                    field.getAttributePath() + "." + field.getAttributeName(),field.getColumnName());
-            i++;
+        switch (historyState){
+            case ACTUAL:
+                tableName = getActualTableName();
+                break;
+            default:
+                tableName = getHistoryTableName();
         }
 
-        int allRecordsSize = 0;
-        for(i=0;i<n;i++)
-            allRecordsSize+=showCases[i].getEntriesSize();
+        String sql;
+        Date openDate = null;
+        sql = "SELECT MAX(open_date) AS OPEN_DATE FROM %s WHERE open_date <= ? AND %sroot_id = ?";
+        sql = String.format(sql, tableName, COLUMN_PREFIX);
+        Map m = jdbcTemplate.queryForMap(sql, entity.getReportDate(), entity.getId());
+        openDate = (Date) m.get("OPEN_DATE");
+        if(openDate == null) return;
 
-        boolean [] was = new boolean[allRecordsSize];
-        boolean [] usedGroup = new boolean[n];
-        int [] id = new int[allRecordsSize];
-        List<HashMap> entries = new ArrayList<HashMap>(allRecordsSize);
 
-        int yk=0;
-        for(i=0;i<n;i++)
-            for(HashMap m : showCases[i].getEntries()){
-                entries.add(yk, m);
-                id[yk] = i;
-                yk++;
-            }
+       sql = "UPDATE %s SET close_date = ? WHERE %sroot_id = ? AND open_date = ?";
+       sql = String.format(sql, tableName, COLUMN_PREFIX);
+       jdbcTemplate.update(sql, entity.getReportDate(), entity.getId(), openDate);
 
-        boolean found = true;
-        while(found){
-            found = false;
-            for(i=0;i<allRecordsSize;i++) if(!was[i]){
+       sql = "DELETE FROM %s WHERE %sROOT_ID = ? AND OPEN_DATE = CLOSE_DATE";
+       sql = String.format(sql, tableName, COLUMN_PREFIX);
+       jdbcTemplate.update(sql, entity.getId());
+    }
+
+    public String getActualTableName(){
+        return TABLES_PREFIX + showCaseMeta.getTableName();
+    }
+
+    public String getHistoryTableName(){
+        return TABLES_PREFIX + showCaseMeta.getTableName() + HISTORY_POSTFIX;
+    }
+
+    @Transactional
+    public void moveActualToHistory(IBaseEntity entity){
+
+        StringBuilder select = new StringBuilder();
+        StringBuilder sql = new StringBuilder("insert into %s");
+
+        for(String s : prefixToColumn.values()){
+            select.append(COLUMN_PREFIX).append(s).append("_id").append(",");
+        }
+        for(ShowCaseField s : showCaseMeta.getFieldsList()){
+            select.append(COLUMN_PREFIX).append(s.getColumnName()).append(",");
+        }
+
+        select.append("OPEN_DATE, CLOSE_DATE ");
+        sql.append("(").append(select).append(")( select ")
+                .append(select).append("from %s where %sROOT_ID = ? )");
+
+        String sqlResult = String.format(sql.toString(), getHistoryTableName(), getActualTableName(), COLUMN_PREFIX);
+        System.out.println(sqlResult);
+        jdbcTemplate.update(sqlResult, entity.getId());
+
+        sqlResult = String.format("DELETE FROM %s WHERE %sROOT_ID = ? AND CLOSE_DATE IS NOT NULL", getActualTableName(), COLUMN_PREFIX);
+        jdbcTemplate.update(sqlResult, entity.getId());
+    }
+
+   @Transactional
+   public void dbCarteageGenerate(IBaseEntity entity){
+       Date openDate = null;
+       Date closeDate = null;
+       String sql;
+       try {
+           sql = "SELECT OPEN_DATE FROM %s WHERE %sROOT_ID = ? AND ROWNUM = 1";
+           sql= String.format(sql, getActualTableName(), COLUMN_PREFIX);
+           openDate = (Date) jdbcTemplate.queryForMap(sql, entity.getId()).get("OPEN_DATE");
+       } catch (EmptyResultDataAccessException e) {
+           openDate = null;
+       }
+
+       if(openDate == null || openDate.compareTo(entity.getReportDate()) <=0 ){
+           updateLeftRange(HistoryState.ACTUAL, entity);
+           moveActualToHistory(entity);
+           openDate = entity.getReportDate();
+           System.out.println("actual " + openDate);
+       }else if(openDate != null){
+
+           sql = "SELECT MIN(OPEN_DATE) as OPEN_DATE FROM %s WHERE %sROOT_ID = ? AND OPEN_DATE > ? ";
+           sql = String.format(sql, getHistoryTableName(), COLUMN_PREFIX);
+           closeDate = (Date) jdbcTemplate.queryForMap(sql, entity.getId(), entity.getReportDate()).get("OPEN_DATE");
+           if(closeDate == null)
+               closeDate = openDate;
+           openDate = entity.getReportDate();
+
+           System.out.println(openDate +" " + closeDate);
+           updateLeftRange(HistoryState.HISTORY, entity);
+           System.out.println("history");
+       }
+
+       int n = showCaseMeta.getFieldsList().size();
+       ShowCaseEntries[] showCases = new ShowCaseEntries[n];
+       int i = 0;
+       for(ShowCaseField field: showCaseMeta.getFieldsList()){
+           showCases[i] = new ShowCaseEntries(entity,
+                   field.getAttributePath() + "." + field.getAttributeName(),field.getColumnName());
+           i++;
+       }
+
+       int allRecordsSize = 0;
+       for(i=0;i<n;i++)
+           allRecordsSize+=showCases[i].getEntriesSize();
+
+       boolean [] was = new boolean[allRecordsSize];
+       boolean [] usedGroup = new boolean[n];
+       int [] id = new int[allRecordsSize];
+       List<HashMap> entries = new ArrayList<HashMap>(allRecordsSize);
+
+       int yk=0;
+       for(i=0;i<n;i++)
+           for(HashMap m : showCases[i].getEntries()){
+               entries.add(yk, m);
+               id[yk] = i;
+               yk++;
+           }
+
+       boolean found = true;
+       while(found){
+           found = false;
+           for(i=0;i<allRecordsSize;i++) if(!was[i]){
                was[i] = true;
                HashMap map = (HashMap) entries.get(i).clone();
                found = true;
 
-                Arrays.fill(usedGroup, false);
-                usedGroup[id[i]] = true;
+               Arrays.fill(usedGroup, false);
+               usedGroup[id[i]] = true;
 
                for(int j=0;j<allRecordsSize;j++) if(i!=j && !was[j] && !usedGroup[id[j]])
                    if(merge( map, entries.get(j)))
@@ -717,10 +790,10 @@ public class ShowCaseHolder extends JDBCSupport
                        was[j] = true;
                        usedGroup[id[j]] = true;
                    }
-               persistMap(map);
-            }
-        }
-    }
+               persistMap(map, openDate, closeDate);
+           }
+       }
+   }
 
     private List<IdsHolder> prepare(IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntity baseEntityApplied,
                                     IBaseEntityManager entityManager) {
