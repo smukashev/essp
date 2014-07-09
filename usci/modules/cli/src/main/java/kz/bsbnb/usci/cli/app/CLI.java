@@ -38,6 +38,10 @@ import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.showcase.ShowCase;
+import kz.bsbnb.usci.eav.showcase.ShowCaseField;
+import kz.bsbnb.usci.eav.showcase.ShowCaseHolder;
+import kz.bsbnb.usci.eav.showcase.dao.IShowCaseDao;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -109,6 +113,12 @@ public class CLI
 
     @Autowired
     private RulesSingleton rulesSingleton;
+
+    @Autowired
+    protected IShowCaseDao showCaseDao;
+
+    @Autowired
+    protected ShowCaseHolder scHolder;
 
     private BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
 
@@ -680,7 +690,7 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b  where b.rep_date = to_date('" +
+                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
                                     reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e)
                         {
@@ -911,7 +921,7 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b  where b.rep_date = to_date('" +
+                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
                                     reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e)
                         {
@@ -1148,7 +1158,7 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b  where b.rep_date = to_date('" +
+                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
                                     reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e)
                         {
@@ -2623,6 +2633,68 @@ public class CLI
         //rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());*/
     }
 
+    ShowCase showCase;
+
+    public void commandShowCase(){
+        if(showCase == null)  {
+            showCase = new ShowCase();
+            /* uncomment for fast init of showCase
+            showCase.setMeta(metaClassRepository.getMetaClass("credit"));
+            showCase.setTableName("www");
+            showCase.setName("www");
+            showCase.addField(showCase.getMeta(), "credit_type","code");
+            showCase.addField(showCase.getMeta(), "subjects.person.addresses","details","DOM");
+            showCase.addField(showCase.getMeta(), "","amount","VAL");*/
+        }
+        if(args.get(0).equals("status")){
+            System.out.println("Name: " + showCase.getName() );
+            System.out.println("Table name: " + showCase.getTableName());
+            System.out.println("Meta name: " + ( showCase.getMeta() == null ? null : showCase.getMeta().getClassName()));
+            System.out.printf("fields(%d):\n",showCase.getFieldsList().size());
+            for(ShowCaseField showCaseField : showCase.getFieldsList()){
+                if(showCaseField.getAttributePath().equals(""))
+                    System.out.println("  " + showCaseField.getAttributeName() + ":" + showCaseField.getColumnName());
+                else{
+                    System.out.println("  " + showCaseField.getAttributePath()
+                        + "." + showCaseField.getAttributeName() + ":" + showCaseField.getColumnName());
+                }
+            }
+        } else if(args.get(0).equals("set")){
+            if(args.size() !=3 )
+                throw new IllegalArgumentException("showcase set [meta] {value}");
+            if(args.get(1).equals("meta")){
+                showCase.setMeta(metaClassRepository.getMetaClass(args.get(2)));
+            } else if(args.get(1).equals("name")){
+                showCase.setName(args.get(2));
+            } else if(args.get(1).equals("tableName"))
+                showCase.setTableName(args.get(2));
+        } else if(args.get(0).equals("list")){
+            if(args.get(1).equals("reset"))
+                showCase.getFieldsList().clear();
+            else if( args.get(1).equals("add")){
+                String path = "";
+                String colName = args.get(2);
+                int id = args.get(2).lastIndexOf('.');
+                if(id!=-1)
+                {
+                    path = args.get(2).substring(0, id);
+                    colName = args.get(2).substring(id+1);
+                }
+                if(args.size() == 3 )
+                 showCase.addField(showCase.getMeta(), path, colName);
+                else if(args.size() == 4)
+                 showCase.addField(showCase.getMeta(), path, colName, args.get(3));
+                else throw new IllegalArgumentException("Example: showcase list add [path] [columnName] {columnAlias}");
+            }
+        } else if(args.get(0).equals("save")){
+            showCaseDao.save(showCase);
+            scHolder.setShowCaseMeta(showCase);
+            scHolder.createTables();
+        } else{
+            throw new IllegalArgumentException("Arguments: showcase [status, set]");
+        }
+    }
+
     String line;
     Exception lastException = null;
 
@@ -2700,6 +2772,8 @@ public class CLI
                 batchRestartSingle();
             } else if(command.equals("stc")) {
                 commandSTC();
+            } else if(command.equals("showcase")) {
+                commandShowCase();
             } else {
                 System.out.println("No such command: " + command);
             }
