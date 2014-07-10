@@ -30,7 +30,8 @@ public class ShowCaseDaoImpl extends JDBCSupport implements IShowCaseDao
     public ShowCase load(long id)
     {
         Select select = context
-                .select(EAV_SC_SHOWCASES.TITLE,
+                .select(EAV_SC_SHOWCASES.ID,
+                        EAV_SC_SHOWCASES.TITLE,
                         EAV_SC_SHOWCASES.TABLE_NAME,
                         EAV_SC_SHOWCASES.NAME)
                 .from(EAV_SC_SHOWCASES)
@@ -77,14 +78,17 @@ public class ShowCaseDaoImpl extends JDBCSupport implements IShowCaseDao
             for (Map<String, Object> curRow : rows) {
                 ShowCaseField showCaseField = new ShowCaseField();
 
-                showCaseField.setName((String)row.get(EAV_SC_SHOWCASE_FIELDS.NAME.getName()));
-                showCaseField.setTitle((String) row.get(EAV_SC_SHOWCASE_FIELDS.TITLE.getName()));
-                showCaseField.setColumnName((String) row.get(EAV_SC_SHOWCASE_FIELDS.COLUMN_NAME.getName()));
-                showCaseField.setAttributeName((String) row.get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_NAME.getName()));
-                showCaseField.setAttributePath((String) row.get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH.getName()));
-                showCaseField.setAttributeId(((BigDecimal) row
+                showCaseField.setName((String)curRow.get(EAV_SC_SHOWCASE_FIELDS.NAME.getName()));
+                showCaseField.setTitle((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.TITLE.getName()));
+                showCaseField.setColumnName((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.COLUMN_NAME.getName()));
+                showCaseField.setAttributeName((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_NAME.getName()));
+                if(curRow.get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH.getName()) !=null)
+                    showCaseField.setAttributePath((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH.getName()));
+                else
+                    showCaseField.setAttributePath("");
+                showCaseField.setAttributeId(((BigDecimal) curRow
                         .get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_ID.getName())).longValue());
-                showCaseField.setId(((BigDecimal) row
+                showCaseField.setId(((BigDecimal) curRow
                         .get(EAV_SC_SHOWCASE_FIELDS.ID.getName())).longValue());
 
                 showCase.addField(showCaseField);
@@ -92,6 +96,12 @@ public class ShowCaseDaoImpl extends JDBCSupport implements IShowCaseDao
         }
 
         return showCase;
+    }
+
+    @Override
+    public ShowCase load(String name) {
+        Long id = getIdByName(name);
+        return load(id);
     }
 
     public long getIdByName(String name)

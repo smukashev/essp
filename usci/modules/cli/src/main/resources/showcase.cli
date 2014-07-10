@@ -1,0 +1,122 @@
+#start of showcase script
+
+showcase set meta credit
+
+#==================================================================================
+#   Showcase core
+#==================================================================================
+
+showcase set name CORE
+showcase set tableName CORE
+showcase list add credit_type.code credit_code
+showcase list add creditor.name
+showcase list add creditor_branch.code branch_code
+showcase list add contract.no
+showcase list add contract.date
+showcase list add contract_maturity_date
+showcase list add currency.code currency_code
+showcase list add credit_purpose.code purpose_code
+showcase list add credit_object.code object_code
+showcase list add amount
+showcase list add finance_source.code fin_code
+showcase list add interest_rate_yearly inrateyear
+showcase list add has_currency_earn
+showcase list add maturity_date
+showcase list add prolongation_date
+showcase list add portfolio.portfolio.code portfolio_code
+showcase list add portfolio.portfolio_msfo.code portfolio_msfo_code
+showcase list add actual_issue_date issue_date
+
+showcase save
+
+#==================================================================================
+
+
+
+#==================================================================================
+#   Showcase subject[Creditor Doc] (i.e debtor)
+#==================================================================================
+
+showcase set name SUBJECT_CREDITOR_DOC
+showcase set tableName SUBJECT_CREDITOR_DOC
+showcase list add subjects.creditor.docs.no
+showcase list add subjects.creditor.docs.doc_type.code
+showcase list add subjects.creditor.docs.name
+
+showcase save
+
+#==================================================================================
+
+
+#==================================================================================
+#   Showcase subject[Person Doc] (i.e debtor)
+#==================================================================================
+
+showcase set name SUBJECT_PERSON_DOC
+showcase set tableName SUBJECT_PERSON_DOC
+showcase list add subjects.person.docs.no
+showcase list add subjects.person.docs.doc_type.code
+showcase list add subjects.person.docs.name
+
+showcase save
+
+#==================================================================================
+
+
+#==================================================================================
+#   Showcase subject[Organization DOC] (i.e debtor)
+#==================================================================================
+
+showcase set name SUBJECT_ORGANIZATION_DOC
+showcase set tableName SUBJECT_ORGANIZATION_DOC
+showcase list add subjects.organization.docs.no
+showcase list add subjects.organization.docs.doc_type.code
+showcase list add subjects.organization.docs.name
+
+showcase save
+
+#==================================================================================
+
+
+#==================================================================================
+#   Showcase subject[Creditor] (i.e debtor)
+#==================================================================================
+
+showcase set name SUBJECT_CREDITOR
+showcase set tableName SUBJECT_CREDITOR
+showcase list add subjects.creditor.code credcode
+showcase list add subjects.type.code typecode
+
+showcase save
+
+#==================================================================================
+
+
+#==================================================================================
+#   Showcase subject[Person] (i.e debtor)
+#==================================================================================
+
+showcase set name SUBJECT_PERSON
+showcase set tableName SUBJECT_PERSON
+showcase list add subjects.person.country.code cntrycode
+showcase list add subjects.type.code typecode
+
+showcase save
+
+#==================================================================================
+
+
+#==================================================================================
+#   Showcase subject[Organization] (i.e debtor)
+#==================================================================================
+
+showcase set name SUBJECT_ORGANIZATION
+showcase set tableName SUBJECT_ORGANIZATION
+showcase list add subjects.organization.country.code cntrycode
+showcase list add subjects.type.code typecode
+
+showcase save
+
+#==================================================================================
+
+quit

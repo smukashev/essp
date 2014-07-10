@@ -101,4 +101,17 @@ public class ShowCase extends Persistable
     public List<ShowCaseField> getFieldsList() {
         return fields;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder ret = new StringBuilder();
+        ret.append("Name: " + getName() + "\n" );
+        ret.append("Table name: " + getTableName() +"\n");
+        ret.append("Meta name: " + ( getMeta() == null ? null : getMeta().getClassName()) + "\n");
+        ret.append(String.format("fields(%d):\n",getFieldsList().size()));
+        for(ShowCaseField showCaseField : getFieldsList()){
+            ret.append(" " + showCaseField.getPath() + ":" + showCaseField.getColumnName() + "\n");
+        }
+        return ret.toString();
+    }
 }

@@ -329,7 +329,7 @@ public class ShowCaseHolder extends JDBCSupport
             column.setPrimaryKey(false);
             column.setRequired(false);
 
-            IMetaType metaType = showCaseMeta.getMeta().getEl(field.getAttributePath() + "." + field.getAttributeName());
+            IMetaType metaType = showCaseMeta.getMeta().getEl(field.getPath());
 
             column.setType(getDBType(metaType));
 
