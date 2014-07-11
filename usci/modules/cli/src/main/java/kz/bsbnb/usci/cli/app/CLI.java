@@ -2648,18 +2648,7 @@ public class CLI
             showCase.addField(showCase.getMeta(), "","amount","VAL");*/
         }
         if(args.get(0).equals("status")){
-//            System.out.println("Name: " + showCase.getName() );
-//            System.out.println("Table name: " + showCase.getTableName());
-//            System.out.println("Meta name: " + ( showCase.getMeta() == null ? null : showCase.getMeta().getClassName()));
-//            System.out.printf("fields(%d):\n",showCase.getFieldsList().size());
-//            for(ShowCaseField showCaseField : showCase.getFieldsList()){
-//                if(showCaseField.getAttributePath().equals(""))
-//                    System.out.println("  " + showCaseField.getAttributeName() + ":" + showCaseField.getColumnName());
-//                else{
-//                    System.out.println("  " + showCaseField.getAttributePath()
-//                        + "." + showCaseField.getAttributeName() + ":" + showCaseField.getColumnName());
-//                }
-//            }
+            System.out.println(showCase.toString());
         } else if(args.get(0).equals("set")){
             if(args.size() !=3 )
                 throw new IllegalArgumentException("showcase set [meta] {value}");

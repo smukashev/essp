@@ -304,8 +304,7 @@ public class ShowCaseHolder extends JDBCSupport
         table.addColumn(idColumn);
 
         //calculateIdxPaths();
-        if(prefixToColumn == null)
-           generatePaths();
+        generatePaths();
 
         for(String prefix : prefixToColumn.keySet()){
             Column column = new Column();
