@@ -47,6 +47,7 @@ import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerato
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
+import kz.bsbnb.usci.showcase.service.ShowcaseService;
 import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 import kz.bsbnb.usci.tool.status.SyncStatus;
@@ -2416,17 +2417,64 @@ public class CLI
             new BaseRepository().run();
         } else throw new IllegalArgumentException("allowed operations refs [import] [filename]");
     }
+    public void commandSC()
+    {
+        if(args.get(0).equals("list")){
+
+        } else if(args.get(0).equals("add")){
+            showcaseServiceFactoryBean = new RmiProxyFactoryBean();
+            showcaseServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
+            showcaseServiceFactoryBean.setServiceInterface(ShowcaseService.class);
+
+            showcaseServiceFactoryBean.afterPropertiesSet();
+            showcaseService = (ShowcaseService) showcaseServiceFactoryBean.getObject();
+
+            String name = args.get(1);
+            String metaName = args.get(2);
+            System.out.println("argument: " + args.get(1) + "   " + args.get(2));
+            MetaClass metaClass = metaClassRepository.getMetaClass(metaName);
+            ShowCase showCase = new ShowCase();
+            showCase.setName(name);
+            showCase.setTableName(name);
+            showCase.setMeta(metaClass);
+            for(int i = 3; i < args.size(); i++){
+                String field = args.get(i);
+                String columnName;
+                String fieldName;
+                String path;
+                if(field.contains(":")){
+                    columnName = field.split(":")[1];
+                    field = field.split(":")[0];
+                }
+                if(field.contains(".")){
+                    fieldName = field.substring(field.lastIndexOf(".") + 1);
+                    path = field.substring(0, field.lastIndexOf("."));
+                } else{
+                    path = "";
+                    fieldName = field;
+                }
+                columnName = fieldName;
+                showCase.addField(metaClass, path, fieldName, columnName);
+            }
+            showcaseService.add(showCase);
+            System.out.println("Showcase successfully added!");
+        } else if(args.get(0).equals("delete")){
+
+        }
+    }
 
     private RmiProxyFactoryBean batchServiceFactoryBean;
     private RmiProxyFactoryBean batchVersionServiceFactoryBean;
     private RmiProxyFactoryBean ruleServiceFactoryBean;
     private RmiProxyFactoryBean listenerServiceFactoryBean;
+    private RmiProxyFactoryBean showcaseServiceFactoryBean;
 
     private RmiProxyFactoryBean entityServiceFactoryBean;
 
     private IBatchService batchService;
     private IRuleService ruleService;
     private IBatchVersionService batchVersionService;
+    private ShowcaseService showcaseService;
 
     public void init(){
 
@@ -2461,6 +2509,7 @@ public class CLI
 
             ruleServiceFactoryBean.afterPropertiesSet();
             ruleService = (IRuleService) ruleServiceFactoryBean.getObject();
+
         } catch (Exception e) {
             System.out.println("Can\"t initialise services: " + e.getMessage());
         }
@@ -2633,7 +2682,18 @@ public class CLI
         //rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());*/
     }
 
+    private void initSC(){
+        scStart = true;
+        showcaseServiceFactoryBean = new RmiProxyFactoryBean();
+        showcaseServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
+        showcaseServiceFactoryBean.setServiceInterface(ShowcaseService.class);
+
+        showcaseServiceFactoryBean.afterPropertiesSet();
+        showcaseService = (ShowcaseService) showcaseServiceFactoryBean.getObject();
+    }
+
     ShowCase showCase;
+    boolean scStart = false;
 
     public void commandShowCase(){
         if(showCase == null)  {
@@ -2648,18 +2708,7 @@ public class CLI
             showCase.addField(showCase.getMeta(), "","amount","VAL");*/
         }
         if(args.get(0).equals("status")){
-//            System.out.println("Name: " + showCase.getName() );
-//            System.out.println("Table name: " + showCase.getTableName());
-//            System.out.println("Meta name: " + ( showCase.getMeta() == null ? null : showCase.getMeta().getClassName()));
-//            System.out.printf("fields(%d):\n",showCase.getFieldsList().size());
-//            for(ShowCaseField showCaseField : showCase.getFieldsList()){
-//                if(showCaseField.getAttributePath().equals(""))
-//                    System.out.println("  " + showCaseField.getAttributeName() + ":" + showCaseField.getColumnName());
-//                else{
-//                    System.out.println("  " + showCaseField.getAttributePath()
-//                        + "." + showCaseField.getAttributeName() + ":" + showCaseField.getColumnName());
-//                }
-//            }
+            System.out.println(showCase.toString());
         } else if(args.get(0).equals("set")){
             if(args.size() !=3 )
                 throw new IllegalArgumentException("showcase set [meta] {value}");
@@ -2688,10 +2737,19 @@ public class CLI
                 else throw new IllegalArgumentException("Example: showcase list add [path] [columnName] {columnAlias}");
             }
         } else if(args.get(0).equals("save")){
-            showCaseDao.save(showCase);
-            scHolder.setShowCaseMeta(showCase);
-            scHolder.createTables();
-            showCase = null;
+
+            if(args.size() > 1 && args.get(1).equals("local"))
+            {
+                showCaseDao.save(showCase);
+                scHolder.setShowCaseMeta(showCase);
+                scHolder.createTables();
+            }else{
+                if(!scStart) initSC();
+                showcaseService.add(showCase);
+            }
+
+           showCase = null;
+           System.out.println("Showcase successfully added!");
         } else{
             throw new IllegalArgumentException("Arguments: showcase [status, set]");
         }
