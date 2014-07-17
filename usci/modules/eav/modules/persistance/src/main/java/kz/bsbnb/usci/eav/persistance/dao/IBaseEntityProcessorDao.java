@@ -76,4 +76,10 @@ public interface IBaseEntityProcessorDao
 
     public void setApplyListener(IDaoListener applyListener);
 
+    public void populate(String metaName, Long id);
+
+    public List<Long> getNewTableIds(Long id);
+
+    public void removeNewTableIds(List<Long> list, Long id);
+
 }
