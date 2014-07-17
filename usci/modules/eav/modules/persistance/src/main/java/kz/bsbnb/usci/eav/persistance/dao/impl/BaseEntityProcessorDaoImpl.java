@@ -2974,7 +2974,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     public void populate(String metaName, Long scId){
-        createMainTables();
+        //createMainTables();
         Long id = metaClassRepository.getMetaClass(metaName).getId();
         Insert ins = context.insertInto(SC_ID_BAG)
                 .select(context.select(EAV_BE_ENTITIES.ID, DSL.val(scId).as("ENTITY_ID")).from(EAV_BE_ENTITIES).where(EAV_BE_ENTITIES.CLASS_ID.equal(id)));

@@ -962,4 +962,12 @@
 			<reference local="showcase_id" foreign="id"/>
 		</foreign-key>-->
 	</table>
+	<table name="sc_id_bag">
+    		<column name="id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+    		<column name="showcase_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+    		<unique name="ind_uk_sc_003_00">
+    			<unique-column name="id"/>
+    			<unique-column name="showcase_id"/>
+    		</unique>
+    </table>
 </database>
