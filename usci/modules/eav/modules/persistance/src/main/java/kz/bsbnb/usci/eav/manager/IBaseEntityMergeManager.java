@@ -13,7 +13,6 @@ public interface IBaseEntityMergeManager{
         KEEP_RIGHT,
         KEEP_LEFT,
         TO_MERGE,
-        TO_MIX
     }
 
     public Action getAction();

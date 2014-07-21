@@ -21,7 +21,9 @@ import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
+import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
+import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
 import kz.bsbnb.usci.eav.model.Batch;
@@ -2803,16 +2805,17 @@ public class CLI
             String fileName = args.get(0);
             String repDate = args.get(1);
             String mergeManagerFileName = args.get(2);
-            List<BaseEntity> entityList = new ArrayList<BaseEntity>();
+            List<IBaseEntity> entityList = new ArrayList<IBaseEntity>();
             try {
                 Date reportDate = sdfout.parse(repDate);
                 CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
-                BaseEntity entity;
-                while((entity = reader.read()) != null) {
+                BaseEntity entityToWrite;
+                IBaseEntity savedEntity;
+                while(( entityToWrite = reader.read()) != null) {
                     try {
-                        long id = baseEntityProcessorDao.process(entity).getId();
-                        System.out.println("Instance of BaseEntity saved with id: " + id);
-                        entityList.add(entity);
+                        savedEntity = baseEntityProcessorDao.process(entityToWrite);
+                        entityList.add(savedEntity);
+                        System.out.println("Instance of BaseEntity saved with id: " + savedEntity.getId());
 
                     } catch(Exception ex) {
                         lastException = ex;
@@ -2826,6 +2829,18 @@ public class CLI
                 System.out.println("Can't parse date " + repDate + " must be in format "+ sdfout.toString());
             }
             IBaseEntityMergeManager mergeManager = constructMergeManagerFromJson(mergeManagerFileName);
+
+            System.out.println("Merging two base entities " + entityList.get(0).getId() + "  " + entityList.get(1).getId());
+            System.out.println(">>>>>>>>>>>>>>LEFT ENTITY<<<<<<<<<<<<<<<<<<<<<");
+            System.out.println(entityList.get(0));
+            System.out.println("\n >>>>>>>>>>>>>>RIGHT ENTITY<<<<<<<<<<<<<<<<<<<<<");
+            System.out.println(entityList.get(1));
+            IBaseEntityManager baseEntityManager = new BaseEntityManager();
+            System.out.println("\n >>>>>>>>>>>>>>>RESULT!!!<<<<<<<<<<<<<<<<<<< ");
+            IBaseEntity result = baseEntityProcessorDao.merge(entityList.get(0), entityList.get(1), mergeManager,
+                    IBaseEntityProcessorDao.MergeResultChoice.LEFT);
+
+            System.out.println(result);
         }
         else
         {
@@ -2839,7 +2854,9 @@ public class CLI
         try {
             FileReader fileReader = new FileReader(jsonFilePath);
             JsonReader jsonReader = new JsonReader(fileReader);
+            jsonReader.beginObject();
             mergeManager = jsonToMergeManager(jsonReader);
+            jsonReader.endObject();
 
         } catch (FileNotFoundException e) {
             System.out.println("File " + jsonFilePath + " not found, with error: " + e.getMessage());
@@ -2853,42 +2870,20 @@ public class CLI
     public IBaseEntityMergeManager jsonToMergeManager(JsonReader jsonReader) throws IOException
     {
         IBaseEntityMergeManager mergeManager = new BaseEntityMergeManager();
-        jsonReader.beginObject();
         while (jsonReader.hasNext())
         {
             String name = jsonReader.nextName();
             if (name.equals("action"))
             {
-               System.out.println(jsonReader.nextString());
+                String action = jsonReader.nextString();
+                if(action.equals("keep_left"))
+                    mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_LEFT);
+                if(action.equals("keep_right"))
+                    mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_RIGHT);
+                if(action.equals("merge"))
+                    mergeManager.setAction(IBaseEntityMergeManager.Action.TO_MERGE);
             } else if (name.equals("childMap"))
             {
-                System.out.println("MAP!");
-            }
-        }
-        jsonReader.endObject();
-        return mergeManager;
-    }
-
-  /*  public IBaseEntityMergeManager jsonToMergeManager(JsonReader jsonReader) throws IOException
-    {
-        IBaseEntityMergeManager mergeManager = new BaseEntityMergeManager();
-        jsonReader.beginObject();
-        while (jsonReader.hasNext())
-        {
-            String name = jsonReader.nextName();
-            if (name.equals("action"))
-            {
-                if(jsonReader.nextString().equals("keep_left"))
-                    mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_LEFT);
-                if(jsonReader.nextString().equals("keep_right"))
-                    mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_RIGHT);
-                if(jsonReader.nextString().equals("merge"))
-                    mergeManager.setAction(IBaseEntityMergeManager.Action.TO_MERGE);
-                System.out.println(jsonReader.nextString());
-            }
-            else if (name.equals("childMap"))
-            {
-                System.out.println(jsonReader.nextString());
                 jsonReader.beginArray();
                 while(jsonReader.hasNext())
                 {
@@ -2897,12 +2892,18 @@ public class CLI
                     jsonReader.beginObject();
                     while(jsonReader.hasNext())
                     {
-                        if(jsonReader.nextString().equals("id")){
+                        String innerName = jsonReader.nextName();
+                        if(innerName.equals("id"))
+                        {
                             jsonReader.beginObject();
                             key = getKeyFromJson(jsonReader);
                             jsonReader.endObject();
-                        } else if(jsonReader.nextString().equals("map")){
+                        }
+                        else if(innerName.equals("map"))
+                        {
+                            jsonReader.beginObject();
                             childManager = jsonToMergeManager(jsonReader);
+                            jsonReader.endObject();
                         }
 
                     }
@@ -2912,9 +2913,9 @@ public class CLI
                 jsonReader.endArray();
             }
         }
-        jsonReader.endObject();
         return mergeManager;
-    }*/
+    }
+
 
     private MergeManagerKey getKeyFromJson(JsonReader jsonReader)
     {
@@ -2944,9 +2945,11 @@ public class CLI
             }
             if(type.equals("long")){
                 MergeManagerKey<Long> key = new MergeManagerKey<Long>(Long.parseLong(left), Long.parseLong(right));
+                return key;
             }
             if(type.equals("UUID")){
                 MergeManagerKey<UUID> key = new MergeManagerKey<UUID>(UUID.fromString(left), UUID.fromString(right));
+                return key;
             }
         } catch (IOException e) {
             e.printStackTrace();

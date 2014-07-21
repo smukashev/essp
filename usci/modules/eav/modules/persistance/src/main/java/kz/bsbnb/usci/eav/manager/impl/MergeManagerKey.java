@@ -57,7 +57,7 @@ public class MergeManagerKey<T>
         }
         for(int i=0; i<key.getKeyStore().size(); i++)
         {
-            if(key.getKeyStore().get(i) != keyStore.get(i))
+            if(!keyStore.get(i).equals(key.getKeyStore().get(i)))
             {
                 return false;
             }

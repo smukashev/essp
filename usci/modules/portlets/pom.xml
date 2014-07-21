@@ -28,11 +28,11 @@
         <module>credit-registry-report-portlet</module>
         <module>credit-registry-audit-portlet</module>
         <module>credit-registry-signing-portlet</module>
-        <module>credit-registry-approval-portlet</module>
+        <!--<module>credit-registry-approval-portlet</module>-->
         <module>translit-util</module>
-
         <module>meta_editor</module>
         <module>entity_editor</module>
+        <module>entity_merge</module>
         <module>rules_portlet</module>
         <module>batch_entry_list</module>
     </modules>
