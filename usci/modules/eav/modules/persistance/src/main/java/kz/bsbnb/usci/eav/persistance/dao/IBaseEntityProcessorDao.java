@@ -76,7 +76,7 @@ public interface IBaseEntityProcessorDao
 
     public void setApplyListener(IDaoListener applyListener);
 
-    public void populate(String metaName, Long id);
+    public void populate(String metaName, Long id, Date reportDate);
 
     public List<Long> getNewTableIds(Long id);
 

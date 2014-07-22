@@ -2973,11 +2973,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public void populate(String metaName, Long scId){
+    public void populate(String metaName, Long scId, Date reportDate){
         //createMainTables();
         Long id = metaClassRepository.getMetaClass(metaName).getId();
         Insert ins = context.insertInto(SC_ID_BAG)
-                .select(context.select(EAV_BE_ENTITIES.ID, DSL.val(scId).as("ENTITY_ID")).from(EAV_BE_ENTITIES).where(EAV_BE_ENTITIES.CLASS_ID.equal(id)));
+                .select(context.select(EAV_BE_ENTITIES.ID, DSL.val(scId).as("SHOWCASE_ID"))
+                        .from(EAV_BE_ENTITIES.join(EAV_BE_ENTITY_REPORT_DATES).on(EAV_BE_ENTITIES.ID.eq(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID)))
+                        .where(EAV_BE_ENTITIES.CLASS_ID.equal(id)
+                                .and(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.eq(new java.sql.Date(reportDate.getTime())))));
         jdbcTemplate.update(ins.getSQL(), ins.getBindValues().toArray());
     }
 

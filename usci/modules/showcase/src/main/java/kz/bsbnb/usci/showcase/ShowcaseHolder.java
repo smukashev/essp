@@ -3,11 +3,12 @@ package kz.bsbnb.usci.showcase;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ShowcaseHolder
+public class ShowcaseHolder implements Serializable
 {
     private ShowCase showCaseMeta;
     private ArrayList<String> idxPaths = new ArrayList<String>();

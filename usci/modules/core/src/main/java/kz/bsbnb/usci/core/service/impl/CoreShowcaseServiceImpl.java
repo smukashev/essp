@@ -6,6 +6,8 @@ import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.eav.showcase.ShowcaseMessageProducer;
 import org.apache.activemq.broker.jmx.BrokerViewMBean;
 import org.apache.activemq.broker.jmx.QueueViewMBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +33,12 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     @Autowired
     protected ShowcaseMessageProducer producer;
     private Map<String, QueueViewMBean> queueViewBeanCache = new HashMap<String, QueueViewMBean>();
+    private final Logger logger = LoggerFactory.getLogger(CoreShowcaseServiceImpl.class);
 
     @Override
-    public void start(String metaName, Long id){
+    public void start(String metaName, Long id, Date reportDate){
 
-        baseEntityProcessorDao.populate(metaName, id);
+        baseEntityProcessorDao.populate(metaName, id, reportDate);
         //TODO: restart on failure
         new Thread(new Sender(id)).start();
 
@@ -81,7 +85,10 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
             while(true){
                 if(queueMbean.getQueueSize() == 0){
                     List<Long> list = baseEntityProcessorDao.getNewTableIds(scId);
-                    if(list.size() == 0) return;
+                    if(list.size() == 0){
+                        logger.info("Done loading entities for showcase %s, reportDate %s");
+                        return;
+                    }
                     for(Long id : list){
                         QueueEntry entry = new QueueEntry().setBaseEntityApplied(baseEntityProcessorDao.load(id))
                                 .setScId(scId);

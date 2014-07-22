@@ -13,13 +13,10 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
-import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
-import kz.bsbnb.usci.eav.showcase.ShowCaseHolder;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
-import kz.bsbnb.usci.showcase.generated.Showcase;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +29,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -40,7 +36,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
-import static kz.bsbnb.usci.showcase.generated.Tables.*;
+import static kz.bsbnb.usci.showcase.generated.Tables.EAV_SC_SHOWCASES;
+import static kz.bsbnb.usci.showcase.generated.Tables.EAV_SC_SHOWCASE_FIELDS;
 
 /**
  * Created by almaz on 7/2/14.
@@ -541,7 +538,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
         return showCase;
     }
 
-    //@Override
+    @Override
     public ShowCase load(String name) {
         Long id = getIdByName(name);
         return load(id);

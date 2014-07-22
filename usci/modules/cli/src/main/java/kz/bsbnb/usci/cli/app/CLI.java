@@ -47,6 +47,8 @@ import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerato
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
+import kz.bsbnb.usci.showcase.ShowcaseHolder;
+import kz.bsbnb.usci.showcase.generated.Showcase;
 import kz.bsbnb.usci.showcase.service.ShowcaseService;
 import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
@@ -2750,6 +2752,36 @@ public class CLI
 
            showCase = null;
            System.out.println("Showcase successfully added!");
+        } else if(args.get(0).equals("listSC")){
+            if(!scStart) initSC();
+
+            List<ShowcaseHolder> list = showcaseService.list();
+            for(ShowcaseHolder holder : list){
+                System.out.println(holder.getShowCaseMeta().getName());
+                for(ShowCaseField field : holder.getShowCaseMeta().getFieldsList()){
+                    System.out.println("\t" + field.getName());
+                }
+            }
+        } else if(args.get(0).equals("loadSC")){
+            if(args.size() > 1){
+                ShowCase sc = showcaseService.load(args.get(1));
+                System.out.println(sc.getName());
+                for(ShowCaseField field : sc.getFieldsList()){
+                    System.out.println("\t" + field.getName());
+                }
+            } else{
+                System.out.println("Usage: loadSC <showcase name>");
+            }
+        } else if(args.get(0).equals("startLoad")){
+            if(args.size() > 2){
+                try {
+                    showcaseService.startLoad(args.get(1), sdfout.parse(args.get(2)));
+                } catch (ParseException e) {
+                    System.out.println("Date format: \"dd.MM.yyyy\"");
+                }
+            } else{
+                System.out.println("Usage: startLoad <showcase name> <report date>");
+            }
         } else{
             throw new IllegalArgumentException("Arguments: showcase [status, set]");
         }

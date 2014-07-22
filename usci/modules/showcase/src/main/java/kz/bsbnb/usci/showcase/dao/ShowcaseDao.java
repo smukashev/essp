@@ -16,4 +16,5 @@ public interface ShowcaseDao {
     public ArrayList<ShowcaseHolder> getHolders();
     public long save(ShowCase showCaseForSave);
     public void remove(ShowCase showCase);
+    public ShowCase load(String name);
 }
