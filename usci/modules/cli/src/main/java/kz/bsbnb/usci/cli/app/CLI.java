@@ -2684,6 +2684,65 @@ public class CLI
         //rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());*/
     }
 
+    public void showcaseStat()
+    {
+        RmiProxyFactoryBean serviceFactory = null;
+        ShowcaseService showcaseService = null;
+
+        try {
+            serviceFactory = new RmiProxyFactoryBean();
+            //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+            serviceFactory.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
+            serviceFactory.setServiceInterface(ShowcaseService.class);
+            serviceFactory.setRefreshStubOnConnectFailure(true);
+
+            serviceFactory.afterPropertiesSet();
+            showcaseService = (ShowcaseService) serviceFactory.getObject();
+        } catch (Exception e) {
+            System.out.println("Can't connect to receiver service: " + e.getMessage());
+        }
+
+        HashMap<String, QueryEntry> map = showcaseService.getSQLStats();
+
+        System.out.println();
+        System.out.println("+---------+------------------+------------------------+");
+        System.out.println("|  count  |     avg (ms)     |       total (ms)       |");
+        System.out.println("+---------+------------------+------------------------+");
+
+        double totalInserts = 0;
+        double totalSelects = 0;
+        double totalProcess = 0;
+        int totalProcessCount = 0;
+
+        for (String query : map.keySet()) {
+            QueryEntry qe = map.get(query);
+
+            System.out.printf("| %7d | %16.6f | %22.6f | %s%n", qe.count,
+                    qe.totalTime / qe.count, qe.totalTime, query);
+
+            if (query.startsWith("insert")) {
+                totalInserts += qe.totalTime;
+            }
+            if (query.startsWith("select")) {
+                totalSelects += qe.totalTime;
+            }
+            if (query.startsWith("coreService")) {
+                totalProcess += qe.totalTime;
+                totalProcessCount += qe.count;
+            }
+        }
+
+        System.out.println("+---------+------------------+------------------------+");
+
+        if(totalProcessCount > 0) {
+            System.out.println("AVG process: " + totalProcess / totalProcessCount);
+            System.out.println("AVG inserts per process: " + totalInserts / totalProcessCount);
+            System.out.println("AVG selects per process: " + totalSelects / totalProcessCount);
+        }
+
+        //showcaseService.clearSQLStats();
+    }
+
     private void initSC(){
         scStart = true;
         showcaseServiceFactoryBean = new RmiProxyFactoryBean();
@@ -2782,6 +2841,8 @@ public class CLI
             } else{
                 System.out.println("Usage: startLoad <showcase name> <report date>");
             }
+        } else if(args.get(0).equals("stats")){
+            showcaseStat();
         } else{
             throw new IllegalArgumentException("Arguments: showcase [status, set]");
         }

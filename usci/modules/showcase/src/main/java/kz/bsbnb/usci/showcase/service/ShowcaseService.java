@@ -1,9 +1,11 @@
 package kz.bsbnb.usci.showcase.service;
 
 import kz.bsbnb.usci.eav.showcase.ShowCase;
+import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -14,4 +16,5 @@ public interface ShowcaseService {
     public List<ShowcaseHolder> list();
     public ShowCase load(String name);
     public void startLoad(String name, Date reportDate);
+    public HashMap<String, QueryEntry> getSQLStats();
 }

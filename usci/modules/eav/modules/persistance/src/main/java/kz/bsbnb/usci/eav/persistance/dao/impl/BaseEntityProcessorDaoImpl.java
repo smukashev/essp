@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import kz.bsbnb.ddlutils.Platform;
 import kz.bsbnb.ddlutils.PlatformFactory;
 import kz.bsbnb.ddlutils.model.*;

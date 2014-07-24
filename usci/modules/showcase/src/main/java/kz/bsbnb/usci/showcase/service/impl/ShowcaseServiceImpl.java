@@ -1,6 +1,8 @@
 package kz.bsbnb.usci.showcase.service.impl;
 
 import kz.bsbnb.usci.eav.showcase.ShowCase;
+import kz.bsbnb.usci.eav.stats.QueryEntry;
+import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
 import kz.bsbnb.usci.showcase.generated.Showcase;
@@ -12,6 +14,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -27,6 +30,9 @@ public class ShowcaseServiceImpl implements ShowcaseService{
     @Autowired
     @Qualifier(value="remoteCoreShowcaseService")
     RmiProxyFactoryBean rmiProxyFactoryBean;
+
+    @Autowired
+    SQLQueriesStats stats;
 
     @Override
     public void add(ShowCase showCase){
@@ -53,5 +59,10 @@ public class ShowcaseServiceImpl implements ShowcaseService{
     public ShowCase load(String name){
         ShowCase showcase = showcaseDao.load(name);
         return showcase;
+    }
+
+    @Override
+    public HashMap<String, QueryEntry> getSQLStats() {
+        return stats.getStats();
     }
 }
