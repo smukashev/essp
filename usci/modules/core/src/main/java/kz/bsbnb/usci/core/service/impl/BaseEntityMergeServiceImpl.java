@@ -25,9 +25,6 @@ public class BaseEntityMergeServiceImpl implements IBaseEntityMergeService {
     @Override
     public void mergeBaseEntities(long leftEntityId, long rightEntityId, String json) {
 
-
-
-        System.out.println("JSON STRINGGGGGG!"+json);
         IBaseEntityMergeManager mergeManager = constructMergeManagerFromJson(json);
 
         IBaseEntity leftEntity = baseEntityProcessorDao.load(leftEntityId);
@@ -36,8 +33,6 @@ public class BaseEntityMergeServiceImpl implements IBaseEntityMergeService {
         if(mergeManager != null && leftEntity != null && rightEntity != null){
             result = baseEntityProcessorDao.merge(leftEntity, rightEntity, mergeManager,  IBaseEntityProcessorDao.MergeResultChoice.LEFT);
         }
-        System.out.println("\n >>>>>>>>>RESULT<<<<<<<<<<<<< \n");
-        System.out.println(result);
 
     }
 
@@ -58,7 +53,7 @@ public class BaseEntityMergeServiceImpl implements IBaseEntityMergeService {
         return mergeManager;
     }
 
-    private IBaseEntityMergeManager jsonToMergeManager(JsonReader jsonReader) throws IOException
+    public IBaseEntityMergeManager jsonToMergeManager(JsonReader jsonReader) throws IOException
     {
         IBaseEntityMergeManager mergeManager = new BaseEntityMergeManager();
         while (jsonReader.hasNext())
@@ -73,6 +68,8 @@ public class BaseEntityMergeServiceImpl implements IBaseEntityMergeService {
                     mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_RIGHT);
                 if(action.equals("merge"))
                     mergeManager.setAction(IBaseEntityMergeManager.Action.TO_MERGE);
+                if(action.equals("keep_both"))
+                    mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_BOTH);
             } else if (name.equals("childMap"))
             {
                 jsonReader.beginArray();
@@ -106,6 +103,7 @@ public class BaseEntityMergeServiceImpl implements IBaseEntityMergeService {
         }
         return mergeManager;
     }
+
 
     private MergeManagerKey getKeyFromJson(JsonReader jsonReader)
     {

@@ -4,7 +4,7 @@ import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import com.sun.scenario.effect.Merge;
+//import com.sun.scenario.effect.Merge;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
@@ -2820,6 +2820,7 @@ public class CLI
                     } catch(Exception ex) {
                         lastException = ex;
                         System.out.println("While processing instance of BaseEntity unexpected error occurred: " + ex.getMessage());
+                        ex.printStackTrace();
                     }
                 }
             } catch (FileNotFoundException e)
@@ -2835,7 +2836,6 @@ public class CLI
             System.out.println(entityList.get(0));
             System.out.println("\n >>>>>>>>>>>>>>RIGHT ENTITY<<<<<<<<<<<<<<<<<<<<<");
             System.out.println(entityList.get(1));
-            IBaseEntityManager baseEntityManager = new BaseEntityManager();
             System.out.println("\n >>>>>>>>>>>>>>>RESULT!!!<<<<<<<<<<<<<<<<<<< ");
             IBaseEntity result = baseEntityProcessorDao.merge(entityList.get(0), entityList.get(1), mergeManager,
                     IBaseEntityProcessorDao.MergeResultChoice.LEFT);
@@ -2882,6 +2882,8 @@ public class CLI
                     mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_RIGHT);
                 if(action.equals("merge"))
                     mergeManager.setAction(IBaseEntityMergeManager.Action.TO_MERGE);
+                if(action.equals("keep_both"))
+                    mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_BOTH);
             } else if (name.equals("childMap"))
             {
                 jsonReader.beginArray();

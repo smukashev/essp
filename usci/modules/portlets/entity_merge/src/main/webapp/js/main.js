@@ -26,15 +26,16 @@ function createJSON(currentNode, offset, first){
                          '"action" : "keep_right", \n'+
                          '"childMap" : [ \n';
         }
-        if(currentNode.data.merge){
-            alert("MERGING ON ROOT is not allowed");
-            return "";
+        if(currentNode.data.keep_both){
+            JSONstr += offset + "{" +"\n" +
+                         '"action" : "keep_both", \n'+
+                         '"childMap" : [ \n';
         }
-    }
-    if(!currentNode.data.keep_left && !currentNode.data.keep_right && !currentNode.data.merge){
-        JSONstr += offset + "{" +"\n" +
-                     '"action" : "keep_left", \n'+
-                     '"childMap" : [ \n';
+        if(currentNode.data.merge){
+            JSONstr += offset + "{" +"\n" +
+                                     '"action" : "merge", \n'+
+                                     '"childMap" : [ \n';
+        }
     }
 
     for(var i = 0; i < children.length; i++){
@@ -64,6 +65,14 @@ function createJSON(currentNode, offset, first){
                 {
                     JSONstr += offset + '{"id":{ "type":"long", "left":"'+ children[i].data.id_left +'", "right":"'+ children[i].data.id_right+'"},'+
                                 ' "map": { "action" : "merge", "childMap" : ['+ createJSON(children[i], offset+" ", false, false)+'] } }';
+                    if(!(i + 1 == children.length)){
+                        JSONstr +=",";
+                    }
+                }
+                if(children[i].data.keep_both)
+                {
+                    JSONstr += offset + '{"id":{ "type":"long", "left":"'+ children[i].data.id_left +'", "right":"'+ children[i].data.id_right+'"},'+
+                                ' "map": { "action" : "keep_both", "childMap" : ['+ createJSON(children[i], offset+" ", false, false)+'] } }';
                     if(!(i + 1 == children.length)){
                         JSONstr +=",";
                     }
@@ -98,6 +107,14 @@ function createJSON(currentNode, offset, first){
                         JSONstr +=",";
                     }
                 }
+                if(children[i].data.keep_both)
+                {
+                    JSONstr += offset + '{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
+                                ' "map": { "action" : "keep_both", "childMap" : [] } }';
+                    if(!(i + 1 == children.length)){
+                        JSONstr +=",";
+                    }
+                }
 
             } else {
                 var subNodeAction;
@@ -109,6 +126,9 @@ function createJSON(currentNode, offset, first){
                 }
                 if(currentNode.data.merge){
                     subNodeAction = "merge";
+                }
+                if(currentNode.data.keep_both){
+                    subNodeAction = "keep_both";
                 }
                 if(children[i].data.keep_left)
                 {
@@ -166,6 +186,26 @@ function createJSON(currentNode, offset, first){
 
                         JSONstr += offset + '{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
                                     ' "map": { "action" : "merge", "childMap" : ['+createJSON(children[i], offset+" ", false)+'] } }';
+                        if(!(i + 1 == children.length)){
+                            JSONstr +=",";
+                        }
+
+                    }
+                }
+                if(children[i].data.keep_both)
+                {
+                    if(currentNode.data.id_left != "" && currentNode.data.id_right != "" && !first && currentNode.data.code.indexOf("[")==-1){
+                         JSONstr += offset + '{ "id":{ "type":"long", "left": "'+currentNode.data.id_left +'", "right":"'+ currentNode.data.id_right+'"},'+
+                                    ' "map": { "action" : "'+subNodeAction+'", "childMap" : [{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
+                                    ' "map": { "action" : "keep_both", "childMap" : ['+createJSON(children[i], offset+" ", false)+'] } }] } }';
+                        if(!(i + 1 == children.length)){
+                            JSONstr +=",";
+                        }
+
+                    } else {
+
+                        JSONstr += offset + '{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
+                                    ' "map": { "action" : "keep_both", "childMap" : ['+createJSON(children[i], offset+" ", false)+'] } }';
                         if(!(i + 1 == children.length)){
                             JSONstr +=",";
                         }
@@ -280,18 +320,9 @@ function markEntityKeepLeft(){
         selectedNode.data.keep_left = true;
         selectedNode.data.keep_right = false;
         selectedNode.data.merge = false;
+        selectedNode.data.keep_both = false;
     }
 
-/*    var children = selectedNode.childNodes;
-    for(var i = 0; i < children.length; i++){
-        if(children[i].data.keep_left){
-            children[i].data.keep_left = false;
-        } else {
-            children[i].data.keep_left = true;
-            children[i].data.keep_right = false;
-            children[i].data.merge = false;
-        }
-    }*/
      Ext.getCmp("entityTreeView").getView().refresh();
 }
 
@@ -309,18 +340,9 @@ function markEntityKeepRight(){
         selectedNode.data.keep_right = true;
         selectedNode.data.keep_left = false;
         selectedNode.data.merge = false;
+        selectedNode.data.keep_both = false;
     }
 
-/*    var children = selectedNode.childNodes;
-    for(var i = 0; i < children.length; i++){
-        if(children[i].data.keep_right){
-            children[i].data.keep_right = false;
-        } else {
-            children[i].data.keep_right = true;
-            children[i].data.keep_left = false;
-            children[i].data.merge = false;
-        }
-    }*/
     Ext.getCmp("entityTreeView").getView().refresh();
 }
 
@@ -338,18 +360,28 @@ function markEntityMerge(){
         selectedNode.data.merge = true;
         selectedNode.data.keep_right = false;
         selectedNode.data.keep_left = false;
+        selectedNode.data.keep_both = false;
     }
 
-/*    var children = selectedNode.childNodes;
-    for(var i = 0; i < children.length; i++){
-        if(children[i].data.merge){
-            children[i].data.merge = false;
-        } else {
-            children[i].data.merge = true;
-            children[i].data.keep_right = false;
-            children[i].data.keep_left = false;
-        }
-    }*/
+    Ext.getCmp("entityTreeView").getView().refresh();
+}
+
+function markEntityKeepBoth(){
+
+    var grid = Ext.getCmp('entityTreeView');
+    var store = grid.store;
+
+    var selectedNode = grid.getSelectionModel().getLastSelected();
+
+    if(selectedNode.data.keep_both){
+        selectedNode.data.keep_both = false;
+    } else {
+        selectedNode.data.keep_both = true;
+        selectedNode.data.keep_left = false;
+        selectedNode.data.keep_right = false;
+        selectedNode.data.merge = false;
+    }
+
     Ext.getCmp("entityTreeView").getView().refresh();
 }
 
@@ -420,6 +452,7 @@ Ext.onReady(function() {
             {name: 'keep_left',    type: 'boolean', defaultValue: false},
             {name: 'keep_right',    type: 'boolean', defaultValue: false},
             {name: 'merge',    type: 'boolean', defaultValue: false},
+            {name: 'keep_both',    type: 'boolean', defaultValue: false},
             {name: 'id_left',    type: 'string'},
             {name: 'id_right',    type: 'string'},
         ]
@@ -478,10 +511,10 @@ Ext.onReady(function() {
                     rightEntityId: rightEntityId.getValue()
                 },
                 success: function() {
-                    console.log('success');
+                    Ext.MessageBox.alert(label_DB_SUCCESS_TITLE, label_DB_SUCCESS);
                 },
                 failure: function() {
-                    console.log('woops');
+                    Ext.MessageBox.alert(label_DB_FAILURE_TITLE, label_DB_FAILURE);
                 }
             });
         }
@@ -549,6 +582,7 @@ Ext.onReady(function() {
         store: entityStore,
         multiSelect: true,
         singleExpand: true,
+        autoScroll: true,
         columns: [{
             xtype: 'treecolumn',
             text: label_TITLE,
@@ -575,6 +609,15 @@ Ext.onReady(function() {
             flex: 2,
             dataIndex: 'type',
             sortable: true
+        },
+        {
+            text: label_KEEP_BOTH,
+            flex: 3,
+            dataIndex: 'keep_both',
+            sortable: true,
+                renderer: function (dataIndex) {
+                            return '<center><input type="checkbox" onclick="markEntityKeepBoth()"'+ (dataIndex ? 'checked' : '') +' /></center>'
+                        }
         },{
             text: label_KEEP_LEFT,
             flex: 3,
@@ -596,10 +639,13 @@ Ext.onReady(function() {
             flex: 3,
             dataIndex: 'merge',
             sortable: true,
-                renderer: function (dataIndex) {
-                            return '<center><input type="checkbox" onclick="markEntityMerge()"'+ (dataIndex ? 'checked' : '') +' /></center>'
-
-                      }
+                renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
+                            if(record.get('array')){
+                                return '<center><input type="checkbox" onclick="markEntityMerge()"'+ (record.get('merge') ? 'checked' : '') +' /></center>'
+                            } else {
+                                return "";
+                            }
+                     }
          }],
         listeners : {}
     });
