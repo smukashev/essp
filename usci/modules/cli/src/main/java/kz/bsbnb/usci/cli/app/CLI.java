@@ -4,7 +4,6 @@ import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-//import com.sun.scenario.effect.Merge;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
@@ -45,11 +44,17 @@ import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.showcase.ShowCase;
+import kz.bsbnb.usci.eav.showcase.ShowCaseField;
+import kz.bsbnb.usci.eav.showcase.ShowCaseHolder;
+import kz.bsbnb.usci.eav.showcase.dao.IShowCaseDao;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
+import kz.bsbnb.usci.showcase.ShowcaseHolder;
+import kz.bsbnb.usci.showcase.service.ShowcaseService;
 import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 import kz.bsbnb.usci.tool.status.SyncStatus;
@@ -116,6 +121,12 @@ public class CLI
 
     @Autowired
     private RulesSingleton rulesSingleton;
+
+    @Autowired
+    protected IShowCaseDao showCaseDao;
+
+    @Autowired
+    protected ShowCaseHolder scHolder;
 
     private BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
 
@@ -687,7 +698,7 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b  where b.rep_date = to_date('" +
+                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
                                     reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e)
                         {
@@ -918,7 +929,7 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b  where b.rep_date = to_date('" +
+                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
                                     reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e)
                         {
@@ -1155,7 +1166,7 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b  where b.rep_date = to_date('" +
+                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
                                     reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e)
                         {
@@ -2413,17 +2424,64 @@ public class CLI
             new BaseRepository().run();
         } else throw new IllegalArgumentException("allowed operations refs [import] [filename]");
     }
+    public void commandSC()
+    {
+        if(args.get(0).equals("list")){
+
+        } else if(args.get(0).equals("add")){
+            showcaseServiceFactoryBean = new RmiProxyFactoryBean();
+            showcaseServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
+            showcaseServiceFactoryBean.setServiceInterface(ShowcaseService.class);
+
+            showcaseServiceFactoryBean.afterPropertiesSet();
+            showcaseService = (ShowcaseService) showcaseServiceFactoryBean.getObject();
+
+            String name = args.get(1);
+            String metaName = args.get(2);
+            System.out.println("argument: " + args.get(1) + "   " + args.get(2));
+            MetaClass metaClass = metaClassRepository.getMetaClass(metaName);
+            ShowCase showCase = new ShowCase();
+            showCase.setName(name);
+            showCase.setTableName(name);
+            showCase.setMeta(metaClass);
+            for(int i = 3; i < args.size(); i++){
+                String field = args.get(i);
+                String columnName;
+                String fieldName;
+                String path;
+                if(field.contains(":")){
+                    columnName = field.split(":")[1];
+                    field = field.split(":")[0];
+                }
+                if(field.contains(".")){
+                    fieldName = field.substring(field.lastIndexOf(".") + 1);
+                    path = field.substring(0, field.lastIndexOf("."));
+                } else{
+                    path = "";
+                    fieldName = field;
+                }
+                columnName = fieldName;
+                showCase.addField(metaClass, path, fieldName, columnName);
+            }
+            showcaseService.add(showCase);
+            System.out.println("Showcase successfully added!");
+        } else if(args.get(0).equals("delete")){
+
+        }
+    }
 
     private RmiProxyFactoryBean batchServiceFactoryBean;
     private RmiProxyFactoryBean batchVersionServiceFactoryBean;
     private RmiProxyFactoryBean ruleServiceFactoryBean;
     private RmiProxyFactoryBean listenerServiceFactoryBean;
+    private RmiProxyFactoryBean showcaseServiceFactoryBean;
 
     private RmiProxyFactoryBean entityServiceFactoryBean;
 
     private IBatchService batchService;
     private IRuleService ruleService;
     private IBatchVersionService batchVersionService;
+    private ShowcaseService showcaseService;
 
     public void init(){
 
@@ -2630,6 +2688,170 @@ public class CLI
         //rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());*/
     }
 
+    public void showcaseStat()
+    {
+        RmiProxyFactoryBean serviceFactory = null;
+        ShowcaseService showcaseService = null;
+
+        try {
+            serviceFactory = new RmiProxyFactoryBean();
+            //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+            serviceFactory.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
+            serviceFactory.setServiceInterface(ShowcaseService.class);
+            serviceFactory.setRefreshStubOnConnectFailure(true);
+
+            serviceFactory.afterPropertiesSet();
+            showcaseService = (ShowcaseService) serviceFactory.getObject();
+        } catch (Exception e) {
+            System.out.println("Can't connect to receiver service: " + e.getMessage());
+        }
+
+        HashMap<String, QueryEntry> map = showcaseService.getSQLStats();
+
+        System.out.println();
+        System.out.println("+---------+------------------+------------------------+");
+        System.out.println("|  count  |     avg (ms)     |       total (ms)       |");
+        System.out.println("+---------+------------------+------------------------+");
+
+        double totalInserts = 0;
+        double totalSelects = 0;
+        double totalProcess = 0;
+        int totalProcessCount = 0;
+
+        for (String query : map.keySet()) {
+            QueryEntry qe = map.get(query);
+
+            System.out.printf("| %7d | %16.6f | %22.6f | %s%n", qe.count,
+                    qe.totalTime / qe.count, qe.totalTime, query);
+
+            if (query.startsWith("insert")) {
+                totalInserts += qe.totalTime;
+            }
+            if (query.startsWith("select")) {
+                totalSelects += qe.totalTime;
+            }
+            if (query.startsWith("coreService")) {
+                totalProcess += qe.totalTime;
+                totalProcessCount += qe.count;
+            }
+        }
+
+        System.out.println("+---------+------------------+------------------------+");
+
+        if(totalProcessCount > 0) {
+            System.out.println("AVG process: " + totalProcess / totalProcessCount);
+            System.out.println("AVG inserts per process: " + totalInserts / totalProcessCount);
+            System.out.println("AVG selects per process: " + totalSelects / totalProcessCount);
+        }
+
+        //showcaseService.clearSQLStats();
+    }
+
+    private void initSC(){
+        scStart = true;
+        showcaseServiceFactoryBean = new RmiProxyFactoryBean();
+        showcaseServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
+        showcaseServiceFactoryBean.setServiceInterface(ShowcaseService.class);
+
+        showcaseServiceFactoryBean.afterPropertiesSet();
+        showcaseService = (ShowcaseService) showcaseServiceFactoryBean.getObject();
+    }
+
+    ShowCase showCase;
+    boolean scStart = false;
+
+    public void commandShowCase(){
+        if(showCase == null)  {
+            showCase = new ShowCase();
+            showCase.setMeta(metaClassRepository.getMetaClass("credit"));
+            /* uncomment for fast init of showCase
+            showCase.setMeta(metaClassRepository.getMetaClass("credit"));
+            showCase.setTableName("www");
+            showCase.setName("www");
+            showCase.addField(showCase.getMeta(), "credit_type","code");
+            showCase.addField(showCase.getMeta(), "subjects.person.addresses","details","DOM");
+            showCase.addField(showCase.getMeta(), "","amount","VAL");*/
+        }
+        if(args.get(0).equals("status")){
+            System.out.println(showCase.toString());
+        } else if(args.get(0).equals("set")){
+            if(args.size() !=3 )
+                throw new IllegalArgumentException("showcase set [meta] {value}");
+            if(args.get(1).equals("meta")){
+                showCase.setMeta(metaClassRepository.getMetaClass(args.get(2)));
+            } else if(args.get(1).equals("name")){
+                showCase.setName(args.get(2));
+            } else if(args.get(1).equals("tableName"))
+                showCase.setTableName(args.get(2));
+        } else if(args.get(0).equals("list")){
+            if(args.get(1).equals("reset"))
+                showCase.getFieldsList().clear();
+            else if( args.get(1).equals("add")){
+                String path = "";
+                String colName = args.get(2);
+                int id = args.get(2).lastIndexOf('.');
+                if(id!=-1)
+                {
+                    path = args.get(2).substring(0, id);
+                    colName = args.get(2).substring(id+1);
+                }
+                if(args.size() == 3 )
+                 showCase.addField(showCase.getMeta(), path, colName);
+                else if(args.size() == 4)
+                 showCase.addField(showCase.getMeta(), path, colName, args.get(3));
+                else throw new IllegalArgumentException("Example: showcase list add [path] [columnName] {columnAlias}");
+            }
+        } else if(args.get(0).equals("save")){
+
+            if(args.size() > 1 && args.get(1).equals("local"))
+            {
+                showCaseDao.save(showCase);
+                scHolder.setShowCaseMeta(showCase);
+                scHolder.createTables();
+            }else{
+                if(!scStart) initSC();
+                showcaseService.add(showCase);
+            }
+
+           showCase = null;
+           System.out.println("Showcase successfully added!");
+        } else if(args.get(0).equals("listSC")){
+            if(!scStart) initSC();
+
+            List<ShowcaseHolder> list = showcaseService.list();
+            for(ShowcaseHolder holder : list){
+                System.out.println(holder.getShowCaseMeta().getName());
+                for(ShowCaseField field : holder.getShowCaseMeta().getFieldsList()){
+                    System.out.println("\t" + field.getName());
+                }
+            }
+        } else if(args.get(0).equals("loadSC")){
+            if(args.size() > 1){
+                ShowCase sc = showcaseService.load(args.get(1));
+                System.out.println(sc.getName());
+                for(ShowCaseField field : sc.getFieldsList()){
+                    System.out.println("\t" + field.getName());
+                }
+            } else{
+                System.out.println("Usage: loadSC <showcase name>");
+            }
+        } else if(args.get(0).equals("startLoad")){
+            if(args.size() > 2){
+                try {
+                    showcaseService.startLoad(args.get(1), sdfout.parse(args.get(2)));
+                } catch (ParseException e) {
+                    System.out.println("Date format: \"dd.MM.yyyy\"");
+                }
+            } else{
+                System.out.println("Usage: startLoad <showcase name> <report date>");
+            }
+        } else if(args.get(0).equals("stats")){
+            showcaseStat();
+        } else{
+            throw new IllegalArgumentException("Arguments: showcase [status, set]");
+        }
+    }
+
     String line;
     Exception lastException = null;
 
@@ -2707,6 +2929,8 @@ public class CLI
                 batchRestartSingle();
             } else if(command.equals("stc")) {
                 commandSTC();
+            } else if(command.equals("showcase")) {
+                commandShowCase();
             } else if(command.equals("merge")){
                 mergeEntity();
             } else {

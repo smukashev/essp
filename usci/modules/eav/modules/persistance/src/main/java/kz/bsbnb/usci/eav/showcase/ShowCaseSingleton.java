@@ -15,8 +15,8 @@ import java.util.Queue;
 /**
  * Created by almaz on 6/16/14.
  */
-@Scope("singleton")
-@Component
+//@Scope("singleton")
+//@Component
 public class ShowCaseSingleton {
 
     private Queue<QueueEntry> queue = new LinkedList<QueueEntry>();

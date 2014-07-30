@@ -89,6 +89,10 @@ public class ShowCaseField extends Persistable
         this.attributePath = attributePath;
     }
 
+    public String getPath() {
+        return attributePath.equals("") ? attributeName : attributePath + "." + attributeName;
+    }
+
     @Override
     public boolean equals(Object o)
     {

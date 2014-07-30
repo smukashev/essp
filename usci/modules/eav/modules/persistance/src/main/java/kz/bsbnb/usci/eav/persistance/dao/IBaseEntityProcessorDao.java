@@ -86,4 +86,10 @@ public interface IBaseEntityProcessorDao
     public IBaseEntity merge(IBaseEntity baseEntityLeft, IBaseEntity baseEntityRight,
                              IBaseEntityMergeManager mergeManager, MergeResultChoice choice);
 
+    public void populate(String metaName, Long id, Date reportDate);
+
+    public List<Long> getNewTableIds(Long id);
+
+    public void removeNewTableIds(List<Long> list, Long id);
+
 }

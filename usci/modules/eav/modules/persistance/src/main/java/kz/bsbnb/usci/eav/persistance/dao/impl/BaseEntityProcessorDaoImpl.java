@@ -1,5 +1,8 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.ddlutils.Platform;
+import kz.bsbnb.ddlutils.PlatformFactory;
+import kz.bsbnb.ddlutils.model.*;
 import kz.bsbnb.usci.cr.model.DataTypeUtil;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
@@ -23,14 +26,22 @@ import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.tool.Quote;
 import org.jooq.*;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.jdbc.support.MetaDataAccessException;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
@@ -3677,4 +3688,83 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return baseEntityDao.getChildBaseEntityIds(parentBaseEntityIds);
     }
 
+    @Override
+    public void populate(String metaName, Long scId, Date reportDate){
+        //createMainTables();
+        Long id = metaClassRepository.getMetaClass(metaName).getId();
+        Insert ins = context.insertInto(SC_ID_BAG)
+                .select(context.select(EAV_BE_ENTITIES.ID, DSL.val(scId).as("SHOWCASE_ID"))
+                        .from(EAV_BE_ENTITIES.join(EAV_BE_ENTITY_REPORT_DATES).on(EAV_BE_ENTITIES.ID.eq(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID)))
+                        .where(EAV_BE_ENTITIES.CLASS_ID.equal(id)
+                                .and(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.eq(new java.sql.Date(reportDate.getTime())))));
+        jdbcTemplate.update(ins.getSQL(), ins.getBindValues().toArray());
+    }
+
+    @Override
+    public List<Long> getNewTableIds(Long id){
+        List<Long> list;
+        Select select = context.select(SC_ID_BAG.ID).from(SC_ID_BAG).where(SC_ID_BAG.SHOWCASE_ID.eq(id)).limit(10);
+        Select select2 = context.select(select.field(0)).from(select);
+        list = jdbcTemplate.queryForList(select2.getSQL(), Long.class, select2.getBindValues().toArray());
+
+        return list;
+    }
+
+    @Override
+    public void removeNewTableIds(List<Long> list, Long id){
+        Delete delete = context.delete(SC_ID_BAG).where(SC_ID_BAG.ID.in(list).and(SC_ID_BAG.SHOWCASE_ID.eq(id)));
+        jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
+    }
+
+    private void createMainTables(){
+        Platform mainPlatform = PlatformFactory.createNewPlatformInstance(jdbcTemplate.getDataSource());
+
+        String dbName;
+        String schema;
+        try {
+            String url = JdbcUtils.extractDatabaseMetaData(jdbcTemplate.getDataSource(), "getURL").toString();
+            dbName = url.substring(url.lastIndexOf(":"));
+            schema = jdbcTemplate.getDataSource().getConnection().getSchema();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if(mainPlatform.readModelFromDatabase("XE", null, "USCI", null).
+                findTable("SC_ID_BAG") != null){
+            return;
+        }
+        Database model = new Database();
+        model.setName("model");
+
+        kz.bsbnb.ddlutils.model.Table dataTable = new kz.bsbnb.ddlutils.model.Table();
+        dataTable.setName("SC_ID_BAG");
+
+        Column idColumn = new Column();
+
+        idColumn.setName("ID");
+        //idColumn.setPrimaryKey(true);
+        idColumn.setRequired(true);
+        idColumn.setType("NUMERIC");
+        idColumn.setSize("14,0");
+        idColumn.setAutoIncrement(true);
+
+        dataTable.addColumn(idColumn);
+
+        Column entityIdColumn = new Column();
+
+        entityIdColumn.setName("SHOWCASE_ID");
+        entityIdColumn.setPrimaryKey(false);
+        entityIdColumn.setRequired(false);
+        entityIdColumn.setType("NUMERIC");
+        entityIdColumn.setSize("14,0");
+        entityIdColumn.setAutoIncrement(false);
+
+        dataTable.addColumn(entityIdColumn);
+
+        model.addTable(dataTable);
+
+        System.out.println(model.toVerboseString());
+
+        mainPlatform.createModel(model, false, true);
+    }
 }
