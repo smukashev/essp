@@ -92,7 +92,8 @@ public class MainPortlet extends MVCPortlet {
         LIST_CLASSES,
         LIST_ENTITY,
         SAVE_JSON,
-        LIST_BY_CLASS
+        LIST_BY_CLASS,
+        GET_CANDIDATES
     }
 
     private String testNull(String str) {
@@ -628,6 +629,11 @@ public class MainPortlet extends MVCPortlet {
                                 "]}");
                     }
                     break;
+                case GET_CANDIDATES:
+                    // DUMMY DATA
+                    writer.write("[{'type': 'credit', 'name_1':'0128', 'name_2': '02121', 'id_1':'5214', 'id_2':'36598'}, " +
+                            "{'type': 'person', 'name_1':'Захар Петрович Басов', 'name_2': 'Петр Васильевич Франкенштейн', 'id_1':'333', 'id_2':'222'}," +
+                            "{'type': 'doc', 'name_1':'важный документ', 'name_2': 'неважный документ', 'id_1':'123', 'id_2':'321'}]");
                 default:
                     break;
             }

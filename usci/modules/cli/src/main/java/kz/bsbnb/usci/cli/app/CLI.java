@@ -3173,10 +3173,6 @@ public class CLI
                 MergeManagerKey<Long> key = new MergeManagerKey<Long>(Long.parseLong(left), Long.parseLong(right));
                 return key;
             }
-            if(type.equals("UUID")){
-                MergeManagerKey<UUID> key = new MergeManagerKey<UUID>(UUID.fromString(left), UUID.fromString(right));
-                return key;
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -385,9 +385,20 @@ function markEntityKeepBoth(){
     Ext.getCmp("entityTreeView").getView().refresh();
 }
 
+function setMegrePair(idLeft, idRight){
+    var tabs = Ext.getCmp("tabs");
+    tabs.setActiveTab(1);
+    var leftEntityId = Ext.getCmp("leftEntityId");
+    var rightEntityId = Ext.getCmp("rightEntityId");
+    leftEntityId.setValue(idLeft);
+    rightEntityId.setValue(idRight);
+
+}
+
 
 Ext.onReady(function() {
     grid = null;
+
 
     Ext.define('classesStoreModel', {
         extend: 'Ext.data.Model',
@@ -651,11 +662,10 @@ Ext.onReady(function() {
     });
 
     mainEntityEditorPanel = Ext.create('Ext.panel.Panel', {
-        title : 'Панель данных',
+        title : label_MERGE_PANEL,
         preventHeader: true,
         width : '100%',
-        height: '500px',
-        renderTo : 'entity-editor-content',
+        height: '700px',
         layout : 'border',
         defaults : {
             padding: '3'
@@ -666,7 +676,8 @@ Ext.onReady(function() {
                 region: 'center',
                 preventHeader: true,
                 width: "60%",
-                autoScroll:true,
+                autoScroll:false,
+                layout: 'fit',
                 items: [entityGrid]
             }],
         dockedItems: [
@@ -675,6 +686,7 @@ Ext.onReady(function() {
                 id: 'leftEntityId',
                 name: 'leftEntityId',
                 xtype: 'textfield',
+                margin: '10 10 10 10',
                 value: (givenEntityId == "null" ? "" : givenEntityId)
             },
             {
@@ -682,9 +694,69 @@ Ext.onReady(function() {
                 id: 'rightEntityId',
                 name: 'rightEntityId',
                 xtype: 'textfield',
+                margin: '10 10 10 10',
                 value: (givenEntityId == "null" ? "" : givenEntityId)
             },
             buttonShow, buttonShowXML, buttonXML
         ]
     });
+
+    Ext.define('candidateModel', {
+            extend: 'Ext.data.Model',
+            fields: [
+                {name: 'type',      type: 'string'},
+                {name: 'name_1',    type: 'string'},
+                {name: 'name_2',    type: 'string'},
+                {name: 'id_1',      type: 'string'},
+                {name: 'id_2',      type: 'string'}
+            ]
+        });
+
+    var candidateStore = Ext.create('Ext.data.Store', {
+             model: 'candidateModel',
+             autoLoad: true,
+             proxy: {
+                type: 'ajax',
+                url: dataUrl,
+                extraParams: {op : 'GET_CANDIDATES'}
+                }
+        });
+
+
+
+    mergeCandidatesGrid =  Ext.create('Ext.grid.Panel', {
+          title : label_MERGE_CANDIDATES,
+          store: candidateStore,
+          columns: [
+              {text: "Type", width:100, dataIndex:'type'},
+              {text: "Name 1", width:250, dataIndex:'name_1'},
+              {text: "Name 2", width: 250, dataIndex:'name_2'},
+              {text: "ID 1", width: 100, dataIndex:'id_1'},
+              {text: "ID 2", width: 100, dataIndex:'id_2'},
+              {
+                  text: label_MERGE,
+                  width: 100,
+                  sortable: true,
+                  renderer:
+                  function (value, metaData, record, rowIndex, colIndex, store, view) {
+                    return '<center><input type="button" onclick="setMegrePair(\''+record.get('id_1')+'\', \''+record.get('id_2')+'\')" value="'+ label_MERGE +'"/></center>'
+                    }
+              }
+
+          ],
+          width: 900,
+          height: 500
+      });
+
+
+       var tabs = Ext.widget('tabpanel', {
+                   id:"tabs",
+                   renderTo: 'tabs',
+                   width: '100%',
+                   height: '100%',
+                   activeTab: 0,
+                   defaults :{
+                       bodyPadding: 0
+                   },
+                   items: [mergeCandidatesGrid, mainEntityEditorPanel] });
 });

@@ -5,7 +5,6 @@ import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
-import kz.bsbnb.usci.showcase.generated.Showcase;
 import kz.bsbnb.usci.showcase.service.CoreShowcaseService;
 import kz.bsbnb.usci.showcase.service.ShowcaseService;
 import org.springframework.beans.factory.annotation.Autowired;

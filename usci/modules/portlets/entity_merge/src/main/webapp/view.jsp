@@ -31,6 +31,4 @@
 <script src="<%=request.getContextPath()%>/js/lang/default.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/lang/<%= ((ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY)).getLocale() %>.js" type="text/javascript"></script>
 
-<div id="entity-editor-content">
-
-</div>
+<div id="tabs"></div>

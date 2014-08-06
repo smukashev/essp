@@ -28,3 +28,5 @@ var label_DB_SUCCESS="Операции в базе данных завершен
 var label_DB_FAILURE="Операции в базе данных не завершены";
 var label_DB_SUCCESS_TITLE="Внимание!";
 var label_DB_FAILURE_TITLE="Ошибка!";
+var label_MERGE_PANEL="Панель объединения";
+var label_MERGE_CANDIDATES="Кандидаты на объединение";

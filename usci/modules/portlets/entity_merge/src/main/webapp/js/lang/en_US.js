@@ -28,3 +28,5 @@ var label_DB_SUCCESS="Мәлiметтер базасында операция с
 var label_DB_FAILURE="Мәлiметтер базасында операция сәтсiз аяқталды";
 var label_DB_SUCCESS_TITLE="Назар аударыңыз!";
 var label_DB_FAILURE_TITLE="Қате!";
+var label_MERGE_PANEL="Бiрiктiру панелi";
+var label_MERGE_CANDIDATES="Бiрiктiруге тиiстi кандидаттар";
