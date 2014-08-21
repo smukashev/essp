@@ -184,6 +184,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     //xmlEventReader.next();
                 } catch (NumberFormatException n) {
                     n.printStackTrace();
+                    logger.error("Cast error: " + localName + ", exception text: " + n.getMessage());
+                    throw new RuntimeException("Cast error: " + localName + ", exception text: " + n.getMessage());
                 } catch (ClassCastException ex) {
                     logger.debug("Empty tag: " + localName);
                     level--;

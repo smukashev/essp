@@ -10,8 +10,14 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author k.tulbassiyev
@@ -30,14 +36,65 @@ public final class DataJob extends AbstractDataJob {
     private IEntityService entityService;
     private final Logger logger = Logger.getLogger(DataJob.class);
 
+    protected final List<InProcessTester> entitiesInProcess
+            = Collections.synchronizedList(new ArrayList<InProcessTester>());
+
+    BaseEntity currentEntity;
+    boolean currentIntersection;
+
+    ExecutorService service = Executors.newCachedThreadPool();
+
     private double avgTimePrev = 0;
     private double avgTimeCur = 0;
     private long entityCounter = 0;
 
     private int clearJobsIndex = 0;
 
+    private class InProcessTester implements Callable<Boolean> {
+        BaseEntity myEntity;
+
+        private InProcessTester(BaseEntity myEntity) {
+            this.myEntity = myEntity;
+        }
+
+        public Boolean call() {
+            if(hasCrossLine(currentEntity, myEntity)) {
+                currentIntersection = true;
+                return true;
+            }
+
+            return false;
+        }
+
+        public BaseEntity getMyEntity() {
+            return myEntity;
+        }
+    }
+
     @Autowired
     protected StatusSingleton statusSingleton;
+
+    private class InProcessContainer extends Thread {
+        private BaseEntity entity;
+
+        private InProcessContainer(BaseEntity entity) {
+            this.entity = entity;
+        }
+
+        @Override
+        public void run() {
+            if(hasCrossLine(entity, currentEntity))
+            currentIntersection = true;
+        }
+
+        public BaseEntity getEntity() {
+            return entity;
+        }
+
+        public void setEntity(BaseEntity entity) {
+            this.entity = entity;
+        }
+    }
 
     @Override
     public void run() {
@@ -124,12 +181,12 @@ public final class DataJob extends AbstractDataJob {
                 }
                 ////////////////
 
-                Iterator<BaseEntity> entityProcessIterator = entitiesInProcess.iterator();
+                Iterator<InProcessTester> entityProcessIterator = entitiesInProcess.iterator();
 
                 boolean found = false;
 
                 while(entityProcessIterator.hasNext()) {
-                    if(entity.hashCode() == entityProcessIterator.next().hashCode()) {
+                    if(entity.hashCode() == entityProcessIterator.next().getMyEntity().hashCode()) {
                         entityProcessIterator.remove();
                         found = true;
                         break;
@@ -150,7 +207,7 @@ public final class DataJob extends AbstractDataJob {
 
         if(entity != null) {
             logger.debug("Starting job");
-            entitiesInProcess.add(entity);
+            entitiesInProcess.add(new InProcessTester(entity));
             processingJobs.add(processJob);
 
             processJob.start();
@@ -177,6 +234,8 @@ public final class DataJob extends AbstractDataJob {
             i++;
         }      */
 
+        long t1 = System.currentTimeMillis();
+
         if(clearJobsIndex >= entities.size()) {
             clearJobsIndex = 0;
         }
@@ -186,9 +245,10 @@ public final class DataJob extends AbstractDataJob {
         while(iterator.hasNext()) {
             BaseEntity entity = iterator.next();
 
-            if(!isInProcess(entity)) {
+            if(!isInProcessWithThreads(entity)) {
                 iterator.remove();
                 //System.out.println("Watched entities " + (++i));
+                //System.out.println("Time spent: " + (System.currentTimeMillis() - t1));
                 return entity;
             } else {
                 logger.debug("Entity in process.");
@@ -197,16 +257,28 @@ public final class DataJob extends AbstractDataJob {
             clearJobsIndex++;
         }
 
-
         return null;
     }
 
     private boolean isInProcess(BaseEntity baseEntity) {
-        for (BaseEntity entity : entitiesInProcess)
-            if(hasCrossLine(baseEntity, entity))
+        for (InProcessTester entity : entitiesInProcess)
+            if(hasCrossLine(baseEntity, entity.getMyEntity()))
                 return true;
 
         return false;
+    }
+
+    private boolean isInProcessWithThreads(BaseEntity baseEntity) {
+        currentEntity = baseEntity;
+        currentIntersection = false;
+
+        try {
+            service.invokeAll(entitiesInProcess);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return currentIntersection;
     }
 
     private boolean hasCrossLine(BaseEntity entity1, BaseEntity entity2) {

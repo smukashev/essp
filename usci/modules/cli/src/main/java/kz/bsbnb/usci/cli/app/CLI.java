@@ -1792,6 +1792,7 @@ public class CLI
                         "  FROM core.xml_file xf\n" +
                         " WHERE xf.status = 'COMPLETED'\n" +
                         "   AND xf.report_date = to_date('" + args.get(5) + "', 'dd.MM.yyyy')" +
+                        //"   ORDER BY xf.id ASC");
                         "   AND xf.sent = 0 ORDER BY xf.id ASC");
 
                 preparedStatementDone = conn.prepareStatement("UPDATE core.xml_file xf \n" +

@@ -24,6 +24,7 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +43,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 {
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
 
-    private static final boolean exceptionOnImmutableWrite = false;
+    private static final boolean exceptionOnImmutableWrite = true;
 
     @Autowired
     IBatchRepository batchRepository;

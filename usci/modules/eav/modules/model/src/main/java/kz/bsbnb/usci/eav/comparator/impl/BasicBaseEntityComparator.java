@@ -167,6 +167,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator
 
             if(value1 == null || value2 == null)
             {
+                //check this row
                 throw new IllegalArgumentException("Key attribute " + name + " couldn't be null");
             }
 

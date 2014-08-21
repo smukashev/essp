@@ -71,6 +71,9 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
                         getClassName()).findSingle(docType);
             }
 
+            if (docTypeId == null)
+                return res;
+
             if (docTypeId > 0) {
                 /*SelectConditionStep select = context.
                         select(EAV_BE_STRING_VALUES.as("d_no").ENTITY_ID.as("inner_id")).
