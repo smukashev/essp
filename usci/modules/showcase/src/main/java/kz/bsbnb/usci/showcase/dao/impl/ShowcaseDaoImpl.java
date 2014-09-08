@@ -46,7 +46,7 @@ import static kz.bsbnb.usci.showcase.generated.Tables.EAV_SC_SHOWCASE_FIELDS;
 @Component
 public class ShowcaseDaoImpl implements ShowcaseDao{
     private final static String TABLES_PREFIX = "EAV_SCH_";
-    private final static String COLUMN_PREFIX = "SC_";
+    private final static String COLUMN_PREFIX = "";
     private final static String HISTORY_POSTFIX = "_HIS";
 
     protected JdbcTemplate jdbcTemplateSC;
