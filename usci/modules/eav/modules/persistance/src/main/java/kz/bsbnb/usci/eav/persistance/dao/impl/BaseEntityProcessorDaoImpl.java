@@ -323,6 +323,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             if (maxReportDate == null)
             {
+                Date minReportDate = baseEntityReportDateDao
+                        .getMaxReportDate(baseEntityForSave.getId());
+
+                baseEntityLoaded = load(baseEntityForSave.getId(), minReportDate, reportDate);
+
                 throw new UnsupportedOperationException("Not yet implemented. Entity ID: " + baseEntityForSave.getId());
                 //return applyBaseEntityAdvanced(baseEntityForSave, baseEntityManager);
             }
