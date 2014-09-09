@@ -2,6 +2,154 @@
 
 showcase set meta credit
 
+#=================================================================================
+#   Organization addresses
+#=================================================================================
+
+showcase set name ORG_ADDRESS
+showcase set tableName ORG_ADDRESS
+
+showcase list add subjects.organization.addresses.details adds_detail
+showcase list add subjects.organization.addresses.type adds_type
+showcase list add subjects.organization.addresses.region.code adds_r_code
+
+showcase save
+
+#=================================================================================
+
+
+
+
+#=================================================================================
+#   Person addresses
+#=================================================================================
+
+showcase set name PERSON_ADDRESS
+showcase set tableName PERSON_ADDRESS
+
+showcase list add subjects.person.addresses.details adds_detail
+showcase list add subjects.person.addresses.region.code adds_r_code
+showcase list add subjects.person.addresses.type adds_type
+
+showcase save
+
+#=================================================================================
+
+
+
+
+#=================================================================================
+
+#=================================================================================
+#  Organization contacts
+#=================================================================================
+
+showcase set name ORG_CONTACTS
+showcase set tableName ORG_CONTACTS
+
+showcase list add subjects.organization.contacts.contact_type.code
+showcase list add subjects.organization.contacts.contact_type.name_ru
+showcase list add subjects.organization.contacts.contact_type.name_kz
+showcase list add subjects.organization.contacts.details value
+
+showcase save
+
+#=================================================================================
+
+#=================================================================================
+#  Person contacts
+#=================================================================================
+
+showcase set name PERSON_CONTACTS
+showcase set tableName PERSON_CONTACTS
+
+showcase list add subjects.person.contacts.contact_type.code
+showcase list add subjects.person.contacts.contact_type.name_ru
+showcase list add subjects.person.contacts.contact_type.name_kz
+showcase list add subjects.person.contacts.details value
+
+showcase save
+
+#=================================================================================
+
+#=================================================================================
+#  Turnover
+#=================================================================================
+
+showcase set name TURNOVER
+showcase set tableName TURNOVER
+
+showcase list add change.turnover.issue.debt.amount debt_amount
+showcase list add change.turnover.issue.debt.amount_currency da_cny
+showcase list add change.turnover.issue.interest.amount interest_amount
+showcase list add change.turnover.issue.interest.amount_currency ia_cny
+
+showcase save
+
+#=================================================================================
+
+
+
+#=================================================================================
+#  Showcase credit_flow
+#=================================================================================
+
+
+showcase set name CREDIT_FLOW
+showcase set tableName CREDIT_FLOW
+showcase list add change.credit_flow.classification.code
+showcase list add change.credit_flow.classification.value_ cl_value
+showcase list add change.credit_flow.classification.name_ru name_ru
+showcase list add change.credit_flow.classification.name_kz name_kz
+showcase list add change.credit_flow.provision.provision_kfn.value kfn_val
+showcase list add change.credit_flow.provision.provision_kfn.balance_account.no_ kfn_ba
+showcase list add change.credit_flow.provision.provision_msfo.value msfo_val
+showcase list add change.credit_flow.provision.provision_msfo.balance_account.no_ msfo_ba
+showcase list add change.credit_flow.provision.provision_msfo_over_balance.balance_account.no_ msfo_b_ba
+
+showcase save
+
+#=================================================================================
+
+
+#=================================================================================
+#  Showcase remains(debt_remains)
+#=================================================================================
+
+showcase set name REMAINS
+showcase set tableName REMAINS
+showcase list add change.remains.limit.value lim_value
+showcase list add change.remains.limit.value lim_vcny
+showcase list add change.remains.limit.balance_account.no_ lim_ba
+showcase list add change.remains.interest.current.value in_cur_value
+showcase list add change.remains.interest.pastdue.value  in_pas_value
+showcase list add change.remains.interest.pastdue.balance_account.no_ in_pas_ba
+showcase list add change.remains.debt.current.value debt_cur_value
+showcase list add change.remains.debt.current.value debt_cur_vcny
+showcase list add change.remains.debt.current.balance_account.no_ dcur_ba
+showcase list add change.remains.debt.pastdue.value debt_pas_value
+showcase list add change.remains.debt.pastdue.value debt_pas_vcny
+showcase list add change.remains.debt.pastdue.balance_account.no_ dbas_ba
+showcase list add change.remains.debt.write_off.value debt_wrt_value
+showcase list add change.remains.debt.write_off.value debt_wrt_vcny
+showcase list add change.remains.debt.write_off.balance_account.no_ dwrt_ba
+showcase list add change.remains.discount.value debt_dis_value
+showcase list add change.remains.discount.value_currency debt_dis_vcny
+showcase list add change.remains.discount.balance_account.no_ ddis_ba_no
+showcase list add change.remains.discounted_value.value dis_value
+showcase list add change.remains.discounted_value.value dis_vcny
+showcase list add change.remains.discounted_value.value dis_ba
+showcase list add change.remains.correction.value corr_value
+showcase list add change.remains.correction.value_currency corr_vcny
+showcase list add change.remains.correction.value_currency corr_ba
+
+showcase save
+
+
+#=================================================================================
+
+
+
 #==================================================================================
 #   Showcase core
 #==================================================================================
@@ -12,7 +160,7 @@ showcase list add credit_type.code credit_code
 showcase list add creditor.name
 showcase list add creditor_branch.code branch_code
 showcase list add contract.no
-showcase list add contract.date
+showcase list add contract.date con_date
 showcase list add contract_maturity_date
 showcase list add currency.code currency_code
 showcase list add credit_purpose.code purpose_code
@@ -32,13 +180,12 @@ showcase save
 #==================================================================================
 
 
-
 #==================================================================================
 #   Showcase subject[Creditor Doc] (i.e debtor)
 #==================================================================================
 
-showcase set name SUBJECT_CREDITOR_DOC
-showcase set tableName SUBJECT_CREDITOR_DOC
+showcase set name SUBJECT_CR_DOC
+showcase set tableName SUBJECT_CR_DOC
 showcase list add subjects.creditor.docs.no
 showcase list add subjects.creditor.docs.doc_type.code
 showcase list add subjects.creditor.docs.name
@@ -67,8 +214,8 @@ showcase save
 #   Showcase subject[Organization DOC] (i.e debtor)
 #==================================================================================
 
-showcase set name SUBJECT_ORGANIZATION_DOC
-showcase set tableName SUBJECT_ORGANIZATION_DOC
+showcase set name SUBJECT_ORG_DOC
+showcase set tableName SUBJECT_ORG_DOC
 showcase list add subjects.organization.docs.no
 showcase list add subjects.organization.docs.doc_type.code
 showcase list add subjects.organization.docs.name
@@ -110,10 +257,11 @@ showcase save
 #   Showcase subject[Organization] (i.e debtor)
 #==================================================================================
 
-showcase set name SUBJECT_ORGANIZATION
-showcase set tableName SUBJECT_ORGANIZATION
+showcase set name SUBJECT_ORG
+showcase set tableName SUBJECT_ORG
 showcase list add subjects.organization.country.code cntrycode
 showcase list add subjects.type.code typecode
+showcase list add subjects.organization.legal_form.code legal_code
 
 showcase save
 
