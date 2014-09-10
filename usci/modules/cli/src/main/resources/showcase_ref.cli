@@ -1,4 +1,20 @@
 #=================================================================================
+#  0. REF_CREDITOR_DOC
+#=================================================================================
+
+showcase set meta ref_creditor
+
+showcase set name REF_CREDITOR_DOC
+showcase set tableName REF_CREDITOR_DOC
+
+showcase list add docs.no
+showcase list add docs.doc_type.code doc_type_code
+showcase list add docs.name
+
+showcase save
+#---------------------------------------------------------------------------------
+
+#=================================================================================
 #  1.REF_BALANCE_ACCOUNT
 #=================================================================================
  
@@ -129,6 +145,7 @@ showcase list add code
 showcase list add name
 showcase list add nokbdb_code
 showcase list add short_name
+showcase list add subject_type.code subject_type_code
  
 showcase save
 #---------------------------------------------------------------------------------
