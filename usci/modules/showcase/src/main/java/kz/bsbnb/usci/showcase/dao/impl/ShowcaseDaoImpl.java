@@ -17,6 +17,7 @@ import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
+import kz.bsbnb.usci.showcase.service.IMetaFactoryService;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,7 @@ import static kz.bsbnb.usci.showcase.generated.Tables.EAV_SC_SHOWCASE_FIELDS;
 
 @Component
 public class ShowcaseDaoImpl implements ShowcaseDao{
-    private final static String TABLES_PREFIX = "EAV_SCH_";
+    private final static String TABLES_PREFIX = "R_";
     private final static String COLUMN_PREFIX = "";
     private final static String HISTORY_POSTFIX = "_HIS";
 
@@ -61,6 +62,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
 
     @Autowired
     private SQLQueriesStats stats;
+
+    @Autowired
+    private IMetaFactoryService metaService;
 
     @Autowired
     public void setDataSourceSC(DataSource dataSourceSC)
@@ -90,7 +94,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
     public void createTables(ShowcaseHolder showcaseHolder){
         createTable(HistoryState.ACTUAL, showcaseHolder);
         createTable(HistoryState.HISTORY, showcaseHolder);
-        holders.add(showcaseHolder);
+        getHolders().add(showcaseHolder);
     }
 
     public void createTable(HistoryState historyState, ShowcaseHolder showcaseHolder){
@@ -527,7 +531,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
                 .select(EAV_SC_SHOWCASES.ID,
                         EAV_SC_SHOWCASES.TITLE,
                         EAV_SC_SHOWCASES.TABLE_NAME,
-                        EAV_SC_SHOWCASES.NAME)
+                        EAV_SC_SHOWCASES.NAME,
+                        EAV_SC_SHOWCASES.CLASS_NAME)
                 .from(EAV_SC_SHOWCASES)
                 .where(EAV_SC_SHOWCASES.ID.equal(id));
 
@@ -553,6 +558,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
         showCase.setName((String)row.get(EAV_SC_SHOWCASES.NAME.getName()));
         showCase.setTitle((String) row.get(EAV_SC_SHOWCASES.TITLE.getName()));
         showCase.setTableName((String) row.get(EAV_SC_SHOWCASES.TABLE_NAME.getName()));
+        showCase.setMeta(metaService.getMetaClass((String) row.get(EAV_SC_SHOWCASES.CLASS_NAME.getName())));
 
         select = context
                 .select(EAV_SC_SHOWCASE_FIELDS.ID,
@@ -669,7 +675,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
                 .insertInto(EAV_SC_SHOWCASES)
                 .set(EAV_SC_SHOWCASES.NAME, showCase.getName())
                 .set(EAV_SC_SHOWCASES.TABLE_NAME, showCase.getTableName())
-                .set(EAV_SC_SHOWCASES.TITLE, showCase.getTitle());
+                .set(EAV_SC_SHOWCASES.TITLE, showCase.getTitle())
+                .set(EAV_SC_SHOWCASES.CLASS_NAME, showCase.getMeta().getClassName());
 
         logger.debug(insert.toString());
         long showCaseId =  insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -787,6 +794,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
             String nextPath = curPath.indexOf('.') == -1 ? null : curPath.substring(curPath.indexOf('.') + 1);
             IMetaAttribute attribute = curMeta.getMetaAttribute(path);
             map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
+
+            //if(attribute == null)
+            //    return;
 
             if(!attribute.getMetaType().isComplex()){
                 map.put(prefixToColumn.get(prefix) + "_id", entity.getId());

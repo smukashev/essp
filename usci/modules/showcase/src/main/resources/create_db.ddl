@@ -6,6 +6,7 @@
     		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
     		<column name="table_name" primaryKey="false" required="true" type="VARCHAR" size="128" autoIncrement="false"/>
     		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
+    		<column name="class_name" primaryKey="false" required="true" type="varchar" size="100" autoIncrement="false"/>
     		<unique name="ind_uk_sc_001_00">
     			<unique-column name="name"/>
     		</unique>
