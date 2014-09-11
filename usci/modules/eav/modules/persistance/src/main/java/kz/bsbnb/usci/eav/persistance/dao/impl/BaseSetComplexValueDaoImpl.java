@@ -16,6 +16,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseSetComplexValueDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
+import kz.bsbnb.usci.eav.tool.CommonConfig;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -52,8 +53,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     IBaseEntityDao baseEntityDao;
     @Autowired
     IBaseEntityProcessorDao baseEntityProcessorDao;
-
-    private final boolean throwExceptionOnMultipleReportDate = false;
 
     @Override
     public long insert(IPersistable persistable) {
@@ -188,7 +187,11 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         if (rows.size() > 1)
         {
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
+            if(CommonConfig.throwExceptionOnMultipleReportDate) {
+                throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
+            } else {
+                logger.warn("Query for get next instance of BaseValue return more than one row.");
+            }
         }
 
         if (rows.size() == 1)
@@ -268,7 +271,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         if (rows.size() > 1)
         {
-            if(throwExceptionOnMultipleReportDate) {
+            if(CommonConfig.throwExceptionOnMultipleReportDate) {
                 throw new RuntimeException("Query for get next instance of BaseValue return more than one row. Query: " +
                     select.toString());
             } else {
@@ -337,7 +340,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         if (rows.size() > 1)
         {
-            if (throwExceptionOnMultipleReportDate) {
+            if (CommonConfig.throwExceptionOnMultipleReportDate) {
                 throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
             } else {
                 logger.warn("Query for get next instance of BaseValue return more than one row.");

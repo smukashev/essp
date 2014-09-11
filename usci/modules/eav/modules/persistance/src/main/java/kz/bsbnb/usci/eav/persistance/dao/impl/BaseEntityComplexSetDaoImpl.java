@@ -19,6 +19,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseSetComplexValueDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseSetDao;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
+import kz.bsbnb.usci.eav.tool.CommonConfig;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -272,10 +273,14 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
         if (rows.size() > 1)
         {
-            throw new RuntimeException("Query for get previous instance of BaseValue return more than one row.");
+            if(CommonConfig.throwExceptionOnMultipleReportDate) {
+                throw new RuntimeException("Query for get previous instance of BaseValue return more than one row.");
+            } else {
+                logger.warn("Query for get previous instance of BaseValue return more than one row.");
+            }
         }
 
-        if (rows.size() == 1)
+        if (rows.size() >= 1)
         {
             Map<String, Object> row = rows.iterator().next();
 
@@ -331,7 +336,11 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
         if (rows.size() > 1)
         {
-            throw new RuntimeException("Query for get closed instance of BaseValue return more than one row.");
+            if(CommonConfig.throwExceptionOnMultipleReportDate) {
+                throw new RuntimeException("Query for get closed instance of BaseValue return more than one row.");
+            } else {
+                logger.warn("Query for get closed instance of BaseValue return more than one row.");
+            }
         }
 
         if (rows.size() == 1)
@@ -386,7 +395,11 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
         if (rows.size() > 1)
         {
-            throw new RuntimeException("Query for get last instance of BaseValue return more than one row.");
+            if(CommonConfig.throwExceptionOnMultipleReportDate) {
+                throw new RuntimeException("Query for get last instance of BaseValue return more than one row.");
+            } else {
+                logger.warn("Query for get last instance of BaseValue return more than one row.");
+            }
         }
 
         if (rows.size() == 1)

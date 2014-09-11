@@ -32,7 +32,7 @@ public class BaseRepository implements  Runnable
 
       private static Connection connection;
       private static Statement statement;
-      protected static String repDate = "01.06.2013";
+      protected static String repDate = "01.03.2014";
 
      public void saveXml(String[] lookup, ResultSet rows, String path){
          try {
@@ -131,7 +131,7 @@ public class BaseRepository implements  Runnable
     public static Statement getStatement(){
         try {
             if(connection == null){
-                    connection = DriverManager.getConnection("jdbc:oracle:thin:@srv-scan.corp.nb.rk:1521/DBM01", "core","core_oct_2013");
+                    connection = DriverManager.getConnection("jdbc:oracle:thin:@10.10.15.17:1521/CREDITS", "core","core_oct_2013");
                     return statement = connection.createStatement();
             }
 
