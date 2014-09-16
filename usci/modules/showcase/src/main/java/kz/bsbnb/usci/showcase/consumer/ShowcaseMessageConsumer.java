@@ -57,7 +57,6 @@ public class ShowcaseMessageConsumer implements MessageListener{
                         continue;
 
                     //showcaseDao.generate(queueEntry.getBaseEntityApplied(), holder);
-
                     if(scId == null || scId == holder.getShowCaseMeta().getId()){
                         Future future = exec.submit(new CarteageGenerator(queueEntry.getBaseEntityApplied(), holder));
                         futures.add(future);

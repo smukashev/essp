@@ -13,7 +13,6 @@ public interface ShowcaseDao {
 
     public void createTables(ShowcaseHolder showcaseHolder);
     public void generate(IBaseEntity entity, ShowcaseHolder showcaseHolder);
-    public void dbCarteageGenerate(IBaseEntity entity, ShowcaseHolder showcaseHolder);
     public ArrayList<ShowcaseHolder> getHolders();
     public long save(ShowCase showCaseForSave);
     public void remove(ShowCase showCase);
