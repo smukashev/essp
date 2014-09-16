@@ -128,7 +128,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
         idColumn.setAutoIncrement(true);
 
         table.addColumn(idColumn);
-        MetaClass metaClass = showcaseHolder.getShowCaseMeta().getMeta();
 
         //calculateIdxPaths();
         //if(prefixToColumn == null)
@@ -138,16 +137,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
 
         for(String prefix : prefixToColumn.keySet()){
             Column column = new Column();
-
-            /*IMetaAttribute attribute = metaClass.getMetaAttribute(prefix);
-            MetaClass childMeta;
-
-            if(attribute.getMetaType().isSet()){
-                MetaSet metaSet = (MetaSet) attribute;
-                childMeta = (MetaClass) metaSet.getMemberType();
-
-            }*/
-
             column.setName(COLUMN_PREFIX + prefixToColumn.get(prefix) + "_ID");
 
             column.setPrimaryKey(false);
@@ -694,10 +683,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
     }
 
     private long insertField(ShowCaseField showCaseField, long showCaseId) {
-
-        //if(showCaseId < 1)
-        //    throw new IllegalArgumentException("id must not be < 1");
-
         Insert insert = context
                 .insertInto(EAV_SC_SHOWCASE_FIELDS)
                 .set(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_ID, showCaseField.getAttributeId())

@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.showcase;
 
-import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -101,7 +100,6 @@ public class ShowcaseHolder implements Serializable
                     MetaSet metaSet = (MetaSet) attribute.getMetaType();
                     temp[i] = ((MetaClass) metaSet.getMemberType() ).getClassName();
                 }
-
                 if( !prefixToColumn.containsKey(prefix)){
                     if(!nextNumber.containsKey(temp[i]))
                         nextNumber.put(temp[i], 1);
