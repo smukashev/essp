@@ -76,7 +76,10 @@ public class ShowCaseField extends Persistable
 
     public void setAttributeName(String attributeName)
     {
-        this.attributeName = attributeName;
+        if(attributeName == null)
+            this.attributeName = "";
+        else
+            this.attributeName = attributeName;
     }
 
     public String getAttributePath()

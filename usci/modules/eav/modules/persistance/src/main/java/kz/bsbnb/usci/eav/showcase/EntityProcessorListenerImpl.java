@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class EntityProcessorListenerImpl implements IDaoListener
 {
     final static Logger logger = Logger.getLogger(EntityProcessorListenerImpl.class);
-    private ArrayList<ShowCaseHolder> holders = new ArrayList<ShowCaseHolder>();
+    //private ArrayList<ShowCaseHolder> holders = new ArrayList<ShowCaseHolder>();
 
     @Autowired
     ShowcaseMessageProducer producer;
@@ -42,7 +42,7 @@ public class EntityProcessorListenerImpl implements IDaoListener
         }
     }
 
-    public void addShowCaseHolder(ShowCaseHolder holder) {
-        holders.add(holder);
-    }
+    //public void addShowCaseHolder(ShowCaseHolder holder) {
+    //    holders.add(holder);
+    //}
 }

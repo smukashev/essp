@@ -17,4 +17,5 @@ public interface ShowcaseService {
     public ShowCase load(String name);
     public void startLoad(String name, Date reportDate);
     public HashMap<String, QueryEntry> getSQLStats();
+    public void reloadCash();
 }

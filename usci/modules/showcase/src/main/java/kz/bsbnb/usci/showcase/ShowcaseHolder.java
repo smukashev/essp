@@ -1,5 +1,9 @@
 package kz.bsbnb.usci.showcase;
 
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 
@@ -55,6 +59,11 @@ public class ShowcaseHolder implements Serializable
         this.showCaseMeta = showCaseMeta;
     }
 
+    public String getRootClassName(){
+        return getShowCaseMeta().getActualMeta().getClassName();
+    }
+
+
     /**
      * fills prefixToColumn = generates all possible columns from all carteage paths
      */
@@ -64,15 +73,35 @@ public class ShowcaseHolder implements Serializable
         prefixToColumn = new HashMap<String, String>();
         Map<String,Integer> nextNumber = new HashMap<String,Integer>();
         Map<String,String> columnToPrefix = new HashMap<String, String>();
+        MetaClass metaClass = showCaseMeta.getActualMeta();
+        prefixToColumn.put("root",getRootClassName());
+        columnToPrefix.put(getRootClassName(), "root");
 
         for(ShowCaseField field : showCaseMeta.getFieldsList()){
-            String pt = "root." + field.getAttributePath();
+
+            if(field.getAttributePath().equals(""))
+                continue;
+
+            String pt = field.getAttributePath();
             String[] temp  = pt.split("\\.");
-            String prefix = "";
+            String prefix = "root";
+            String path = "";
+
+
             for(int i=0;i<temp.length;i++){
                 if(temp[i].matches(".*\\d$"))
                     throw new IllegalArgumentException("Description ends with number !!!");
-                prefix = prefix.equals("") ? temp[i] : prefix + "." + temp[i];
+                prefix =  prefix + "." + temp[i];
+                if(prefix.startsWith("root."))
+                    path = prefix.substring(5);
+
+                IMetaAttribute attribute = metaClass.getMetaAttribute(path);
+
+                if(attribute!=null && attribute.getMetaType().isSet()){
+                    MetaSet metaSet = (MetaSet) attribute.getMetaType();
+                    temp[i] = ((MetaClass) metaSet.getMemberType() ).getClassName();
+                }
+
                 if( !prefixToColumn.containsKey(prefix)){
                     if(!nextNumber.containsKey(temp[i]))
                         nextNumber.put(temp[i], 1);

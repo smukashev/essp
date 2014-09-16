@@ -810,6 +810,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
            }
         }
 
+        if(function.startsWith("get"))
+            return ret;
+
         return retCount;
     }
 

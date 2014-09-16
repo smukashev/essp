@@ -20,9 +20,7 @@ import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
-import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
-import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
 import kz.bsbnb.usci.eav.model.Batch;
@@ -46,7 +44,6 @@ import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
-import kz.bsbnb.usci.eav.showcase.ShowCaseHolder;
 import kz.bsbnb.usci.eav.showcase.dao.IShowCaseDao;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
@@ -125,8 +122,6 @@ public class CLI
     @Autowired
     protected IShowCaseDao showCaseDao;
 
-    @Autowired
-    protected ShowCaseHolder scHolder;
 
     private BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
 
@@ -2461,7 +2456,7 @@ public class CLI
                     fieldName = field;
                 }
                 columnName = fieldName;
-                showCase.addField(metaClass, path, fieldName, columnName);
+                showCase.addField(path, fieldName, columnName);
             }
             showcaseService.add(showCase);
             System.out.println("Showcase successfully added!");
@@ -2772,17 +2767,30 @@ public class CLI
             showCase.addField(showCase.getMeta(), "subjects.person.addresses","details","DOM");
             showCase.addField(showCase.getMeta(), "","amount","VAL");*/
         }
+
+        if(args.get(0).equals("debug")){
+            MetaClass meta = metaClassRepository.getMetaClass("credit");
+            System.out.println("ok");
+        }else
         if(args.get(0).equals("status")){
             System.out.println(showCase.toString());
         } else if(args.get(0).equals("set")){
             if(args.size() !=3 )
-                throw new IllegalArgumentException("showcase set [meta] {value}");
+                throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
             if(args.get(1).equals("meta")){
                 showCase.setMeta(metaClassRepository.getMetaClass(args.get(2)));
             } else if(args.get(1).equals("name")){
                 showCase.setName(args.get(2));
-            } else if(args.get(1).equals("tableName"))
+            } else if(args.get(1).equals("tableName")) {
                 showCase.setTableName(args.get(2));
+            }else if(args.get(1).equals("downPath")){
+                MetaClass metaClass = showCase.getMeta();
+                if( metaClass.getEl(args.get(2)) == null )
+                    throw new IllegalArgumentException("no such path for downPath:" + args.get(2));
+                showCase.setDownPath(args.get(2));
+            }else
+                throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
+
         } else if(args.get(0).equals("list")){
             if(args.get(1).equals("reset"))
                 showCase.getFieldsList().clear();
@@ -2796,25 +2804,16 @@ public class CLI
                     colName = args.get(2).substring(id+1);
                 }
                 if(args.size() == 3 )
-                 showCase.addField(showCase.getMeta(), path, colName);
+                 showCase.addField(path, colName);
                 else if(args.size() == 4)
-                 showCase.addField(showCase.getMeta(), path, colName, args.get(3));
+                 showCase.addField(path, colName, args.get(3));
                 else throw new IllegalArgumentException("Example: showcase list add [path] [columnName] {columnAlias}");
             }
         } else if(args.get(0).equals("save")){
-
-            if(args.size() > 1 && args.get(1).equals("local"))
-            {
-                showCaseDao.save(showCase);
-                scHolder.setShowCaseMeta(showCase);
-                scHolder.createTables();
-            }else{
-                if(!scStart) initSC();
-                showcaseService.add(showCase);
-            }
-
-           showCase = null;
-           System.out.println("Showcase successfully added!");
+            if(!scStart) initSC();
+            showcaseService.add(showCase);
+            showCase = null;
+            System.out.println("Showcase successfully added!");
         } else if(args.get(0).equals("listSC")){
             if(!scStart) initSC();
 
@@ -2845,7 +2844,11 @@ public class CLI
             } else{
                 System.out.println("Usage: startLoad <showcase name> <report date>");
             }
-        } else if(args.get(0).equals("stats")){
+        } else if(args.get(0).equals("rc")){
+            if(!scStart)
+                initSC();
+            showcaseService.reloadCash();
+        }else if(args.get(0).equals("stats")){
             showcaseStat();
         } else{
             throw new IllegalArgumentException("Arguments: showcase [status, set]");
