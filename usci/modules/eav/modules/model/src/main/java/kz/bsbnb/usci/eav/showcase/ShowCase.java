@@ -110,7 +110,7 @@ public class ShowCase extends Persistable
         IMetaAttribute attr = getActualMeta().getElAttribute(path + "." + name);
 
         if (attr == null) {
-            throw new IllegalArgumentException("Can't get attribute: " + path + "." + name);
+            throw new IllegalArgumentException(getName() + ": Can't get attribute: " + path + "." + name);
         }
 
         IMetaType metaType = attr.getMetaType();

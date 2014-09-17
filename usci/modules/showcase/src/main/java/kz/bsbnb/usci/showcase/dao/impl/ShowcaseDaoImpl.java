@@ -821,7 +821,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
             //if(curPath == null || curPath.equals("") || entity == null) return;
 
             if(curPath == null || curPath.equals("") || entity == null){
-                map.put(parent + "_id", entity.getId());
+                if(entity!=null)
+                    map.put(parent + "_id", entity.getId());
                 entries.add(map);
                 return;
             }
