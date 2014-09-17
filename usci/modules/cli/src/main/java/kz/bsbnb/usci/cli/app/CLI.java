@@ -2812,8 +2812,8 @@ public class CLI
         } else if(args.get(0).equals("save")){
             if(!scStart) initSC();
             showcaseService.add(showCase);
+            System.out.println(showCase.getName() + ": Showcase successfully added!");
             showCase = null;
-            System.out.println("Showcase successfully added!");
         } else if(args.get(0).equals("listSC")){
             if(!scStart) initSC();
 

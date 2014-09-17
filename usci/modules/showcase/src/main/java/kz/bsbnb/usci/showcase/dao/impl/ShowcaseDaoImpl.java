@@ -805,7 +805,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
             if(path.startsWith("."))
                 path = path.substring(1);
             this.prefixToColumn = prefixToColumn;
-            gen(entity, path, new HashMap(), "", "root");
+            gen(entity, path, new HashMap(), "root");
         }
         public List<HashMap> getEntries(){
             return entries;
@@ -817,12 +817,12 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
         public int getEntriesSize(){
             return entries.size();
         }
-        public void gen(IBaseEntity entity,String curPath, HashMap map, String parent, String prefix){
+        public void gen(IBaseEntity entity,String curPath, HashMap map,  String prefix){
             //if(curPath == null || curPath.equals("") || entity == null) return;
 
             if(curPath == null || curPath.equals("") || entity == null){
                 if(entity!=null)
-                    map.put(parent + "_id", entity.getId());
+                    map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
                 entries.add(map);
                 return;
             }
@@ -857,12 +857,12 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
                 if(next!=null){
                     for(Object o : next.get()){
                         gen( (IBaseEntity) ( (IBaseValue) o).getValue(), nextPath, (HashMap) map.clone() ,
-                                ((MetaClass) next.getMemberType()) .getClassName(), prefix + "." +path);
+                                prefix + "." +path);
                     }
                 }
             }else{
                 IBaseEntity next = (IBaseEntity) entity.getEl(path);
-                gen(next, nextPath, (HashMap) map.clone(), path, prefix+"."+path);
+                gen(next, nextPath, (HashMap) map.clone(), prefix+"."+path);
             }
         }
     }

@@ -4,6 +4,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 
 import java.util.ArrayList;
@@ -92,6 +93,8 @@ public class ShowCase extends Persistable
     public MetaClass getActualMeta(){
         if(downPath.equals(""))
             return meta;
+        if(meta.getElAttribute(downPath).getMetaType().isSet())
+            return (MetaClass) ((MetaSet) meta.getEl(downPath) ).getMemberType();
         return (MetaClass) meta.getEl(downPath);
     }
 

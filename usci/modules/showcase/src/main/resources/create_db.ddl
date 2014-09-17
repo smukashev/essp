@@ -21,10 +21,6 @@
     		<column name="attribute_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
     		<column name="attribute_name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
     		<column name="attribute_path" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
-    		<unique name="ind_uk_sc_002_00">
-    			<unique-column name="name"/>
-			    <unique-column name="showcase_id"/>
-    		</unique>
     		<!--<foreign-key foreignTable="eav_sc_showcases" name="FK_eav_sc_showcases">
     			<reference local="showcase_id" foreign="id"/>
     		</foreign-key>-->
