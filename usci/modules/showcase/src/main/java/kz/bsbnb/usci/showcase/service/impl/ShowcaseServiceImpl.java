@@ -64,4 +64,9 @@ public class ShowcaseServiceImpl implements ShowcaseService{
     public HashMap<String, QueryEntry> getSQLStats() {
         return stats.getStats();
     }
+
+    @Override
+    public void reloadCash() {
+        showcaseDao.reloadCache();
+    }
 }

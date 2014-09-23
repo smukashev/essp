@@ -30,6 +30,8 @@ public interface IBaseEntity extends IBaseContainer {
 
     public Object getEl(String path);
 
+    public Object getEls(String path);
+
     public List<Object> getElWithArrays(String path);
 
     public IBaseValue safeGetValue(String name);

@@ -1,8 +1,10 @@
 package kz.bsbnb.usci.eav.showcase;
 
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ public class ShowCase extends Persistable
     private String tableName;
     private String title;
     private MetaClass meta;
+    private String downPath =  "";
 
     private ArrayList<ShowCaseField> fields = new ArrayList<ShowCaseField>();
 
@@ -72,20 +75,48 @@ public class ShowCase extends Persistable
         this.title = title;
     }
 
+    public String getDownPath() {
+        return downPath;
+    }
+
+    public void setDownPath(String downPath) {
+        if(downPath == null)
+            this.downPath = "";
+        else
+            this.downPath = downPath;
+    }
+
     public void addField(ShowCaseField field) {
         fields.add(field);
     }
 
-    public void addField(MetaClass meta, String path, String name) {
-        addField(meta, path, name, name);
+    public MetaClass getActualMeta(){
+        if(downPath.equals(""))
+            return meta;
+        if(meta.getElAttribute(downPath).getMetaType().isSet())
+            return (MetaClass) ((MetaSet) meta.getEl(downPath) ).getMemberType();
+        return (MetaClass) meta.getEl(downPath);
     }
 
-    public void addField(MetaClass meta, String path, String name, String columnName) {
-        IMetaAttribute attr = meta.getElAttribute(path + "." + name);
+    public void addField(String path, String name) {
+        if(meta==null)
+            throw new IllegalArgumentException("meta not set for showcase");
+
+        addField(path, name, name);
+    }
+
+    public void addField(String path, String name, String columnName) {
+
+        if(meta == null)
+            throw new IllegalArgumentException("meta not set for showcase");
+
+        IMetaAttribute attr = getActualMeta().getElAttribute(path + "." + name);
 
         if (attr == null) {
-            throw new IllegalArgumentException("Can't get attribute: " + path + "." + name);
+            throw new IllegalArgumentException(getName() + ": Can't get attribute: " + path + "." + name);
         }
+
+        IMetaType metaType = attr.getMetaType();
 
         ShowCaseField showCaseField = new ShowCaseField();
         showCaseField.setAttributeId(attr.getId());
@@ -94,6 +125,11 @@ public class ShowCase extends Persistable
         showCaseField.setAttributeName(name);
         showCaseField.setColumnName(columnName);
         showCaseField.setTitle(attr.getTitle());
+
+        if(metaType.isComplex()){
+            showCaseField.setAttributePath(path.equals("") ? name : path + "." + name );
+            showCaseField.setAttributeName("");
+        }
 
         addField(showCaseField);
     }
@@ -108,6 +144,7 @@ public class ShowCase extends Persistable
         ret.append("Name: " + getName() + "\n" );
         ret.append("Table name: " + getTableName() +"\n");
         ret.append("Meta name: " + ( getMeta() == null ? null : getMeta().getClassName()) + "\n");
+        ret.append("Down path: " + downPath + "\n");
         ret.append(String.format("fields(%d):\n",getFieldsList().size()));
         for(ShowCaseField showCaseField : getFieldsList()){
             ret.append(" " + showCaseField.getPath() + ":" + showCaseField.getColumnName() + "\n");

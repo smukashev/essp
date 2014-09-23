@@ -7,6 +7,7 @@ import kz.bsbnb.ddlutils.model.Table;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
@@ -17,6 +18,7 @@ import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
+import kz.bsbnb.usci.showcase.service.IMetaFactoryService;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +47,7 @@ import static kz.bsbnb.usci.showcase.generated.Tables.EAV_SC_SHOWCASE_FIELDS;
 
 @Component
 public class ShowcaseDaoImpl implements ShowcaseDao{
-    private final static String TABLES_PREFIX = "EAV_SCH_";
+    private final static String TABLES_PREFIX = "R_";
     private final static String COLUMN_PREFIX = "";
     private final static String HISTORY_POSTFIX = "_HIS";
 
@@ -63,14 +65,21 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
     private SQLQueriesStats stats;
 
     @Autowired
+    private IMetaFactoryService metaService;
+
+    @Autowired
     public void setDataSourceSC(DataSource dataSourceSC)
     {
         this.jdbcTemplateSC = new JdbcTemplate(dataSourceSC);
     }
 
     public ArrayList<ShowcaseHolder> getHolders() {
-        if(holders == null) return populateHolders();
+        if(holders == null) holders = populateHolders();
         return holders;
+    }
+
+    public void reloadCache(){
+        holders = populateHolders();
     }
 
     private ArrayList<ShowcaseHolder> populateHolders(){
@@ -90,7 +99,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
     public void createTables(ShowcaseHolder showcaseHolder){
         createTable(HistoryState.ACTUAL, showcaseHolder);
         createTable(HistoryState.HISTORY, showcaseHolder);
-        holders.add(showcaseHolder);
+        getHolders().add(showcaseHolder);
     }
 
     public void createTable(HistoryState historyState, ShowcaseHolder showcaseHolder){
@@ -143,17 +152,21 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
 
         Index indexR = new NonUniqueIndex();
         indexR.setName("ind_" + tableName + "_01");
-        indexR.addColumn(new IndexColumn(COLUMN_PREFIX + "ROOT_ID"));
+        indexR.addColumn(new IndexColumn(COLUMN_PREFIX + prefixToColumn.get("root") + "_id"));
         table.addIndex(indexR);
 
         for (ShowCaseField field : showcaseHolder.getShowCaseMeta().getFieldsList()) {
+
+            if(field.getAttributeName().equals(""))
+                continue;
+
             Column column = new Column();
 
             column.setName(COLUMN_PREFIX + field.getColumnName().toUpperCase());
             column.setPrimaryKey(false);
             column.setRequired(false);
 
-            IMetaType metaType = showcaseHolder.getShowCaseMeta().getMeta().getEl(field.getPath());
+            IMetaType metaType = showcaseHolder.getShowCaseMeta().getActualMeta().getEl(field.getPath());
 
             column.setType(getDBType(metaType));
 
@@ -171,6 +184,15 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
         }
 
         Column column = new Column();
+        column.setName("cdc");
+        column.setPrimaryKey(false);
+        column.setRequired(false);
+        column.setDefaultValue("0");
+        column.setType("NUMERIC");
+        table.addColumn(column);
+
+
+        column = new Column();
         column.setName("OPEN_DATE");
         column.setPrimaryKey(false);
         column.setRequired(false);
@@ -292,8 +314,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
 
         String sql;
         Date openDate = null;
-        sql = "SELECT MAX(open_date) AS OPEN_DATE FROM %s WHERE open_date <= ? AND %sroot_id = ?";
-        sql = String.format(sql, tableName, COLUMN_PREFIX);
+        sql = "SELECT MAX(open_date) AS OPEN_DATE FROM %s WHERE open_date <= ? AND %s%s_id = ?";
+        sql = String.format(sql, tableName, COLUMN_PREFIX,showCaseHolder.getRootClassName());
         long t1 = System.currentTimeMillis();
         Map m = jdbcTemplateSC.queryForMap(sql, entity.getReportDate(), entity.getId());
         long t2 = System.currentTimeMillis() - t1;
@@ -302,15 +324,15 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
         if(openDate == null) return;
 
 
-        sql = "UPDATE %s SET close_date = ? WHERE %sroot_id = ? AND open_date = ?";
-        sql = String.format(sql, tableName, COLUMN_PREFIX);
+        sql = "UPDATE %s SET close_date = ? WHERE %s%s_id = ? AND open_date = ?";
+        sql = String.format(sql, tableName, COLUMN_PREFIX,showCaseHolder.getRootClassName());
         long t5 = System.currentTimeMillis();
         jdbcTemplateSC.update(sql, entity.getReportDate(), entity.getId(), openDate);
         long t6 = System.currentTimeMillis() - t5;
         stats.put("UPDATE %s SET close_date = ? WHERE %sroot_id = ? AND open_date = ?", t6);
 
-        sql = "DELETE FROM %s WHERE %sROOT_ID = ? AND OPEN_DATE = CLOSE_DATE";
-        sql = String.format(sql, tableName, COLUMN_PREFIX);
+        sql = "DELETE FROM %s WHERE %s%s_ID = ? AND OPEN_DATE = CLOSE_DATE";
+        sql = String.format(sql, tableName, COLUMN_PREFIX, showCaseHolder.getRootClassName());
         long t3 = System.currentTimeMillis();
         jdbcTemplateSC.update(sql, entity.getId());
         long t4 = System.currentTimeMillis() - t3;
@@ -335,28 +357,37 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
             select.append(COLUMN_PREFIX).append(s).append("_id").append(",");
         }
         for(ShowCaseField s : showcaseHolder.getShowCaseMeta().getFieldsList()){
+            if(s.getAttributeName().equals(""))continue;
             select.append(COLUMN_PREFIX).append(s.getColumnName()).append(",");
         }
 
         select.append("OPEN_DATE, CLOSE_DATE ");
         sql.append("(").append(select).append(")( select ")
-                .append(select).append("from %s where %sROOT_ID = ? )");
+                .append(select).append("from %s where %s%s_id = ? )");
 
         String sqlResult = String.format(sql.toString(),
                 getHistoryTableName(showcaseHolder.getShowCaseMeta()),
-                getActualTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX);
+                getActualTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX,showcaseHolder.getRootClassName());
         //System.out.println(sqlResult);
         long t1 = System.currentTimeMillis();
         jdbcTemplateSC.update(sqlResult, entity.getId());
         long t2 = System.currentTimeMillis() - t1;
         stats.put("insert into %s ( select from %s where %sROOT_ID = ? )", t2);
 
-        sqlResult = String.format("DELETE FROM %s WHERE %sROOT_ID = ? AND CLOSE_DATE IS NOT NULL",
-                getActualTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX);
+        sqlResult = String.format("DELETE FROM %s WHERE %s%s_ID = ? AND CLOSE_DATE IS NOT NULL",
+                getActualTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX, showcaseHolder.getRootClassName());
         long t3 = System.currentTimeMillis();
         jdbcTemplateSC.update(sqlResult, entity.getId());
         long t4 = System.currentTimeMillis() - t3;
         stats.put("DELETE FROM %s WHERE %sROOT_ID = ? AND CLOSE_DATE IS NOT NULL", t4);
+    }
+
+    @Transactional
+    public void generate(IBaseEntity entity, ShowcaseHolder showcaseHolder){
+        List<BaseEntity> all = (List<BaseEntity>)entity.getEls("{get}" + showcaseHolder.getShowCaseMeta().getDownPath());
+        for(BaseEntity baseEntity: all){
+            dbCarteageGenerate(baseEntity, showcaseHolder);
+        }
     }
 
     @Transactional
@@ -365,8 +396,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
         Date closeDate = null;
         String sql;
         try {
-            sql = "SELECT OPEN_DATE FROM %s WHERE %sROOT_ID = ? AND ROWNUM = 1";
-            sql= String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX);
+            sql = "SELECT OPEN_DATE FROM %s WHERE %s%s_ID = ? AND ROWNUM = 1";
+            sql= String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX, showcaseHolder.getRootClassName());
             long t1 = System.currentTimeMillis();
             openDate = (Date) jdbcTemplateSC.queryForMap(sql, entity.getId()).get("OPEN_DATE");
             long t2 = System.currentTimeMillis() - t1;
@@ -385,8 +416,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
             //System.out.println("actual " + openDate);
         }else if(openDate != null){
 
-            sql = "SELECT MIN(OPEN_DATE) as OPEN_DATE FROM %s WHERE %sROOT_ID = ? AND OPEN_DATE > ? ";
-            sql = String.format(sql, getHistoryTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX);
+            sql = "SELECT MIN(OPEN_DATE) as OPEN_DATE FROM %s WHERE %s%s_ID = ? AND OPEN_DATE > ? ";
+            sql = String.format(sql, getHistoryTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX, showcaseHolder.getRootClassName());
             long t3 = System.currentTimeMillis();
             closeDate = (Date) jdbcTemplateSC.queryForMap(sql, entity.getId(), entity.getReportDate()).get("OPEN_DATE");
             long t4 = System.currentTimeMillis() - t3;
@@ -408,7 +439,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
         int i = 0;
         for(ShowCaseField field: showcaseHolder.getShowCaseMeta().getFieldsList()){
             showCases[i] = new ShowCaseEntries(entity,
-                    field.getAttributePath() + "." + field.getAttributeName(),
+                    field.getAttributeName().equals("") ? field.getAttributePath() :
+                            field.getAttributePath() + "." + field.getAttributeName(),
                     field.getColumnName(), showcaseHolder.generatePaths());
             i++;
         }
@@ -527,7 +559,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
                 .select(EAV_SC_SHOWCASES.ID,
                         EAV_SC_SHOWCASES.TITLE,
                         EAV_SC_SHOWCASES.TABLE_NAME,
-                        EAV_SC_SHOWCASES.NAME)
+                        EAV_SC_SHOWCASES.NAME,
+                        EAV_SC_SHOWCASES.CLASS_NAME,
+                        EAV_SC_SHOWCASES.DOWN_PATH)
                 .from(EAV_SC_SHOWCASES)
                 .where(EAV_SC_SHOWCASES.ID.equal(id));
 
@@ -553,6 +587,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
         showCase.setName((String)row.get(EAV_SC_SHOWCASES.NAME.getName()));
         showCase.setTitle((String) row.get(EAV_SC_SHOWCASES.TITLE.getName()));
         showCase.setTableName((String) row.get(EAV_SC_SHOWCASES.TABLE_NAME.getName()));
+        showCase.setMeta(metaService.getMetaClass((String) row.get(EAV_SC_SHOWCASES.CLASS_NAME.getName())));
+        showCase.setDownPath((String) row.get(EAV_SC_SHOWCASES.DOWN_PATH.getName()));
 
         select = context
                 .select(EAV_SC_SHOWCASE_FIELDS.ID,
@@ -669,7 +705,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
                 .insertInto(EAV_SC_SHOWCASES)
                 .set(EAV_SC_SHOWCASES.NAME, showCase.getName())
                 .set(EAV_SC_SHOWCASES.TABLE_NAME, showCase.getTableName())
-                .set(EAV_SC_SHOWCASES.TITLE, showCase.getTitle());
+                .set(EAV_SC_SHOWCASES.TITLE, showCase.getTitle())
+                .set(EAV_SC_SHOWCASES.CLASS_NAME, showCase.getMeta().getClassName())
+                .set(EAV_SC_SHOWCASES.DOWN_PATH, showCase.getDownPath());
 
         logger.debug(insert.toString());
         long showCaseId =  insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -767,7 +805,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
             if(path.startsWith("."))
                 path = path.substring(1);
             this.prefixToColumn = prefixToColumn;
-            gen(entity, path, new HashMap(), "", "root");
+            gen(entity, path, new HashMap(), "root");
         }
         public List<HashMap> getEntries(){
             return entries;
@@ -779,14 +817,24 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
         public int getEntriesSize(){
             return entries.size();
         }
-        public void gen(IBaseEntity entity,String curPath, HashMap map, String parent, String prefix){
-            if(curPath == null || curPath.equals("") || entity == null) return;
+        public void gen(IBaseEntity entity,String curPath, HashMap map,  String prefix){
+            //if(curPath == null || curPath.equals("") || entity == null) return;
+
+            if(curPath == null || curPath.equals("") || entity == null){
+                if(entity!=null)
+                    map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
+                entries.add(map);
+                return;
+            }
 
             MetaClass curMeta = entity.getMeta();
             String path = (curPath.indexOf('.') == -1 ) ? curPath: curPath.substring(0, curPath.indexOf('.'));
             String nextPath = curPath.indexOf('.') == -1 ? null : curPath.substring(curPath.indexOf('.') + 1);
             IMetaAttribute attribute = curMeta.getMetaAttribute(path);
             map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
+
+            //if(attribute == null)
+            //    return;
 
             if(!attribute.getMetaType().isComplex()){
                 map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
@@ -808,12 +856,13 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
 
                 if(next!=null){
                     for(Object o : next.get()){
-                        gen( (IBaseEntity) ( (IBaseValue) o).getValue(), nextPath, (HashMap) map.clone() , path, prefix + "." +path);
+                        gen( (IBaseEntity) ( (IBaseValue) o).getValue(), nextPath, (HashMap) map.clone() ,
+                                prefix + "." +path);
                     }
                 }
             }else{
                 IBaseEntity next = (IBaseEntity) entity.getEl(path);
-                gen(next, nextPath, (HashMap) map.clone(), path, prefix+"."+path);
+                gen(next, nextPath, (HashMap) map.clone(), prefix+"."+path);
             }
         }
     }

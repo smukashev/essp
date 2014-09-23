@@ -64,6 +64,12 @@
         <property name="serviceInterface" value="kz.bsbnb.usci.showcase.service.CoreShowcaseService"/>
     </bean>
 
+    <bean id="remoteMetaFactoryService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="refreshStubOnConnectFailure" value="true"/>
+        <property name="serviceUrl" value="rmi://127.0.0.1:1098/metaFactoryService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.showcase.service.IMetaFactoryService"/>
+    </bean>
+
     <!-- ActiveMQ destinations to use -->
     <amq:queue id="destination" physicalName="${jms.queueName}" />
 

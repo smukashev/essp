@@ -51,6 +51,12 @@ public class ShowcaseMessageConsumer implements MessageListener{
                 List<ShowcaseHolder> holders = showcaseDao.getHolders();
 
                 for(ShowcaseHolder holder : holders) {
+
+                    if(!holder.getShowCaseMeta().getMeta().getClassName()
+                            .equals(queueEntry.getBaseEntityApplied().getMeta().getClassName()))
+                        continue;
+
+                    //showcaseDao.generate(queueEntry.getBaseEntityApplied(), holder);
                     if(scId == null || scId == holder.getShowCaseMeta().getId()){
                         Future future = exec.submit(new CarteageGenerator(queueEntry.getBaseEntityApplied(), holder));
                         futures.add(future);
@@ -91,7 +97,8 @@ public class ShowcaseMessageConsumer implements MessageListener{
         @Override
         public void run() {
             long t1 = System.currentTimeMillis();
-            showcaseDao.dbCarteageGenerate(entity, holder);
+            //showcaseDao.dbCarteageGenerate(entity, holder);
+            showcaseDao.generate(entity,holder);
             long t2 = System.currentTimeMillis() - t1;
             //stats.put("showcase " + holder.getShowCaseMeta().getName(), t2);
             stats.put("showcase", t2);
