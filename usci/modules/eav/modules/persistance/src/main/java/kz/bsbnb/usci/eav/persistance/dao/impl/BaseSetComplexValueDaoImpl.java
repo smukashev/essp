@@ -53,6 +53,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     @Autowired
     IBaseEntityProcessorDao baseEntityProcessorDao;
 
+    private final boolean throwExceptionOnMultipleReportDate = false;
+
     @Override
     public long insert(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue)persistable;
@@ -266,11 +268,16 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         if (rows.size() > 1)
         {
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row. Query: " +
+            if(throwExceptionOnMultipleReportDate) {
+                throw new RuntimeException("Query for get next instance of BaseValue return more than one row. Query: " +
                     select.toString());
+            } else {
+                logger.warn("Query for get next instance of BaseValue return more than one row. Query: " +
+                    select.toString());
+            }
         }
 
-        if (rows.size() == 1)
+        if (rows.size() >= 1)
         {
             Map<String, Object> row = rows.iterator().next();
 
@@ -330,7 +337,11 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         if (rows.size() > 1)
         {
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
+            if (throwExceptionOnMultipleReportDate) {
+                throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
+            } else {
+                logger.warn("Query for get next instance of BaseValue return more than one row.");
+            }
         }
 
         if (rows.size() == 1)

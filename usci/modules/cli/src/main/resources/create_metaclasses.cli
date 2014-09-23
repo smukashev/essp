@@ -412,6 +412,8 @@ meta add --name=organization --attribute=contacts --type=meta_class --array --ch
 meta add --name=organization --attribute=docs --type=meta_class --array --childname=document
 meta add --name=organization --attribute=names --type=meta_class --array --childname=organization_name
 
+meta key --name=organization --attribute=docs
+
 #====================================
 #= PERSON
 #====================================

@@ -17,10 +17,12 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -53,7 +55,9 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     public void process(BaseEntity baseEntity) {
         try {
             long t1 = System.currentTimeMillis();
+
             BaseEntity entity = (BaseEntity) baseEntityProcessorDao.process(baseEntity);
+
             long t2 = System.currentTimeMillis() - t1;
 
             //TODO: Remove hardcode (credit specific attributes)

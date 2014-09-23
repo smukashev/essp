@@ -16,6 +16,8 @@ import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
+import net.spy.memcached.OperationTimeoutException;
+import net.spy.memcached.internal.CheckedOperationTimeoutException;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -83,7 +85,12 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
             while (counter < 100 && batchStr == null) {
                 counter++;
-                batchStr = couchbaseClient.get("batch:" + batchId);
+                try {
+                    batchStr = couchbaseClient.get("batch:" + batchId);
+                }
+                catch (OperationTimeoutException e) {
+                    batchStr = null;
+                }
             }
 
             if (batchStr == null) {
@@ -177,6 +184,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     //xmlEventReader.next();
                 } catch (NumberFormatException n) {
                     n.printStackTrace();
+                    logger.error("Cast error: " + localName + ", exception text: " + n.getMessage());
+                    throw new RuntimeException("Cast error: " + localName + ", exception text: " + n.getMessage());
                 } catch (ClassCastException ex) {
                     logger.debug("Empty tag: " + localName);
                     level--;

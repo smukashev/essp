@@ -586,7 +586,7 @@ public class CrossCheckLayout extends VerticalLayout {
             groupedCellFormatRed.setBackground(Colour.RED);
             groupedCellFormatRed.setBorder(Border.ALL, BorderLineStyle.THIN);
             autoSizeCellView = new jxl.CellView();
-            //autoSizeCellView.setAutosize(true);
+            //autoSizeCellView.set
             WritableWorkbook workbook = jxl.Workbook.createWorkbook(baos, settings);
             for (CrossCheck crossCheck : uniqueCreditorsCrossChecks) {
                 writeCrossCheckOnSheet(crossCheck, workbook);

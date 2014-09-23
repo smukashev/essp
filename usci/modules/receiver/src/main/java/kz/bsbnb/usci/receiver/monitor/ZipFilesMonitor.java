@@ -79,7 +79,7 @@ public class ZipFilesMonitor{
     //private static Gson gson = new Gson();
 
     public static final int ZIP_BUFFER_SIZE = 1024;
-    public static final int MAX_SYNC_QUEUE_SIZE = 1024;
+    public static final int MAX_SYNC_QUEUE_SIZE = 512;
 
     private static final long WAIT_TIMEOUT = 360; //in 10 sec units
 
@@ -166,74 +166,81 @@ public class ZipFilesMonitor{
         /*Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(0);
         cal.set(2013, 4, 1, 0, 0, 0);*/
+        Iterator<ViewRow> rows = null;
+        ViewResponse response = null;
 
         while(true) {
-            try {
-                View view = couchbaseClient.getView("batch", "batch_pending");
-                Query query = new Query();
+                if(rows == null) {
+                    View view = couchbaseClient.getView("batch", "batch_pending");
+                    Query query = new Query();
+                    query.setDebug(true);
+                    query.setStale(Stale.FALSE);
 
-                ViewResponse response = couchbaseClient.query(view, query);
+                    response = couchbaseClient.query(view, query);
 
-                Iterator<ViewRow> rows = response.iterator();
+                    rows = response.iterator();
+                }
 
                 if (response.size() > 0) {
-                    System.out.println("Found pending jobs: ");
+                    System.out.println("Found pending jobs: " + response.size());
                     System.out.println("-------------------------------------------------------------------------");
 
                     int jobsRestarted = 0;
 
                     while(rows.hasNext()) {
-                        ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) rows.next();
-                        long batchId = Long.parseLong(viewRowNoDocs.getKey());
-
-                        if (viewRowNoDocs.getValue().equals("ERROR"))
-                        {
-                            System.out.println("Skipped because of error!");
-                            continue;
-                        }
-
-                        System.out.println("batchId: " + batchId + ", status: " + viewRowNoDocs.getValue());
-
-                        Object batchObject = couchbaseClient.get("batch:" + batchId);
-                        Object manifestObject = couchbaseClient.get("manifest:" + batchId);
-
-                        if (batchObject == null || manifestObject == null) {
-                            System.out.println("Batch with id: " + batchId + " has no manifest or batch. Restart failed.");
-                            break;
-                        }
-
-                        System.out.println(manifestObject.toString());
-                        System.out.println("-------------------------------------------------------------------------");
-
-                        BatchInfo batchInfo = gson.fromJson(manifestObject.toString(), BatchInfo.class);
                         try {
-                            batchService.load(batchId);
-                        } catch(Exception e) {
-                            System.out.println("Can't get batch from eav DB. Skipped.");
+                            ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) rows.next();
+                            long batchId = Long.parseLong(viewRowNoDocs.getKey());
+
+                            if (viewRowNoDocs.getValue().equals("ERROR"))
+                            {
+                                System.out.println("Skipped because of error!");
+                                continue;
+                            }
+
+                            System.out.println("batchId: " + batchId + ", status: " + viewRowNoDocs.getValue());
+
+                            Object batchObject = couchbaseClient.get("batch:" + batchId);
+                            Object manifestObject = couchbaseClient.get("manifest:" + batchId);
+
+                            if (batchObject == null || manifestObject == null) {
+                                System.out.println("Batch with id: " + batchId + " has no manifest or batch. Restart failed.");
+                                continue;
+                            }
+
+                            System.out.println(manifestObject.toString());
+                            System.out.println("-------------------------------------------------------------------------");
+
+                            BatchInfo batchInfo = gson.fromJson(manifestObject.toString(), BatchInfo.class);
+                            try {
+                                batchService.load(batchId);
+                            } catch(Exception e) {
+                                System.out.println("Can't get batch from eav DB. Skipped.");
+                            }
+
+
+
+    //                        if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), cal.getTime()) != 0)
+    //                        {
+    //                            System.out.println("Skipping wrone dates: " + batchInfo.getRepDate());
+    //                            System.out.println("Must be: " + cal.getTime());
+    //                            continue;
+    //                        }
+
+                            sender.addJob(batchId, batchInfo);
+                            receiverStatusSingleton.batchReceived();
+                            System.out.println("Restarted job #" + ++jobsRestarted);
+                        } catch (Exception e) {
+                            System.out.println("Error in pending batches view: " + e.getMessage());
+                            System.out.println("Retrying...");
                         }
-
-
-
-                        /*if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), cal.getTime()) != 0)
-                        {
-                            System.out.println("Skipping wrone dates: " + batchInfo.getRepDate());
-                            System.out.println("Must be: " + cal.getTime());
-                            continue;
-                        }   */
-
-                        sender.addJob(batchId, batchInfo);
-                        receiverStatusSingleton.batchReceived();
-                        System.out.println("Restarted job #" + ++jobsRestarted);
                     }
                 }
                 break;
-            } catch (Exception e) {
-                System.out.println("Error in pending batches view: " + e.getMessage());
-                System.out.println("Retrying...");
-            }
+
         }
 
-        //restartBatch(5564);
+//        restartBatch(22265);
 
         //////////////////////////
 

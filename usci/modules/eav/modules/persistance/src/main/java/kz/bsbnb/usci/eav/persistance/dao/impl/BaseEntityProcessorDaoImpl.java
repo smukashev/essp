@@ -35,6 +35,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.MetaDataAccessException;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +56,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 {
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
 
-    private static final boolean exceptionOnImmutableWrite = false;
+    private static final boolean exceptionOnImmutableWrite = true;
 
     @Autowired
     IBatchRepository batchRepository;
@@ -1677,7 +1678,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 childBaseValueSaving.isLast());
                         baseValueForSearch.setBaseContainer(childBaseSetApplied);
 
-                        IBaseValue childBaseValueClosed = setValueDao.getClosedBaseValue(baseValueForSearch);
+                        IBaseValue childBaseValueClosed = null;
+
+                        if (childBaseSetApplied != null && childBaseSetApplied.getId() > 0) {
+                            childBaseValueClosed = setValueDao.getClosedBaseValue(baseValueForSearch);
+                        } //TODO: add code for not existing container
+
                         if (childBaseValueClosed != null)
                         {
                             childBaseValueClosed.setBaseContainer(childBaseSetApplied);
@@ -2476,20 +2482,23 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                     apply(baseEntitySaving, baseEntityManager) :
                                     applyBaseEntityAdvanced(baseEntitySaving, baseEntityClosed, baseEntityManager);
                         }
-                        baseValuePrevious.setValue(baseEntityApplied);
 
-                        if (baseValueClosed.isLast())
-                        {
-                            baseValuePrevious.setIndex(baseValueSaving.getIndex());
-                            baseValuePrevious.setBatch(baseValueSaving.getBatch());
-                            baseValuePrevious.setLast(true);
+                        if(baseValuePrevious != null) {
+                            baseValuePrevious.setValue(baseEntityApplied);
 
-                            baseEntity.put(metaAttribute.getName(), baseValuePrevious);
-                            baseEntityManager.registerAsUpdated(baseValuePrevious);
-                        }
-                        else
-                        {
-                            baseEntity.put(metaAttribute.getName(), baseValuePrevious);
+                            if (baseValueClosed.isLast())
+                            {
+                                baseValuePrevious.setIndex(baseValueSaving.getIndex());
+                                baseValuePrevious.setBatch(baseValueSaving.getBatch());
+                                baseValuePrevious.setLast(true);
+
+                                baseEntity.put(metaAttribute.getName(), baseValuePrevious);
+                                baseEntityManager.registerAsUpdated(baseValuePrevious);
+                            }
+                            else
+                            {
+                                baseEntity.put(metaAttribute.getName(), baseValuePrevious);
+                            }
                         }
                     }
                     else
