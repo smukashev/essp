@@ -134,7 +134,7 @@
                         <name>org.jooq.util.DefaultGenerator</name>
                         <database>
                             <name>${jooq.db.name}</name>
-                            <includes>.*</includes>
+                            <includes>(SC_.*)</includes>
                             <excludes></excludes>
                             <inputSchema>${jooq.db.schema}</inputSchema>
                             <customTypes>
