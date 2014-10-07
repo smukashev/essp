@@ -7,6 +7,7 @@ import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by almaz on 7/3/14.
@@ -18,4 +19,14 @@ public interface ShowcaseService {
     public void startLoad(String name, Date reportDate);
     public HashMap<String, QueryEntry> getSQLStats();
     public void reloadCash();
+
+
+    void stopLoad(String name);
+    void pauseLoad(String name);
+    void resumeLoad(String name);
+    List<String> listLoading();
+
+    ShowCase load(Long id);
+    List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate);
+
 }

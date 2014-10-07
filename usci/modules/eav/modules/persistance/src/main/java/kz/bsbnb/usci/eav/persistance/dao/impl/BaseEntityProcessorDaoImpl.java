@@ -3704,7 +3704,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     public void populate(String metaName, Long scId, Date reportDate){
-        //createMainTables();
         Long id = metaClassRepository.getMetaClass(metaName).getId();
         Insert ins = context.insertInto(SC_ID_BAG)
                 .select(context.select(EAV_BE_ENTITIES.ID, DSL.val(scId).as("SHOWCASE_ID"))
@@ -3715,7 +3714,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public List<Long> getNewTableIds(Long id){
+    public List<Long> getSCEntityIds(Long id){
         List<Long> list;
         Select select = context.select(SC_ID_BAG.ID).from(SC_ID_BAG).where(SC_ID_BAG.SHOWCASE_ID.eq(id)).limit(10);
         Select select2 = context.select(select.field(0)).from(select);
@@ -3725,60 +3724,20 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public void removeNewTableIds(List<Long> list, Long id){
+    public void removeSCEntityIds(List<Long> list, Long id){
         Delete delete = context.delete(SC_ID_BAG).where(SC_ID_BAG.ID.in(list).and(SC_ID_BAG.SHOWCASE_ID.eq(id)));
         jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
     }
 
-    private void createMainTables(){
-        Platform mainPlatform = PlatformFactory.createNewPlatformInstance(jdbcTemplate.getDataSource());
+    @Override
+    public void removeShowcaseId(Long id){
+        Delete delete = context.delete(SC_ID_BAG).where(SC_ID_BAG.SHOWCASE_ID.eq(id));
+        jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
+    }
 
-        String dbName;
-        String schema;
-        try {
-            String url = JdbcUtils.extractDatabaseMetaData(jdbcTemplate.getDataSource(), "getURL").toString();
-            dbName = url.substring(url.lastIndexOf(":"));
-            schema = jdbcTemplate.getDataSource().getConnection().getSchema();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if(mainPlatform.readModelFromDatabase("XE", null, "USCI", null).
-                findTable("SC_ID_BAG") != null){
-            return;
-        }
-        Database model = new Database();
-        model.setName("model");
-
-        kz.bsbnb.ddlutils.model.Table dataTable = new kz.bsbnb.ddlutils.model.Table();
-        dataTable.setName("SC_ID_BAG");
-
-        Column idColumn = new Column();
-
-        idColumn.setName("ID");
-        //idColumn.setPrimaryKey(true);
-        idColumn.setRequired(true);
-        idColumn.setType("NUMERIC");
-        idColumn.setSize("14,0");
-        idColumn.setAutoIncrement(true);
-
-        dataTable.addColumn(idColumn);
-
-        Column entityIdColumn = new Column();
-
-        entityIdColumn.setName("SHOWCASE_ID");
-        entityIdColumn.setPrimaryKey(false);
-        entityIdColumn.setRequired(false);
-        entityIdColumn.setType("NUMERIC");
-        entityIdColumn.setSize("14,0");
-        entityIdColumn.setAutoIncrement(false);
-
-        dataTable.addColumn(entityIdColumn);
-
-        model.addTable(dataTable);
-
-        System.out.println(model.toVerboseString());
-
-        mainPlatform.createModel(model, false, true);
+    @Override
+    public List<Long> getShowcaseIdsToLoad(){
+        Select select = context.selectDistinct(SC_ID_BAG.SHOWCASE_ID).from(SC_ID_BAG);
+        return jdbcTemplate.queryForList(select.getSQL(), Long.class);
     }
 }

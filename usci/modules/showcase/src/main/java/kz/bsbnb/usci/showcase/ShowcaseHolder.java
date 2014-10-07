@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Contains information about showcase.
+ */
 public class ShowcaseHolder implements Serializable
 {
     private ShowCase showCaseMeta;

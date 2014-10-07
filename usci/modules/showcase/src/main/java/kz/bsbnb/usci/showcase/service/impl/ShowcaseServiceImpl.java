@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by almaz on 7/3/14.
@@ -41,7 +39,7 @@ public class ShowcaseServiceImpl implements ShowcaseService{
         showcaseDao.createTables(scHolder);
     }
 
-
+    @Override
     public void startLoad(String name, Date reportDate){
         CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
         Long id = showcaseDao.load(name).getId();
@@ -68,5 +66,47 @@ public class ShowcaseServiceImpl implements ShowcaseService{
     @Override
     public void reloadCash() {
         showcaseDao.reloadCache();
+    }
+
+    @Override
+    public void stopLoad(String name){
+        CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
+        Long id = showcaseDao.load(name).getId();
+        coreShowcaseService.stop(id);
+    }
+
+    @Override
+    public void pauseLoad(String name){
+        CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
+        Long id = showcaseDao.load(name).getId();
+        coreShowcaseService.pause(id);
+    }
+
+    @Override
+    public void resumeLoad(String name){
+        CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
+        Long id = showcaseDao.load(name).getId();
+        coreShowcaseService.resume(id);
+    }
+
+    @Override
+    public List<String> listLoading(){
+        CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
+        List list = new ArrayList<String>();
+        for(Long id : coreShowcaseService.listLoading()){
+            list.add(showcaseDao.load(id).getName());
+        }
+        return list;
+    }
+
+    @Override
+    public ShowCase load(Long id){
+        ShowCase showcase = showcaseDao.load(id);
+        return showcase;
+    }
+
+    @Override
+    public List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate){
+        return showcaseDao.view(id, offset, limit, reportDate);
     }
 }

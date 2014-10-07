@@ -20,6 +20,7 @@ import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
 import kz.bsbnb.usci.showcase.service.IMetaFactoryService;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -553,6 +554,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
         }
     }
 
+    @Override
     public ShowCase load(long id)
     {
         Select select = context
@@ -680,6 +682,19 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
     public void remove(ShowCase showCase)
     {
         throw new RuntimeException("Unimplemented");
+    }
+
+    @Transactional
+    @Override
+    public List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate){
+        ShowCase showcase = load(id);
+        java.sql.Date date = new java.sql.Date(reportDate.getTime());
+        //Select select = context.selectFrom(DSL.tableByName(TABLES_PREFIX + showcase.getTableName())).where(DSL.fieldByName("OPEN_DATE").eq(date)).limit(limit).offset(offset);
+        Select select = context.selectFrom(DSL.tableByName(TABLES_PREFIX + showcase.getTableName())).limit(limit).offset(offset);
+        List<Map<String, Object>> rows = jdbcTemplateSC.queryForList(select.getSQL(), select.getBindValues().toArray());
+        //select = context.selectCount().from(DSL.tableByName(TABLES_PREFIX + showcase.getTableName()));
+        //jdbcTemplateSC.query(select.getSQL(), select.getBindValues().toArray());
+        return rows;
     }
 
     private long insertField(ShowCaseField showCaseField, long showCaseId) {

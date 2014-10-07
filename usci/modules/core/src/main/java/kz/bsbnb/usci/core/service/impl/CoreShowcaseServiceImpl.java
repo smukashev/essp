@@ -17,10 +17,7 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by almaz on 6/27/14.
@@ -35,13 +32,43 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     private Map<String, QueueViewMBean> queueViewBeanCache = new HashMap<String, QueueViewMBean>();
     private final Logger logger = LoggerFactory.getLogger(CoreShowcaseServiceImpl.class);
 
+    private Map<Long, Thread> SCThreads = new HashMap<Long, Thread>();
+
     @Override
     public void start(String metaName, Long id, Date reportDate){
-
         baseEntityProcessorDao.populate(metaName, id, reportDate);
-        //TODO: restart on failure
-        new Thread(new Sender(id)).start();
+        Thread t = new Thread(new Sender(id));
+        SCThreads.put(id, t);
+        t.start();
+    }
 
+    @Override
+    public void pause(Long id){
+        if(SCThreads.containsKey(id))
+            SCThreads.get(id).interrupt();
+    }
+
+    @Override
+    public void resume(Long id){
+        Thread t = new Thread(new Sender(id));
+        SCThreads.put(id, t);
+        t.start();
+    }
+
+    @Override
+    public void stop(Long id){
+        SCThreads.get(id).interrupt();
+        baseEntityProcessorDao.removeShowcaseId(id);
+        SCThreads.remove(id);
+    }
+
+    @Override
+    public List<Long> listLoading(){
+        List list = new ArrayList<Long>();
+        for(Long id : SCThreads.keySet()){
+            list.add(id);
+        }
+        return list;
     }
 
     private QueueViewMBean getShowcaseQueue(){
@@ -84,9 +111,10 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
             QueueViewMBean queueMbean = getShowcaseQueue();
             while(true){
                 if(queueMbean.getQueueSize() == 0){
-                    List<Long> list = baseEntityProcessorDao.getNewTableIds(scId);
+                    List<Long> list = baseEntityProcessorDao.getSCEntityIds(scId);
                     if(list.size() == 0){
                         logger.info("Done loading entities for showcase %s, reportDate %s");
+                        SCThreads.remove(scId);
                         return;
                     }
                     for(Long id : list){
@@ -94,15 +122,18 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
                                 .setScId(scId);
                         try {
                             producer.produce(entry);
+                        } catch (InterruptedException e) {
+                            //do nothing, finish loading
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
-                    baseEntityProcessorDao.removeNewTableIds(list, scId);
+                    baseEntityProcessorDao.removeSCEntityIds(list, scId);
+                    if(Thread.interrupted()) return;
                 } else try {
-                    Thread.sleep(10000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    return;
                 }
             }
         }

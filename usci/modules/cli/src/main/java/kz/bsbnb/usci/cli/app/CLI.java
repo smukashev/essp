@@ -2784,6 +2784,8 @@ public class CLI
                 showCase.setName(args.get(2));
             } else if(args.get(1).equals("tableName")) {
                 showCase.setTableName(args.get(2));
+            } else if(args.get(1).equals("title")) {
+                showCase.setTitle(args.get(2));
             }else if(args.get(1).equals("downPath")){
                 MetaClass metaClass = showCase.getMeta();
                 if( metaClass.getEl(args.get(2)) == null )
@@ -2844,6 +2846,28 @@ public class CLI
                 }
             } else{
                 System.out.println("Usage: startLoad <showcase name> <report date>");
+            }
+        } else if(args.get(0).equals("stopLoad")){
+            if(args.size() > 1){
+                showcaseService.stopLoad(args.get(1));
+            } else{
+                System.out.println("Usage: stopLoad <showcase name>");
+            }
+        } else if(args.get(0).equals("pauseLoad")){
+            if(args.size() > 1){
+                showcaseService.pauseLoad(args.get(1));
+            } else{
+                System.out.println("Usage: pauseLoad <showcase name>");
+            }
+        } else if(args.get(0).equals("resumeLoad")){
+            if(args.size() > 1){
+                showcaseService.resumeLoad(args.get(1));
+            } else{
+                System.out.println("Usage: resumeLoad <showcase name>");
+            }
+        } else if(args.get(0).equals("listLoading")){
+            for(String sc : showcaseService.listLoading()){
+                System.out.println("\t" + sc);
             }
         } else if(args.get(0).equals("rc")){
             if(!scStart)

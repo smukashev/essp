@@ -23,8 +23,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * Created by almaz on 6/25/14.
+ *
+ * Message Listener. Consumes messages from ActiveMQ and passes them for further processing.
+ * <p>
+ *     Starts a thread for every Showcase defined in the application and processes messages in parallel.
+ * </p>
+ *
  */
+
 @Component
 public class ShowcaseMessageConsumer implements MessageListener{
 

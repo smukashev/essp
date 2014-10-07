@@ -88,8 +88,12 @@ public interface IBaseEntityProcessorDao
 
     public void populate(String metaName, Long id, Date reportDate);
 
-    public List<Long> getNewTableIds(Long id);
+    public List<Long> getSCEntityIds(Long id);
 
-    public void removeNewTableIds(List<Long> list, Long id);
+    public void removeSCEntityIds(List<Long> list, Long id);
+
+    public void removeShowcaseId(Long id);
+
+    public List<Long> getShowcaseIdsToLoad();
 
 }
