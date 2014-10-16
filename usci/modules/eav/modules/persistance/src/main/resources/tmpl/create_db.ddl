@@ -953,12 +953,25 @@
 		<column name="showcase_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="attribute_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="attribute_name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<column name="attribute_path" primaryKey="false" required="true" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<column name="attribute_path" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
 		<unique name="ind_uk_sc_002_00">
 			<unique-column name="name"/>
+			<unique-column name="showcase_id"/>
 		</unique>
 		<!--<foreign-key foreignTable="eav_sc_showcases" name="FK_eav_sc_showcases">
 			<reference local="showcase_id" foreign="id"/>
 		</foreign-key>-->
 	</table>
+	<table name="sc_id_bag">
+    		<column name="id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+    		<column name="showcase_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+    		<index name="eav_ind_022_01">
+                <index-column name="id"/>
+                <index-column name="showcase_id"/>
+            </index>
+    		<unique name="ind_uk_sc_003_00">
+    			<unique-column name="id"/>
+    			<unique-column name="showcase_id"/>
+    		</unique>
+    </table>
 </database>

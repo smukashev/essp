@@ -3,6 +3,7 @@ package kz.bsbnb.usci.cli.app;
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
@@ -19,6 +20,9 @@ import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
+import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
+import kz.bsbnb.usci.eav.manager.impl.BaseEntityMergeManager;
+import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -38,11 +42,16 @@ import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.showcase.ShowCase;
+import kz.bsbnb.usci.eav.showcase.ShowCaseField;
+import kz.bsbnb.usci.eav.showcase.dao.IShowCaseDao;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
+import kz.bsbnb.usci.showcase.ShowcaseHolder;
+import kz.bsbnb.usci.showcase.service.ShowcaseService;
 import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 import kz.bsbnb.usci.tool.status.SyncStatus;
@@ -109,6 +118,10 @@ public class CLI
 
     @Autowired
     private RulesSingleton rulesSingleton;
+
+    @Autowired
+    protected IShowCaseDao showCaseDao;
+
 
     private BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
 
@@ -680,7 +693,7 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b  where b.rep_date = to_date('" +
+                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
                                     reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e)
                         {
@@ -911,7 +924,7 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b  where b.rep_date = to_date('" +
+                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
                                     reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e)
                         {
@@ -1148,7 +1161,7 @@ public class CLI
                         PreparedStatement preparedStatement = null;
                         try
                         {
-                            preparedStatement = conn.prepareStatement("select b.id from eav_batches b  where b.rep_date = to_date('" +
+                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
                                     reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e)
                         {
@@ -2407,17 +2420,64 @@ public class CLI
             new BaseRepository().run();
         } else throw new IllegalArgumentException("allowed operations refs [import] [filename]");
     }
+    public void commandSC()
+    {
+        if(args.get(0).equals("list")){
+
+        } else if(args.get(0).equals("add")){
+            showcaseServiceFactoryBean = new RmiProxyFactoryBean();
+            showcaseServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
+            showcaseServiceFactoryBean.setServiceInterface(ShowcaseService.class);
+
+            showcaseServiceFactoryBean.afterPropertiesSet();
+            showcaseService = (ShowcaseService) showcaseServiceFactoryBean.getObject();
+
+            String name = args.get(1);
+            String metaName = args.get(2);
+            System.out.println("argument: " + args.get(1) + "   " + args.get(2));
+            MetaClass metaClass = metaClassRepository.getMetaClass(metaName);
+            ShowCase showCase = new ShowCase();
+            showCase.setName(name);
+            showCase.setTableName(name);
+            showCase.setMeta(metaClass);
+            for(int i = 3; i < args.size(); i++){
+                String field = args.get(i);
+                String columnName;
+                String fieldName;
+                String path;
+                if(field.contains(":")){
+                    columnName = field.split(":")[1];
+                    field = field.split(":")[0];
+                }
+                if(field.contains(".")){
+                    fieldName = field.substring(field.lastIndexOf(".") + 1);
+                    path = field.substring(0, field.lastIndexOf("."));
+                } else{
+                    path = "";
+                    fieldName = field;
+                }
+                columnName = fieldName;
+                showCase.addField(path, fieldName, columnName);
+            }
+            showcaseService.add(showCase);
+            System.out.println("Showcase successfully added!");
+        } else if(args.get(0).equals("delete")){
+
+        }
+    }
 
     private RmiProxyFactoryBean batchServiceFactoryBean;
     private RmiProxyFactoryBean batchVersionServiceFactoryBean;
     private RmiProxyFactoryBean ruleServiceFactoryBean;
     private RmiProxyFactoryBean listenerServiceFactoryBean;
+    private RmiProxyFactoryBean showcaseServiceFactoryBean;
 
     private RmiProxyFactoryBean entityServiceFactoryBean;
 
     private IBatchService batchService;
     private IRuleService ruleService;
     private IBatchVersionService batchVersionService;
+    private ShowcaseService showcaseService;
 
     public void init(){
 
@@ -2624,6 +2684,202 @@ public class CLI
         //rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());*/
     }
 
+    public void showcaseStat()
+    {
+        RmiProxyFactoryBean serviceFactory = null;
+        ShowcaseService showcaseService = null;
+
+        try {
+            serviceFactory = new RmiProxyFactoryBean();
+            //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+            serviceFactory.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
+            serviceFactory.setServiceInterface(ShowcaseService.class);
+            serviceFactory.setRefreshStubOnConnectFailure(true);
+
+            serviceFactory.afterPropertiesSet();
+            showcaseService = (ShowcaseService) serviceFactory.getObject();
+        } catch (Exception e) {
+            System.out.println("Can't connect to receiver service: " + e.getMessage());
+        }
+
+        HashMap<String, QueryEntry> map = showcaseService.getSQLStats();
+
+        System.out.println();
+        System.out.println("+---------+------------------+------------------------+");
+        System.out.println("|  count  |     avg (ms)     |       total (ms)       |");
+        System.out.println("+---------+------------------+------------------------+");
+
+        double totalInserts = 0;
+        double totalSelects = 0;
+        double totalProcess = 0;
+        int totalProcessCount = 0;
+
+        for (String query : map.keySet()) {
+            QueryEntry qe = map.get(query);
+
+            System.out.printf("| %7d | %16.6f | %22.6f | %s%n", qe.count,
+                    qe.totalTime / qe.count, qe.totalTime, query);
+
+            if (query.startsWith("insert")) {
+                totalInserts += qe.totalTime;
+            }
+            if (query.startsWith("select")) {
+                totalSelects += qe.totalTime;
+            }
+            if (query.startsWith("coreService")) {
+                totalProcess += qe.totalTime;
+                totalProcessCount += qe.count;
+            }
+        }
+
+        System.out.println("+---------+------------------+------------------------+");
+
+        if(totalProcessCount > 0) {
+            System.out.println("AVG process: " + totalProcess / totalProcessCount);
+            System.out.println("AVG inserts per process: " + totalInserts / totalProcessCount);
+            System.out.println("AVG selects per process: " + totalSelects / totalProcessCount);
+        }
+
+        //showcaseService.clearSQLStats();
+    }
+
+    private void initSC(){
+        scStart = true;
+        showcaseServiceFactoryBean = new RmiProxyFactoryBean();
+        showcaseServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
+        showcaseServiceFactoryBean.setServiceInterface(ShowcaseService.class);
+
+        showcaseServiceFactoryBean.afterPropertiesSet();
+        showcaseService = (ShowcaseService) showcaseServiceFactoryBean.getObject();
+    }
+
+    ShowCase showCase;
+    boolean scStart = false;
+
+    public void commandShowCase(){
+        if(showCase == null)  {
+            showCase = new ShowCase();
+            showCase.setMeta(metaClassRepository.getMetaClass("credit"));
+            /* uncomment for fast init of showCase
+            showCase.setMeta(metaClassRepository.getMetaClass("credit"));
+            showCase.setTableName("www");
+            showCase.setName("www");
+            showCase.addField(showCase.getMeta(), "credit_type","code");
+            showCase.addField(showCase.getMeta(), "subjects.person.addresses","details","DOM");
+            showCase.addField(showCase.getMeta(), "","amount","VAL");*/
+        }
+
+        if(args.get(0).equals("debug")){
+            MetaClass meta = metaClassRepository.getMetaClass("credit");
+            System.out.println("ok");
+        }else
+        if(args.get(0).equals("status")){
+            System.out.println(showCase.toString());
+        } else if(args.get(0).equals("set")){
+            if(args.size() !=3 )
+                throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
+            if(args.get(1).equals("meta")){
+                showCase.setMeta(metaClassRepository.getMetaClass(args.get(2)));
+            } else if(args.get(1).equals("name")){
+                showCase.setName(args.get(2));
+            } else if(args.get(1).equals("tableName")) {
+                showCase.setTableName(args.get(2));
+            } else if(args.get(1).equals("title")) {
+                showCase.setTitle(args.get(2));
+            }else if(args.get(1).equals("downPath")){
+                MetaClass metaClass = showCase.getMeta();
+                if( metaClass.getEl(args.get(2)) == null )
+                    throw new IllegalArgumentException("no such path for downPath:" + args.get(2));
+                showCase.setDownPath(args.get(2));
+            }else
+                throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
+
+        } else if(args.get(0).equals("list")){
+            if(args.get(1).equals("reset"))
+                showCase.getFieldsList().clear();
+            else if( args.get(1).equals("add")){
+                String path = "";
+                String colName = args.get(2);
+                int id = args.get(2).lastIndexOf('.');
+                if(id!=-1)
+                {
+                    path = args.get(2).substring(0, id);
+                    colName = args.get(2).substring(id+1);
+                }
+                if(args.size() == 3 )
+                 showCase.addField(path, colName);
+                else if(args.size() == 4)
+                 showCase.addField(path, colName, args.get(3));
+                else throw new IllegalArgumentException("Example: showcase list add [path] [columnName] {columnAlias}");
+            }
+        } else if(args.get(0).equals("save")){
+            if(!scStart) initSC();
+            showcaseService.add(showCase);
+            System.out.println(showCase.getName() + ": Showcase successfully added!");
+            showCase = null;
+        } else if(args.get(0).equals("listSC")){
+            if(!scStart) initSC();
+
+            List<ShowcaseHolder> list = showcaseService.list();
+            for(ShowcaseHolder holder : list){
+                System.out.println(holder.getShowCaseMeta().getName());
+                for(ShowCaseField field : holder.getShowCaseMeta().getFieldsList()){
+                    System.out.println("\t" + field.getName());
+                }
+            }
+        } else if(args.get(0).equals("loadSC")){
+            if(args.size() > 1){
+                ShowCase sc = showcaseService.load(args.get(1));
+                System.out.println(sc.getName());
+                for(ShowCaseField field : sc.getFieldsList()){
+                    System.out.println("\t" + field.getName());
+                }
+            } else{
+                System.out.println("Usage: loadSC <showcase name>");
+            }
+        } else if(args.get(0).equals("startLoad")){
+            if(args.size() > 2){
+                try {
+                    showcaseService.startLoad(args.get(1), sdfout.parse(args.get(2)));
+                } catch (ParseException e) {
+                    System.out.println("Date format: \"dd.MM.yyyy\"");
+                }
+            } else{
+                System.out.println("Usage: startLoad <showcase name> <report date>");
+            }
+        } else if(args.get(0).equals("stopLoad")){
+            if(args.size() > 1){
+                showcaseService.stopLoad(args.get(1));
+            } else{
+                System.out.println("Usage: stopLoad <showcase name>");
+            }
+        } else if(args.get(0).equals("pauseLoad")){
+            if(args.size() > 1){
+                showcaseService.pauseLoad(args.get(1));
+            } else{
+                System.out.println("Usage: pauseLoad <showcase name>");
+            }
+        } else if(args.get(0).equals("resumeLoad")){
+            if(args.size() > 1){
+                showcaseService.resumeLoad(args.get(1));
+            } else{
+                System.out.println("Usage: resumeLoad <showcase name>");
+            }
+        } else if(args.get(0).equals("listLoading")){
+            for(String sc : showcaseService.listLoading()){
+                System.out.println("\t" + sc);
+            }
+        } else if(args.get(0).equals("rc")){
+            if(!scStart)
+                initSC();
+            showcaseService.reloadCash();
+        }else if(args.get(0).equals("stats")){
+            showcaseStat();
+        } else{
+            throw new IllegalArgumentException("Arguments: showcase [status, set]");
+        }
+    }
+
     String line;
     Exception lastException = null;
 
@@ -2701,6 +2957,10 @@ public class CLI
                 batchRestartSingle();
             } else if(command.equals("stc")) {
                 commandSTC();
+            } else if(command.equals("showcase")) {
+                commandShowCase();
+            } else if(command.equals("merge")){
+                mergeEntity();
             } else {
                 System.out.println("No such command: " + command);
             }
@@ -2789,4 +3049,162 @@ public class CLI
     {
         this.inputStream = in;
     }
+
+    public void mergeEntity()
+    {
+        if (args.size() == 3)
+        {
+            String fileName = args.get(0);
+            String repDate = args.get(1);
+            String mergeManagerFileName = args.get(2);
+            List<IBaseEntity> entityList = new ArrayList<IBaseEntity>();
+            try {
+                Date reportDate = sdfout.parse(repDate);
+                CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
+                BaseEntity entityToWrite;
+                IBaseEntity savedEntity;
+                while(( entityToWrite = reader.read()) != null) {
+                    try {
+                        savedEntity = baseEntityProcessorDao.process(entityToWrite);
+                        entityList.add(savedEntity);
+                        System.out.println("Instance of BaseEntity saved with id: " + savedEntity.getId());
+
+                    } catch(Exception ex) {
+                        lastException = ex;
+                        System.out.println("While processing instance of BaseEntity unexpected error occurred: " + ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                }
+            } catch (FileNotFoundException e)
+            {
+                System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
+            } catch (ParseException e) {
+                System.out.println("Can't parse date " + repDate + " must be in format "+ sdfout.toString());
+            }
+            IBaseEntityMergeManager mergeManager = constructMergeManagerFromJson(mergeManagerFileName);
+
+            System.out.println("Merging two base entities " + entityList.get(0).getId() + "  " + entityList.get(1).getId());
+            System.out.println(">>>>>>>>>>>>>>LEFT ENTITY<<<<<<<<<<<<<<<<<<<<<");
+            System.out.println(entityList.get(0));
+            System.out.println("\n >>>>>>>>>>>>>>RIGHT ENTITY<<<<<<<<<<<<<<<<<<<<<");
+            System.out.println(entityList.get(1));
+            System.out.println("\n >>>>>>>>>>>>>>>RESULT!!!<<<<<<<<<<<<<<<<<<< ");
+            IBaseEntity result = baseEntityProcessorDao.merge(entityList.get(0), entityList.get(1), mergeManager,
+                    IBaseEntityProcessorDao.MergeResultChoice.LEFT);
+
+            System.out.println(result);
+        }
+        else
+        {
+            System.out.println("Wrong number of arguments!");
+        }
+    }
+
+    public IBaseEntityMergeManager constructMergeManagerFromJson(String jsonFilePath)
+    {
+        IBaseEntityMergeManager mergeManager = new BaseEntityMergeManager();
+        try {
+            FileReader fileReader = new FileReader(jsonFilePath);
+            JsonReader jsonReader = new JsonReader(fileReader);
+            jsonReader.beginObject();
+            mergeManager = jsonToMergeManager(jsonReader);
+            jsonReader.endObject();
+
+        } catch (FileNotFoundException e) {
+            System.out.println("File " + jsonFilePath + " not found, with error: " + e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return mergeManager;
+    }
+
+    public IBaseEntityMergeManager jsonToMergeManager(JsonReader jsonReader) throws IOException
+    {
+        IBaseEntityMergeManager mergeManager = new BaseEntityMergeManager();
+        while (jsonReader.hasNext())
+        {
+            String name = jsonReader.nextName();
+            if (name.equals("action"))
+            {
+                String action = jsonReader.nextString();
+                if(action.equals("keep_left"))
+                    mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_LEFT);
+                if(action.equals("keep_right"))
+                    mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_RIGHT);
+                if(action.equals("merge"))
+                    mergeManager.setAction(IBaseEntityMergeManager.Action.TO_MERGE);
+                if(action.equals("keep_both"))
+                    mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_BOTH);
+            } else if (name.equals("childMap"))
+            {
+                jsonReader.beginArray();
+                while(jsonReader.hasNext())
+                {
+                    MergeManagerKey key =  null;
+                    IBaseEntityMergeManager childManager = null;
+                    jsonReader.beginObject();
+                    while(jsonReader.hasNext())
+                    {
+                        String innerName = jsonReader.nextName();
+                        if(innerName.equals("id"))
+                        {
+                            jsonReader.beginObject();
+                            key = getKeyFromJson(jsonReader);
+                            jsonReader.endObject();
+                        }
+                        else if(innerName.equals("map"))
+                        {
+                            jsonReader.beginObject();
+                            childManager = jsonToMergeManager(jsonReader);
+                            jsonReader.endObject();
+                        }
+
+                    }
+                    jsonReader.endObject();
+                    mergeManager.setChildManager(key, childManager);
+                }
+                jsonReader.endArray();
+            }
+        }
+        return mergeManager;
+    }
+
+
+    private MergeManagerKey getKeyFromJson(JsonReader jsonReader)
+    {
+        String type = null;
+        String left =  null;
+        String right =  null;
+        String attr =  null;
+        try {
+            while(jsonReader.hasNext())
+            {
+                String name = jsonReader.nextName();
+                if(name.equals("type"))
+                {
+                    type = jsonReader.nextString();
+                } else if(name.equals("left")){
+                    left = jsonReader.nextString();
+                } else if(name.equals("right")){
+                    right = jsonReader.nextString();
+                } else if(name.equals("attr")){
+                    attr = jsonReader.nextString();
+                }
+            }
+            if(type.equals("attribute"))
+            {
+                MergeManagerKey<String> key = new MergeManagerKey<String>(attr);
+                return key;
+            }
+            if(type.equals("long")){
+                MergeManagerKey<Long> key = new MergeManagerKey<Long>(Long.parseLong(left), Long.parseLong(right));
+                return key;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

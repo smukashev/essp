@@ -13,4 +13,6 @@ public interface IShowCaseDao extends IDao<ShowCase>
 
     @Override
     void remove(ShowCase showCase);
+
+    ShowCase load(String name);
 }

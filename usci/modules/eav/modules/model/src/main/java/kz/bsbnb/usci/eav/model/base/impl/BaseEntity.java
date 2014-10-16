@@ -627,21 +627,21 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         queueEnd = 0;
     }
 
-    private void enQueue(Object o){
+    private synchronized void enQueue(Object o){
         queue[queueEnd++] = o;
     }
 
-    private int queueSize(){
+    private synchronized int queueSize(){
         return queueEnd - queueStart;
     }
 
-    private Object deQueue(){
+    private synchronized Object deQueue(){
         if(queueSize()==0) throw new RuntimeException("queue is empty");
         return queue[queueStart++];
     }
 
 
-    public Object getEls(String path){
+    public synchronized Object getEls(String path){
       initQueue();
       StringBuilder str = new StringBuilder();
       String[] operations = new String[500];
@@ -751,8 +751,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
             if(step == yk)
             {
+                if(curO == null)
+                    continue;
+
                 if(function.startsWith("count")) {
-                    if(curO != null )retCount ++;
+                    retCount ++;
                 }
                 else if(function.startsWith("set"))
                     if(allowedSet.contains( curO ))
@@ -809,6 +812,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                }
            }
         }
+
+        if(function.startsWith("get"))
+            return ret;
 
         return retCount;
     }

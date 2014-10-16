@@ -64,7 +64,7 @@ public class GenericTestCase
         metaAddressHolder.setMetaAttribute("street",
                 new MetaAttribute(metaStreetHolder));
 
-        MetaClass metaDocumentHolder = new MetaClass("document");
+        MetaClass metaDocumentHolder = new MetaClass("document1");
         metaDocumentHolder.setMetaAttribute("type",
                 new MetaAttribute(true, false, new MetaValue(DataTypes.STRING)));
         metaDocumentHolder.setMetaAttribute("no",
@@ -121,11 +121,11 @@ public class GenericTestCase
         addressEntity.put("street", new BaseValue(batch, 3, streetEntity));
         addressEntity.put("house", new BaseValue(batch, 3, houseEntity));
 
-        BaseEntity documentEntity1 = new BaseEntity(metaFactory.getMetaClass("document"), batch.getRepDate());
+        BaseEntity documentEntity1 = new BaseEntity(metaFactory.getMetaClass("document1"), batch.getRepDate());
         documentEntity1.put("type", new BaseValue(batch, 4, "RNN"));
         documentEntity1.put("no", new BaseValue(batch, 4, "1234567890"));
 
-        BaseEntity documentEntity2 = new BaseEntity(metaFactory.getMetaClass("document"), batch.getRepDate());
+        BaseEntity documentEntity2 = new BaseEntity(metaFactory.getMetaClass("document1"), batch.getRepDate());
         documentEntity2.put("type", new BaseValue(batch, 4, "PASSPORT"));
         documentEntity2.put("no", new BaseValue(batch, 4, "0987654321"));
 

@@ -13,6 +13,7 @@
         <runSuite>**/EavTestsSuit.class</runSuite>
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
+        <activemq.version>5.10.0</activemq.version>
     </properties>
 
     <parent>
@@ -54,11 +55,6 @@
             <version>1.1</version>
         </dependency>
         <dependency>
-            <groupId>kz.bsbnb.usci.eav</groupId>
-            <artifactId>tool</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>14.0.1</version>
@@ -77,6 +73,16 @@
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>9.1-901.jdbc4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-all</artifactId>
+            <version>${activemq.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xbean</groupId>
+            <artifactId>xbean-spring</artifactId>
+            <version>3.7</version>
         </dependency>
     </dependencies>
 
@@ -393,7 +399,7 @@
                                 <name>org.jooq.util.DefaultGenerator</name>
                                 <database>
                                     <name>${jooq.db.name}</name>
-                                    <includes>(EAV_.*)|(BATCH_.*)</includes>
+                                    <includes>(SC_.*)|(EAV_.*)|(BATCH_.*)</includes>
                                     <excludes></excludes>
                                     <inputSchema>${jooq.db.schema}</inputSchema>
                                     <customTypes>
@@ -449,7 +455,7 @@
                         </configuration>
                     </plugin>
                     <!-- TODO: uncomment this to recreate the database  -->
-                    <!--<plugin>
+                    <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.2.1</version>
@@ -484,7 +490,7 @@
                                 </systemProperty>
                             </systemProperties>
                         </configuration>
-                    </plugin>-->
+                    </plugin>
                 </plugins>
             </build>
         </profile>

@@ -1,12 +1,14 @@
 package kz.bsbnb.usci.eav.persistance.dao;
 
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
+import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 
 import java.util.Date;
 import java.util.List;
@@ -70,5 +72,28 @@ public interface IBaseEntityProcessorDao
     public long getRandomBaseEntityId(IMetaClass metaClass);
 
     public Set<Long> getChildBaseEntityIds(long parentBaseEntityIds);
+
+    public IDaoListener getApplyListener();
+
+    public void setApplyListener(IDaoListener applyListener);
+
+    enum MergeResultChoice
+    {
+        RIGHT,
+        LEFT
+    }
+
+    public IBaseEntity merge(IBaseEntity baseEntityLeft, IBaseEntity baseEntityRight,
+                             IBaseEntityMergeManager mergeManager, MergeResultChoice choice);
+
+    public void populate(String metaName, Long id, Date reportDate);
+
+    public List<Long> getSCEntityIds(Long id);
+
+    public void removeSCEntityIds(List<Long> list, Long id);
+
+    public void removeShowcaseId(Long id);
+
+    public List<Long> getShowcaseIdsToLoad();
 
 }

@@ -6,7 +6,9 @@ import kz.bsbnb.ddlutils.io.DatabaseIO;
 import kz.bsbnb.ddlutils.model.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import javax.sql.DataSource;
 
@@ -61,13 +63,18 @@ public class DDLHelper
 
         if(args.length < 2)
         {
-            System.out.println("Usage: <command> <filename>");
+            System.out.println("Usage: <command> <filename> [applicationContext]");
             System.out.println("Commands: gen, apply");
             return;
         }
 
-        ClassPathXmlApplicationContext ctx
-                = new ClassPathXmlApplicationContext("applicationContextDDL.xml");
+        AbstractXmlApplicationContext ctx = args.length > 2 ?
+                //new FileSystemXmlApplicationContext("file:" + args[2]) :
+                new FileSystemXmlApplicationContext("file:" + args[2]) :
+                new ClassPathXmlApplicationContext("applicationContextDDL.xml");
+
+//        ClassPathXmlApplicationContext ctx
+//                = new ClassPathXmlApplicationContext("applicationContextDDL.xml");
 
         DataSource source = ctx.getBean(DataSource.class);
 
