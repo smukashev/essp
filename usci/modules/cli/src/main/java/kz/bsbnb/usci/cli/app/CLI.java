@@ -83,6 +83,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 @Component
 public class CLI
@@ -2961,6 +2964,8 @@ public class CLI
                 commandShowCase();
             } else if(command.equals("merge")){
                 mergeEntity();
+            } else if(command.equals("getbatch")){
+                commandGetBatch();
             } else {
                 System.out.println("No such command: " + command);
             }
@@ -3037,6 +3042,72 @@ public class CLI
         } else {
             System.out.println("Argument needed: <sync_url>");
             System.out.println("Example: sstat rmi://127.0.0.1:1098/entityService");
+        }
+    }
+
+    public void commandGetBatch() {
+        if(args.size() > 1) {
+            Long batchId = Long.valueOf(args.get(0));
+            String path = args.get(1);
+
+            Gson gson = new Gson();
+            BatchFullJModel batchFullJModel;
+
+            Object batchStr;
+
+            try {
+                batchStr = couchbaseClient.get("batch:" + batchId);
+            } catch (OperationTimeoutException e) {
+                batchStr = null;
+            }
+
+            if(batchStr == null) {
+                System.out.println("Couldn't find batch with id: " + batchId + " in Couchbase");
+                throw new NullPointerException();
+            }
+
+            batchFullJModel = gson.fromJson(batchStr.toString(), BatchFullJModel.class);
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(batchFullJModel.getContent());
+
+            ZipOutputStream zos = null;
+
+            try {
+                zos = new ZipOutputStream(new FileOutputStream(new File(path + batchId + ".zip")));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            ZipInputStream zis = new ZipInputStream(inputStream);
+            ZipEntry entry;
+
+            try {
+                while ((entry = zis.getNextEntry()) != null) {
+                    ZipEntry destEntry = new ZipEntry(entry.getName());
+                    zos.putNextEntry(destEntry);
+
+                    byte[] buf = new byte[1024];
+                    int len;
+
+                    while ((len = zis.read(buf)) > 0) zos.write(buf, 0, len);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                inputStream.close();
+                zos.closeEntry();
+                zos.close();
+                zis.closeEntry();
+                zis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("Batch with ID: " + batchId + " sucessfully moved to \"" + path + "\"");
+        } else {
+            System.out.println("Argument needed: <batchId> <path>");
+            System.out.println("Example: getbatch 100500 /home/ktulbassiyev/");
         }
     }
 
