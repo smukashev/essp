@@ -35,10 +35,8 @@ public class EntityProcessorListenerImpl implements IDaoListener
 
         try {
             producer.produce(queueEntry);
-        } catch (UncategorizedJmsException e) {
-            logger.warn("JMS is not available!");
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
     }
 
