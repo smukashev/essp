@@ -148,7 +148,8 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
             {
                 IBaseEntityValueDao baseEntityValueDao = persistableDaoPool
                         .getPersistableDao(baseValueClass, IBaseEntityValueDao.class);
-                baseEntityValueDao.loadBaseValues(baseEntity, actualReportDate, last);
+                int compare = DataTypeUtil.compareBeginningOfTheDay(actualReportDate, reportDate);
+                baseEntityValueDao.loadBaseValues(baseEntity, compare == -1 ? reportDate : actualReportDate, last);
             }
         }
 

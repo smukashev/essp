@@ -283,6 +283,21 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
     }
 
     @Override
+    public Date getMinReportDate(long baseEntityId, Date reportDate)
+    {
+        Select select = context
+                .select(DSL.min(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE).as("min_report_date"))
+                .from(EAV_BE_ENTITY_REPORT_DATES)
+                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId))
+                .and(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.greaterOrEqual(DataUtils.convert(reportDate)));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        return DataUtils.convert((Timestamp) rows.get(0).get("min_report_date"));
+    }
+
+    @Override
     public Date getMaxReportDate(long baseEntityId, Date reportDate)
     {
         Select select = context

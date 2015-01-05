@@ -18,6 +18,8 @@ public interface IBaseEntityReportDateDao extends IPersistableDao {
 
     public Date getMinReportDate(long baseEntityId);
 
+    public Date getMinReportDate(long baseEntityId, Date reportDate);
+
     public Date getMaxReportDate(long baseEntityId);
 
     public Date getMaxReportDate(long baseEntityId, Date reportDate);

@@ -43,6 +43,14 @@ public interface IBaseEntityProcessorDao
 
     public IBaseEntity loadByMaxReportDate(long id, Date reportDate, boolean caching);
 
+    public IBaseEntity loadByMinReportDate(long id, Date reportDate);
+
+    public IBaseEntity loadByMinReportDate(long id, Date reportDate, boolean caching);
+
+    public IBaseEntity loadByReportDate(long id, Date actualReportDate, boolean caching);
+
+    public IBaseEntity loadByReportDate(long id, Date actualReportDate);
+
     public IBaseEntity load(long id);
 
     public IBaseEntity load(long id, boolean caching);
@@ -95,5 +103,9 @@ public interface IBaseEntityProcessorDao
     public void removeShowcaseId(Long id);
 
     public List<Long> getShowcaseIdsToLoad();
+
+    public List<Long> getNewTableIds(Long id);
+
+    public void removeNewTableIds(List<Long> list, Long id);
 
 }
