@@ -1067,7 +1067,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             else
             {
 
-                /***@timur (START) PREVIOUS REPORT DATE INSERT ***/
                 reportDateSaving = baseValueSaving.getRepDate();
                 reportDateLoaded = baseValueLoaded.getRepDate();
 
@@ -1109,7 +1108,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsUpdated(baseValueApplied);
                 }
-                /***@timur (END) PREVIOUS REPORT DATE INSERT ***/
             }
         }
         else
@@ -1144,9 +1142,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             else
             {
 
-
-                /////
-                /***@timur (START)PREV REPORT DATE INSERT ***/
                 IBaseEntityReportDateDao baseEntityReportDateDao =
                         persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
                 reportDateLoaded = baseEntityReportDateDao.getMinReportDate(baseEntity.getId());
@@ -1280,7 +1275,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         baseEntityManager.registerAsInserted(baseValueAppliedClosed);
                     }
                 }
-                /***@timur (END)PREV REPORT DATE INSERT ***/
             }
         }
 
@@ -1787,7 +1781,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             if (baseValueClosed == null)
             {
-                /***@timur (START)PREV REPORT DATE INSERT ***/
                 IBaseEntityReportDateDao baseEntityReportDateDao =
                         persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
                 reportDateLoaded = baseEntityReportDateDao.getMinReportDate(baseEntity.getId());
@@ -1917,11 +1910,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 childBaseSetApplied,
                                 true,
                                 true);
-                        baseEntity.put(metaAttribute.getName(), baseValueAppliedClosed); // TODO: ?
+                        baseEntity.put(metaAttribute.getName(), baseValueAppliedClosed);
                         baseEntityManager.registerAsInserted(baseValueAppliedClosed);
                     }
                 }
-                /***@timur (END)PREV REPORT DATE INSERT ***/
             }
         }
 
@@ -1961,8 +1953,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 processedUuids.add(childBaseValueLoaded.getUuid());
                                 baseValueFound = true;
 
-
-                                /***@timur (START)PREV REPORT DATE INSERT ***/
                                 boolean nextByRepDateIsNextByBaseValue =
                                         DataUtils.compareBeginningOfTheDay(reportDateLoaded, childBaseValueLoaded.getRepDate()) == 0;
 
@@ -2027,7 +2017,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                         baseEntityManager.registerAsInserted(baseValueAppliedClosed);
                                     }
                                 }
-                                /***@timur (END)PREV REPORT DATE INSERT ***/
 
                                 break;
                             }
@@ -2118,7 +2107,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     }
                 }
 
-                /***@timur (START)PREV REPORT DATE INSERT ***/
                 IBaseEntity baseEntitySavingTmp = apply(childBaseEntitySaving, baseEntityManager);
                 IBaseEntityReportDateDao baseEntityReportDateDao =
                         persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
@@ -2133,10 +2121,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         childBaseValueSaving.getBatch(),
                         childBaseValueSaving.getIndex(),
                         childBaseValueSaving.getRepDate(),
-                        /***@timur (START)PREV REPORT DATE INSERT ***/
                         //apply(childBaseEntitySaving, baseEntityManager),
                         baseEntitySavingTmp,
-                        /***@timur (END)PREV REPORT DATE INSERT ***/
                         false,
                         !isClosing
                 );
@@ -2153,10 +2139,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             childBaseValueSaving.getBatch(),
                             childBaseValueSaving.getIndex(),
                             reportDateLoaded != null ? reportDateLoaded : minReportDate,
-                            /***@timur (START)PREV REPORT DATE INSERT ***/
                             //baseEntityAAA,
                             baseEntitySavingTmp,
-                            /***@timur (END)PREV REPORT DATE INSERT ***/
                             true,
                             isClosing
                     );
@@ -2164,7 +2148,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     childBaseValueAppliedClosed.setBaseContainer(childBaseSetApplied);
                     baseEntityManager.registerAsInserted(childBaseValueAppliedClosed);
                 }
-                /***@timur (END)PREV REPORT DATE INSERT ***/
             }
         }
 
