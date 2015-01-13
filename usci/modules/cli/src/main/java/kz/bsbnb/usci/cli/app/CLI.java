@@ -76,6 +76,7 @@ import javax.annotation.PostConstruct;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.text.DateFormat;
 import java.util.*;
@@ -1483,6 +1484,28 @@ public class CLI
         }
     }
 
+    public void readEntityFromXMLString(String xml, String repDate){
+        try {
+            Date reportDate = sdfout.parse(repDate);
+            CLIXMLReader reader = new CLIXMLReader(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))
+                    ,metaClassRepository,batchRepository,reportDate);
+
+            BaseEntity entity;
+            while((entity = reader.read()) != null) {
+                try {
+                    long id = baseEntityProcessorDao.process(entity).getId();
+                    System.out.println("Instance of BaseEntity saved with id: " + id);
+                } catch(Exception ex) {
+                    lastException = ex;
+                    System.out.println("While processing instance of BaseEntity unexpected error occurred: " + ex.getMessage());
+                }
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void readEntityFromXML(String fileName, String repDate) {
         try {
             Date reportDate = sdfout.parse(repDate);
@@ -1692,6 +1715,14 @@ public class CLI
         meta.removeMemberType(attrName);
 
         metaClassRepository.saveMetaClass(meta);
+    }
+
+    public void setArgs(ArrayList<String> args) {
+        this.args = args;
+    }
+
+    public void resetMetaCache(){
+        metaClassRepository.resetCache();
     }
 
     public void commandMeta()
@@ -2914,6 +2945,8 @@ public class CLI
                 metaClassRepository.resetCache();
             } else if (command.equals("init")) {
                 storage.initialize();
+            } else if(command.equals("empty")){
+                storage.empty();
             } else if (command.equals("tc")) {
                 storage.tableCounts();
             } else if (command.equals("le")) {
@@ -2992,18 +3025,6 @@ public class CLI
         }
 
         while(true) {
-            /*
-             //args.clear(); args.add("c:\\2_portfolio.xml"); args.add("2"); args.add("0");
-            args.clear(); args.add("c:\\1.xml"); args.add("2"); args.add("49");
-            //args.clear(); args.add("C:\\Projects\\usci\\usci\\modules\\cli\\src\\main\\resources\\test_batch.xml"); args.add("2"); args.add("0");
-             try{
-                commandCRBatch();
-                 if(1==1) break;
-             } catch(Exception e){
-                 //System.out.println(e.getMessage());
-                 e.printStackTrace();
-             }
-             */
             while ( !(line = in.nextLine()).equals("quit")) {
                 processCommand(line, in);
 

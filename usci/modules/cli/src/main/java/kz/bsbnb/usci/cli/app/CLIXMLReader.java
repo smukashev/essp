@@ -66,6 +66,25 @@ public class CLIXMLReader
         }
     }
 
+    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchRepository batchRepository, Date repDate){
+        logger.info("Reader init.");
+        metaClassRepository = metaRepo;
+        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
+
+        try {
+            xmlEventReader = inputFactory.createXMLEventReader(inputStream);
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+        }
+
+        this.reportDate = repDate;
+
+        batch = new Batch(reportDate, 1L);
+
+        batchRepository.addBatch(batch);
+    }
+
     public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchRepository batchRepository, Date repDate) throws FileNotFoundException
     {
         logger.info("Reader init.");
@@ -232,5 +251,9 @@ public class CLIXMLReader
         }
 
         return false;
+    }
+
+    public void setXmlEventReader(XMLEventReader xmlEventReader) {
+        this.xmlEventReader = xmlEventReader;
     }
 }

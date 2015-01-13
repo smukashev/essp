@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -54,7 +55,23 @@ public class StorageImpl extends JDBCSupport implements IStorage {
 
 	@Override
 	public void empty() {
-        //todo: implement
+        String query = "SELECT table_name from all_tables where table_name like 'EAV%'";
+        List<String> list = jdbcTemplate.queryForList(query, String.class);
+        for(String s : list){
+            jdbcTemplate.update("delete from " + s);
+        }
+
+        String seq = "SELECT object_name from all_objects where object_type  = 'SEQUENCE' " +
+                "and object_name like 'SEQ_EAV%'" +
+                "and owner = (select user from dual)";
+
+        list = jdbcTemplate.queryForList(seq, String.class);
+
+        for(String s: list){
+            jdbcTemplate.update("drop sequence " + s);
+            jdbcTemplate.update("create sequence " + s + " minvalue 1 maxvalue 9999999999999999999999999 " +
+                    "start with 1 increment by 1 cache 20");
+        }
     }
 
     @Override
