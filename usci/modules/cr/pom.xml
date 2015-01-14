@@ -46,15 +46,16 @@
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <configuration>
-                      <executable>java</executable>
-                      <arguments>
-                    <argument>-classpath</argument><classpath />
-                    <argument>kz.bsbnb.usci.sync.Main</argument>
-                    <argument>-Djava.security.policy=${basedir}/src/main/resources/no.policy</argument>
-                      </arguments>
-                    </configuration>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.3.2</version>
+                <configuration>
+                  <executable>java</executable>
+                  <arguments>
+                <argument>-classpath</argument><classpath />
+                <argument>kz.bsbnb.usci.sync.Main</argument>
+                <argument>-Djava.security.policy=${basedir}/src/main/resources/no.policy</argument>
+                  </arguments>
+                </configuration>
             </plugin>
         </plugins>
     </build>
