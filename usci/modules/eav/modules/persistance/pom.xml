@@ -11,8 +11,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <runSuite>**/EavTestsSuit.class</runSuite>
-        <maven.compiler.source>1.6</maven.compiler.source>
-        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
         <activemq.version>5.10.0</activemq.version>
     </properties>
 
@@ -340,7 +340,7 @@
                         </executions>
                         <configuration>
                             <files>
-                                <file>src/main/resources/properties/profiles/oracle.properties</file>
+                                <file>src/main/resources/properties/oracle.properties</file>
                             </files>
                         </configuration>
                     </plugin>
