@@ -27,28 +27,15 @@
         <property name="maxActive" value="${jdbc.maxActive}"/>
     </bean>
 
-    <!-- datasource to the database -->
-    <beans profile="oracle">
-        <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-            <property name="locations">
-                <list>
-                    <value>classpath:properties/profiles/oracle.properties</value>
-                    <value>classpath:properties/main.properties</value>
-                    <value>classpath:properties/refs.properties</value>
-                </list>
-            </property>
-        </bean>
-    </beans>
 
-    <beans profile="postgres">
-        <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-            <property name="locations">
-                <list>
-                    <value>classpath:properties/profiles/postgres.properties</value>
-                    <value>classpath:properties/main.properties</value>
-                </list>
-            </property>
-        </bean>
-    </beans>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:properties/oracle.properties</value>
+                <value>classpath:properties/main.properties</value>
+                <value>classpath:properties/refs.properties</value>
+            </list>
+        </property>
+    </bean>
 
 </beans>
