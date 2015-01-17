@@ -19,22 +19,20 @@ import java.text.ParseException;
  */
 //16:06:25
 public class SimpleZipMain {
-    public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException, ParseException, InterruptedException {
-
+    public static void main(String args[]) throws IOException, ParserConfigurationException,
+            SAXException, ParseException, InterruptedException {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextZip.xml");
 
         IServiceRepository serviceFactory = ctx.getBean(IServiceRepository.class);
         IBatchService batchService = serviceFactory.getBatchService();
 
         ICouchbaseClientFactory couchbaseClientFactory = ctx.getBean(ICouchbaseClientFactory.class);
-        System.out.println(couchbaseClientFactory);
-//        CouchbaseClient client = couchbaseClientFactory.getCouchbaseClient();
 
         StatusSingleton statusSingleton = ctx.getBean(StatusSingleton.class);
 
         ZipFilesMonitor monitor = ctx.getBean(ZipFilesMonitor.class);
-        //monitor.monitor(Paths.get("c:\\zips"));
-        monitor.monitor(Paths.get("/home/a.tkachenko/input"));
+
+        monitor.monitor(Paths.get("C:\\zips"));
 
     }
 }
