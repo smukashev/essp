@@ -2,4 +2,6 @@
 target
 *.iml
 version.properties
+oracle.properties
+*.log
 
