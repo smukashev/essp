@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE database SYSTEM "http://db.apache.org/torque/dtd/database">
 <database name="model">
-/*	<table name="eav_a_user">
+	<table name="eav_a_user">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="screen_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
@@ -985,7 +985,7 @@
 				<unique-column name="id"/>
 				<unique-column name="showcase_id"/>
 			</unique>
-	</table>*/
+	</table>
 
 	<!-- DROOLS -->
 	<table name="logic_packages">
