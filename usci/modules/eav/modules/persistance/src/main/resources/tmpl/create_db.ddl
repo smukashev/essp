@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE database SYSTEM "http://db.apache.org/torque/dtd/database">
 <database name="model">
-	<table name="eav_a_user">
+/*	<table name="eav_a_user">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="screen_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
@@ -975,15 +975,71 @@
 		</foreign-key>-->
 	</table>
 	<table name="sc_id_bag">
-    		<column name="id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-    		<column name="showcase_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-    		<index name="eav_ind_022_01">
-                <index-column name="id"/>
-                <index-column name="showcase_id"/>
-            </index>
-    		<unique name="ind_uk_sc_003_00">
-    			<unique-column name="id"/>
-    			<unique-column name="showcase_id"/>
-    		</unique>
-    </table>
+			<column name="id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+			<column name="showcase_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+			<index name="eav_ind_022_01">
+							<index-column name="id"/>
+							<index-column name="showcase_id"/>
+					</index>
+			<unique name="ind_uk_sc_003_00">
+				<unique-column name="id"/>
+				<unique-column name="showcase_id"/>
+			</unique>
+	</table>*/
+
+	<!-- DROOLS -->
+	<table name="logic_packages">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="name" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<column name="description" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+		<unique>
+			<unique-column name="id"/>
+		</unique>
+		<index name="ind_packages_01">
+			<index-column name="id"/>
+		</index>
+	</table>
+	<table name="logic_rules">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="rule" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<unique>
+			<unique-column name="id"/>
+		</unique>
+		<index name="ind_rules_01">
+			<index-column name="id"/>
+		</index>
+	</table>
+	<table name="logic_package_versions">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="package_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+		<unique>
+			<unique-column name="id"/>
+		</unique>
+		<index name="ind_package_versions_01">
+			<index-column name="id"/>
+		</index>
+		<index name="ind_package_versions_02">
+			<index-column name="package_id"/>
+		</index>
+	</table>
+	<table name="logic_rule_package_versions">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="rule_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="package_versions_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<unique>
+			<unique-column name="id"/>
+		</unique>
+		<index name="ind_rule_package_versions_01">
+			<index-column name="id"/>
+		</index>
+		<index name="ind_rule_package_versions_02">
+			<index-column name="rule_id"/>
+		</index>
+		<index name="ind_rule_package_versions_03">
+			<index-column name="package_versions_id"/>
+		</index>
+	</table>
 </database>
