@@ -24,7 +24,7 @@ import java.util.List;
 public class RuleDao implements IRuleDao {
 
     private JdbcTemplate jdbcTemplate;
-
+    private final String PREFIX_ = "LOGIC_";
 
     public boolean testConnection()
     {
@@ -45,11 +45,14 @@ public class RuleDao implements IRuleDao {
 
 
     public List<Rule> load(BatchVersion batchVersion){
-        if (batchVersion.getId() < 1){
+        if (batchVersion.getId() < 1)
             throw new IllegalArgumentException("Batchversion has no id.");
-        }
-        String SQL = "SELECT * FROM rules WHERE id IN(SELECT rule_id FROM rule_package_versions WHERE package_versions_id = ?)";
-        List<Rule> ruleList = jdbcTemplate.query(SQL,new Object[]{batchVersion.getId()},new BeanPropertyRowMapper(Rule.class));
+
+        String SQL = "SELECT * FROM " + PREFIX_ + "rules WHERE id IN(SELECT rule_id FROM " + PREFIX_ +
+                "rule_package_versions WHERE package_versions_id = ?)";
+
+        List<Rule> ruleList = jdbcTemplate.query(SQL,new Object[]{batchVersion.getId()},
+                new BeanPropertyRowMapper(Rule.class));
 
         return ruleList;
     }
@@ -59,14 +62,14 @@ public class RuleDao implements IRuleDao {
         if (rule.getId() < 1){
             throw new IllegalArgumentException("Rule has no id.");
         }
-        String SQL = "UPDATE rules SET title=?,rule=? WHERE id=?";
+        String SQL = "UPDATE " + PREFIX_ + "rules SET title=?, rule=? WHERE id=?";
         jdbcTemplate.update(SQL,rule.getTitle(),rule.getRule(),rule.getId());
         return rule.getId();
     }
 
     @Override
     public List<Rule> getAllRules() {
-        String SQL = "SELECT * FROM rules order by id";
+        String SQL = "SELECT * FROM " + PREFIX_ + "rules order by id";
         List<Rule> ruleList = jdbcTemplate.query(SQL,new BeanPropertyRowMapper(Rule.class));
 
         return ruleList;
@@ -75,11 +78,11 @@ public class RuleDao implements IRuleDao {
 
     @Override
     public List<SimpleTrack> getRuleTitles(Long packageId, Date repDate) {
-        String SQL = "SELECT id, title AS NAME FROM rules WHERE id IN (\n" +
-                "SELECT rule_id FROM rule_package_versions WHERE package_versions_id = \n" +
-                "(SELECT id FROM package_versions WHERE repdate = \n" +
-                "    (SELECT MAX(repdate) FROM package_versions WHERE package_id = ? AND repdate <= ? ) \n" +
-                " AND package_id = ? LIMIT 1\n" +
+        String SQL = "SELECT id, title AS NAME FROM " + PREFIX_ + "rules WHERE id IN (\n" +
+                "SELECT rule_id FROM " + PREFIX_ + "rule_package_versions WHERE package_versions_id = \n" +
+                "(SELECT id FROM " + PREFIX_ + "package_versions WHERE REPORT_DATE = \n" +
+                "    (SELECT MAX(REPORT_DATE) FROM " + PREFIX_ + "package_versions WHERE package_id = ? AND REPORT_DATE <= ? ) \n" +
+                " AND package_id = ? rownum = 1\n" +
                 " ))";
 
 
@@ -89,10 +92,10 @@ public class RuleDao implements IRuleDao {
     }
 
     public long save(Rule rule,BatchVersion batchVersion){
-        String SQL = "INSERT INTO rules(title,rule) VALUES(?,?)";
+        String SQL = "INSERT INTO " + PREFIX_ + "rules(title, rule) VALUES(?, ?)";
         jdbcTemplate.update(SQL,rule.getTitle(),rule.getRule());
 
-        SQL = "SELECT id FROM rules WHERE rule = ?";
+        SQL = "SELECT id FROM " + PREFIX_ + "rules WHERE rule = ?";
         long id = jdbcTemplate.queryForLong(SQL,rule.getRule());
 
 //        if (batchVersion.getId() > 0){
@@ -105,7 +108,7 @@ public class RuleDao implements IRuleDao {
 
     @Override
     public Rule getRule(Long ruleId) {
-        String SQL = "SELECT * FROM rules WHERE id = ?";
+        String SQL = "SELECT * FROM " + PREFIX_ + "rules WHERE id = ?";
         List<Rule> rules = jdbcTemplate.query(SQL, new Object[]{ruleId}, new BeanPropertyRowMapper<Rule>(Rule.class));
         if(rules.size() > 1)
             throw new RuntimeException("several rules with same id");
@@ -114,7 +117,8 @@ public class RuleDao implements IRuleDao {
 
     @Override
     public boolean deleteRule(long ruleId, long batchVersionId) {
-        jdbcTemplate.update("DELETE FROM rule_package_versions WHERE rule_id = ? AND package_versions_id = ?", ruleId, batchVersionId);
+        jdbcTemplate.update("DELETE FROM " + PREFIX_ + "rule_package_versions WHERE rule_id = ? " +
+                "AND package_versions_id = ?", ruleId, batchVersionId);
         return true;
     }
 
@@ -124,7 +128,8 @@ public class RuleDao implements IRuleDao {
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO rules (title) VALUES(?)", new String[]{"id"});
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO " + PREFIX_ + "rules (title) " +
+                        "VALUES(?)", new String[]{"id"});
                 ps.setString(1,title);
                 return ps;
             }
@@ -134,19 +139,19 @@ public class RuleDao implements IRuleDao {
 
     @Override
     public void save(long ruleId, long batchVersionId) {
-        String sql = "INSERT INTO rule_package_versions (rule_id , package_versions_id) VALUES (?,?)";
+        String sql = "INSERT INTO " + PREFIX_ + "rule_package_versions (rule_id , package_versions_id) VALUES (?,?)";
         jdbcTemplate.update(sql,new Object[]{ruleId,batchVersionId});
     }
 
     @Override
     public void updateBody(Long ruleId, String body) {
-        String sql = "UPDATE rules SET rule = ? WHERE id=?";
+        String sql = "UPDATE " + PREFIX_ + "rules SET rule = ? WHERE id=?";
         jdbcTemplate.update(sql, new Object[]{body, ruleId});
     }
 
     @Override
     public void copyExistingRule(long ruleId, long batchVersionId) {
-        String sql = "INSERT INTO rule_package_versions (rule_id, package_versions_id) VALUES (?,?)";
+        String sql = "INSERT INTO " + PREFIX_ + "rule_package_versions (rule_id, package_versions_id) VALUES (?,?)";
         jdbcTemplate.update(sql, new Object[]{ruleId, batchVersionId});
     }
 
@@ -156,7 +161,7 @@ public class RuleDao implements IRuleDao {
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO rules (rule, title)\n" +
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO " + PREFIX_ + "rules (rule, title)\n" +
                         "  SELECT rule, ? AS title FROM rules WHERE id = ?", new String[]{"id"});
                 ps.setString(1, title);
                 ps.setLong(2,ruleId);
@@ -173,8 +178,8 @@ public class RuleDao implements IRuleDao {
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO rules (title,rule)" +
-                        "values (?,?)", new String[]{"id"});
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO " + PREFIX_ + "rules (title, rule)" +
+                        "values (?, ?)", new String[]{"id"});
                 ps.setString(1, rule.getTitle());
                 ps.setString(2, rule.getRule());
                 return ps;
@@ -185,7 +190,7 @@ public class RuleDao implements IRuleDao {
 
     @Override
     public void renameRule(long ruleId, String title) {
-        String sql = "Update rules set title = ? where id = ?";
+        String sql = "Update " + PREFIX_ + "rules set title = ? where id = ?";
         jdbcTemplate.update(sql, title, ruleId);
     }
 }

@@ -41,10 +41,10 @@ public class RuleService implements IRuleService {
 
 //        Batch batch = batchDao.loadBatch(batchVersion.getPackage_id());
 //
-//        listenerSingleton.callListeners(batchVersion.getId(),batchVersion.getRepDate(), batch.getName());
+//        listenerSingleton.callListeners(batchVersion.getId(),batchVersion.getReport_date(), batch.getName());
         long id = ruleDao.save(rule,batchVersion);
 
-//        listenerSingleton.callListeners(batchVersion.getId(), batchVersion.getRepDate(), batch.getName());
+//        listenerSingleton.callListeners(batchVersion.getId(), batchVersion.getReport_date(), batch.getName());
 
         return id;
     }

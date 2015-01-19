@@ -183,7 +183,7 @@ public class RulesSingleton
                             e.getMessage()));
                 }
 
-                ruleCasheEntries.add(new RuleCasheEntry(curVersion.getRepDate(),
+                ruleCasheEntries.add(new RuleCasheEntry(curVersion.getReport_date(),
                         curBatch.getName() + "_" + curVersion.getId()));
             }
 
@@ -238,7 +238,7 @@ public class RulesSingleton
 
         BatchVersion curVersion = new BatchVersion();
         curVersion.setId(versionId);
-        curVersion.setRepDate(date);
+        curVersion.setReport_date(date);
 
         List<Rule> rules = remoteRuleService.load(curVersion);
 
@@ -272,13 +272,13 @@ public class RulesSingleton
             {
                 if (entry.getRules().equals(packageName + "_" + curVersion.getId())) {
                     found = true;
-                    entry.setRepDate(curVersion.getRepDate());
+                    entry.setRepDate(curVersion.getReport_date());
                     break;
                 }
             }
 
             if(!found) {
-                ruleCasheEntries.add(new RuleCasheEntry(curVersion.getRepDate(),
+                ruleCasheEntries.add(new RuleCasheEntry(curVersion.getReport_date(),
                         packageName + "_" + curVersion.getId()));
             }
 
