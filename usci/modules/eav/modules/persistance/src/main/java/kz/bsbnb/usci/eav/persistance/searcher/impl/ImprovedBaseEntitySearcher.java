@@ -447,7 +447,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             }
         }
 
-        SelectConditionStep where = joins.where(EAV_BE_ENTITIES.as(entityAlias).CLASS_ID.equal(metaClass.getId()));
+        SelectConditionStep where = joins.where(EAV_BE_ENTITIES.as(entityAlias).CLASS_ID.equal(metaClass.getId()))
+               .and(EAV_BE_ENTITIES.as(entityAlias).DELETED.equal(DataUtils.convert(false)));
 
         if(condition != null) {
             where = where.and(condition);

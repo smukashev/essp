@@ -304,7 +304,11 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
                 .select(DSL.max(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE).as("min_report_date"))
                 .from(EAV_BE_ENTITY_REPORT_DATES)
                 .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId))
-                .and(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.lessOrEqual(DataUtils.convert(reportDate)));
+                .and(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.lessOrEqual(DataUtils.convert(reportDate)))
+                .and(DSL.notExists(context.select(EAV_BE_ENTITIES.ID)
+                        .from(EAV_BE_ENTITIES)
+                        .where(EAV_BE_ENTITIES.ID.eq(baseEntityId))
+                        .and(EAV_BE_ENTITIES.DELETED.eq(DataUtils.convert(true)))));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -316,10 +320,16 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
     public Date getMaxReportDate(long baseEntityId)
     {
         String tableAlias = "rd";
+        String eavTable = "et";
         Select select = context
                 .select(DSL.max(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).REPORT_DATE).as("max_report_date"))
                 .from(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias))
-                .where(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ENTITY_ID.eq(baseEntityId));
+                .where(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ENTITY_ID.eq(baseEntityId))
+                .and(DSL.notExists(context
+                        .select(EAV_BE_ENTITIES.as(eavTable).ID)
+                        .from(EAV_BE_ENTITIES.as(eavTable))
+                        .where(EAV_BE_ENTITIES.as(eavTable).ID.eq(baseEntityId))
+                        .and(EAV_BE_ENTITIES.as(eavTable).DELETED.equal(DataUtils.convert(true)))));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

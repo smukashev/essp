@@ -52,6 +52,14 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     private Set<String> validationErrors = new HashSet<String>();
 
+    private boolean markedAsDeleted;
+
+    public void markAsDeleted() {
+        this.markedAsDeleted = true;
+    }
+
+    public boolean markedAsDeleted(){ return markedAsDeleted;}
+
     /**
      * Initializes entity.
      */

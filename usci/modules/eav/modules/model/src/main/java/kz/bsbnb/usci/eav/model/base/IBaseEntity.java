@@ -28,6 +28,8 @@ public interface IBaseEntity extends IBaseContainer {
 
     public void remove(String attribute);
 
+    public boolean markedAsDeleted();
+
     public Object getEl(String path);
 
     public Object getEls(String path);

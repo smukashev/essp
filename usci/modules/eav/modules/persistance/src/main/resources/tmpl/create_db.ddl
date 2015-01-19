@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE database SYSTEM "http://db.apache.org/torque/dtd/database">
 <database name="model">
-/*	<table name="eav_a_user">
+	<table name="eav_a_user">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="screen_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
@@ -554,6 +554,7 @@
 	<table name="eav_be_entities">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="class_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="deleted" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="0"/>
 		<!--<foreign-key foreignTable="eav_m_classes" name="eav_fk_010_00">
 			<reference local="class_id" foreign="id"/>
 		</foreign-key>-->
@@ -564,6 +565,10 @@
 			<index-column name="id"/>
 			<index-column name="class_id"/>
 		</index>
+		<unique name="eav_uk_010_00">
+		  <unique-column name="id"/>
+		  <unique-column name="deleted"/>
+		</unique>
 	</table>
 	<table name="eav_be_entity_complex_sets">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -985,7 +990,7 @@
 				<unique-column name="id"/>
 				<unique-column name="showcase_id"/>
 			</unique>
-	</table>*/
+	</table>
 
 	<!-- DROOLS -->
 	<table name="logic_packages">

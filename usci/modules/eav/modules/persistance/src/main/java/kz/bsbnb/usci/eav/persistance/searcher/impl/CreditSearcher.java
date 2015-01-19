@@ -4,8 +4,10 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherPool;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_VALUES;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITIES;
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_STRING_VALUES;
 
 @Component
@@ -86,7 +89,9 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher
                         .select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.as("inner_id"))
                         .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
                         .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ATTRIBUTE_ID.equal(entity.getMetaAttribute("primary_contract").getId()))
-                        .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(primaryContractId));
+                        .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(primaryContractId))
+                        .and(DSL.notExists(context.selectFrom(EAV_BE_ENTITIES).where(EAV_BE_ENTITIES.ID.eq(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID)
+                                        .and(EAV_BE_ENTITIES.DELETED.eq(DataUtils.convert(true))))));
 
                 List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray()); 
                 for (Map<String, Object> row : rows)

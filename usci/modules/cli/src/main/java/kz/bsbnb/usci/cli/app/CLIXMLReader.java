@@ -116,6 +116,11 @@ public class CLIXMLReader
 
     private boolean hasMembers = false;
 
+    private boolean hasOperationDelete(StartElement startElement){
+        return startElement.getAttributeByName(new QName("operation"))!=null &&
+                startElement.getAttributeByName(new QName("operation")).getValue().equals("delete");
+    }
+
     public void startElement(XMLEvent event, StartElement startElement, String localName) {
         if(localName.equals("batch")) {
             //logger.info("batch");
@@ -123,8 +128,11 @@ public class CLIXMLReader
             //logger.info("entities");
         } else if(localName.equals("entity")) {
             //logger.info("entity");
-            currentContainer = new BaseEntity(metaClassRepository.getMetaClass(
+            BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass(
                     startElement.getAttributeByName(new QName("class")).getValue()), batch.getRepDate());
+            if(hasOperationDelete(startElement))
+                baseEntity.markAsDeleted();
+            currentContainer = baseEntity;
         } else {
             //logger.info("other: " + localName);
             IMetaType metaType = currentContainer.getMemberType(localName);

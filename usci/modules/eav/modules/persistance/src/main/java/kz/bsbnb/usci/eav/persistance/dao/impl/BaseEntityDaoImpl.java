@@ -15,6 +15,7 @@ import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -83,19 +84,20 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     protected void delete(long id)
     {
         String tableAlias = "e";
-        Delete delete = context
-                .delete(EAV_BE_ENTITIES.as(tableAlias))
-                .where(EAV_BE_ENTITIES.as(tableAlias).ID.equal(id));
+        Update update = context
+                .update(EAV_BE_ENTITIES.as(tableAlias))
+                .set(EAV_BE_ENTITIES.as(tableAlias).DELETED, DataUtils.convert(true))
+                .where(EAV_BE_ENTITIES.as(tableAlias).ID.eq(id));
 
-        logger.debug(delete.toString());
-        int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+        logger.debug(update.toString());
+        int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
         if (count > 1)
         {
-            throw new RuntimeException("DELETE operation should be delete only one record. ID: " + id);
+            throw new RuntimeException("DELETE operation should be update only one record. ID: " + id);
         }
         if (count < 1)
         {
-            logger.warn("DELETE operation should delete a record. ID: " + id);
+            logger.warn("DELETE operation should update a record. ID: " + id);
         }
     }
 

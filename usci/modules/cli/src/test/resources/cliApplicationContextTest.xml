@@ -31,7 +31,7 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>classpath:properties/profiles/oracle.properties</value>
+                <value>classpath:properties/oracle.properties</value>
                 <value>classpath:properties/main.properties</value>
                 <value>classpath:properties/refs.properties</value>
                 <value>classpath:properties/jms.properties</value>

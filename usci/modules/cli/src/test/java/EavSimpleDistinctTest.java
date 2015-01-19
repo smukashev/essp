@@ -1,3 +1,4 @@
+import base.EavTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +14,7 @@ import static junit.framework.Assert.assertTrue;
  */
 @RunWith( SpringJUnit4ClassRunner.class )
 @ContextConfiguration(locations = {"classpath:cliApplicationContextTest.xml"})
-public class EavSimpleDistinctTest extends EavTest{
+public class EavSimpleDistinctTest extends EavTest {
 
     public EavSimpleDistinctTest(){
         meta = new String[]{
