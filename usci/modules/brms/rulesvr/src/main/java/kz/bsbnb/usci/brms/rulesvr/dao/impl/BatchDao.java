@@ -13,6 +13,7 @@ import java.util.List;
 
 /**
  * @author abukabayev
+ * @modified k.tulbassiyev
  */
 
 
@@ -20,10 +21,10 @@ public class BatchDao implements IBatchDao
 {
     private JdbcTemplate jdbcTemplate;
 
-    public BatchDao(){
+    private final String PREFIX_ = "LOGIC_";
 
+    public BatchDao() {
     }
-
 
     public boolean testConnection()
     {
@@ -46,11 +47,9 @@ public class BatchDao implements IBatchDao
     public Batch loadBatch(long id) {
 
         if(id < 1)
-        {
             throw new IllegalArgumentException("Does not have id. Can't load.");
-        }
 
-        String SQL = "SELECT * FROM packages WHERE id  = ?";
+        String SQL = "SELECT * FROM " + PREFIX_ + "packages WHERE id  = ?";
         Batch batch = jdbcTemplate.queryForObject(SQL,new Object[]{id},new BatchMapper());
         return batch;
     }
@@ -64,11 +63,11 @@ public class BatchDao implements IBatchDao
                     "of Batch saving to the DB.");
         }
 
-        String SQL = "INSERT INTO packages(NAME,repdate) VALUES (?,?)";
+        String SQL = "INSERT INTO " + PREFIX_ + "packages(NAME, REPORT_DATE) VALUES (?, ?)";
         jdbcTemplate.update(SQL,batch.getName(),batch.getRepoDate());
         System.out.println("Created batch with repodate"+batch.getRepoDate()+" called "+batch.getName());
 
-        SQL = "SELECT id FROM packages WHERE NAME = ?";
+        SQL = "SELECT id FROM " + PREFIX_ + "packages WHERE NAME = ?";
         long id = jdbcTemplate.queryForLong(SQL,batch.getName());
         return id;
     }
@@ -80,7 +79,7 @@ public class BatchDao implements IBatchDao
             throw new IllegalArgumentException("Batch does not have id. Can't create batch version.");
         }
 
-       String SQL = "INSERT INTO package_versions(package_id,repdate) VALUES(?,?)";
+       String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, REPORT_DATE) VALUES(?, ?)";
         jdbcTemplate.update(SQL,batchId,batch.getRepoDate());
     }
 
@@ -94,16 +93,16 @@ public class BatchDao implements IBatchDao
 
     @Override
     public List<Batch> getAllBatches() {
-        String SQL = "SELECT * FROM packages";
-        List<Batch> batchList = jdbcTemplate.query(SQL,new BeanPropertyRowMapper(Batch.class));
+        String SQL = "SELECT * FROM " + PREFIX_ + "packages";
+        List<Batch> batchList = jdbcTemplate.query(SQL, new BeanPropertyRowMapper(Batch.class));
         return batchList;
     }
 
     @Override
     public long getBatchVersionId(long batchId, Date repDate) {
-        String SQL = "SELECT id FROM package_versions WHERE repdate = \n" +
-                "     (SELECT MAX(repdate) FROM package_versions WHERE package_id = ? AND repdate <= ? ) \n" +
-                "AND package_id = ? LIMIT 1";
+        String SQL = "SELECT id FROM " + PREFIX_ + "package_versions WHERE REPORT_DATE = \n" +
+                "     (SELECT MAX(REPORT_DATE) FROM " + PREFIX_ + "package_versions WHERE package_id = ? AND REPORT_DATE <= ? ) \n" +
+                "AND package_id = ? AND rownum = 1";
 
         return jdbcTemplate.queryForLong(SQL, batchId, repDate, batchId);
     }

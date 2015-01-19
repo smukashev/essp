@@ -14,9 +14,12 @@ import java.util.List;
 @Service
 public class BatchService implements IBatchService
 {
-
     @Autowired
     private IBatchDao batchDao;
+
+    public BatchService() {
+        System.out.println("BatchService loaded.");
+    }
 
     @Override
     public long save(Batch batch) {

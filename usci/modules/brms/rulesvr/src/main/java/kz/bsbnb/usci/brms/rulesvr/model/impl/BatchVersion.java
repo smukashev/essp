@@ -8,7 +8,7 @@ import java.util.Date;
  * @author abukabayev
  */
 public class BatchVersion extends Persistable implements IBatchVersion {
-    private Date repDate;
+    private Date report_date;
     private long package_id;
     private String name;
 
@@ -17,16 +17,16 @@ public class BatchVersion extends Persistable implements IBatchVersion {
     }
 
     public BatchVersion(Date repDate,long package_id){
-       this.repDate = repDate;
+       this.report_date = repDate;
        this.package_id = package_id;
     }
 
-    public Date getRepDate() {
-        return repDate;
+    public Date getReport_date() {
+        return report_date;
     }
 
-    public void setRepDate(Date repDate) {
-        this.repDate = repDate;
+    public void setReport_date(Date report_date) {
+        this.report_date = report_date;
     }
 
     public long getPackage_id() {
