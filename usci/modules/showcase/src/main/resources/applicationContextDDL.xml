@@ -27,13 +27,4 @@
         <property name="maxActive" value="256"/>
     </bean>
 
-    <!-- datasource to the database -->
-    <!--<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>classpath:properties/oracle.properties</value>
-            </list>
-        </property>
-    </bean>-->
-
 </beans>
