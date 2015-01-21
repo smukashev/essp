@@ -3219,12 +3219,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
         IBaseEntity baseEntityPrepared = prepare(((BaseEntity) baseEntity).clone());
-        if(baseEntityPrepared.getId() > 0 ){
-            IBaseEntityDao baseEntityDao = persistableDaoPool
-                    .getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
-            if(baseEntityDao.isDeleted(baseEntityPrepared.getId()))
-                return null;
-        }
         IBaseEntity baseEntityApplied = apply(baseEntityPrepared, baseEntityManager, entityHolder);
 
         /*if (baseEntityPrepared.getId() > 0)
