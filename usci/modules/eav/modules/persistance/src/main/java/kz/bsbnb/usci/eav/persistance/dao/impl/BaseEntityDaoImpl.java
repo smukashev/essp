@@ -101,6 +101,18 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         }
     }
 
+    @Override
+    public boolean isDeleted(long id)
+    {
+        Select select = context.select(EAV_BE_ENTITIES.ID)
+                .from(EAV_BE_ENTITIES)
+                .where(EAV_BE_ENTITIES.ID.eq(id))
+                .and(EAV_BE_ENTITIES.DELETED.eq(DataUtils.convert(true)));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+        return rows.size() > 0;
+    }
+
     public IBaseEntity load(long id)
     {
         MetaClass metaClass = (MetaClass)getMetaClass(id);

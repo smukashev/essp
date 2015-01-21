@@ -29,4 +29,6 @@ public interface IBaseEntityDao extends IPersistableDao {
 
     public Set<Long> getChildBaseEntityIds(long parentBaseEntityId);
 
+    public boolean isDeleted(long id);
+
 }

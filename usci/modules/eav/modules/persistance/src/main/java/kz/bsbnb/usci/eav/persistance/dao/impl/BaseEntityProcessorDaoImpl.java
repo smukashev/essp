@@ -167,6 +167,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             throw new UnsupportedOperationException("Not found appropriate report date.");
         }
 
+        IBaseEntityDao baseEntityDao =
+                persistableDaoPool.getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
+        if(baseEntityDao.isDeleted(id))
+            return null;
+
         /*if (caching)
         {
             return baseEntityCacheDao.getBaseEntity(id, maxReportDate);
@@ -3214,9 +3219,13 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
         IBaseEntity baseEntityPrepared = prepare(((BaseEntity) baseEntity).clone());
-        //baseEntityPrepared = cleanDeleted(baseEntityPrepared);
+        if(baseEntityPrepared.getId() > 0 ){
+            IBaseEntityDao baseEntityDao = persistableDaoPool
+                    .getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
+            if(baseEntityDao.isDeleted(baseEntityPrepared.getId()))
+                return null;
+        }
         IBaseEntity baseEntityApplied = apply(baseEntityPrepared, baseEntityManager, entityHolder);
-        System.out.println(baseEntityApplied);
 
         /*if (baseEntityPrepared.getId() > 0)
         {
@@ -3243,63 +3252,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         return baseEntityApplied;
     }
-
-    private IBaseEntity cleanDeleted(IBaseEntity baseEntity) {
-        Map<IBaseContainer, String> deletedObjects = new HashMap<IBaseContainer, String>();
-        if(baseEntity.markedAsDeleted()){
-            System.out.println("remove baseEntity with id: " + baseEntity.getId());
-            return null;
-        }
-
-        for(String attribute : baseEntity.getAttributes()){
-            IBaseValue baseValue = baseEntity.getBaseValue(attribute);
-            if(baseValue.getValue() != null) {
-                IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-                IMetaType metaType = metaAttribute.getMetaType();
-                if (metaType.isComplex()) {
-                    if (metaType.isSet()) {
-                        if(metaType.isSetOfSets())
-                            throw new UnsupportedOperationException("Not yet implemented");
-
-                        IBaseSet baseSet = (BaseSet) baseValue;
-                        Iterator it = baseSet.get().iterator();
-
-                        for (IBaseValue childBaseValue : baseSet.get()) {
-                            IBaseEntity childBaseEntity = (IBaseEntity)childBaseValue.getValue();
-                            if(childBaseEntity.markedAsDeleted()){
-                                System.out.println("remove baseEntity with id: " + childBaseEntity.getId());
-                                baseSet.remove(childBaseEntity.getUuid().toString());
-                            }else{
-                                cleanDeleted(childBaseEntity);
-                            }
-                        }
-                    } else {
-                        IBaseEntity nextBaseEntity = (IBaseEntity)baseValue.getValue();
-                        if(nextBaseEntity.markedAsDeleted()){
-                            System.out.println("remove baseEntity with id: " + nextBaseEntity.getId());
-                            deletedObjects.put(baseEntity,attribute);
-                        }else{
-                            cleanDeleted(nextBaseEntity);
-                        }
-                    }
-                }
-            }
-        }
-
-        for(IBaseContainer baseContainer : deletedObjects.keySet()){
-            String attr = deletedObjects.get(baseContainer);
-            if(baseContainer.getBaseContainerType() == BaseContainerType.BASE_ENTITY){
-                IBaseEntity baseEntity1 = (IBaseEntity)baseContainer;
-                baseEntity1.remove(attr);
-            }else{
-                IBaseSet baseSet = (IBaseSet)baseContainer;
-                baseSet.remove(attr);
-            }
-        }
-
-    return baseEntity;
-    }
-
 
     public boolean checkReportDateExists(long baseEntityId, Date reportDate)
     {
