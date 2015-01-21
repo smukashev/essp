@@ -185,10 +185,15 @@
             <artifactId>gson</artifactId>
             <version>${com.google.gson.version}</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-all</artifactId>
             <version>${activemq.version}</version>
+        </dependency>-->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
+            <version>5.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.xbean</groupId>
