@@ -67,8 +67,7 @@ public class EavTest extends JDBCSupport {
 
     public void nextKey(){
         for(int i=0;i<testingBaseEntites.length;i++) {
-            testingBaseEntites[i] = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><entities>"
-                    + testingBaseEntites[i] + "</entities>";
+            testingBaseEntites[i] = wrap(testingBaseEntites[i]);
             testingBaseEntites[i]= testingBaseEntites[i].replaceFirst("key_\\d+","key_" + seed);
             //System.out.println(testingBaseEntites[i]);
         }
@@ -76,6 +75,11 @@ public class EavTest extends JDBCSupport {
 
     public long getBEid(){
         return jdbcTemplate.queryForLong("select max(id) from eav_be_entities");
+    }
+
+    public void checkException(){
+        if(cli.getLastException() != null)
+            throw new RuntimeException("failed last exception check");
     }
 
 }

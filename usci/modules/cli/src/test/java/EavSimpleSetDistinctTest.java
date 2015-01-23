@@ -354,5 +354,18 @@ public class EavSimpleSetDistinctTest extends EavTest {
         assertTrue(testHolder.lastWrong, status == 0);
     }
 
-
+    /**
+     * NULL pointer exception bug  in BaseEntityProcessorDaoImpl
+     * when batch resend to the same report date
+     */
+    @Test
+    public void test4() throws Exception {
+        cli.readEntityFromXMLString(testingBaseEntites[0], testingDates[0]);
+        long id1 = getBEid();
+        checkException();
+        cli.readEntityFromXMLString(testingBaseEntites[0], testingDates[0]);
+        long id2 = getBEid();
+        checkException();
+        assertTrue("ids must be equal", id1 == id2);
+    }
 }
