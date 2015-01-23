@@ -18,7 +18,7 @@ public class BatchService implements IBatchService
     private IBatchDao batchDao;
 
     public BatchService() {
-        System.out.println("BatchService loaded.");
+        super();
     }
 
     @Override
