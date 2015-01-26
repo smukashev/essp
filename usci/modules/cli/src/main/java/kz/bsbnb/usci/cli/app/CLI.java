@@ -3003,20 +3003,12 @@ public class CLI
                 mergeEntity();
             } else if(command.equals("getbatch")){
                 commandGetBatch();
-            } else if(command.equals("oracle")){
-                commandOracle(in);
             } else {
                 System.out.println("No such command: " + command);
             }
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
             lastException = e;
-        }
-    }
-
-    private void commandOracle(Scanner in) {
-        if(args.get(0).equals("user")){
-            System.out.println(storage.currentUser());
         }
     }
 
