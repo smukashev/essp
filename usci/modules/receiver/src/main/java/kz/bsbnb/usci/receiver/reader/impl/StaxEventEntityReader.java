@@ -148,6 +148,12 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         }
     }
 
+    private boolean hasOperationDelete(StartElement startElement){
+        return startElement.getAttributeByName(new QName("operation"))!=null &&
+                                startElement.getAttributeByName(new QName("operation")).getValue()
+                                        .equalsIgnoreCase(OperationType.DELETE.toString());
+    }
+
     public void startElement(XMLEvent event, StartElement startElement, String localName) {
         if(localName.equals("batch")) {
             //logger.info("batch");
@@ -155,8 +161,11 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             //logger.info("entities");
         } else if(localName.equals("entity")) {
             //logger.info("entity");
-            currentContainer = metaFactoryService.getBaseEntity(
+            BaseEntity baseEntity = metaFactoryService.getBaseEntity(
                     startElement.getAttributeByName(new QName("class")).getValue(), batch.getRepDate());
+            if(hasOperationDelete(startElement))
+                baseEntity.setOperation(OperationType.DELETE);
+            currentContainer = baseEntity;
         } else {
             //logger.info("other: " + localName);
             IMetaType metaType = currentContainer.getMemberType(localName);

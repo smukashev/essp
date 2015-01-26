@@ -360,9 +360,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         IBaseEntity baseEntityLoaded = null;
         IBaseEntity baseEntityApplied = null;
 
-        if(baseEntityForSave.markedAsDeleted()){
-            baseEntityManager.registerAsDeleted(baseEntityForSave);
-            return null;
+        if(baseEntityForSave.getOperation() != null){
+            switch (baseEntityForSave.getOperation()) {
+                case DELETE:
+                    baseEntityManager.registerAsDeleted(baseEntityForSave);
+            }
         }
 
         if (baseEntityForSave.getId() < 1 || baseEntityForSave.getMeta().isSearchable() == false)

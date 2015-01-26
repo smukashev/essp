@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.model.base;
 
+import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
@@ -28,7 +29,7 @@ public interface IBaseEntity extends IBaseContainer {
 
     public void remove(String attribute);
 
-    public boolean markedAsDeleted();
+    public OperationType getOperation();
 
     public Object getEl(String path);
 

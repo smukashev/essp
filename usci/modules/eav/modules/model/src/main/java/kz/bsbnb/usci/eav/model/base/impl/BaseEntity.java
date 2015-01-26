@@ -43,6 +43,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      */
     private MetaClass meta;
 
+    OperationType operationType;
+
     private IBaseEntityReportDate baseEntityReportDate;
     
     /**
@@ -52,13 +54,14 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     private Set<String> validationErrors = new HashSet<String>();
 
-    private boolean markedAsDeleted;
-
-    public void markAsDeleted() {
-        this.markedAsDeleted = true;
+    @Override
+    public OperationType getOperation() {
+        return operationType;
     }
 
-    public boolean markedAsDeleted(){ return markedAsDeleted;}
+    public void setOperation(OperationType type){
+        operationType = type;
+    }
 
     /**
      * Initializes entity.

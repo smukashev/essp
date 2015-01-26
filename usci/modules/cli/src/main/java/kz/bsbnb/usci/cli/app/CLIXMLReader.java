@@ -118,7 +118,8 @@ public class CLIXMLReader
 
     private boolean hasOperationDelete(StartElement startElement){
         return startElement.getAttributeByName(new QName("operation"))!=null &&
-                startElement.getAttributeByName(new QName("operation")).getValue().equals("delete");
+                startElement.getAttributeByName(new QName("operation")).getValue()
+                        .equalsIgnoreCase(OperationType.DELETE.toString());
     }
 
     public void startElement(XMLEvent event, StartElement startElement, String localName) {
@@ -131,7 +132,7 @@ public class CLIXMLReader
             BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass(
                     startElement.getAttributeByName(new QName("class")).getValue()), batch.getRepDate());
             if(hasOperationDelete(startElement))
-                baseEntity.markAsDeleted();
+                baseEntity.setOperation(OperationType.DELETE);
             currentContainer = baseEntity;
         } else {
             //logger.info("other: " + localName);
