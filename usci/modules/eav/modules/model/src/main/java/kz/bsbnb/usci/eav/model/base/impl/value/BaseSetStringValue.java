@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * @author alexandr.motov
  */
-public class BaseSetStringValue extends BaseValue<String> implements IBaseValue<String> {
+public class BaseSetStringValue extends BaseSetValue<String> {
 
     public BaseSetStringValue(long id, Batch batch, long index, Date reportDate, String value, boolean closed, boolean last) {
         super(id, batch, index, reportDate, value, closed, last);
