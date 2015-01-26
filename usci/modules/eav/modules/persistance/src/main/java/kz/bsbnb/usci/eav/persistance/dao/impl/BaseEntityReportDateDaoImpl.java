@@ -298,6 +298,64 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
     }
 
     @Override
+    public boolean isLastReportDate(long baseEntityId, Date reportDate)
+    {
+        String tableAlias = "rd";
+
+        Select select = context
+                .select(
+                        DSL.decode(
+                                DSL.max(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).REPORT_DATE),
+                                DataUtils.convert(reportDate), DSL.val(1, BigDecimal.class), DSL.val(0, BigDecimal.class)).as("is_last"))
+                        .from(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias))
+                        .where(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ENTITY_ID.eq(baseEntityId))
+                        .and(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).REPORT_DATE.greaterOrEqual(DataUtils.convert(reportDate)));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        return ((BigDecimal)rows.get(0).get("is_last")).equals(BigDecimal.ONE);
+    }
+
+    @Override
+    public Date getNextReportDate(long baseEntityId, Date reportDate)
+    {
+        String tableAlias = "rd";
+        Select select = context
+                .select(DSL.min(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).REPORT_DATE).as("next_report_date"))
+                .from(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias))
+                .where(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ENTITY_ID.eq(baseEntityId))
+                .and(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(reportDate)));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+        if (rows.size() != 0)
+        {
+            return DataUtils.convert((Timestamp) rows.get(0).get("next_report_date"));
+        }
+        return null;
+    }
+
+    @Override
+    public Date getPreviousReportDate(long baseEntityId, Date reportDate)
+    {
+        String tableAlias = "rd";
+        Select select = context
+                .select(DSL.max(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).REPORT_DATE).as("previous_report_date"))
+                .from(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias))
+                .where(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ENTITY_ID.eq(baseEntityId))
+                .and(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(reportDate)));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+        if (rows.size() != 0)
+        {
+            return DataUtils.convert((Timestamp) rows.get(0).get("previous_report_date"));
+        }
+        return null;
+    }
+
+    @Override
     public Date getMaxReportDate(long baseEntityId, Date reportDate)
     {
         Select select = context

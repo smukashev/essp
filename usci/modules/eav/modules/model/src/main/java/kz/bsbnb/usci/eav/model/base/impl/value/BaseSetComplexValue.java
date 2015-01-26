@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * @author alexandr.motov
  */
-public class BaseSetComplexValue extends BaseValue<IBaseEntity> implements IBaseValue<IBaseEntity> {
+public class BaseSetComplexValue extends BaseSetValue<IBaseEntity> {
 
     public BaseSetComplexValue(long id, Batch batch, long index, Date reportDate, IBaseEntity value, boolean closed, boolean last) {
         super(id, batch, index, reportDate, value, closed, last);

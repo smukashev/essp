@@ -322,7 +322,7 @@ public class EavSimpleSetDistinctTest extends EavTest {
         test = new SingleTest();
         test.addCond(SET_ID, setId);
         test.addCond(REPORT_DATE, "date '2015-01-01'");
-        test.addCond(VALUE, "c");
+        test.addCond(VALUE, "a");
         test.addCond(IS_CLOSED,0);
         test.addCond(IS_LAST,1);
         test.setAnswer(1);

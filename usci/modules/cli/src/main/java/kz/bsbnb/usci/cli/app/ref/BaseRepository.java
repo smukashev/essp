@@ -131,7 +131,7 @@ public class BaseRepository implements  Runnable
     public static Statement getStatement(){
         try {
             if(connection == null){
-                    connection = DriverManager.getConnection("jdbc:oracle:thin:@10.10.15.17:1521/CREDITS", "core","core_oct_2013");
+                    connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1522:XE", "CORE","CORE_2013");
                     return statement = connection.createStatement();
             }
 

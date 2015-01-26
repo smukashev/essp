@@ -463,4 +463,42 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
     }
 
+    @Override
+    public Date getNextReportDate(long baseSetId, Date reportDate)
+    {
+        String tableAlias = "ssv";
+        Select select = context
+                .select(DSL.min(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE).as("next_report_date"))
+                .from(EAV_BE_STRING_SET_VALUES.as(tableAlias))
+                .where(EAV_BE_STRING_SET_VALUES.as(tableAlias).SET_ID.eq(baseSetId))
+                .and(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(reportDate)));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+        if (rows.size() > 0)
+        {
+            return DataUtils.convert((Timestamp) rows.get(0).get("next_report_date"));
+        }
+        return null;
+    }
+
+    @Override
+    public Date getPreviousReportDate(long baseSetId, Date reportDate)
+    {
+        String tableAlias = "ssv";
+        Select select = context
+                .select(DSL.max(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE).as("previous_report_date"))
+                .from(EAV_BE_STRING_SET_VALUES.as(tableAlias))
+                .where(EAV_BE_STRING_SET_VALUES.as(tableAlias).SET_ID.eq(baseSetId))
+                .and(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(reportDate)));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+        if (rows.size() > 0)
+        {
+            return DataUtils.convert((Timestamp) rows.get(0).get("previous_report_date"));
+        }
+        return null;
+    }
+
 }
