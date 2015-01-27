@@ -2,6 +2,8 @@ package kz.bsbnb.usci.eav.showcase;
 
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.OperationType;
+import kz.bsbnb.usci.eav.model.base.impl.OperationTypes;
 
 import java.io.Serializable;
 
@@ -10,10 +12,12 @@ import java.io.Serializable;
  */
 public class QueueEntry implements Serializable{
 
-    IBaseEntity baseEntitySaving;
-    IBaseEntity baseEntityLoaded;
-    IBaseEntity baseEntityApplied;
-    Long scId = null;
+    private IBaseEntity baseEntitySaving;
+    private IBaseEntity baseEntityLoaded;
+    private IBaseEntity baseEntityApplied;
+    private Long scId = null;
+
+    private OperationType operation;
 
     public Long getScId() {
         return scId;
@@ -60,5 +64,13 @@ public class QueueEntry implements Serializable{
     public QueueEntry setEntityManager(IBaseEntityManager entityManager) {
         this.entityManager = entityManager;
         return this;
+    }
+
+    public OperationType getOperation() {
+        return operation;
+    }
+
+    public void setOperation(OperationType operationType) {
+        this.operation = operationType;
     }
 }

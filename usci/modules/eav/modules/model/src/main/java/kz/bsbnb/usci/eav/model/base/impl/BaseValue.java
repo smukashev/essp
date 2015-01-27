@@ -41,6 +41,8 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
 
     private IMetaAttribute metaAttribute;
 
+    private IBaseValue newBaseValue = null;
+
     /**
      * Information about the sequential number of record in the batch
      */
@@ -190,6 +192,16 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
     public boolean isClosed()
     {
         return closed;
+    }
+
+    @Override
+    public void setNewBaseValue(IBaseValue baseValue) {
+        this.newBaseValue = baseValue;
+    }
+
+    @Override
+    public IBaseValue getNewBaseValue() {
+        return newBaseValue;
     }
 
     @Override

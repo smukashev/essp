@@ -1484,6 +1484,29 @@ public class CLI
         }
     }
 
+    public void dumpDeleteEntityToXML(String ids, String fileName) {
+        StringTokenizer st = new StringTokenizer(ids, ",");
+        ArrayList<BaseEntity> entities = new ArrayList<BaseEntity>();
+
+        while (st.hasMoreTokens()) {
+            long id = Long.parseLong(st.nextToken());
+            IBaseEntity entity = baseEntityProcessorDao.load(id);
+            if (entity != null) {
+                entities.add((BaseEntity)entity);
+            }
+        }
+
+        if (entities.size() == 0) {
+            System.out.println("No entities found with ids: " + ids);
+        } else {
+            BaseEntityXmlGenerator baseEntityXmlGenerator = new BaseEntityXmlGenerator();
+
+            Document document = baseEntityXmlGenerator.getGeneratedDeleteDocument(entities);
+
+            baseEntityXmlGenerator.writeToXml(document, fileName);
+        }
+    }
+
     public void readEntityFromXMLString(String xml, String repDate){
         try {
             Date reportDate = sdfout.parse(repDate);
@@ -2368,10 +2391,13 @@ public class CLI
                     System.out.println("No such entity identification method: " + args.get(1));
                 }
             } else if(args.get(0).equals("xml")) {
-                if (args.size() > 2) {
+                if (args.size() == 2) {
                     dumpEntityToXML(args.get(1), args.get(2));
+                } else if(args.size() > 2 && args.get(1).equals("delete")){
+                    dumpDeleteEntityToXML(args.get(2), args.get(3));
                 } else {
                     System.out.println("Argument needed: <xml> <id> <fileName>");
+                    System.out.println("Argument needed: <xml> delete <id> <fileName>");
                 }
             } else if(args.get(0).equals("rm")) {
                 if (args.size() > 2) {

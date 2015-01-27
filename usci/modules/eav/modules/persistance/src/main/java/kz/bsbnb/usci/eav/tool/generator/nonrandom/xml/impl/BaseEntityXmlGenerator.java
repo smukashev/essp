@@ -29,7 +29,21 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
         Element entitiesElement = document.createElement("entities");
 
         for (BaseEntity baseEntity : baseEntities)
-            processBaseEntity(document, baseEntity, "entity", true, entitiesElement);
+            processBaseEntity(document, baseEntity, "entity", true, entitiesElement, null);
+
+        batchElement.appendChild(entitiesElement);
+
+        return document;
+    }
+
+    public Document getGeneratedDeleteDocument(List<BaseEntity> baseEntities) {
+        Document document = getDocument();
+        Element batchElement = document.createElement("batch");
+        document.appendChild(batchElement);
+        Element entitiesElement = document.createElement("entities");
+
+        for (BaseEntity baseEntity : baseEntities)
+            processBaseEntity(document, baseEntity, "entity", true, entitiesElement, "delete");
 
         batchElement.appendChild(entitiesElement);
 
@@ -37,12 +51,15 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
     }
 
     private void processBaseEntity(Document document, BaseEntity entity, String nameInParent,
-                                   boolean firstTime, Element parentElement) {
+                                   boolean firstTime, Element parentElement, String operation) {
         MetaClass meta = entity.getMeta();
         Element element = document.createElement(nameInParent);
 
         if(firstTime)
             element.setAttribute("class", entity.getMeta().getClassName());
+
+        if(operation != null && operation.length() > 0)
+            element.setAttribute("operation", "delete");
 
         for (String name : meta.getMemberNames()) {
             IMetaType metaType = meta.getMemberType(name);
@@ -75,7 +92,7 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
                                Element parentElement, String name) {
         if (baseValue != null) {
             BaseEntity memberEntity = (BaseEntity)baseValue.getValue();
-            processBaseEntity(document, memberEntity, name, false, parentElement);
+            processBaseEntity(document, memberEntity, name, false, parentElement, null);
         }
     }
 
