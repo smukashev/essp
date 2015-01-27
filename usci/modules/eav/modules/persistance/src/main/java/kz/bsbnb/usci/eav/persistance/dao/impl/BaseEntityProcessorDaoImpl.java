@@ -3515,6 +3515,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         throw new RuntimeException("deleting entity must be found");
                     baseEntityManager.registerAsDeleted(baseEntityPrepared);
                     baseEntityApplied = ((BaseEntity) baseEntityPrepared).clone();
+                    entityHolder.applied = baseEntityApplied;
+                    entityHolder.saving = baseEntityPrepared;
+                    break;
             }
         }else {
             baseEntityApplied = apply(baseEntityPrepared, baseEntityManager, entityHolder);
