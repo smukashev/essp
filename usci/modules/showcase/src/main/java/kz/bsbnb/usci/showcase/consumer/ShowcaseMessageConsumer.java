@@ -57,9 +57,9 @@ public class ShowcaseMessageConsumer implements MessageListener{
                 ArrayList<Future> futures = new ArrayList<Future>();
                 List<ShowcaseHolder> holders = showcaseDao.getHolders();
 
-                if(queueEntry.getOperation() == OperationType.DELETE) {
+                if(queueEntry.getBaseEntityApplied().getOperation() == OperationType.DELETE) {
                     logger.debug("operation delete");
-                } else if(queueEntry.getOperation() == OperationType.NEW) {
+                } else if(queueEntry.getBaseEntityApplied().getOperation() == OperationType.NEW) {
                     throw new UnsupportedOperationException("Operation new not supported in showcase");
                 } else {
                     for(ShowcaseHolder holder : holders) {
