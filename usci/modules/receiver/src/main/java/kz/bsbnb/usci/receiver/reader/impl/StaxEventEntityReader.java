@@ -4,6 +4,7 @@ import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
@@ -72,8 +73,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     @PostConstruct
     public void init() {
-        //logger.info("Reader init.");
-        //System.out.println("Reader created " + batchId);
         batchService = serviceRepository.getBatchService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
         couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
@@ -154,20 +153,28 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                                         .equalsIgnoreCase(OperationType.DELETE.toString());
     }
 
+    private boolean hasOperationNew(StartElement startElement) {
+        return startElement.getAttributeByName(new QName("operation"))!=null &&
+                startElement.getAttributeByName(new QName("operation")).getValue()
+                        .equalsIgnoreCase(OperationType.NEW.toString());
+    }
+
     public void startElement(XMLEvent event, StartElement startElement, String localName) {
         if(localName.equals("batch")) {
-            //logger.info("batch");
+            logger.debug("batch");
         } else if(localName.equals("entities")) {
-            //logger.info("entities");
+            logger.debug("entities");
         } else if(localName.equals("entity")) {
-            //logger.info("entity");
+            logger.debug("entity " + startElement.getAttributeByName(new QName("class")).getValue());
             BaseEntity baseEntity = metaFactoryService.getBaseEntity(
                     startElement.getAttributeByName(new QName("class")).getValue(), batch.getRepDate());
+
             if(hasOperationDelete(startElement))
                 baseEntity.setOperation(OperationType.DELETE);
+
             currentContainer = baseEntity;
         } else {
-            //logger.info("other: " + localName);
+            logger.debug("other: " + localName);
             IMetaType metaType = currentContainer.getMemberType(localName);
 
             if(metaType.isSet()) {
@@ -181,7 +188,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 currentContainer = new BaseEntity((MetaClass)metaType, batch.getRepDate());
                 flagsStack.push(hasMembers);
                 hasMembers = false;
-                //metaFactoryService.getBaseEntity((MetaClass)metaType, batch.getRepDate());
                 level++;
             } else if(!metaType.isComplex() && !metaType.isSet()) {
                 Object o = null;
@@ -190,7 +196,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 try {
                     event = (XMLEvent) xmlEventReader.next();
                     o = parserHelper.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
-                    //xmlEventReader.next();
                 } catch (NumberFormatException n) {
                     n.printStackTrace();
                     logger.error("Cast error: " + localName + ", exception text: " + n.getMessage());
@@ -200,17 +205,25 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     level--;
                 }
 
-                if (o != null) {
+                if (o != null)
                     hasMembers = true;
-                }
 
                 String memberName = localName;
-                if (currentContainer.getBaseContainerType() == BaseContainerType.BASE_SET) {
+                if (currentContainer.getBaseContainerType() == BaseContainerType.BASE_SET)
                     memberName += "_" + currentContainer.getValueCount();
+
+
+                IBaseValue baseValue = BaseValueFactory
+                        .create(currentContainer.getBaseContainerType(), metaType, batch, index, o);
+
+                if(hasOperationNew(startElement)) {
+                    IBaseValue newBaseValue = BaseValueFactory
+                            .create(currentContainer.getBaseContainerType(), metaType, batch, index, startElement.getAttributeByName(new QName("data")).getValue());
+
+                    baseValue.setNewBaseValue(newBaseValue);
                 }
 
-                currentContainer.put(memberName, BaseValueFactory
-                        .create(currentContainer.getBaseContainerType(), metaType, batch, index, o));
+                currentContainer.put(memberName, baseValue);
 
                 level++;
             }

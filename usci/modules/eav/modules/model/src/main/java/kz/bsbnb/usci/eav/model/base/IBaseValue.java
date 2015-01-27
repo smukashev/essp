@@ -70,6 +70,10 @@ public interface IBaseValue<T> extends IPersistable, Cloneable
 
     public boolean isClosed();
 
+    public void setNewBaseValue(IBaseValue baseValue);
+
+    public IBaseValue getNewBaseValue();
+
     public UUID getUuid();
 
     public boolean equalsByValue(IBaseValue baseValue);
