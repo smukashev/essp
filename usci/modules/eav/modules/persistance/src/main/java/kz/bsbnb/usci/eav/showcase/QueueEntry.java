@@ -10,14 +10,11 @@ import java.io.Serializable;
 /**
  * Created by almaz on 6/18/14.
  */
-public class QueueEntry implements Serializable{
-
+public class QueueEntry implements Serializable {
     private IBaseEntity baseEntitySaving;
     private IBaseEntity baseEntityLoaded;
     private IBaseEntity baseEntityApplied;
     private Long scId = null;
-
-    private OperationType operation;
 
     public Long getScId() {
         return scId;
@@ -64,13 +61,5 @@ public class QueueEntry implements Serializable{
     public QueueEntry setEntityManager(IBaseEntityManager entityManager) {
         this.entityManager = entityManager;
         return this;
-    }
-
-    public OperationType getOperation() {
-        return operation;
-    }
-
-    public void setOperation(OperationType operationType) {
-        this.operation = operationType;
     }
 }
