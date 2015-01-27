@@ -362,10 +362,10 @@ public class EavSimpleSetDistinctTest extends EavTest {
     public void test4() throws Exception {
         cli.readEntityFromXMLString(testingBaseEntites[0], testingDates[0]);
         long id1 = getBEid();
-        checkException();
+        checkNoException();
         cli.readEntityFromXMLString(testingBaseEntites[0], testingDates[0]);
         long id2 = getBEid();
-        checkException();
+        checkNoException();
         assertTrue("ids must be equal", id1 == id2);
     }
 }

@@ -1,7 +1,6 @@
 package deletion;
 
 import base.CreditTestBase;
-import base.EavTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -104,10 +103,13 @@ public class CreditTest extends CreditTestBase{
         long id1,id2;
         cli.readEntityFromXMLString(testingBaseEntites[0],testingDates[0]);
         id1 = getBEid();
+        checkNoException();
 
         cli.readEntityFromXMLString(testingBaseEntites[1],testingDates[1]);
+        checkNoException();
         cli.readEntityFromXMLString(testingBaseEntites[2],testingDates[2]);
         id2 = getBEid();
+        checkNoException();
 
         assertTrue("two new instances must be created",id1+1 == id2);
     }
