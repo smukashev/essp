@@ -37,6 +37,7 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.*;
 
 import static kz.bsbnb.usci.showcase.generated.Tables.EAV_SC_SHOWCASES;
@@ -77,6 +78,18 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
     public ArrayList<ShowcaseHolder> getHolders() {
         if(holders == null) holders = populateHolders();
         return holders;
+    }
+
+    public ShowcaseHolder getHolderByClassName(String className) {
+        if(holders == null) holders = populateHolders();
+
+        for(ShowcaseHolder h : holders) {
+            if(h.getShowCaseMeta().getMeta().getClassName().equals(className)) {
+                return h;
+            }
+        }
+
+        throw new UnknownError("ShowcaseHolder with name: " + className + " not found");
     }
 
     public void reloadCache(){
@@ -349,8 +362,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
     }
 
     @Transactional
-    public void moveActualToHistory(IBaseEntity entity,ShowcaseHolder showcaseHolder){
-
+    public void moveActualToHistory(IBaseEntity entity,ShowcaseHolder showcaseHolder) {
         StringBuilder select = new StringBuilder();
         StringBuilder sql = new StringBuilder("insert into %s");
 
@@ -381,6 +393,20 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
         jdbcTemplateSC.update(sqlResult, entity.getId());
         long t4 = System.currentTimeMillis() - t3;
         stats.put("DELETE FROM %s WHERE %sROOT_ID = ? AND CLOSE_DATE IS NOT NULL", t4);
+    }
+
+    public int deleteById(ShowcaseHolder holder, IBaseEntity e) {
+        String sql;
+
+        sql = "DELETE FROM %s WHERE %s%s_ID = ?";
+        sql = String.format(sql, getActualTableName(holder.getShowCaseMeta()), COLUMN_PREFIX, holder.getRootClassName());
+
+        int rows = jdbcTemplateSC.update(sql, e.getId());
+
+        logger.debug(sql, e.getId());
+        logger.debug("Rows deleted: " + rows);
+
+        return rows;
     }
 
     @Transactional

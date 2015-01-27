@@ -23,6 +23,8 @@ public interface ShowcaseDao {
     public ShowCase load(String name);
     public ShowCase load(long id);
     public void reloadCache();
+    public int deleteById(ShowcaseHolder holder, IBaseEntity e);
+    public ShowcaseHolder getHolderByClassName(String className);
     @Transactional
     List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate);
 }

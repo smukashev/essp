@@ -58,7 +58,10 @@ public class ShowcaseMessageConsumer implements MessageListener{
                 List<ShowcaseHolder> holders = showcaseDao.getHolders();
 
                 if(queueEntry.getBaseEntityApplied().getOperation() == OperationType.DELETE) {
-                    logger.debug("operation delete");
+                    ShowcaseHolder h = showcaseDao.getHolderByClassName(
+                            queueEntry.getBaseEntityApplied().getMeta().getClassName());
+
+                    showcaseDao.deleteById(h, queueEntry.getBaseEntityApplied());
                 } else if(queueEntry.getBaseEntityApplied().getOperation() == OperationType.NEW) {
                     throw new UnsupportedOperationException("Operation new not supported in showcase");
                 } else {
@@ -67,7 +70,6 @@ public class ShowcaseMessageConsumer implements MessageListener{
                                 .equals(queueEntry.getBaseEntityApplied().getMeta().getClassName()))
                             continue;
 
-                        //showcaseDao.generate(queueEntry.getBaseEntityApplied(), holder);
                         if(scId == null || scId == holder.getShowCaseMeta().getId()){
                             Future future = exec.submit(new CarteageGenerator(queueEntry.getBaseEntityApplied(), holder));
                             futures.add(future);
