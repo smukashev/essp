@@ -6,6 +6,7 @@ import javax.xml.transform.Result;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
@@ -56,34 +57,39 @@ public class ShowcaseMessageConsumer implements MessageListener{
                 ArrayList<Future> futures = new ArrayList<Future>();
                 List<ShowcaseHolder> holders = showcaseDao.getHolders();
 
-                for(ShowcaseHolder holder : holders) {
+                if(queueEntry.getOperation() == OperationType.DELETE) {
+                    logger.debug("operation delete");
+                } else if(queueEntry.getOperation() == OperationType.NEW) {
+                    throw new UnsupportedOperationException("Operation new not supported in showcase");
+                } else {
+                    for(ShowcaseHolder holder : holders) {
+                        if(!holder.getShowCaseMeta().getMeta().getClassName()
+                                .equals(queueEntry.getBaseEntityApplied().getMeta().getClassName()))
+                            continue;
 
-                    if(!holder.getShowCaseMeta().getMeta().getClassName()
-                            .equals(queueEntry.getBaseEntityApplied().getMeta().getClassName()))
-                        continue;
-
-                    //showcaseDao.generate(queueEntry.getBaseEntityApplied(), holder);
-                    if(scId == null || scId == holder.getShowCaseMeta().getId()){
-                        Future future = exec.submit(new CarteageGenerator(queueEntry.getBaseEntityApplied(), holder));
-                        futures.add(future);
+                        //showcaseDao.generate(queueEntry.getBaseEntityApplied(), holder);
+                        if(scId == null || scId == holder.getShowCaseMeta().getId()){
+                            Future future = exec.submit(new CarteageGenerator(queueEntry.getBaseEntityApplied(), holder));
+                            futures.add(future);
+                        }
                     }
-                }
 
-                for(Future f : futures){
-                    try {
-                        f.get();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
+                    for(Future f : futures){
+                        try {
+                            f.get();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
                     }
+                    futures.removeAll(futures);
+
+                    long t4 = System.currentTimeMillis() - t3;
+                    stats.put("message", t4);
+
+                    message.acknowledge();
                 }
-                futures.removeAll(futures);
-
-                long t4 = System.currentTimeMillis() - t3;
-                stats.put("message", t4);
-
-                message.acknowledge();
             }
         } catch (JMSException e) {
             logger.error(e.getMessage(), e);
