@@ -10,10 +10,12 @@ import java.io.Serializable;
  */
 public class QueueEntry implements Serializable{
 
-    IBaseEntity baseEntitySaving;
-    IBaseEntity baseEntityLoaded;
-    IBaseEntity baseEntityApplied;
-    Long scId = null;
+    private IBaseEntity baseEntitySaving;
+    private IBaseEntity baseEntityLoaded;
+    private IBaseEntity baseEntityApplied;
+    private Long scId = null;
+
+    private String operation = null;
 
     public Long getScId() {
         return scId;
@@ -60,5 +62,13 @@ public class QueueEntry implements Serializable{
     public QueueEntry setEntityManager(IBaseEntityManager entityManager) {
         this.entityManager = entityManager;
         return this;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
 }
