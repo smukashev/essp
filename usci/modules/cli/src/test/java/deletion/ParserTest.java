@@ -67,12 +67,12 @@ public class ParserTest extends EavTest {
     public void test1() throws Exception {
         cli.readEntityFromXMLString(testingBaseEntites[0], testingDates[0]);
         long id1 = getBEid();
+        checkNoException();
         cli.readEntityFromXMLString(testingBaseEntites[1], testingDates[1]);
-
+        checkNoException();
         cli.readEntityFromXMLString(testingBaseEntites[2], testingDates[2]);
         long id2 = getBEid();
+        checkNoException();
         assertTrue("new instance must be added after delete",id1 + 1 == id2);
-
-        readInDb();
     }
 }

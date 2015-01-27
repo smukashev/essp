@@ -77,7 +77,7 @@ public class EavTest extends JDBCSupport {
         return jdbcTemplate.queryForLong("select max(id) from eav_be_entities");
     }
 
-    public void checkException(){
+    public void checkNoException(){
         if(cli.getLastException() != null)
             throw new RuntimeException("failed last exception check");
     }

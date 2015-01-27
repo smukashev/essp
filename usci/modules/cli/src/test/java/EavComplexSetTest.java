@@ -42,10 +42,10 @@ public class EavComplexSetTest extends EavTest {
     public void test1() throws Exception {
         cli.readEntityFromXMLString(testingBaseEntites[0],testingDates[0]);
         long id1 = getBEid();
-        checkException();
+        checkNoException();
         cli.readEntityFromXMLString(testingBaseEntites[0],testingDates[0]);
         long id2 = getBEid();
-        checkException();
+        checkNoException();
         assertTrue("must be same id ", id1 == id2);
     }
 }

@@ -359,14 +359,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     {
         IBaseEntity baseEntityLoaded = null;
         IBaseEntity baseEntityApplied = null;
-
-        if(baseEntityForSave.getOperation() != null){
-            switch (baseEntityForSave.getOperation()) {
-                case DELETE:
-                    baseEntityManager.registerAsDeleted(baseEntityForSave);
-            }
-        }
-
         if (baseEntityForSave.getId() < 1 || baseEntityForSave.getMeta().isSearchable() == false)
         {
             baseEntityApplied = applyBaseEntityBasic(baseEntityForSave, baseEntityManager);
@@ -3514,7 +3506,22 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
         IBaseEntity baseEntityPrepared = prepare(((BaseEntity) baseEntity).clone());
-        IBaseEntity baseEntityApplied = apply(baseEntityPrepared, baseEntityManager, entityHolder);
+        IBaseEntity baseEntityApplied = null;
+
+        if(baseEntityPrepared.getOperation()!= null){
+            switch (baseEntityPrepared.getOperation()){
+                case DELETE:
+                    if(baseEntityPrepared.getId() <= 0)
+                        throw new RuntimeException("deleting entity must be found");
+                    baseEntityManager.registerAsDeleted(baseEntityPrepared);
+                    baseEntityApplied = ((BaseEntity) baseEntityPrepared).clone();
+                    entityHolder.applied = baseEntityApplied;
+                    entityHolder.saving = baseEntityPrepared;
+                    break;
+            }
+        }else {
+            baseEntityApplied = apply(baseEntityPrepared, baseEntityManager, entityHolder);
+        }
 
         /*if (baseEntityPrepared.getId() > 0)
         {
