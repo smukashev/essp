@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
+import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
@@ -78,26 +79,43 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
     @Override
     public void delete(IPersistable persistable) {
-        delete(persistable.getId());
+        IBaseEntity baseEntity = (BaseEntity)persistable;
+        if(baseEntity.getOperation() == OperationType.DELETE){
+            Update update = context
+                    .update(EAV_BE_ENTITIES)
+                    .set(EAV_BE_ENTITIES.DELETED, DataUtils.convert(true))
+                    .where(EAV_BE_ENTITIES.ID.equal(baseEntity.getId()));
+
+            logger.debug(update.toString());
+            int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
+            if (count > 1)
+            {
+                throw new RuntimeException("DELETE operation should update only one record. ID: " + baseEntity.getId());
+            }
+            if (count < 1)
+            {
+                logger.warn("DELETE operation should update a record. ID: " + baseEntity.getId());
+            }
+        }else
+            delete(persistable.getId());
     }
 
     protected void delete(long id)
     {
         String tableAlias = "e";
-        Update update = context
-                .update(EAV_BE_ENTITIES.as(tableAlias))
-                .set(EAV_BE_ENTITIES.as(tableAlias).DELETED, DataUtils.convert(true))
-                .where(EAV_BE_ENTITIES.as(tableAlias).ID.eq(id));
+        Delete delete = context
+                .delete(EAV_BE_ENTITIES.as(tableAlias))
+                .where(EAV_BE_ENTITIES.as(tableAlias).ID.equal(id));
 
-        logger.debug(update.toString());
-        int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
+        logger.debug(delete.toString());
+        int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
         if (count > 1)
         {
-            throw new RuntimeException("DELETE operation should be update only one record. ID: " + id);
+            throw new RuntimeException("DELETE operation should be delete only one record. ID: " + id);
         }
         if (count < 1)
         {
-            logger.warn("DELETE operation should update a record. ID: " + id);
+            logger.warn("DELETE operation should delete a record. ID: " + id);
         }
     }
 
