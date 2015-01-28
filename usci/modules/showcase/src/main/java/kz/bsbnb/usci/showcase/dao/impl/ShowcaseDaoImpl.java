@@ -403,15 +403,30 @@ public class ShowcaseDaoImpl implements ShowcaseDao{
             if(!sh.getShowCaseMeta().getTableName().equals(holder.getShowCaseMeta().getTableName()) &&
                     sh.getRootClassName().equals(holder.getRootClassName())) {
                 sql = "DELETE FROM %s WHERE %s%s_ID = ?";
+                sql = String.format(sql, getHistoryTableName(sh.getShowCaseMeta()), COLUMN_PREFIX, holder.getRootClassName());
+
+                rows = jdbcTemplateSC.update(sql, e.getId());
+
+                logger.debug(sql, e.getId());
+                logger.debug("Rows deleted from " + getHistoryTableName(sh.getShowCaseMeta()) + ": " + rows);
+
+                sql = "DELETE FROM %s WHERE %s%s_ID = ?";
                 sql = String.format(sql, getActualTableName(sh.getShowCaseMeta()), COLUMN_PREFIX, holder.getRootClassName());
 
                 rows = jdbcTemplateSC.update(sql, e.getId());
 
                 logger.debug(sql, e.getId());
                 logger.debug("Rows deleted from " + getActualTableName(sh.getShowCaseMeta()) + ": " + rows);
-
             }
         }
+
+        sql = "DELETE FROM %s WHERE %s%s_ID = ?";
+        sql = String.format(sql, getHistoryTableName(holder.getShowCaseMeta()), COLUMN_PREFIX, holder.getRootClassName());
+
+        rows = jdbcTemplateSC.update(sql, e.getId());
+
+        logger.debug(sql, e.getId());
+        logger.debug("Rows deleted from " + getHistoryTableName(holder.getShowCaseMeta()) + ": " + rows);
 
         sql = "DELETE FROM %s WHERE %s%s_ID = ?";
         sql = String.format(sql, getActualTableName(holder.getShowCaseMeta()), COLUMN_PREFIX, holder.getRootClassName());
