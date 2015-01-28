@@ -3492,7 +3492,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    class EntityHolder {
+    static class EntityHolder {
         IBaseEntity saving;
         IBaseEntity loaded;
         IBaseEntity applied;
@@ -3500,8 +3500,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     @Transactional
-    public IBaseEntity process(IBaseEntity baseEntity)
-    {
+    public IBaseEntity process(IBaseEntity baseEntity) {
         EntityHolder entityHolder = new EntityHolder();
 
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
@@ -3518,33 +3517,19 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     entityHolder.applied = baseEntityApplied;
                     entityHolder.saving = baseEntityPrepared;
                     break;
+                default:
+                    throw new UnsupportedOperationException("Unsuppoerted operation: "
+                            + baseEntityPrepared.getOperation());
             }
-        }else {
+        } else {
             baseEntityApplied = apply(baseEntityPrepared, baseEntityManager, entityHolder);
         }
 
-        /*if (baseEntityPrepared.getId() > 0)
-        {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(0);
-            calendar.set(2013, 4, 1, 0, 0, 0);
-
-            IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool
-                    .getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
-            if (baseEntityReportDateDao.exists(baseEntityPrepared.getId(), calendar.getTime()))
-            {
-                logger.error("Instance of BaseEntity with ID " + baseEntityPrepared.getId() + " skipped.");
-                return baseEntityPrepared;
-            }
-        }
-
-        logger.error("Instance of BaseEntity with ID " + baseEntityPrepared.getId() + " processing started."); */
-
         applyToDb(baseEntityManager);
 
-        if (applyListener != null) {
-            applyListener.applyToDBEnded(entityHolder.saving, entityHolder.loaded, entityHolder.applied, baseEntityManager);
-        }
+        if (applyListener != null)
+            applyListener.applyToDBEnded(entityHolder.saving, entityHolder.loaded,
+                    entityHolder.applied, baseEntityManager);
 
         return baseEntityApplied;
     }
@@ -3562,8 +3547,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         return ((BigDecimal)rows.get(0).get("report_dates_count")).longValue() > 0;
     }
-
-
 
     private Set<BaseEntity> collectComplexSetValues(BaseSet baseSet)
     {
@@ -3613,48 +3596,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         return entityIds;
     }
-
-//    public List<RefListItem> getRefsByMetaclass(long metaClassId) {
-//        ArrayList<RefListItem> entityIds = new ArrayList<RefListItem>();
-//
-//        Select select = context
-//                .select(EAV_BE_ENTITIES.ID,
-//                        EAV_BE_STRING_VALUES.as("name_value").VALUE.as("value"),
-//                        EAV_BE_STRING_VALUES.as("code_value").VALUE.as("code"))
-//                .from(EAV_BE_ENTITIES,
-//                        EAV_BE_STRING_VALUES.as("name_value"),
-//                        EAV_M_SIMPLE_ATTRIBUTES.as("name_attr"),
-//                        EAV_BE_STRING_VALUES.as("code_value"),
-//                        EAV_M_SIMPLE_ATTRIBUTES.as("code_attr"))
-//                .where(EAV_BE_ENTITIES.CLASS_ID.equal(metaClassId))
-//
-//                .and(EAV_BE_ENTITIES.ID.equal(EAV_BE_STRING_VALUES.as("name_value").ENTITY_ID))
-//                .and(EAV_M_SIMPLE_ATTRIBUTES.as("name_attr").ID.equal(EAV_BE_STRING_VALUES.as("name_value").ATTRIBUTE_ID))
-//                .and(EAV_M_SIMPLE_ATTRIBUTES.as("name_attr").NAME.equal("name_ru"))
-//
-//                .and(EAV_BE_ENTITIES.ID.equal(EAV_BE_STRING_VALUES.as("code_value").ENTITY_ID))
-//                .and(EAV_M_SIMPLE_ATTRIBUTES.as("code_attr").ID.equal(EAV_BE_STRING_VALUES.as("code_value").ATTRIBUTE_ID))
-//                .and(EAV_M_SIMPLE_ATTRIBUTES.as("code_attr").NAME.equal("code"));
-//
-//        logger.debug(select.toString());
-//        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-//
-//        Iterator<Map<String, Object>> i = rows.iterator();
-//        while(i.hasNext())
-//        {
-//            Map<String, Object> row = i.next();
-//
-//            RefListItem rli = new RefListItem();
-//
-//            rli.setId(((BigDecimal)row.get(EAV_BE_ENTITIES.ID.getName())).longValue());
-//            rli.setTitle((String)row.get("value"));
-//            rli.setCode((String)row.get("code"));
-//
-//            entityIds.add(rli);
-//        }
-//
-//        return entityIds;
-//    }
 
     public List<RefListItem> getRefsByMetaclass(long metaClassId) {
         ArrayList<RefListItem> entityIds = new ArrayList<RefListItem>();
@@ -4600,58 +4541,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public void removeNewTableIds(List<Long> list, Long id){
         Delete delete = context.delete(SC_ID_BAG).where(SC_ID_BAG.ID.in(list).and(SC_ID_BAG.SHOWCASE_ID.eq(id)));
         jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
-    }
-
-    private void createMainTables(){
-        Platform mainPlatform = PlatformFactory.createNewPlatformInstance(jdbcTemplate.getDataSource());
-
-        String dbName;
-        String schema;
-        try {
-            String url = JdbcUtils.extractDatabaseMetaData(jdbcTemplate.getDataSource(), "getURL").toString();
-            dbName = url.substring(url.lastIndexOf(":"));
-            schema = jdbcTemplate.getDataSource().getConnection().getSchema();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if(mainPlatform.readModelFromDatabase("XE", null, "USCI", null).
-                findTable("SC_ID_BAG") != null){
-            return;
-        }
-        Database model = new Database();
-        model.setName("model");
-
-        kz.bsbnb.ddlutils.model.Table dataTable = new kz.bsbnb.ddlutils.model.Table();
-        dataTable.setName("SC_ID_BAG");
-
-        Column idColumn = new Column();
-
-        idColumn.setName("ID");
-        //idColumn.setPrimaryKey(true);
-        idColumn.setRequired(true);
-        idColumn.setType("NUMERIC");
-        idColumn.setSize("14,0");
-        idColumn.setAutoIncrement(true);
-
-        dataTable.addColumn(idColumn);
-
-        Column entityIdColumn = new Column();
-
-        entityIdColumn.setName("SHOWCASE_ID");
-        entityIdColumn.setPrimaryKey(false);
-        entityIdColumn.setRequired(false);
-        entityIdColumn.setType("NUMERIC");
-        entityIdColumn.setSize("14,0");
-        entityIdColumn.setAutoIncrement(false);
-
-        dataTable.addColumn(entityIdColumn);
-
-        model.addTable(dataTable);
-
-        System.out.println(model.toVerboseString());
-
-        mainPlatform.createModel(model, false, true);
     }
 
     @Override
