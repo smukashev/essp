@@ -683,34 +683,4 @@ sql insert into audit_event_kind (name,is_always_auditable,is_active,code) value
 sql insert into audit_event_kind (name,is_always_auditable,is_active,code) values ('debug',1,1,'126AA')
 #---------------------------------------------------------------------------------------------
 
-#quit
-
-entity read  usci/modules/cli/src/main/resources/refs/doc1.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_subject_type.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_doc_type.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_balance_account.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_balance_account_05.xml 01.05.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_bank_relation.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_classification.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_contact_type.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_country.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_credit_object.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_credit_purpose.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_credit_type.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_creditor.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_creditor_branch.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_currency.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_econ_trade.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_enterprise_type.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_finance_source.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_legal_form.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_offshore.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_pledge_type.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_portfolio.xml 01.04.2013
-entity read  usci/modules/cli/src/main/resources/refs/ref_region.xml 01.04.2013
-#entity read  usci/modules/cli/src/main/resources/refs/ref_shared.xml 01.04.2013
-
-
-#rule create package credit_parser
-
 quit
