@@ -683,6 +683,13 @@ sql insert into audit_event_kind (name,is_always_auditable,is_active,code) value
 sql insert into audit_event_kind (name,is_always_auditable,is_active,code) values ('debug',1,1,'126AA')
 #---------------------------------------------------------------------------------------------
 
+#==============================================================================================
+#  Maintenance
+#==============================================================================================
+sql insert into mnt_operations(name) values ('Операция удаления с таблицы MAINTENANCE.CREDREG_DELETE_CREDIT')
+#----------------------------------------------------------------------------------------------
+
+
 #quit
 
 entity read  usci/modules/cli/src/main/resources/refs/doc1.xml 01.04.2013

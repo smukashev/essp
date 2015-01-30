@@ -1047,4 +1047,20 @@
 			<index-column name="package_versions_id"/>
 		</index>
 	</table>
+
+	<!-- MAINTENANCE -->
+	<table name="mnt_operations">
+			<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+			<column name="name" type="VARCHAR" size="100" />
+	</table>
+
+	<table name="mnt_logs" >
+			<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+			<column name="mnt_operation_id" required="true" type = "NUMERIC" size="14,0" />
+			<column name="foreign_id" required="true" type = "NUMERIC" size="14,0" />
+			<column name="execution_time" required="true" type = "TIMESTAMP"  />
+			<column name="status" required="true" type="NUMERIC" size="1" />
+			<column name="error_msg" type="VARCHAR" size="250" />
+	</table>
+
 </database>

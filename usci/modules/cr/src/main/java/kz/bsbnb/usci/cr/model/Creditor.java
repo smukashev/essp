@@ -20,6 +20,7 @@ public class Creditor implements Serializable {
     private Date changeDate;
     private String BIN;
     private String RNN;
+    private String BIK;
 
     private Creditor mainOffice;
 
@@ -198,6 +199,14 @@ public class Creditor implements Serializable {
 
     public void setRNN(String RNN) {
         this.RNN = RNN;
+    }
+
+    public String getBIK() {
+        return BIK;
+    }
+
+    public void setBIK(String BIK) {
+        this.BIK = BIK;
     }
 
     @Override

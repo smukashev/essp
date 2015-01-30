@@ -136,7 +136,7 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
             Object value = baseValue.getValue();
             childElement.appendChild(document.createTextNode(
                     metaValue.getTypeCode() == DataTypes.DATE ?
-                            new SimpleDateFormat("yyyy-MM-dd").format(value)
+                            new SimpleDateFormat("dd.MM.yyyy").format(value)
                             : value.toString()));
 
             parentElement.appendChild(childElement);
