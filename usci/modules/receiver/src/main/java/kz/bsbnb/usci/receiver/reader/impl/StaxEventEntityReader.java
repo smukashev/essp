@@ -218,7 +218,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
                 if(hasOperationNew(startElement)) {
                     IBaseValue newBaseValue = BaseValueFactory
-                            .create(currentContainer.getBaseContainerType(), metaType, batch, index, startElement.getAttributeByName(new QName("data")).getValue());
+                            .create(currentContainer.getBaseContainerType(), metaType, batch, index,
+                                    parserHelper.getCastObject(metaValue.getTypeCode(),
+                                            startElement.getAttributeByName(new QName("data")).getValue()));
 
                     baseValue.setNewBaseValue(newBaseValue);
                 }

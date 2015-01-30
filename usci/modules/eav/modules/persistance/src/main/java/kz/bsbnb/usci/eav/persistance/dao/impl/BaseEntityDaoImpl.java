@@ -141,26 +141,21 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     public IBaseEntity load(long id, Date reportDate, Date actualReportDate)
     {
         if(id < 1)
-        {
             throw new IllegalArgumentException("Does not have id. Can't load.");
-        }
 
         if (reportDate == null)
-        {
             throw new IllegalArgumentException("To load instance of BaseEntity must always " +
                     "be specified report date.");
-        }
 
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
         IBaseEntity baseEntity = load(id);
-        IBaseEntityReportDate baseEntityReportDate =
-                baseEntityReportDateDao.load(id, reportDate);
+        IBaseEntityReportDate baseEntityReportDate = baseEntityReportDateDao.load(id, reportDate);
         baseEntity.setBaseEntityReportDate(baseEntityReportDate);
 
-        Map<Class<? extends IBaseValue>, Long> baseValueCounts =
-                new HashMap<Class<? extends IBaseValue>, Long>();
+        Map<Class<? extends IBaseValue>, Long> baseValueCounts = new HashMap<Class<? extends IBaseValue>, Long>();
+
         baseValueCounts.put(BaseEntityIntegerValue.class, baseEntityReportDate.getIntegerValuesCount());
         baseValueCounts.put(BaseEntityDateValue.class, baseEntityReportDate.getDateValuesCount());
         baseValueCounts.put(BaseEntityStringValue.class, baseEntityReportDate.getStringValuesCount());
@@ -173,13 +168,12 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id);
         boolean last = DataTypeUtil.compareBeginningOfTheDay(maxReportDate, reportDate) == 0;
 
-        for (Class<? extends IBaseValue> baseValueClass: baseValueCounts.keySet())
-        {
+        for (Class<? extends IBaseValue> baseValueClass: baseValueCounts.keySet()) {
             long baseValuesCount = baseValueCounts.get(baseValueClass);
-            if (baseValuesCount > 0)
-            {
+            if (baseValuesCount > 0) {
                 IBaseEntityValueDao baseEntityValueDao = persistableDaoPool
                         .getPersistableDao(baseValueClass, IBaseEntityValueDao.class);
+
                 int compare = DataTypeUtil.compareBeginningOfTheDay(actualReportDate, reportDate);
                 baseEntityValueDao.loadBaseValues(baseEntity, compare == -1 ? reportDate : actualReportDate, last);
             }

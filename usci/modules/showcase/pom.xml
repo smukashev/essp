@@ -125,7 +125,7 @@
                     </generator>
                 </configuration>
             </plugin>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.2.1</version>
@@ -155,7 +155,7 @@
                         <argument>${basedir}/src/main/resources/applicationContextDDL.xml</argument>
                     </arguments>
                 </configuration>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 

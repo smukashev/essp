@@ -37,16 +37,12 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
     public IBaseEntityReportDate load(long baseEntityId, Date reportDate)
     {
         if(baseEntityId < 1)
-        {
             throw new IllegalArgumentException("To load instance of BaseEntityReportDate must always " +
                     "be specified entity ID.");
-        }
 
         if (reportDate == null)
-        {
             throw new IllegalArgumentException("To load instance of BaseEntityReportDate must always " +
                     "be specified report date.");
-        }
 
         String tableAlias = "rd";
         Select select = context
@@ -67,14 +63,10 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-        {
             throw new IllegalArgumentException("More then one instance of BaseEntityReportDate found.");
-        }
 
         if (rows.size() < 1)
-        {
             throw new IllegalStateException("Instance of BaseEntityReportDate was not found.");
-        }
 
         Map<String, Object> row = rows.get(0);
         if(row != null)
