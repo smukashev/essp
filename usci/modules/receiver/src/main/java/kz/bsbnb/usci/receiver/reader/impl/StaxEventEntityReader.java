@@ -114,7 +114,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                         continue;
 
                     int len;
-                    out = new ByteArrayOutputStream((int)entry.getSize());
+                    /*out = new ByteArrayOutputStream((int)entry.getSize());
                     int size = (int)entry.getSize();
                     while ((len = zis.read(buffer, 0, Math.min(buffer.length, size))) > 0)
                     {
@@ -122,6 +122,11 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                         out.write(buffer, 0, len);
                         if (size <= 0)
                             break;
+                    }*/
+                    out = new ByteArrayOutputStream(4096);
+                    while ((len = zis.read(buffer, 0, 4096)) > 0)
+                    {
+                        out.write(buffer, 0, len);
                     }
                     break;
                 }
