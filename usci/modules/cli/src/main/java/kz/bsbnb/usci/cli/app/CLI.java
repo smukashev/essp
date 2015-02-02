@@ -3307,8 +3307,16 @@ public class CLI
                     Creditor crCreditor = crCreditors.get(creditorId);
                     BaseEntityXmlGenerator baseEntityXmlGenerator = new BaseEntityXmlGenerator();
                     Document document = baseEntityXmlGenerator.getGeneratedDeleteDocument(entities);
+                    String creditorLabel = path + "_";
+                    if(crCreditor.getBIK() == null)
+                        creditorLabel += crCreditor.getBIN();
+                    else
+                        creditorLabel += crCreditor.getBIK();
+
+                    creditorLabel += ".zip";
+
                     baseEntityXmlGenerator.writeToZip(new Document[]{document, getManifest(crCreditor, entities.size())}
-                            , new String[]{"data.xml", "manifest.xml"}, path + "_" + crCreditor.getBIK() + ".zip");
+                            , new String[]{"data.xml", "manifest.xml"}, creditorLabel);
                 }
 
                 if(listSuccess.size() > 0){
