@@ -139,6 +139,13 @@ public class BaseEntityXmlGenerator extends AbstractXmlGenerator
                             new SimpleDateFormat("dd.MM.yyyy").format(value)
                             : value.toString()));
 
+            if(baseValue.getNewBaseValue() != null){
+                Object newValue = baseValue.getNewBaseValue().getValue();
+                childElement.setAttribute("operation","new");
+                childElement.setAttribute("data",metaValue.getTypeCode() == DataTypes.DATE ?
+                        new SimpleDateFormat("dd.MM.yyyy").format(newValue) : newValue.toString());
+            }
+
             parentElement.appendChild(childElement);
         }
     }

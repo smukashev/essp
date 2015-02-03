@@ -27,6 +27,7 @@ import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
@@ -3172,60 +3173,66 @@ public class CLI
 
         String commandUsage = "Arguments: mnt [delScript|keyScript] from core:core_sep_2014@10.10.11.44:CREDITS [creditor_id=36] [--all] > C:\\zips\\batch.zip";
 
-        if(line.contains("delScript")) {
-            boolean creditorFlag = false;
-            boolean allFlag = false;
-            int limit = -1;
-            long creditorFilterId = -1;
-            String path = "";
-            Matcher m;
-            String pattern = "mnt\\s+delScript from (\\S+):(\\S+)@(\\S+):(\\S+)";
 
-            if (line.contains("creditor_id")) {
-                pattern = pattern + "\\s+creditor_id=(\\d+)";
-                creditorFlag = true;
-            }
+        boolean creditorFlag = false;
+        boolean allFlag = false;
+        int limit = -1;
+        long creditorFilterId = -1;
+        String path = "";
+        String script = "";
+        Matcher m;
+        String pattern = "mnt\\s+(delScript|keyScript) from (\\S+):(\\S+)@(\\S+):(\\S+)";
 
-            if (line.contains("--all")) {
-                pattern = pattern + "\\s+--all";
-                allFlag = true;
-            }
+        if (line.contains("creditor_id")) {
+            pattern = pattern + "\\s+creditor_id=(\\d+)";
+            creditorFlag = true;
+        }
 
-            pattern = pattern + "\\s+>\\s+(\\S+)\\.zip";
+        if (line.contains("--all")) {
+            pattern = pattern + "\\s+--all";
+            allFlag = true;
+        }
 
-            m = Pattern.compile(pattern).matcher(line);
-            int gid = 1;
+        pattern = pattern + "\\s+>\\s+(\\S+)\\.zip";
 
-            if (m.find()) {
-                String user = m.group(gid++);
-                String pwd = m.group(gid++);
-                String address = m.group(gid++);
-                String sid = m.group(gid++);
+        m = Pattern.compile(pattern).matcher(line);
+        int gid = 1;
+        List<Long> listSuccess = new ArrayList<Long>();
+        Map<Long, ArrayList<BaseEntity>> byCreditor = new HashMap<Long, ArrayList<BaseEntity>>();
 
-                if (creditorFlag)
-                    creditorFilterId = Long.valueOf(m.group(gid++));
+        if (m.find()) {
+            script = m.group(gid++);
+            String user = m.group(gid++);
+            String pwd = m.group(gid++);
+            String address = m.group(gid++);
+            String sid = m.group(gid++);
 
-                path = m.group(gid++);
+            if (creditorFlag)
+                creditorFilterId = Long.valueOf(m.group(gid++));
 
-                Connection conn = null;
+            path = m.group(gid++);
 
+            Connection conn = null;
+
+            try {
+                conn = connectToDB(String.format("jdbc:oracle:thin:@%s:1521:%s", address, sid), user, pwd);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                return;
+            } catch (SQLException e) {
+                e.printStackTrace();
                 try {
-                    conn = connectToDB(String.format("jdbc:oracle:thin:@%s:1521:%s", address, sid), user, pwd);
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                    return;
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    try {
-                        conn.close();
-                    } catch (SQLException e1) {
-                        e1.printStackTrace();
-                    }
-                    return;
+                    conn.close();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
                 }
+                return;
+            }
 
-                PreparedStatement preparedStatement = null;
-                ResultSet resultSet = null;
+            PreparedStatement preparedStatement = null;
+            ResultSet resultSet = null;
+
+            if(script.equals("delScript")) {
 
                 String select = "select t.ID, root.CREDITOR_ID, t.CONTRACT_NO, t.CONTRACT_DATE" +
                         "  from MAINTENANCE.CREDREG_DELETE_CREDIT t ," +
@@ -3249,8 +3256,6 @@ public class CLI
 
                 Batch batch = new Batch(new Date());
                 batch.setId(777);
-                Map<Long, ArrayList<BaseEntity>> byCreditor = new HashMap<Long, ArrayList<BaseEntity>>();
-                List<Long> listSuccess = new ArrayList<Long>();
 
                 try {
                     while (resultSet.next()) {
@@ -3301,50 +3306,142 @@ public class CLI
                     e.printStackTrace();
                 }
 
-                for (long creditorId : byCreditor.keySet()) {
-                    ArrayList<BaseEntity> entities = byCreditor.get(creditorId);
-                    //IBaseEntity creditor = getCreditor(conn, creditorId);
-                    Creditor crCreditor = crCreditors.get(creditorId);
-                    BaseEntityXmlGenerator baseEntityXmlGenerator = new BaseEntityXmlGenerator();
-                    Document document = baseEntityXmlGenerator.getGeneratedDeleteDocument(entities);
-                    String creditorLabel = path + "_";
-                    if(crCreditor.getBIK() == null)
-                        creditorLabel += crCreditor.getBIN();
-                    else
-                        creditorLabel += crCreditor.getBIK();
+            } else if(script.equals("keyScript")) {
 
-                    creditorLabel += ".zip";
+                String select = "select t.ID, root.CREDITOR_ID, t.CONTRACT_NO, t.CONTRACT_DATE, t.CONTRACT_NO_OLD, t.CONTRACT_DATE_OLD" +
+                        "  from MAINTENANCE.CREDREG_edit_credit t ," +
+                        "       MAINTENANCE.CREDREG_EDIT root" +
+                        " where root.ID = t.EDIT_ID " +
+                        "  and (t.CONTRACT_NO_OLD is not null or t.CONTRACT_DATE_OLD is not null)";
 
-                    baseEntityXmlGenerator.writeToZip(new Document[]{document, getManifest(crCreditor, entities.size())}
-                            , new String[]{"data.xml", "manifest.xml"}, creditorLabel);
+                if (!allFlag)
+                    select += "   and t.PROCESSED_USCI = 0";
+
+                if(creditorFlag)
+                    select += " and root.CREDITOR_ID = " + creditorFilterId;
+
+                try {
+                    preparedStatement = conn.prepareStatement(select);
+                    resultSet = preparedStatement.executeQuery();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    return;
                 }
 
-                if(listSuccess.size() > 0){
-                    StringBuilder sql = new StringBuilder("update MAINTENANCE.CREDREG_DELETE_CREDIT SET PROCESSED_USCI = 1 where ID IN ( ?");
+                Batch batch = new Batch(new Date());
+                batch.setId(777);
 
-                    for(int i=1;i<listSuccess.size();i++)
-                        sql.append(",?");
+                try {
+                    while (resultSet.next()) {
+                        String contractNo = resultSet.getString("contract_no_old");
+                        Date contractDate = resultSet.getDate("contract_date_old");
+                        String contractNoNew = resultSet.getString("contract_no");
+                        Date contractDateNew = resultSet.getDate("contract_date");
+                        Long creditorId = resultSet.getLong("creditor_id");
+                        Long mntId = resultSet.getLong("ID");
 
-                    sql.append(")");
+                        IBaseEntity credit = new BaseEntity(metaClassRepository.getMetaClass("credit"),
+                                new Date());
 
-                    try {
-                        PreparedStatement statement = conn.prepareStatement(sql.toString());
-                        for(int i=0;i<listSuccess.size();i++)
-                            statement.setLong(i+1 , listSuccess.get(i));
-                        statement.executeQuery();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
+                        IBaseEntity primaryContract = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"),
+                                new Date());
+
+                        IBaseValue contractNoValue = BaseValueFactory.create(BaseContainerType.BASE_ENTITY, primaryContract.getMemberType("no"), batch, 0, contractNo);
+                        if(!contractNo.equals(contractNoNew))
+                            contractNoValue.setNewBaseValue(BaseValueFactory.create(BaseContainerType.BASE_ENTITY, primaryContract.getMemberType("no"), batch, 0, contractNoNew));
+
+                        IBaseValue contractDateValue = BaseValueFactory.create(BaseContainerType.BASE_ENTITY, primaryContract.getMemberType("date"), batch, 0, contractDate);
+                        if(!contractDate.equals(contractDateNew))
+                            contractDateValue.setNewBaseValue(BaseValueFactory.create(BaseContainerType.BASE_ENTITY, primaryContract.getMemberType("date"), batch, 0, contractDateNew));
+
+                        primaryContract.put("no", contractNoValue);
+                        primaryContract.put("date",contractDateValue);
+
+
+                        IBaseEntity creditor = getCreditor(conn, creditorId);
+
+                        if (creditor == null) {
+                            //storage.simpleSql(String.format("insert into mnt_logs(mnt_operation_id, foreign_id, execution_time, status, error_msg) values (1,%d,sysdate,1,'creditor_not_found')",mntId));
+                            System.out.println("creditor not found with id " + creditorId);
+                            continue;
+                        }
+
+                        credit.put("primary_contract", new BaseValue(batch, 0, primaryContract));
+                        credit.put("creditor", new BaseValue(batch, 0, creditor));
+
+                        baseEntityProcessorDao.prepare(credit);
+
+                        if (credit.getId() <= 0) {
+                            //storage.simpleSql(String.format("insert into MNT_LOGS (MNT_OPERATION_ID, FOREIGN_ID, EXECUTION_TIME, status, error_msg) values (1,%d,sysdate,1,'%s')", mntId, "credit not found"));
+                            System.out.println(String.format("credit not found contract_no = %s contract_date = %s", contractNo, contractDate));
+                            continue;
+                        } else {
+                            listSuccess.add(mntId);
+                            //storage.simpleSql(String.format("insert into MNT_LOGS (MNT_OPERATION_ID, FOREIGN_ID, EXECUTION_TIME, STATUS) values (%d,1,sysdate,0)", mntId));
+                        }
+
+                        if (!byCreditor.containsKey(creditorId)) {
+                            byCreditor.put(creditorId, new ArrayList<BaseEntity>());
+                        }
+
+                        byCreditor.get(creditorId).add((BaseEntity) credit);
                     }
 
-                    System.out.println("ok done");
-                } else {
-                    System.out.println("no work");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            for (long creditorId : byCreditor.keySet()) {
+                ArrayList<BaseEntity> entities = byCreditor.get(creditorId);
+                //IBaseEntity creditor = getCreditor(conn, creditorId);
+                Creditor crCreditor = crCreditors.get(creditorId);
+                BaseEntityXmlGenerator baseEntityXmlGenerator = new BaseEntityXmlGenerator();
+                Document document;
+                if(script.equals("delScript"))
+                    document = baseEntityXmlGenerator.getGeneratedDeleteDocument(entities);
+                else
+                    document = baseEntityXmlGenerator.getGeneratedDocument(entities);
+
+                String creditorLabel = path + "_";
+                if (crCreditor.getBIK() == null)
+                    creditorLabel += crCreditor.getBIN();
+                else
+                    creditorLabel += crCreditor.getBIK();
+
+                creditorLabel += ".zip";
+
+                baseEntityXmlGenerator.writeToZip(new Document[]{document, getManifest(crCreditor, entities.size())}
+                        , new String[]{"data.xml", "manifest.xml"}, creditorLabel);
+            }
+
+            if (listSuccess.size() > 0) {
+                StringBuilder sql;
+                if(script.equals("delScript"))
+                   sql = new StringBuilder("update MAINTENANCE.CREDREG_DELETE_CREDIT SET PROCESSED_USCI = 1 where ID IN ( ?");
+                else
+                   sql = new StringBuilder("update MAINTENANCE.CREDREG_EDIT_CREDIT SET PROCESSED_USCI = 1 where ID IN ( ?");
+
+                for (int i = 1; i < listSuccess.size(); i++)
+                    sql.append(",?");
+
+                sql.append(")");
+
+                try {
+                    PreparedStatement statement = conn.prepareStatement(sql.toString());
+                    for (int i = 0; i < listSuccess.size(); i++)
+                        statement.setLong(i + 1, listSuccess.get(i));
+                    statement.executeQuery();
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
 
+                System.out.println("ok done");
             } else {
-                System.out.println(commandUsage);
+                System.out.println("no work");
             }
-        }else{
+
+        } else {
             System.out.println(commandUsage);
         }
     }
