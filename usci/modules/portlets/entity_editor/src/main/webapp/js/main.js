@@ -500,7 +500,7 @@ Ext.onReady(function() {
             }],
         dockedItems: [
             {
-                fieldLabel: label_REF + '123',
+                fieldLabel: label_REF,
                 id: 'entityEditorComplexTypeCombo',
                 xtype: 'combobox',
                 store: classesStore,
