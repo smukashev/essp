@@ -339,7 +339,7 @@ public class MainPortlet extends MVCPortlet {
                     break;
                 case LIST_CLASSES:
                     MetaClassList classesListJson = new MetaClassList();
-                    List<MetaClassName> metaClassesList = metaFactoryService.getMetaClassesNames();
+                    List<MetaClassName> metaClassesList = metaFactoryService.getRefNames();
 
                     classesListJson.setTotal(metaClassesList.size());
 

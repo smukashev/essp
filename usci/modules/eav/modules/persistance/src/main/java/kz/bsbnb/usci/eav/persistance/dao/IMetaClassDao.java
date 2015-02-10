@@ -13,5 +13,6 @@ public interface IMetaClassDao extends IDao<MetaClass>
     public List<MetaClass> loadAll();
     public long save(MetaClass meta);
     public List<MetaClassName> getMetaClassesNames();
+    public List<MetaClassName> getRefNames();
     public void remove(MetaClass metaClass);
 }

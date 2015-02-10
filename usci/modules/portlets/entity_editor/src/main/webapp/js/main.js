@@ -500,7 +500,7 @@ Ext.onReady(function() {
             }],
         dockedItems: [
             {
-                fieldLabel: label_REF,
+                fieldLabel: label_REF + '123',
                 id: 'entityEditorComplexTypeCombo',
                 xtype: 'combobox',
                 store: classesStore,
@@ -508,18 +508,14 @@ Ext.onReady(function() {
                 displayField:'className',
                 listeners: {
                     change: function (field, newValue, oldValue) {
-                            currentClassId = newValue;
+                        currentClassId = newValue;
 
-                            refStore.reload(
-                                {
-                                    params:
-                                    {
-                                        metaId : currentClassId
-                                    }
-                                });
+                        refStore.proxy.extraParams = {metaId: currentClassId, op: 'LIST_BY_CLASS'};
+                        Ext.getCmp('entityEditorrefCombo').value = null;
 
-                            createItemsGrid(currentClassId);
-                        }
+                        refStore.reload();
+                        createItemsGrid(currentClassId);
+                    }
                 }
             },{
                 fieldLabel: label_ITEMS,

@@ -16,5 +16,6 @@ public interface IMetaClassRepository
     public void saveMetaClass(MetaClass meta);
     public void resetCache();
     public List<MetaClassName> getMetaClassesNames();
+    public List<MetaClassName> getRefNames();
     public boolean delMetaClass(String className);
 }

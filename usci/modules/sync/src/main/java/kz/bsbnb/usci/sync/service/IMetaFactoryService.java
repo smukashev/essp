@@ -21,6 +21,7 @@ public interface IMetaFactoryService {
     public List<BaseEntity> getBaseEntities();
     public List<MetaClass> getMetaClasses();
     public List<MetaClassName> getMetaClassesNames();
+    public List<MetaClassName> getRefNames();
     public MetaClass getMetaClass(String name);
     public boolean saveMetaClass(MetaClass meta);
     public boolean delMetaClass(String className);

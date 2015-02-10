@@ -94,6 +94,12 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository
         return metaClassDao.getMetaClassesNames();
     }
 
+
+    @Override
+    public List<MetaClassName> getRefNames() {
+        return metaClassDao.getRefNames();
+    }
+
     @Override
     //TODO: does not erase from names
     public boolean delMetaClass(String className)

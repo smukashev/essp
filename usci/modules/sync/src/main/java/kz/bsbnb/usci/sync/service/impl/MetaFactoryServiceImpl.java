@@ -69,9 +69,13 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     }
 
     @Override
-    public List<MetaClassName> getMetaClassesNames()
-    {
+    public List<MetaClassName> getMetaClassesNames() {
         return remoteMetaFactoryService.getMetaClassesNames();
+    }
+
+    @Override
+    public List<MetaClassName> getRefNames() {
+        return remoteMetaFactoryService.getRefNames();
     }
 
     @Override
