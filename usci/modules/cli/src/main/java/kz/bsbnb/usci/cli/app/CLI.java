@@ -2397,10 +2397,11 @@ public class CLI
                     System.out.println("No such entity identification method: " + args.get(1));
                 }
             } else if(args.get(0).equals("xml")) {
-                if (args.size() == 2) {
-                    dumpEntityToXML(args.get(1), args.get(2));
-                } else if(args.size() > 2 && args.get(1).equals("delete")){
-                    dumpDeleteEntityToXML(args.get(2), args.get(3));
+                if (args.size() > 2) {
+                    if(args.get(1).equals("delete"))
+                        dumpDeleteEntityToXML(args.get(2), args.get(3));
+                    else
+                        dumpEntityToXML(args.get(1), args.get(2));
                 } else {
                     System.out.println("Argument needed: <xml> <id> <fileName>");
                     System.out.println("Argument needed: <xml> delete <id> <fileName>");
