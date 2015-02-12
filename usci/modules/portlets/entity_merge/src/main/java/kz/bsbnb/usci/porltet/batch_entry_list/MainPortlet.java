@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.porltet.batch_entry_list;
 
 import com.google.gson.Gson;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
@@ -82,8 +83,12 @@ public class MainPortlet extends MVCPortlet {
         HttpServletRequest httpReq = PortalUtil.getOriginalServletRequest(
                 PortalUtil.getHttpServletRequest(renderRequest));
 
+        String param = PortalUtil.getOriginalServletRequest(PortalUtil.getHttpServletRequest(renderRequest))
+                .getParameter("op");
+
         String entityId = httpReq.getParameter("entityId");
-        renderRequest.setAttribute("entityId", entityId);
+        if(entityId != null)
+            renderRequest.setAttribute("entityId", entityId);
 
         super.doView(renderRequest, renderResponse);
     }
@@ -93,7 +98,8 @@ public class MainPortlet extends MVCPortlet {
         LIST_ENTITY,
         SAVE_JSON,
         LIST_BY_CLASS,
-        GET_CANDIDATES
+        GET_CANDIDATES,
+        NULL
     }
 
     private String testNull(String str) {
@@ -528,6 +534,8 @@ public class MainPortlet extends MVCPortlet {
         return str;
     }
 
+
+
     @Override
     public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws IOException
     {
@@ -541,14 +549,7 @@ public class MainPortlet extends MVCPortlet {
         PrintWriter writer = resourceResponse.getWriter();
 
         try {
-            String op = resourceRequest.getParameter("op");
-            OperationTypes operationType;
-            if(op == null)
-                operationType = OperationTypes.valueOf(op);
-            else
-                operationType = OperationTypes.valueOf("");
-
-            System.out.println("OperationType: " + operationType);
+            OperationTypes operationType = OperationTypes.valueOf(getParam("op", resourceRequest));
 
             Gson gson = new Gson();
 
@@ -648,5 +649,21 @@ public class MainPortlet extends MVCPortlet {
             e.printStackTrace();
             writer.write("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}");
         }
+    }
+
+    public String getParam(String name, RenderRequest request) {
+        if(request.getParameter(name) != null)
+            return request.getParameter(name);
+
+        return PortalUtil.getOriginalServletRequest(PortalUtil.
+                getHttpServletRequest(request)).getParameter(name);
+    }
+
+    public String getParam(String name, ResourceRequest request) {
+        if(request.getParameter(name) != null)
+            return request.getParameter(name);
+
+        return PortalUtil.getOriginalServletRequest(PortalUtil.
+                getHttpServletRequest(request)).getParameter(name);
     }
 }
