@@ -190,7 +190,8 @@ public class MainPortlet extends MVCPortlet {
                     "\"array\": false,\n" +
                     "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
                     "\"leaf\":true,\n" +
-                    "\"iconCls\":\"file\"\n" +
+                    "\"iconCls\":\"file\",\n" +
+                    "\"isKey\":\""+meta.getMetaAttribute(innerClassesNames).isKey()+"\"\n" +
                     "}";
                 } else {
                     Object dtVal = value.getValue();
@@ -207,7 +208,8 @@ public class MainPortlet extends MVCPortlet {
                             "\"array\": false,\n" +
                             "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
                             "\"leaf\":true,\n" +
-                            "\"iconCls\":\"file\"\n" +
+                            "\"iconCls\":\"file\",\n" +
+                            "\"isKey\":\""+meta.getMetaAttribute(innerClassesNames).isKey()+"\"\n" +
                             "}";
                 }
             }
@@ -339,7 +341,7 @@ public class MainPortlet extends MVCPortlet {
                     break;
                 case LIST_CLASSES:
                     MetaClassList classesListJson = new MetaClassList();
-                    List<MetaClassName> metaClassesList = metaFactoryService.getMetaClassesNames();
+                    List<MetaClassName> metaClassesList = metaFactoryService.getRefNames();
 
                     classesListJson.setTotal(metaClassesList.size());
 

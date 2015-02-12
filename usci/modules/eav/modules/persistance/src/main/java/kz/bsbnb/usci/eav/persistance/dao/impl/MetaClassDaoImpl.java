@@ -1186,18 +1186,31 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
     }
 
     @Override
-    public List<MetaClassName> getMetaClassesNames()
-    {
+    public List<MetaClassName> getMetaClassesNames() {
+        return getMetaClassesNames(false);
+    }
+
+    @Override
+    public List<MetaClassName> getRefNames() {
+        return getMetaClassesNames(true);
+    }
+
+    public List<MetaClassName> getMetaClassesNames(boolean refs) {
+
         ArrayList<MetaClassName> metaClassNameList = new ArrayList<MetaClassName>();
         SelectForUpdateStep select;
+        SelectJoinStep join;
 
-        select = context.select(
+        join = context.select(
                 EAV_M_CLASSES.ID,
                 EAV_M_CLASSES.NAME,
                 EAV_M_CLASSES.TITLE
-        ).from(EAV_M_CLASSES).
-                orderBy(EAV_M_CLASSES.BEGIN_DATE.desc());
+        ).from(EAV_M_CLASSES);
 
+        if(refs)
+            select = join.where(EAV_M_CLASSES.IS_REFERENCE.eq((byte) 1));
+        else
+            select = join;
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

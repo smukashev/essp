@@ -194,7 +194,8 @@ Ext.onReady(function() {
             {name: 'value',     type: 'string'},
             {name: 'simple',     type: 'boolean'},
             {name: 'array',     type: 'boolean'},
-            {name: 'type',     type: 'string'}
+            {name: 'type',     type: 'string'},
+            {name: 'isKey',     type: 'boolean'}
         ]
     });
 
@@ -436,7 +437,8 @@ Ext.onReady(function() {
                                     format: 'd.m.Y',
                                     value: new Date(
                                         children[i].data.value.
-                                            replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1'))
+                                            replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1')),
+                                    disabled: children[i].data.isKey
                                 }));
                         } else {
                             form.add(Ext.create("Ext.form.field.Text",
@@ -444,7 +446,8 @@ Ext.onReady(function() {
                                     id: children[i].data.code + "FromItem",
                                     fieldLabel: children[i].data.title,
                                     width: "100%",
-                                    value: children[i].data.value
+                                    value: children[i].data.value,
+                                    disabled: children[i].data.isKey
                                 }));
                         }
                     }
@@ -508,18 +511,14 @@ Ext.onReady(function() {
                 displayField:'className',
                 listeners: {
                     change: function (field, newValue, oldValue) {
-                            currentClassId = newValue;
+                        currentClassId = newValue;
 
-                            refStore.reload(
-                                {
-                                    params:
-                                    {
-                                        metaId : currentClassId
-                                    }
-                                });
+                        refStore.proxy.extraParams = {metaId: currentClassId, op: 'LIST_BY_CLASS'};
+                        Ext.getCmp('entityEditorrefCombo').value = null;
 
-                            createItemsGrid(currentClassId);
-                        }
+                        refStore.reload();
+                        createItemsGrid(currentClassId);
+                    }
                 }
             },{
                 fieldLabel: label_ITEMS,
