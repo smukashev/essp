@@ -541,7 +541,14 @@ public class MainPortlet extends MVCPortlet {
         PrintWriter writer = resourceResponse.getWriter();
 
         try {
-            OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
+            String op = resourceRequest.getParameter("op");
+            OperationTypes operationType;
+            if(op == null)
+                operationType = OperationTypes.valueOf(op);
+            else
+                operationType = OperationTypes.valueOf("");
+
+            System.out.println("OperationType: " + operationType);
 
             Gson gson = new Gson();
 

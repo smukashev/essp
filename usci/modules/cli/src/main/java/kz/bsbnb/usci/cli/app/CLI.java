@@ -2681,6 +2681,12 @@ public class CLI
         } else if(args.get(0).equals("save")){
             long ruleId = ruleService.createNewRuleInBatch(currentRule, currentBatchVersion);
             System.out.println("ok saved: ruleId = " + ruleId);
+            /* Remove overhead from TNS Listener */
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }else if(args.get(0).equals("run")){
 
             DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
