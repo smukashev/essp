@@ -10,57 +10,44 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.sql.DataSource;
 
-public class DDLHelper
-{
+public class DDLHelper {
     private final static Logger logger = LoggerFactory.getLogger(DDLHelper.class);
 
-    public static Database readDatabaseFromXML(String fileName)
-    {
+    public static Database readDatabaseFromXML(String fileName) {
         return new DatabaseIO().read(fileName);
     }
 
-    public static void writeDatabaseToXML(Database db, String fileName)
-    {
+    public static void writeDatabaseToXML(Database db, String fileName) {
         new DatabaseIO().write(db, fileName);
     }
 
-    public static Database readDatabase(DataSource dataSource)
-    {
+    public static Database readDatabase(DataSource dataSource) {
         Platform platform = PlatformFactory.createNewPlatformInstance(dataSource);
 
         return platform.readModelFromDatabase("model");
     }
 
-    public static void changeDatabase(DataSource dataSource,
-                               Database   targetModel,
-                               boolean    alterDb)
-    {
+    public static void changeDatabase(DataSource dataSource, Database targetModel, boolean alterDb) {
         Platform platform = PlatformFactory.createNewPlatformInstance(dataSource);
 
-        if (alterDb)
-        {
+        if (alterDb) {
             platform.alterTables(targetModel, false);
-        }
-        else
-        {
+        } else {
             platform.createModel(targetModel, false, true);
         }
     }
 
     public static void dropDatabase(DataSource dataSource,
-                                      Database   targetModel)
-    {
+                                    Database targetModel) {
         Platform platform = PlatformFactory.createNewPlatformInstance(dataSource);
 
         platform.dropModel(targetModel, true);
     }
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         logger.info("DBHelper started");
 
-        if(args.length < 2)
-        {
+        if (args.length < 2) {
             System.out.println("Usage: <command> <filename>");
             System.out.println("Commands: gen, apply");
             return;
@@ -71,17 +58,14 @@ public class DDLHelper
 
         DataSource source = ctx.getBean(DataSource.class);
 
-        if(args[0].equals("gen"))
-        {
+        if (args[0].equals("gen")) {
             Database db = readDatabase(source);
 
             String workingDir = System.getProperty("user.dir");
             System.out.println("Current working directory : " + workingDir);
 
             writeDatabaseToXML(db, args[1]);
-        }
-        else if(args[0].equals("apply"))
-        {
+        } else if (args[0].equals("apply")) {
             DDLHelper.dropDatabase(source,
                     DDLHelper.readDatabaseFromXML(args[1]));
 
