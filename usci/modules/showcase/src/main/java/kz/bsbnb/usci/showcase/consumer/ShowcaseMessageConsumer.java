@@ -62,6 +62,7 @@ public class ShowcaseMessageConsumer implements MessageListener{
                             queueEntry.getBaseEntityApplied().getMeta().getClassName());
 
                     showcaseDao.deleteById(h, queueEntry.getBaseEntityApplied());
+                    message.acknowledge();
                 } else if(queueEntry.getBaseEntityApplied().getOperation() == OperationType.NEW) {
                     throw new UnsupportedOperationException("Operation new not supported in showcase");
                 } else {

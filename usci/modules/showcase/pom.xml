@@ -87,7 +87,7 @@
                         <database>
                             <name>${jooq.db.name}</name>
                             <includes>(EAV_SC_.*)</includes>
-                            <excludes></excludes>
+                            <excludes/>
                             <inputSchema>${jooq.db.schema}</inputSchema>
                             <customTypes>
                                 <customType>
@@ -173,6 +173,11 @@
         <dependency>
             <groupId>kz.bsbnb.usci.eav</groupId>
             <artifactId>persistance</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>kz.bsbnb.usci</groupId>
+            <artifactId>core</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>

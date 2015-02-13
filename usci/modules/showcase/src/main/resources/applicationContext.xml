@@ -61,13 +61,13 @@
 
     <bean id="remoteCoreShowcaseService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1099/coreShowcaseService"/>
-        <property name="serviceInterface" value="kz.bsbnb.usci.showcase.service.CoreShowcaseService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.CoreShowcaseService"/>
     </bean>
 
     <bean id="remoteMetaFactoryService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="refreshStubOnConnectFailure" value="true"/>
         <property name="serviceUrl" value="rmi://127.0.0.1:1098/metaFactoryService"/>
-        <property name="serviceInterface" value="kz.bsbnb.usci.showcase.service.IMetaFactoryService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IMetaFactoryService"/>
     </bean>
 
     <!-- ActiveMQ destinations to use -->
