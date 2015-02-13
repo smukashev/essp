@@ -2,8 +2,8 @@
 
 <portlet-app xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd" version="2.0">
 	<portlet>
-		<portlet-name>entity-portlet</portlet-name>
-		<display-name>Портлет данных</display-name>
+		<portlet-name>ref-portlet</portlet-name>
+		<display-name>Портлет справочников</display-name>
 		<portlet-class>kz.bsbnb.usci.porltet.ref_portlet.MainPortlet</portlet-class>
 		<init-param>
 			<name>view-template</name>
@@ -14,9 +14,9 @@
 			<mime-type>text/html</mime-type>
 		</supports>
 		<portlet-info>
-			<title>Портлет для работы с данными</title>
-			<short-title>Портлет данных</short-title>
-			<keywords>редактирование данных</keywords>
+			<title>Портлет для работы со справочниками</title>
+			<short-title>Портлет справочников</short-title>
+			<keywords>редактирование справочников</keywords>
 		</portlet-info>
 		<security-role-ref>
 			<role-name>administrator</role-name>

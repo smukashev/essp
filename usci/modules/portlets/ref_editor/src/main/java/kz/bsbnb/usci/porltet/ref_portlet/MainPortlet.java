@@ -318,13 +318,13 @@ public class MainPortlet extends MVCPortlet {
         PrintWriter writer = resourceResponse.getWriter();
 
         try {
-            OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
+            OperationTypes operationType = OperationTypes.valueOf(getParam("op", resourceRequest));
 
             Gson gson = new Gson();
 
             switch (operationType) {
                 case SAVE_XML:
-                    String xml = resourceRequest.getParameter("xml_data");
+                    String xml = getParam("xml_data", resourceRequest);
 
                     BatchEntry batchEntry = new BatchEntry();
 
@@ -362,7 +362,7 @@ public class MainPortlet extends MVCPortlet {
 
                     break;
                 case LIST_BY_CLASS:
-                    String metaId = resourceRequest.getParameter("metaId");
+                    String metaId = getParam("metaId", resourceRequest);
                     if (metaId != null && metaId.trim().length() > 0) {
                         List<RefListItem> ids = entityService.getRefsByMetaclass(Long.parseLong(metaId));
 
@@ -396,7 +396,7 @@ public class MainPortlet extends MVCPortlet {
 
                     break;
                 case LIST_ENTITY:
-                    String entityId = resourceRequest.getParameter("entityId");
+                    String entityId = getParam("entityId", resourceRequest);
                     if (entityId != null && entityId.trim().length() > 0) {
                         BaseEntity entity = entityService.load(Integer.parseInt(entityId));
 
@@ -413,5 +413,9 @@ public class MainPortlet extends MVCPortlet {
             e.printStackTrace();
             writer.write("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}");
         }
+    }
+
+    private String getParam(String name, ResourceRequest resourceRequest) {
+        return PortalUtil.getOriginalServletRequest(PortalUtil.getHttpServletRequest(resourceRequest)).getParameter(name);
     }
 }

@@ -3,6 +3,6 @@
 
 <display>
 	<category name="USCI">
-		<portlet id="entity-portlet" />
+		<portlet id="ref-portlet" />
 	</category>
 </display>
