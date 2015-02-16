@@ -3423,24 +3423,30 @@ public class CLI
             }
 
             if (listSuccess.size() > 0) {
-                StringBuilder sql;
-                if(script.equals("delScript"))
-                   sql = new StringBuilder("update MAINTENANCE.CREDREG_DELETE_CREDIT SET PROCESSED_USCI = 1 where ID IN ( ?");
-                else
-                   sql = new StringBuilder("update MAINTENANCE.CREDREG_EDIT_CREDIT SET PROCESSED_USCI = 1 where ID IN ( ?");
+                int start = 0, nextStart;
+                while(start < listSuccess.size()) {
+                    nextStart = start + 100;
+                    StringBuilder sql;
+                    if (script.equals("delScript"))
+                        sql = new StringBuilder("update MAINTENANCE.CREDREG_DELETE_CREDIT SET PROCESSED_USCI = 1 where ID IN ( ?");
+                    else
+                        sql = new StringBuilder("update MAINTENANCE.CREDREG_EDIT_CREDIT SET PROCESSED_USCI = 1 where ID IN ( ?");
 
-                for (int i = 1; i < listSuccess.size(); i++)
-                    sql.append(",?");
+                    for (int i=start + 1; i < Math.min(nextStart, listSuccess.size()); i++)
+                        sql.append(",?");
 
-                sql.append(")");
+                    sql.append(")");
 
-                try {
-                    PreparedStatement statement = conn.prepareStatement(sql.toString());
-                    for (int i = 0; i < listSuccess.size(); i++)
-                        statement.setLong(i + 1, listSuccess.get(i));
-                    statement.executeQuery();
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                    try {
+                        PreparedStatement statement = conn.prepareStatement(sql.toString());
+                        System.out.println(sql.toString());
+                        for (int i = start; i < Math.min(nextStart, listSuccess.size() ); i++)
+                            statement.setLong(i + 1 - start, listSuccess.get(i));
+                        statement.executeQuery();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    start = nextStart;
                 }
 
                 System.out.println("ok done");
