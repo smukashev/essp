@@ -47,7 +47,7 @@ import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
-import kz.bsbnb.usci.eav.showcase.dao.IShowCaseDao;
+/*import kz.bsbnb.usci.eav.showcase.dao.IShowCaseDao;*/
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -129,8 +129,8 @@ public class CLI
     @Autowired
     private RulesSingleton rulesSingleton;
 
-    @Autowired
-    protected IShowCaseDao showCaseDao;
+    /*@Autowired
+    protected IShowCaseDao showCaseDao;*/
 
 
     private BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
