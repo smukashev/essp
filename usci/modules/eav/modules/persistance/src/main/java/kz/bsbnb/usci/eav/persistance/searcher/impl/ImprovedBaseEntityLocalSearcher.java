@@ -92,63 +92,6 @@ public class ImprovedBaseEntityLocalSearcher extends JDBCSupport implements IBas
         return generateSQL(entity, entityName, null);
     }
 
-    private SelectJoinStep generateJoins(SelectJoinStep joins, String entityAlias, String name, IMetaType type,
-                                         IMetaAttribute attribute) {
-        String valueAlias = "v_" + name;
-        if (!type.isSet()) {
-            if (!type.isComplex()) {
-                MetaValue metaValue = (MetaValue) type;
-
-                switch (metaValue.getTypeCode()) {
-                    case BOOLEAN:
-                        joins = joins.join(EAV_BE_BOOLEAN_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    case DATE:
-                        joins = joins.join(EAV_BE_DATE_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_DATE_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_DATE_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    case DOUBLE:
-                        joins = joins.join(EAV_BE_DOUBLE_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_DOUBLE_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_DOUBLE_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    case INTEGER:
-                        joins = joins.join(EAV_BE_INTEGER_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_INTEGER_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_INTEGER_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    case STRING:
-                        joins = joins.join(EAV_BE_STRING_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_STRING_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_STRING_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    default:
-                        throw new IllegalStateException("Unknown data type: " + metaValue.getTypeCode() +
-                                " for attribute: " + name);
-                }
-            } else {
-                joins = joins.join(EAV_BE_COMPLEX_VALUES.as(valueAlias)).
-                        on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_ID).
-                                and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ATTRIBUTE_ID.equal(attribute.getId())));
-            }
-        }
-
-        return joins;
-    }
-
     public SelectConditionStep generateSQL(IBaseEntity entity, String entityName,
                                            HashMap<String, ArrayList<String>> arrayKeyFilter) {
         MetaClass metaClass = entity.getMeta();
@@ -160,10 +103,9 @@ public class ImprovedBaseEntityLocalSearcher extends JDBCSupport implements IBas
         if (metaClass == null)
             throw new IllegalArgumentException("MetaData can't be null");
 
-        Set<String> names = metaClass.getMemberNames();
-
         Condition condition = null;
-        for (String name : names) {
+
+        for (String name : metaClass.getMemberNames()) {
             IMetaAttribute metaAttribute = metaClass.getMetaAttribute(name);
             IMetaType memberType = metaClass.getMemberType(name);
 
@@ -433,5 +375,62 @@ public class ImprovedBaseEntityLocalSearcher extends JDBCSupport implements IBas
         logger.debug("Searcher SQL after conditions generated: " + where.toString());
 
         return where;
+    }
+
+    private SelectJoinStep generateJoins(SelectJoinStep joins, String entityAlias, String name, IMetaType type,
+                                         IMetaAttribute attribute) {
+        String valueAlias = "v_" + name;
+        if (!type.isSet()) {
+            if (!type.isComplex()) {
+                MetaValue metaValue = (MetaValue) type;
+
+                switch (metaValue.getTypeCode()) {
+                    case BOOLEAN:
+                        joins = joins.join(EAV_BE_BOOLEAN_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ATTRIBUTE_ID.
+                                                equal(attribute.getId())));
+                        break;
+                    case DATE:
+                        joins = joins.join(EAV_BE_DATE_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_DATE_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_DATE_VALUES.as(valueAlias).ATTRIBUTE_ID.
+                                                equal(attribute.getId())));
+                        break;
+                    case DOUBLE:
+                        joins = joins.join(EAV_BE_DOUBLE_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_DOUBLE_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_DOUBLE_VALUES.as(valueAlias).ATTRIBUTE_ID.
+                                                equal(attribute.getId())));
+                        break;
+                    case INTEGER:
+                        joins = joins.join(EAV_BE_INTEGER_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_INTEGER_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_INTEGER_VALUES.as(valueAlias).ATTRIBUTE_ID.
+                                                equal(attribute.getId())));
+                        break;
+                    case STRING:
+                        joins = joins.join(EAV_BE_STRING_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_STRING_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_STRING_VALUES.as(valueAlias).ATTRIBUTE_ID.
+                                                equal(attribute.getId())));
+                        break;
+                    default:
+                        throw new IllegalStateException("Unknown data type: " + metaValue.getTypeCode() +
+                                " for attribute: " + name);
+                }
+            } else {
+                joins = joins.join(EAV_BE_COMPLEX_VALUES.as(valueAlias)).
+                        on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_ID).
+                                and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ATTRIBUTE_ID.equal(attribute.getId())));
+            }
+        }
+
+        return joins;
     }
 }
