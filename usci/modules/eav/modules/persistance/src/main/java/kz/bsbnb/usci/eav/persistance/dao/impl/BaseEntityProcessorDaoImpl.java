@@ -2843,7 +2843,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
         IBaseEntity baseEntityPrepared = prepare(((BaseEntity) baseEntity).clone());
-        IBaseEntity baseEntityApplied = null;
+        IBaseEntity baseEntityApplied;
 
         if (baseEntityPrepared.getOperation() != null) {
             switch (baseEntityPrepared.getOperation()) {
