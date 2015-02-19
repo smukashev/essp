@@ -32,7 +32,7 @@ import static kz.bsbnb.eav.persistance.generated.Tables.*;
  */
 @Component
 public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEntitySearcher {
-    Logger logger = LoggerFactory.getLogger(ImprovedBaseEntitySearcher.class);
+    private final Logger logger = LoggerFactory.getLogger(ImprovedBaseEntitySearcher.class);
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -51,8 +51,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         if (entity.getId() > 0)
             return entity.getId();
 
-        /*List<Long> ids = searcherPool.getSearcher(entity.getMeta().
-                getClassName()).findAll(entity);
+        /*List<Long> ids = searcherPool.getSearcher(entity.getMeta().getClassName()).findAll(entity);
 
         if (ids.size() > 1) {
             //throw new RuntimeException("Found more than one instance of BaseEntity. Needed one.");
@@ -343,7 +342,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         } else {
 
                             MetaClass childMetaClass = (MetaClass) metaSet.getMemberType();
-                            List<Long> childBaseEntityIds = new ArrayList<Long>();
+                            List<Long> childBaseEntityIds = new ArrayList<>();
                             for (IBaseValue childBaseValue : baseSet.get()) {
                                 BaseEntity childBaseEntity = (BaseEntity) childBaseValue.getValue();
                                 //Long childBaseEntityId = findSingle(childBaseEntity);
@@ -434,7 +433,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
     @Override
     public ArrayList<Long> findAll(BaseEntity baseEntity) {
-        ArrayList<Long> result = new ArrayList<Long>();
+        ArrayList<Long> result = new ArrayList<>();
         if (baseEntity.getValueCount() == 0) {
             return result;
         }

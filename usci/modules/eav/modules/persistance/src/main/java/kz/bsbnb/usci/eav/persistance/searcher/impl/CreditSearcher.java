@@ -41,9 +41,10 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
         List<Long> ids = searcherPool.getSearcher(entity.getMeta().
                 getClassName()).findAll(entity);
 
-        if (ids.size() > 1) {
-            // TODO: throw new RuntimeException("Found more than one instance of BaseEntity. Needed one.");
-        }
+        // TODO: uncomment
+        /* if (ids.size() > 1) {
+            throw new RuntimeException("Found more than one instance of BaseEntity. Needed one.");
+        } */
 
         Long id = ids.size() >= 1 ? ids.get(0) : null;
 
