@@ -84,12 +84,28 @@ public class BeanDataProvider implements DataProvider {
         return creditors;
     }
 
+    private PortalUser convert(User liferayUser) throws IllegalArgumentException {
+        if (liferayUser == null)
+            throw new IllegalArgumentException("Parameter <liferayUser> can not be null");
+
+        PortalUser portalUser = new PortalUser();
+        portalUser.setUserId(liferayUser.getUserId());
+        portalUser.setEmailAddress(liferayUser.getEmailAddress());
+        portalUser.setModifiedDate(liferayUser.getModifiedDate());
+        portalUser.setFirstName(liferayUser.getFirstName());
+        portalUser.setLastName(liferayUser.getLastName());
+        portalUser.setMiddleName(liferayUser.getMiddleName());
+        portalUser.setScreenName(liferayUser.getScreenName());
+
+        return portalUser;
+    }
+
     private void synchronizePortalUsersWithDatabase() {
         try {
             List<User> liferayUserList = UserLocalServiceUtil.getUsers(0, UserLocalServiceUtil.getUsersCount());
             List<PortalUser> portalUserList = new ArrayList<PortalUser>(liferayUserList.size());
             for (User liferayUser : liferayUserList) {
-                portalUserList.add(PortalUser.convert(liferayUser));
+                portalUserList.add(convert(liferayUser));
             }
             portalUserBusiness.synchronize(portalUserList);
         } catch (SystemException se) {
