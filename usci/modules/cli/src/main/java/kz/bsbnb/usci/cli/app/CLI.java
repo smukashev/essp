@@ -38,6 +38,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
+import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -629,6 +630,25 @@ public class CLI
                 System.out.println("No such attribute: " + attrName);
             }
         }
+    }
+
+    public void entityToJava(long id, String reportDateStr) {
+        IBaseEntity entity;
+
+        if (reportDateStr != null) {
+            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+
+            try {
+                entity = baseEntityProcessorDao.loadByMaxReportDate(id, dateFormat.parse(reportDateStr));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return;
+            }
+        } else {
+            entity = baseEntityProcessorDao.load(id);
+        }
+
+        System.out.println(BaseEntityOutput.toJava((BaseEntity) entity, "", 0));
     }
 
     public void showEntity(long id, String reportDateStr) {
@@ -2362,7 +2382,11 @@ public class CLI
         if (args.size() > 1) {
             if (args.get(0).equals("show")) {
                 if (args.get(1).equals("id")) {
-                    showEntity(Long.parseLong(args.get(2)), args.size() > 3 ? args.get(3) : null);
+                    if(args.get(2) != null && args.get(2).equals("tojava")) {
+                        entityToJava(Long.parseLong(args.get(3)), args.size() > 4 ? args.get(4) : null);
+                    } else {
+                        showEntity(Long.parseLong(args.get(2)), args.size() > 3 ? args.get(3) : null);
+                    }
                 } else if (args.get(1).equals("attr")) {
                     if (args.size() > 3) {
                         showEntityAttr(args.get(3), Long.parseLong(args.get(2)));
