@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>kz.bsbnb</groupId>
+    <groupId>kz.bsbnb.usci.portlets</groupId>
     <artifactId>signing-portlet</artifactId>
     <packaging>war</packaging>
     <name>signing-portlet</name>
     <version>0.1</version>
     <properties>
         <liferay.version>6.1.2</liferay.version>
-        <liferay.auto.deploy.dir>/home/a.tkachenko/software/liferay/deploy</liferay.auto.deploy.dir>
-        <liferay.app.server.deploy.dir>/home/a.tkachenko/software/liferay/deploy</liferay.app.server.deploy.dir>
-        <liferay.app.server.portal.dir>/home/a.tkachenko/software/liferay/deploy</liferay.app.server.portal.dir>
+        <liferay.auto.deploy.dir>/home/maksat/soft/glassfish3/deploy</liferay.auto.deploy.dir>
+        <liferay.app.server.deploy.dir>/home/maksat/soft/glassfish3/deploy</liferay.app.server.deploy.dir>
+        <liferay.app.server.portal.dir>/home/maksat/soft/glassfish3/deploy</liferay.app.server.portal.dir>
     </properties>
     <build>
         <plugins>
