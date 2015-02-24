@@ -13,7 +13,7 @@
 <%@ taglib prefix="liferay-ui" uri="http://liferay.com/tld/ui" %>
 <portlet:defineObjects />
 
-<link type="text/css" rel="stylesheet" src="https://170.7.15.117/credit-registry-signing-portlet/css/style.css" />
+<link type="text/css" rel="stylesheet" src="/signing-portlet/css/style.css" />
 <script type="text/javascript">
 
     function loadProfiles() {
@@ -21,6 +21,7 @@
         var profilesSelect = document.getElementById("profilesSelect");
         profilesSelect.length = 0;
         var profiles = profilesString.split('|');
+
         for (var i = 0; i < profiles.length; i++) {
             var opt = document.createElement('option');
             opt.value = profiles[i];
@@ -46,10 +47,13 @@
     }
 
     function loadCertificates() {
-
         var profile = document.getElementById('profilesSelect').options[document.getElementById('profilesSelect').selectedIndex].text;
         var password = document.getElementById('profilePassword').value;
-        var certificates = document.app.getCertificatesInfo(profile, password, 0, '', true, false, '|').split('|');
+        var sCertificates = document.app.getCertificatesInfo(profile, password, 0, '', true, false, '|');
+        var certificates = [];
+        if (sCertificates) {
+            certificates = sCertificates.split('|');
+        }
         var certificatesSelect = document.getElementById('certificatesSelect');
         certificatesSelect.length = 0;
         for (var i = 0; i < certificates.length; i++) {
@@ -76,7 +80,7 @@
                 sign.value = pkcs7;
 
                 var acceptImage = document.createElement('img');
-                acceptImage.src = 'https://170.7.15.117/credit-registry-signing-portlet/accept.png';
+                acceptImage.src = '/signing-portlet/accept.png';
                 var signSymbolCell = document.getElementById("signSymbol" + id);
                 signSymbolCell.appendChild(acceptImage);
             }
@@ -84,9 +88,9 @@
     }
 
 </script>
-<script type="text/javascript" src="https://170.7.15.117/credit-registry-signing-portlet/js/deployJava.js"></script>
+<script type="text/javascript" src="/signing-portlet/js/deployJava.js"></script>
 <script type="text/javascript">
-    var contextPath = 'https://170.7.15.117/credit-registry-signing-portlet';
+        var contextPath = '/signing-portlet';
     var attributes = {
         codebase: './',
         code: 'kz.gamma.TumarCSP.class',
