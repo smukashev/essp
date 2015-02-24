@@ -27,7 +27,7 @@
         <module>credit-registry-upload-portlet</module>
         <module>credit-registry-report-portlet</module>
         <module>credit-registry-audit-portlet</module>
-        <module>credit-registry-signing-portlet</module>
+        <module>signing-portlet</module>
         <!--<module>credit-registry-approval-portlet</module>-->
         <module>translit-util</module>
         <module>meta_editor</module>

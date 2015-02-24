@@ -3,7 +3,7 @@
 
 <liferay-portlet-app>
     <portlet>
-        <portlet-name>credit-registry-signing-portlet</portlet-name>
+        <portlet-name>signing-portlet</portlet-name>
         <icon>/signing.png</icon>
         <instanceable>true</instanceable>
         <ajaxable>false</ajaxable>

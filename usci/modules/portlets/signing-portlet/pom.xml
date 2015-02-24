@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bsbnb</groupId>
-    <artifactId>credit-registry-signing-portlet</artifactId>
+    <artifactId>signing-portlet</artifactId>
     <packaging>war</packaging>
-    <name>credit-registry-signing-portlet</name>
+    <name>signing-portlet</name>
     <version>0.1</version>
     <properties>
         <liferay.version>6.1.2</liferay.version>
@@ -44,7 +44,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>credit-registry-signing-portlet</finalName>
+        <finalName>signing-portlet</finalName>
     </build>
     <dependencies>
         <dependency>
