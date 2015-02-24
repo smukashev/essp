@@ -4,8 +4,8 @@
     Author     : Aidar.Myrzahanov
 --%>
 
-<%@page import="com.bsbnb.creditregistry.portlets.signing.data.DataProvider"%>
-<%@page import="com.bsbnb.creditregistry.portlets.signing.data.BeanDataProvider"%>
+<%@page import="kz.bsbnb.usci.portlets.signing.data.DataProvider"%>
+<%@page import="kz.bsbnb.usci.portlets.signing.data.BeanDataProvider"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>

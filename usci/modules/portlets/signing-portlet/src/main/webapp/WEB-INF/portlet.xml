@@ -10,7 +10,7 @@
         <portlet-name>signing-portlet</portlet-name>
         <display-name>signing-portlet</display-name>
         
-        <portlet-class>com.bsbnb.creditregistry.portlets.signing.SigningPortlet</portlet-class>
+        <portlet-class>kz.bsbnb.usci.portlets.signing.SigningPortlet</portlet-class>
 	<init-param>
 	<name>view-jsp</name>
 		<value>/view.jsp</value>

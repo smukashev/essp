@@ -1,4 +1,4 @@
-package com.bsbnb.creditregistry.portlets.signing.data;
+package kz.bsbnb.usci.portlets.signing.data;
 
 //import com.bsbnb.creditregistry.dm.maintenance.InputFile;
 //import com.bsbnb.creditregistry.dm.maintenance.InputFileSignature;
@@ -17,19 +17,12 @@ package com.bsbnb.creditregistry.portlets.signing.data;
 import kz.bsbnb.usci.core.service.InputFileBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.InputInfoBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
-import kz.bsbnb.usci.core.service.ProtocolBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputFile;
-import kz.bsbnb.usci.cr.model.InputInfo;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
-import static com.bsbnb.creditregistry.portlets.signing.SigningPortlet.log;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.util.logging.Level;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 /**
  *

@@ -1,8 +1,8 @@
-package com.bsbnb.creditregistry.portlets.signing;
+package kz.bsbnb.usci.portlets.signing;
 
-import com.bsbnb.creditregistry.portlets.signing.data.BeanDataProvider;
-import com.bsbnb.creditregistry.portlets.signing.data.DataProvider;
-import com.bsbnb.creditregistry.portlets.signing.data.FileSignatureRecord;
+import kz.bsbnb.usci.portlets.signing.data.BeanDataProvider;
+import kz.bsbnb.usci.portlets.signing.data.DataProvider;
+import kz.bsbnb.usci.portlets.signing.data.FileSignatureRecord;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.User;

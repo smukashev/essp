@@ -1,4 +1,4 @@
-package com.bsbnb.creditregistry.portlets.signing.data;
+package kz.bsbnb.usci.portlets.signing.data;
 
 import kz.bsbnb.usci.cr.model.Creditor;
 
