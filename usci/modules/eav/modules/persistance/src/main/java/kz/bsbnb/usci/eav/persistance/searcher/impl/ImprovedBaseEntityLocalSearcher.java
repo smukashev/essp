@@ -11,7 +11,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
@@ -28,7 +27,7 @@ import java.util.*;
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Component
-public class ImprovedBaseEntityLocalSearcher extends JDBCSupport implements IBaseEntitySearcher {
+public class ImprovedBaseEntityLocalSearcher extends JDBCSupport {
     private final Logger logger = LoggerFactory.getLogger(ImprovedBaseEntityLocalSearcher.class);
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
@@ -38,20 +37,11 @@ public class ImprovedBaseEntityLocalSearcher extends JDBCSupport implements IBas
     @Autowired
     private BasicBaseEntitySearcherPool searcherPool;
 
-    @Override
-    public String getClassName() {
-        return null;
-    }
-
-    @Override
-    public Long findSingle(BaseEntity entity) {
-        if (entity.getId() > 0)
-            return entity.getId();
-
+    public Long findSingleWithParent(BaseEntity entity, BaseEntity parentEntity) {
         if (entity.getValueCount() == 0)
             return null;
 
-        SelectConditionStep select = generateSQL(entity, null);
+        SelectConditionStep select = generateSQL(entity, null, parentEntity);
 
         if (select != null) {
             List<Map<String, Object>> rows = queryForListWithStats(select.limit(1).getSQL(),
@@ -64,36 +54,12 @@ public class ImprovedBaseEntityLocalSearcher extends JDBCSupport implements IBas
         return null;
     }
 
-    @Override
-    public ArrayList<Long> findAll(BaseEntity baseEntity) {
-        ArrayList<Long> result = new ArrayList<>();
-        if (baseEntity.getValueCount() == 0) {
-            return result;
-        }
-
-        SelectConditionStep select = generateSQL(baseEntity, null);
-
-        if (select != null) {
-            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
-                    select.getBindValues().toArray());
-
-            for (Map<String, Object> row : rows)
-                result.add(((BigDecimal) row.get("inner_id")).longValue());
-        }
-
-        logger.debug("Result size: " + result.size());
-
-        Collections.sort(result);
-
-        return result;
+    SelectConditionStep generateSQL(IBaseEntity entity, String entityName, BaseEntity parentEntity) {
+        return generateSQL(entity, entityName, parentEntity, null);
     }
 
-    public SelectConditionStep generateSQL(IBaseEntity entity, String entityName) {
-        return generateSQL(entity, entityName, null);
-    }
-
-    public SelectConditionStep generateSQL(IBaseEntity entity, String entityName,
-                                           HashMap<String, ArrayList<String>> arrayKeyFilter) {
+    SelectConditionStep generateSQL(IBaseEntity entity, String entityName, BaseEntity parentEntity,
+                                    HashMap<String, ArrayList<String>> arrayKeyFilter) {
         MetaClass metaClass = entity.getMeta();
         String entityAlias = (entityName == null ? "root" : "e_" + entityName);
 
@@ -306,11 +272,11 @@ public class ImprovedBaseEntityLocalSearcher extends JDBCSupport implements IBas
 
                             if (childBaseEntityIds.size() > 0) {
                                 String className = childMetaClass.getClassName();
-                                String childEntityAlias = "e_" + className;
+                                // String childEntityAlias = "e_" + className;
                                 String setValueAlias = "sv_" + className;
-                                String setAlias = "s_" + className;
+                                // String setAlias = "s_" + className;
                                 String entitySetAlias = "es_" + className;
-                                Select select = null;
+                                Select select;
 
                                 if (metaSet.getArrayKeyType() == ComplexKeyTypes.ANY) {
                                     select = context.select(
@@ -361,6 +327,15 @@ public class ImprovedBaseEntityLocalSearcher extends JDBCSupport implements IBas
                 }
             }
         }
+
+        // Local variables
+        String complexValueAlias = "cv_parent";
+        joins = joins.join(EAV_BE_COMPLEX_VALUES.as(complexValueAlias)).
+                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                        equal(EAV_BE_COMPLEX_VALUES.as(complexValueAlias).ENTITY_VALUE_ID).
+                        and(EAV_BE_COMPLEX_VALUES.as(complexValueAlias).ENTITY_ID.
+                                equal(parentEntity.getId())));
+
 
         SelectConditionStep where = joins.where(EAV_BE_ENTITIES.as(entityAlias).CLASS_ID.equal(metaClass.getId()))
                 .and(EAV_BE_ENTITIES.as(entityAlias).DELETED.equal(DataUtils.convert(false)));

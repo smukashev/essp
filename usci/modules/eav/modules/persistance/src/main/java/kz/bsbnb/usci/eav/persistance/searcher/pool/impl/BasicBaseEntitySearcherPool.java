@@ -38,10 +38,15 @@ public class BasicBaseEntitySearcherPool implements IBaseEntitySearcherPool {
     public IBaseEntitySearcher getSearcher(String name) {
         IBaseEntitySearcher searcher = searchersByName.get(name);
         if (searcher == null)
-            return baseEntityLocalSearcher;
-            //return baseEntitySearcher;
+            return baseEntitySearcher;
         return searcher;
     }
+
+    @Override
+    public ImprovedBaseEntityLocalSearcher getImprovedBaseEntityLocalSearcher() {
+        return baseEntityLocalSearcher;
+    }
+
 
     public void addSearcher(String name, IBaseEntitySearcher searcher) {
         searchersByName.put(name, searcher);
