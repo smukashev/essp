@@ -22,6 +22,7 @@ class DigitalSignConfigurationComponent extends VerticalLayout{
     @Override
     public void attach() {
         CheckBox toggleCheckBox = new CheckBox(environment.getResourceString(Localization.SEND_USING_DIGITAL_SIGNATURE.getKey()), environment.isUsingDigitalSign());
+        toggleCheckBox.setEnabled(false);
         toggleCheckBox.addListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
