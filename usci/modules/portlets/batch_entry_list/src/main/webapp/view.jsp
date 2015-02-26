@@ -15,7 +15,7 @@
 
 </portlet:resourceURL>
 
-<link rel="stylesheet" media="all" href="<%=request.getContextPath()%>/js/ext/resources/css/ext-all.css" />
+<link rel="stylesheet" media="all" href="/static-usci/ext/resources/css/ext-all.css" />
 <link rel="stylesheet" media="all" href="<%=request.getContextPath()%>/css/main.css" />
 
 <script>
@@ -24,7 +24,7 @@
     var contextPathUrl = '<%=request.getContextPath()%>';
 </script>
 
-<script src="<%=request.getContextPath()%>/js/ext/ext-all.js" type="text/javascript"></script>
+<script src="/static-usci/ext/ext-all.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/main_bee.js" type="text/javascript"></script>
 
 <script src="<%=request.getContextPath()%>/js/lang/default.js" type="text/javascript"></script>
