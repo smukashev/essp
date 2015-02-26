@@ -626,9 +626,8 @@ public class ZipFilesMonitor{
 
             batchInfo.setRepDate(date);
 
-            System.out.println(batchInfo.getSize()); // TODO: size
-            System.out.println(batchInfo.getRepDate());
-
+            System.out.println("Batch size: " + batchInfo.getSize()); // TODO: size
+            System.out.println("Batch report date: " + batchInfo.getRepDate());
 
             zipFile.close();
 
