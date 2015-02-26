@@ -7,8 +7,8 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd"
 >
     <portlet>
-        <portlet-name>credit-registry-upload-portlet</portlet-name>
-        <display-name>credit-registry-upload-portlet</display-name>
+        <portlet-name>upload-portlet</portlet-name>
+        <display-name>upload-portlet</display-name>
         
         <portlet-class>com.vaadin.terminal.gwt.server.ApplicationPortlet2</portlet-class>
         <init-param>
