@@ -917,18 +917,6 @@
 			<unique-column name="report_date"/>
 		</unique>
 	</table>
-    <table name="eav_be_entity_change_dates">
-        <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-        <column name="entity_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-        <column name="change_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-        <!--<foreign-key foreignTable="eav_be_entities" name="eav_fk_022_00">
-            <reference local="entity_id" foreign="id"/>
-        </foreign-key>-->
-        <unique name="eav_ind_022_00">
-            <unique-column name="entity_id"/>
-            <unique-column name="change_date"/>
-        </unique>
-    </table>
 	<table name="AUDIT_EVENT_KIND">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="100" autoIncrement="false"/>

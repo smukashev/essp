@@ -11,7 +11,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
@@ -27,12 +26,9 @@ import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
-/**
- * Used to compare BaseEntity in memory, and to retrieve BaseEntities from storage by example.
- */
 @Component
-public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEntitySearcher {
-    private final Logger logger = LoggerFactory.getLogger(ImprovedBaseEntitySearcher.class);
+public class ImprovedBaseEntityLocalSearcher extends JDBCSupport {
+    private final Logger logger = LoggerFactory.getLogger(ImprovedBaseEntityLocalSearcher.class);
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -41,37 +37,13 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
     @Autowired
     private BasicBaseEntitySearcherPool searcherPool;
 
-    @Override
-    public String getClassName() {
-        return null;
-    }
-
-    @Override
-    public Long findSingle(BaseEntity entity) {
-        if (entity.getId() > 0)
-            return entity.getId();
-
-        /*List<Long> ids = searcherPool.getSearcher(entity.getMeta().getClassName()).findAll(entity);
-
-        if (ids.size() > 1) {
-            //throw new RuntimeException("Found more than one instance of BaseEntity. Needed one.");
-        }
-
-        Long id = ids.size() >= 1 ? ids.get(0) : null;
-
-        if (id != null)
-            entity.setId(id);
-
-        return id;*/
-
-        if (entity.getValueCount() == 0) {
+    public Long findSingleWithParent(BaseEntity entity, BaseEntity parentEntity) {
+        if (entity.getValueCount() == 0)
             return null;
-        }
 
-        SelectConditionStep select = generateSQL(entity, null);
+        SelectConditionStep select = generateSQL(entity, null, parentEntity);
 
         if (select != null) {
-            //orderBy(EAV_BE_ENTITIES.as("root").ID)
             List<Map<String, Object>> rows = queryForListWithStats(select.limit(1).getSQL(),
                     select.getBindValues().toArray());
 
@@ -82,69 +54,12 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         return null;
     }
 
-    public SelectConditionStep generateSQL(IBaseEntity entity, String entityName) {
-        return generateSQL(entity, entityName, null);
+    SelectConditionStep generateSQL(IBaseEntity entity, String entityName, BaseEntity parentEntity) {
+        return generateSQL(entity, entityName, parentEntity, null);
     }
 
-    private SelectJoinStep generateJoins(SelectJoinStep joins, String entityAlias, String name, IMetaType type,
-                                         IMetaAttribute attribute) {
-        String valueAlias = "v_" + name;
-        if (!type.isSet()) {
-            if (!type.isComplex()) {
-                MetaValue metaValue = (MetaValue) type;
-
-                switch (metaValue.getTypeCode()) {
-                    case BOOLEAN:
-                        joins = joins.join(EAV_BE_BOOLEAN_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    case DATE:
-                        joins = joins.join(EAV_BE_DATE_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_DATE_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_DATE_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    case DOUBLE:
-                        joins = joins.join(EAV_BE_DOUBLE_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_DOUBLE_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_DOUBLE_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    case INTEGER:
-                        joins = joins.join(EAV_BE_INTEGER_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_INTEGER_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_INTEGER_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    case STRING:
-                        joins = joins.join(EAV_BE_STRING_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_STRING_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_STRING_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    default:
-                        throw new IllegalStateException("Unknown data type: " + metaValue.getTypeCode() +
-                                " for attribute: " + name);
-                }
-            } else {
-                joins = joins.join(EAV_BE_COMPLEX_VALUES.as(valueAlias)).
-                        on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_ID).
-                                and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ATTRIBUTE_ID.equal(attribute.getId())));
-            }
-        }
-
-        return joins;
-    }
-
-    public SelectConditionStep generateSQL(IBaseEntity entity, String entityName,
-                                           HashMap<String, ArrayList<String>> arrayKeyFilter) {
+    SelectConditionStep generateSQL(IBaseEntity entity, String entityName, BaseEntity parentEntity,
+                                    HashMap<String, ArrayList<String>> arrayKeyFilter) {
         MetaClass metaClass = entity.getMeta();
         String entityAlias = (entityName == null ? "root" : "e_" + entityName);
 
@@ -154,10 +69,9 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         if (metaClass == null)
             throw new IllegalArgumentException("MetaData can't be null");
 
-        Set<String> names = metaClass.getMemberNames();
-
         Condition condition = null;
-        for (String name : names) {
+
+        for (String name : metaClass.getMemberNames()) {
             IMetaAttribute metaAttribute = metaClass.getMetaAttribute(name);
             IMetaType memberType = metaClass.getMemberType(name);
 
@@ -166,8 +80,6 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                 if ((baseValue == null || baseValue.getValue() == null) &&
                         (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)) {
-                    /*throw new IllegalArgumentException("Key attribute " + name + " can't be null. MetaClass: " +
-                            entity.getMeta().getClassName());*/
                     logger.warn("Key attribute " + name + " can't be null. MetaClass: " +
                             entity.getMeta().getClassName());
                     continue;
@@ -345,7 +257,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                             List<Long> childBaseEntityIds = new ArrayList<>();
                             for (IBaseValue childBaseValue : baseSet.get()) {
                                 BaseEntity childBaseEntity = (BaseEntity) childBaseValue.getValue();
-                                //Long childBaseEntityId = findSingle(childBaseEntity);
+
                                 Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().
                                         getClassName()).findSingle(childBaseEntity);
 
@@ -360,11 +272,11 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                             if (childBaseEntityIds.size() > 0) {
                                 String className = childMetaClass.getClassName();
-                                String childEntityAlias = "e_" + className;
+                                // String childEntityAlias = "e_" + className;
                                 String setValueAlias = "sv_" + className;
-                                String setAlias = "s_" + className;
+                                // String setAlias = "s_" + className;
                                 String entitySetAlias = "es_" + className;
-                                Select select = null;
+                                Select select;
 
                                 if (metaSet.getArrayKeyType() == ComplexKeyTypes.ANY) {
                                     select = context.select(
@@ -416,6 +328,15 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             }
         }
 
+        // Local variables
+        String complexValueAlias = "cv_parent";
+        joins = joins.join(EAV_BE_COMPLEX_VALUES.as(complexValueAlias)).
+                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                        equal(EAV_BE_COMPLEX_VALUES.as(complexValueAlias).ENTITY_VALUE_ID).
+                        and(EAV_BE_COMPLEX_VALUES.as(complexValueAlias).ENTITY_ID.
+                                equal(parentEntity.getId())));
+
+
         SelectConditionStep where = joins.where(EAV_BE_ENTITIES.as(entityAlias).CLASS_ID.equal(metaClass.getId()))
                 .and(EAV_BE_ENTITIES.as(entityAlias).DELETED.equal(DataUtils.convert(false)));
 
@@ -431,27 +352,60 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         return where;
     }
 
-    @Override
-    public ArrayList<Long> findAll(BaseEntity baseEntity) {
-        ArrayList<Long> result = new ArrayList<>();
-        if (baseEntity.getValueCount() == 0) {
-            return result;
+    private SelectJoinStep generateJoins(SelectJoinStep joins, String entityAlias, String name, IMetaType type,
+                                         IMetaAttribute attribute) {
+        String valueAlias = "v_" + name;
+        if (!type.isSet()) {
+            if (!type.isComplex()) {
+                MetaValue metaValue = (MetaValue) type;
+
+                switch (metaValue.getTypeCode()) {
+                    case BOOLEAN:
+                        joins = joins.join(EAV_BE_BOOLEAN_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ATTRIBUTE_ID.
+                                                equal(attribute.getId())));
+                        break;
+                    case DATE:
+                        joins = joins.join(EAV_BE_DATE_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_DATE_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_DATE_VALUES.as(valueAlias).ATTRIBUTE_ID.
+                                                equal(attribute.getId())));
+                        break;
+                    case DOUBLE:
+                        joins = joins.join(EAV_BE_DOUBLE_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_DOUBLE_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_DOUBLE_VALUES.as(valueAlias).ATTRIBUTE_ID.
+                                                equal(attribute.getId())));
+                        break;
+                    case INTEGER:
+                        joins = joins.join(EAV_BE_INTEGER_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_INTEGER_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_INTEGER_VALUES.as(valueAlias).ATTRIBUTE_ID.
+                                                equal(attribute.getId())));
+                        break;
+                    case STRING:
+                        joins = joins.join(EAV_BE_STRING_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_STRING_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_STRING_VALUES.as(valueAlias).ATTRIBUTE_ID.
+                                                equal(attribute.getId())));
+                        break;
+                    default:
+                        throw new IllegalStateException("Unknown data type: " + metaValue.getTypeCode() +
+                                " for attribute: " + name);
+                }
+            } else {
+                joins = joins.join(EAV_BE_COMPLEX_VALUES.as(valueAlias)).
+                        on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_ID).
+                                and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ATTRIBUTE_ID.equal(attribute.getId())));
+            }
         }
 
-        SelectConditionStep select = generateSQL(baseEntity, null);
-
-        if (select != null) {
-            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
-                    select.getBindValues().toArray());
-
-            for (Map<String, Object> row : rows)
-                result.add(((BigDecimal) row.get("inner_id")).longValue());
-        }
-
-        logger.debug("Result size: " + result.size());
-
-        Collections.sort(result);
-
-        return result;
+        return joins;
     }
 }

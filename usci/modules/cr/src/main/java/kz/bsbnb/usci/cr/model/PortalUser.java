@@ -1,14 +1,9 @@
 package kz.bsbnb.usci.cr.model;
 
-import com.liferay.portal.model.User;
-
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
-
-//import com.bsbnb.creditregistry.dm.ref.Creditor;
-//import com.liferay.portal.model.User;
 
 public class PortalUser implements Serializable {
     private BigInteger id;
@@ -170,28 +165,6 @@ public class PortalUser implements Serializable {
      */
     public void setCreditorList(List<Creditor> creditorList) {
         this.creditorList = creditorList;
-    }
-
-    /**
-     * Конвертация пользователя Liferay-я к PortalUser
-     * @param liferayUser Пользователь Liferay-я.
-     * @return Созданный portalUser.
-     * @throws IllegalArgumentException В случае, если параметр liferayUser равен null.
-     */
-    public static PortalUser convert(User liferayUser) throws IllegalArgumentException {
-        if (liferayUser == null)
-            throw new IllegalArgumentException("Parameter <liferayUser> can not be null");
-
-        PortalUser portalUser = new PortalUser();
-        portalUser.setUserId(liferayUser.getUserId());
-        portalUser.setEmailAddress(liferayUser.getEmailAddress());
-        portalUser.setModifiedDate(liferayUser.getModifiedDate());
-        portalUser.setFirstName(liferayUser.getFirstName());
-        portalUser.setLastName(liferayUser.getLastName());
-        portalUser.setMiddleName(liferayUser.getMiddleName());
-        portalUser.setScreenName(liferayUser.getScreenName());
-
-        return portalUser;
     }
 }
 
