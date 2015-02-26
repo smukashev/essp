@@ -1,14 +1,14 @@
-package com.bsbnb.creditregistry.portlets.upload.ui;
+package kz.bsbnb.usci.portlets.upload.ui;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 
+import kz.bsbnb.usci.portlets.upload.UploadApplication;
 import org.vaadin.easyuploads.MultiFileUpload;
 
-import com.bsbnb.creditregistry.portlets.upload.PortletEnvironmentFacade;
-import static com.bsbnb.creditregistry.portlets.upload.UploadApplication.log;
+import kz.bsbnb.usci.portlets.upload.PortletEnvironmentFacade;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 
@@ -40,7 +40,7 @@ public class MultiUploadComponent extends AbstractUploadComponent {
                         fis.read(content);
                         parent.handleFile(content, fileName);
                     } catch (IOException ex) {
-                        log.log(Level.WARNING, "", ex);
+                        UploadApplication.log.log(Level.WARNING, "", ex);
                     } finally {
                         try {
                             fis.close();

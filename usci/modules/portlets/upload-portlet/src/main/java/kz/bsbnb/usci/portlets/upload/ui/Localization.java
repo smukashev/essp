@@ -1,4 +1,4 @@
-package com.bsbnb.creditregistry.portlets.upload.ui;
+package kz.bsbnb.usci.portlets.upload.ui;
 
 /**
  *

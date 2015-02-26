@@ -1,4 +1,4 @@
-package com.bsbnb.creditregistry.portlets.upload;
+package kz.bsbnb.usci.portlets.upload;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,8 +12,8 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
-import com.bsbnb.creditregistry.portlets.upload.ui.MainLayout;
-import com.bsbnb.creditregistry.portlets.upload.ui.SingleUploadComponent;
+import kz.bsbnb.usci.portlets.upload.ui.MainLayout;
+import kz.bsbnb.usci.portlets.upload.ui.SingleUploadComponent;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.util.PortalUtil;

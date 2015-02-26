@@ -1,4 +1,4 @@
-package com.bsbnb.creditregistry.portlets.upload.ui;
+package kz.bsbnb.usci.portlets.upload.ui;
 
 //import com.bsbnb.creditregistry.dm.Report;
 import java.io.File;
@@ -7,11 +7,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Level;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 //import com.bsbnb.creditregistry.dm.maintenance.InputFile;
 //import com.bsbnb.creditregistry.dm.maintenance.InputInfo;
@@ -25,13 +21,13 @@ import javax.naming.NamingException;
 //import com.bsbnb.creditregistry.ejb.ref.business.remote.IRemoteSharedBusiness;
 //import com.bsbnb.creditregistry.ejb.ref.exception.ResultInconsistentException;
 //import com.bsbnb.creditregistry.ejb.ref.exception.ResultNotFoundException;
-import com.bsbnb.creditregistry.portlets.upload.PortletEnvironmentFacade;
-import static com.bsbnb.creditregistry.portlets.upload.UploadApplication.log;
+import kz.bsbnb.usci.portlets.upload.PortletEnvironmentFacade;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import kz.bsbnb.usci.core.service.*;
 import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.portlets.upload.UploadApplication;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
@@ -162,7 +158,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
         try {
             System.out.println("#%% " + fileName);
             String path = saveFileOnDisk(array, fileName);
-            log.log(Level.INFO, "Path: {0}", path);
+            UploadApplication.log.log(Level.INFO, "Path: {0}", path);
             //Shared webServiceLoadType = sharedBusiness.findByC_T("WS", "input_type");
             //Shared inQueueStatus = sharedBusiness.findByC_T("IN_QUEUE", "input_info_status");
             //InputInfo ii = inputInfoBusiness.insert(portletEnvironment.getUserID(), creditor,
@@ -176,7 +172,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
             batchProcessService.processBatch(path, portletEnvironment.getUserID());
             addStatusMessage(String.format(getResourceString(Localization.UPLOAD_SUCCEDED_MESSAGE.getKey()), fileName), false);
         } catch (IOException ioe) {
-            log.log(Level.SEVERE, "Can't save file {0}", fileName);
+            UploadApplication.log.log(Level.SEVERE, "Can't save file {0}", fileName);
         }
     }
 

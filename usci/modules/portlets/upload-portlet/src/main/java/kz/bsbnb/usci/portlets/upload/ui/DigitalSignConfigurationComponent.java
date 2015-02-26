@@ -1,10 +1,9 @@
-package com.bsbnb.creditregistry.portlets.upload.ui;
+package kz.bsbnb.usci.portlets.upload.ui;
 
-import com.bsbnb.creditregistry.portlets.upload.PortletEnvironmentFacade;
+import kz.bsbnb.usci.portlets.upload.PortletEnvironmentFacade;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 
 /**

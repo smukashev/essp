@@ -1,11 +1,10 @@
-package com.bsbnb.creditregistry.portlets.upload.ui;
+package kz.bsbnb.usci.portlets.upload.ui;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.logging.Level;
 
-import com.bsbnb.creditregistry.portlets.upload.PortletEnvironmentFacade;
-import static com.bsbnb.creditregistry.portlets.upload.UploadApplication.log;
+import kz.bsbnb.usci.portlets.upload.PortletEnvironmentFacade;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.Upload;
@@ -13,6 +12,7 @@ import com.vaadin.ui.Upload.FailedEvent;
 import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.Upload.StartedEvent;
 import com.vaadin.ui.Upload.SucceededEvent;
+import kz.bsbnb.usci.portlets.upload.UploadApplication;
 
 /**
  *
@@ -84,7 +84,7 @@ public class SingleUploadComponent extends AbstractUploadComponent
         }
         indicator.setVisible(false);
         upload.setEnabled(true);
-        log.log(Level.SEVERE, "Upload failed", event.getReason());
+        UploadApplication.log.log(Level.SEVERE, "Upload failed", event.getReason());
         addStatusMessage(event.getReason().getMessage(), true);
     }
 
@@ -102,7 +102,7 @@ public class SingleUploadComponent extends AbstractUploadComponent
 
     @Override
     public void uploadSucceeded(SucceededEvent event) {
-        log.log(Level.INFO, "Upload succeeded");
+        UploadApplication.log.log(Level.INFO, "Upload succeeded");
         byte[] array = baos.toByteArray();
         String fileName = event.getFilename();
         handleFile(array, fileName);

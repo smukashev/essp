@@ -1,4 +1,4 @@
-package com.bsbnb.creditregistry.portlets.upload;
+package kz.bsbnb.usci.portlets.upload;
 
 import com.vaadin.terminal.ExternalResource;
 

@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.bsbnb.creditregistry.portlets.upload.ui;
+package kz.bsbnb.usci.portlets.upload.ui;
 
-import com.bsbnb.creditregistry.portlets.upload.PortletEnvironmentFacade;
+import kz.bsbnb.usci.portlets.upload.PortletEnvironmentFacade;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
