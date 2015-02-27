@@ -125,6 +125,7 @@
                     </generator>
                 </configuration>
             </plugin>
+            <!-- Uncomment this to recreate the database  -->
             <!--<plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -190,11 +191,6 @@
             <artifactId>gson</artifactId>
             <version>${com.google.gson.version}</version>
         </dependency>
-        <!--<dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-all</artifactId>
-            <version>${activemq.version}</version>
-        </dependency>-->
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-core</artifactId>

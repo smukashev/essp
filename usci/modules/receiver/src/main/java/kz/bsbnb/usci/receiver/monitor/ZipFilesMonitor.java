@@ -55,9 +55,6 @@ public class ZipFilesMonitor{
 
     private CouchbaseClient couchbaseClient;
 
-    //@Autowired
-    //private ICouchbaseClientFactory clientFactory;
-
     @Autowired
     private IServiceRepository serviceFactory;
 
@@ -76,8 +73,6 @@ public class ZipFilesMonitor{
 
     SenderThread sender;
 
-    //private static Gson gson = new Gson();
-
     public static final int ZIP_BUFFER_SIZE = 1024;
     public static final int MAX_SYNC_QUEUE_SIZE = 512;
 
@@ -85,9 +80,7 @@ public class ZipFilesMonitor{
 
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
-
         sender = new SenderThread();
-
         sender.start();
     }
 
@@ -141,7 +134,6 @@ public class ZipFilesMonitor{
 
     @PostConstruct
     public void init() {
-
         sender.setReceiverStatusSingleton(receiverStatusSingleton);
         System.out.println("Retrieving creditors list");
         creditors = serviceFactory.getRemoteCreditorBusiness().findMainOfficeCreditors();
@@ -163,9 +155,6 @@ public class ZipFilesMonitor{
 
         IBatchService batchService = serviceFactory.getBatchService();
 
-        /*Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(0);
-        cal.set(2013, 4, 1, 0, 0, 0);*/
         Iterator<ViewRow> rows = null;
         ViewResponse response = null;
 
@@ -173,7 +162,7 @@ public class ZipFilesMonitor{
                 if(rows == null) {
                     View view = couchbaseClient.getView("batch", "batch_pending");
                     Query query = new Query();
-                    query.setDebug(true);
+                    query.setDebug(false);
                     query.setStale(Stale.FALSE);
 
                     response = couchbaseClient.query(view, query);
@@ -637,9 +626,8 @@ public class ZipFilesMonitor{
 
             batchInfo.setRepDate(date);
 
-            System.out.println(batchInfo.getSize());
-            System.out.println(batchInfo.getRepDate());
-
+            System.out.println("Batch size: " + batchInfo.getSize()); // TODO: size
+            System.out.println("Batch report date: " + batchInfo.getRepDate());
 
             zipFile.close();
 

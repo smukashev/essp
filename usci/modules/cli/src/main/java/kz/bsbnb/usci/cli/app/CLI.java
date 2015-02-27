@@ -38,6 +38,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
+import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -47,7 +48,7 @@ import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
-import kz.bsbnb.usci.eav.showcase.dao.IShowCaseDao;
+/*import kz.bsbnb.usci.eav.showcase.dao.IShowCaseDao;*/
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -129,8 +130,8 @@ public class CLI
     @Autowired
     private RulesSingleton rulesSingleton;
 
-    @Autowired
-    protected IShowCaseDao showCaseDao;
+    /*@Autowired
+    protected IShowCaseDao showCaseDao;*/
 
 
     private BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
@@ -629,6 +630,25 @@ public class CLI
                 System.out.println("No such attribute: " + attrName);
             }
         }
+    }
+
+    public void entityToJava(long id, String reportDateStr) {
+        IBaseEntity entity;
+
+        if (reportDateStr != null) {
+            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+
+            try {
+                entity = baseEntityProcessorDao.loadByMaxReportDate(id, dateFormat.parse(reportDateStr));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return;
+            }
+        } else {
+            entity = baseEntityProcessorDao.load(id);
+        }
+
+        System.out.println(BaseEntityOutput.toJava((BaseEntity) entity, "", 0));
     }
 
     public void showEntity(long id, String reportDateStr) {
@@ -2362,7 +2382,11 @@ public class CLI
         if (args.size() > 1) {
             if (args.get(0).equals("show")) {
                 if (args.get(1).equals("id")) {
-                    showEntity(Long.parseLong(args.get(2)), args.size() > 3 ? args.get(3) : null);
+                    if(args.get(2) != null && args.get(2).equals("tojava")) {
+                        entityToJava(Long.parseLong(args.get(3)), args.size() > 4 ? args.get(4) : null);
+                    } else {
+                        showEntity(Long.parseLong(args.get(2)), args.size() > 3 ? args.get(3) : null);
+                    }
                 } else if (args.get(1).equals("attr")) {
                     if (args.size() > 3) {
                         showEntityAttr(args.get(3), Long.parseLong(args.get(2)));
@@ -2983,11 +3007,15 @@ public class CLI
             if (command.equals("test")) {
                 commandTest();
             } else if (command.equals("clear")) {
+                System.out.println("Storage clearing...");
                 storage.clear();
+                System.out.println("Storage cleared");
             } else if (command.equals("rc")) {
                 metaClassRepository.resetCache();
             } else if (command.equals("init")) {
+                System.out.println("Storage initializing...");
                 storage.initialize();
+                System.out.println("Storage initialized");
             } else if(command.equals("empty")){
                 storage.empty();
             } else if (command.equals("tc")) {
@@ -3425,24 +3453,30 @@ public class CLI
             }
 
             if (listSuccess.size() > 0) {
-                StringBuilder sql;
-                if(script.equals("delScript"))
-                   sql = new StringBuilder("update MAINTENANCE.CREDREG_DELETE_CREDIT SET PROCESSED_USCI = 1 where ID IN ( ?");
-                else
-                   sql = new StringBuilder("update MAINTENANCE.CREDREG_EDIT_CREDIT SET PROCESSED_USCI = 1 where ID IN ( ?");
+                int start = 0, nextStart;
+                while(start < listSuccess.size()) {
+                    nextStart = start + 100;
+                    StringBuilder sql;
+                    if (script.equals("delScript"))
+                        sql = new StringBuilder("update MAINTENANCE.CREDREG_DELETE_CREDIT SET PROCESSED_USCI = 1 where ID IN ( ?");
+                    else
+                        sql = new StringBuilder("update MAINTENANCE.CREDREG_EDIT_CREDIT SET PROCESSED_USCI = 1 where ID IN ( ?");
 
-                for (int i = 1; i < listSuccess.size(); i++)
-                    sql.append(",?");
+                    for (int i=start + 1; i < Math.min(nextStart, listSuccess.size()); i++)
+                        sql.append(",?");
 
-                sql.append(")");
+                    sql.append(")");
 
-                try {
-                    PreparedStatement statement = conn.prepareStatement(sql.toString());
-                    for (int i = 0; i < listSuccess.size(); i++)
-                        statement.setLong(i + 1, listSuccess.get(i));
-                    statement.executeQuery();
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                    try {
+                        PreparedStatement statement = conn.prepareStatement(sql.toString());
+                        System.out.println(sql.toString());
+                        for (int i = start; i < Math.min(nextStart, listSuccess.size() ); i++)
+                            statement.setLong(i + 1 - start, listSuccess.get(i));
+                        statement.executeQuery();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    start = nextStart;
                 }
 
                 System.out.println("ok done");

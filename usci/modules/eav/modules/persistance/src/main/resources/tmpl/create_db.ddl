@@ -917,18 +917,6 @@
 			<unique-column name="report_date"/>
 		</unique>
 	</table>
-    <table name="eav_be_entity_change_dates">
-        <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-        <column name="entity_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-        <column name="change_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-        <!--<foreign-key foreignTable="eav_be_entities" name="eav_fk_022_00">
-            <reference local="entity_id" foreign="id"/>
-        </foreign-key>-->
-        <unique name="eav_ind_022_00">
-            <unique-column name="entity_id"/>
-            <unique-column name="change_date"/>
-        </unique>
-    </table>
 	<table name="AUDIT_EVENT_KIND">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="100" autoIncrement="false"/>
@@ -950,33 +938,6 @@
 		<column name="table_name" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
 		<!--<foreign-key foreignTable="AUDIT_EVENT_KIND" name="FK_AUDIT_EVENT_AEK">
 			<reference local="kind_id" foreign="id"/>
-		</foreign-key>-->
-	</table>
-	<!-- Tables for showcases -->
-	<table name="eav_sc_showcases">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<column name="table_name" primaryKey="false" required="true" type="VARCHAR" size="128" autoIncrement="false"/>
-		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
-		<unique name="ind_uk_sc_001_00">
-			<unique-column name="name"/>
-		</unique>
-	</table>
-	<table name="eav_sc_showcase_fields">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<column name="column_name" primaryKey="false" required="true" type="VARCHAR" size="128" autoIncrement="false"/>
-		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
-		<column name="showcase_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="attribute_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="attribute_name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<column name="attribute_path" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
-		<unique name="ind_uk_sc_002_00">
-			<unique-column name="name"/>
-			<unique-column name="showcase_id"/>
-		</unique>
-		<!--<foreign-key foreignTable="eav_sc_showcases" name="FK_eav_sc_showcases">
-			<reference local="showcase_id" foreign="id"/>
 		</foreign-key>-->
 	</table>
 	<table name="sc_id_bag">
