@@ -395,14 +395,14 @@ public class CLI
 
     @PostConstruct
     public void initBean() {
-        System.setProperty("viewmode", "production");
-        //System.setProperty("viewmode", "development");
+        //System.setProperty("viewmode", "production");
+        System.setProperty("viewmode", "development");
 
         ArrayList<URI> nodes = new ArrayList<URI>();
         nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
         try {
-            couchbaseClient = new CouchbaseClient(nodes, "test", "");
+            couchbaseClient = new CouchbaseClient(nodes, "Test", "");
         } catch (Exception e) {
             System.out.println("Error connecting to Couchbase: " + e.getMessage());
         }
@@ -3044,6 +3044,8 @@ public class CLI
                 commandGetBatch();
             } else if(command.equals("mnt")){
                  commandMaintenance(line);
+            } else if(command.equals("getNotProcessed")){
+                commandGetNotProcessed(line);
             } else {
                 System.out.println("No such command: " + command);
             }
@@ -3447,6 +3449,117 @@ public class CLI
             } else {
                 System.out.println("no work");
             }
+
+        } else {
+            System.out.println(commandUsage);
+        }
+    }
+
+    private void commandGetNotProcessed(String line){
+        String commandUsage = "Arguments: getNotProcessed from core:core_sep_2014@10.10.20.44:CREDITS [report_date=11.11.15] > C:\\zips";
+
+        String path = "";
+        Matcher m;
+        Date reportDate = null;
+        String pattern = "getNotProcessed from (\\S+):(\\S+)@(\\S+):(\\S+)";
+
+        StringBuffer creditIds = new StringBuffer();
+        Long creditId = null;
+        Long creditorId = null;
+        String contractNo = null;
+        String contractDate = null;
+
+        if (line.contains("report_date")) {
+            pattern = pattern + "\\s+report_date=(\\S+)";
+        }
+
+        pattern = pattern + "\\s+>\\s+(\\S+)";
+
+        m = Pattern.compile(pattern).matcher(line);
+        int gid = 1;
+
+        if (m.find()) {
+            String user = m.group(gid++);
+            String pwd = m.group(gid++);
+            String address = m.group(gid++);
+            String sid = m.group(gid++);
+
+            try {
+                reportDate = new SimpleDateFormat("dd.MM.yy").parse(m.group(gid++));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println(reportDate);
+
+            path = m.group(gid++);
+
+            Connection conn = null;
+
+            try {
+                conn = connectToDB(String.format("jdbc:oracle:thin:@%s:1521:%s", address, sid), user, pwd);
+
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                return;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                try {
+                    conn.close();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
+                return;
+            }
+
+            ResultSet resultSet = null;
+
+            String select = "SELECT t3.contract_no,t3.contract_date,t.id,t2.creditor_id FROM MAINTENANCE.CREDREG_EDIT_CREDIT t3" +
+            "  LEFT JOIN v_credit_his t ON t.contract_no = t3.contract_no and t.contract_date=t3.contract_date" +
+                    "  LEFT JOIN MAINTENANCE.CREDREG_EDIT t2 ON t.creditor_id = t2.creditor_id" +
+                    "  WHERE t3.processed_usci = 0 " +
+                    "  and t3.CONTRACT_NO_OLD is null and t3.CONTRACT_DATE_OLD is null"+
+                    " order by t.creditor_id ";
+
+            try {
+                conn.setAutoCommit(false);
+                Statement st = conn.createStatement();
+                st.setFetchSize(1);
+                resultSet = st.executeQuery(select);
+                Long lastCreditorId = null;
+
+                while (resultSet.next()) {
+
+                    creditId = resultSet.getLong("ID");
+                    creditorId = resultSet.getLong("CREDITOR_ID");
+                    contractNo = resultSet.getString("CONTRACT_NO");
+                    contractDate = resultSet.getDate("CONTRACT_DATE").toString();
+
+                    if (creditId == null || creditId == 0){
+                        System.out.println("Fill MNT.LOG contractNo contractDate");
+                    } else {
+
+                        if (creditorId == null || creditorId == 0){
+                            System.out.println("Creditor id is null");
+                        }
+
+                        if (lastCreditorId == null) lastCreditorId = creditorId;
+
+                        if (creditIds.length() >= 20 || lastCreditorId != creditorId){
+                            System.out.println("Call method of Abish "+creditIds+" "+lastCreditorId);
+                            lastCreditorId = creditorId;
+                            creditIds.delete(0,creditIds.length());
+                        }
+                        System.out.println("appending "+creditorId);
+                        creditIds.append(creditId+",");
+                    }
+                }
+                resultSet.close();
+                st.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
 
         } else {
             System.out.println(commandUsage);
