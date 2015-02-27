@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.porltet.batch_entry_list;
+package kz.bsbnb.usci.porltet.entity_editor;
 
 import com.google.gson.Gson;
 import com.liferay.portal.model.User;
@@ -15,8 +15,8 @@ import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.porltet.batch_entry_list.model.json.MetaClassList;
-import kz.bsbnb.usci.porltet.batch_entry_list.model.json.MetaClassListEntry;
+import kz.bsbnb.usci.porltet.entity_editor.model.json.MetaClassList;
+import kz.bsbnb.usci.porltet.entity_editor.model.json.MetaClassListEntry;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
