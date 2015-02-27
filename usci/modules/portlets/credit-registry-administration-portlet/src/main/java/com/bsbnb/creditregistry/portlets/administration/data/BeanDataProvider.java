@@ -1,13 +1,5 @@
 package com.bsbnb.creditregistry.portlets.administration.data;
 
-import java.util.ArrayList;
-import java.util.List;
-
-//import com.bsbnb.creditregistry.dm.maintenance.PortalUser;
-//import com.bsbnb.creditregistry.dm.ref.Creditor;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.PortalUserBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.ref.business.remote.IRemoteCreditorBusiness;
-import static com.bsbnb.creditregistry.portlets.administration.AdministrationApplication.log;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
@@ -17,11 +9,19 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.PortalUser;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
+
+import static com.bsbnb.creditregistry.portlets.administration.AdministrationApplication.log;
+
+//import com.bsbnb.creditregistry.dm.maintenance.PortalUser;
+//import com.bsbnb.creditregistry.dm.ref.Creditor;
+//import com.bsbnb.creditregistry.ejb.api.maintenance.PortalUserBeanRemoteBusiness;
+//import com.bsbnb.creditregistry.ejb.ref.business.remote.IRemoteCreditorBusiness;
 
 /**
- *
  * @author Aidar.Myrzahanov
  */
 public class BeanDataProvider implements DataProvider {
@@ -54,7 +54,7 @@ public class BeanDataProvider implements DataProvider {
 
     public List<Creditor> getAllCreditors() {
         List<Creditor> mainOfficeCreditors = creditorBusiness.findMainOfficeCreditors();
-        log.info("Main office creditors count: "+mainOfficeCreditors.size());
+        log.info("Main office creditors count: " + mainOfficeCreditors.size());
         return mainOfficeCreditors;
     }
 
@@ -75,7 +75,7 @@ public class BeanDataProvider implements DataProvider {
         Collections.sort(creditors, new Comparator<Creditor>() {
 
             public int compare(Creditor o1, Creditor o2) {
-                if(o1==null || o2==null) {
+                if (o1 == null || o2 == null) {
                     return 0;
                 }
                 return o1.getName().compareTo(o2.getName());

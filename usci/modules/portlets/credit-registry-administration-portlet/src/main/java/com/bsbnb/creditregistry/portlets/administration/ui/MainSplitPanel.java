@@ -1,14 +1,5 @@
 package com.bsbnb.creditregistry.portlets.administration.ui;
 
-import com.vaadin.event.FieldEvents.TextChangeEvent;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import static com.bsbnb.creditregistry.portlets.administration.AdministrationApplication.log;
 import com.bsbnb.creditregistry.portlets.administration.PortletIcon;
 import com.bsbnb.creditregistry.portlets.administration.data.DataProvider;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -21,29 +12,25 @@ import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.terminal.Sizeable;
-import com.vaadin.ui.Alignment;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.HorizontalSplitPanel;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import kz.bsbnb.usci.cr.model.Creditor;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
+
+import static com.bsbnb.creditregistry.portlets.administration.AdministrationApplication.log;
 
 /**
- *
  * @author Marat Madybayev
  */
 public class MainSplitPanel extends HorizontalSplitPanel {
 
     private static final long serialVersionUID = 9134226451694477874L;
+    private static final String[] CREDITOR_COLUMNS = new String[]{"name"};
     private List<Creditor> creditorList;
     private DataProvider provider;
     private ResourceBundle bundle;
@@ -52,7 +39,6 @@ public class MainSplitPanel extends HorizontalSplitPanel {
     private Table tableUserCreditors;
     private BeanItemContainer<Creditor> availableCreditorsContainer;
     private BeanItemContainer<Creditor> userCreditorsContainer;
-    private static final String[] CREDITOR_COLUMNS = new String[]{"name"};
     private IconButton addButton;
     private IconButton removeButton;
     private BeanItemContainer<User> usersContainer;
@@ -170,7 +156,7 @@ public class MainSplitPanel extends HorizontalSplitPanel {
             public void textChange(TextChangeEvent event) {
                 usersContainer.removeAllContainerFilters();
                 String filterText = event.getText();
-                if(filterText!=null&&!filterText.isEmpty()) {
+                if (filterText != null && !filterText.isEmpty()) {
                     usersContainer.addContainerFilter(new SimpleStringFilter("login", filterText, true, false));
                 }
             }
@@ -179,7 +165,7 @@ public class MainSplitPanel extends HorizontalSplitPanel {
         leftPanel.addComponent(filterField);
         leftPanel.addComponent(usersTable);
         leftPanel.setHeight("100%");
-        
+
         VerticalLayout rightPanel = new VerticalLayout();
         rightPanel.addComponent(tableAvailableCreditors);
         rightPanel.addComponent(buttonsLayout);
@@ -188,6 +174,18 @@ public class MainSplitPanel extends HorizontalSplitPanel {
         rightPanel.setHeight("100%");
         addComponent(leftPanel);
         addComponent(rightPanel);
+    }
+
+    private static boolean isNationalBankEmployee(User user) {
+        try {
+            return ExpandoValueLocalServiceUtil.getData(user.getCompanyId(), User.class.getName(),
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "isNb", user.getPrimaryKey(), false);
+        } catch (PortalException pe) {
+            log.error(null, pe);
+        } catch (SystemException se) {
+            log.error(null, se);
+        }
+        return false;
     }
 
     public void addSelectedCreditors() {
@@ -240,17 +238,5 @@ public class MainSplitPanel extends HorizontalSplitPanel {
             availableCreditorsList.removeAll(userCreditorList);
             availableCreditorsContainer.addAll(availableCreditorsList);
         }
-    }
-
-    private static boolean isNationalBankEmployee(User user) {
-        try {
-            return ExpandoValueLocalServiceUtil.getData(user.getCompanyId(), User.class.getName(),
-                    ExpandoTableConstants.DEFAULT_TABLE_NAME, "isNb", user.getPrimaryKey(), false);
-        } catch (PortalException pe) {
-            log.error(null, pe);
-        } catch (SystemException se) {
-            log.error(null, se);
-        }
-        return false;
     }
 }
