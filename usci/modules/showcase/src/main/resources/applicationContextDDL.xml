@@ -18,7 +18,7 @@
 
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
-        <property name="url" value="jdbc:oracle:thin:@170.7.15.15:1521:ESSP"/>
+        <property name="url" value="jdbc:oracle:thin:@localhost:1521:XE"/>
         <property name="username" value="SHOWCASE"/>
         <property name="password" value="Qwerty_123"/>
         <property name="initialSize" value="32"/>
