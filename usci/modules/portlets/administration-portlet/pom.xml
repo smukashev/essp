@@ -3,9 +3,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bsbnb</groupId>
-    <artifactId>credit-registry-administration-portlet</artifactId>
+    <artifactId>administration-portlet</artifactId>
     <packaging>war</packaging>
-    <name>credit-registry-administration-portlet</name>
+    <name>USCI Portlets: AdministrationPortlet</name>
     <version>0.1</version>
 
     <properties>
@@ -46,7 +46,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>credit-registry-administration-portlet</finalName>
+        <finalName>administration-portlet</finalName>
     </build>
     <dependencies>
         <dependency>

@@ -3,6 +3,6 @@
 
 <display>
     <category name="USCI_cr">
-        <portlet id="credit-registry-administration-portlet"/>
+        <portlet id="administration-portlet"/>
     </category>
 </display>
