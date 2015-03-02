@@ -32,8 +32,8 @@
                 <version>2.5</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -91,25 +91,16 @@
             <artifactId>ojdbc6</artifactId>
             <version>11.2.0.3.0</version>
         </dependency>
-        
-        <!-- vaadin dependencies -->
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin</artifactId>
             <version>6.6.2</version>
             <scope>provided</scope>
         </dependency>
-        <!-- javax dependencies -->
         <dependency>
             <groupId>com.liferay.portal</groupId>
             <artifactId>portal-client</artifactId>
             <version>6.0.5</version>
         </dependency>
-        <!--<dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>-->
     </dependencies>
 </project>
