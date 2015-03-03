@@ -3571,7 +3571,6 @@ public class CLI
                 String fileName = null;
                 while (resultSet.next()) {
                     editId = resultSet.getLong("editId");
-                    System.out.println(editId);
                     creditId = resultSet.getLong("ID");
                     creditorId = 1L;// resultSet.getLong("CREDITOR_ID");
                     contractNo = resultSet.getString("CONTRACT_NO");
