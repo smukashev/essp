@@ -21,7 +21,7 @@
     <modules>
         <module>vaadin-messagebox</module>
         <module>vaadin-filterable-selector</module>
-        <module>credit-registry-administration-portlet</module>
+        <module>administration-portlet</module>
         <!-- <module>credit-registry-crosscheck-portlet</module> TODO: fix build -->
         <module>credit-registry-protocol-portlet</module>
         <module>upload-portlet</module>
