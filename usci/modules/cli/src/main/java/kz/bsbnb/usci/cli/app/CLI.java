@@ -89,6 +89,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -403,7 +404,7 @@ public class CLI
         nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
         try {
-            couchbaseClient = new CouchbaseClient(nodes, "Test", "");
+            couchbaseClient = new CouchbaseClient(nodes, "test", "");
         } catch (Exception e) {
             System.out.println("Error connecting to Couchbase: " + e.getMessage());
         }
@@ -3490,7 +3491,7 @@ public class CLI
     }
 
     private void commandGetNotProcessed(String line){
-        String commandUsage = "Arguments: getNotProcessed from core:core_sep_2014@10.10.20.44:CREDITS [report_date=11.11.15] > C:\\zips";
+        String commandUsage = "Arguments: getNotProcessed from core:core_sep_2014@10.10.20.44:CREDITS report_date=11.11.15 > /home/aybek/test/";
 
         String path = "";
         Matcher m;
@@ -3498,10 +3499,13 @@ public class CLI
         String pattern = "getNotProcessed from (\\S+):(\\S+)@(\\S+):(\\S+)";
 
         StringBuffer creditIds = new StringBuffer();
+        List<Long> credits = new ArrayList<Long>();
+        StringBuilder editIds = new StringBuilder("update MAINTENANCE.CREDREG_DELETE_CREDIT SET PROCESSED_USCI = 1 where ID IN (");
         Long creditId = null;
+        Long editId = null;
         Long creditorId = null;
         String contractNo = null;
-        String contractDate = null;
+        Date contractDate = null;
 
         if (line.contains("report_date")) {
             pattern = pattern + "\\s+report_date=(\\S+)";
@@ -3517,18 +3521,16 @@ public class CLI
             String pwd = m.group(gid++);
             String address = m.group(gid++);
             String sid = m.group(gid++);
-
             try {
                 reportDate = new SimpleDateFormat("dd.MM.yy").parse(m.group(gid++));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 
-            System.out.println(reportDate);
-
             path = m.group(gid++);
 
             Connection conn = null;
+            Statement st = null;
 
             try {
                 conn = connectToDB(String.format("jdbc:oracle:thin:@%s:1521:%s", address, sid), user, pwd);
@@ -3548,56 +3550,209 @@ public class CLI
 
             ResultSet resultSet = null;
 
-            String select = "SELECT t3.contract_no,t3.contract_date,t.id,t2.creditor_id FROM MAINTENANCE.CREDREG_EDIT_CREDIT t3" +
-            "  LEFT JOIN v_credit_his t ON t.contract_no = t3.contract_no and t.contract_date=t3.contract_date" +
+            String select = "SELECT t3.contract_no,t3.contract_date,t.id,t2.creditor_id,t3.id as editId FROM MAINTENANCE.CREDREG_EDIT_CREDIT t3" +
+            " LEFT JOIN v_credit_his t ON t.contract_no = t3.contract_no and t.contract_date=t3.contract_date" +
                     "  LEFT JOIN MAINTENANCE.CREDREG_EDIT t2 ON t.creditor_id = t2.creditor_id" +
                     "  WHERE t3.processed_usci = 0 " +
                     "  and t3.CONTRACT_NO_OLD is null and t3.CONTRACT_DATE_OLD is null"+
                     " order by t.creditor_id ";
 
+//            String select = "SELECT t.contract_no,t.contract_date,t.id,1 creditor_id,1 as editId FROM  v_credit_his t";
+
+
+
             try {
                 conn.setAutoCommit(false);
-                Statement st = conn.createStatement();
+                st = conn.createStatement();
                 st.setFetchSize(1);
                 resultSet = st.executeQuery(select);
                 Long lastCreditorId = null;
-
+                int count = 0;
+                String fileName = null;
                 while (resultSet.next()) {
-
+                    editId = resultSet.getLong("editId");
+                    System.out.println(editId);
                     creditId = resultSet.getLong("ID");
-                    creditorId = resultSet.getLong("CREDITOR_ID");
+                    creditorId = 1L;// resultSet.getLong("CREDITOR_ID");
                     contractNo = resultSet.getString("CONTRACT_NO");
-                    contractDate = resultSet.getDate("CONTRACT_DATE").toString();
+                    contractDate = resultSet.getDate("CONTRACT_DATE");
 
                     if (creditId == null || creditId == 0){
-                        System.out.println("Fill MNT.LOG contractNo contractDate");
+                        storage.simpleSql(String.format("insert into mnt_logs(mnt_operation_id, foreign_id, execution_time, status, error_msg, contract_no, contract_date) values (2,1,sysdate,1,'%S','%S',date'%S')","No credit was found with such contract_no and contract_date",contractNo,contractDate.toString()));
                     } else {
-
                         if (creditorId == null || creditorId == 0){
-                            System.out.println("Creditor id is null");
+                            throw new RuntimeException("Creditor id is null");
                         }
 
                         if (lastCreditorId == null) lastCreditorId = creditorId;
 
-                        if (creditIds.length() >= 20 || lastCreditorId != creditorId){
-                            System.out.println("Call method of Abish "+creditIds+" "+lastCreditorId);
+                        if (count > 10 || lastCreditorId != creditorId){
+                            fileName = generateZipFile(conn ,creditIds.toString(), lastCreditorId, path, reportDate,address,sid,user,pwd);
+                            storage.simpleSql(String.format("insert into mnt_processes(process_date, filename, creditor_id) values (sysdate,'%S','%d')",fileName,lastCreditorId));
+                            for (Long id: credits){
+                                storage.simpleSql(String.format("insert into mnt_process_credits(filename, credit_id) values ('%S','%d')",fileName,id));
+                            }
                             lastCreditorId = creditorId;
+                            count = 0;
                             creditIds.delete(0,creditIds.length());
+                            credits.clear();
                         }
-                        System.out.println("appending "+creditorId);
                         creditIds.append(creditId+",");
+                        credits.add(creditId);
+                        editIds.append(editId + ",");
+                        count++;
                     }
                 }
-                resultSet.close();
-                st.close();
+                if (count != 0){
+                    fileName = generateZipFile(conn, creditIds.toString(), lastCreditorId, path, reportDate,address,sid,user,pwd);
+                    storage.simpleSql(String.format("insert into mnt_processes(process_date, filename, creditor_id) values (sysdate,'%S','%d')",fileName,lastCreditorId));
+                    for (Long id: credits){
+                        storage.simpleSql(String.format("insert into mnt_process_credits(filename, credit_id) values ('%S','%d')",fileName,id));
+                    }
+                }
+
             } catch (SQLException e) {
                 e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            } finally {
+                try
+                {
+                    editIds.delete(editIds.lastIndexOf(","),editIds.length());
+                    editIds.append(")");
+                    PreparedStatement statement = conn.prepareStatement(editIds.toString());
+                    statement.executeQuery(editIds.toString());
+                    statement.close();
+                    st.close();
+                    resultSet.close();
+                    conn.close();
+                } catch (SQLException e1)
+                {
+                    e1.printStackTrace();
+                }
             }
-
-
         } else {
             System.out.println(commandUsage);
         }
+    }
+
+    public String generateZipFile(Connection connn, String creditIds, Long creditorId, String path, Date reportDate ,String address, String sid, String user, String pwd) throws TimeoutException, InterruptedException, SQLException, IOException {
+        ResultSet result = null;
+        PreparedStatement preparedStatement = null;
+        String fileName = "";
+        Long maxXmlFileId = 0L;
+
+        Connection conn = null;
+        Statement st = null;
+
+        try {
+            conn = connectToDB(String.format("jdbc:oracle:thin:@%s:1521:%s", address, sid), user, pwd);
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            try {
+                conn.close();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+
+        }
+
+
+        try{
+            preparedStatement = conn.prepareStatement("SELECT MAX(xf.id) AS MAX_ID FROM core.xml_file2 xf");
+            result = preparedStatement.executeQuery();
+            result.next();
+            maxXmlFileId = result.getLong("MAX_ID");
+        } catch (SQLException e)
+        {
+            System.out.println("Can't get MAX XML_FILE ID from DB: " + e.getMessage());
+            throw new SQLException(e);
+        }
+        CallableStatement stm = null;
+        try{
+            stm = conn.prepareCall("{call CORE.PKG_EAV_XML_UTIL.generate_by_credit_list(?, ?, 1, ?)}");
+            stm.setString(1, creditIds);
+            stm.setDate(2, new java.sql.Date(reportDate.getTime()));
+            stm.setLong(3, creditorId);
+            stm.execute();
+        } catch (SQLException e)
+        {
+            System.out.println("Can't call procedure generate_by_credit_list from DB: " + e.getMessage());
+            throw new SQLException(e);
+        } finally {
+            if(stm != null){
+                try {
+                    stm.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        preparedStatement = null;
+        result = null;
+
+        try
+        {
+            String query = "SELECT xf.id, xf.file_name, xf.file_content\n" +
+                    " FROM core.xml_file2 xf\n" +
+                    " WHERE xf.status = 'COMPLETED'\n" +
+                    " AND xf.id > " + maxXmlFileId.toString() + "\n" +
+                    " ORDER BY xf.id ASC";
+            preparedStatement = conn.prepareStatement(query);
+            result = preparedStatement.executeQuery();
+
+            int tryCount = 0;
+            while (!result.next()){
+                Thread.sleep(500);
+                result = preparedStatement.executeQuery();
+                tryCount ++;
+                if(tryCount > 2400){//20 minutes
+                    throw new TimeoutException("Procedure call timeout exception");
+                }
+            }
+
+            fileName = result.getString("file_name");
+            Blob blob = result.getBlob("file_content");
+
+            File newFile = new File(path + fileName + ".zip");
+            newFile.createNewFile();
+
+            InputStream in = blob.getBinaryStream();
+
+            byte[] buffer = new byte[1024];
+
+            FileOutputStream fout = new FileOutputStream(newFile);
+
+            while(in.read(buffer) > 0) {
+                fout.write(buffer);
+            }
+
+        } catch (SQLException e)
+        {
+            System.out.println("Can't create prepared statement: " + e.getMessage());
+            throw new SQLException(e);
+        } finally {
+            try
+            {
+
+                result.close();
+                preparedStatement.close();
+                conn.close();
+            } catch (SQLException e1)
+            {
+                e1.printStackTrace();
+            }
+        }
+        return fileName;
     }
 
     public void run() {
