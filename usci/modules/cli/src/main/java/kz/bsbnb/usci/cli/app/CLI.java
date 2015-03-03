@@ -3559,7 +3559,7 @@ public class CLI
 
 //            String select = "SELECT t.contract_no,t.contract_date,t.id,1 creditor_id,1 as editId FROM  v_credit_his t";
 
-
+            int maxLimit = 0; // Only first 1000 is processed
 
             try {
                 conn.setAutoCommit(false);
@@ -3576,6 +3576,8 @@ public class CLI
                     creditorId = 1L;// resultSet.getLong("CREDITOR_ID");
                     contractNo = resultSet.getString("CONTRACT_NO");
                     contractDate = resultSet.getDate("CONTRACT_DATE");
+
+                    if (maxLimit > 100) throw new RuntimeException("1000 contracts are processed ."); //TODO: delete this after test
 
                     if (creditId == null || creditId == 0){
                         storage.simpleSql(String.format("insert into mnt_logs(mnt_operation_id, foreign_id, execution_time, status, error_msg, contract_no, contract_date) values (2,1,sysdate,1,'%S','%S',date'%S')","No credit was found with such contract_no and contract_date",contractNo,contractDate.toString()));
