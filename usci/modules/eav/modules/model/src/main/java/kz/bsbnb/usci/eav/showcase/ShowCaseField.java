@@ -2,11 +2,7 @@ package kz.bsbnb.usci.eav.showcase;
 
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 
-/**
- * Created by a.tkachenko on 4/8/14.
- */
-public class ShowCaseField extends Persistable
-{
+public class ShowCaseField extends Persistable {
     private String name;
     private String columnName;
     private String title;
@@ -14,12 +10,12 @@ public class ShowCaseField extends Persistable
     private String attributeName;
     private String attributePath;
 
-    public ShowCaseField()
-    {
+    public ShowCaseField() {
+        super();
     }
 
-    public ShowCaseField(long id, String name, String columnName, String title, long attributeId, String attributeName, String attributePath)
-    {
+    public ShowCaseField(long id, String name, String columnName, String title,
+                         long attributeId, String attributeName, String attributePath) {
         this.id = id;
         this.name = name;
         this.columnName = columnName;
@@ -29,66 +25,54 @@ public class ShowCaseField extends Persistable
         this.attributePath = attributePath;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public String getColumnName()
-    {
+    public String getColumnName() {
         return columnName;
     }
 
-    public void setColumnName(String columnName)
-    {
+    public void setColumnName(String columnName) {
         this.columnName = columnName;
     }
 
-    public String getTitle()
-    {
+    public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title)
-    {
+    public void setTitle(String title) {
         this.title = title;
     }
 
-    public long getAttributeId()
-    {
+    public long getAttributeId() {
         return attributeId;
     }
 
-    public void setAttributeId(long attributeId)
-    {
+    public void setAttributeId(long attributeId) {
         this.attributeId = attributeId;
     }
 
-    public String getAttributeName()
-    {
+    public String getAttributeName() {
         return attributeName;
     }
 
-    public void setAttributeName(String attributeName)
-    {
-        if(attributeName == null)
+    public void setAttributeName(String attributeName) {
+        if (attributeName == null)
             this.attributeName = "";
         else
             this.attributeName = attributeName;
     }
 
-    public String getAttributePath()
-    {
+    public String getAttributePath() {
         return attributePath;
     }
 
-    public void setAttributePath(String attributePath)
-    {
+    public void setAttributePath(String attributePath) {
         this.attributePath = attributePath;
     }
 
@@ -97,8 +81,7 @@ public class ShowCaseField extends Persistable
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
@@ -118,8 +101,7 @@ public class ShowCaseField extends Persistable
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (columnName != null ? columnName.hashCode() : 0);
@@ -128,5 +110,17 @@ public class ShowCaseField extends Persistable
         result = 31 * result + (attributeName != null ? attributeName.hashCode() : 0);
         result = 31 * result + (attributePath != null ? attributePath.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ShowCaseField{" +
+                "name='" + name + '\'' +
+                ", columnName='" + columnName + '\'' +
+                ", title='" + title + '\'' +
+                ", attributeId=" + attributeId +
+                ", attributeName='" + attributeName + '\'' +
+                ", attributePath='" + attributePath + '\'' +
+                '}';
     }
 }

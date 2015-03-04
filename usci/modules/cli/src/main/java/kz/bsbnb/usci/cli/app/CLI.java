@@ -1,7 +1,10 @@
 package kz.bsbnb.usci.cli.app;
 
 import com.couchbase.client.CouchbaseClient;
-import com.couchbase.client.protocol.views.*;
+import com.couchbase.client.protocol.views.Query;
+import com.couchbase.client.protocol.views.View;
+import com.couchbase.client.protocol.views.ViewResponse;
+import com.couchbase.client.protocol.views.ViewRow;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
@@ -48,7 +51,6 @@ import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
-/*import kz.bsbnb.usci.eav.showcase.dao.IShowCaseDao;*/
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -84,9 +86,9 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.text.DateFormat;
-import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
@@ -96,57 +98,60 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 @Component
-public class CLI
-{
+public class CLI {
+    private static SimpleDateFormat sdfout = new SimpleDateFormat("dd.MM.yyyy");
+    @Autowired
+    protected IMetaClassRepository metaClassRepository;
+    @Autowired
+    protected IBatchRepository batchRepository;
+    RmiProxyFactoryBean serviceFactory = null;
+    IEntityService entityServiceCore = null;
+    ShowCase showCase;
+    boolean scStart = false;
+    String line;
+    Exception lastException = null;
     private String command;
     private ArrayList<String> args = new ArrayList<String>();
-
-    private static SimpleDateFormat sdfout = new SimpleDateFormat("dd.MM.yyyy");
-
     @Autowired
     private IStorage storage;
 
     @Autowired
     private IMetaClassDao metaClassDao;
-
-    @Autowired
-    protected IMetaClassRepository metaClassRepository;
-
-    @Autowired
-    protected IBatchRepository batchRepository;
-
     @Autowired
     private Xsd2MetaClass xsdConverter;
-
     @Autowired
     private MainParser crParser;
-
     @Autowired
     private IBaseEntityProcessorDao baseEntityProcessorDao;
-
     @Autowired
     private ImprovedBaseEntitySearcher searcher;
-
     @Autowired
     private RulesSingleton rulesSingleton;
-
-    /*@Autowired
-    protected IShowCaseDao showCaseDao;*/
-
-
     private BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
-
     private InputStream inputStream = null;
-
     private CouchbaseClient couchbaseClient;
-
-    RmiProxyFactoryBean serviceFactory = null;
-
-    IEntityService entityServiceCore = null;
+    private JobDispatcher jobDispatcher = new JobDispatcher();
+    private RmiProxyFactoryBean batchServiceFactoryBean;
+    private RmiProxyFactoryBean batchVersionServiceFactoryBean;
+    private RmiProxyFactoryBean ruleServiceFactoryBean;
+    private RmiProxyFactoryBean showcaseServiceFactoryBean;
+    private RmiProxyFactoryBean entityServiceFactoryBean;
+    private IBatchService batchService;
+    private IRuleService ruleService;
+    private IBatchVersionService batchVersionService;
+    private ShowcaseService showcaseService;
+    private Rule currentRule;
+    private String currentPackageName = "afk";
+    private Date currentDate = new Date();
+    private boolean started = false;
+    private BatchVersion currentBatchVersion;
+    private String defaultDumpFile = "c:/rules/pledge2.cli";
+    private BaseEntity currentBaseEntity;
+    private HashMap<Long, IBaseEntity> creditors;
+    private HashMap<Long, Creditor> crCreditors;
 
     public IEntityService getEntityService(String url) {
-        if (entityServiceCore == null)
-        {
+        if (entityServiceCore == null) {
             try {
                 serviceFactory = new RmiProxyFactoryBean();
                 //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
@@ -163,236 +168,6 @@ public class CLI
 
         return entityServiceCore;
     }
-
-    class JobDispatcher extends Thread {
-        private ConcurrentLinkedQueue<DispatcherJob> threadsQueue = new ConcurrentLinkedQueue<DispatcherJob>();
-        private ConcurrentLinkedQueue<DispatcherJob> preparedThreadsQueue = new ConcurrentLinkedQueue<DispatcherJob>();
-        private ArrayList<ThreadPreparator> activePreparingThreads = new ArrayList<ThreadPreparator>();
-        private ArrayList<DispatcherJob> activeThreads = new ArrayList<DispatcherJob>();
-
-        private final int MAX_ACTIVE_THREADS = 32;
-        private final int MAX_PREPARING_THREADS = 8;
-        private long jobsEnded = 0;
-
-        public synchronized void addThread(DispatcherJob thread) {
-            threadsQueue.add(thread);
-        }
-
-        public synchronized void addPreparedThread(DispatcherJob thread) {
-            preparedThreadsQueue.add(thread);
-        }
-
-        public synchronized DispatcherJob getNextThread() {
-            return threadsQueue.poll();
-        }
-
-        public synchronized DispatcherJob getNextPeparedThread() {
-            return preparedThreadsQueue.poll();
-        }
-
-        public void clearDeadThreads () {
-            Iterator<DispatcherJob> threadsIterator = activeThreads.iterator();
-
-            while(threadsIterator.hasNext()) {
-                DispatcherJob thread = threadsIterator.next();
-
-                if (!thread.isAlive()) {
-                    threadsIterator.remove();
-                    jobsEnded++;
-                }
-            }
-        }
-
-        public void clearDeadPreparingThreads () {
-            Iterator<ThreadPreparator> threadsIterator = activePreparingThreads.iterator();
-
-            while(threadsIterator.hasNext()) {
-                ThreadPreparator preparator = threadsIterator.next();
-
-                if (!preparator.isAlive()) {
-                    threadsIterator.remove();
-                    addPreparedThread(preparator.getThread());
-                }
-            }
-        }
-
-        @Override
-        public void run() {
-            long t1 = System.currentTimeMillis();
-            while(true) {
-                try {
-                    clearDeadPreparingThreads();
-                    clearDeadThreads();
-
-                    if (System.currentTimeMillis() - t1 > 5000) {
-                        t1 = System.currentTimeMillis();
-                        if(activeThreads.size() > 0 || activePreparingThreads.size() > 0 ||
-                                threadsQueue.size() > 0) {
-                            System.out.println("Active: " + activeThreads.size() + ", queue: " + threadsQueue.size() +
-                                    ", ended: " + jobsEnded + ", preparing: " + activePreparingThreads.size() +
-                                    ", prepared: " + preparedThreadsQueue.size());
-                        }
-                    }
-
-                    if (activePreparingThreads.size() < MAX_PREPARING_THREADS) {
-                        DispatcherJob newThread = getNextThread();
-                        if (newThread != null) {
-                            ThreadPreparator preparator = new ThreadPreparator(newThread);
-                            preparator.start();
-                            activePreparingThreads.add(preparator);
-                        }
-                    }
-
-                    if (activeThreads.size() < MAX_ACTIVE_THREADS) {
-                        DispatcherJob newThread = getNextPeparedThread();
-                        if (newThread != null) {
-                            boolean intersectionFound = false;
-                            for (DispatcherJob job : activeThreads) {
-                                if (job.intersects(newThread)) {
-                                    intersectionFound = true;
-                                    break;
-                                }
-                            }
-
-                            if(intersectionFound) {
-                                addThread(newThread);
-                            } else {
-                                newThread.start();
-                                activeThreads.add(newThread);
-                            }
-                        } else {
-                            try {
-                                sleep(1000L);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    } else {
-                        try {
-                            sleep(100L);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    interface DispatcherJob {
-        public boolean intersects(DispatcherJob job);
-        public boolean isAlive();
-        public void start();
-        public void prepare();
-    }
-
-    class ThreadPreparator extends Thread {
-        DispatcherJob thread;
-
-        ThreadPreparator(DispatcherJob thread) {
-            this.thread = thread;
-        }
-
-        public DispatcherJob getThread() {
-            return thread;
-        }
-
-        @Override
-        public void run() {
-            try {
-                thread.prepare();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    class DeleteJob extends Thread implements DispatcherJob {
-
-        private IEntityService entityServiceCore = null;
-        private long id;
-        private Set<Long> ids = null;
-
-        DeleteJob(IEntityService entityServiceCore, long id) {
-            this.entityServiceCore = entityServiceCore;
-            this.id = id;
-        }
-
-        @Override
-        public void run() {
-            try {
-                System.out.println("Deleting entity with id: " + id);
-                entityServiceCore.remove(id);
-                System.out.println("Deleted entity with id: " + id);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        @Override
-        public boolean intersects(DispatcherJob job) {
-            if (job instanceof DeleteJob) {
-                if (ids == null || ((DeleteJob)job).ids == null) {
-                    throw new RuntimeException("Unprepared thread");
-                }
-
-                Set<Long> inter = SetUtils.intersection(ids, ((DeleteJob)job).ids);
-
-                /*String thisSout = "";
-                String thatSout = "";
-                String sout = "";
-                boolean first = true;
-
-                for(Long id : ids) {
-                    if(first) {
-                        thisSout += id;
-                        first = false;
-                    } else
-                        thisSout += "," + id;
-                }
-
-                first = true;
-
-                for(Long id : ((DeleteJob) job).ids) {
-                    if(first) {
-                        thatSout += id;
-                        first = false;
-                    } else
-                        thatSout += "," + id;
-                }
-
-                first = true;
-
-
-                for(Long id : inter) {
-                    if(first) {
-                        sout += id;
-                        first = false;
-                    } else
-                        sout += "," + id;
-                }
-
-                System.out.println(
-                        "============== this id " + id + " that id " + ((DeleteJob) job).id + "\n" +
-                        "This ids: " + thisSout + "\n" +
-                        "That ids: " + thatSout + "\n" +
-                        "Intersection size: " + inter.size() + "\n" +
-                        "Intersection values: " + sout + "\n");*/
-                return inter.size() > 0;
-            }
-            return false;
-        }
-
-        @Override
-        public void prepare() {
-            ids = entityServiceCore.getChildBaseEntityIds(id);
-        }
-    }
-
-    private JobDispatcher jobDispatcher = new JobDispatcher();
 
     @PostConstruct
     public void initBean() {
@@ -415,8 +190,7 @@ public class CLI
         couchbaseClient.shutdown();
     }
 
-    public void processCRBatch(String fname, int count, int offset, Date repDate) throws SAXException, IOException, XMLStreamException
-    {
+    public void processCRBatch(String fname, int count, int offset, Date repDate) throws SAXException, IOException, XMLStreamException {
         File inFile = new File(fname);
 
         InputStream in = null;
@@ -433,7 +207,7 @@ public class CLI
 
         BaseEntity entity;
         int i = 0;
-        while(crParser.hasMore() && (((i++) - offset) < count)) {
+        while (crParser.hasMore() && (((i++) - offset) < count)) {
             if (i > offset) {
                 entity = crParser.getCurrentBaseEntity();
                 System.out.println(entity);
@@ -450,8 +224,7 @@ public class CLI
 
     }
 
-    public void processXSD(String fname, String metaClassName) throws FileNotFoundException
-    {
+    public void processXSD(String fname, String metaClassName) throws FileNotFoundException {
         File inFile = new File(fname);
 
         InputStream in = null;
@@ -466,8 +239,7 @@ public class CLI
         System.out.println("Saved with id: " + id);
     }
 
-    public void listXSD(String fname) throws FileNotFoundException
-    {
+    public void listXSD(String fname) throws FileNotFoundException {
         File inFile = new File(fname);
 
         InputStream in = null;
@@ -594,7 +366,7 @@ public class CLI
 
             if (attr != null) {
                 if (attr.isSet() && attr.isComplex()) {
-                    MetaSet set = (MetaSet)attr;
+                    MetaSet set = (MetaSet) attr;
 
                     set.addArrayKeyFilter(subName, value);
 
@@ -618,7 +390,7 @@ public class CLI
 
             if (attr != null) {
                 if (attr.isSet() && attr.isComplex()) {
-                    MetaSet set = (MetaSet)attr;
+                    MetaSet set = (MetaSet) attr;
 
                     set.addArrayKeyFilter(subName, value);
 
@@ -703,36 +475,29 @@ public class CLI
 
                 fout = new FileOutputStream(f);
 
-                while(true) {
+                while (true) {
                     try {
                         Connection conn = null;
 
-                        try
-                        {
+                        try {
                             conn = connectToDB(args.get(2), args.get(3), args.get(4));
-                        } catch (ClassNotFoundException e)
-                        {
+                        } catch (ClassNotFoundException e) {
                             System.out.println("Error can't load driver: oracle.jdbc.OracleDriver");
                             return;
-                        } catch (SQLException e)
-                        {
+                        } catch (SQLException e) {
                             System.out.println("Can't connect to DB: " + e.getMessage());
                             return;
                         }
 
                         PreparedStatement preparedStatement = null;
-                        try
-                        {
+                        try {
                             preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
                                     reportDateStr.trim() + "', 'dd.MM.yyyy')");
-                        } catch (SQLException e)
-                        {
+                        } catch (SQLException e) {
                             System.out.println("Can't create prepared statement: " + e.getMessage());
-                            try
-                            {
+                            try {
                                 conn.close();
-                            } catch (SQLException e1)
-                            {
+                            } catch (SQLException e1) {
                                 e1.printStackTrace();
                             }
                             return;
@@ -740,7 +505,7 @@ public class CLI
 
                         ResultSet result = preparedStatement.executeQuery();
 
-                        while(result.next()) {
+                        while (result.next()) {
                             long batchId = result.getLong("id");
 
                             System.out.println("Processing id: " + batchId);
@@ -751,11 +516,11 @@ public class CLI
 
                             int counter = 0;
 
-                            while(counter < 100) {
+                            while (counter < 100) {
                                 try {
                                     batchObject = couchbaseClient.get("batch:" + batchId);
                                     break;
-                                } catch(OperationTimeoutException ex) {
+                                } catch (OperationTimeoutException ex) {
                                     System.out.println("Timeout. Restarting...");
                                     counter++;
                                 }
@@ -763,11 +528,11 @@ public class CLI
 
                             counter = 0;
 
-                            while(counter < 100) {
+                            while (counter < 100) {
                                 try {
                                     manifestObject = couchbaseClient.get("manifest:" + batchId);
                                     break;
-                                } catch(OperationTimeoutException ex) {
+                                } catch (OperationTimeoutException ex) {
                                     System.out.println("Timeout. Restarting...");
                                     counter++;
                                 }
@@ -775,11 +540,11 @@ public class CLI
 
                             counter = 0;
 
-                            while(counter < 100) {
+                            while (counter < 100) {
                                 try {
                                     batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
                                     break;
-                                } catch(OperationTimeoutException ex) {
+                                } catch (OperationTimeoutException ex) {
                                     System.out.println("Timeout. Restarting...");
                                     counter++;
                                 }
@@ -808,8 +573,7 @@ public class CLI
 
                             BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
 
-                            if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), reportDate) != 0)
-                            {
+                            if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), reportDate) != 0) {
                                 continue;
                             }
 
@@ -825,7 +589,7 @@ public class CLI
 
                             int row_count = 0;
                             int error_count = 0;
-                            while(rows.hasNext()) {
+                            while (rows.hasNext()) {
                                 ViewRow viewRowNoDocs = rows.next();
 
                                 row_count++;
@@ -836,12 +600,10 @@ public class CLI
                                 boolean errorFound = false;
                                 boolean completedFound = false;
                                 for (EntityStatusJModel csajm : batchFullStatusJModel.getEntityStatuses()) {
-                                    if (csajm.getProtocol().equals("ERROR"))
-                                    {
+                                    if (csajm.getProtocol().equals("ERROR")) {
                                         errorFound = true;
                                     }
-                                    if (csajm.getProtocol().equals("COMPLETED"))
-                                    {
+                                    if (csajm.getProtocol().equals("COMPLETED")) {
                                         completedFound = true;
                                     }
                                 }
@@ -872,7 +634,7 @@ public class CLI
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                if(fout != null) {
+                if (fout != null) {
                     try {
                         fout.close();
                     } catch (IOException e) {
@@ -934,36 +696,29 @@ public class CLI
 
                 fout = new FileOutputStream(f);
 
-                while(true) {
+                while (true) {
                     try {
                         Connection conn = null;
 
-                        try
-                        {
+                        try {
                             conn = connectToDB(args.get(2), args.get(3), args.get(4));
-                        } catch (ClassNotFoundException e)
-                        {
+                        } catch (ClassNotFoundException e) {
                             System.out.println("Error can't load driver: oracle.jdbc.OracleDriver");
                             return;
-                        } catch (SQLException e)
-                        {
+                        } catch (SQLException e) {
                             System.out.println("Can't connect to DB: " + e.getMessage());
                             return;
                         }
 
                         PreparedStatement preparedStatement = null;
-                        try
-                        {
+                        try {
                             preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
                                     reportDateStr.trim() + "', 'dd.MM.yyyy')");
-                        } catch (SQLException e)
-                        {
+                        } catch (SQLException e) {
                             System.out.println("Can't create prepared statement: " + e.getMessage());
-                            try
-                            {
+                            try {
                                 conn.close();
-                            } catch (SQLException e1)
-                            {
+                            } catch (SQLException e1) {
                                 e1.printStackTrace();
                             }
                             return;
@@ -971,7 +726,7 @@ public class CLI
 
                         ResultSet result = preparedStatement.executeQuery();
 
-                        while(result.next()) {
+                        while (result.next()) {
                             long batchId = result.getLong("id");
 
                             System.out.println("Processing id: " + batchId);
@@ -982,7 +737,7 @@ public class CLI
 
                             int counter = 0;
 
-                            while(counter < 100) {
+                            while (counter < 100) {
                                 try {
                                     batchObject = couchbaseClient.get("batch:" + batchId);
                                     break;
@@ -994,7 +749,7 @@ public class CLI
 
                             counter = 0;
 
-                            while(counter < 100) {
+                            while (counter < 100) {
                                 try {
                                     manifestObject = couchbaseClient.get("manifest:" + batchId);
                                     break;
@@ -1006,7 +761,7 @@ public class CLI
 
                             counter = 0;
 
-                            while(counter < 100) {
+                            while (counter < 100) {
                                 try {
                                     batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
                                     break;
@@ -1039,8 +794,7 @@ public class CLI
 
                             BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
 
-                            if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), reportDate) != 0)
-                            {
+                            if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), reportDate) != 0) {
                                 continue;
                             }
 
@@ -1056,7 +810,7 @@ public class CLI
 
                             int row_count = 0;
                             int error_count = 0;
-                            while(rows.hasNext()) {
+                            while (rows.hasNext()) {
                                 ViewRow viewRowNoDocs = rows.next();
 
                                 row_count++;
@@ -1067,12 +821,10 @@ public class CLI
                                 boolean errorFound = false;
                                 boolean completedFound = false;
                                 for (EntityStatusJModel csajm : batchFullStatusJModel.getEntityStatuses()) {
-                                    if (csajm.getProtocol().equals("ERROR"))
-                                    {
+                                    if (csajm.getProtocol().equals("ERROR")) {
                                         errorFound = true;
                                     }
-                                    if (csajm.getProtocol().equals("COMPLETED"))
-                                    {
+                                    if (csajm.getProtocol().equals("COMPLETED")) {
                                         completedFound = true;
                                     }
                                 }
@@ -1080,19 +832,19 @@ public class CLI
                                     error_count++;
                             }
 
-                        if (error_count > 0 || row_count != batchInfo.getSize()) {
-                            fout.write((batchId + "," +
-                                    batchFull.getFileName() + "," +
-                                    batchInfo.getSize() + "," + row_count + "," + error_count + ",restarted\n").getBytes());
+                            if (error_count > 0 || row_count != batchInfo.getSize()) {
+                                fout.write((batchId + "," +
+                                        batchFull.getFileName() + "," +
+                                        batchInfo.getSize() + "," + row_count + "," + error_count + ",restarted\n").getBytes());
 
-                            //sender.addJob(batchId, batchInfo);
-                            //receiverStatusSingleton.batchReceived();
-                            batchProcessService.restartBatch(batchId);
-                        } else {
-                            fout.write((batchId + "," +
-                                    batchFull.getFileName() + "," +
-                                    batchInfo.getSize() + "," + row_count + "," + error_count + ",skipped\n").getBytes());
-                        }
+                                //sender.addJob(batchId, batchInfo);
+                                //receiverStatusSingleton.batchReceived();
+                                batchProcessService.restartBatch(batchId);
+                            } else {
+                                fout.write((batchId + "," +
+                                        batchFull.getFileName() + "," +
+                                        batchInfo.getSize() + "," + row_count + "," + error_count + ",skipped\n").getBytes());
+                            }
 
 
                         }
@@ -1109,7 +861,7 @@ public class CLI
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                if(fout != null) {
+                if (fout != null) {
                     try {
                         fout.close();
                     } catch (IOException e) {
@@ -1171,36 +923,29 @@ public class CLI
 
                 fout = new FileOutputStream(f);
 
-                while(true) {
+                while (true) {
                     try {
                         Connection conn = null;
 
-                        try
-                        {
+                        try {
                             conn = connectToDB(args.get(2), args.get(3), args.get(4));
-                        } catch (ClassNotFoundException e)
-                        {
+                        } catch (ClassNotFoundException e) {
                             System.out.println("Error can't load driver: oracle.jdbc.OracleDriver");
                             return;
-                        } catch (SQLException e)
-                        {
+                        } catch (SQLException e) {
                             System.out.println("Can't connect to DB: " + e.getMessage());
                             return;
                         }
 
                         PreparedStatement preparedStatement = null;
-                        try
-                        {
+                        try {
                             preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
                                     reportDateStr.trim() + "', 'dd.MM.yyyy')");
-                        } catch (SQLException e)
-                        {
+                        } catch (SQLException e) {
                             System.out.println("Can't create prepared statement: " + e.getMessage());
-                            try
-                            {
+                            try {
                                 conn.close();
-                            } catch (SQLException e1)
-                            {
+                            } catch (SQLException e1) {
                                 e1.printStackTrace();
                             }
                             return;
@@ -1208,7 +953,7 @@ public class CLI
 
                         ResultSet result = preparedStatement.executeQuery();
 
-                        while(result.next()) {
+                        while (result.next()) {
                             long batchId = result.getLong("id");
 
                             System.out.println("Processing id: " + batchId);
@@ -1219,7 +964,7 @@ public class CLI
 
                             int counter = 0;
 
-                            while(counter < 100) {
+                            while (counter < 100) {
                                 try {
                                     batchObject = couchbaseClient.get("batch:" + batchId);
                                     break;
@@ -1231,7 +976,7 @@ public class CLI
 
                             counter = 0;
 
-                            while(counter < 100) {
+                            while (counter < 100) {
                                 try {
                                     manifestObject = couchbaseClient.get("manifest:" + batchId);
                                     break;
@@ -1243,7 +988,7 @@ public class CLI
 
                             counter = 0;
 
-                            while(counter < 100) {
+                            while (counter < 100) {
                                 try {
                                     batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
                                     break;
@@ -1276,8 +1021,7 @@ public class CLI
 
                             BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
 
-                            if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), reportDate) != 0)
-                            {
+                            if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), reportDate) != 0) {
                                 continue;
                             }
 
@@ -1300,7 +1044,7 @@ public class CLI
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                if(fout != null) {
+                if (fout != null) {
                     try {
                         fout.close();
                     } catch (IOException e) {
@@ -1351,7 +1095,7 @@ public class CLI
 
         int counter = 0;
 
-        while(counter < 100) {
+        while (counter < 100) {
             try {
                 batchObject = couchbaseClient.get("batch:" + batchId);
                 break;
@@ -1363,7 +1107,7 @@ public class CLI
 
         counter = 0;
 
-        while(counter < 100) {
+        while (counter < 100) {
             try {
                 manifestObject = couchbaseClient.get("manifest:" + batchId);
                 break;
@@ -1375,7 +1119,7 @@ public class CLI
 
         counter = 0;
 
-        while(counter < 100) {
+        while (counter < 100) {
             try {
                 batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
                 break;
@@ -1420,7 +1164,7 @@ public class CLI
 
         int row_count = 0;
         int error_count = 0;
-        while(rows.hasNext()) {
+        while (rows.hasNext()) {
             ViewRow viewRowNoDocs = rows.next();
 
             row_count++;
@@ -1431,12 +1175,10 @@ public class CLI
             boolean errorFound = false;
             boolean completedFound = false;
             for (EntityStatusJModel csajm : batchFullStatusJModel.getEntityStatuses()) {
-                if (csajm.getProtocol().equals("ERROR"))
-                {
+                if (csajm.getProtocol().equals("ERROR")) {
                     errorFound = true;
                 }
-                if (csajm.getProtocol().equals("COMPLETED"))
-                {
+                if (csajm.getProtocol().equals("COMPLETED")) {
                     completedFound = true;
                 }
             }
@@ -1445,13 +1187,13 @@ public class CLI
         }
 
         //if (error_count > 0 || row_count != batchInfo.getSize()) {
-            System.out.println(batchId + "," +
-                    batchFull.getFileName() + "," +
-                    batchInfo.getSize() + "," + row_count + "," + error_count + ",restarted");
+        System.out.println(batchId + "," +
+                batchFull.getFileName() + "," +
+                batchInfo.getSize() + "," + row_count + "," + error_count + ",restarted");
 
-            //sender.addJob(batchId, batchInfo);
-            //receiverStatusSingleton.batchReceived();
-            batchProcessService.restartBatch(batchId);
+        //sender.addJob(batchId, batchInfo);
+        //receiverStatusSingleton.batchReceived();
+        batchProcessService.restartBatch(batchId);
         /*} else {
             System.out.println(batchId + "," +
                     batchFull.getFileName() + "," +
@@ -1495,7 +1237,7 @@ public class CLI
             long id = Long.parseLong(st.nextToken());
             IBaseEntity entity = baseEntityProcessorDao.load(id);
             if (entity != null) {
-                entities.add((BaseEntity)entity);
+                entities.add((BaseEntity) entity);
             }
         }
 
@@ -1518,7 +1260,7 @@ public class CLI
             long id = Long.parseLong(st.nextToken());
             IBaseEntity entity = baseEntityProcessorDao.load(id);
             if (entity != null) {
-                entities.add((BaseEntity)entity);
+                entities.add((BaseEntity) entity);
             }
         }
 
@@ -1533,18 +1275,18 @@ public class CLI
         }
     }
 
-    public void readEntityFromXMLString(String xml, String repDate){
+    public void readEntityFromXMLString(String xml, String repDate) {
         try {
             Date reportDate = sdfout.parse(repDate);
             CLIXMLReader reader = new CLIXMLReader(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))
-                    ,metaClassRepository,batchRepository,reportDate);
+                    , metaClassRepository, batchRepository, reportDate);
 
             BaseEntity entity;
-            while((entity = reader.read()) != null) {
+            while ((entity = reader.read()) != null) {
                 try {
                     long id = baseEntityProcessorDao.process(entity).getId();
                     System.out.println("Instance of BaseEntity saved with id: " + id);
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     lastException = ex;
                     System.out.println("While processing instance of BaseEntity unexpected error occurred: " + ex.getMessage());
                 }
@@ -1560,20 +1302,19 @@ public class CLI
             Date reportDate = sdfout.parse(repDate);
             CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
             BaseEntity entity;
-            while((entity = reader.read()) != null) {
+            while ((entity = reader.read()) != null) {
                 try {
                     long id = baseEntityProcessorDao.process(entity).getId();
                     System.out.println("Instance of BaseEntity saved with id: " + id);
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     lastException = ex;
                     System.out.println("While processing instance of BaseEntity unexpected error occurred: " + ex.getMessage());
                 }
             }
-        } catch (FileNotFoundException e)
-        {
+        } catch (FileNotFoundException e) {
             System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
         } catch (ParseException e) {
-            System.out.println("Can't parse date " + repDate + " must be in format "+ sdfout.toString());
+            System.out.println("Can't parse date " + repDate + " must be in format " + sdfout.toString());
         }
 
     }
@@ -1583,7 +1324,7 @@ public class CLI
             Date reportDate = sdfout.parse(repDate);
             CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
             BaseEntity entity;
-            while((entity = reader.read()) != null) {
+            while ((entity = reader.read()) != null) {
                 //long id = baseEntityProcessorDao.process(entity).getId();
                 ArrayList<Long> ids = searcher.findAll(entity);
                 if (ids.size() < 1) {
@@ -1596,11 +1337,10 @@ public class CLI
                 }
 
             }
-        } catch (FileNotFoundException e)
-        {
+        } catch (FileNotFoundException e) {
             System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
         } catch (ParseException e) {
-            System.out.println("Can't parse date " + repDate + " must be in format "+ sdfout.toString());
+            System.out.println("Can't parse date " + repDate + " must be in format " + sdfout.toString());
         }
 
     }
@@ -1610,7 +1350,7 @@ public class CLI
             Date reportDate = sdfout.parse(repDate);
             CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
             BaseEntity entity;
-            while((entity = reader.read()) != null) {
+            while ((entity = reader.read()) != null) {
                 BaseEntity clonedEntity = entity.clone();
 
                 List<String> intersectionList = comparator.intersect(entity, clonedEntity);
@@ -1623,11 +1363,10 @@ public class CLI
                     }
                 }
             }
-        } catch (FileNotFoundException e)
-        {
+        } catch (FileNotFoundException e) {
             System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
         } catch (ParseException e) {
-            System.out.println("Can't parse date " + repDate + " must be in format "+ sdfout.toString());
+            System.out.println("Can't parse date " + repDate + " must be in format " + sdfout.toString());
         }
 
     }
@@ -1657,7 +1396,7 @@ public class CLI
         } else if (entity2 == null) {
             System.out.println("No such entity with id: " + id2);
         } else {
-            List<String> inter = comparator.intersect((BaseEntity)entity1, (BaseEntity)entity2);
+            List<String> inter = comparator.intersect((BaseEntity) entity1, (BaseEntity) entity2);
 
             for (String str : inter) {
                 System.out.println(str);
@@ -1688,7 +1427,7 @@ public class CLI
             System.out.println("No such entity with id: " + id);
         } else {
             //SelectConditionStep where = searcher.generateSQL(entity, null);
-            ArrayList<Long> array = searcher.findAll((BaseEntity)entity);
+            ArrayList<Long> array = searcher.findAll((BaseEntity) entity);
 
             for (Long ids : array) {
                 System.out.println(ids.toString());
@@ -1715,8 +1454,7 @@ public class CLI
         }
     }
 
-    public void commandXSD() throws FileNotFoundException
-    {
+    public void commandXSD() throws FileNotFoundException {
         if (args.size() > 1) {
             if (args.get(0).equals("list")) {
                 listXSD(args.get(1));
@@ -1734,8 +1472,7 @@ public class CLI
         }
     }
 
-    public void commandCRBatch() throws IOException, SAXException, XMLStreamException, ParseException
-    {
+    public void commandCRBatch() throws IOException, SAXException, XMLStreamException, ParseException {
         if (args.size() > 2) {
             if (args.size() > 3) {
                 processCRBatch(args.get(0), Integer.parseInt(args.get(1)), Integer.parseInt(args.get(2)),
@@ -1756,8 +1493,6 @@ public class CLI
         metaClassRepository.saveMetaClass(meta);
     }
 
-
-
     public void removeAttributeFromMeta(String metaName, String attrName) {
         MetaClass meta = metaClassRepository.getMetaClass(metaName);
 
@@ -1770,12 +1505,11 @@ public class CLI
         this.args = args;
     }
 
-    public void resetMetaCache(){
+    public void resetMetaCache() {
         metaClassRepository.resetCache();
     }
 
-    public void commandMeta()
-    {
+    public void commandMeta() {
         if (args.size() > 1) {
             if (args.get(0).equals("show")) {
                 MetaShowCommand metaShowCommand = new MetaShowCommand();
@@ -1839,14 +1573,12 @@ public class CLI
         }
     }
 
-    public Connection connectToDB(String url, String name, String password) throws ClassNotFoundException, SQLException
-    {
+    public Connection connectToDB(String url, String name, String password) throws ClassNotFoundException, SQLException {
         Class.forName("oracle.jdbc.OracleDriver");
         return DriverManager.getConnection(url, name, password);
     }
 
-    public void commandImport()
-    {
+    public void commandImport() {
         if (args.size() > 4) {
             Connection conn = null;
 
@@ -1867,23 +1599,19 @@ public class CLI
                 System.out.println("Can't connect to receiver service: " + e.getMessage());
             }
 
-            try
-            {
+            try {
                 conn = connectToDB(args.get(0), args.get(1), args.get(2));
-            } catch (ClassNotFoundException e)
-            {
+            } catch (ClassNotFoundException e) {
                 System.out.println("Error can't load driver: oracle.jdbc.OracleDriver");
                 return;
-            } catch (SQLException e)
-            {
+            } catch (SQLException e) {
                 System.out.println("Can't connect to DB: " + e.getMessage());
                 return;
             }
 
             PreparedStatement preparedStatement = null;
             PreparedStatement preparedStatementDone = null;
-            try
-            {
+            try {
                 preparedStatement = conn.prepareStatement("SELECT xf.id, xf.file_name, xf.file_content\n" +
                         "  FROM core.xml_file xf\n" +
                         " WHERE xf.status = 'COMPLETED'\n" +
@@ -1894,14 +1622,11 @@ public class CLI
                 preparedStatementDone = conn.prepareStatement("UPDATE core.xml_file xf \n" +
                         "   SET xf.sent = ? \n" +
                         " WHERE xf.id = ?");
-            } catch (SQLException e)
-            {
+            } catch (SQLException e) {
                 System.out.println("Can't create prepared statement: " + e.getMessage());
-                try
-                {
+                try {
                     conn.close();
-                } catch (SQLException e1)
-                {
+                } catch (SQLException e1) {
                     e1.printStackTrace();
                 }
                 return;
@@ -1921,23 +1646,20 @@ public class CLI
 
             int fileNumber = 0;
 
-            while(true) {
+            while (true) {
                 fileNumber++;
 
                 ResultSet result2 = null;
-                try
-                {
+                try {
                     result2 = preparedStatement.executeQuery();
-                } catch (SQLException e)
-                {
+                } catch (SQLException e) {
                     System.out.println("Can't execute db query: " + e.getMessage());
                     break;
                 }
 
                 int id = 0;
 
-                try
-                {
+                try {
                     if (result2.next()) {
                         id = result2.getInt("id");
                         String fileName = result2.getString("file_name");
@@ -1952,7 +1674,7 @@ public class CLI
 
                         FileOutputStream fout = new FileOutputStream(newFile);
 
-                        while(in.read(buffer) > 0) {
+                        while (in.read(buffer) > 0) {
                             fout.write(buffer);
                         }
 
@@ -1974,18 +1696,14 @@ public class CLI
                         System.out.println("Nothing to do.");
                         Thread.sleep(10000);
                     }
-                } catch (SQLException e)
-                {
+                } catch (SQLException e) {
                     System.out.println("Can't get result from db: " + e.getMessage());
                     break;
-                } catch (InterruptedException e)
-                {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
-                } catch (IOException e)
-                {
+                } catch (IOException e) {
                     System.out.println("Can't create temp file: " + e.getMessage());
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                     try {
                         preparedStatementDone.setInt(1, 1);
@@ -2008,8 +1726,7 @@ public class CLI
         }
     }
 
-    public void commandCollectIds()
-    {
+    public void commandCollectIds() {
         if (args.size() > 1) {
             String inFileName = args.get(0);
             String outFileName = args.get(1);
@@ -2020,7 +1737,7 @@ public class CLI
                 Scanner inputScanner = new Scanner(new FileInputStream(inFileName));
                 FileOutputStream fout = new FileOutputStream(outFileName);
 
-                while(inputScanner.hasNextLine()) {
+                while (inputScanner.hasNextLine()) {
                     String nextLine = inputScanner.nextLine();
 
                     int idIndex = nextLine.indexOf("Not yet implemented. Entity ID:");
@@ -2062,8 +1779,7 @@ public class CLI
         }
     }
 
-    public void commandRStat()
-    {
+    public void commandRStat() {
         if (args.size() > 0) {
             RmiProxyFactoryBean batchProcessServiceFactoryBean = null;
 
@@ -2092,8 +1808,7 @@ public class CLI
         }
     }
 
-    public void commandRemoteStat()
-    {
+    public void commandRemoteStat() {
         if (args.size() > 3) {
             RmiProxyFactoryBean batchProcessServiceFactoryBean = null;
 
@@ -2152,7 +1867,7 @@ public class CLI
 
             String url = args.get(3);
 
-            while(true) {
+            while (true) {
                 ReceiverStatus receiverStatus = batchProcessService.getStatus();
                 SyncStatus syncStatus = entityServiceSync.getStatus();
                 HashMap<String, QueryEntry> map = entityServiceCore.getSQLStats();
@@ -2189,7 +1904,7 @@ public class CLI
 
                 coreStatus.setTotalProcessed(totalProcessCount);
 
-                if(totalProcessCount > 0) {
+                if (totalProcessCount > 0) {
                     coreStatus.setAvgProcessed(totalProcess / totalProcessCount);
                     coreStatus.setAvgInserts(totalInserts / totalProcessCount);
                     coreStatus.setAvgSelects(totalSelects / totalProcessCount);
@@ -2225,18 +1940,16 @@ public class CLI
                         processCommand(command.trim(), null);
                         System.out.println("Command done");
                     }
-                }catch (Exception ex) {
+                } catch (Exception ex) {
                     // handle exception here
                     ex.printStackTrace();
                 } finally {
                     httpClient.getConnectionManager().shutdown();
                 }
 
-                try
-                {
+                try {
                     Thread.sleep(15000L);
-                } catch (InterruptedException e)
-                {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -2249,8 +1962,7 @@ public class CLI
         }
     }
 
-    public void commandSStat()
-    {
+    public void commandSStat() {
         if (args.size() > 0) {
             RmiProxyFactoryBean entityServiceFactoryBean = null;
 
@@ -2279,8 +1991,7 @@ public class CLI
         }
     }
 
-    public void commandSQLStat()
-    {
+    public void commandSQLStat() {
         if (args.size() > 0) {
             RmiProxyFactoryBean serviceFactory = null;
 
@@ -2331,7 +2042,7 @@ public class CLI
 
             System.out.println("+---------+------------------+------------------------+");
 
-            if(totalProcessCount > 0) {
+            if (totalProcessCount > 0) {
                 System.out.println("AVG process: " + totalProcess / totalProcessCount);
                 System.out.println("AVG inserts per process: " + totalInserts / totalProcessCount);
                 System.out.println("AVG selects per process: " + totalSelects / totalProcessCount);
@@ -2345,8 +2056,7 @@ public class CLI
         }
     }
 
-    public void commandSTC()
-    {
+    public void commandSTC() {
         if (args.size() > 2) {
             Connection conn = null;
 
@@ -2370,19 +2080,19 @@ public class CLI
             int tCount = Integer.parseInt(args.get(1));
             boolean allowAutoIncrement = Boolean.parseBoolean(args.get(2));
 
-            entityService.setThreadsCount(tCount, allowAutoIncrement);
+            if(entityService != null)
+                entityService.setThreadsCount(tCount, allowAutoIncrement);
         } else {
             System.out.println("Argument needed: <core_url> <threads_count> <allow_auto_increment>");
             System.out.println("Example: stc rmi://127.0.0.1:1098/entityService 32 false");
         }
     }
 
-    public void commandEntity()
-    {
+    public void commandEntity() {
         if (args.size() > 1) {
             if (args.get(0).equals("show")) {
                 if (args.get(1).equals("id")) {
-                    if(args.get(2) != null && args.get(2).equals("tojava")) {
+                    if (args.get(2) != null && args.get(2).equals("tojava")) {
                         entityToJava(Long.parseLong(args.get(3)), args.size() > 4 ? args.get(4) : null);
                     } else {
                         showEntity(Long.parseLong(args.get(2)), args.size() > 3 ? args.get(3) : null);
@@ -2420,9 +2130,9 @@ public class CLI
                 } else {
                     System.out.println("No such entity identification method: " + args.get(1));
                 }
-            } else if(args.get(0).equals("xml")) {
+            } else if (args.get(0).equals("xml")) {
                 if (args.size() > 2) {
-                    if(args.get(1).equals("delete"))
+                    if (args.get(1).equals("delete"))
                         dumpDeleteEntityToXML(args.get(2), args.get(3));
                     else
                         dumpEntityToXML(args.get(1), args.get(2));
@@ -2430,33 +2140,33 @@ public class CLI
                     System.out.println("Argument needed: <xml> <id> <fileName>");
                     System.out.println("Argument needed: <xml> delete <id> <fileName>");
                 }
-            } else if(args.get(0).equals("rm")) {
+            } else if (args.get(0).equals("rm")) {
                 if (args.size() > 2) {
                     removeEntityById(Long.parseLong(args.get(1)), args.get(2));
                 } else {
                     System.out.println("Argument needed: <rm> <id> <service_url>");
                     System.out.println("Example: rm 100 rmi://127.0.0.1:1099/batchEntryService");
                 }
-            } else if(args.get(0).equals("rmall")) {
+            } else if (args.get(0).equals("rmall")) {
                 if (args.size() > 2) {
                     removeAllEntityById(Long.parseLong(args.get(1)), args.get(2));
                 } else {
                     System.out.println("Argument needed: <rmall> <id> <service_url>");
                     System.out.println("Example: rmall 100 rmi://127.0.0.1:1099/batchEntryService");
                 }
-            } else if(args.get(0).equals("read")) {
+            } else if (args.get(0).equals("read")) {
                 if (args.size() > 2) {
                     readEntityFromXML(args.get(1), args.get(2));
                 } else {
                     System.out.println("Argument needed: <read> <fileName> <rep_date>");
                 }
-            } else if(args.get(0).equals("find")) {
+            } else if (args.get(0).equals("find")) {
                 if (args.size() > 2) {
                     findEntityFromXML(args.get(1), args.get(2));
                 } else {
                     System.out.println("Argument needed: <find> <fileName> <rep_date>");
                 }
-            } else if(args.get(0).equals("test")) {
+            } else if (args.get(0).equals("test")) {
                 if (args.size() > 2) {
                     testEntityFromXML(args.get(1), args.get(2));
                 } else {
@@ -2470,8 +2180,7 @@ public class CLI
         }
     }
 
-    public void commandTest()
-    {
+    public void commandTest() {
         if (storage.testConnection()) {
             System.out.println("Connected to DB.");
         }
@@ -2482,27 +2191,27 @@ public class CLI
             } else {
                 System.out.println("DB with data");
             }
-        } catch(BadSqlGrammarException e) {
+        } catch (BadSqlGrammarException e) {
             System.out.println("Error: " + e.getMessage());
             System.out.println("EAV structure might be corrupted. Try clear/init.");
         }
     }
 
-    public void commandSql(){
+    public void commandSql() {
 
         System.out.println("ok sql mode...");
         StringBuilder str = new StringBuilder();
-        for(Object o : args)
-            str.append(o+" ");
+        for (Object o : args)
+            str.append(o + " ");
         System.out.println(str.toString());
         boolean res = storage.simpleSql(str.toString());
-        System.out.println( res?"success":"fail");
+        System.out.println(res ? "success" : "fail");
 
     }
 
-    public void commandRefs(){
-        if(args.get(0).equals("import")){
-            if(args.size() > 1)
+    public void commandRefs() {
+        if (args.get(0).equals("import")) {
+            if (args.size() > 1)
                 BaseCrawler.fileName = args.get(1);
             else {
                 BaseCrawler.fileName = "D:\\refs\\";
@@ -2511,11 +2220,11 @@ public class CLI
             new BaseRepository().run();
         } else throw new IllegalArgumentException("allowed operations refs [import] [filename]");
     }
-    public void commandSC()
-    {
-        if(args.get(0).equals("list")){
 
-        } else if(args.get(0).equals("add")){
+    public void commandSC() {
+        if (args.get(0).equals("list")) {
+
+        } else if (args.get(0).equals("add")) {
             showcaseServiceFactoryBean = new RmiProxyFactoryBean();
             showcaseServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
             showcaseServiceFactoryBean.setServiceInterface(ShowcaseService.class);
@@ -2531,19 +2240,19 @@ public class CLI
             showCase.setName(name);
             showCase.setTableName(name);
             showCase.setMeta(metaClass);
-            for(int i = 3; i < args.size(); i++){
+            for (int i = 3; i < args.size(); i++) {
                 String field = args.get(i);
                 String columnName;
                 String fieldName;
                 String path;
-                if(field.contains(":")){
+                if (field.contains(":")) {
                     columnName = field.split(":")[1];
                     field = field.split(":")[0];
                 }
-                if(field.contains(".")){
+                if (field.contains(".")) {
                     fieldName = field.substring(field.lastIndexOf(".") + 1);
                     path = field.substring(0, field.lastIndexOf("."));
-                } else{
+                } else {
                     path = "";
                     fieldName = field;
                 }
@@ -2552,25 +2261,12 @@ public class CLI
             }
             showcaseService.add(showCase);
             System.out.println("Showcase successfully added!");
-        } else if(args.get(0).equals("delete")){
+        } else if (args.get(0).equals("delete")) {
 
         }
     }
 
-    private RmiProxyFactoryBean batchServiceFactoryBean;
-    private RmiProxyFactoryBean batchVersionServiceFactoryBean;
-    private RmiProxyFactoryBean ruleServiceFactoryBean;
-    private RmiProxyFactoryBean listenerServiceFactoryBean;
-    private RmiProxyFactoryBean showcaseServiceFactoryBean;
-
-    private RmiProxyFactoryBean entityServiceFactoryBean;
-
-    private IBatchService batchService;
-    private IRuleService ruleService;
-    private IBatchVersionService batchVersionService;
-    private ShowcaseService showcaseService;
-
-    public void init(){
+    public void init() {
 
 
         try {
@@ -2609,19 +2305,8 @@ public class CLI
 
     }
 
-    private Rule currentRule;
-    private String currentPackageName = "afk";
-    private Date currentDate = new Date();
-    private boolean started = false;
-    private BatchVersion currentBatchVersion;
-    private String defaultDumpFile = "c:/rules/pledge2.cli";
-    private BaseEntity currentBaseEntity;
-
-
-
-    public void commandRule(Scanner in){
-        if(!started)
-        {
+    public void commandRule(Scanner in) {
+        if (!started) {
             init();
             started = true;
             try {
@@ -2630,150 +2315,146 @@ public class CLI
             }
         }
 
-        try{
-        if(args.get(0).equals("debug")){
+        try {
+            if (args.get(0).equals("debug")) {
 
-            DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
-            Date date = dateFormatter.parse("01.03.2014");
+                DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
+                Date date = dateFormatter.parse("01.03.2014");
 
-            try {
-                CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, date);
-                BaseEntity baseEntity = reader.read();
-                //System.out.println(ma);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else if(args.get(0).equals("dump")){
-            if(args.size() < 2)
-                System.out.println("using default dump file path " + defaultDumpFile);
-            try {
-                PrintWriter out = new PrintWriter( args.size() < 2 ? defaultDumpFile : args.get(1));
-                List<Rule> rules = ruleService.getAllRules();
-
-                out.println("#rule set date 01.04.2013");
-                out.println("rule create package afk");
-                out.println("rule rc");
-                out.println("rule set package afk");
-                out.println("rule set version\n");
-                for(Rule r: rules){
-                    out.println("rule read $$$");
-                    out.println("title: " + r.getTitle());
-                    out.println(r.getRule());
-                    out.println("$$$\n");
-                    out.println("rule save\n");
+                try {
+                    CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, date);
+                    BaseEntity baseEntity = reader.read();
+                    //System.out.println(ma);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
                 }
-                out.println("quit");
-                out.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }else
-        if(args.get(0).equals("read")){
-            if(args.size() < 2){
-                throw new IllegalArgumentException();
-            }else{
-                System.out.println("reading until "+args.get(1) +"...");
-                StringBuilder sb = new StringBuilder();
-                line = in.nextLine();
-                if(!line.startsWith("title: "))
-                    throw new IllegalArgumentException("title must be specified format title: <name>");
-                String title = line.split("title: ")[1];
-                line = in.nextLine();
-                if(line.startsWith(args.get(1)))
-                    throw new IllegalArgumentException("rule must not be empty");
-                sb.append(line);
-                do{
+            } else if (args.get(0).equals("dump")) {
+                if (args.size() < 2)
+                    System.out.println("using default dump file path " + defaultDumpFile);
+                try {
+                    PrintWriter out = new PrintWriter(args.size() < 2 ? defaultDumpFile : args.get(1));
+                    List<Rule> rules = ruleService.getAllRules();
+
+                    out.println("#rule set date 01.04.2013");
+                    out.println("rule create package afk");
+                    out.println("rule rc");
+                    out.println("rule set package afk");
+                    out.println("rule set version\n");
+                    for (Rule r : rules) {
+                        out.println("rule read $$$");
+                        out.println("title: " + r.getTitle());
+                        out.println(r.getRule());
+                        out.println("$$$\n");
+                        out.println("rule save\n");
+                    }
+                    out.println("quit");
+                    out.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            } else if (args.get(0).equals("read")) {
+                if (args.size() < 2) {
+                    throw new IllegalArgumentException();
+                } else {
+                    System.out.println("reading until " + args.get(1) + "...");
+                    StringBuilder sb = new StringBuilder();
                     line = in.nextLine();
-                    if(line.startsWith(args.get(1))) break;
-                    sb.append("\n" + line);
-                }while(true);
-                currentRule = new Rule();
-                currentRule.setRule(sb.toString());
-                currentRule.setTitle(title);
-            }
-        } else if(args.get(0).equals("current")){
-            if(args.size() == 1)
-                System.out.println( currentRule ==null?null: currentRule.getRule());
-            else if(args.get(1).equals("version"))
-                System.out.println(currentBatchVersion);
-            else if(args.get(1).equals("package"))
-                System.out.println(currentPackageName);
-            else if(args.get(1).equals("date"))
-                System.out.println(currentDate);
-            else if(args.get(1).equals("entity"))
-                System.out.println(currentBaseEntity);
-            else throw new IllegalArgumentException();
-        } else if(args.get(0).equals("save")){
-            long ruleId = ruleService.createNewRuleInBatch(currentRule, currentBatchVersion);
-            System.out.println("ok saved: ruleId = " + ruleId);
+                    if (!line.startsWith("title: "))
+                        throw new IllegalArgumentException("title must be specified format title: <name>");
+                    String title = line.split("title: ")[1];
+                    line = in.nextLine();
+                    if (line.startsWith(args.get(1)))
+                        throw new IllegalArgumentException("rule must not be empty");
+                    sb.append(line);
+                    do {
+                        line = in.nextLine();
+                        if (line.startsWith(args.get(1))) break;
+                        sb.append("\n" + line);
+                    } while (true);
+                    currentRule = new Rule();
+                    currentRule.setRule(sb.toString());
+                    currentRule.setTitle(title);
+                }
+            } else if (args.get(0).equals("current")) {
+                if (args.size() == 1)
+                    System.out.println(currentRule == null ? null : currentRule.getRule());
+                else if (args.get(1).equals("version"))
+                    System.out.println(currentBatchVersion);
+                else if (args.get(1).equals("package"))
+                    System.out.println(currentPackageName);
+                else if (args.get(1).equals("date"))
+                    System.out.println(currentDate);
+                else if (args.get(1).equals("entity"))
+                    System.out.println(currentBaseEntity);
+                else throw new IllegalArgumentException();
+            } else if (args.get(0).equals("save")) {
+                long ruleId = ruleService.createNewRuleInBatch(currentRule, currentBatchVersion);
+                System.out.println("ok saved: ruleId = " + ruleId);
             /* Remove overhead from TNS Listener */
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }else if(args.get(0).equals("run")){
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else if (args.get(0).equals("run")) {
 
-            DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
-            Date reportDate = dateFormatter.parse("01.03.2014");
+                DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
+                Date reportDate = dateFormatter.parse("01.03.2014");
 
-            try {
-                CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, reportDate);
-                currentBaseEntity = reader.read();
-                rulesSingleton.runRules(currentBaseEntity,currentPackageName,currentDate);
+                try {
+                    CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, reportDate);
+                    currentBaseEntity = reader.read();
+                    rulesSingleton.runRules(currentBaseEntity, currentPackageName, currentDate);
 
-                for (String s: currentBaseEntity.getValidationErrors())
-                    System.out.println("Validation error:" + s);
+                    for (String s : currentBaseEntity.getValidationErrors())
+                        System.out.println("Validation error:" + s);
 
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
 
 
-        }else if(args.get(0).equals("set")){
+            } else if (args.get(0).equals("set")) {
 
-             if(args.get(1).equals("version")){
-               currentBatchVersion = batchVersionService.getBatchVersion(currentPackageName, currentDate);
-             }else if(args.size() < 3) throw new IllegalArgumentException();
-             else if(args.get(1).equals("package"))
-               {
-                   rulesSingleton.reloadCache();
-                   rulesSingleton.getRulePackageName(args.get(2),currentDate);
-                   currentPackageName = args.get(2);
-               }
-               else if(args.get(1).equals("date"))
-               {
-                   DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-                   currentDate = formatter.parse(args.get(2));
-               } else throw new IllegalArgumentException();
-        } else if(args.get(0).equals("create")){
-            try{
-               if(!args.get(1).equals("package") || args.size()<3) throw new IllegalArgumentException();
-            } catch (IllegalArgumentException e){
-                throw e;
-            }
-            kz.bsbnb.usci.brms.rulesvr.model.impl.Batch batch = new kz.bsbnb.usci.brms.rulesvr.model.impl.Batch(args.get(2),currentDate);
-            Long id = batchService.save(batch);
-            batch.setId(id);
-            batchVersionService.save(batch);
-            System.out.println("ok batch created with id:"+id);
-        } else if(args.get(0).equals("rc")){
-            rulesSingleton.reloadCache();
-        } else if( args.get(0).equals("eval")){
-            System.out.println(currentBaseEntity.getEls(args.get(1)));
-        } else if( args.get(0).equals("eval2")){
-            System.out.println(currentBaseEntity.getEl(args.get(1)));
-        }  else throw new IllegalArgumentException();
-        }catch(IllegalArgumentException e){
-            if(e.getMessage()==null)
-              System.out.println("Argument needed: <read {label},current [<pckName,date>],save,run {id},set <package,date> {value} , create package {pckName}>");
+                if (args.get(1).equals("version")) {
+                    currentBatchVersion = batchVersionService.getBatchVersion(currentPackageName, currentDate);
+                } else if (args.size() < 3) throw new IllegalArgumentException();
+                else if (args.get(1).equals("package")) {
+                    rulesSingleton.reloadCache();
+                    rulesSingleton.getRulePackageName(args.get(2), currentDate);
+                    currentPackageName = args.get(2);
+                } else if (args.get(1).equals("date")) {
+                    DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+                    currentDate = formatter.parse(args.get(2));
+                } else throw new IllegalArgumentException();
+            } else if (args.get(0).equals("create")) {
+                try {
+                    if (!args.get(1).equals("package") || args.size() < 3) throw new IllegalArgumentException();
+                } catch (IllegalArgumentException e) {
+                    throw e;
+                }
+                kz.bsbnb.usci.brms.rulesvr.model.impl.Batch batch = new kz.bsbnb.usci.brms.rulesvr.model.impl.Batch(args.get(2), currentDate);
+                Long id = batchService.save(batch);
+                batch.setId(id);
+                batchVersionService.save(batch);
+                System.out.println("ok batch created with id:" + id);
+            } else if (args.get(0).equals("rc")) {
+                rulesSingleton.reloadCache();
+            } else if (args.get(0).equals("eval")) {
+                System.out.println(currentBaseEntity.getEls(args.get(1)));
+            } else if (args.get(0).equals("eval2")) {
+                System.out.println(currentBaseEntity.getEl(args.get(1)));
+            } else throw new IllegalArgumentException();
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage() == null)
+                System.out.println("Argument needed: <read {label},current [<pckName,date>],save,run {id},set <package,date> {value} , create package {pckName}>");
             else
-              System.out.println(e.getMessage());
+                System.out.println(e.getMessage());
             return;
         } catch (ParseException e) {
             System.out.println("Parse exception day format must be: dd.MM.yyyy");
             return;
-        }  catch (IncorrectResultSizeDataAccessException e){
+        } catch (IncorrectResultSizeDataAccessException e) {
             System.out.println("no packages(maybe on that date)");
             return;
         }
@@ -2781,8 +2462,7 @@ public class CLI
         //rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());*/
     }
 
-    public void showcaseStat()
-    {
+    public void showcaseStat() {
         RmiProxyFactoryBean serviceFactory = null;
         ShowcaseService showcaseService = null;
 
@@ -2831,7 +2511,7 @@ public class CLI
 
         System.out.println("+---------+------------------+------------------------+");
 
-        if(totalProcessCount > 0) {
+        if (totalProcessCount > 0) {
             System.out.println("AVG process: " + totalProcess / totalProcessCount);
             System.out.println("AVG inserts per process: " + totalInserts / totalProcessCount);
             System.out.println("AVG selects per process: " + totalSelects / totalProcessCount);
@@ -2840,7 +2520,7 @@ public class CLI
         //showcaseService.clearSQLStats();
     }
 
-    private void initSC(){
+    private void initSC() {
         scStart = true;
         showcaseServiceFactoryBean = new RmiProxyFactoryBean();
         showcaseServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
@@ -2850,135 +2530,116 @@ public class CLI
         showcaseService = (ShowcaseService) showcaseServiceFactoryBean.getObject();
     }
 
-    ShowCase showCase;
-    boolean scStart = false;
-
-    public void commandShowCase(){
-        if(showCase == null)  {
-            showCase = new ShowCase();
-            showCase.setMeta(metaClassRepository.getMetaClass("credit"));
-            /* uncomment for fast init of showCase
-            showCase.setMeta(metaClassRepository.getMetaClass("credit"));
-            showCase.setTableName("www");
-            showCase.setName("www");
-            showCase.addField(showCase.getMeta(), "credit_type","code");
-            showCase.addField(showCase.getMeta(), "subjects.person.addresses","details","DOM");
-            showCase.addField(showCase.getMeta(), "","amount","VAL");*/
-        }
-
-        if(args.get(0).equals("debug")){
+    public void commandShowCase() {
+        if (args.get(0).equals("debug")) {
             MetaClass meta = metaClassRepository.getMetaClass("credit");
             System.out.println("ok");
-        }else
-        if(args.get(0).equals("status")){
+        } else if (args.get(0).equals("status")) {
             System.out.println(showCase.toString());
-        } else if(args.get(0).equals("set")){
-            if(args.size() !=3 )
+        } else if (args.get(0).equals("set")) {
+            if (args.size() != 3)
                 throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
-            if(args.get(1).equals("meta")){
+            if (args.get(1).equals("meta")) {
+                showCase = new ShowCase();
                 showCase.setMeta(metaClassRepository.getMetaClass(args.get(2)));
-            } else if(args.get(1).equals("name")){
+            } else if (args.get(1).equals("name")) {
                 showCase.setName(args.get(2));
-            } else if(args.get(1).equals("tableName")) {
+            } else if (args.get(1).equals("tableName")) {
                 showCase.setTableName(args.get(2));
-            } else if(args.get(1).equals("title")) {
+            } else if (args.get(1).equals("title")) {
                 showCase.setTitle(args.get(2));
-            }else if(args.get(1).equals("downPath")){
+            } else if (args.get(1).equals("downPath")) {
                 MetaClass metaClass = showCase.getMeta();
-                if( metaClass.getEl(args.get(2)) == null )
+                if (metaClass.getEl(args.get(2)) == null)
                     throw new IllegalArgumentException("no such path for downPath:" + args.get(2));
                 showCase.setDownPath(args.get(2));
-            }else
+            } else
                 throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
 
-        } else if(args.get(0).equals("list")){
-            if(args.get(1).equals("reset"))
+        } else if (args.get(0).equals("list")) {
+            if (args.get(1).equals("reset"))
                 showCase.getFieldsList().clear();
-            else if( args.get(1).equals("add")){
+            else if (args.get(1).equals("add")) {
                 String path = "";
                 String colName = args.get(2);
                 int id = args.get(2).lastIndexOf('.');
-                if(id!=-1)
-                {
+                if (id != -1) {
                     path = args.get(2).substring(0, id);
-                    colName = args.get(2).substring(id+1);
+                    colName = args.get(2).substring(id + 1);
                 }
-                if(args.size() == 3 )
-                 showCase.addField(path, colName);
-                else if(args.size() == 4)
-                 showCase.addField(path, colName, args.get(3));
+                if (args.size() == 3)
+                    showCase.addField(path, colName);
+                else if (args.size() == 4)
+                    showCase.addField(path, colName, args.get(3));
                 else throw new IllegalArgumentException("Example: showcase list add [path] [columnName] {columnAlias}");
             }
-        } else if(args.get(0).equals("save")){
-            if(!scStart) initSC();
+        } else if (args.get(0).equals("save")) {
+            if (!scStart) initSC();
             showcaseService.add(showCase);
             System.out.println(showCase.getName() + ": Showcase successfully added!");
             showCase = null;
-        } else if(args.get(0).equals("listSC")){
-            if(!scStart) initSC();
+        } else if (args.get(0).equals("listSC")) {
+            if (!scStart) initSC();
 
             List<ShowcaseHolder> list = showcaseService.list();
-            for(ShowcaseHolder holder : list){
+            for (ShowcaseHolder holder : list) {
                 System.out.println(holder.getShowCaseMeta().getName());
-                for(ShowCaseField field : holder.getShowCaseMeta().getFieldsList()){
+                for (ShowCaseField field : holder.getShowCaseMeta().getFieldsList()) {
                     System.out.println("\t" + field.getName());
                 }
             }
-        } else if(args.get(0).equals("loadSC")){
-            if(args.size() > 1){
+        } else if (args.get(0).equals("loadSC")) {
+            if (args.size() > 1) {
                 ShowCase sc = showcaseService.load(args.get(1));
                 System.out.println(sc.getName());
-                for(ShowCaseField field : sc.getFieldsList()){
+                for (ShowCaseField field : sc.getFieldsList()) {
                     System.out.println("\t" + field.getName());
                 }
-            } else{
+            } else {
                 System.out.println("Usage: loadSC <showcase name>");
             }
-        } else if(args.get(0).equals("startLoad")){
-            if(args.size() > 2){
+        } else if (args.get(0).equals("startLoad")) {
+            if (args.size() > 2) {
                 try {
                     showcaseService.startLoad(args.get(1), sdfout.parse(args.get(2)));
                 } catch (ParseException e) {
                     System.out.println("Date format: \"dd.MM.yyyy\"");
                 }
-            } else{
+            } else {
                 System.out.println("Usage: startLoad <showcase name> <report date>");
             }
-        } else if(args.get(0).equals("stopLoad")){
-            if(args.size() > 1){
+        } else if (args.get(0).equals("stopLoad")) {
+            if (args.size() > 1) {
                 showcaseService.stopLoad(args.get(1));
-            } else{
+            } else {
                 System.out.println("Usage: stopLoad <showcase name>");
             }
-        } else if(args.get(0).equals("pauseLoad")){
-            if(args.size() > 1){
+        } else if (args.get(0).equals("pauseLoad")) {
+            if (args.size() > 1) {
                 showcaseService.pauseLoad(args.get(1));
-            } else{
+            } else {
                 System.out.println("Usage: pauseLoad <showcase name>");
             }
-        } else if(args.get(0).equals("resumeLoad")){
-            if(args.size() > 1){
+        } else if (args.get(0).equals("resumeLoad")) {
+            if (args.size() > 1) {
                 showcaseService.resumeLoad(args.get(1));
-            } else{
+            } else {
                 System.out.println("Usage: resumeLoad <showcase name>");
             }
-        } else if(args.get(0).equals("listLoading")){
-            for(String sc : showcaseService.listLoading()){
+        } else if (args.get(0).equals("listLoading")) {
+            for (String sc : showcaseService.listLoading()) {
                 System.out.println("\t" + sc);
             }
-        } else if(args.get(0).equals("rc")){
-            if(!scStart)
+        } else if (args.get(0).equals("rc")) {
+            if (!scStart)
                 initSC();
             showcaseService.reloadCash();
-        }else if(args.get(0).equals("stats")){
+        } else if (args.get(0).equals("stats")) {
             showcaseStat();
-        } else{
+        } else {
             throw new IllegalArgumentException("Arguments: showcase [status, set]");
         }
     }
-
-    String line;
-    Exception lastException = null;
 
     public Exception getLastException() {
         return lastException;
@@ -2990,7 +2651,7 @@ public class CLI
             command = st.nextToken().trim();
 
             args.clear();
-            while(st.hasMoreTokens()) {
+            while (st.hasMoreTokens()) {
                 args.add(st.nextToken().trim());
             }
         } else {
@@ -3016,7 +2677,7 @@ public class CLI
                 System.out.println("Storage initializing...");
                 storage.initialize();
                 System.out.println("Storage initialized");
-            } else if(command.equals("empty")){
+            } else if (command.equals("empty")) {
                 storage.empty();
             } else if (command.equals("tc")) {
                 storage.tableCounts();
@@ -3036,42 +2697,42 @@ public class CLI
                 commandEntity();
             } else if (command.equals("include")) {
                 commandInclude();
-            } else if(command.equals("refs")){
+            } else if (command.equals("refs")) {
                 commandRefs();
-            } else if(command.equals("sql")){
+            } else if (command.equals("sql")) {
                 commandSql();
-            } else if(command.equals("rule")) {
+            } else if (command.equals("rule")) {
                 commandRule(in);
-            } else if(command.equals("import")) {
+            } else if (command.equals("import")) {
                 commandImport();
-            } else if(command.equals("collectids")) {
+            } else if (command.equals("collectids")) {
                 commandCollectIds();
-            } else if(command.equals("rstat")) {
+            } else if (command.equals("rstat")) {
                 commandRStat();
-            } else if(command.equals("sstat")) {
+            } else if (command.equals("sstat")) {
                 commandSStat();
-            } else if(command.equals("sqlstat")) {
+            } else if (command.equals("sqlstat")) {
                 commandSQLStat();
-            } else if(command.equals("remotestat")) {
+            } else if (command.equals("remotestat")) {
                 commandRemoteStat();
-            } else if(command.equals("batchstat")) {
+            } else if (command.equals("batchstat")) {
                 batchStat();
-            } else if(command.equals("batchrestart")) {
+            } else if (command.equals("batchrestart")) {
                 batchRestart();
-            } else if(command.equals("batchrestartall")) {
+            } else if (command.equals("batchrestartall")) {
                 batchRestartAll();
-            } else if(command.equals("sbatchrestart")) {
+            } else if (command.equals("sbatchrestart")) {
                 batchRestartSingle();
-            } else if(command.equals("stc")) {
+            } else if (command.equals("stc")) {
                 commandSTC();
-            } else if(command.equals("showcase")) {
+            } else if (command.equals("showcase")) {
                 commandShowCase();
-            } else if(command.equals("merge")){
+            } else if (command.equals("merge")) {
                 mergeEntity();
-            } else if(command.equals("getbatch")){
+            } else if (command.equals("getbatch")) {
                 commandGetBatch();
-            } else if(command.equals("mnt")){
-                 commandMaintenance(line);
+            } else if (command.equals("mnt")) {
+                commandMaintenance(line);
             } else {
                 System.out.println("No such command: " + command);
             }
@@ -3081,16 +2742,13 @@ public class CLI
         }
     }
 
-    private HashMap<Long ,IBaseEntity> creditors;
-    private HashMap<Long, Creditor> crCreditors;
-
     private IBaseEntity getCreditor(Connection conn, long creditorId) {
-        if(creditors == null) {
+        if (creditors == null) {
             creditors = new HashMap<Long, IBaseEntity>();
             crCreditors = new HashMap<Long, Creditor>();
         }
 
-        if(creditors.containsKey(creditorId))
+        if (creditors.containsKey(creditorId))
             return creditors.get(creditorId);
 
         PreparedStatement preparedStatement = null;
@@ -3100,12 +2758,12 @@ public class CLI
         Creditor creditor = new Creditor();
 
 
-        try{
+        try {
             preparedStatement = conn.prepareStatement("select name,code from ref.creditor where id = ?");
             preparedStatement.setLong(1, creditorId);
             resultSet = preparedStatement.executeQuery();
             creditor.setId(creditorId);
-            if(resultSet.next()) {
+            if (resultSet.next()) {
                 creditor.setName(resultSet.getString("name"));
                 creditor.setCode(resultSet.getString("code"));
             }
@@ -3114,13 +2772,13 @@ public class CLI
             return null;
         }
 
-        try{
+        try {
             preparedStatement = conn.prepareStatement("select t1.no_,  t2.code " +
                     " from ref.creditor_doc t1, ref.doc_type t2 " +
                     "where t1.creditor_id = ? and t1.type_id = t2.id");
             preparedStatement.setLong(1, creditorId);
             resultSet = preparedStatement.executeQuery();
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -3128,7 +2786,7 @@ public class CLI
             IBaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor"), new Date());
             IBaseSet baseSet = new BaseSet(metaClassRepository.getMetaClass("document"));
 
-            while(resultSet.next()){
+            while (resultSet.next()) {
                 IBaseEntity doc = new BaseEntity(metaClassRepository.getMetaClass("document"),
                         new Date());
                 IBaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
@@ -3136,15 +2794,15 @@ public class CLI
                 String code = resultSet.getString("code");
                 String no = resultSet.getString("no_");
 
-                if(code.equals("07"))
+                if (code.equals("07"))
                     creditor.setBIN(no);
 
-                if(code.equals("15"))
+                if (code.equals("15"))
                     creditor.setBIK(no);
 
                 docType.put("code", new BaseValue(batch, 0, code));
-                doc.put("no", new BaseValue(batch,0, no));
-                doc.put("doc_type",new BaseValue(batch,0, docType));
+                doc.put("no", new BaseValue(batch, 0, no));
+                doc.put("doc_type", new BaseValue(batch, 0, docType));
                 baseSet.put(new BaseValue(batch, 0, doc));
             }
 
@@ -3165,35 +2823,35 @@ public class CLI
         return element;
     }
 
-    private Document getManifest(Creditor creditor, int count){
+    private Document getManifest(Creditor creditor, int count) {
         BaseEntityXmlGenerator baseEntityXmlGenerator = new BaseEntityXmlGenerator();
         Document document = baseEntityXmlGenerator.getDocument();
 
         Element manifest = document.createElement("manifest");
 
-        manifest.appendChild(getElementString("type","1",document));
-        manifest.appendChild(getElementString("name","data.xml",document));
-        manifest.appendChild(getElementString("userid","100500",document));
-        manifest.appendChild(getElementString("size",String.valueOf(count),document));
-        manifest.appendChild(getElementString("date",new SimpleDateFormat("dd.MM.yyyy").format(new Date()),document));
+        manifest.appendChild(getElementString("type", "1", document));
+        manifest.appendChild(getElementString("name", "data.xml", document));
+        manifest.appendChild(getElementString("userid", "100500", document));
+        manifest.appendChild(getElementString("size", String.valueOf(count), document));
+        manifest.appendChild(getElementString("date", new SimpleDateFormat("dd.MM.yyyy").format(new Date()), document));
 
         Element properties = document.createElement("properties");
 
         Element propertyCode = document.createElement("property");
-        propertyCode.appendChild(getElementString("name","CODE", document));
-        propertyCode.appendChild(getElementString("value",String.valueOf(creditor.getCode()), document));
+        propertyCode.appendChild(getElementString("name", "CODE", document));
+        propertyCode.appendChild(getElementString("value", String.valueOf(creditor.getCode()), document));
 
         Element propertyName = document.createElement("property");
-        propertyName.appendChild(getElementString("name","NAME", document));
-        propertyName.appendChild(getElementString("value",String.valueOf(creditor.getName()), document));
+        propertyName.appendChild(getElementString("name", "NAME", document));
+        propertyName.appendChild(getElementString("value", String.valueOf(creditor.getName()), document));
 
         Element propertyBIN = document.createElement("property");
-        propertyBIN.appendChild(getElementString("name","BIN", document));
-        propertyBIN.appendChild(getElementString("value",String.valueOf(creditor.getBIN()), document));
+        propertyBIN.appendChild(getElementString("name", "BIN", document));
+        propertyBIN.appendChild(getElementString("value", String.valueOf(creditor.getBIN()), document));
 
         Element propertyBIK = document.createElement("property");
-        propertyBIK.appendChild(getElementString("name","BIK", document));
-        propertyBIK.appendChild(getElementString("value",String.valueOf(creditor.getBIK()), document));
+        propertyBIK.appendChild(getElementString("name", "BIK", document));
+        propertyBIK.appendChild(getElementString("value", String.valueOf(creditor.getBIK()), document));
         properties.appendChild(propertyCode);
         properties.appendChild(propertyName);
         properties.appendChild(propertyBIN);
@@ -3206,7 +2864,8 @@ public class CLI
 
     private void commandMaintenance(String line) {
 
-        String commandUsage = "Arguments: mnt [delScript|keyScript] from core:core_sep_2014@10.10.11.44:CREDITS [creditor_id=36] [--all] > C:\\zips\\batch.zip";
+        String commandUsage = "Arguments: mnt [delScript|keyScript] from " +
+                "core:core_sep_2014@10.10.11.44:CREDITS [creditor_id=36] [--all] > C:\\zips\\batch.zip";
 
 
         boolean creditorFlag = false;
@@ -3267,7 +2926,7 @@ public class CLI
             PreparedStatement preparedStatement = null;
             ResultSet resultSet = null;
 
-            if(script.equals("delScript")) {
+            if (script.equals("delScript")) {
 
                 String select = "select t.ID, root.CREDITOR_ID, t.CONTRACT_NO, t.CONTRACT_DATE" +
                         "  from MAINTENANCE.CREDREG_DELETE_CREDIT t ," +
@@ -3302,8 +2961,8 @@ public class CLI
                         IBaseEntity credit = new BaseEntity(metaClassRepository.getMetaClass("credit"),
                                 new Date());
 
-                        IBaseEntity primaryContract = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"),
-                                new Date());
+                        IBaseEntity primaryContract = new BaseEntity(
+                                metaClassRepository.getMetaClass("primary_contract"), new Date());
 
                         primaryContract.put("no", new BaseValue(batch, 0, contractNo));
                         primaryContract.put("date", new BaseValue(batch, 0, contractDate));
@@ -3311,7 +2970,6 @@ public class CLI
                         IBaseEntity creditor = getCreditor(conn, creditorId);
 
                         if (creditor == null) {
-                            //storage.simpleSql(String.format("insert into mnt_logs(mnt_operation_id, foreign_id, execution_time, status, error_msg) values (1,%d,sysdate,1,'creditor_not_found')",mntId));
                             System.out.println("creditor not found with id " + creditorId);
                             continue;
                         }
@@ -3322,13 +2980,13 @@ public class CLI
                         baseEntityProcessorDao.prepare(credit);
 
                         if (credit.getId() <= 0) {
-                            //storage.simpleSql(String.format("insert into MNT_LOGS (MNT_OPERATION_ID, FOREIGN_ID, EXECUTION_TIME, status, error_msg) values (1,%d,sysdate,1,'%s')", mntId, "credit not found"));
-                            System.out.println(String.format("credit not found contract_no = %s contract_date = %s", contractNo, contractDate));
+                            System.out.println(String.format("credit not found contract_no = %s contract_date = %s",
+                                    contractNo, contractDate));
+
                             continue;
                         } else {
                             ((BaseEntity) credit).setOperation(OperationType.DELETE);
                             listSuccess.add(mntId);
-                            //storage.simpleSql(String.format("insert into MNT_LOGS (MNT_OPERATION_ID, FOREIGN_ID, EXECUTION_TIME, STATUS) values (%d,1,sysdate,0)", mntId));
                         }
 
                         if (!byCreditor.containsKey(creditorId)) {
@@ -3341,9 +2999,9 @@ public class CLI
                     e.printStackTrace();
                 }
 
-            } else if(script.equals("keyScript")) {
-
-                String select = "select t.ID, root.CREDITOR_ID, t.CONTRACT_NO, t.CONTRACT_DATE, t.CONTRACT_NO_OLD, t.CONTRACT_DATE_OLD" +
+            } else if (script.equals("keyScript")) {
+                String select = "select t.ID, root.CREDITOR_ID, t.CONTRACT_NO, t.CONTRACT_DATE, " +
+                        "t.CONTRACT_NO_OLD, t.CONTRACT_DATE_OLD" +
                         "  from MAINTENANCE.CREDREG_edit_credit t ," +
                         "       MAINTENANCE.CREDREG_EDIT root" +
                         " where root.ID = t.EDIT_ID " +
@@ -3352,7 +3010,7 @@ public class CLI
                 if (!allFlag)
                     select += "   and t.PROCESSED_USCI = 0";
 
-                if(creditorFlag)
+                if (creditorFlag)
                     select += " and root.CREDITOR_ID = " + creditorFilterId;
 
                 try {
@@ -3378,25 +3036,31 @@ public class CLI
                         IBaseEntity credit = new BaseEntity(metaClassRepository.getMetaClass("credit"),
                                 new Date());
 
-                        IBaseEntity primaryContract = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"),
+                        IBaseEntity primaryContract = new BaseEntity(
+                                metaClassRepository.getMetaClass("primary_contract"),
                                 new Date());
 
-                        IBaseValue contractNoValue = BaseValueFactory.create(BaseContainerType.BASE_ENTITY, primaryContract.getMemberType("no"), batch, 0, contractNo);
-                        if(!contractNo.equals(contractNoNew))
-                            contractNoValue.setNewBaseValue(BaseValueFactory.create(BaseContainerType.BASE_ENTITY, primaryContract.getMemberType("no"), batch, 0, contractNoNew));
+                        IBaseValue contractNoValue = BaseValueFactory.create(BaseContainerType.BASE_ENTITY,
+                                primaryContract.getMemberType("no"), batch, 0, contractNo);
 
-                        IBaseValue contractDateValue = BaseValueFactory.create(BaseContainerType.BASE_ENTITY, primaryContract.getMemberType("date"), batch, 0, contractDate);
-                        if(!contractDate.equals(contractDateNew))
-                            contractDateValue.setNewBaseValue(BaseValueFactory.create(BaseContainerType.BASE_ENTITY, primaryContract.getMemberType("date"), batch, 0, contractDateNew));
+                        if (!contractNo.equals(contractNoNew))
+                            contractNoValue.setNewBaseValue(BaseValueFactory.create(BaseContainerType.BASE_ENTITY,
+                                    primaryContract.getMemberType("no"), batch, 0, contractNoNew));
+
+                        IBaseValue contractDateValue = BaseValueFactory.create(BaseContainerType.BASE_ENTITY,
+                                primaryContract.getMemberType("date"), batch, 0, contractDate);
+
+                        if (!contractDate.equals(contractDateNew))
+                            contractDateValue.setNewBaseValue(BaseValueFactory.create(BaseContainerType.BASE_ENTITY,
+                                    primaryContract.getMemberType("date"), batch, 0, contractDateNew));
 
                         primaryContract.put("no", contractNoValue);
-                        primaryContract.put("date",contractDateValue);
+                        primaryContract.put("date", contractDateValue);
 
 
                         IBaseEntity creditor = getCreditor(conn, creditorId);
 
                         if (creditor == null) {
-                            //storage.simpleSql(String.format("insert into mnt_logs(mnt_operation_id, foreign_id, execution_time, status, error_msg) values (1,%d,sysdate,1,'creditor_not_found')",mntId));
                             System.out.println("creditor not found with id " + creditorId);
                             continue;
                         }
@@ -3407,12 +3071,11 @@ public class CLI
                         baseEntityProcessorDao.prepare(credit);
 
                         if (credit.getId() <= 0) {
-                            //storage.simpleSql(String.format("insert into MNT_LOGS (MNT_OPERATION_ID, FOREIGN_ID, EXECUTION_TIME, status, error_msg) values (1,%d,sysdate,1,'%s')", mntId, "credit not found"));
-                            System.out.println(String.format("credit not found contract_no = %s contract_date = %s", contractNo, contractDate));
+                            System.out.println(String.format("credit not found contract_no = %s contract_date = %s",
+                                    contractNo, contractDate));
                             continue;
                         } else {
                             listSuccess.add(mntId);
-                            //storage.simpleSql(String.format("insert into MNT_LOGS (MNT_OPERATION_ID, FOREIGN_ID, EXECUTION_TIME, STATUS) values (%d,1,sysdate,0)", mntId));
                         }
 
                         if (!byCreditor.containsKey(creditorId)) {
@@ -3429,11 +3092,10 @@ public class CLI
 
             for (long creditorId : byCreditor.keySet()) {
                 ArrayList<BaseEntity> entities = byCreditor.get(creditorId);
-                //IBaseEntity creditor = getCreditor(conn, creditorId);
                 Creditor crCreditor = crCreditors.get(creditorId);
                 BaseEntityXmlGenerator baseEntityXmlGenerator = new BaseEntityXmlGenerator();
                 Document document;
-                if(script.equals("delScript"))
+                if (script.equals("delScript"))
                     document = baseEntityXmlGenerator.getGeneratedDeleteDocument(entities);
                 else
                     document = baseEntityXmlGenerator.getGeneratedDocument(entities);
@@ -3452,15 +3114,17 @@ public class CLI
 
             if (listSuccess.size() > 0) {
                 int start = 0, nextStart;
-                while(start < listSuccess.size()) {
+                while (start < listSuccess.size()) {
                     nextStart = start + 100;
                     StringBuilder sql;
                     if (script.equals("delScript"))
-                        sql = new StringBuilder("update MAINTENANCE.CREDREG_DELETE_CREDIT SET PROCESSED_USCI = 1 where ID IN ( ?");
+                        sql = new StringBuilder("update MAINTENANCE.CREDREG_DELETE_CREDIT SET " +
+                                "PROCESSED_USCI = 1 where ID IN ( ?");
                     else
-                        sql = new StringBuilder("update MAINTENANCE.CREDREG_EDIT_CREDIT SET PROCESSED_USCI = 1 where ID IN ( ?");
+                        sql = new StringBuilder("update MAINTENANCE.CREDREG_EDIT_CREDIT SET " +
+                                "PROCESSED_USCI = 1 where ID IN ( ?");
 
-                    for (int i=start + 1; i < Math.min(nextStart, listSuccess.size()); i++)
+                    for (int i = start + 1; i < Math.min(nextStart, listSuccess.size()); i++)
                         sql.append(",?");
 
                     sql.append(")");
@@ -3468,7 +3132,7 @@ public class CLI
                     try {
                         PreparedStatement statement = conn.prepareStatement(sql.toString());
                         System.out.println(sql.toString());
-                        for (int i = start; i < Math.min(nextStart, listSuccess.size() ); i++)
+                        for (int i = start; i < Math.min(nextStart, listSuccess.size()); i++)
                             statement.setLong(i + 1 - start, listSuccess.get(i));
                         statement.executeQuery();
                     } catch (SQLException e) {
@@ -3503,8 +3167,8 @@ public class CLI
             in = new Scanner(inputStream);
         }
 
-        while(true) {
-            while ( !(line = in.nextLine()).equals("quit")) {
+        while (true) {
+            while (!(line = in.nextLine()).equals("quit")) {
                 processCommand(line, in);
 
                 if (inputStream == null) {
@@ -3523,8 +3187,7 @@ public class CLI
         shutdown();
     }
 
-    public void commandInclude()
-    {
+    public void commandInclude() {
         if (args.size() > 0) {
             String fileName = args.get(0);
 
@@ -3533,7 +3196,7 @@ public class CLI
             try {
                 Scanner in = new Scanner(new FileInputStream(new File(fileName)));
 
-                while ( !(line = in.nextLine()).equals("quit")) {
+                while (!(line = in.nextLine()).equals("quit")) {
                     processCommand(line, in);
                 }
             } catch (FileNotFoundException e) {
@@ -3546,7 +3209,7 @@ public class CLI
     }
 
     public void commandGetBatch() {
-        if(args.size() > 1) {
+        if (args.size() > 1) {
             Long batchId = Long.valueOf(args.get(0));
             String path = args.get(1);
 
@@ -3561,7 +3224,7 @@ public class CLI
                 batchStr = null;
             }
 
-            if(batchStr == null) {
+            if (batchStr == null) {
                 System.out.println("Couldn't find batch with id: " + batchId + " in Couchbase");
                 throw new NullPointerException();
             }
@@ -3611,20 +3274,16 @@ public class CLI
         }
     }
 
-    public InputStream getInputStream()
-    {
+    public InputStream getInputStream() {
         return inputStream;
     }
 
-    public void setInputStream(InputStream in)
-    {
+    public void setInputStream(InputStream in) {
         this.inputStream = in;
     }
 
-    public void mergeEntity()
-    {
-        if (args.size() == 3)
-        {
+    public void mergeEntity() {
+        if (args.size() == 3) {
             String fileName = args.get(0);
             String repDate = args.get(1);
             String mergeManagerFileName = args.get(2);
@@ -3634,27 +3293,28 @@ public class CLI
                 CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
                 BaseEntity entityToWrite;
                 IBaseEntity savedEntity;
-                while(( entityToWrite = reader.read()) != null) {
+                while ((entityToWrite = reader.read()) != null) {
                     try {
                         savedEntity = baseEntityProcessorDao.process(entityToWrite);
                         entityList.add(savedEntity);
                         System.out.println("Instance of BaseEntity saved with id: " + savedEntity.getId());
 
-                    } catch(Exception ex) {
+                    } catch (Exception ex) {
                         lastException = ex;
-                        System.out.println("While processing instance of BaseEntity unexpected error occurred: " + ex.getMessage());
+                        System.out.println("While processing instance of BaseEntity unexpected error occurred: "
+                                + ex.getMessage());
                         ex.printStackTrace();
                     }
                 }
-            } catch (FileNotFoundException e)
-            {
+            } catch (FileNotFoundException e) {
                 System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
             } catch (ParseException e) {
-                System.out.println("Can't parse date " + repDate + " must be in format "+ sdfout.toString());
+                System.out.println("Can't parse date " + repDate + " must be in format " + sdfout.toString());
             }
             IBaseEntityMergeManager mergeManager = constructMergeManagerFromJson(mergeManagerFileName);
 
-            System.out.println("Merging two base entities " + entityList.get(0).getId() + "  " + entityList.get(1).getId());
+            System.out.println("Merging two base entities " + entityList.get(0).getId() + "  "
+                    + entityList.get(1).getId());
             System.out.println(">>>>>>>>>>>>>>LEFT ENTITY<<<<<<<<<<<<<<<<<<<<<");
             System.out.println(entityList.get(0));
             System.out.println("\n >>>>>>>>>>>>>>RIGHT ENTITY<<<<<<<<<<<<<<<<<<<<<");
@@ -3664,15 +3324,12 @@ public class CLI
                     IBaseEntityProcessorDao.MergeResultChoice.LEFT);
 
             System.out.println(result);
-        }
-        else
-        {
+        } else {
             System.out.println("Wrong number of arguments!");
         }
     }
 
-    public IBaseEntityMergeManager constructMergeManagerFromJson(String jsonFilePath)
-    {
+    public IBaseEntityMergeManager constructMergeManagerFromJson(String jsonFilePath) {
         IBaseEntityMergeManager mergeManager = new BaseEntityMergeManager();
         try {
             FileReader fileReader = new FileReader(jsonFilePath);
@@ -3690,42 +3347,33 @@ public class CLI
         return mergeManager;
     }
 
-    public IBaseEntityMergeManager jsonToMergeManager(JsonReader jsonReader) throws IOException
-    {
+    public IBaseEntityMergeManager jsonToMergeManager(JsonReader jsonReader) throws IOException {
         IBaseEntityMergeManager mergeManager = new BaseEntityMergeManager();
-        while (jsonReader.hasNext())
-        {
+        while (jsonReader.hasNext()) {
             String name = jsonReader.nextName();
-            if (name.equals("action"))
-            {
+            if (name.equals("action")) {
                 String action = jsonReader.nextString();
-                if(action.equals("keep_left"))
+                if (action.equals("keep_left"))
                     mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_LEFT);
-                if(action.equals("keep_right"))
+                if (action.equals("keep_right"))
                     mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_RIGHT);
-                if(action.equals("merge"))
+                if (action.equals("merge"))
                     mergeManager.setAction(IBaseEntityMergeManager.Action.TO_MERGE);
-                if(action.equals("keep_both"))
+                if (action.equals("keep_both"))
                     mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_BOTH);
-            } else if (name.equals("childMap"))
-            {
+            } else if (name.equals("childMap")) {
                 jsonReader.beginArray();
-                while(jsonReader.hasNext())
-                {
-                    MergeManagerKey key =  null;
+                while (jsonReader.hasNext()) {
+                    MergeManagerKey key = null;
                     IBaseEntityMergeManager childManager = null;
                     jsonReader.beginObject();
-                    while(jsonReader.hasNext())
-                    {
+                    while (jsonReader.hasNext()) {
                         String innerName = jsonReader.nextName();
-                        if(innerName.equals("id"))
-                        {
+                        if (innerName.equals("id")) {
                             jsonReader.beginObject();
                             key = getKeyFromJson(jsonReader);
                             jsonReader.endObject();
-                        }
-                        else if(innerName.equals("map"))
-                        {
+                        } else if (innerName.equals("map")) {
                             jsonReader.beginObject();
                             childManager = jsonToMergeManager(jsonReader);
                             jsonReader.endObject();
@@ -3741,34 +3389,29 @@ public class CLI
         return mergeManager;
     }
 
-
-    private MergeManagerKey getKeyFromJson(JsonReader jsonReader)
-    {
+    private MergeManagerKey getKeyFromJson(JsonReader jsonReader) {
         String type = null;
-        String left =  null;
-        String right =  null;
-        String attr =  null;
+        String left = null;
+        String right = null;
+        String attr = null;
         try {
-            while(jsonReader.hasNext())
-            {
+            while (jsonReader.hasNext()) {
                 String name = jsonReader.nextName();
-                if(name.equals("type"))
-                {
+                if (name.equals("type")) {
                     type = jsonReader.nextString();
-                } else if(name.equals("left")){
+                } else if (name.equals("left")) {
                     left = jsonReader.nextString();
-                } else if(name.equals("right")){
+                } else if (name.equals("right")) {
                     right = jsonReader.nextString();
-                } else if(name.equals("attr")){
+                } else if (name.equals("attr")) {
                     attr = jsonReader.nextString();
                 }
             }
-            if(type.equals("attribute"))
-            {
+            if (type.equals("attribute")) {
                 MergeManagerKey<String> key = new MergeManagerKey<String>(attr);
                 return key;
             }
-            if(type.equals("long")){
+            if (type.equals("long")) {
                 MergeManagerKey<Long> key = new MergeManagerKey<Long>(Long.parseLong(left), Long.parseLong(right));
                 return key;
             }
@@ -3776,6 +3419,196 @@ public class CLI
             e.printStackTrace();
         }
         return null;
+    }
+
+    interface DispatcherJob {
+        public boolean intersects(DispatcherJob job);
+
+        public boolean isAlive();
+
+        public void start();
+
+        public void prepare();
+    }
+
+    class JobDispatcher extends Thread {
+        private final int MAX_ACTIVE_THREADS = 32;
+        private final int MAX_PREPARING_THREADS = 8;
+        private ConcurrentLinkedQueue<DispatcherJob> threadsQueue = new ConcurrentLinkedQueue<DispatcherJob>();
+        private ConcurrentLinkedQueue<DispatcherJob> preparedThreadsQueue = new ConcurrentLinkedQueue<DispatcherJob>();
+        private ArrayList<ThreadPreparator> activePreparingThreads = new ArrayList<ThreadPreparator>();
+        private ArrayList<DispatcherJob> activeThreads = new ArrayList<DispatcherJob>();
+        private long jobsEnded = 0;
+
+        public synchronized void addThread(DispatcherJob thread) {
+            threadsQueue.add(thread);
+        }
+
+        public synchronized void addPreparedThread(DispatcherJob thread) {
+            preparedThreadsQueue.add(thread);
+        }
+
+        public synchronized DispatcherJob getNextThread() {
+            return threadsQueue.poll();
+        }
+
+        public synchronized DispatcherJob getNextPeparedThread() {
+            return preparedThreadsQueue.poll();
+        }
+
+        public void clearDeadThreads() {
+            Iterator<DispatcherJob> threadsIterator = activeThreads.iterator();
+
+            while (threadsIterator.hasNext()) {
+                DispatcherJob thread = threadsIterator.next();
+
+                if (!thread.isAlive()) {
+                    threadsIterator.remove();
+                    jobsEnded++;
+                }
+            }
+        }
+
+        public void clearDeadPreparingThreads() {
+            Iterator<ThreadPreparator> threadsIterator = activePreparingThreads.iterator();
+
+            while (threadsIterator.hasNext()) {
+                ThreadPreparator preparator = threadsIterator.next();
+
+                if (!preparator.isAlive()) {
+                    threadsIterator.remove();
+                    addPreparedThread(preparator.getThread());
+                }
+            }
+        }
+
+        @Override
+        public void run() {
+            long t1 = System.currentTimeMillis();
+            while (true) {
+                try {
+                    clearDeadPreparingThreads();
+                    clearDeadThreads();
+
+                    if (System.currentTimeMillis() - t1 > 5000) {
+                        t1 = System.currentTimeMillis();
+                        if (activeThreads.size() > 0 || activePreparingThreads.size() > 0 ||
+                                threadsQueue.size() > 0) {
+                            System.out.println("Active: " + activeThreads.size() + ", queue: " + threadsQueue.size() +
+                                    ", ended: " + jobsEnded + ", preparing: " + activePreparingThreads.size() +
+                                    ", prepared: " + preparedThreadsQueue.size());
+                        }
+                    }
+
+                    if (activePreparingThreads.size() < MAX_PREPARING_THREADS) {
+                        DispatcherJob newThread = getNextThread();
+                        if (newThread != null) {
+                            ThreadPreparator preparator = new ThreadPreparator(newThread);
+                            preparator.start();
+                            activePreparingThreads.add(preparator);
+                        }
+                    }
+
+                    if (activeThreads.size() < MAX_ACTIVE_THREADS) {
+                        DispatcherJob newThread = getNextPeparedThread();
+                        if (newThread != null) {
+                            boolean intersectionFound = false;
+                            for (DispatcherJob job : activeThreads) {
+                                if (job.intersects(newThread)) {
+                                    intersectionFound = true;
+                                    break;
+                                }
+                            }
+
+                            if (intersectionFound) {
+                                addThread(newThread);
+                            } else {
+                                newThread.start();
+                                activeThreads.add(newThread);
+                            }
+                        } else {
+                            try {
+                                sleep(1000L);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    } else {
+                        try {
+                            sleep(100L);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    class ThreadPreparator extends Thread {
+        DispatcherJob thread;
+
+        ThreadPreparator(DispatcherJob thread) {
+            this.thread = thread;
+        }
+
+        public DispatcherJob getThread() {
+            return thread;
+        }
+
+        @Override
+        public void run() {
+            try {
+                thread.prepare();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    class DeleteJob extends Thread implements DispatcherJob {
+
+        private IEntityService entityServiceCore = null;
+        private long id;
+        private Set<Long> ids = null;
+
+        DeleteJob(IEntityService entityServiceCore, long id) {
+            this.entityServiceCore = entityServiceCore;
+            this.id = id;
+        }
+
+        @Override
+        public void run() {
+            try {
+                System.out.println("Deleting entity with id: " + id);
+                entityServiceCore.remove(id);
+                System.out.println("Deleted entity with id: " + id);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        @Override
+        public boolean intersects(DispatcherJob job) {
+            if (job instanceof DeleteJob) {
+                if (ids == null || ((DeleteJob) job).ids == null)
+                    throw new RuntimeException("Unprepared thread");
+
+                Set<Long> inter = SetUtils.intersection(ids, ((DeleteJob) job).ids);
+
+                return inter.size() > 0;
+            }
+
+            return false;
+        }
+
+        @Override
+        public void prepare() {
+            ids = entityServiceCore.getChildBaseEntityIds(id);
+        }
     }
 
 }
