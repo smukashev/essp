@@ -103,6 +103,7 @@ public class CLI
     private ArrayList<String> args = new ArrayList<String>();
 
     private static SimpleDateFormat sdfout = new SimpleDateFormat("dd.MM.yyyy");
+    private static String jobStatus = null;
 
     @Autowired
     private IStorage storage;
@@ -3491,7 +3492,7 @@ public class CLI
     }
 
     private void commandGetNotProcessed(String line){
-        String commandUsage = "Arguments: getNotProcessed from core:core_sep_2014@10.10.20.44:CREDITS report_date=11.11.15 > /home/aybek/test/";
+        String commandUsage = "Arguments: getNotProcessed from core:core_sep_2014@10.10.20.44:CREDITS report_date=11.11.15 creditor_id=31 edit_id=1 limit=100 > /home/aybek/test/";
 
         String path = "";
         Matcher m;
@@ -3502,8 +3503,13 @@ public class CLI
         List<Long> credits = new ArrayList<Long>();
         StringBuilder editIds = new StringBuilder("update MAINTENANCE.CREDREG_DELETE_CREDIT SET PROCESSED_USCI = 1 where ID IN (");
         Long creditId = null;
-        Long editId = null;
+        Long cdcId = null;
         Long creditorId = null;
+        Long editId = null;
+        int limit = 0;
+        boolean creditorFlag = false;
+        boolean editIdFlag = false;
+        boolean limitFlag = false;
         String contractNo = null;
         Date contractDate = null;
 
@@ -3511,12 +3517,33 @@ public class CLI
             pattern = pattern + "\\s+report_date=(\\S+)";
         }
 
+        if (line.contains("creditor_id")) {
+            pattern = pattern + "\\s+creditor_id=(\\d+)";
+            creditorFlag = true;
+        }
+
+        if (line.contains("edit_id")) {
+            pattern = pattern + "\\s+edit_id=(\\d+)";
+            editIdFlag = true;
+        }
+
+        if (line.contains("limit")) {
+            pattern = pattern + "\\s+limit=(\\d+)";
+            limitFlag = true;
+        }
+
+
         pattern = pattern + "\\s+>\\s+(\\S+)";
 
         m = Pattern.compile(pattern).matcher(line);
         int gid = 1;
 
         if (m.find()) {
+
+            jobStatus = "doing";
+            Thread listener = new CommandListenerThread();
+            listener.start();
+
             String user = m.group(gid++);
             String pwd = m.group(gid++);
             String address = m.group(gid++);
@@ -3527,6 +3554,15 @@ public class CLI
                 e.printStackTrace();
             }
 
+            if (creditorFlag) {
+                creditorId = Long.valueOf(m.group(gid++));
+            }
+            if (editIdFlag) {
+                editId = Long.valueOf(m.group(gid++));
+            }
+            if (limitFlag) {
+                limit = Integer.valueOf(m.group(gid++));
+            }
             path = m.group(gid++);
 
             Connection conn = null;
@@ -3550,33 +3586,60 @@ public class CLI
 
             ResultSet resultSet = null;
 
-            String select = "SELECT t3.contract_no,t3.contract_date,t.id,t2.creditor_id,t3.id as editId FROM MAINTENANCE.CREDREG_EDIT_CREDIT t3" +
-            " LEFT JOIN v_credit_his t ON t.contract_no = t3.contract_no and t.contract_date=t3.contract_date" +
-                    "  LEFT JOIN MAINTENANCE.CREDREG_EDIT t2 ON t.creditor_id = t2.creditor_id" +
-                    "  WHERE t3.processed_usci = 0 " +
-                    "  and t3.CONTRACT_NO_OLD is null and t3.CONTRACT_DATE_OLD is null"+
-                    " order by t.creditor_id ";
+            StringBuilder select = new StringBuilder();
 
-//            String select = "SELECT t.contract_no,t.contract_date,t.id,1 creditor_id,1 as editId FROM  v_credit_his t";
 
-            int maxLimit = 0; // Only first 1000 is processed
 
+
+                if (!creditorFlag){
+                    select.append("SELECT t3.contract_no,t3.contract_date,t.id,t2.creditor_id,t3.id as cdcId FROM MAINTENANCE.CREDREG_EDIT_CREDIT t3" +
+                            " LEFT JOIN v_credit_his t ON t.contract_no = t3.contract_no and t.contract_date=t3.contract_date");
+
+                    select.append("  LEFT JOIN MAINTENANCE.CREDREG_EDIT t2 ON t.creditor_id = t2.creditor_id");
+                } else {
+                    select.append("SELECT t3.contract_no,t3.contract_date,t.id,t.creditor_id,t3.id as cdcId FROM MAINTENANCE.CREDREG_EDIT_CREDIT t3" +
+                            " LEFT JOIN v_credit_his t ON t.contract_no = t3.contract_no and t.contract_date=t3.contract_date");
+                }
+
+                select.append("  WHERE t3.processed_usci = 0 " +
+                        "  and t3.CONTRACT_NO_OLD is null and t3.CONTRACT_DATE_OLD is null");
+
+                if (creditorFlag){
+                    select.append(" and t.creditor_id = "+creditorId);
+                }
+
+                if (editIdFlag) {
+                    select.append(" and t3.edit_id = " + editId);
+                }
+
+                select.append(" order by t.creditor_id ");
+
+//               select.append("SELECT t3.contract_no,t3.contract_date,t.id,t2.creditor_id,t3.id as cdcId FROM MAINTENANCE.CREDREG_EDIT_CREDIT t3" +
+//                        " LEFT JOIN v_credit_his t ON t.contract_no = t3.contract_no and t.contract_date=t3.contract_date" +
+//                        "  LEFT JOIN MAINTENANCE.CREDREG_EDIT t2 ON t.creditor_id = t2.creditor_id" +
+//                        "  WHERE t3.processed_usci = 0 " +
+//                        "  and t3.CONTRACT_NO_OLD is null and t3.CONTRACT_DATE_OLD is null" +
+//                        " order by t.creditor_id ");
+
+
+          //  select.append("SELECT t.contract_no,t.contract_date,t.id,1 creditor_id,1 as cdcId FROM  v_credit_his t");
             try {
                 conn.setAutoCommit(false);
                 st = conn.createStatement();
                 st.setFetchSize(1);
-                resultSet = st.executeQuery(select);
+                resultSet = st.executeQuery(select.toString());
                 Long lastCreditorId = null;
                 int count = 0;
                 String fileName = null;
                 while (resultSet.next()) {
-                    editId = resultSet.getLong("editId");
+                    cdcId = resultSet.getLong("cdcId");
                     creditId = resultSet.getLong("ID");
-                    creditorId = 1L;// resultSet.getLong("CREDITOR_ID");
+                    if (!creditorFlag) {
+                        creditorId = resultSet.getLong("CREDITOR_ID");
+                    }
                     contractNo = resultSet.getString("CONTRACT_NO");
                     contractDate = resultSet.getDate("CONTRACT_DATE");
-
-                    if (maxLimit > 100) throw new RuntimeException("1000 contracts are processed ."); //TODO: delete this after test
+                    limit--;
 
                     if (creditId == null || creditId == 0){
                         storage.simpleSql(String.format("insert into mnt_logs(mnt_operation_id, foreign_id, execution_time, status, error_msg, contract_no, contract_date) values (2,1,sysdate,1,'%S','%S',date'%S')","No credit was found with such contract_no and contract_date",contractNo,contractDate.toString()));
@@ -3600,11 +3663,31 @@ public class CLI
                         }
                         creditIds.append(creditId+",");
                         credits.add(creditId);
-                        editIds.append(editId + ",");
+                        editIds.append(cdcId + ",");
                         count++;
+
+                        if(jobStatus != null && jobStatus.equals("stop")){
+                            System.out.println("Process stopped!");
+                            break;
+                        } else if(jobStatus != null && jobStatus.equals("pause")){
+                            System.out.println("Process paused!");
+                            while (jobStatus.equals("pause")){
+                                Thread.sleep(1000);
+                            }
+                            if(jobStatus == null && jobStatus.equals("stop")){
+                                break;
+                            } else {
+                                System.out.println("Process resumed!");
+                            }
+                        }
+                    }
+
+                    if (limit < 1){
+                        System.out.println("Limit was reached !");
+                        break;
                     }
                 }
-                if (count != 0){
+                if (count != 0 && (jobStatus == null || !jobStatus.equals("stop"))){
                     fileName = generateZipFile(conn, creditIds.toString(), lastCreditorId, path, reportDate,address,sid,user,pwd);
                     storage.simpleSql(String.format("insert into mnt_processes(process_date, filename, creditor_id) values (sysdate,'%S','%d')",fileName,lastCreditorId));
                     for (Long id: credits){
@@ -3636,6 +3719,9 @@ public class CLI
                     e1.printStackTrace();
                 }
             }
+
+            listener.interrupt();
+            jobStatus = null;
         } else {
             System.out.println(commandUsage);
         }
@@ -4047,4 +4133,36 @@ public class CLI
         return null;
     }
 
+    class CommandListenerThread extends Thread {
+        public void run() {
+            Scanner in;
+
+            if (inputStream == null) {
+                in = new Scanner(System.in);
+            } else {
+                in = new Scanner(inputStream);
+            }
+
+            String command = "doing";
+            System.out.println("Command Listener started!");
+
+            while (!command.equals("stop")) {
+                command = in.nextLine().toLowerCase();
+                System.out.println("Command entered : " + command);
+                if (command.equals("stop")) {
+                    System.out.println("Process will be stopped....");
+                    jobStatus = command;
+                } else if (command.equals("pause")) {
+                    System.out.println("Process will be paused....");
+                    jobStatus = command;
+                } else if (command.equals("resume")) {
+                    System.out.println("Resuming process....");
+                    jobStatus = command;
+                } else {
+                    System.out.println("Incorrect command! Available commands: stop | pause | resume");
+                }
+            }
+
+        }
+    }
 }
