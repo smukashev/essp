@@ -68,7 +68,7 @@ public class MainPortlet extends MVCPortlet {
             batchEntryService = (IBatchEntryService) batchEntryServiceFactoryBean.getObject();
 
             searcherFormEntryServiceFactoryBean = new RmiProxyFactoryBean();
-            searcherFormEntryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/searcherFormService");
+            searcherFormEntryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/searcherFormService");
             searcherFormEntryServiceFactoryBean.setServiceInterface(ISearcherFormService.class);
             searcherFormEntryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
