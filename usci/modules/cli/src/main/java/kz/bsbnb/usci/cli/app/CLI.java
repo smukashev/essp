@@ -2572,6 +2572,20 @@ public class CLI {
                 else if (args.size() == 4)
                     showCase.addField(path, colName, args.get(3));
                 else throw new IllegalArgumentException("Example: showcase list add [path] [columnName] {columnAlias}");
+            } else if (args.get(1).equals("addCustom")) {
+                MetaClass customMeta = metaClassRepository.getMetaClass(args.get(2));
+
+                String path = "";
+                String colName = args.get(4);
+
+                if (args.get(3).lastIndexOf('.') != -1)
+                    path = args.get(3).substring(0, args.get(3).lastIndexOf('.'));
+
+                showCase.addCustomField(path, colName, args.get(4), customMeta);
+            } else {
+                System.err.println("Example: showcase list add [path] [columnName] {columnAlias}");
+                System.err.println("Example: showcase list addCustom metaClass [path] [columnName] {columnAlias}");
+                throw new IllegalArgumentException();
             }
         } else if (args.get(0).equals("save")) {
             if (!scStart) initSC();

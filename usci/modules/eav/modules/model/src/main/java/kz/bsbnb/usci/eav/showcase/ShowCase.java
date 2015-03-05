@@ -17,16 +17,11 @@ public class ShowCase extends Persistable {
     private String downPath = "";
 
     private ArrayList<ShowCaseField> fields = new ArrayList<ShowCaseField>();
+    private ArrayList<ShowCaseField> customFields = new ArrayList<ShowCaseField>();
+    private ArrayList<ShowCaseField> filterFields = new ArrayList<ShowCaseField>();
 
     public ShowCase() {
         super();
-    }
-
-    public ShowCase(long id, String name, String tableName, String title) {
-        this.id = id;
-        this.name = name;
-        this.tableName = tableName;
-        this.title = title;
     }
 
     public MetaClass getMeta() {
@@ -92,15 +87,13 @@ public class ShowCase extends Persistable {
     }
 
     public void addField(String path, String name, String columnName) {
-
         if (meta == null)
             throw new IllegalArgumentException("meta not set for showcase");
 
         IMetaAttribute attr = getActualMeta().getElAttribute(path + "." + name);
 
-        if (attr == null) {
+        if (attr == null)
             throw new IllegalArgumentException(getName() + ": Can't get attribute: " + path + "." + name);
-        }
 
         IMetaType metaType = attr.getMetaType();
 
@@ -120,6 +113,68 @@ public class ShowCase extends Persistable {
         addField(showCaseField);
     }
 
+    public void addCustomField(String path, String name, String columnName, MetaClass meta) {
+        if (meta == null)
+            throw new IllegalArgumentException("meta can't be null");
+
+        IMetaAttribute metaAttribute = meta.getElAttribute(path + "." + name);
+
+        if (metaAttribute == null)
+            throw new IllegalArgumentException("Can't get attribute: " + path + "." + name);
+
+        IMetaType metaType = metaAttribute.getMetaType();
+
+        ShowCaseField showCaseField = new ShowCaseField();
+        showCaseField.setAttributeId(metaAttribute.getId());
+        showCaseField.setName(columnName);
+        showCaseField.setAttributePath(path);
+        showCaseField.setAttributeName(name);
+        showCaseField.setColumnName(columnName);
+        showCaseField.setTitle(metaAttribute.getTitle());
+
+        if (metaType.isComplex()) {
+            showCaseField.setAttributePath(path.equals("") ? name : path + "." + name);
+            showCaseField.setAttributeName("");
+        }
+
+        customFields.add(showCaseField);
+    }
+
+    public void addFilterField(String path, String name, String columnName) {
+        if (meta == null)
+            throw new IllegalArgumentException("meta not set for showcase");
+
+        IMetaAttribute attr = getActualMeta().getElAttribute(path + "." + name);
+
+        if (attr == null)
+            throw new IllegalArgumentException(getName() + ": Can't get attribute: " + path + "." + name);
+
+        IMetaType metaType = attr.getMetaType();
+
+        ShowCaseField showCaseField = new ShowCaseField();
+        showCaseField.setAttributeId(attr.getId());
+        showCaseField.setName(columnName);
+        showCaseField.setAttributePath(path);
+        showCaseField.setAttributeName(name);
+        showCaseField.setColumnName(columnName);
+        showCaseField.setTitle(attr.getTitle());
+
+        if (metaType.isComplex()) {
+            showCaseField.setAttributePath(path.equals("") ? name : path + "." + name);
+            showCaseField.setAttributeName("");
+        }
+
+        filterFields.add(showCaseField);
+    }
+
+    public ArrayList<ShowCaseField> getCustomFields() {
+        return customFields;
+    }
+
+    public ArrayList<ShowCaseField> getFilterFields() {
+        return filterFields;
+    }
+
     public List<ShowCaseField> getFieldsList() {
         return fields;
     }
@@ -132,7 +187,6 @@ public class ShowCase extends Persistable {
                 ", title='" + title + '\'' +
                 ", meta=" + meta +
                 ", downPath='" + downPath + '\'' +
-                ", fields=" + fields +
-                '}';
+        '}';
     }
 }
