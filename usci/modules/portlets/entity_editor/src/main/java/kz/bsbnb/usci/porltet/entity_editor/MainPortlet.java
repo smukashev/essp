@@ -350,7 +350,6 @@ public class MainPortlet extends MVCPortlet {
                     break;
                 case FIND_ACTION:
                     Enumeration<String> list = resourceRequest.getParameterNames();
-                    Thread.sleep(5000L);
 
                     String metaString = resourceRequest.getParameter("metaClass");
 
