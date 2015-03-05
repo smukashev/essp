@@ -4,7 +4,6 @@ import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.MetaClassName;
-import kz.bsbnb.usci.eav.search_form.SearchField;
 import kz.bsbnb.usci.eav.util.Pair;
 
 import java.util.List;
@@ -14,6 +13,5 @@ import java.util.List;
  */
 public interface ISearcherFormService {
     public List<Pair> getMetaClasses(long userId);
-    public List<SearchField> getFields(long userId, IMetaClass metaClass);
-    public String getDom(long userId, IMetaClass metaClass, String attribute);
+    public String getDom(long userId, IMetaClass metaClass);
 }

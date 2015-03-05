@@ -67,6 +67,8 @@ public interface IBaseEntityProcessorDao
 
     public List<RefListItem> getRefsByMetaclass(long metaClassId);
 
+    public List<RefListItem> getRefsByMetaclassRaw(long metaClassId);
+
     public List<BaseEntity> getEntityByMetaclass(MetaClass meta);
 
     public boolean isApproved(long id);

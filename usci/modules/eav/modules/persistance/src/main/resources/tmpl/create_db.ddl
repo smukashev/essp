@@ -1036,4 +1036,41 @@
 			<column name="error_msg" type="VARCHAR" size="250" />
 	</table>
 
+	<!-- entity_editor portlet tables -->
+	<table name="eav_a_user_class">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="user_id" required="true" type="NUMERIC" size="14,0"/>
+		<column name="meta_name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
+		<!--<foreign-key foreignTable="eav_m_classes" name="eav_fk_023_00">
+			<reference local="meta_name" foreign="name"/>
+		</foreign-key>-->
+		<index name="ind_023_00">
+			<index-column name="user_id"/>
+			<index-column name="meta_name"/>
+		</index>
+	</table>
+
+	<table name="eav_a_user_ref">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="user_id" required="true" type="NUMERIC" size="14,0"/>
+		<column name="meta_name" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
+		<column name="entity_id"  required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<unique>
+			<unique-column name="user_id"/>
+			<unique-column name="meta_name"/>
+			<unique-column name="entity_id"/>
+		</unique>
+		<index name="ind_024_00">
+			<index-column name="user_id"/>
+			<index-column name="meta_name"/>
+			<index-column name="entity_id" />
+		</index>
+		<!--<foreign-key foreignTable="eav_m_classes" name="eav_fk_024_00">
+			<reference local="meta_name" foreign="name"/>
+		</foreign-key>-->
+		<!--<foreign-key foreignTable="eav_m_classes" name="eav_fk_024_01">
+			<reference local="entity_id" foreign="id"/>
+		</foreign-key>-->
+	</table>
+
 </database>

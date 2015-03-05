@@ -19,3 +19,6 @@ var label_REF = 'Анықтама';
 var label_ITEMS = 'Элементтер';
 var label_ENTITY_ID = 'Болмыс идентификаторы';
 //var label_DEL = 'Удалить_en';
+var label_CLASS = 'Класс';
+var LABEL_UPDATE = 'Жанарту';
+var label_date = 'Күні';

@@ -62,9 +62,9 @@ public enum DataTypes
         return getDataTypeClass(this);
     }
 
-    public Object fromString(String value){
+    public static Object fromString(DataTypes type, String value){
 
-        switch (this)
+        switch (type)
         {
             case INTEGER:
                 return Integer.parseInt(value);

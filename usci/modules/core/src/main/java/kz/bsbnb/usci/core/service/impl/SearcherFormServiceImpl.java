@@ -2,17 +2,16 @@ package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.ISearcherFormService;
 import kz.bsbnb.usci.eav.model.RefListItem;
-import kz.bsbnb.usci.eav.model.base.IBaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
+import kz.bsbnb.usci.eav.persistance.dao.IUserDao;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
-import kz.bsbnb.usci.eav.search_form.IRoleManager;
-import kz.bsbnb.usci.eav.search_form.SearchField;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Bauyrzhan.Makhambeto on 19/02/2015.
@@ -31,43 +29,33 @@ import java.util.concurrent.atomic.AtomicLong;
 public class SearcherFormServiceImpl implements ISearcherFormService {
 
     @Autowired
-    IRoleManager roleManager;
-
-    @Autowired
     IMetaClassRepository metaClassRepository;
 
     @Autowired
     private IBaseEntityProcessorDao baseEntityProcessorDao;
 
+    @Autowired
+    private IUserDao userDao;
+
     @Override
     public List<Pair> getMetaClasses(long userId) {
 
-        List<Long> allowedMetas = roleManager.getAllowedMetas(userId);
+        List<String> allowedMetas = userDao.getAllowedClasses(userId);
         List<Pair> ret = new ArrayList<Pair>();
         List<MetaClassName> metas = metaClassRepository.getMetaClassesNames();
 
-        Set<Long> allowedMetasSet = new HashSet<Long>();
+        Set<String> allowedMetasSet = new HashSet<String>();
 
         if(allowedMetas != null)
-            allowedMetasSet = new HashSet<Long>(allowedMetas);
+            allowedMetasSet = new HashSet<String>(allowedMetas);
 
         for(MetaClassName metaClass : metas) {
-            if(allowedMetas == null || allowedMetasSet.contains(metaClass.getId()))
+            if(allowedMetas == null || allowedMetasSet.contains(metaClass.getClassName()))
                 ret.add(new Pair(metaClass.getId(), metaClass.getClassName()));
         }
 
         return ret;
     }
-
-    @Override
-    public List<SearchField> getFields(long userId, IMetaClass metaClass) {
-        return null;
-    }
-
-    /*public String getDom(long userId, IMetaClass metaClass){
-        return getDom(userId, metaClass, "credit");
-    }*/
-
 
     private static final ThreadLocal<Long> inputId = new ThreadLocal<Long>() {
         @Override protected Long initialValue(){
@@ -82,19 +70,27 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
     }
 
     public String getDomRef(long userId, IMetaClass metaClass, String attr) {
-
         String ret = "<div class='leaf'> %s: <select id='ref-%d-%s-%s'>";
         ret = String.format(ret, metaClass.getClassName(), nextId(), metaClass.getClassName(), attr);
 
-        List<RefListItem> list = baseEntityProcessorDao.getRefsByMetaclass(metaClass.getId());
+        List<RefListItem> list = baseEntityProcessorDao.getRefsByMetaclassRaw(metaClass.getId());
+        List<Long> allowedRefs = userDao.getAllowedRefs(userId, metaClass.getClassName());
+        Set<Long> refSet = new HashSet<Long>(allowedRefs);
         String option;
         for(RefListItem item : list) {
+            if(!refSet.contains(item.getId()))
+                continue;
             option = "<option value='%d'>" + item.getTitle() + "</option>";
             option = String.format(option, item.getId());
             ret += option;
         }
 
         return ret + "</select></div>";
+    }
+
+    public String getDom(long userId, IMetaClass metaClass) {
+        inputId.set(1L);
+        return getDom(userId, metaClass, "null");
     }
 
     public String getDom(long userId, IMetaClass metaClass,  String attribute) {
@@ -121,8 +117,13 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
                         throw new NotImplementedException();
                     ret += getDom(userId, (MetaClass) metaType, attr);
                 } else {
-                    String divSimple = "<div class='leaf'> %s: <input type = 'text' id='inp-%d-%s-%s' />" +
-                            "<div class='not-filled' id='err-%d'>not.filled</div></div>";
+                    String divSimple;
+                    if( ((MetaValue)metaType).getTypeCode().equals(DataTypes.DATE))
+                        divSimple = "<div class='leaf'> %s: <input type = 'date' id='inp-%d-%s-%s' />" +
+                                "<div class='not-filled' id='err-%d'>not.filled</div></div>";
+                    else
+                        divSimple = "<div class='leaf'> %s: <input type = 'text' id='inp-%d-%s-%s' />" +
+                                "<div class='not-filled' id='err-%d'>not.filled</div></div>";
                     long nextId = nextId();
                     divSimple = String.format(divSimple, metaAttribute.getName(), nextId, "simple", attr , nextId);
                     ret += divSimple;

@@ -5,18 +5,20 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
+import kz.bsbnb.usci.core.service.ISearcherFormService;
+import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchEntry;
-import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.BaseContainerType;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
-import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.porltet.entity_editor.model.json.MetaClassList;
-import kz.bsbnb.usci.porltet.entity_editor.model.json.MetaClassListEntry;
+import kz.bsbnb.usci.eav.util.Pair;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -32,10 +34,12 @@ public class MainPortlet extends MVCPortlet {
     private RmiProxyFactoryBean metaFactoryServiceFactoryBean;
     private RmiProxyFactoryBean entityServiceFactoryBean;
     private RmiProxyFactoryBean batchEntryServiceFactoryBean;
+    private RmiProxyFactoryBean searcherFormEntryServiceFactoryBean;
 
     private IMetaFactoryService metaFactoryService;
     private IEntityService entityService;
     private IBatchEntryService batchEntryService;
+    private ISearcherFormService searcherFormService;
 
     public void connectToServices() {
         try {
@@ -62,6 +66,15 @@ public class MainPortlet extends MVCPortlet {
 
             batchEntryServiceFactoryBean.afterPropertiesSet();
             batchEntryService = (IBatchEntryService) batchEntryServiceFactoryBean.getObject();
+
+            searcherFormEntryServiceFactoryBean = new RmiProxyFactoryBean();
+            searcherFormEntryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/searcherFormService");
+            searcherFormEntryServiceFactoryBean.setServiceInterface(ISearcherFormService.class);
+            searcherFormEntryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+            searcherFormEntryServiceFactoryBean.afterPropertiesSet();
+            searcherFormService = (ISearcherFormService) searcherFormEntryServiceFactoryBean.getObject();
+
         } catch (Exception e) {
             System.out.println("Can\"t initialise services: " + e.getMessage());
         }
@@ -91,7 +104,8 @@ public class MainPortlet extends MVCPortlet {
         LIST_CLASSES,
         LIST_ENTITY,
         SAVE_XML,
-        LIST_BY_CLASS
+        FIND_ACTION,
+        GET_FORM
     }
 
     private String testNull(String str) {
@@ -103,7 +117,6 @@ public class MainPortlet extends MVCPortlet {
     private String clearSlashes(String str) {
         //TODO: str.replaceAll("\"","\\\""); does not work! Fix needed.
         String outStr = str.replaceAll("\""," ");
-        System.out.println(outStr);
         return outStr;
     }
 
@@ -183,16 +196,16 @@ public class MainPortlet extends MVCPortlet {
 
                 if(((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() != DataTypes.DATE) {
                     str +=  "{" +
-                    "\"title\":\"" + attrTitle + "\",\n" +
-                    "\"code\":\"" + innerClassesNames + "\",\n" +
-                    "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
-                    "\"simple\": true,\n" +
-                    "\"array\": false,\n" +
-                    "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
-                    "\"leaf\":true,\n" +
-                    "\"iconCls\":\"file\",\n" +
-                    "\"isKey\":\""+meta.getMetaAttribute(innerClassesNames).isKey()+"\"\n" +
-                    "}";
+                            "\"title\":\"" + attrTitle + "\",\n" +
+                            "\"code\":\"" + innerClassesNames + "\",\n" +
+                            "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
+                            "\"simple\": true,\n" +
+                            "\"array\": false,\n" +
+                            "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
+                            "\"leaf\":true,\n" +
+                            "\"iconCls\":\"file\",\n" +
+                            "\"isKey\":\""+meta.getMetaAttribute(innerClassesNames).isKey()+"\"\n" +
+                            "}";
                 } else {
                     Object dtVal = value.getValue();
                     String dtStr = "";
@@ -252,7 +265,7 @@ public class MainPortlet extends MVCPortlet {
                     }
 
                     str +=  entityToJson((BaseEntity)(value.getValue()), "[" + i + "]",
-                                "[" + i + "]");
+                            "[" + i + "]");
                     i++;
                 }
 
@@ -269,15 +282,15 @@ public class MainPortlet extends MVCPortlet {
                     if(((MetaValue)type).getTypeCode() != DataTypes.DATE)
                     {
                         str +=  "{" +
-                            "\"title\":\"" + "[" + i + "]" + "\",\n" +
-                            "\"code\":\"" + "[" + i + "]" + "\",\n" +
-                            "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
-                            "\"simple\": true,\n" +
-                            "\"array\": false,\n" +
-                            "\"type\": \"" + ((MetaValue)type).getTypeCode() + "\",\n" +
-                            "\"leaf\":true,\n" +
-                            "\"iconCls\":\"file\"\n" +
-                            "}";
+                                "\"title\":\"" + "[" + i + "]" + "\",\n" +
+                                "\"code\":\"" + "[" + i + "]" + "\",\n" +
+                                "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
+                                "\"simple\": true,\n" +
+                                "\"array\": false,\n" +
+                                "\"type\": \"" + ((MetaValue)type).getTypeCode() + "\",\n" +
+                                "\"leaf\":true,\n" +
+                                "\"iconCls\":\"file\"\n" +
+                                "}";
                     } else {
                         Object dtVal = value.getValue();
                         String dtStr = "";
@@ -286,15 +299,15 @@ public class MainPortlet extends MVCPortlet {
                         }
 
                         str +=  "{" +
-                            "\"title\":\"" + "[" + i + "]" + "\",\n" +
-                            "\"code\":\"" + "[" + i + "]" + "\",\n" +
-                            "\"value\":\"" + dtStr + "\",\n" +
-                            "\"simple\": true,\n" +
-                            "\"array\": false,\n" +
-                            "\"type\": \"" + ((MetaValue)type).getTypeCode() + "\",\n" +
-                            "\"leaf\":true,\n" +
-                            "\"iconCls\":\"file\"\n" +
-                            "}";
+                                "\"title\":\"" + "[" + i + "]" + "\",\n" +
+                                "\"code\":\"" + "[" + i + "]" + "\",\n" +
+                                "\"value\":\"" + dtStr + "\",\n" +
+                                "\"simple\": true,\n" +
+                                "\"array\": false,\n" +
+                                "\"type\": \"" + ((MetaValue)type).getTypeCode() + "\",\n" +
+                                "\"leaf\":true,\n" +
+                                "\"iconCls\":\"file\"\n" +
+                                "}";
                     }
                 }
             }
@@ -319,18 +332,83 @@ public class MainPortlet extends MVCPortlet {
 
         try {
             OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
+            User currentUser = PortalUtil.getUser(resourceRequest);
 
             Gson gson = new Gson();
 
             switch (operationType) {
+                case LIST_CLASSES:
+                    List<Pair> classes = searcherFormService.getMetaClasses(currentUser.getUserId());
+                    if(classes.size() < 1)
+                        throw new RuntimeException("no.any.rights");
+                    writer.write("{\"success\":\"true\", \"data\": " + gson.toJson(classes) + "}");
+                    break;
+                case GET_FORM:
+                    String metaName = resourceRequest.getParameter("meta");
+                    String generatedForm = searcherFormService.getDom(currentUser.getUserId(), metaFactoryService.getMetaClass(metaName));
+                    writer.write(generatedForm);
+                    break;
+                case FIND_ACTION:
+                    Enumeration<String> list = resourceRequest.getParameterNames();
+                    Thread.sleep(5000L);
+
+                    String metaString = resourceRequest.getParameter("metaClass");
+
+                    MetaClass metaClass = metaFactoryService.getMetaClass(metaString);
+                    BaseEntity baseEntity = new BaseEntity(metaClass, new Date());
+
+                    while(list.hasMoreElements()) {
+                        String attribute = list.nextElement();
+
+                        if(attribute.equals("op") || attribute.equals("metaClass"))
+                            continue;
+
+                        Object value;
+                        String parameterValue = resourceRequest.getParameter(attribute);
+
+                        IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
+                        if(metaAttribute == null)
+                            continue;
+                        IMetaType metaType = metaAttribute.getMetaType();
+
+                        if(metaType.isSet() || metaType.isSetOfSets())
+                            throw new UnsupportedOperationException("Not yet implemented");
+
+                        if(metaType.isComplex()) {
+                            BaseEntity childBaseEntity = new BaseEntity((MetaClass) metaType, new Date());
+                            childBaseEntity.setId(Long.valueOf(parameterValue));
+                            value = childBaseEntity;
+
+                        } else {
+                            MetaValue metaValue = (MetaValue) metaType;
+                            value = DataTypes.fromString(metaValue.getTypeCode(), parameterValue);
+                        }
+
+                        Batch b = new Batch(new Date(), currentUser.getUserId());
+                        b.setId(777L);
+
+                        baseEntity.put(attribute, BaseValueFactory.create(
+                                BaseContainerType.BASE_ENTITY,
+                                metaAttribute.getMetaType(),
+                                b, 1, value));
+                    }
+
+                    baseEntity = entityService.search(baseEntity);
+
+                    long ret = -1;
+
+                    if(baseEntity.getId() > 0)
+                        ret = baseEntity.getId();
+
+                    writer.write("{\"success\": true, \"data\":\""+ ret +"\"}");
+
+                    break;
                 case SAVE_XML:
                     String xml = resourceRequest.getParameter("xml_data");
 
                     BatchEntry batchEntry = new BatchEntry();
 
                     batchEntry.setValue(xml);
-
-                    User currentUser = PortalUtil.getUser(resourceRequest);
 
                     batchEntry.setUserId(currentUser.getUserId());
 
@@ -339,66 +417,12 @@ public class MainPortlet extends MVCPortlet {
                     writer.write("{\"success\": true }");
 
                     break;
-                case LIST_CLASSES:
-                    MetaClassList classesListJson = new MetaClassList();
-                    List<MetaClassName> metaClassesList = metaFactoryService.getRefNames();
-
-                    classesListJson.setTotal(metaClassesList.size());
-
-                    for (MetaClassName metaName : metaClassesList) {
-                        MetaClassListEntry metaClassListEntry = new MetaClassListEntry();
-
-                        metaClassListEntry.setClassId("" + metaName.getId());
-                        if(metaName.getClassTitle() != null
-                                && metaName.getClassTitle().trim().length() > 0)
-                            metaClassListEntry.setClassName(metaName.getClassTitle());
-                        else
-                            metaClassListEntry.setClassName(metaName.getClassName());
-
-                        classesListJson.getData().add(metaClassListEntry);
-                    }
-
-                    writer.write(gson.toJson(classesListJson));
-
-                    break;
-                case LIST_BY_CLASS:
-                    String metaId = resourceRequest.getParameter("metaId");
-                    if (metaId != null && metaId.trim().length() > 0) {
-                        List<RefListItem> ids = entityService.getRefsByMetaclass(Long.parseLong(metaId));
-
-                        writer.write("{\"total\":" + ids.size());
-                        writer.write(",\"data\":[");
-
-                        boolean first = true;
-
-                        for (RefListItem id : ids) {
-                            if (first) {
-                                first = false;
-                            } else {
-                                writer.write(",");
-                            }
-
-                            writer.write("{");
-
-                            writer.write("\"id\":\"" + id.getId() + "\",");
-                            writer.write("\"code\":\"" + id.getCode() + "\",");
-
-                            for (String key : id.getKeys()) {
-                                writer.write("\"" + key + "\":\"" + id.getValue(key) + "\",");
-                            }
-
-                            writer.write("\"title\":\"" + id.getTitle() + "\"");
-                            writer.write("}");
-                        }
-
-                        writer.write("]}");
-                    }
-
-                    break;
                 case LIST_ENTITY:
                     String entityId = resourceRequest.getParameter("entityId");
+                    Date date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
                     if (entityId != null && entityId.trim().length() > 0) {
-                        BaseEntity entity = entityService.load(Integer.parseInt(entityId));
+                        //BaseEntity entity = entityService.load(Integer.parseInt(entityId));
+                        BaseEntity entity = entityService.load(Long.valueOf(entityId), date);
 
                         writer.write("{\"text\":\".\",\"children\": [\n" +
                                 entityToJson(entity, entity.getMeta().getClassTitle(),
