@@ -2578,11 +2578,6 @@ public class CLI {
                     colName = args.get(2).substring(id + 1);
                 }
 
-                for(ShowCaseField sf : showCase.getFieldsList()) {
-                    if(sf.getColumnName().equalsIgnoreCase(colName))
-                        throw new IllegalArgumentException("Column name " + colName + " already exists");
-                }
-
                 if (args.size() == 3)
                     showCase.addField(path, colName);
                 else if (args.size() == 4)
