@@ -2542,6 +2542,9 @@ public class CLI {
             System.out.println("ok");
         } else if (args.get(0).equals("status")) {
             System.out.println(showCase.toString());
+            for(ShowCaseField sf : showCase.getFieldsList()) {
+                System.out.println(sf.getColumnName());
+            }
         } else if (args.get(0).equals("set")) {
             if (args.size() != 3)
                 throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
@@ -2569,10 +2572,17 @@ public class CLI {
                 String path = "";
                 String colName = args.get(2);
                 int id = args.get(2).lastIndexOf('.');
+
                 if (id != -1) {
                     path = args.get(2).substring(0, id);
                     colName = args.get(2).substring(id + 1);
                 }
+
+                for(ShowCaseField sf : showCase.getFieldsList()) {
+                    if(sf.getColumnName().equalsIgnoreCase(colName))
+                        throw new IllegalArgumentException("Column name " + colName + " already exists");
+                }
+
                 if (args.size() == 3)
                     showCase.addField(path, colName);
                 else if (args.size() == 4)

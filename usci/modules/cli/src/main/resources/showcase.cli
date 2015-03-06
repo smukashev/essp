@@ -49,6 +49,8 @@ showcase set downPath subjects.person
 showcase list add country.code country_code
 showcase list add offshore.code offshore_code
 
+showcase list addCustom credit creditor creditor_id
+
 showcase save
 
 #=================================================================================
@@ -68,6 +70,8 @@ showcase list add legal_form
 showcase list add offshore
 showcase list add enterprise_type
 showcase list add country
+
+showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -133,8 +137,10 @@ showcase set name CORE_PERSON_CONTACTS
 showcase set tableName CORE_PERSON_CONTACTS
 showcase set downPath subjects.person
 
-showcase list add contacts.contact_type
+showcase list add contacts.contact_type.code
 showcase list add contacts.details
+
+showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -152,6 +158,8 @@ showcase set downPath subjects.organization
 showcase list add contacts.contact_type.code
 showcase list add contacts.details
 
+showcase list addCustom credit creditor creditor_id
+
 showcase save
 
 #=================================================================================
@@ -167,7 +175,7 @@ showcase set downPath subjects.person
 
 showcase list add docs.no
 showcase list add docs.doc_type
-
+showcase list add docs.name
 
 showcase save
 
@@ -184,7 +192,7 @@ showcase set downPath subjects.organization
 
 showcase list add docs.no
 showcase list add docs.doc_type
-
+showcase list add docs.name
 
 showcase save
 
@@ -219,6 +227,7 @@ showcase set tableName CORE_ORGANIZATION_NAME
 showcase set downPath subjects.organization
 
 showcase list add names.name
+showcase list add names.lang
 
 showcase save
 
@@ -237,6 +246,9 @@ showcase list add turnover.issue.debt.amount debt_amount
 showcase list add turnover.issue.debt.amount_currency debt_amount_currency
 showcase list add turnover.issue.interest.amount interest_amount
 showcase list add turnover.issue.interest.amount_currency interest_amount_currency
+
+showcase list addCustom credit root credit_id
+showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -276,7 +288,6 @@ showcase save
 
 showcase set name CORE_CREDIT_PLEDGE
 showcase set tableName CORE_CREDIT_PLEDGE
-showcase set meta credit
 
 showcase list add pledges
 
@@ -296,6 +307,10 @@ showcase set downPath pledges
 showcase list add pledge_type
 showcase list add contract
 showcase list add value
+
+showcase list addCustom credit root credit_id
+showcase list addCustom credit creditor creditor_id
+showcase list addCustom credit maturity_date maturity_date
 
 showcase save
 
@@ -319,6 +334,11 @@ showcase list add remains.interest.pastdue.value_currency  interest_pastdue_cval
 showcase list add remains.interest.pastdue.open_date interest_pastdue_open_date
 showcase list add remains.interest.pastdue.close_date  interest_pastdue_close_date
 showcase list add remains.interest.pastdue.balance_account
+
+showcase list add remains.interest.write_off.date
+showcase list add remains.interest.write_off.value
+showcase list add remains.interest.write_off.value_currency
+
 showcase list add remains.debt.current.value debt_current_value
 showcase list add remains.debt.current.value_currency debt_cur_cvalue
 showcase list add remains.debt.current.balance_account
@@ -339,5 +359,52 @@ showcase list add remains.correction.balance_account
 showcase save
 
 #=================================================================================
+
+#=================================================================================
+#  17. CORE_DEBTOR_INFO
+#=================================================================================
+
+showcase set name CORE_DEBTOR_INFO
+showcase set tableName CORE_DEBTOR_INFO
+showcase set downPath subjects
+
+showcase list add organization.bank_relations.bank_relation
+showcase list add person.bank_relations.bank_relation
+
+# showcase --filter organization.bank_relations
+# showcase --filter person.bank_relations
+
+showcase save
+
+#=================================================================================
+
+#=================================================================================
+#  18. PORTFOLIO_FLOW_KFN
+#=================================================================================
+
+showcase set meta portfolio_flow_kfn
+showcase set name CORE_PORTFOLIO_FLOW_KFN
+showcase set tableName CORE_PORTFOLIO_FLOW_KFN
+
+showcase list add details.balance_account
+showcase list add details.value
+showcase list add portfolio.creditor
+
+showcase save
+
+#=================================================================================
+#  19. PORTFOLIO_FLOW_MSFO
+#=================================================================================
+
+showcase set meta portfolio_flow_msfo
+showcase set name CORE_PORTFOLIO_FLOW_MSFO
+showcase set tableName CORE_PORTFOLIO_FLOW_MSFO
+
+showcase list add details.balance_account
+showcase list add details.value
+showcase list add portfolio.creditor
+showcase list add discounted_value
+
+showcase save
 
 quit
