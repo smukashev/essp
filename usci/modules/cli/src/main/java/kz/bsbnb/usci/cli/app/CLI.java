@@ -2582,7 +2582,8 @@ public class CLI {
                     showCase.addField(path, colName);
                 else if (args.size() == 4)
                     showCase.addField(path, colName, args.get(3));
-                else throw new IllegalArgumentException("Example: showcase list add [path] [columnName] {columnAlias}");
+                else
+                    throw new IllegalArgumentException("Example: showcase list add [path] [columnName] {columnAlias}");
             } else if (args.get(1).equals("addCustom")) {
                 MetaClass customMeta = metaClassRepository.getMetaClass(args.get(2));
 
@@ -2595,9 +2596,22 @@ public class CLI {
                 }
 
                 showCase.addCustomField(path, name, args.get(4), customMeta);
+            } else if (args.get(1).equals("addFilter")) {
+                MetaClass customMeta = metaClassRepository.getMetaClass(args.get(2));
+
+                String path = "";
+                String name = args.get(3);
+
+                if (args.get(3).lastIndexOf('.') != -1) {
+                    path = args.get(3).substring(0, args.get(3).lastIndexOf('.'));
+                    name = args.get(3).substring(args.get(3).lastIndexOf('.') + 1);
+                }
+
+                showCase.addFilterField(path, name, args.get(4));
             } else {
                 System.err.println("Example: showcase list add [path] [columnName] {columnAlias}");
                 System.err.println("Example: showcase list addCustom metaClass [path] [columnName] {columnAlias}");
+                System.err.println("Example: showcase list addFilter metaClass [path] [columnName]");
                 throw new IllegalArgumentException();
             }
         } else if (args.get(0).equals("save")) {
