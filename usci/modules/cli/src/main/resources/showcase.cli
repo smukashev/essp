@@ -82,6 +82,7 @@ showcase set tableName CORE_DEBTOR
 
 showcase list add subjects.person
 showcase list add subjects.organization
+showcase list add subjects.creditor
 
 showcase save
 
@@ -99,6 +100,8 @@ showcase list add addresses.details
 showcase list add addresses.region.code
 showcase list add addresses.type
 
+showcase list addCustom credit creditor creditor_id
+
 showcase save
 
 #=================================================================================
@@ -115,6 +118,8 @@ showcase set downPath subjects.organization
 showcase list add addresses.details
 showcase list add addresses.type
 showcase list add addresses.region
+
+showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -196,6 +201,8 @@ showcase set downPath subjects.person
 
 showcase list add names.firstname
 showcase list add names.lastname
+showcase list add names.middlename
+showcase list add names.lang
 
 showcase save
 
@@ -255,6 +262,8 @@ showcase list add credit_flow.provision.provision_msfo.value msfo_value
 
 showcase list add credit_flow.provision.provision_msfo_over_balance.balance_account ba3
 showcase list add credit_flow.provision.provision_msfo_over_balance.value msfo_o_b_value
+
+showcase list addCustom credit root credit_id
 
 showcase save
 

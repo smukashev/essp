@@ -2531,6 +2531,12 @@ public class CLI {
     }
 
     public void commandShowCase() {
+        // Fast Init
+        if(showCase == null) {
+            showCase = new ShowCase();
+            showCase.setMeta(metaClassRepository.getMetaClass("credit"));
+        }
+
         if (args.get(0).equals("debug")) {
             MetaClass meta = metaClassRepository.getMetaClass("credit");
             System.out.println("ok");
@@ -2576,12 +2582,14 @@ public class CLI {
                 MetaClass customMeta = metaClassRepository.getMetaClass(args.get(2));
 
                 String path = "";
-                String colName = args.get(4);
+                String name = args.get(3);
 
-                if (args.get(3).lastIndexOf('.') != -1)
+                if (args.get(3).lastIndexOf('.') != -1) {
                     path = args.get(3).substring(0, args.get(3).lastIndexOf('.'));
+                    name = args.get(3).substring(args.get(3).lastIndexOf('.') + 1);
+                }
 
-                showCase.addCustomField(path, colName, args.get(4), customMeta);
+                showCase.addCustomField(path, name, args.get(4), customMeta);
             } else {
                 System.err.println("Example: showcase list add [path] [columnName] {columnAlias}");
                 System.err.println("Example: showcase list addCustom metaClass [path] [columnName] {columnAlias}");

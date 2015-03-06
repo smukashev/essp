@@ -116,6 +116,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
             default:
                 tableName = getHistoryTableName(showcaseHolder.getShowCaseMeta());
         }
+
         Database model = new Database();
         model.setName("model");
 
@@ -139,16 +140,39 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         for (String prefix : prefixToColumn.keySet()) {
             Column column = new Column();
             column.setName(COLUMN_PREFIX + prefixToColumn.get(prefix) + "_ID");
-
             column.setPrimaryKey(false);
             column.setRequired(false);
-
             column.setType("NUMERIC");
             column.setSize("14,0");
-
             column.setAutoIncrement(false);
 
             table.addColumn(column);
+        }
+
+        if(showcaseHolder.getShowCaseMeta().getCustomFields().size() > 0) {
+            for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getCustomFields()) {
+                if(sf.getAttributePath().equals("ROOT")) {
+                    Column column = new Column();
+                    column.setName(COLUMN_PREFIX + sf.getColumnName());
+                    column.setPrimaryKey(false);
+                    column.setRequired(false);
+                    column.setType("NUMERIC");
+                    column.setSize("14,0");
+                    column.setAutoIncrement(false);
+
+                    table.addColumn(column);
+                } else {
+                    Column column = new Column();
+                    column.setName(COLUMN_PREFIX + sf.getColumnName());
+                    column.setPrimaryKey(false);
+                    column.setRequired(false);
+                    column.setType("NUMERIC");
+                    column.setSize("14,0");
+                    column.setAutoIncrement(false);
+
+                    table.addColumn(column);
+                }
+            }
         }
 
         Index indexR = new NonUniqueIndex();
@@ -157,7 +181,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         table.addIndex(indexR);
 
         for (ShowCaseField field : showcaseHolder.getShowCaseMeta().getFieldsList()) {
-
             if (field.getAttributeName().equals(""))
                 continue;
 
