@@ -3007,11 +3007,15 @@ public class CLI
             if (command.equals("test")) {
                 commandTest();
             } else if (command.equals("clear")) {
+                System.out.println("Storage clearing...");
                 storage.clear();
+                System.out.println("Storage cleared");
             } else if (command.equals("rc")) {
                 metaClassRepository.resetCache();
             } else if (command.equals("init")) {
+                System.out.println("Storage initializing...");
                 storage.initialize();
+                System.out.println("Storage initialized");
             } else if(command.equals("empty")){
                 storage.empty();
             } else if (command.equals("tc")) {

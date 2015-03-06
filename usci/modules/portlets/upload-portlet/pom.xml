@@ -4,7 +4,7 @@
     <groupId>kz.bsbnb.usci.portlets</groupId>
     <artifactId>upload-portlet</artifactId>
     <packaging>war</packaging>
-    <name>upload-portlet</name>
+    <name>USCI Portlets: UploadPortlet</name>
     <version>0.1</version>
     <properties>
         <liferay.version>6.1.2</liferay.version>

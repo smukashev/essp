@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bsbnb</groupId>
     <artifactId>credit-registry-report-portlet</artifactId>
@@ -32,8 +34,8 @@
                 <version>2.5</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -77,19 +79,12 @@
             <version>2.0</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- vaadin dependencies -->
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin</artifactId>
             <version>6.7.4</version>
             <scope>provided</scope>
         </dependency>
-        <!--<dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <scope>provided</scope>
-        </dependency>-->
         <dependency>
             <groupId>commons-digester</groupId>
             <artifactId>commons-digester</artifactId>
@@ -111,12 +106,6 @@
             <artifactId>jasperreports</artifactId>
             <version>4.1.3</version>
         </dependency>
-        <!--<dependency>
-            <groupId>net.sf.jasperreports</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>1.7.5</version>
-            <scope>provided</scope>
-        </dependency>-->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>vaadin-messagebox</artifactId>

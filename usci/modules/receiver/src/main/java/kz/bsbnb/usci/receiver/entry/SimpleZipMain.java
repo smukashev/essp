@@ -14,20 +14,15 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.ParseException;
 
-/**
- * @author abukabayev
- */
-//16:06:25
 public class SimpleZipMain {
     public static void main(String args[]) throws IOException, ParserConfigurationException,
             SAXException, ParseException, InterruptedException {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextZip.xml");
 
         IServiceRepository serviceFactory = ctx.getBean(IServiceRepository.class);
+
         IBatchService batchService = serviceFactory.getBatchService();
-
         ICouchbaseClientFactory couchbaseClientFactory = ctx.getBean(ICouchbaseClientFactory.class);
-
         StatusSingleton statusSingleton = ctx.getBean(StatusSingleton.class);
 
         ZipFilesMonitor monitor = ctx.getBean(ZipFilesMonitor.class);

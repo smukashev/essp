@@ -4,7 +4,7 @@
     <groupId>kz.bsbnb.usci.portlets</groupId>
     <artifactId>signing-portlet</artifactId>
     <packaging>war</packaging>
-    <name>signing-portlet</name>
+    <name>USCI Portlets: SigningPortlet</name>
     <version>0.1</version>
     <properties>
         <liferay.version>6.1.2</liferay.version>

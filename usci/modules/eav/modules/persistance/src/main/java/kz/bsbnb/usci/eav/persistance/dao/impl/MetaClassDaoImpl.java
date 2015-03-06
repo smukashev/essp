@@ -180,6 +180,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
             metaClass.setClassTitle((String) row.get("title"));
             metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
             metaClass.setReference(((BigDecimal)row.get("is_reference")).longValue() == 1);
+            metaClass.setParentIsKey(((BigDecimal) row.get("parent_is_key")).longValue() == 1);
         } else {
             logger.error("Can't load metaClass, empty data set.");
         }

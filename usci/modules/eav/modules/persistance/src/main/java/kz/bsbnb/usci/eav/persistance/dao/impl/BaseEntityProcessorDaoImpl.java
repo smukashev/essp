@@ -201,9 +201,56 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return new ArrayList<>();
     }
 
+    public IBaseEntity postPrepare(IBaseEntity baseEntity, IBaseEntity parentEntity) {
+        MetaClass metaClass = baseEntity.getMeta();
+
+        for (String attribute : baseEntity.getAttributes()) {
+            IMetaType memberType = baseEntity.getMemberType(attribute);
+
+            if (memberType.isComplex()) {
+                IBaseValue memberValue = baseEntity.getBaseValue(attribute);
+
+                if (memberValue.getValue() != null) {
+                    if (memberType.isSet()) {
+                        IMetaSet childMetaSet = (IMetaSet) memberType;
+                        IMetaType childMetaType = childMetaSet.getMemberType();
+
+                        if (childMetaType.isSet()) {
+                            throw new UnsupportedOperationException("Not yet implemented.");
+                        } else {
+                            IBaseSet childBaseSet = (IBaseSet) memberValue.getValue();
+
+                            for (IBaseValue childBaseValue : childBaseSet.get()) {
+                                IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
+
+                                if (childBaseEntity.getValueCount() != 0)
+                                    postPrepare((IBaseEntity) childBaseValue.getValue(), baseEntity);
+                            }
+                        }
+                    } else {
+                        IBaseEntity childBaseEntity = (IBaseEntity) memberValue.getValue();
+
+                        if (childBaseEntity.getValueCount() != 0)
+                            postPrepare((IBaseEntity) memberValue.getValue(), baseEntity);
+                    }
+                }
+            }
+        }
+
+        if (parentEntity != null && metaClass.isSearchable() && metaClass.isParentIsKey()) {
+            Long baseEntityId = searcherPool.getImprovedBaseEntityLocalSearcher().
+                    findSingleWithParent((BaseEntity) baseEntity, (BaseEntity) parentEntity);
+
+            if(baseEntityId == null) baseEntity.setId(0);
+            else baseEntity.setId(baseEntityId);
+        }
+
+        return baseEntity;
+    }
 
     public IBaseEntity prepare(IBaseEntity baseEntity) {
         IMetaClass metaClass = baseEntity.getMeta();
+
         for (String attribute : baseEntity.getAttributes()) {
             IMetaType metaType = baseEntity.getMemberType(attribute);
             if (metaType.isComplex()) {
@@ -2843,24 +2890,25 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
         IBaseEntity baseEntityPrepared = prepare(((BaseEntity) baseEntity).clone());
-        IBaseEntity baseEntityApplied = null;
+        IBaseEntity baseEntityPostPrepared = postPrepare(((BaseEntity) baseEntityPrepared).clone(), null);
+        IBaseEntity baseEntityApplied;
 
-        if (baseEntityPrepared.getOperation() != null) {
-            switch (baseEntityPrepared.getOperation()) {
+        if (baseEntityPostPrepared.getOperation() != null) {
+            switch (baseEntityPostPrepared.getOperation()) {
                 case DELETE:
-                    if (baseEntityPrepared.getId() <= 0)
+                    if (baseEntityPostPrepared.getId() <= 0)
                         throw new RuntimeException("deleting entity must be found");
-                    baseEntityManager.registerAsDeleted(baseEntityPrepared);
-                    baseEntityApplied = ((BaseEntity) baseEntityPrepared).clone();
+                    baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
+                    baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
                     entityHolder.applied = baseEntityApplied;
-                    entityHolder.saving = baseEntityPrepared;
+                    entityHolder.saving = baseEntityPostPrepared;
                     break;
                 default:
                     throw new UnsupportedOperationException("Unsupported operation: "
-                            + baseEntityPrepared.getOperation());
+                            + baseEntityPostPrepared.getOperation());
             }
         } else {
-            baseEntityApplied = apply(baseEntityPrepared, baseEntityManager, entityHolder);
+            baseEntityApplied = apply(baseEntityPostPrepared, baseEntityManager, entityHolder);
         }
 
         applyToDb(baseEntityManager);

@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bsbnb</groupId>
-    <artifactId>credit-registry-audit-portlet</artifactId>
+    <artifactId>administration-portlet</artifactId>
     <packaging>war</packaging>
-    <name>credit-registry-audit-portlet</name>
+    <name>USCI Portlets: AdministrationPortlet</name>
     <version>0.1</version>
+
     <properties>
         <liferay.version>6.1.2</liferay.version>
-        <liferay.auto.deploy.dir>C:\liferay-portal-6.1.2-ce-ga3\deploy</liferay.auto.deploy.dir>
-        <liferay.app.server.deploy.dir>C:\liferay-portal-6.1.2-ce-ga3\deploy</liferay.app.server.deploy.dir>
-        <liferay.app.server.portal.dir>C:\liferay-portal-6.1.2-ce-ga3\deploy</liferay.app.server.portal.dir>
+        <liferay.auto.deploy.dir>/home/ktulbassiyev/Software/glassfish3_/deploy</liferay.auto.deploy.dir>
+        <liferay.app.server.deploy.dir>/home/ktulbassiyev/Software/glassfish3_/deploy</liferay.app.server.deploy.dir>
+        <liferay.app.server.portal.dir>/home/ktulbassiyev/Software/glassfish3_/deploy</liferay.app.server.portal.dir>
     </properties>
     <build>
         <plugins>
@@ -32,8 +34,8 @@
                 <version>2.5</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.5</source>
+                    <target>1.5</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -44,7 +46,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>credit-registry-audit-portlet</finalName>
+        <finalName>administration-portlet</finalName>
     </build>
     <dependencies>
         <dependency>
@@ -54,43 +56,22 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.liferay.portal</groupId>
-            <artifactId>util-bridges</artifactId>
-            <version>${liferay.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.liferay.portal</groupId>
-            <artifactId>util-taglib</artifactId>
-            <version>${liferay.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.liferay.portal</groupId>
-            <artifactId>util-java</artifactId>
-            <version>${liferay.version}</version>
-        </dependency>
-        <dependency>
             <groupId>javax.portlet</groupId>
             <artifactId>portlet-api</artifactId>
             <version>2.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
-            <scope>provided</scope>
+            <groupId>kz.bsbnb.usci</groupId>
+            <artifactId>core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>2.0</version>
-            <scope>provided</scope>
+            <groupId>kz.bsbnb.usci</groupId>
+            <artifactId>cr</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.3.0</version>
-        </dependency>
+        <!-- vaadin dependencies -->
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin</artifactId>
@@ -98,9 +79,23 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.liferay.portal</groupId>
-            <artifactId>portal-client</artifactId>
-            <version>6.0.5</version>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>deployment</id>
+            <name>Internal Releases</name>
+            <url>http://cigit.bsbnb.kz:8080/nexus-2.3.1-01/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>deployment</id>
+            <name>Internal Snapshots</name>
+            <url>http://cigit.bsbnb.kz:8080/nexus-2.3.1-01/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

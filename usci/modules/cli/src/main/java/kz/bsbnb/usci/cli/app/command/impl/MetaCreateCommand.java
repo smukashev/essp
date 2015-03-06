@@ -4,28 +4,15 @@ import kz.bsbnb.usci.cli.app.command.IMetaCommand;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 /**
  * @author alexandr.motov
  */
 public class MetaCreateCommand extends AbstractCommand implements IMetaCommand {
-
-    public enum AttributeKeyType
-    {
-        ALL(ComplexKeyTypes.ALL), ANY(ComplexKeyTypes.ANY);
-
-        private ComplexKeyTypes complexKeyType;
-
-        AttributeKeyType(ComplexKeyTypes complexKeyType)
-        {
-            this.complexKeyType = complexKeyType;
-        }
-
-        public ComplexKeyTypes getComplexKeyType() {
-            return complexKeyType;
-        }
-    }
 
     public static final String OPTION_NAME = "n";
     public static final String LONG_OPTION_NAME = "name";
@@ -33,14 +20,14 @@ public class MetaCreateCommand extends AbstractCommand implements IMetaCommand {
     public static final String LONG_OPTION_REFERENCE = "reference";
     public static final String OPTION_KEY_TYPE = "kt";
     public static final String LONG_OPTION_KEY_TYPE = "keytype";
-
+    public static final String OPTION_PARENT_KEY = "pk";
+    public static final String LONG_OPTION_PARENT_KEY = "parent_is_key";
     public static final String DEFAULT_NAME = null;
     public static final boolean DEFAULT_REFERENCE = false;
+    public static final boolean DEFAULT_PARENT_KEY = false;
     public static final AttributeKeyType DEFAULT_KEY_TYPE = AttributeKeyType.ALL;
-
     private IMetaClassRepository metaClassRepository;
     private Options options = new Options();
-
     public MetaCreateCommand()
     {
         Option nameOption = new Option(OPTION_NAME, LONG_OPTION_NAME, true,
@@ -65,12 +52,19 @@ public class MetaCreateCommand extends AbstractCommand implements IMetaCommand {
         keyTypeOption.setArgName(LONG_OPTION_KEY_TYPE);
         keyTypeOption.setType(String.class);
         options.addOption(keyTypeOption);
+
+        Option parentKeyOption = new Option(OPTION_PARENT_KEY, LONG_OPTION_PARENT_KEY, false,
+                "Parent_is_key flag for new instance of MetaClass.");
+        parentKeyOption.setArgs(0);
+        parentKeyOption.setRequired(false);
+        options.addOption(parentKeyOption);
     }
 
     @Override
     public void run(String args[]) {
         String name = DEFAULT_NAME;
         boolean isReference = DEFAULT_REFERENCE;
+        boolean isParentKey = DEFAULT_PARENT_KEY;
         AttributeKeyType keyType = DEFAULT_KEY_TYPE;
 
         try {
@@ -86,6 +80,10 @@ public class MetaCreateCommand extends AbstractCommand implements IMetaCommand {
 
             if(commandLine.hasOption(OPTION_REFERENCE)) {
                 isReference = true;
+            }
+
+            if (commandLine.hasOption(OPTION_PARENT_KEY)) {
+                isParentKey = true;
             }
 
             if(commandLine.hasOption(OPTION_KEY_TYPE)) {
@@ -104,12 +102,11 @@ public class MetaCreateCommand extends AbstractCommand implements IMetaCommand {
         }
 
         if (metaClassRepository == null)
-        {
             throw new RuntimeException("Instance of IMetaClassRepository can not be null.");
-        }
 
         MetaClass meta = new MetaClass(name);
         meta.setReference(isReference);
+        meta.setParentIsKey(isParentKey);
         meta.setComplexKeyType(keyType.getComplexKeyType());
 
         metaClassRepository.saveMetaClass(meta);
@@ -118,5 +115,19 @@ public class MetaCreateCommand extends AbstractCommand implements IMetaCommand {
     @Override
     public void setMetaClassRepository(IMetaClassRepository metaClassRepository) {
         this.metaClassRepository = metaClassRepository;
+    }
+
+    public enum AttributeKeyType {
+        ALL(ComplexKeyTypes.ALL), ANY(ComplexKeyTypes.ANY);
+
+        private ComplexKeyTypes complexKeyType;
+
+        AttributeKeyType(ComplexKeyTypes complexKeyType) {
+            this.complexKeyType = complexKeyType;
+        }
+
+        public ComplexKeyTypes getComplexKeyType() {
+            return complexKeyType;
+        }
     }
 }
