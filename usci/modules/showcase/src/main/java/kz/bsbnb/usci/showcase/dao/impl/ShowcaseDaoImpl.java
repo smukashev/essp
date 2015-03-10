@@ -17,6 +17,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
 import org.jooq.*;
@@ -650,7 +651,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
                         EAV_SC_SHOWCASE_FIELDS.COLUMN_NAME,
                         EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_ID,
                         EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_NAME,
-                        EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH)
+                        EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH,
+                        EAV_SC_SHOWCASE_FIELDS.TYPE)
                 .from(EAV_SC_SHOWCASE_FIELDS)
                 .where(EAV_SC_SHOWCASE_FIELDS.SHOWCASE_ID.equal(showCase.getId()));
 
@@ -664,6 +666,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
                 showCaseField.setName((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.NAME.getName()));
                 showCaseField.setTitle((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.TITLE.getName()));
                 showCaseField.setColumnName((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.COLUMN_NAME.getName()));
+                showCaseField.setType((Integer) curRow.get(EAV_SC_SHOWCASE_FIELDS.TYPE.getName()));
                 showCaseField.setAttributeName((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_NAME.getName()));
 
                 if (curRow.get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH.getName()) != null)
@@ -676,7 +679,13 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
                 showCaseField.setId(((BigDecimal) curRow
                         .get(EAV_SC_SHOWCASE_FIELDS.ID.getName())).longValue());
 
-                showCase.addField(showCaseField);
+                if(showCaseField.getType() == ShowCaseField.ShowCaseFieldTypes.CUSTOM) {
+                    showCase.addCustomField(showCaseField);
+                } else if(showCaseField.getType() == ShowCaseField.ShowCaseFieldTypes.FILTER) {
+                    showCase.addFilterField(showCaseField);
+                } else {
+                    showCase.addField(showCaseField);
+                }
             }
         }
 
@@ -755,7 +764,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
                 .set(EAV_SC_SHOWCASE_FIELDS.COLUMN_NAME, showCaseField.getColumnName())
                 .set(EAV_SC_SHOWCASE_FIELDS.NAME, showCaseField.getName())
                 .set(EAV_SC_SHOWCASE_FIELDS.SHOWCASE_ID, showCaseId)
-                .set(EAV_SC_SHOWCASE_FIELDS.TITLE, showCaseField.getTitle());
+                .set(EAV_SC_SHOWCASE_FIELDS.TITLE, showCaseField.getTitle())
+                .set(EAV_SC_SHOWCASE_FIELDS.TYPE, DataUtils.convert(showCaseField.getType() != 0));
 
         logger.debug(insert.toString());
         long showCaseFieldId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());

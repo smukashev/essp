@@ -71,6 +71,14 @@ public class ShowCase extends Persistable {
         fields.add(field);
     }
 
+    public void addCustomField(ShowCaseField field) {
+        customFields.add(field);
+    }
+
+    public void addFilterField(ShowCaseField field) {
+        filterFields.add(field);
+    }
+
     public MetaClass getActualMeta() {
         if (downPath.equals(""))
             return meta;
