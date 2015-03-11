@@ -2543,7 +2543,7 @@ public class CLI {
         } else if (args.get(0).equals("status")) {
             System.out.println(showCase.toString());
             for(ShowCaseField sf : showCase.getFieldsList()) {
-                System.out.println(sf.getColumnName());
+                System.out.println(sf.getAttributePath() + ", " + sf.getColumnName());
             }
         } else if (args.get(0).equals("set")) {
             if (args.size() != 3)

@@ -22,9 +22,9 @@
     <column name="attribute_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
     <column name="attribute_name" primaryKey="false" required="false" type="VARCHAR" size="64" autoIncrement="false"/>
     <column name="attribute_path" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
-    <column name="type" primaryKey="false" required="false" type="NUMERIC" default="0" size="1" autoIncrement="false"/>
+    <column name="type" required="true" type="NUMERIC" size="5,0" autoIncrement="false"/>
 
-    <foreign-key foreignTable="eav_sc_showcases" name="FK_eav_sc_showcases">
+    <!--<foreign-key foreignTable="eav_sc_showcases" name="FK_eav_sc_showcases">
       <reference local="showcase_id" foreign="id"/>
     </foreign-key>-->
   </table>

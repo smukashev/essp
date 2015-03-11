@@ -17,7 +17,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
-import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
 import org.jooq.*;
@@ -150,9 +149,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
             table.addColumn(column);
         }
 
-        if(showcaseHolder.getShowCaseMeta().getCustomFields().size() > 0) {
+        if (showcaseHolder.getShowCaseMeta().getCustomFields().size() > 0) {
             for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getCustomFields()) {
-                if(sf.getAttributePath().equals("ROOT")) {
+                if (sf.getAttributePath().equals("ROOT")) {
                     Column column = new Column();
                     column.setName(COLUMN_PREFIX + sf.getColumnName());
                     column.setPrimaryKey(false);
@@ -679,9 +678,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
                 showCaseField.setId(((BigDecimal) curRow
                         .get(EAV_SC_SHOWCASE_FIELDS.ID.getName())).longValue());
 
-                if(showCaseField.getType() == ShowCaseField.ShowCaseFieldTypes.CUSTOM) {
+                if (showCaseField.getType() == ShowCaseField.ShowCaseFieldTypes.CUSTOM) {
                     showCase.addCustomField(showCaseField);
-                } else if(showCaseField.getType() == ShowCaseField.ShowCaseFieldTypes.FILTER) {
+                } else if (showCaseField.getType() == ShowCaseField.ShowCaseFieldTypes.FILTER) {
                     showCase.addFilterField(showCaseField);
                 } else {
                     showCase.addField(showCaseField);
@@ -765,10 +764,13 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
                 .set(EAV_SC_SHOWCASE_FIELDS.NAME, showCaseField.getName())
                 .set(EAV_SC_SHOWCASE_FIELDS.SHOWCASE_ID, showCaseId)
                 .set(EAV_SC_SHOWCASE_FIELDS.TITLE, showCaseField.getTitle())
-                .set(EAV_SC_SHOWCASE_FIELDS.TYPE, DataUtils.convert(showCaseField.getType() != 0));
+                .set(EAV_SC_SHOWCASE_FIELDS.TYPE, showCaseField.getType());
 
         logger.debug(insert.toString());
-        long showCaseFieldId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+
+        long showCaseFieldId = insertWithId(insert.getSQL(),
+                insert.getBindValues().toArray());
+
         showCaseField.setId(showCaseFieldId);
 
         return showCaseFieldId;
@@ -784,12 +786,20 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
                 .set(EAV_SC_SHOWCASES.DOWN_PATH, showCase.getDownPath());
 
         logger.debug(insert.toString());
-        long showCaseId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+
+        long showCaseId = insertWithId(insert.getSQL(),
+                insert.getBindValues().toArray());
+
         showCase.setId(showCaseId);
 
-        for (ShowCaseField showCaseField : showCase.getFieldsList()) {
-            insertField(showCaseField, showCase.getId());
-        }
+        for (ShowCaseField sf : showCase.getFieldsList())
+            insertField(sf, showCase.getId());
+
+        for (ShowCaseField sf : showCase.getCustomFields())
+            insertField(sf, showCase.getId());
+
+        for (ShowCaseField sf : showCase.getFilterFields())
+            insertField(sf, showCase.getId());
 
         return showCaseId;
     }

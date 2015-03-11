@@ -140,6 +140,7 @@ public class ShowCase extends Persistable {
             showCaseField.setAttributeName(name);
             showCaseField.setColumnName(columnName);
             showCaseField.setTitle(metaAttribute.getTitle());
+            showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.CUSTOM);
 
             if (metaType.isComplex()) {
                 showCaseField.setAttributePath(path.equals("") ? name : path + "." + name);
@@ -155,6 +156,7 @@ public class ShowCase extends Persistable {
             showCaseField.setAttributeName(name);
             showCaseField.setColumnName(columnName);
             showCaseField.setTitle("ROOT_ID");
+            showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.CUSTOM);
 
             customFields.add(showCaseField);
         }
@@ -178,6 +180,7 @@ public class ShowCase extends Persistable {
         showCaseField.setAttributeName(name);
         showCaseField.setColumnName(columnName);
         showCaseField.setTitle(attr.getTitle());
+        showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.FILTER);
 
         if (metaType.isComplex()) {
             showCaseField.setAttributePath(path.equals("") ? name : path + "." + name);

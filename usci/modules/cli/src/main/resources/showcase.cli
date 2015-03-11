@@ -327,6 +327,7 @@ showcase set downPath change
 showcase list add remains.limit.value limit_value
 showcase list add remains.limit.value_currency limit_cvalue
 showcase list add remains.limit.balance_account
+
 showcase list add remains.interest.current.value interest_current_value
 showcase list add remains.interest.current.value_currency interest_current_cvalue
 showcase list add remains.interest.pastdue.value  interest_pastdue_value
@@ -335,9 +336,9 @@ showcase list add remains.interest.pastdue.open_date interest_pastdue_open_date
 showcase list add remains.interest.pastdue.close_date  interest_pastdue_close_date
 showcase list add remains.interest.pastdue.balance_account
 
-showcase list add remains.interest.write_off.date
-showcase list add remains.interest.write_off.value
-showcase list add remains.interest.write_off.value_currency
+showcase list add remains.interest.write_off.date interest_wrt_date
+showcase list add remains.interest.write_off.value interest_wrt_value
+showcase list add remains.interest.write_off.value_currency interest_wrt_cvalue
 
 showcase list add remains.debt.current.value debt_current_value
 showcase list add remains.debt.current.value_currency debt_cur_cvalue
