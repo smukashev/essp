@@ -4,7 +4,7 @@
 	<portlet>
 		<portlet-name>entity-portlet</portlet-name>
 		<display-name>Портлет данных</display-name>
-		<portlet-class>kz.bsbnb.usci.porltet.batch_entry_list.MainPortlet</portlet-class>
+		<portlet-class>kz.bsbnb.usci.porltet.entity_editor.MainPortlet</portlet-class>
 		<init-param>
 			<name>view-template</name>
 			<value>/view.jsp</value>

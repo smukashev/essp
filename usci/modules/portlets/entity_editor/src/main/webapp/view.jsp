@@ -24,6 +24,35 @@
     var contextPathUrl = '<%=request.getContextPath()%>';
 </script>
 
+<style>
+    .node {
+        border: 1px solid black;
+        margin: 5px;
+    }
+
+    .leaf {
+        margin: 5px;
+    }
+
+    .loading {
+        display: none;
+        background-image: url("<%=request.getContextPath()%>/pics/loading.gif");
+        background-repeat: no-repeat;
+        background-position: 0 center;
+        text-decoration: none;
+        width: 10px;
+        cursor: default;
+    }
+
+    .not-filled{
+        display: none;
+        text-decoration: none;
+        cursor: default;
+        color: red;
+        margin-left: 2px;
+    }
+</style>
+
 <script src="/static-usci/ext/ext-all.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/main.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/st_format.js" type="text/javascript"></script>

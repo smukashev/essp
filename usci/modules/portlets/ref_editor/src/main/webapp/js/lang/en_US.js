@@ -18,4 +18,5 @@ var label_INPUT_FORM = "Енгізу формасы";
 var label_REF = 'Анықтама';
 var label_ITEMS = 'Элементтер';
 var label_ENTITY_ID = 'Болмыс идентификаторы';
+var label_Date = 'Дата';
 //var label_DEL = 'Удалить_en';

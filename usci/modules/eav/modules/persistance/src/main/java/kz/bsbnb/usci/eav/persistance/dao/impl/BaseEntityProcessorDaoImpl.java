@@ -2977,7 +2977,15 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return entityIds;
     }
 
-    public List<RefListItem> getRefsByMetaclass(long metaClassId) {
+    /**
+     * Analog of getRefsByMetaClass method, not escapes content with quotes
+     */
+    public List<RefListItem> getRefsByMetaclassRaw(long metaClassId) {
+        return getRefsByMetaClass(metaClassId, true);
+    }
+
+    public List<RefListItem> getRefsByMetaClass(long metaClassId, boolean raw) {
+
         ArrayList<RefListItem> entityIds = new ArrayList<RefListItem>();
 
         Select select = context.select().from(
@@ -3057,11 +3065,20 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             rli.setId(id);
             while (old_id == id) {
                 if (((String) row.get("NAME")).equals("code")) {
-                    rli.setCode(Quote.addSlashes((String) row.get("VALUE")));
+                    String code = (String) row.get("VALUE");
+                    if(!raw)
+                        code = Quote.addSlashes(code);
+                    rli.setCode(code);
                 } else if (((String) row.get("NAME")).startsWith("name_")) {
-                    rli.setTitle(Quote.addSlashes((String) row.get("VALUE")));
+                    String value = (String) row.get("VALUE");
+                    if(!raw)
+                        value = Quote.addSlashes(value);
+                    rli.setTitle(value);
                 } else if (((String) row.get("NAME")).startsWith("name")) {
-                    rli.setTitle(Quote.addSlashes((String) row.get("VALUE")));
+                    String value = (String) row.get("VALUE");
+                    if(!raw)
+                        value = Quote.addSlashes(value);
+                    rli.setTitle(value);
                 }
 
                 for (String key : row.keySet()) {
@@ -3069,7 +3086,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         continue;
                     }
 
-                    String value = Quote.addSlashes(row.get(key).toString());
+                    String value = row.get(key).toString();
+
+                    if(!raw)
+                        value = Quote.addSlashes(value);
 
                     //System.out.println("###% " + value);
 
@@ -3088,6 +3108,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
 
         return entityIds;
+    }
+
+    public List<RefListItem> getRefsByMetaclass(long metaClassId) {
+        return getRefsByMetaClass(metaClassId, false);
     }
 
     public List<BaseEntity> getEntityByMetaclass(MetaClass meta) {

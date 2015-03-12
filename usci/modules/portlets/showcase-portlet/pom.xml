@@ -5,7 +5,7 @@
     <groupId>kz.bsbnb.usci</groupId>
     <artifactId>showcase-portlet</artifactId>
     <packaging>war</packaging>
-    <name>showcase-portlet Portlet</name>
+    <name>USCI Portlets: ShowcasePortlet</name>
     <version>1.0-SNAPSHOT</version>
     <properties>
         <liferay.maven.plugin.version>6.2.10.6</liferay.maven.plugin.version>

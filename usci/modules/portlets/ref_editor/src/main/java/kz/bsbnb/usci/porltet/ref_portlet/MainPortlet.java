@@ -398,7 +398,8 @@ public class MainPortlet extends MVCPortlet {
                 case LIST_ENTITY:
                     String entityId = getParam("entityId", resourceRequest);
                     if (entityId != null && entityId.trim().length() > 0) {
-                        BaseEntity entity = entityService.load(Integer.parseInt(entityId));
+                        Date date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+                        BaseEntity entity = entityService.load(Integer.parseInt(entityId), date);
 
                         writer.write("{\"text\":\".\",\"children\": [\n" +
                                 entityToJson(entity, entity.getMeta().getClassTitle(),

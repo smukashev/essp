@@ -5,7 +5,104 @@ Ext.require([
     'Ext.tip.*'
 ]);
 
-var currentClassId = null;
+var regex = /^\S+-(\d+)-(\S+)-(\S+)$/;
+var currentClass;
+
+
+function getForm(){
+    currentClass = Ext.getCmp('edClass').value;
+    Ext.Ajax.request({
+        url: dataUrl,
+        method: 'POST',
+        params: {
+            op: 'GET_FORM',
+            meta: currentClass
+        },
+        success: function(data){
+            document.getElementById('entity-editor-form').innerHTML = data.responseText;
+        }
+    });
+}
+
+var errors = [];
+
+function filterLeaf(control, queryObject){
+    for(var i =0 ;i<control.childNodes.length;i++) {
+        var childControl = control.childNodes[i];
+        if(childControl.tagName == 'INPUT' || childControl.tagName=='SELECT') {
+            var info =  childControl.id.match(regex);
+            var id = info[1];
+
+            if(childControl.value.length == 0) {
+                errors.push(document.getElementById('err-' + id));
+            }
+
+            queryObject[info[3]] = childControl.value;
+        }
+    }
+}
+
+function filterNode(control, queryObject){
+    for(var i =0; i<control.childNodes.length;i++) {
+        var childControl = control.childNodes[i];
+        if(childControl.className != undefined && childControl.className.indexOf('leaf') > -1) {
+            filterLeaf(childControl, queryObject);
+            break;
+        }
+    }
+}
+
+function find(control){
+    var nextDiv = control.parentNode.nextSibling;
+    var inputDiv = control.previousSibling.previousSibling;
+
+    var info = inputDiv.id.match(regex);
+
+
+    var params = {op : 'FIND_ACTION', metaClass: info[2]};
+    for(var i=0;i<errors.length;i++)
+        errors[i].style.display = 'none';
+
+    errors = [];
+
+    for (var  i = 0; i < nextDiv.childNodes.length; i++) {
+        var preKeyElem = nextDiv.childNodes[i];
+        if(preKeyElem.className.indexOf('leaf') > -1) {
+            filterLeaf(preKeyElem, params);
+        } else {
+            filterNode(preKeyElem, params);
+        }
+    }
+
+    if(errors.length > 0) {
+        for (var i = 0; i < errors.length; i++) {
+            errors[i].style.display = 'inline';
+        }
+        return;
+    } else {
+        var loadDiv = control.nextSibling;
+        loadDiv.style.display = 'inline';
+    }
+
+
+    Ext.Ajax.request({
+        url: dataUrl,
+        method: 'POST',
+        params: params,
+        success: function(response) {
+            var data = JSON.parse(response.responseText);
+            if(data.data > -1)
+                inputDiv.value = data.data;
+            else
+                inputDiv.value = '';
+
+            loadDiv.style.display = 'none';
+        },
+        failure: function() {
+            console.log('woops');
+        }
+    });
+}
 
 function createXML(currentNode, rootFlag, offset, arrayEl, first) {
     var xmlStr = "";
@@ -17,10 +114,10 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first) {
     } else {
         if(first) {
             xmlStr += offset + "<entity " +
-                (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
+            (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
         } else {
             xmlStr += offset + "<" + currentNode.data.code +
-                (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
+            (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
         }
     }
 
@@ -53,137 +150,11 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first) {
     return xmlStr;
 }
 
-var grid;
-var store;
-
-function createItemsGrid(itemId) {
-    if(grid == null) {
-        Ext.define('myModel', {
-            extend: 'Ext.data.Model',
-            fields: ['id','code','title']
-        });
-
-        store = Ext.create('Ext.data.Store', {
-            model: 'myModel',
-            remoteGroup: true,
-            buffered: true,
-            leadingBufferZone: 300,
-            pageSize: 100,
-            proxy: {
-                type: 'ajax',
-                url: dataUrl,
-                extraParams: {op : 'LIST_BY_CLASS', metaId : itemId},
-                actionMethods: {
-                    read: 'POST'
-                },
-                reader: {
-                    type: 'json',
-                    root: 'data',
-                    totalProperty: 'total'
-                }
-            },
-            autoLoad: true,
-            remoteSort: true
-        });
-
-        grid = Ext.create('Ext.grid.Panel', {
-            id: "itemsGrid",
-            height: "100%",
-            store: store,
-
-            columns: [
-                {
-                    text     : 'ID',
-                    dataIndex: 'id',
-                    flex:1
-                },
-                {
-                    text     : label_CODE,
-                    dataIndex: 'code',
-                    flex:1
-                },
-                {
-                    text     : label_TITLE,
-                    dataIndex: 'title',
-                    flex:3
-                }
-            ],
-            title: label_ITEMS,
-            listeners : {
-                itemdblclick: function(dv, record, item, index, e) {
-                    entityId = Ext.getCmp("entityId");
-                    entityId.setValue(record.get('id'));
-                }
-            }
-        });
-
-        return grid;
-    } else {
-        store.load({
-            params: {
-                metaId: itemId,
-                op : 'LIST_BY_CLASS'
-            },
-            callback: function(records, operation, success) {
-                if (!success) {
-                    Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA);
-                }
-            }
-        });
-    }
-}
-
 Ext.onReady(function() {
-    grid = null;
 
     Ext.define('classesStoreModel', {
         extend: 'Ext.data.Model',
-        fields: ['classId','className']
-    });
-
-    var classesStore = Ext.create('Ext.data.Store', {
-        model: 'classesStoreModel',
-        pageSize: 100,
-        proxy: {
-            type: 'ajax',
-            url: dataUrl,
-            extraParams: {op : 'LIST_CLASSES'},
-            actionMethods: {
-                read: 'POST'
-            },
-            reader: {
-                type: 'json',
-                root: 'data',
-                totalProperty: 'total'
-            }
-        },
-        autoLoad: true,
-        remoteSort: true
-    });
-
-    Ext.define('refStoreModel', {
-        extend: 'Ext.data.Model',
-        fields: ['id','title']
-    });
-
-    var refStore = Ext.create('Ext.data.Store', {
-        model: 'refStoreModel',
-        pageSize: 100,
-        proxy: {
-            type: 'ajax',
-            url: dataUrl,
-            extraParams: {op : 'LIST_BY_CLASS'},
-            actionMethods: {
-                read: 'POST'
-            },
-            reader: {
-                type: 'json',
-                root: 'data',
-                totalProperty: 'total'
-            }
-        },
-        autoLoad: false,
-        remoteSort: true
+        fields: ['id','name']
     });
 
     Ext.define('entityModel', {
@@ -213,20 +184,24 @@ Ext.onReady(function() {
         id: "entityEditorShowBtn",
         text: label_VIEW,
         handler : function (){
-            entityId = Ext.getCmp("entityId");
+            //entityId = Ext.getCmp("entityId");
+            var entityId = document.getElementById('inp-1-' + currentClass + '-null').value;
 
             entityStore.load({
                 params: {
                     op : 'LIST_ENTITY',
-                    entityId: entityId.getValue()
+                    entityId: entityId,
+                    date: Ext.getCmp('edDate').value
                 },
                 callback: function(records, operation, success) {
                     if (!success) {
-                        Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
+                        Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
                     }
                 }
             });
-        }
+        },
+        maxWidth: 50,
+        shadow: true
     });
 
     var buttonXML = Ext.create('Ext.button.Button', {
@@ -252,10 +227,22 @@ Ext.onReady(function() {
                     console.log('woops');
                 }
             });
+        },
+        maxWidth: 50
+    });
 
-            /*var buttonClose = Ext.create('Ext.button.Button', {
+    var buttonShowXML = Ext.create('Ext.button.Button', {
+        id: "entityEditorShowXmlBtn",
+        text: 'XML',
+        handler : function (){
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+
+            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
+
+            var buttonClose = Ext.create('Ext.button.Button', {
                 id: "itemFormCancel",
-                text: 'Отмена',
+                text: label_CANCEL,
                 handler : function (){
                     Ext.getCmp('xmlFromWin').destroy();
                 }
@@ -293,61 +280,9 @@ Ext.onReady(function() {
                 items:[xmlForm]
             });
 
-            xmlFromWin.show();*/
-        }
-    });
-
-    var buttonShowXML = Ext.create('Ext.button.Button', {
-        id: "entityEditorShowXmlBtn",
-        text: 'XML',
-        handler : function (){
-            var tree = Ext.getCmp('entityTreeView');
-            rootNode = tree.getRootNode();
-
-            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
-
-            var buttonClose = Ext.create('Ext.button.Button', {
-             id: "itemFormCancel",
-             text: label_CANCEL,
-             handler : function (){
-             Ext.getCmp('xmlFromWin').destroy();
-             }
-             });
-
-             var xmlForm = Ext.create('Ext.form.Panel', {
-             id: 'xmlForm',
-             region: 'center',
-             width: 615,
-             fieldDefaults: {
-             msgTarget: 'side'
-             },
-             defaults: {
-             anchor: '100%'
-             },
-
-             bodyPadding: '5 5 0',
-             items: [{
-             fieldLabel: 'XML',
-             name: 'id',
-             xtype: 'textarea',
-             value: xmlStr,
-             height: 615
-             }],
-
-             buttons: [buttonClose]
-             });
-
-             xmlFromWin = new Ext.Window({
-             id: "xmlFromWin",
-             layout: 'fit',
-             title:'XML',
-             modal: true,
-             maximizable: true,
-             items:[xmlForm]
-             });
-
-             xmlFromWin.show();
-        }
+            xmlFromWin.show();
+        },
+        maxWidth: 50
     });
 
     var entityGrid = Ext.create('Ext.tree.Panel', {
@@ -397,7 +332,7 @@ Ext.onReady(function() {
                 var selectedNode = tree.getSelectionModel().getLastSelected();
 
                 var buttonSaveAttributes = Ext.create('Ext.button.Button', {
-                    id: "entityEditorShowBtn",
+                    id: "btnFormSave",
                     text: label_SAVE,
                     handler : function () {
                         var tree = Ext.getCmp('entityTreeView');
@@ -424,7 +359,7 @@ Ext.onReady(function() {
 
                 var children = selectedNode.childNodes;
 
-                var form = Ext.getCmp('EntityEditorFormPannel');
+                var form = Ext.getCmp('EntityEditorFormPanel');
                 form.removeAll();
                 for(var i = 0; i < children.length; i++){
                     if(children[i].data.simple) {
@@ -460,87 +395,95 @@ Ext.onReady(function() {
         }
     });
 
-    mainEntityEditorPanel = Ext.create('Ext.panel.Panel', {
-        title : 'Панель данных',
-        preventHeader: true,
-        width : '100%',
-        height: '500px',
-        renderTo : 'entity-editor-content',
-        layout : 'border',
-        defaults : {
-            padding: '3'
-        },
-        items  : [
-            {
-                xtype : 'panel',
-                region: 'center',
-                preventHeader: true,
-                width: "60%",
-                autoScroll:true,
-                items: [entityGrid]
-            },{
-                id: "EntityEditorFormPannel",
-                xtype : 'panel',
-                region: 'east',
-                width: "40%",
-                collapsible: true,
-                split:true,
-                //preventHeader: true,
-                title: label_INPUT_FORM,
-                defaults: {
-                    anchor: '100%'
-                },
-                bodyPadding: '5 5 0',
-                autoScroll:true
-            },{
-                xtype : 'panel',
-                region: 'south',
-                preventHeader: true,
-                width: "60%",
-                height: 150,
-                autoScroll:true,
-                items: [ createItemsGrid()]
-            }],
-        dockedItems: [
-            {
-                fieldLabel: label_REF,
-                id: 'entityEditorComplexTypeCombo',
-                xtype: 'combobox',
-                store: classesStore,
-                valueField:'classId',
-                displayField:'className',
-                listeners: {
-                    change: function (field, newValue, oldValue) {
-                        currentClassId = newValue;
-
-                        refStore.proxy.extraParams = {metaId: currentClassId, op: 'LIST_BY_CLASS'};
-                        Ext.getCmp('entityEditorrefCombo').value = null;
-
-                        refStore.reload();
-                        createItemsGrid(currentClassId);
-                    }
-                }
-            },{
-                fieldLabel: label_ITEMS,
-                id: 'entityEditorrefCombo',
-                xtype: 'combobox',
-                store: refStore,
-                valueField:'id',
-                displayField:'title',
-                listeners: {
-                    change: function (field, newValue, oldValue) {
-                        entityId = Ext.getCmp("entityId");
-                        entityId.setValue(newValue);
-                    }
-                }
-            },{
-                fieldLabel: label_ENTITY_ID,
-                id: 'entityId',
-                name: 'entityId',
-                xtype: 'textfield',
-                value: (givenEntityId == "null" ? "" : givenEntityId)
+    var classesStore = Ext.create('Ext.data.Store', {
+        model: 'classesStoreModel',
+        pageSize: 100,
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op : 'LIST_CLASSES'},
+            actionMethods: {
+                read: 'POST'
             },
-            buttonShow, buttonXML, buttonShowXML
-        ]
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
+        },
+        autoLoad: true,
+        remoteSort: true
+    });
+
+    var mainPanel = Ext.create('Ext.panel.Panel',{
+        height: 500,
+        renderTo: 'entity-editor-content',
+        title: '&nbsp',
+        //preventHeader: true,
+        layout: 'border',
+        items: [{
+            region: 'west',
+            width: '20%',
+            split: true,
+            layout: 'border',
+            items: [{
+                region: 'north',
+                height: '20%',
+                split: true,
+                layout: {
+                    type: 'vbox',
+                    padding: 5,
+                    align: 'stretch'
+                },
+                items: [{
+                    id: 'edClass',
+                    xtype: 'combobox',
+                    store: classesStore,
+                    labelWidth: 70,
+                    valueField:'name',
+                    displayField:'name',
+                    fieldLabel: label_CLASS
+                }, {
+                    xtype: 'component',
+                    html: "<a href='#' onclick='getForm();'>" +LABEL_UPDATE+ "</a>"
+                },{
+                    xtype: 'datefield',
+                    id: 'edDate',
+                    fieldLabel: label_date,
+                    listeners: {
+                        change: function(){
+                            console.log('datefield changed');
+                        }
+                    },
+                    format: 'd.m.Y'
+                }]
+            },{
+                region: 'center',
+                height: '80%',
+                split: true,
+                html: '<div id="entity-editor-form"></div>',
+                tbar: [buttonShow, buttonXML, buttonShowXML]
+            }]
+        },{
+            region: 'center',
+            split: true,
+            items: [entityGrid],
+            autoScroll:true
+        },{
+            id: "EntityEditorFormPanel",
+            xtype : 'panel',
+            region: 'east',
+            width: "20%",
+            collapsible: true,
+            split:true,
+            //preventHeader: true,
+            title: label_INPUT_FORM,
+            defaults: {
+                anchor: '100%'
+            },
+            bodyPadding: '5 5 0',
+            autoScroll:true
+        }]
+
     });
 });
