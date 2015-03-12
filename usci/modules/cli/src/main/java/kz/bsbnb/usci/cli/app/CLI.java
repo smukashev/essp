@@ -36,7 +36,6 @@ import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.eav.model.json.EntityStatusArrayJModel;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
@@ -154,7 +153,6 @@ public class CLI {
         if (entityServiceCore == null) {
             try {
                 serviceFactory = new RmiProxyFactoryBean();
-                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
                 serviceFactory.setServiceUrl(url);
                 serviceFactory.setServiceInterface(IEntityService.class);
                 serviceFactory.setRefreshStubOnConnectFailure(true);
@@ -190,10 +188,11 @@ public class CLI {
         couchbaseClient.shutdown();
     }
 
-    public void processCRBatch(String fname, int count, int offset, Date repDate) throws SAXException, IOException, XMLStreamException {
+    public void processCRBatch(String fname, int count, int offset, Date repDate)
+            throws SAXException, IOException, XMLStreamException {
         File inFile = new File(fname);
 
-        InputStream in = null;
+        InputStream in;
         in = new FileInputStream(inFile);
 
         System.out.println("Processing batch with rep date: " + repDate);
@@ -253,43 +252,6 @@ public class CLI {
         }
     }
 
-    public void showMetaClass(String name) {
-        MetaClass meta = metaClassRepository.getMetaClass(name);
-
-        if (meta == null) {
-            System.out.println("No such meta class: " + name);
-        } else {
-            System.out.println(meta.toString());
-        }
-    }
-
-    public void showMetaClass(long id) {
-        MetaClass meta = metaClassRepository.getMetaClass(id);
-
-        if (meta == null) {
-            System.out.println("No such meta class with id: " + id);
-        } else {
-            System.out.println(meta.toString());
-        }
-    }
-
-    public void toggleMetaClassKey(long id, String attrName) {
-        MetaClass meta = metaClassRepository.getMetaClass(id);
-
-        if (meta == null) {
-            System.out.println("No such meta class with id: " + id);
-        } else {
-            IMetaAttribute attr = meta.getMetaAttribute(attrName);
-
-            if (attr != null) {
-                attr.setKey(!attr.isKey());
-                metaClassRepository.saveMetaClass(meta);
-            } else {
-                System.out.println("No such attribute: " + attrName);
-            }
-        }
-    }
-
     public void setMetaClassKeyType(String name, ComplexKeyTypes type) {
         MetaClass meta = metaClassRepository.getMetaClass(name);
 
@@ -316,23 +278,6 @@ public class CLI {
 
             for (String path : paths) {
                 System.out.println(path);
-            }
-        }
-    }
-
-    public void toggleMetaClassKey(String className, String attrName) {
-        MetaClass meta = metaClassRepository.getMetaClass(className);
-
-        if (meta == null) {
-            System.out.println("No such meta class with name: " + className);
-        } else {
-            IMetaAttribute attr = meta.getMetaAttribute(attrName);
-
-            if (attr != null) {
-                attr.setKey(!attr.isKey());
-                metaClassRepository.saveMetaClass(meta);
-            } else {
-                System.out.println("No such attribute: " + attrName);
             }
         }
     }
@@ -449,7 +394,8 @@ public class CLI {
     public void batchStat() {
         if (args.size() < 5) {
             System.out.println("Usage: <report_date> <output_file>");
-            System.out.println("Example: batchstat 01.05.2013 D:\\usci\\out.txt jdbc:oracle:thin:@170.7.15.15:1521:ESSP core CORE_2013");
+            System.out.println("Example: batchstat 01.05.2013 " +
+                    "D:\\usci\\out.txt jdbc:oracle:thin:@170.7.15.15:1521:ESSP core CORE_2013");
             return;
         }
 
@@ -477,7 +423,7 @@ public class CLI {
 
                 while (true) {
                     try {
-                        Connection conn = null;
+                        Connection conn;
 
                         try {
                             conn = connectToDB(args.get(2), args.get(3), args.get(4));
@@ -491,8 +437,8 @@ public class CLI {
 
                         PreparedStatement preparedStatement = null;
                         try {
-                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
-                                    reportDateStr.trim() + "', 'dd.MM.yyyy')");
+                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  " +
+                                    "WHERE b.rep_date = to_date('" + reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e) {
                             System.out.println("Can't create prepared statement: " + e.getMessage());
                             try {
@@ -651,8 +597,8 @@ public class CLI {
     public void batchRestart() {
         if (args.size() < 6) {
             System.out.println("Usage: <report_date> <output_file>");
-            System.out.println("Example: batchrestart 01.05.2013 D:\\usci\\out.txt jdbc:oracle:thin:@170.7.15.15:1521:ESSP " +
-                    "core CORE_2013 rmi://127.0.0.1:1097/batchProcessService");
+            System.out.println("Example: batchrestart 01.05.2013 D:\\usci\\out.txt " +
+                    "jdbc:oracle:thin:@170.7.15.15:1521:ESSP core CORE_2013 rmi://127.0.0.1:1097/batchProcessService");
             return;
         }
 
@@ -712,8 +658,8 @@ public class CLI {
 
                         PreparedStatement preparedStatement = null;
                         try {
-                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
-                                    reportDateStr.trim() + "', 'dd.MM.yyyy')");
+                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  " +
+                                    "WHERE b.rep_date = to_date('" + reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e) {
                             System.out.println("Can't create prepared statement: " + e.getMessage());
                             try {
@@ -835,7 +781,8 @@ public class CLI {
                             if (error_count > 0 || row_count != batchInfo.getSize()) {
                                 fout.write((batchId + "," +
                                         batchFull.getFileName() + "," +
-                                        batchInfo.getSize() + "," + row_count + "," + error_count + ",restarted\n").getBytes());
+                                        batchInfo.getSize() + "," + row_count + "," + error_count +
+                                        ",restarted\n").getBytes());
 
                                 //sender.addJob(batchId, batchInfo);
                                 //receiverStatusSingleton.batchReceived();
@@ -843,10 +790,9 @@ public class CLI {
                             } else {
                                 fout.write((batchId + "," +
                                         batchFull.getFileName() + "," +
-                                        batchInfo.getSize() + "," + row_count + "," + error_count + ",skipped\n").getBytes());
+                                        batchInfo.getSize() + "," + row_count + "," + error_count +
+                                        ",skipped\n").getBytes());
                             }
-
-
                         }
                         break;
                     } catch (Exception e) {
@@ -878,7 +824,8 @@ public class CLI {
     public void batchRestartAll() {
         if (args.size() < 6) {
             System.out.println("Usage: <report_date> <output_file>");
-            System.out.println("Example: batchrestartall 01.05.2013 D:\\usci\\out.txt jdbc:oracle:thin:@170.7.15.15:1521:ESSP " +
+            System.out.println("Example: batchrestartall 01.05.2013 D:\\usci\\out.txt " +
+                    "jdbc:oracle:thin:@170.7.15.15:1521:ESSP " +
                     "core CORE_2013 rmi://127.0.0.1:1097/batchProcessService");
             return;
         }
@@ -939,8 +886,8 @@ public class CLI {
 
                         PreparedStatement preparedStatement = null;
                         try {
-                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  WHERE b.rep_date = to_date('" +
-                                    reportDateStr.trim() + "', 'dd.MM.yyyy')");
+                            preparedStatement = conn.prepareStatement("SELECT b.id FROM eav_batches b  " +
+                                    "WHERE b.rep_date = to_date('" + reportDateStr.trim() + "', 'dd.MM.yyyy')");
                         } catch (SQLException e) {
                             System.out.println("Can't create prepared statement: " + e.getMessage());
                             try {
@@ -1288,7 +1235,8 @@ public class CLI {
                     System.out.println("Instance of BaseEntity saved with id: " + id);
                 } catch (Exception ex) {
                     lastException = ex;
-                    System.out.println("While processing instance of BaseEntity unexpected error occurred: " + ex.getMessage());
+                    System.out.println("While processing instance of BaseEntity unexpected error occurred: " +
+                            ex.getMessage());
                 }
             }
 
@@ -1308,7 +1256,8 @@ public class CLI {
                     System.out.println("Instance of BaseEntity saved with id: " + id);
                 } catch (Exception ex) {
                     lastException = ex;
-                    System.out.println("While processing instance of BaseEntity unexpected error occurred: " + ex.getMessage());
+                    System.out.println("While processing instance of BaseEntity unexpected error occurred: " +
+                            ex.getMessage());
                 }
             }
         } catch (FileNotFoundException e) {
@@ -1355,7 +1304,8 @@ public class CLI {
 
                 List<String> intersectionList = comparator.intersect(entity, clonedEntity);
 
-                System.out.println("Intersection count: " + intersectionList.size() + ", actual count: " + entity.getSearchableChildrenCount());
+                System.out.println("Intersection count: " + intersectionList.size() + ", actual count: " +
+                        entity.getSearchableChildrenCount());
                 if (intersectionList.size() != entity.getSearchableChildrenCount()) {
                     System.out.println("Error");
                     for (String path : intersectionList) {
@@ -1573,7 +1523,8 @@ public class CLI {
         }
     }
 
-    public Connection connectToDB(String url, String name, String password) throws ClassNotFoundException, SQLException {
+    public Connection connectToDB(String url, String name, String password)
+            throws ClassNotFoundException, SQLException {
         Class.forName("oracle.jdbc.OracleDriver");
         return DriverManager.getConnection(url, name, password);
     }
@@ -1588,7 +1539,6 @@ public class CLI {
 
             try {
                 batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
-                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
                 batchProcessServiceFactoryBean.setServiceUrl(args.get(3));
                 batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
                 batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
@@ -1719,10 +1669,18 @@ public class CLI {
             }
 
         } else {
-            System.out.println("Argument needed: <credits_db_url> <user> <password> <receiver_url> <temp_files_folder>");
-            System.out.println("Example: import jdbc:oracle:thin:@srv-scan.corp.nb.rk:1521/DBM01 core ***** rmi://127.0.0.1:1097/batchProcessService D:\\usci\\temp_xml_folder 01.05.2013");
-            System.out.println("Example: import jdbc:oracle:thin:@192.168.0.44:1521/CREDITS core core_feb_2013 rmi://127.0.0.1:1097/batchProcessService /home/a.tkachenko/temp_files 01.05.2013");
-            System.out.println("Example: import jdbc:oracle:thin:@192.168.0.44:1521/CREDITS core core_mar_2014 rmi://127.0.0.1:1097/batchProcessService D:\\USCI\\Temp 01.05.2013");
+            System.out.println("Argument needed: <credits_db_url> <user> <password> <receiver_url> " +
+                    "<temp_files_folder>");
+
+            System.out.println("Example: import jdbc:oracle:thin:@srv-scan.corp.nb.rk:1521/DBM01 " +
+                    "core ***** rmi://127.0.0.1:1097/batchProcessService D:\\usci\\temp_xml_folder 01.05.2013");
+
+            System.out.println("Example: import jdbc:oracle:thin:@192.168.0.44:1521/CREDITS " +
+                    "core core_feb_2013 rmi://127.0.0.1:1097/batchProcessService " +
+                    "/home/a.tkachenko/temp_files 01.05.2013");
+
+            System.out.println("Example: import jdbc:oracle:thin:@192.168.0.44:1521/CREDITS " +
+                    "core core_mar_2014 rmi://127.0.0.1:1097/batchProcessService D:\\USCI\\Temp 01.05.2013");
         }
     }
 
@@ -1743,7 +1701,9 @@ public class CLI {
                     int idIndex = nextLine.indexOf("Not yet implemented. Entity ID:");
 
                     if (idIndex > 0) {
-                        String idString = nextLine.substring(idIndex + "Not yet implemented. Entity ID:".length()).trim();
+                        String idString = nextLine.substring(idIndex +
+                                "Not yet implemented. Entity ID:".length()).trim();
+
                         Long id = Long.parseLong(idString);
                         ids.add(id);
                     }
@@ -1787,7 +1747,6 @@ public class CLI {
 
             try {
                 batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
-                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
                 batchProcessServiceFactoryBean.setServiceUrl(args.get(0));
                 batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
                 batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
@@ -1816,7 +1775,6 @@ public class CLI {
 
             try {
                 batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
-                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
                 batchProcessServiceFactoryBean.setServiceUrl(args.get(0));
                 batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
                 batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
@@ -1834,7 +1792,6 @@ public class CLI {
 
             try {
                 entityServiceFactoryBean = new RmiProxyFactoryBean();
-                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
                 entityServiceFactoryBean.setServiceUrl(args.get(1));
                 entityServiceFactoryBean.setServiceInterface(kz.bsbnb.usci.sync.service.IEntityService.class);
                 entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
@@ -1852,7 +1809,6 @@ public class CLI {
 
             try {
                 serviceFactory = new RmiProxyFactoryBean();
-                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
                 serviceFactory.setServiceUrl(args.get(2));
                 serviceFactory.setServiceInterface(IEntityService.class);
                 serviceFactory.setRefreshStubOnConnectFailure(true);
@@ -1970,7 +1926,6 @@ public class CLI {
 
             try {
                 entityServiceFactoryBean = new RmiProxyFactoryBean();
-                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
                 entityServiceFactoryBean.setServiceUrl(args.get(0));
                 entityServiceFactoryBean.setServiceInterface(kz.bsbnb.usci.sync.service.IEntityService.class);
                 entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
@@ -1999,7 +1954,6 @@ public class CLI {
 
             try {
                 serviceFactory = new RmiProxyFactoryBean();
-                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
                 serviceFactory.setServiceUrl(args.get(0));
                 serviceFactory.setServiceInterface(IEntityService.class);
                 serviceFactory.setRefreshStubOnConnectFailure(true);
@@ -2066,7 +2020,6 @@ public class CLI {
 
             try {
                 serviceFactory = new RmiProxyFactoryBean();
-                //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
                 serviceFactory.setServiceUrl(args.get(0));
                 serviceFactory.setServiceInterface(kz.bsbnb.usci.sync.service.IEntityService.class);
                 serviceFactory.setRefreshStubOnConnectFailure(true);
@@ -2080,7 +2033,7 @@ public class CLI {
             int tCount = Integer.parseInt(args.get(1));
             boolean allowAutoIncrement = Boolean.parseBoolean(args.get(2));
 
-            if(entityService != null)
+            if (entityService != null)
                 entityService.setThreadsCount(tCount, allowAutoIncrement);
         } else {
             System.out.println("Argument needed: <core_url> <threads_count> <allow_auto_increment>");
@@ -2311,7 +2264,7 @@ public class CLI {
             started = true;
             try {
             } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             }
         }
 
@@ -2350,7 +2303,7 @@ public class CLI {
                     out.println("quit");
                     out.close();
                 } catch (FileNotFoundException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    e.printStackTrace();
                 }
             } else if (args.get(0).equals("read")) {
                 if (args.size() < 2) {
@@ -2390,7 +2343,7 @@ public class CLI {
             } else if (args.get(0).equals("save")) {
                 long ruleId = ruleService.createNewRuleInBatch(currentRule, currentBatchVersion);
                 System.out.println("ok saved: ruleId = " + ruleId);
-            /* Remove overhead from TNS Listener */
+                /* Remove overhead from TNS Listener */
                 try {
                     Thread.sleep(300);
                 } catch (InterruptedException e) {
@@ -2433,7 +2386,9 @@ public class CLI {
                 } catch (IllegalArgumentException e) {
                     throw e;
                 }
-                kz.bsbnb.usci.brms.rulesvr.model.impl.Batch batch = new kz.bsbnb.usci.brms.rulesvr.model.impl.Batch(args.get(2), currentDate);
+                kz.bsbnb.usci.brms.rulesvr.model.impl.Batch batch =
+                        new kz.bsbnb.usci.brms.rulesvr.model.impl.Batch(args.get(2), currentDate);
+
                 Long id = batchService.save(batch);
                 batch.setId(id);
                 batchVersionService.save(batch);
@@ -2447,7 +2402,8 @@ public class CLI {
             } else throw new IllegalArgumentException();
         } catch (IllegalArgumentException e) {
             if (e.getMessage() == null)
-                System.out.println("Argument needed: <read {label},current [<pckName,date>],save,run {id},set <package,date> {value} , create package {pckName}>");
+                System.out.println("Argument needed: <read {label},current [<pckName,date>],save,run {id}," +
+                        "set <package,date> {value} , create package {pckName}>");
             else
                 System.out.println(e.getMessage());
             return;
@@ -2468,7 +2424,6 @@ public class CLI {
 
         try {
             serviceFactory = new RmiProxyFactoryBean();
-            //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
             serviceFactory.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
             serviceFactory.setServiceInterface(ShowcaseService.class);
             serviceFactory.setRefreshStubOnConnectFailure(true);
@@ -2532,7 +2487,7 @@ public class CLI {
 
     public void commandShowCase() {
         // Fast Init
-        if(showCase == null) {
+        if (showCase == null) {
             showCase = new ShowCase();
             showCase.setMeta(metaClassRepository.getMetaClass("credit"));
         }
@@ -2542,7 +2497,7 @@ public class CLI {
             System.out.println("ok");
         } else if (args.get(0).equals("status")) {
             System.out.println(showCase.toString());
-            for(ShowCaseField sf : showCase.getFieldsList()) {
+            for (ShowCaseField sf : showCase.getFieldsList()) {
                 System.out.println(sf.getAttributePath() + ", " + sf.getColumnName());
             }
         } else if (args.get(0).equals("set")) {
@@ -2874,7 +2829,8 @@ public class CLI {
         manifest.appendChild(getElementString("name", "data.xml", document));
         manifest.appendChild(getElementString("userid", "100500", document));
         manifest.appendChild(getElementString("size", String.valueOf(count), document));
-        manifest.appendChild(getElementString("date", new SimpleDateFormat("dd.MM.yyyy").format(new Date()), document));
+        manifest.appendChild(getElementString("date", new SimpleDateFormat("dd.MM.yyyy").format(new Date()),
+                document));
 
         Element properties = document.createElement("properties");
 
