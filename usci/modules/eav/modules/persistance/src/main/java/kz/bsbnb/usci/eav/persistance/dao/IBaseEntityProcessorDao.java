@@ -85,6 +85,8 @@ public interface IBaseEntityProcessorDao
 
     public void setApplyListener(IDaoListener applyListener);
 
+    List<Date> getEntityReportDates(Long entityId);
+
     enum MergeResultChoice
     {
         RIGHT,
@@ -96,9 +98,15 @@ public interface IBaseEntityProcessorDao
 
     public void populate(String metaName, Long id, Date reportDate);
 
+    void populateSC(String metaName);
+
     public List<Long> getSCEntityIds(Long id);
 
+    public List<Long> getSCEntityIds(int limit);
+
     public void removeSCEntityIds(List<Long> list, Long id);
+
+    void removeSCEntityIds(List<Long> entityIds);
 
     public void removeShowcaseId(Long id);
 

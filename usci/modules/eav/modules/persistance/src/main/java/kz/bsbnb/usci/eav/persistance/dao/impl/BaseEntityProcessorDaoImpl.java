@@ -3844,6 +3844,17 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
+    public void populateSC(String metaName) {
+        Long id = metaClassRepository.getMetaClass(metaName).getId();
+        Insert insert = context.insertInto(SC_ENTITIES).select(
+                context.select(EAV_BE_ENTITIES.ID)
+                        .from(EAV_BE_ENTITIES)
+                        .where(EAV_BE_ENTITIES.CLASS_ID.eq(id))
+        );
+        jdbcTemplate.update(insert.getSQL(), insert.getBindValues().toArray());
+    }
+
+    @Override
     public List<Long> getNewTableIds(Long id) {
         List<Long> list;
         Select select = context.select(SC_ID_BAG.ID).from(SC_ID_BAG).where(SC_ID_BAG.SHOWCASE_ID.eq(id)).limit(10);
@@ -3870,8 +3881,32 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
+    public List<Long> getSCEntityIds(int limit) {
+        Select select = context.select(SC_ENTITIES.ENTITY_ID).from(SC_ENTITIES).limit(limit);
+        Select select2 = context.select(select.field(0)).from(select);
+        List<Long> list = jdbcTemplate.queryForList(select2.getSQL(), Long.class, select2.getBindValues().toArray());
+        return list;
+    }
+
+    @Override
+    public List<Date> getEntityReportDates(Long entityId) {
+        Select select = context.select(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE)
+                .from(EAV_BE_ENTITY_REPORT_DATES)
+                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(entityId))
+                .orderBy(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE);
+        List<Date> reportDates = jdbcTemplate.queryForList(select.getSQL(), Date.class, select.getBindValues().toArray());
+        return reportDates;
+    }
+
+    @Override
     public void removeSCEntityIds(List<Long> list, Long id) {
         Delete delete = context.delete(SC_ID_BAG).where(SC_ID_BAG.ID.in(list).and(SC_ID_BAG.SHOWCASE_ID.eq(id)));
+        jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
+    }
+
+    @Override
+    public void removeSCEntityIds(List<Long> entityIds) {
+        Delete delete = context.delete(SC_ENTITIES).where(SC_ENTITIES.ENTITY_ID.in(entityIds));
         jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
     }
 

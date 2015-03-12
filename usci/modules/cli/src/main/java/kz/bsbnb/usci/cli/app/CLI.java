@@ -2944,12 +2944,35 @@ public class CLI
             } else{
                 System.out.println("Usage: startLoad <showcase name> <report date>");
             }
+        } else if(args.get(0).equals("startLoad")){
+            if(args.size() > 2){
+                try {
+                    showcaseService.startLoad(args.get(1), sdfout.parse(args.get(2)));
+                } catch (ParseException e) {
+                    System.out.println("Date format: \"dd.MM.yyyy\"");
+                }
+            } else{
+                System.out.println("Usage: startLoad <showcase name> <report date>");
+            }
+        } else if(args.get(0).equals("startLoadHistory")){
+            if(!scStart) initSC();
+
+            boolean populate = false;
+
+            if (args.size() > 1 && "populate".equals(args.get(1))) {
+                populate = true;
+            }
+            showcaseService.startLoadHistory(populate);
+
         } else if(args.get(0).equals("stopLoad")){
             if(args.size() > 1){
                 showcaseService.stopLoad(args.get(1));
             } else{
                 System.out.println("Usage: stopLoad <showcase name>");
             }
+        } else if(args.get(0).equals("stopLoadHistory")){
+            showcaseService.stopLoadHistory();
+
         } else if(args.get(0).equals("pauseLoad")){
             if(args.size() > 1){
                 showcaseService.pauseLoad(args.get(1));

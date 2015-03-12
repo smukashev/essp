@@ -17,6 +17,8 @@ public interface ShowcaseService {
     public List<ShowcaseHolder> list();
     public ShowCase load(String name);
     public void startLoad(String name, Date reportDate);
+    void startLoadHistory(boolean populate);
+    void stopLoadHistory();
     public HashMap<String, QueryEntry> getSQLStats();
     public void reloadCash();
 
@@ -28,5 +30,4 @@ public interface ShowcaseService {
 
     ShowCase load(Long id);
     List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate);
-
 }

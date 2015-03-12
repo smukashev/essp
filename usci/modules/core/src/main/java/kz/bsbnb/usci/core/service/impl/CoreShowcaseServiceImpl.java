@@ -33,6 +33,9 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     private final Logger logger = LoggerFactory.getLogger(CoreShowcaseServiceImpl.class);
 
     private Map<Long, Thread> SCThreads = new HashMap<Long, Thread>();
+    private Thread scHistoryThread;
+
+    private static final int ENTITY_COUNT_PER_RUN = 10;
 
     @Override
     public void start(String metaName, Long id, Date reportDate){
@@ -40,6 +43,22 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
         Thread t = new Thread(new Sender(id));
         SCThreads.put(id, t);
         t.start();
+    }
+
+    @Override
+    public void startLoadHistory(boolean populate) {
+        if (populate) {
+            baseEntityProcessorDao.populateSC("credit");
+        }
+        scHistoryThread = new Thread(new HistorySender());
+        scHistoryThread.start();
+    }
+
+    @Override
+    public void stopHistory() {
+        if (scHistoryThread == null) return;
+        scHistoryThread.interrupt();
+        scHistoryThread = null;
     }
 
     @Override
@@ -75,7 +94,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
         JMXServiceURL url = null;
         if(queueViewBeanCache.containsKey("showcaseQueue"))return queueViewBeanCache.get("showcaseQueue");
         try {
-            url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:1094/jmxrmi");
+            url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi");
             JMXConnector jmxc = JMXConnectorFactory.connect(url);
             MBeanServerConnection conn = jmxc.getMBeanServerConnection();
 
@@ -96,6 +115,54 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private class HistorySender implements Runnable {
+
+        @Override
+        public void run() {
+            QueueViewMBean queueViewMBean = getShowcaseQueue();
+
+            while (true) {
+                if (queueViewMBean.getQueueSize() == 0) {
+                    List<Long> entityIds = baseEntityProcessorDao.getSCEntityIds(ENTITY_COUNT_PER_RUN);
+                    if(entityIds.size() == 0){
+                        logger.info("Done loading entities for showcase %s, reportDate %s");
+                        scHistoryThread = null;
+                        return;
+                    }
+                    for (Long entityId : entityIds) {
+                        List<Date> reportDates = baseEntityProcessorDao.getEntityReportDates(entityId);
+
+                        for (Date reportDate : reportDates) {
+                            QueueEntry entry = new QueueEntry()
+                                    .setBaseEntityApplied(baseEntityProcessorDao.loadByReportDate(entityId, reportDate));
+
+                            try {
+                                producer.produce(entry);
+                            } catch (InterruptedException e) {
+                                // do nothing, finish loading
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    baseEntityProcessorDao.removeSCEntityIds(entityIds);
+
+                    logger.info("%s - entities sent for loading.", entityIds);
+                    System.out.printf("%s - entities sent for loading.\n", entityIds);
+
+                    if(Thread.interrupted()) return;
+                } else {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                }
+            }
+        }
+
     }
 
     private class Sender implements Runnable{

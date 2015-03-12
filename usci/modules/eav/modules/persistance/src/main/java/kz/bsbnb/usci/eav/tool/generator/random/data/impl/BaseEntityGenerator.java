@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav.tool.generator.random.data.impl;
 
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -19,12 +20,14 @@ import java.util.Date;
  */
 public class BaseEntityGenerator  extends AbstractDataGenerator {
     private final Logger logger = LoggerFactory.getLogger(BaseEntityGenerator.class);
-    private final int MAX_ARRAY_ELEMENTS = 20;
-    private final int MIN_ARRAY_ELEMENTS = 3;
+    private final int MAX_ARRAY_ELEMENTS = 3;
+    private final int MIN_ARRAY_ELEMENTS = 2;
 
     public BaseEntity generateBaseEntity(Batch batch, MetaClass metaClass, long index) {
         // TODO: Implement generation of the reporting date.
         BaseEntity entity = new BaseEntity(metaClass, new Date());
+
+        entity.setBaseEntityReportDate(new BaseEntityReportDate(entity, new Date()));
 
         for (String name : metaClass.getMemberNames()) {
             IMetaType metaType = metaClass.getMemberType(name);
