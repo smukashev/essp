@@ -162,7 +162,7 @@ public class ShowCase extends Persistable {
         }
     }
 
-    public void addFilterField(String path, String name, String columnName) {
+    public void addFilterField(String path, String name, String columnName, MetaClass meta) {
         if (meta == null)
             throw new IllegalArgumentException("meta not set for showcase");
 
@@ -190,11 +190,11 @@ public class ShowCase extends Persistable {
         filterFields.add(showCaseField);
     }
 
-    public ArrayList<ShowCaseField> getCustomFields() {
+    public ArrayList<ShowCaseField> getCustomFieldsList() {
         return customFields;
     }
 
-    public ArrayList<ShowCaseField> getFilterFields() {
+    public ArrayList<ShowCaseField> getFilterFieldsList() {
         return filterFields;
     }
 

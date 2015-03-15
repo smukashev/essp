@@ -72,8 +72,11 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     }
 
     private QueueViewMBean getShowcaseQueue(){
-        JMXServiceURL url = null;
-        if(queueViewBeanCache.containsKey("showcaseQueue"))return queueViewBeanCache.get("showcaseQueue");
+        JMXServiceURL url;
+
+        if(queueViewBeanCache.containsKey("showcaseQueue"))
+            return queueViewBeanCache.get("showcaseQueue");
+
         try {
             url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:1094/jmxrmi");
             JMXConnector jmxc = JMXConnectorFactory.connect(url);
@@ -95,11 +98,11 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
-    private class Sender implements Runnable{
-
+    private class Sender implements Runnable {
         Long scId;
 
         public Sender(Long id){
@@ -109,6 +112,12 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
         @Override
         public void run() {
             QueueViewMBean queueMbean = getShowcaseQueue();
+
+            if(queueMbean == null) {
+                logger.error("Can't get ShowcaseQueue, queueMBean is null!");
+                throw new NullPointerException();
+            }
+
             while(true){
                 if(queueMbean.getQueueSize() == 0){
                     List<Long> list = baseEntityProcessorDao.getSCEntityIds(scId);

@@ -16,7 +16,6 @@ import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -75,6 +74,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                             e.printStackTrace();
                         }
                     }
+
                     futures.removeAll(futures);
 
                     long t4 = System.currentTimeMillis() - t3;

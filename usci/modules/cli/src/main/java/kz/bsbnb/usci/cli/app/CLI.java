@@ -2492,13 +2492,24 @@ public class CLI {
             showCase.setMeta(metaClassRepository.getMetaClass("credit"));
         }
 
+        if (!scStart) initSC();
+
         if (args.get(0).equals("debug")) {
             MetaClass meta = metaClassRepository.getMetaClass("credit");
             System.out.println("ok");
         } else if (args.get(0).equals("status")) {
             System.out.println(showCase.toString());
+
             for (ShowCaseField sf : showCase.getFieldsList()) {
                 System.out.println(sf.getAttributePath() + ", " + sf.getColumnName());
+            }
+
+            for (ShowCaseField sf : showCase.getCustomFieldsList()) {
+                System.out.println("* " + sf.getAttributePath() + ", " + sf.getColumnName());
+            }
+
+            for (ShowCaseField sf : showCase.getFilterFieldsList()) {
+                System.out.println("% " + sf.getAttributePath() + ", " + sf.getColumnName());
             }
         } else if (args.get(0).equals("set")) {
             if (args.size() != 3)
@@ -2542,6 +2553,9 @@ public class CLI {
             } else if (args.get(1).equals("addCustom")) {
                 MetaClass customMeta = metaClassRepository.getMetaClass(args.get(2));
 
+                if(customMeta == null)
+                    throw new UnsupportedOperationException("MetaClass can't be null");
+
                 String path = "";
                 String name = args.get(3);
 
@@ -2552,7 +2566,10 @@ public class CLI {
 
                 showCase.addCustomField(path, name, args.get(4), customMeta);
             } else if (args.get(1).equals("addFilter")) {
-                MetaClass customMeta = metaClassRepository.getMetaClass(args.get(2));
+                MetaClass filterMeta = metaClassRepository.getMetaClass(args.get(2));
+
+                if(filterMeta == null)
+                    throw new UnsupportedOperationException("MetaClass can't be null");
 
                 String path = "";
                 String name = args.get(3);
@@ -2562,7 +2579,7 @@ public class CLI {
                     name = args.get(3).substring(args.get(3).lastIndexOf('.') + 1);
                 }
 
-                showCase.addFilterField(path, name, args.get(4));
+                showCase.addFilterField(path, name, args.get(4), filterMeta);
             } else {
                 System.err.println("Example: showcase list add [path] [columnName] {columnAlias}");
                 System.err.println("Example: showcase list addCustom metaClass [path] [columnName] {columnAlias}");
@@ -2570,18 +2587,24 @@ public class CLI {
                 throw new IllegalArgumentException();
             }
         } else if (args.get(0).equals("save")) {
-            if (!scStart) initSC();
             showcaseService.add(showCase);
             System.out.println(showCase.getName() + ": Showcase successfully added!");
             showCase = null;
         } else if (args.get(0).equals("listSC")) {
-            if (!scStart) initSC();
-
             List<ShowcaseHolder> list = showcaseService.list();
             for (ShowcaseHolder holder : list) {
                 System.out.println(holder.getShowCaseMeta().getName());
+
                 for (ShowCaseField field : holder.getShowCaseMeta().getFieldsList()) {
                     System.out.println("\t" + field.getName());
+                }
+
+                for(ShowCaseField field : holder.getShowCaseMeta().getCustomFieldsList()) {
+                    System.out.println("\t* " + field.getName());
+                }
+
+                for(ShowCaseField field : holder.getShowCaseMeta().getFilterFieldsList()) {
+                    System.out.println("\t% " + field.getName());
                 }
             }
         } else if (args.get(0).equals("loadSC")) {
@@ -2590,6 +2613,14 @@ public class CLI {
                 System.out.println(sc.getName());
                 for (ShowCaseField field : sc.getFieldsList()) {
                     System.out.println("\t" + field.getName());
+                }
+
+                for (ShowCaseField field : sc.getCustomFieldsList()) {
+                    System.out.println("\t* " + field.getName());
+                }
+
+                for (ShowCaseField field : sc.getFilterFieldsList()) {
+                    System.out.println("\t% " + field.getName());
                 }
             } else {
                 System.out.println("Usage: loadSC <showcase name>");
@@ -2627,8 +2658,6 @@ public class CLI {
                 System.out.println("\t" + sc);
             }
         } else if (args.get(0).equals("rc")) {
-            if (!scStart)
-                initSC();
             showcaseService.reloadCash();
         } else if (args.get(0).equals("stats")) {
             showcaseStat();

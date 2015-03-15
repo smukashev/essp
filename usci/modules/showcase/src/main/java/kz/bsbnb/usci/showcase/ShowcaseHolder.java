@@ -94,4 +94,11 @@ public class ShowcaseHolder implements Serializable {
 
         return prefixToColumn;
     }
+
+    @Override
+    public String toString() {
+        return "ShowcaseHolder{" +
+                "showCaseMeta=" + showCaseMeta.getTableName() +
+                '}';
+    }
 }
