@@ -537,7 +537,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         for (ShowCaseField field : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
             showCases[i] = new ShowCaseEntries(entity, field.getAttributeName().equals("") ?
                     field.getAttributePath() : field.getAttributePath() + "." + field.getAttributeName(),
-                    field.getColumnName(), showcaseHolder.generatePaths());
+                    field.getColumnName(), showcaseHolder.generatePaths(), field);
             i++;
         }
 
@@ -915,6 +915,15 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
             gen(entity, path, new HashMap(), "root");
         }
 
+        ShowCaseEntries(IBaseEntity entity, String path, String columnName, Map<String, String> prefixToColumn,
+                        ShowCaseField showCaseField) {
+            this.columnName = columnName;
+            if (path.startsWith("."))
+                path = path.substring(1);
+            this.prefixToColumn = prefixToColumn;
+            genCustom(entity, path, new HashMap(), "root", showCaseField);
+        }
+
         public List<HashMap> getEntries() {
             return entries;
         }
@@ -965,6 +974,52 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
             } else {
                 IBaseEntity next = (IBaseEntity) entity.getEl(path);
                 gen(next, nextPath, (HashMap) map.clone(), prefix + "." + path);
+            }
+        }
+
+        public void genCustom(IBaseEntity entity, String curPath, HashMap map, String prefix,
+                              ShowCaseField showCaseField) {
+            if (curPath == null || curPath.equals("") || entity == null) {
+                if (entity != null)
+                    map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
+                entries.add(map);
+                return;
+            }
+
+            MetaClass curMeta = entity.getMeta();
+            String path = (curPath.indexOf('.') == -1) ? curPath : curPath.substring(0, curPath.indexOf('.'));
+            String nextPath = curPath.indexOf('.') == -1 ? null : curPath.substring(curPath.indexOf('.') + 1);
+            IMetaAttribute attribute = curMeta.getMetaAttribute(path);
+            map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
+
+            if (!attribute.getMetaType().isComplex()) {
+                map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
+                if (!attribute.getMetaType().isSet()) {
+                    map.put(columnName, entity.getEl(path));
+                    entries.add(map);
+                } else {
+                    IBaseSet set = (IBaseSet) entity.getEl(path);
+
+                    if (set != null) {
+                        for (IBaseValue o : set.get()) {
+                            HashMap nmap = (HashMap) map.clone();
+                            nmap.put(columnName, o.getValue());
+                            entries.add(nmap);
+                        }
+                    }
+                }
+            } else if (attribute.getMetaType().isSet()) {
+                IBaseSet next = (IBaseSet) entity.getEl(path);
+
+                if (next != null) {
+                    for (Object o : next.get()) {
+                        genCustom((IBaseEntity) ((IBaseValue) o).getValue(), nextPath, (HashMap) map.clone(),
+                                prefix + "." + path, showCaseField);
+                    }
+                }
+            } else {
+                IBaseEntity next = (IBaseEntity) entity.getEl(path);
+                genCustom(next, nextPath, (HashMap) map.clone(), prefix + "." + path, showCaseField);
             }
         }
     }
