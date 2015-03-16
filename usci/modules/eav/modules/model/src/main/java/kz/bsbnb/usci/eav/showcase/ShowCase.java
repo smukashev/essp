@@ -204,12 +204,10 @@ public class ShowCase extends Persistable {
 
     @Override
     public String toString() {
-        return "ShowCase{" +
-                "name='" + name + '\'' +
-                ", tableName='" + tableName + '\'' +
-                ", title='" + title + '\'' +
-                ", meta=" + meta.getClassName() +
-                ", downPath='" + downPath + '\'' +
-        '}';
+        StringBuilder sb = new StringBuilder().append("name='").append(name).append(", tableName='")
+                .append(tableName);
+        if(meta != null) sb.append(meta.getClassName());
+        sb.append(", downPath='").append(downPath);
+        return sb.toString();
     }
 }

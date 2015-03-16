@@ -106,7 +106,6 @@ public class CLI {
     RmiProxyFactoryBean serviceFactory = null;
     IEntityService entityServiceCore = null;
     ShowCase showCase;
-    boolean scStart = false;
     String line;
     Exception lastException = null;
     private String command;
@@ -2476,13 +2475,21 @@ public class CLI {
     }
 
     private void initSC() {
-        scStart = true;
-        showcaseServiceFactoryBean = new RmiProxyFactoryBean();
-        showcaseServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
-        showcaseServiceFactoryBean.setServiceInterface(ShowcaseService.class);
+        try {
+            showcaseServiceFactoryBean = new RmiProxyFactoryBean();
+            showcaseServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
+            showcaseServiceFactoryBean.setServiceInterface(ShowcaseService.class);
 
-        showcaseServiceFactoryBean.afterPropertiesSet();
-        showcaseService = (ShowcaseService) showcaseServiceFactoryBean.getObject();
+            showcaseServiceFactoryBean.afterPropertiesSet();
+            showcaseService = (ShowcaseService) showcaseServiceFactoryBean.getObject();
+        } catch (Exception e) {
+            showcaseServiceFactoryBean = null;
+            showcaseService = null;
+
+            System.err.println("Couldn't connect to ShowCaseService");
+            System.err.println(e.getMessage());
+        }
+
     }
 
     public void commandShowCase() {
@@ -2492,7 +2499,8 @@ public class CLI {
             showCase.setMeta(metaClassRepository.getMetaClass("credit"));
         }
 
-        if (!scStart) initSC();
+        if(showcaseServiceFactoryBean == null || showcaseService == null)
+            initSC();
 
         if (args.get(0).equals("debug")) {
             MetaClass meta = metaClassRepository.getMetaClass("credit");
@@ -2762,7 +2770,7 @@ public class CLI {
                 System.out.println("No such command: " + command);
             }
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage());
             lastException = e;
         }
     }

@@ -677,8 +677,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         showCase.setName((String) row.get(EAV_SC_SHOWCASES.NAME.getName()));
         showCase.setTitle((String) row.get(EAV_SC_SHOWCASES.TITLE.getName()));
         showCase.setTableName((String) row.get(EAV_SC_SHOWCASES.TABLE_NAME.getName()));
-        showCase.setMeta(metaService.getMetaClass((String) row.get(EAV_SC_SHOWCASES.CLASS_NAME.getName())));
         showCase.setDownPath((String) row.get(EAV_SC_SHOWCASES.DOWN_PATH.getName()));
+
+        String metaClassName = (String) row.get(EAV_SC_SHOWCASES.CLASS_NAME.getName());
+        MetaClass metaClass = metaService.getMetaClass(metaClassName);
+        showCase.setMeta(metaClass);
 
         select = context
                 .select(EAV_SC_SHOWCASE_FIELDS.ID, EAV_SC_SHOWCASE_FIELDS.TITLE, EAV_SC_SHOWCASE_FIELDS.NAME,
