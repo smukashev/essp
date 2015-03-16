@@ -832,6 +832,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     public Object getEl(String path)
     {
+        if(path.equals("ROOT"))
+            return getId();
+
         StringTokenizer tokenizer = new StringTokenizer(path, ".");
 
         BaseEntity entity = this;
@@ -850,7 +853,13 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
             }
 
             IMetaAttribute attribute = theMeta.getMetaAttribute(token);
-            IMetaType type = attribute.getMetaType();
+
+            IMetaType type = null;
+            try {
+                type = attribute.getMetaType();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             if (entity == null)
                 return null;

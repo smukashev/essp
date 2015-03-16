@@ -310,7 +310,7 @@ showcase list add value
 
 showcase list addCustom credit root credit_id
 showcase list addCustom credit creditor creditor_id
-showcase list addCustom credit maturity_date maturity_date
+showcase list addCustom credit contract_maturity_date contract_maturity_date
 
 showcase save
 

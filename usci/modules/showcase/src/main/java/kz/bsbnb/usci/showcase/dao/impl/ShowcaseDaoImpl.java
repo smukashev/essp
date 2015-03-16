@@ -265,7 +265,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         platform.createModel(model, false, true);
     }
 
-    void persistMap(HashMap<String, Object> map, Date openDate, Date closeDate, ShowcaseHolder showCaseHolder) {
+    void persistMap(HashMap<String, Object> map, Date openDate, Date closeDate, ShowcaseHolder showCaseHolder,
+                    IBaseEntity entity) {
         StringBuilder sql;
         StringBuilder values = new StringBuilder("(");
         String tableName;
@@ -277,13 +278,35 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
 
         sql = new StringBuilder("insert into ").append(tableName).append("(");
 
-        Object[] vals = new Object[map.size() + 2];
+        Object[] vals = new Object[map.size() + 2 + showCaseHolder.getShowCaseMeta().getCustomFieldsList().size()];
         int i = 0;
 
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             sql.append(COLUMN_PREFIX).append(entry.getKey()).append(",");
             values.append("? ,");
             vals[i++] = entry.getValue();
+        }
+
+        for(ShowCaseField sf : showCaseHolder.getShowCaseMeta().getCustomFieldsList()) {
+            sql.append(sf.getColumnName()).append(",");
+            values.append("? ,");
+            Object o = null;
+
+            if(sf.getAttributePath().equals("")) {
+                o = entity.getEl(sf.getAttributeName());
+            } else {
+                o = entity.getEl(sf.getAttributePath());
+            }
+
+            try {
+                if (o instanceof BaseEntity) {
+                    vals[i++] = ((BaseEntity) o).getId();
+                } else {
+                    vals[i++] = o;
+                }
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
 
         sql.append("OPEN_DATE, CLOSE_DATE");
@@ -468,11 +491,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
                 showcaseHolder.getShowCaseMeta().getDownPath());
 
         for (BaseEntity baseEntity : all)
-            dbCarteageGenerate(baseEntity, showcaseHolder);
+            dbCarteageGenerate(entity, baseEntity, showcaseHolder);
     }
 
     @Transactional
-    void dbCarteageGenerate(IBaseEntity entity, ShowcaseHolder showcaseHolder) {
+    void dbCarteageGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
         Date openDate;
         Date closeDate = null;
         String sql;
@@ -521,8 +544,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
             stats.put("showcase: updateLeftRange", t2);
         }
 
-        int n = showcaseHolder.getShowCaseMeta().getFieldsList().size() +
-                showcaseHolder.getShowCaseMeta().getCustomFieldsList().size();
+        int n = showcaseHolder.getShowCaseMeta().getFieldsList().size() /*+
+                showcaseHolder.getShowCaseMeta().getCustomFieldsList().size()*/;
 
         ShowCaseEntries[] showCases = new ShowCaseEntries[n];
         int i = 0;
@@ -534,12 +557,12 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
             i++;
         }
 
-        for (ShowCaseField field : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
+        /*for (ShowCaseField field : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
             showCases[i] = new ShowCaseEntries(entity, field.getAttributeName().equals("") ?
                     field.getAttributePath() : field.getAttributePath() + "." + field.getAttributeName(),
-                    field.getColumnName(), showcaseHolder.generatePaths(), field);
+                    field.getColumnName(), null, field);
             i++;
-        }
+        }*/
 
         int allRecordsSize = 0;
         for (i = 0; i < n; i++)
@@ -581,7 +604,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
                                 usedGroup[id[j]] = true;
                             }
                     long t3 = System.currentTimeMillis();
-                    persistMap(map, openDate, closeDate, showcaseHolder);
+                    persistMap(map, openDate, closeDate, showcaseHolder, globalEntity);
                     long t4 = System.currentTimeMillis() - t3;
                     stats.put("persistMap", t4);
                 }
@@ -918,15 +941,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
             gen(entity, path, new HashMap(), "root");
         }
 
-        ShowCaseEntries(IBaseEntity entity, String path, String columnName, Map<String, String> prefixToColumn,
-                        ShowCaseField showCaseField) {
-            this.columnName = columnName;
-            if (path.startsWith("."))
-                path = path.substring(1);
-            this.prefixToColumn = prefixToColumn;
-            genCustom(entity, path, new HashMap(), "root", showCaseField);
-        }
-
         public List<HashMap> getEntries() {
             return entries;
         }
@@ -977,52 +991,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
             } else {
                 IBaseEntity next = (IBaseEntity) entity.getEl(path);
                 gen(next, nextPath, (HashMap) map.clone(), prefix + "." + path);
-            }
-        }
-
-        public void genCustom(IBaseEntity entity, String curPath, HashMap map, String prefix,
-                              ShowCaseField showCaseField) {
-            if (curPath == null || curPath.equals("") || entity == null) {
-                if (entity != null)
-                    map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
-                entries.add(map);
-                return;
-            }
-
-            MetaClass curMeta = entity.getMeta();
-            String path = (curPath.indexOf('.') == -1) ? curPath : curPath.substring(0, curPath.indexOf('.'));
-            String nextPath = curPath.indexOf('.') == -1 ? null : curPath.substring(curPath.indexOf('.') + 1);
-            IMetaAttribute attribute = curMeta.getMetaAttribute(path);
-            map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
-
-            if (!attribute.getMetaType().isComplex()) {
-                map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
-                if (!attribute.getMetaType().isSet()) {
-                    map.put(columnName, entity.getEl(path));
-                    entries.add(map);
-                } else {
-                    IBaseSet set = (IBaseSet) entity.getEl(path);
-
-                    if (set != null) {
-                        for (IBaseValue o : set.get()) {
-                            HashMap nmap = (HashMap) map.clone();
-                            nmap.put(columnName, o.getValue());
-                            entries.add(nmap);
-                        }
-                    }
-                }
-            } else if (attribute.getMetaType().isSet()) {
-                IBaseSet next = (IBaseSet) entity.getEl(path);
-
-                if (next != null) {
-                    for (Object o : next.get()) {
-                        genCustom((IBaseEntity) ((IBaseValue) o).getValue(), nextPath, (HashMap) map.clone(),
-                                prefix + "." + path, showCaseField);
-                    }
-                }
-            } else {
-                IBaseEntity next = (IBaseEntity) entity.getEl(path);
-                genCustom(next, nextPath, (HashMap) map.clone(), prefix + "." + path, showCaseField);
             }
         }
     }
