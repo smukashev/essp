@@ -2263,31 +2263,28 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         baseEntityManager.registerAsUpdated(baseValuePrevious);
                     }
                 } else if (compare == -1) {
-                    // TODO remove commented code, bug-fix
-//                    IBaseValue baseValueApplied = BaseValueFactory.create(
-//                            MetaContainerTypes.META_CLASS,
-//                            metaType,
-//                            baseValueSaving.getBatch(),
-//                            baseValueSaving.getIndex(),
-//                            new Date(baseValueSaving.getRepDate().getTime()),
-//                            metaValue.getTypeCode() == DataTypes.DATE ?
-//                                    new Date(((Date) baseValueSaving.getValue()).getTime()) :
-//                                    baseValueSaving.getValue(),
-//                            false,
-//                            baseValueLoaded.isLast()
-//                    );
-//
-//                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
-//                    baseEntityManager.registerAsInserted(baseValueApplied);
+                    IBaseValue baseValueApplied = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueSaving.getRepDate().getTime()),
+                            metaValue.getTypeCode() == DataTypes.DATE ?
+                                    new Date(((Date) baseValueSaving.getValue()).getTime()) :
+                                    baseValueSaving.getValue(),
+                            false,
+                            baseValueLoaded.isLast()
+                    );
+
+                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityManager.registerAsInserted(baseValueApplied);
 
                     IBaseValue baseValueAppliedClosed = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
                             metaType,
                             baseValueSaving.getBatch(),
                             baseValueSaving.getIndex(),
-                            // TODO remove commented code, bug-fix
-//                            new Date(baseValueLoaded.getRepDate().getTime()),
-                            new Date(baseValueSaving.getRepDate().getTime()),
+                            new Date(baseValueLoaded.getRepDate().getTime()),
                             metaValue.getTypeCode() == DataTypes.DATE ?
                                     new Date(((Date) baseValueSaving.getValue()).getTime()) :
                                     baseValueSaving.getValue(),
