@@ -2977,7 +2977,15 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return entityIds;
     }
 
-    public List<RefListItem> getRefsByMetaclass(long metaClassId) {
+    /**
+     * Analog of getRefsByMetaClass method, not escapes content with quotes
+     */
+    public List<RefListItem> getRefsByMetaclassRaw(long metaClassId) {
+        return getRefsByMetaClass(metaClassId, true);
+    }
+
+    public List<RefListItem> getRefsByMetaClass(long metaClassId, boolean raw) {
+
         ArrayList<RefListItem> entityIds = new ArrayList<RefListItem>();
 
         Select select = context.select().from(
@@ -3057,11 +3065,20 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             rli.setId(id);
             while (old_id == id) {
                 if (((String) row.get("NAME")).equals("code")) {
-                    rli.setCode(Quote.addSlashes((String) row.get("VALUE")));
+                    String code = (String) row.get("VALUE");
+                    if(!raw)
+                        code = Quote.addSlashes(code);
+                    rli.setCode(code);
                 } else if (((String) row.get("NAME")).startsWith("name_")) {
-                    rli.setTitle(Quote.addSlashes((String) row.get("VALUE")));
+                    String value = (String) row.get("VALUE");
+                    if(!raw)
+                        value = Quote.addSlashes(value);
+                    rli.setTitle(value);
                 } else if (((String) row.get("NAME")).startsWith("name")) {
-                    rli.setTitle(Quote.addSlashes((String) row.get("VALUE")));
+                    String value = (String) row.get("VALUE");
+                    if(!raw)
+                        value = Quote.addSlashes(value);
+                    rli.setTitle(value);
                 }
 
                 for (String key : row.keySet()) {
@@ -3069,7 +3086,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         continue;
                     }
 
-                    String value = Quote.addSlashes(row.get(key).toString());
+                    String value = row.get(key).toString();
+
+                    if(!raw)
+                        value = Quote.addSlashes(value);
 
                     //System.out.println("###% " + value);
 
@@ -3088,6 +3108,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
 
         return entityIds;
+    }
+
+    public List<RefListItem> getRefsByMetaclass(long metaClassId) {
+        return getRefsByMetaClass(metaClassId, false);
     }
 
     public List<BaseEntity> getEntityByMetaclass(MetaClass meta) {
@@ -3844,6 +3868,31 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
+    public void populateSC() {
+        Long id = metaClassRepository.getMetaClass("credit").getId();
+        Insert insert = context.insertInto(SC_ENTITIES).select(
+                context.select(EAV_BE_ENTITIES.ID)
+                        .from(EAV_BE_ENTITIES)
+                        .where(EAV_BE_ENTITIES.CLASS_ID.eq(id))
+        );
+        jdbcTemplate.update(insert.getSQL(), insert.getBindValues().toArray());
+    }
+
+    @Override
+    public void populateSC(Long creditorId) {
+        MetaClass metaClass = metaClassRepository.getMetaClass("credit");
+        IMetaAttribute metaAttribute = metaClass.getMetaAttribute("creditor");
+
+        Insert insert = context.insertInto(SC_ENTITIES).select(
+                context.selectDistinct(EAV_BE_COMPLEX_VALUES.ENTITY_ID)
+                        .from(EAV_BE_COMPLEX_VALUES)
+                        .where(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID.eq(metaAttribute.getId()))
+                        .and(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.eq(creditorId))
+        );
+        jdbcTemplate.update(insert.getSQL(), insert.getBindValues().toArray());
+    }
+
+    @Override
     public List<Long> getNewTableIds(Long id) {
         List<Long> list;
         Select select = context.select(SC_ID_BAG.ID).from(SC_ID_BAG).where(SC_ID_BAG.SHOWCASE_ID.eq(id)).limit(10);
@@ -3870,8 +3919,32 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
+    public List<Long> getSCEntityIds(int limit) {
+        Select select = context.select(SC_ENTITIES.ENTITY_ID).from(SC_ENTITIES).limit(limit);
+        Select select2 = context.select(select.field(0)).from(select);
+        List<Long> list = jdbcTemplate.queryForList(select2.getSQL(), Long.class, select2.getBindValues().toArray());
+        return list;
+    }
+
+    @Override
+    public List<Date> getEntityReportDates(Long entityId) {
+        Select select = context.select(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE)
+                .from(EAV_BE_ENTITY_REPORT_DATES)
+                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(entityId))
+                .orderBy(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE);
+        List<Date> reportDates = jdbcTemplate.queryForList(select.getSQL(), Date.class, select.getBindValues().toArray());
+        return reportDates;
+    }
+
+    @Override
     public void removeSCEntityIds(List<Long> list, Long id) {
         Delete delete = context.delete(SC_ID_BAG).where(SC_ID_BAG.ID.in(list).and(SC_ID_BAG.SHOWCASE_ID.eq(id)));
+        jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
+    }
+
+    @Override
+    public void removeSCEntityIds(List<Long> entityIds) {
+        Delete delete = context.delete(SC_ENTITIES).where(SC_ENTITIES.ENTITY_ID.in(entityIds));
         jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
     }
 

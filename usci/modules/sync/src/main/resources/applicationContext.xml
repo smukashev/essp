@@ -44,6 +44,12 @@
         <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IMetaFactoryService"/>
     </bean>
 
+    <bean id="remoteSearcherFormService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="refreshStubOnConnectFailure" value="true"/>
+        <property name="serviceUrl" value="rmi://127.0.0.1:1099/searcherFormService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.ISearcherFormService"/>
+    </bean>
+
     <!-- available services -->
     <bean id="entityRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
         <property name="serviceName" value="entityService"/>
@@ -63,6 +69,13 @@
         <property name="serviceName" value="metaFactoryService"/>
         <property name="service" ref="metaFactoryServiceImpl"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IMetaFactoryService"/>
+        <property name="registryPort" value="1098"/>
+    </bean>
+
+    <bean id="searcherFormService" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="searcherFormService"/>
+        <property name="service" ref="searcherFormServiceImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.ISearcherFormService"/>
         <property name="registryPort" value="1098"/>
     </bean>
 

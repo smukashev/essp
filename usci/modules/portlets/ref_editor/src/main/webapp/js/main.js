@@ -218,7 +218,8 @@ Ext.onReady(function() {
             entityStore.load({
                 params: {
                     op : 'LIST_ENTITY',
-                    entityId: entityId.getValue()
+                    entityId: entityId.getValue(),
+                    date: Ext.getCmp('edDate').value
                 },
                 callback: function(records, operation, success) {
                     if (!success) {
@@ -226,7 +227,8 @@ Ext.onReady(function() {
                     }
                 }
             });
-        }
+        },
+        maxWidth: 200
     });
 
     var buttonXML = Ext.create('Ext.button.Button', {
@@ -294,7 +296,8 @@ Ext.onReady(function() {
             });
 
             xmlFromWin.show();*/
-        }
+        },
+        maxWidth: 200
     });
 
     var buttonShowXML = Ext.create('Ext.button.Button', {
@@ -347,7 +350,8 @@ Ext.onReady(function() {
              });
 
              xmlFromWin.show();
-        }
+        },
+        maxWidth: 200
     });
 
     var entityGrid = Ext.create('Ext.tree.Panel', {
@@ -397,7 +401,7 @@ Ext.onReady(function() {
                 var selectedNode = tree.getSelectionModel().getLastSelected();
 
                 var buttonSaveAttributes = Ext.create('Ext.button.Button', {
-                    id: "entityEditorShowBtn",
+                    id: "btnFormSave",
                     text: label_SAVE,
                     handler : function () {
                         var tree = Ext.getCmp('entityTreeView');
@@ -519,11 +523,13 @@ Ext.onReady(function() {
                         refStore.reload();
                         createItemsGrid(currentClassId);
                     }
-                }
+                },
+                maxWidth: 400
             },{
                 fieldLabel: label_ITEMS,
                 id: 'entityEditorrefCombo',
                 xtype: 'combobox',
+                maxWidth: 400,
                 store: refStore,
                 valueField:'id',
                 displayField:'title',
@@ -538,8 +544,18 @@ Ext.onReady(function() {
                 id: 'entityId',
                 name: 'entityId',
                 xtype: 'textfield',
+                maxWidth: 400,
                 value: (givenEntityId == "null" ? "" : givenEntityId)
-            },
+            }, {
+                fieldLabel: label_Date,
+                id: 'edDate',
+                xtype: 'datefield',
+                maxWidth: 400
+            }, {
+                xtype: 'tbseparator'
+            }
+        ],
+        tbar: [
             buttonShow, buttonXML, buttonShowXML
         ]
     });

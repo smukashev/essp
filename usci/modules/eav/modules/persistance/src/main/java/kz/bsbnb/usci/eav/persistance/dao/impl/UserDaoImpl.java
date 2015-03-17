@@ -310,4 +310,39 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao
             updateWithStats(update.getSQL(), update.getBindValues().toArray());
         }
     }
+
+    @Override
+    public List<String> getAllowedClasses(long portalUserId) {
+        Select select = context.select(EAV_A_USER_CLASS.META_NAME)
+                .from(EAV_A_USER_CLASS)
+                .where(EAV_A_USER_CLASS.USER_ID.eq(portalUserId));
+
+        List<String> list = new ArrayList<>();
+
+        List<Map<String,Object> > ret = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        for(Map<String,Object> m : ret) {
+            list.add((String)m.get(EAV_A_USER_CLASS.META_NAME.getName()));
+        }
+
+        return list;
+    }
+
+    @Override
+    public List<Long> getAllowedRefs(long portalUserId, String meta){
+        Select select = context.select(EAV_A_USER_REF.ENTITY_ID)
+                .from(EAV_A_USER_REF)
+                .where(EAV_A_USER_REF.USER_ID.eq(portalUserId))
+                .and(EAV_A_USER_REF.META_NAME.eq(meta));
+
+        List<Long> list = new ArrayList<>();
+
+        List<Map<String,Object> > ret = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        for(Map<String,Object> m : ret) {
+            list.add( ((BigDecimal)m.get(EAV_A_USER_REF.ENTITY_ID.getName())).longValue());
+        }
+
+        return list;
+    }
 }

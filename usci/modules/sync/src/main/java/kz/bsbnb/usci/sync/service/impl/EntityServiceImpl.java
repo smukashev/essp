@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.jws.Oneway;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,6 +48,11 @@ public class EntityServiceImpl implements IEntityService {
     public BaseEntity load(long id) {
         System.out.println("Load with id: " + id);
         return remoteEntityService.load(id);
+    }
+
+    @Override
+    public BaseEntity load(long id, Date date) {
+        return remoteEntityService.load(id,date);
     }
 
     @Override

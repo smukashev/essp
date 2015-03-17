@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +16,7 @@ import java.util.Set;
  */
 public interface IEntityService {
     public BaseEntity load(long id);
+    public BaseEntity load(long id, Date date);
     public void process(BaseEntity baseEntity);
     public BaseEntity search(BaseEntity baseEntity);
     public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);

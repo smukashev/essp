@@ -67,6 +67,8 @@ public interface IBaseEntityProcessorDao
 
     public List<RefListItem> getRefsByMetaclass(long metaClassId);
 
+    public List<RefListItem> getRefsByMetaclassRaw(long metaClassId);
+
     public List<BaseEntity> getEntityByMetaclass(MetaClass meta);
 
     public boolean isApproved(long id);
@@ -85,6 +87,8 @@ public interface IBaseEntityProcessorDao
 
     public void setApplyListener(IDaoListener applyListener);
 
+    List<Date> getEntityReportDates(Long entityId);
+
     enum MergeResultChoice
     {
         RIGHT,
@@ -96,9 +100,17 @@ public interface IBaseEntityProcessorDao
 
     public void populate(String metaName, Long id, Date reportDate);
 
+    void populateSC(Long creditorId);
+
+    void populateSC();
+
     public List<Long> getSCEntityIds(Long id);
 
+    public List<Long> getSCEntityIds(int limit);
+
     public void removeSCEntityIds(List<Long> list, Long id);
+
+    void removeSCEntityIds(List<Long> entityIds);
 
     public void removeShowcaseId(Long id);
 
