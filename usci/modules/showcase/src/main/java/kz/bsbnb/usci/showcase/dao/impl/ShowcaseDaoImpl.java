@@ -17,6 +17,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
 import org.jooq.*;
@@ -301,6 +302,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
             try {
                 if (o instanceof BaseEntity) {
                     vals[i++] = ((BaseEntity) o).getId();
+                } else if(o instanceof Date) {
+                    vals[i++] = DataUtils.convert((Date) o);
                 } else {
                     vals[i++] = o;
                 }

@@ -2643,12 +2643,30 @@ public class CLI {
             } else {
                 System.out.println("Usage: startLoad <showcase name> <report date>");
             }
+        } else if(args.get(0).equals("startLoadHistory")){
+            boolean populate = false;
+
+            if (args.size() > 1 && "populate".equals(args.get(1))) {
+                populate = true;
+            }
+
+            Long creditorId = null;
+
+            if (args.size() > 2) {
+                creditorId = Long.valueOf(args.get(2));
+            }
+
+            showcaseService.startLoadHistory(populate, creditorId);
+
         } else if (args.get(0).equals("stopLoad")) {
             if (args.size() > 1) {
                 showcaseService.stopLoad(args.get(1));
             } else {
                 System.out.println("Usage: stopLoad <showcase name>");
             }
+        } else if(args.get(0).equals("stopLoadHistory")){
+            showcaseService.stopLoadHistory();
+
         } else if (args.get(0).equals("pauseLoad")) {
             if (args.size() > 1) {
                 showcaseService.pauseLoad(args.get(1));
