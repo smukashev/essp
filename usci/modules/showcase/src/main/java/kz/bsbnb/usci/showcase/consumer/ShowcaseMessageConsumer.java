@@ -40,7 +40,6 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 ObjectMessage om = (ObjectMessage) message;
                 QueueEntry queueEntry = (QueueEntry) om.getObject();
                 Long scId = queueEntry.getScId();
-                scId = null; // TODO: remove
                 ArrayList<Future> futures = new ArrayList<Future>();
                 List<ShowcaseHolder> holders = showcaseDao.getHolders();
 
