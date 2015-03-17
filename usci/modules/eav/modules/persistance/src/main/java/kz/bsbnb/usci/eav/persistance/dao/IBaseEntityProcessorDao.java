@@ -100,7 +100,9 @@ public interface IBaseEntityProcessorDao
 
     public void populate(String metaName, Long id, Date reportDate);
 
-    void populateSC(String metaName);
+    void populateSC(Long creditorId);
+
+    void populateSC();
 
     public List<Long> getSCEntityIds(Long id);
 

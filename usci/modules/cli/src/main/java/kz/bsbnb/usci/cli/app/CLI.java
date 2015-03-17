@@ -2962,7 +2962,14 @@ public class CLI
             if (args.size() > 1 && "populate".equals(args.get(1))) {
                 populate = true;
             }
-            showcaseService.startLoadHistory(populate);
+
+            Long creditorId = null;
+
+            if (args.size() > 2) {
+                creditorId = Long.valueOf(args.get(2));
+            }
+
+            showcaseService.startLoadHistory(populate, creditorId);
 
         } else if(args.get(0).equals("stopLoad")){
             if(args.size() > 1){

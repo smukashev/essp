@@ -46,9 +46,13 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     }
 
     @Override
-    public void startLoadHistory(boolean populate) {
+    public void startLoadHistory(boolean populate, Long creditorId) {
         if (populate) {
-            baseEntityProcessorDao.populateSC("credit");
+            if (creditorId != null) {
+                baseEntityProcessorDao.populateSC(creditorId);
+            } else {
+                baseEntityProcessorDao.populateSC();
+            }
         }
         scHistoryThread = new Thread(new HistorySender());
         scHistoryThread.start();

@@ -17,7 +17,7 @@ public interface ShowcaseService {
     public List<ShowcaseHolder> list();
     public ShowCase load(String name);
     public void startLoad(String name, Date reportDate);
-    void startLoadHistory(boolean populate);
+    void startLoadHistory(boolean populate, Long creditorId);
     void stopLoadHistory();
     public HashMap<String, QueryEntry> getSQLStats();
     public void reloadCash();

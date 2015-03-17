@@ -3868,12 +3868,26 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public void populateSC(String metaName) {
-        Long id = metaClassRepository.getMetaClass(metaName).getId();
+    public void populateSC() {
+        Long id = metaClassRepository.getMetaClass("credit").getId();
         Insert insert = context.insertInto(SC_ENTITIES).select(
                 context.select(EAV_BE_ENTITIES.ID)
                         .from(EAV_BE_ENTITIES)
                         .where(EAV_BE_ENTITIES.CLASS_ID.eq(id))
+        );
+        jdbcTemplate.update(insert.getSQL(), insert.getBindValues().toArray());
+    }
+
+    @Override
+    public void populateSC(Long creditorId) {
+        MetaClass metaClass = metaClassRepository.getMetaClass("credit");
+        IMetaAttribute metaAttribute = metaClass.getMetaAttribute("creditor");
+
+        Insert insert = context.insertInto(SC_ENTITIES).select(
+                context.selectDistinct(EAV_BE_COMPLEX_VALUES.ENTITY_ID)
+                        .from(EAV_BE_COMPLEX_VALUES)
+                        .where(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID.eq(metaAttribute.getId()))
+                        .and(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.eq(creditorId))
         );
         jdbcTemplate.update(insert.getSQL(), insert.getBindValues().toArray());
     }

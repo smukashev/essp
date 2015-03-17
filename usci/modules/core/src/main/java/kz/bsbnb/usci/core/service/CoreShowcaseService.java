@@ -17,7 +17,7 @@ public interface CoreShowcaseService {
 
     List<Long> listLoading();
 
-    void startLoadHistory(boolean populate);
+    void startLoadHistory(boolean populate, Long creditorId);
 
     void stopHistory();
 }
