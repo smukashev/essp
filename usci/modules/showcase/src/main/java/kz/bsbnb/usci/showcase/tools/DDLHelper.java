@@ -66,12 +66,9 @@ public class DDLHelper {
 
             writeDatabaseToXML(db, args[1]);
         } else if (args[0].equals("apply")) {
-            DDLHelper.dropDatabase(source,
-                    DDLHelper.readDatabaseFromXML(args[1]));
-
-            DDLHelper.changeDatabase(source,
-                    DDLHelper.readDatabaseFromXML(args[1]),
-                    false);
+            Database database = DDLHelper.readDatabaseFromXML(args[1]);
+            DDLHelper.dropDatabase(source, database);
+            DDLHelper.changeDatabase(source, database, false);
         }
     }
 }

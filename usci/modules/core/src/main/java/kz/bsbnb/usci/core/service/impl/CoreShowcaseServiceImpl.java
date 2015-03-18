@@ -19,19 +19,14 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import java.util.*;
 
-/**
- * Created by almaz on 6/27/14.
- */
 @Service
 public class CoreShowcaseServiceImpl implements CoreShowcaseService {
-
+    private final Logger logger = LoggerFactory.getLogger(CoreShowcaseServiceImpl.class);
     @Autowired
     protected IBaseEntityProcessorDao baseEntityProcessorDao;
     @Autowired
     protected ShowcaseMessageProducer producer;
     private Map<String, QueueViewMBean> queueViewBeanCache = new HashMap<String, QueueViewMBean>();
-    private final Logger logger = LoggerFactory.getLogger(CoreShowcaseServiceImpl.class);
-
     private Map<Long, Thread> SCThreads = new HashMap<Long, Thread>();
 
     private static final int ENTITY_COUNT_PER_LOAD = 10;
@@ -44,7 +39,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     @Override
     public void start(String metaName, Long id, Date reportDate) {
         baseEntityProcessorDao.populate(metaName, id, reportDate);
-        Thread t = new Thread(new Sender(id));
+        Thread t = new Thread(new Sender(id, reportDate));
         SCThreads.put(id, t);
         t.start();
     }
@@ -83,42 +78,46 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     }
 
     @Override
-    public void resume(Long id){
+    public void resume(final Long id) {
         Thread t = new Thread(new Sender(id));
         SCThreads.put(id, t);
         t.start();
     }
 
     @Override
-    public void stop(Long id){
+    public void stop(Long id) {
         SCThreads.get(id).interrupt();
         baseEntityProcessorDao.removeShowcaseId(id);
         SCThreads.remove(id);
     }
 
     @Override
-    public List<Long> listLoading(){
-        List list = new ArrayList<Long>();
-        for(Long id : SCThreads.keySet()){
+    public List<Long> listLoading() {
+        List<Long> list = new ArrayList<Long>();
+
+        for (Long id : SCThreads.keySet())
             list.add(id);
-        }
+
         return list;
     }
 
     private QueueViewMBean getShowcaseQueue() {
-        JMXServiceURL url = null;
-        if(queueViewBeanCache.containsKey("showcaseQueue"))return queueViewBeanCache.get("showcaseQueue");
+        JMXServiceURL url;
+
+        if (queueViewBeanCache.containsKey("showcaseQueue"))
+            return queueViewBeanCache.get("showcaseQueue");
+
         try {
-            url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi");
+            url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:1094/jmxrmi");
             JMXConnector jmxc = JMXConnectorFactory.connect(url);
             MBeanServerConnection conn = jmxc.getMBeanServerConnection();
 
             ObjectName activeMQ = new ObjectName("org.apache.activemq:type=Broker,brokerName=localhost");
-            BrokerViewMBean mbean = (BrokerViewMBean) MBeanServerInvocationHandler
+            BrokerViewMBean mbean = MBeanServerInvocationHandler
                     .newProxyInstance(conn, activeMQ, BrokerViewMBean.class, true);
 
             for (ObjectName name : mbean.getQueues()) {
-                QueueViewMBean queueMbean = (QueueViewMBean)
+                QueueViewMBean queueMbean =
                         MBeanServerInvocationHandler.newProxyInstance(conn, name, QueueViewMBean.class, true);
 
                 if (queueMbean.getName().equals("showcaseQueue")) {
@@ -129,6 +128,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
@@ -242,42 +242,59 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
         }
     }
 
-    private class Sender implements Runnable{
+    private class Sender implements Runnable {
+        final Long scId;
+        Date reportDate;
 
-        Long scId;
-
-        public Sender(Long id){
+        public Sender(Long id) {
             this.scId = id;
+        }
+
+        public Sender(Long id, Date reportDate) {
+            this.scId = id;
+            this.reportDate = reportDate;
         }
 
         @Override
         public void run() {
             QueueViewMBean queueMbean = getShowcaseQueue();
-            while(true){
-                if(queueMbean.getQueueSize() == 0){
+
+            if (queueMbean == null) {
+                logger.error("Can't get ShowcaseQueue, queueMBean is null!");
+                throw new NullPointerException();
+            }
+
+            while (true) {
+                if (queueMbean.getQueueSize() == 0) {
                     List<Long> list = baseEntityProcessorDao.getSCEntityIds(scId);
-                    if(list.size() == 0){
-                        logger.info("Done loading entities for showcase %s, reportDate %s");
+
+                    if (list.size() == 0) {
+                        logger.info("Done loading entities for showcase %s, reportDate %s", scId, reportDate);
                         SCThreads.remove(scId);
                         return;
                     }
-                    for(Long id : list){
+                    for (Long id : list) {
                         QueueEntry entry = new QueueEntry().setBaseEntityApplied(baseEntityProcessorDao.load(id))
                                 .setScId(scId);
                         try {
                             producer.produce(entry);
                         } catch (InterruptedException e) {
                             //do nothing, finish loading
+                            logger.error("Producer interrupted!");
+                            logger.error(e.getMessage());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
+
                     baseEntityProcessorDao.removeSCEntityIds(list, scId);
-                    if(Thread.interrupted()) return;
-                } else try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    return;
+                    if (Thread.interrupted()) return;
+                } else {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
                 }
             }
         }

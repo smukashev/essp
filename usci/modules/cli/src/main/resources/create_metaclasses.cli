@@ -1,7 +1,7 @@
 # Warning this line clears DB!
-clear
+# clear
 # Recreate DB
-init
+# init
 
 #====================================
 #= REF_DEBTOR_TYPE
