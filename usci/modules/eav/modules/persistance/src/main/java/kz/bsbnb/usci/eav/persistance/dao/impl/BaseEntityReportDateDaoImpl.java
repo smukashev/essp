@@ -154,6 +154,19 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
         try {
             return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
         } catch (DuplicateKeyException e) {
+            // TODO: temporary solution
+            IBaseEntityReportDate baseEntityReportDate = load(baseEntityId, reportDate);
+
+            if(baseEntityReportDate != null) {
+                update(baseEntityReportDate.getId(), baseEntityReportDate.getIntegerValuesCount(),
+                        baseEntityReportDate.getDateValuesCount(), baseEntityReportDate.getStringValuesCount(),
+                        baseEntityReportDate.getBooleanValuesCount(), baseEntityReportDate.getDoubleValuesCount(),
+                        baseEntityReportDate.getComplexValuesCount(), baseEntityReportDate.getSimpleSetsCount(),
+                        baseEntityReportDate.getComplexSetsCount());
+
+                return baseEntityReportDate.getId();
+            }
+
             logger.error("Report date exists in DB! Query: " + insert.toString());
             throw e;
         }
