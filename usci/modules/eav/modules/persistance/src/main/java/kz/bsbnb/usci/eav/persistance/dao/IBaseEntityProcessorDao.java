@@ -106,7 +106,7 @@ public interface IBaseEntityProcessorDao
 
     public List<Long> getSCEntityIds(Long id);
 
-    public List<Long> getSCEntityIds(int limit);
+    public List<Long> getSCEntityIds(int limit, Long prevMaxId);
 
     public void removeSCEntityIds(List<Long> list, Long id);
 

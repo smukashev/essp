@@ -3919,8 +3919,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public List<Long> getSCEntityIds(int limit) {
-        Select select = context.select(SC_ENTITIES.ENTITY_ID).from(SC_ENTITIES).limit(limit);
+    public List<Long> getSCEntityIds(int limit, Long prevMaxId) {
+        Select select = context.select(SC_ENTITIES.ENTITY_ID).from(SC_ENTITIES)
+                .where(SC_ENTITIES.ENTITY_ID.gt(prevMaxId))
+                .orderBy(SC_ENTITIES.ENTITY_ID).limit(limit);
         Select select2 = context.select(select.field(0)).from(select);
         List<Long> list = jdbcTemplate.queryForList(select2.getSQL(), Long.class, select2.getBindValues().toArray());
         return list;

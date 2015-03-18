@@ -33,12 +33,16 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     private final Logger logger = LoggerFactory.getLogger(CoreShowcaseServiceImpl.class);
 
     private Map<Long, Thread> SCThreads = new HashMap<Long, Thread>();
-    private Thread scHistoryThread;
 
-    private static final int ENTITY_COUNT_PER_RUN = 10;
+    private static final int ENTITY_COUNT_PER_LOAD = 10;
+    private static final int ENTITY_COUNT_PER_CLEAR = 10;
+    private static final int SC_HISTORY_THREADS_COUNT = 10;
+    private static final int SLEEP_TIME_MILLIS = 1000;
+
+    private Map<Integer, Thread> scHistoryThreads = new HashMap<>();
 
     @Override
-    public void start(String metaName, Long id, Date reportDate){
+    public void start(String metaName, Long id, Date reportDate) {
         baseEntityProcessorDao.populate(metaName, id, reportDate);
         Thread t = new Thread(new Sender(id));
         SCThreads.put(id, t);
@@ -54,15 +58,22 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
                 baseEntityProcessorDao.populateSC();
             }
         }
-        scHistoryThread = new Thread(new HistorySender());
-        scHistoryThread.start();
+
+        IdSupplier idSupplier = new IdSupplier();
+
+        for (int i = 0; i < SC_HISTORY_THREADS_COUNT; i++) {
+            Thread t = new Thread(new HistorySender(i, idSupplier));
+            scHistoryThreads.put(i, t);
+            t.start();
+        }
     }
 
     @Override
     public void stopHistory() {
-        if (scHistoryThread == null) return;
-        scHistoryThread.interrupt();
-        scHistoryThread = null;
+        for (Thread t : scHistoryThreads.values()) {
+            t.interrupt();
+        }
+        scHistoryThreads.clear();
     }
 
     @Override
@@ -94,7 +105,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
         return list;
     }
 
-    private QueueViewMBean getShowcaseQueue(){
+    private QueueViewMBean getShowcaseQueue() {
         JMXServiceURL url = null;
         if(queueViewBeanCache.containsKey("showcaseQueue"))return queueViewBeanCache.get("showcaseQueue");
         try {
@@ -121,52 +132,114 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
         return null;
     }
 
+    private class IdSupplier {
+        private List<Long> idsToProcess;
+        private List<Long> processedIds;
+        private Long maxIdToProcess;
+
+        public IdSupplier() {
+            idsToProcess = new ArrayList<>();
+            processedIds = new ArrayList<>();
+            maxIdToProcess = -1L;
+        }
+
+        public synchronized Long supply() {
+            if (idsToProcess.isEmpty()) {
+                List<Long> entityIds = baseEntityProcessorDao.getSCEntityIds(ENTITY_COUNT_PER_LOAD, maxIdToProcess);
+                idsToProcess.addAll(entityIds);
+            }
+
+            if (idsToProcess.isEmpty()) {
+                return null;
+            }
+
+            maxIdToProcess = idsToProcess.get(idsToProcess.size() - 1);
+
+            return idsToProcess.isEmpty() ? null : idsToProcess.remove(0);
+        }
+
+        public synchronized void done(Long entityId) {
+            processedIds.add(entityId);
+
+            if (processedIds.size() == ENTITY_COUNT_PER_CLEAR) {
+                baseEntityProcessorDao.removeSCEntityIds(processedIds);
+                processedIds.clear();
+            }
+        }
+
+        public void clearProcessedLeft() {
+            if (!processedIds.isEmpty()) {
+                baseEntityProcessorDao.removeSCEntityIds(processedIds);
+                processedIds.clear();
+            }
+        }
+    }
+
     private class HistorySender implements Runnable {
+        private int index;
+        private IdSupplier idSupplier;
+
+        public HistorySender(int index, IdSupplier idSupplier) {
+            this.index = index;
+            this.idSupplier = idSupplier;
+        }
 
         @Override
         public void run() {
-            QueueViewMBean queueViewMBean = getShowcaseQueue();
-
             while (true) {
-                if (queueViewMBean.getQueueSize() == 0) {
-                    List<Long> entityIds = baseEntityProcessorDao.getSCEntityIds(ENTITY_COUNT_PER_RUN);
-                    if(entityIds.size() == 0){
-                        logger.info("Done loading entities for showcase %s, reportDate %s");
-                        scHistoryThread = null;
-                        return;
-                    }
-                    for (Long entityId : entityIds) {
-                        List<Date> reportDates = baseEntityProcessorDao.getEntityReportDates(entityId);
+                Long entityId = idSupplier.supply();
 
-                        for (Date reportDate : reportDates) {
-                            QueueEntry entry = new QueueEntry()
-                                    .setBaseEntityApplied(baseEntityProcessorDao.loadByReportDate(entityId, reportDate));
+                logger.info("STARTED LOADING (entityId = %s, threadIndex = %s)", entityId, index);
+                System.out.printf("STARTED LOADING (entityId = %s, threadIndex = %s)\n", entityId, index);
 
-                            try {
-                                producer.produce(entry);
-                            } catch (InterruptedException e) {
-                                // do nothing, finish loading
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    baseEntityProcessorDao.removeSCEntityIds(entityIds);
+                if (entityId == null) {
+                    onFinish(false);
+                    return;
+                }
 
-                    logger.info("%s - entities sent for loading.", entityIds);
-                    System.out.printf("%s - entities sent for loading.\n", entityIds);
+                List<Date> reportDates = baseEntityProcessorDao.getEntityReportDates(entityId);
 
-                    if(Thread.interrupted()) return;
-                } else {
+                for (Date reportDate : reportDates) {
+                    QueueEntry entry = new QueueEntry()
+                            .setBaseEntityApplied(baseEntityProcessorDao.loadByReportDate(entityId, reportDate));
+
                     try {
-                        Thread.sleep(5000);
+                        producer.produce(entry);
                     } catch (InterruptedException e) {
-                        return;
+                        // do nothing, finish loading
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+                }
+
+                idSupplier.done(entityId);
+
+                logger.info("FINISHED LOADING (entityId = %s, threadIndex = %s)", entityId, index);
+                System.out.printf("FINISHED LOADING (entityId = %s, threadIndex = %s)\n", entityId, index);
+
+                if (Thread.interrupted()) {
+                    onFinish(true);
+                    return;
+                }
+
+                try {
+                    Thread.sleep(SLEEP_TIME_MILLIS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         }
 
+        public synchronized void onFinish(boolean afterInterrupt) {
+            logger.info("FINISH LOADING ENTITIES HISTORY TO SHOWCASE (threadIndex = %s, afterInterrupt = %s)", index, afterInterrupt);
+            System.out.printf("FINISH LOADING ENTITIES HISTORY TO SHOWCASE (threadIndex = %s, afterInterrupt = %s)\n", index, afterInterrupt);
+
+            scHistoryThreads.remove(index);
+
+            if (scHistoryThreads.isEmpty()) {
+                idSupplier.clearProcessedLeft();
+            }
+        }
     }
 
     private class Sender implements Runnable{
