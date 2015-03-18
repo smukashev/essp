@@ -41,7 +41,6 @@ public class ShowcaseServiceImpl implements ShowcaseService {
     }
 
     @Override
-    public List<ShowcaseHolder> list() {
     public void startLoadHistory(boolean populate, Long creditorId) {
         CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
         coreShowcaseService.startLoadHistory(populate, creditorId);
