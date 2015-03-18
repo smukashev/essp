@@ -17,7 +17,7 @@ import kz.bsbnb.usci.cli.app.command.impl.MetaCreateCommand;
 import kz.bsbnb.usci.cli.app.command.impl.MetaKeyCommand;
 import kz.bsbnb.usci.cli.app.command.impl.MetaShowCommand;
 import kz.bsbnb.usci.cli.app.common.ICreditUtils;
-import kz.bsbnb.usci.cli.app.mnt.MntMain;
+import kz.bsbnb.usci.cli.app.mnt.Mnt;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.core.service.IEntityService;
@@ -74,7 +74,6 @@ import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import javax.annotation.PostConstruct;
@@ -3085,11 +3084,11 @@ public class CLI
         }
     }
 
-    MntMain mnt;
+    Mnt mnt;
 
     private void commandMaintenance(String line) {
         if(mnt == null)
-            mnt = context.getBean(MntMain.class);
+            mnt = context.getBean(Mnt.class);
 
         mnt.commandMaintenance(line);
     }

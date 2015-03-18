@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  * Created by Bauyrzhan.Makhambeto on 17/03/2015.
  */
 @Component
-public class MntMain {
+public class Mnt {
 
     @Autowired
     IMetaClassRepository metaClassRepository;
