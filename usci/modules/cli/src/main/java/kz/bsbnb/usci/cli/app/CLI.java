@@ -21,14 +21,12 @@ import kz.bsbnb.usci.cli.app.mnt.MntMain;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.core.service.IEntityService;
-import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
-import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
@@ -91,9 +89,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.TimeoutException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -105,7 +100,6 @@ public class CLI
     private ArrayList<String> args = new ArrayList<String>();
 
     private static SimpleDateFormat sdfout = new SimpleDateFormat("dd.MM.yyyy");
-    private static String jobStatus = null;
 
     @Autowired
     private IStorage storage;
@@ -406,8 +400,8 @@ public class CLI
 
     @PostConstruct
     public void initBean() {
-        //System.setProperty("viewmode", "production");
-        System.setProperty("viewmode", "development");
+        System.setProperty("viewmode", "production");
+        //System.setProperty("viewmode", "development");
 
         ArrayList<URI> nodes = new ArrayList<URI>();
         nodes.add(URI.create("http://127.0.0.1:8091/pools"));
