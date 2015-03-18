@@ -1027,16 +1027,4 @@
 			<column name="credit_id" type = "NUMERIC" size="14,0" />
 	</table>
 
-	<table name="mnt_processes" >
-			<column name="filename" primaryKey="true" required="true" type = "VARCHAR" size="200" />
-			<column name="creditor_id" required="true" type = "NUMERIC" size="14,0" />
-			<column name="process_date" required="true" type = "TIMESTAMP"  />
-	</table>
-
-	<table name="mnt_process_credits" >
-			<column name="filename" required="true" type = "VARCHAR" size="200" />
-			<column name="credit_id" required="true" type = "NUMERIC" size="14,0" />
-	</table>
-
-
 </database>

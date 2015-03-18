@@ -3390,37 +3390,4 @@ public class CLI
         }
         return null;
     }
-
-    class CommandListenerThread extends Thread {
-        public void run() {
-            Scanner in;
-
-            if (inputStream == null) {
-                in = new Scanner(System.in);
-            } else {
-                in = new Scanner(inputStream);
-            }
-
-            String command = "doing";
-            System.out.println("Command Listener started!");
-
-            while (!command.equals("stop")) {
-                command = in.nextLine().toLowerCase();
-                System.out.println("Command entered : " + command);
-                if (command.equals("stop")) {
-                    System.out.println("Process will be stopped....");
-                    jobStatus = command;
-                } else if (command.equals("pause")) {
-                    System.out.println("Process will be paused....");
-                    jobStatus = command;
-                } else if (command.equals("resume")) {
-                    System.out.println("Resuming process....");
-                    jobStatus = command;
-                } else {
-                    System.out.println("Incorrect command! Available commands: stop | pause | resume");
-                }
-            }
-
-        }
-    }
 }

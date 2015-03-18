@@ -306,7 +306,7 @@ public class MntMain {
     }
 
     public void commandMaintenanceChange(String line) {
-        String commandUsage = "Arguments: mnt changeScript [stop| pause | resume | from core:core_sep_2014@10.10.20.44:CREDITS [creditor_id=31] [report_date=11.11.15] [edit_id=1] [limit=100] > C:/zips/]";
+        String commandUsage = "Arguments: mnt changeScript [stop| pause | resume | from core:core_sep_2014@10.10.20.44:CREDITS [creditor_id=31] [report_date=11.11.2015] [edit_id=1] [limit=100] > C:/zips/]";
 
         Matcher m;
 
