@@ -4,7 +4,7 @@
     <groupId>com.bsbnb</groupId>
     <artifactId>audit_portlet</artifactId>
     <packaging>war</packaging>
-    <name>audit_portlet</name>
+    <name>USCI Portlets: AuditPortlet</name>
     <version>0.1</version>
     <properties>
         <liferay.version>6.1.2</liferay.version>

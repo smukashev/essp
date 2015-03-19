@@ -18,4 +18,4 @@
 
 <portlet:defineObjects />
 
-This is the <b>credit-registry-portlet</b>.
+This is the <b>usci-portlet</b>.

@@ -3,7 +3,7 @@
 
 <liferay-portlet-app>
     <portlet>
-        <portlet-name>credit-registry-audit-portlet</portlet-name>
+        <portlet-name>audit_portlet</portlet-name>
         <icon>/icon.png</icon>
         <instanceable>true</instanceable>
         <ajaxable>false</ajaxable>
