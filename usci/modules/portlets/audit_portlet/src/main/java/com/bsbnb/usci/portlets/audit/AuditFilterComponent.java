@@ -1,6 +1,6 @@
-package com.bsbnb.creditregistry.portlets.audit;
+package com.bsbnb.usci.portlets.audit;
 
-import com.bsbnb.creditregistry.portlets.audit.dm.AuditTableRecord;
+import com.bsbnb.usci.portlets.audit.dm.AuditTableRecord;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;

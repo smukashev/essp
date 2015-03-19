@@ -1,4 +1,4 @@
-package com.bsbnb.creditregistry.portlets.audit;
+package com.bsbnb.usci.portlets.audit;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;

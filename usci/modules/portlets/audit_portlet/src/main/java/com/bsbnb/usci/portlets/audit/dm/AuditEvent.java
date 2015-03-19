@@ -1,4 +1,4 @@
-package com.bsbnb.creditregistry.portlets.audit.dm;
+package com.bsbnb.usci.portlets.audit.dm;
 
 import java.io.Serializable;
 import java.util.Date;

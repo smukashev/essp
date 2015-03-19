@@ -1,12 +1,9 @@
-package com.bsbnb.creditregistry.portlets.audit.dm;
+package com.bsbnb.usci.portlets.audit.dm;
 
 import com.liferay.util.portlet.PortletProps;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+
 import java.sql.*;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;

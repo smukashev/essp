@@ -1,6 +1,6 @@
-package com.bsbnb.creditregistry.portlets.audit;
+package com.bsbnb.usci.portlets.audit;
 
-import com.bsbnb.creditregistry.portlets.audit.dm.AuditEvent;
+import com.bsbnb.usci.portlets.audit.dm.AuditEvent;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItem;

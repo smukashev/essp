@@ -1,6 +1,5 @@
-package com.bsbnb.creditregistry.portlets.audit;
+package com.bsbnb.usci.portlets.audit;
 
-import com.bsbnb.creditregistry.portlets.audit.AuditLayout;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.EventRequest;
