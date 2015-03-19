@@ -1,5 +1,6 @@
 package com.bsbnb.creditregistry.portlets.audit.dm;
 
+import com.liferay.util.portlet.PortletProps;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -103,7 +104,8 @@ public class AuditController {
     public static Statement getStatement(){
         try {
             Class.forName("oracle.jdbc.OracleDriver");
-            connection = DriverManager.getConnection("jdbc:oracle:thin:@170.7.15.109:1521:ESSP", "CORE", "CORE_2013");
+            connection = DriverManager.getConnection(PortletProps.get("jdbc.url"),
+                    PortletProps.get("jdbc.user"), PortletProps.get("jdbc.password"));
             /*if(connection == null){
                 Class.forName("oracle.jdbc.OracleDriver");
                 connection = DriverManager.getConnection("jdbc:oracle:thin:@170.7.15.109:1521:ESSP", "CORE", "CORE_2013");
