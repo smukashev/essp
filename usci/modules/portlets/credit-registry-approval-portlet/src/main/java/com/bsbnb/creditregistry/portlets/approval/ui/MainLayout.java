@@ -1,10 +1,11 @@
 package com.bsbnb.creditregistry.portlets.approval.ui;
 
-import com.bsbnb.creditregistry.dm.ref.Creditor;
 import com.bsbnb.creditregistry.portlets.approval.PortletEnvironmentFacade;
 import com.bsbnb.creditregistry.portlets.approval.data.DataProvider;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
+import kz.bsbnb.usci.cr.model.Creditor;
+
 import java.util.List;
 
 public class MainLayout extends VerticalLayout {

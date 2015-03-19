@@ -1,6 +1,5 @@
 package com.bsbnb.creditregistry.portlets.approval.ui;
 
-import com.bsbnb.creditregistry.dm.ReportMessageAttachment;
 import static com.bsbnb.creditregistry.portlets.approval.ApprovalApplication.log;
 import com.bsbnb.creditregistry.portlets.approval.PortletEnvironmentFacade;
 import com.vaadin.ui.HorizontalLayout;
@@ -8,6 +7,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.SucceededEvent;
+import kz.bsbnb.usci.cr.model.ReportMessageAttachment;
+
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.logging.Level;

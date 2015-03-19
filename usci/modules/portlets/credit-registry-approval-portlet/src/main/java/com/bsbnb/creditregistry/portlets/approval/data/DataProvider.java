@@ -1,13 +1,6 @@
 package com.bsbnb.creditregistry.portlets.approval.data;
 
-//import com.bsbnb.creditregistry.dm.ReportMessage;
-//import com.bsbnb.creditregistry.dm.ReportMessageAttachment;
-//import com.bsbnb.creditregistry.dm.maintenance.CrossCheck;
-//import com.bsbnb.creditregistry.dm.ref.Creditor;
-//import com.bsbnb.creditregistry.dm.ref.shared.ReportType;
-import kz.bsbnb.usci.cr.model.Creditor;
-import kz.bsbnb.usci.cr.model.Report;
-import kz.bsbnb.usci.cr.model.ReportType;
+import kz.bsbnb.usci.cr.model.*;
 
 import java.util.Date;
 import java.util.List;

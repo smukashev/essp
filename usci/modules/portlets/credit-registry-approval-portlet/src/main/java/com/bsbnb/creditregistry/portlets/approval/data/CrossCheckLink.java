@@ -14,16 +14,16 @@ public class CrossCheckLink extends Link implements Comparable<Object> {
 
     public static final String URL_PREFIX = "https://rcredit.nationalbank.kz/cross-check#";
     public static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
-    private BigInteger orderValue;
+    private Long orderValue;
 
-    public CrossCheckLink(String caption, BigInteger orderValue, int creditorId, Date reportDate) {
+    public CrossCheckLink(String caption, Long orderValue, Long creditorId, Date reportDate) {
         super(caption, new ExternalResource(URL_PREFIX + creditorId + "/" + DEFAULT_DATE_FORMAT.format(reportDate)));
         this.orderValue = orderValue;
         setTargetName("_blank");
     }
 
-    public CrossCheckLink(String caption, int creditorId, Date reportDate) {
-        this(caption, BigInteger.ZERO, creditorId, reportDate);
+    public CrossCheckLink(String caption, Long creditorId, Date reportDate) {
+        this(caption, 0l, creditorId, reportDate);
     }
 
     @Override

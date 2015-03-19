@@ -1,11 +1,5 @@
 package com.bsbnb.creditregistry.portlets.approval.ui;
 
-import com.bsbnb.creditregistry.dm.Report;
-import com.bsbnb.creditregistry.dm.ReportMessage;
-import com.bsbnb.creditregistry.dm.ReportMessageAttachment;
-import com.bsbnb.creditregistry.dm.maintenance.CrossCheck;
-import com.bsbnb.creditregistry.dm.ref.Creditor;
-import com.bsbnb.creditregistry.dm.ref.shared.ReportType;
 import com.bsbnb.creditregistry.portlets.approval.ApprovalPortletResource;
 import com.bsbnb.creditregistry.portlets.approval.PortletEnvironmentFacade;
 import com.bsbnb.creditregistry.portlets.approval.data.CrossCheckLink;
@@ -20,6 +14,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.RichTextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.BaseTheme;
+import kz.bsbnb.usci.cr.model.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -81,7 +77,7 @@ public class ReportDateLayout extends VerticalLayout {
         String crossCheckLinkCaption = lastCrossCheck == null
                 ? environment.getResourceString(Localization.CROSS_CHECK_DID_NOT_RUN)
                 : lastCrossCheck.getStatus().getNameRu();
-        CrossCheckLink crossCheckLink = new CrossCheckLink(crossCheckLinkCaption, creditor.getId().intValue(), reportDate);
+        CrossCheckLink crossCheckLink = new CrossCheckLink(crossCheckLinkCaption, creditor.getId(), reportDate);
         crossCheckStatusLayout.addComponent(crossCheckStatusLabel);
         crossCheckStatusLayout.addComponent(crossCheckLink);
 
@@ -146,7 +142,7 @@ public class ReportDateLayout extends VerticalLayout {
         reportDateDetailsLayout.addComponent(reportDatesLayout);
         report = provider.getReport(creditor, reportDate);
 
-        if (report == null || report.getStatus() == null) {
+        if (report == null || report.getStatusId() == null) {
             Label noReportsLabel = new Label("<h2>" + environment.getResourceString(Localization.NO_REPORTS_MESSAGE) + "</h2>", Label.CONTENT_XHTML);
             reportDateDetailsLayout.addComponent(noReportsLabel);
             return;
@@ -196,11 +192,11 @@ public class ReportDateLayout extends VerticalLayout {
 
         List<ReportMessage> messages = provider.getReportMessages(report);
         List<ReportMessageAttachment> attachments = provider.getReportAttachments(report);
-        HashMap<BigInteger, List<ReportMessageAttachment>> attachmentsByMessages = new HashMap<BigInteger, List<ReportMessageAttachment>>(attachments.size());
+        HashMap<Long, List<ReportMessageAttachment>> attachmentsByMessages = new HashMap<>(attachments.size());
         for (ReportMessageAttachment attachment : attachments) {
             List<ReportMessageAttachment> messageAttachments;
             if (!attachmentsByMessages.containsKey(attachment.getReportMessage().getId())) {
-                messageAttachments = new ArrayList<ReportMessageAttachment>();
+                messageAttachments = new ArrayList<>();
             } else {
                 messageAttachments = attachmentsByMessages.get(attachment.getReportMessage().getId());
             }

@@ -1,10 +1,11 @@
 package com.bsbnb.creditregistry.portlets.approval.ui;
 
-import com.bsbnb.creditregistry.dm.ref.Creditor;
 import com.bsbnb.creditregistry.portlets.approval.PortletEnvironmentFacade;
 import com.bsbnb.creditregistry.portlets.approval.data.DataProvider;
 import com.bsbnb.creditregistry.portlets.approval.ui.MainLayout;
 import java.util.*;
+
+import kz.bsbnb.usci.cr.model.Creditor;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.AfterClass;

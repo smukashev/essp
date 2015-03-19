@@ -1,12 +1,9 @@
 package com.bsbnb.creditregistry.portlets.approval.data;
 
-import com.bsbnb.creditregistry.dm.Report;
-import com.bsbnb.creditregistry.dm.ref.Creditor;
-import com.bsbnb.creditregistry.dm.ref.Shared;
-import com.bsbnb.creditregistry.dm.ref.shared.ReportType;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.themes.BaseTheme;
-import java.math.BigInteger;
+import kz.bsbnb.usci.cr.model.*;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +29,7 @@ public class ReportDisplayBean {
                 callReportDisplay();
             }
         });
-        statusLink = new CrossCheckLink(report.getStatus().getNameRu(),report.getStatus().getId(), report.getCreditor().getId().intValue(), report.getReportDate());
+        statusLink = new CrossCheckLink(report.getStatus().getNameRu(),report.getStatus().getId(), report.getCreditor().getId(), report.getReportDate());
     }
 
     /**
@@ -67,7 +64,7 @@ public class ReportDisplayBean {
         return statusLink;
     }
     
-    public BigInteger getActualCount() {
+    public Long getActualCount() {
         return report.getActualCount();
     }
     

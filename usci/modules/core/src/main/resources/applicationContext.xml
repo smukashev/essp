@@ -93,6 +93,13 @@
         <property name="registryPort" value="1099"/>
     </bean>
 
+    <bean id="reportMessageBeanRemoteBusiness" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="reportMessageBeanRemoteBusiness"/>
+        <property name="service" ref="reportMessageBeanRemoteBusinessImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.ReportMessageBeanRemoteBusiness"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
     <bean id="coreShowcaseServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
         <property name="serviceName" value="coreShowcaseService"/>
         <property name="service" ref="coreShowcaseServiceImpl"/>

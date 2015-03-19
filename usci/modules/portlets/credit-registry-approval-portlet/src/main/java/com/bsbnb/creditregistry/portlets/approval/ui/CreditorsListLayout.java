@@ -1,6 +1,5 @@
 package com.bsbnb.creditregistry.portlets.approval.ui;
 
-import com.bsbnb.creditregistry.dm.ref.Creditor;
 import static com.bsbnb.creditregistry.portlets.approval.ApprovalApplication.log;
 import com.bsbnb.creditregistry.portlets.approval.ApprovalPortletResource;
 import com.bsbnb.creditregistry.portlets.approval.PortletEnvironmentFacade;
@@ -41,6 +40,7 @@ import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
+import kz.bsbnb.usci.cr.model.Creditor;
 
 /**
  *
@@ -165,7 +165,9 @@ public class CreditorsListLayout extends VerticalLayout implements ReportDisplay
 
         addComponent(listLayout);
         addComponent(reportDateLayout);
-        creditorsSelect.selectElements(creditorsList.toArray(new Creditor[creditorsList.size()]));
+        if (creditorsList.size() > 1) {
+            creditorsSelect.selectElements(creditorsList.toArray(new Creditor[creditorsList.size()]));
+        }
     }
 
     private void displayDataForReportDate(Date reportDate, List<Creditor> selectedCreditors) {

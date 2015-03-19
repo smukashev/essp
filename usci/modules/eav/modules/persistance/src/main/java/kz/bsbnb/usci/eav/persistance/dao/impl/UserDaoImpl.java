@@ -156,7 +156,27 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao
             BaseValue val = (BaseValue)entity.getBaseValue("subject_type");
             BaseEntity stEntity = val == null ? null : (BaseEntity)val.getValue();
             if (stEntity != null) {
+                st.setId(stEntity.getId());
 
+                for(String s : stEntity.getAttributes()) {
+                    Object obj = stEntity.getBaseValue(s).getValue();
+                    if (obj == null) {
+                        continue;
+                    }
+                    if (s.equals("code")) {
+                        st.setCode((String)obj);
+                    } else if (s.equals("name_ru")) {
+                        st.setNameRu((String) obj);
+                    } else if (s.equals("name_kz")) {
+                        st.setNameKz((String) obj);
+                    } else if (s.equals("kind_id")) {
+//                        Shared kind = new Shared();
+//                        kind.setId(((Integer) obj).longValue());
+//                        st.setKind(kind);
+                    } else if (s.equals("report_period_duration_months")) {
+                        st.setReportPeriodDurationMonths((Integer) obj);
+                    }
+                }
             } else {
                 st.setCode("NONE");
                 st.setNameKz("NONE");

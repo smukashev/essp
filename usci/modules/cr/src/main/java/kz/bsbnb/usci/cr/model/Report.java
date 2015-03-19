@@ -1,27 +1,51 @@
 package kz.bsbnb.usci.cr.model;
 
-//import com.bsbnb.creditregistry.dm.api.BaseStateModel;
-//import com.bsbnb.creditregistry.dm.ref.Creditor;
-//import com.bsbnb.creditregistry.dm.ref.Shared;
-//import com.bsbnb.creditregistry.util.DataTypeUtil;
-import java.math.BigInteger;
 import java.util.Date;
+import java.util.HashMap;
 
 public class Report {
-    private BigInteger id;
+
+    public final static String INITIAL_REPORT_DATE_STR = "01/04/2013";
+
+    public final static HashMap<Long, String> STATUS_NAME_MAP = new HashMap<>();
+    public final static HashMap<Long, String> STATUS_CODE_MAP = new HashMap<>();
+
+    static {
+        STATUS_NAME_MAP.put(90l, "В процессе");
+        STATUS_NAME_MAP.put(91l, "Ошибка межформенного контроля");
+        STATUS_NAME_MAP.put(92l, "Завершен/Утвержден");
+        STATUS_NAME_MAP.put(74l, "Отчитались не полностью");
+        STATUS_NAME_MAP.put(75l, "Отчитались полностью");
+        STATUS_NAME_MAP.put(76l, "Отконтроллирован с ошибками");
+        STATUS_NAME_MAP.put(77l, "Отконтроллирован без ошибок");
+        STATUS_NAME_MAP.put(128l, "Утвержден организацией");
+
+        STATUS_CODE_MAP.put(90l, "RECIPIENCY_IN_PROGRESS");
+        STATUS_CODE_MAP.put(91l, "CROSS_CHECK_ERROR");
+        STATUS_CODE_MAP.put(92l, "RECIPIENCY_COMPLETED");
+        STATUS_CODE_MAP.put(74l, "IR");
+        STATUS_CODE_MAP.put(75l, "CR");
+        STATUS_CODE_MAP.put(76l, "WE");
+        STATUS_CODE_MAP.put(77l, "WOE");
+        STATUS_CODE_MAP.put(128l, "ORGANIZATION_APPROVED");
+    }
+
+    private Long id;
     private Creditor creditor;
-    private Shared status;
-    private BigInteger totalCount;
-    private BigInteger actualCount;
+    private Long statusId;
+    private Long totalCount;
+    private Long actualCount;
     private Date reportDate;
     private Date beginningDate;
     private Date endDate;
+    private Date lastManualEditDate;
+    private Shared status;
 
-    public BigInteger getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -33,27 +57,27 @@ public class Report {
         this.creditor = creditor;
     }
 
-    public Shared getStatus() {
-        return status;
+    public Long getStatusId() {
+        return statusId;
     }
 
-    public void setStatus(Shared status) {
-        this.status = status;
+    public void setStatusId(Long status) {
+        this.statusId = statusId;
     }
 
-    public BigInteger getTotalCount() {
+    public Long getTotalCount() {
         return totalCount;
     }
 
-    public void setTotalCount(BigInteger totalCount) {
+    public void setTotalCount(Long totalCount) {
         this.totalCount = totalCount;
     }
 
-    public BigInteger getActualCount() {
+    public Long getActualCount() {
         return actualCount;
     }
 
-    public void setActualCount(BigInteger actualCount) {
+    public void setActualCount(Long actualCount) {
         this.actualCount = actualCount;
     }
 
@@ -81,6 +105,29 @@ public class Report {
         this.endDate = endDate;
     }
 
+    public Date getLastManualEditDate() {
+        return lastManualEditDate;
+    }
+
+    public void setLastManualEditDate(Date lastManualEditDate) {
+        this.lastManualEditDate = lastManualEditDate;
+    }
+
+    public Shared getStatus() {
+        if (status == null && statusId != null) {
+            status = new Shared();
+            status.setId(statusId);
+            status.setCode(STATUS_CODE_MAP.get(statusId));
+            status.setNameRu(STATUS_NAME_MAP.get(statusId));
+            status.setNameKz(STATUS_NAME_MAP.get(statusId));
+        }
+        return status;
+    }
+
+    public void setStatus(Shared status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -105,9 +152,9 @@ public class Report {
         sb.append(", endDate=");
         sb.append(DataTypeUtil.convertDateToString(DataTypeUtil.LONG_DATE_FORMAT, getEndDate()));
         
-        if (getStatus() != null) {
+        if (getStatusId() != null) {
             sb.append(", status={id=");
-            sb.append(getStatus().getId());
+            sb.append(getStatusId());
             sb.append("}");
         } else {
             sb.append(", status=null");

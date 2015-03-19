@@ -12,7 +12,7 @@ import java.util.List;
  * @author alexandr.motov
  */
 public class Creditor implements Serializable {
-    private long id;
+    private Long id;
     private String name;
     private String shortName;
     private String code;
@@ -30,14 +30,14 @@ public class Creditor implements Serializable {
 
     public Creditor() {
     }
-    public long getId() {
+    public Long getId() {
         return id;
     }
     
     /**
      * @param id the id to set
      */
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     
@@ -166,7 +166,7 @@ public class Creditor implements Serializable {
      */
     @Override
     public int hashCode() {
-        return (int)id;
+        return id.hashCode();
     }
 
     /**

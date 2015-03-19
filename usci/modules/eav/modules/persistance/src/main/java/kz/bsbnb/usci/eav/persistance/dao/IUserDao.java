@@ -2,7 +2,6 @@ package kz.bsbnb.usci.eav.persistance.dao;
 
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.PortalUser;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 
 import java.util.List;
 

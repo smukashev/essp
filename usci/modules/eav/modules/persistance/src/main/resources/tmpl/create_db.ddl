@@ -1064,4 +1064,37 @@
 		</foreign-key>-->
 	</table>
 
+  <!-- BEGIN: tables for approval portlet-->
+	<table name="eav_report">
+    <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+    <column name="creditor_id" required="true" type="NUMERIC" size="14,0"/>
+    <column name="total_count" required="true" type="NUMERIC" size="14,0"/>
+    <column name="actual_count" required="true" type="NUMERIC" size="14,0"/>
+    <column name="beg_date" required="false" type="DATE"/>
+    <column name="end_date" required="false" type="DATE"/>
+    <column name="report_date" required="true" type="DATE"/>
+    <column name="status_id" required="true" type="NUMERIC" size="14,0"/>
+    <column name="username" required="false" type="VARCHAR" size="80"/>
+    <column name="last_manual_edit_date" required="false" type="DATE"/>
+    <unique name="uk_report__c_r">
+      <unique-column name="creditor_id"/>
+      <unique-column name="report_date"/>
+    </unique>
+	</table>
+
+  <table name="eav_report_message">
+    <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+    <column name="report_id" required="true" type="NUMERIC" size="14,0"/>
+    <column name="username" required="true" type="VARCHAR" size="80"/>
+    <column name="send_date" required="false" type="DATE"/>
+    <column name="text" required="false" type="VARCHAR" size="1000"/>
+  </table>
+
+  <table name="eav_report_message_attachment">
+    <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+    <column name="report_message_id" required="true" type="NUMERIC" size="14,0"/>
+    <column name="filename" required="false" type="VARCHAR" size="1000"/>
+    <column name="content" required="false" type="BLOB"/>
+  </table>
+  <!-- END: tables for approval portlet-->
 </database>

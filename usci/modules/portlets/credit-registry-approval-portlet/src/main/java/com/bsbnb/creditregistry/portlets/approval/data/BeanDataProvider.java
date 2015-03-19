@@ -1,35 +1,33 @@
 package com.bsbnb.creditregistry.portlets.approval.data;
 
 //import com.bsbnb.creditregistry.dm.Report;
-import com.bsbnb.creditregistry.dm.ReportMessage;
-import com.bsbnb.creditregistry.dm.ReportMessageAttachment;
-import com.bsbnb.creditregistry.dm.maintenance.CrossCheck;
-import com.bsbnb.creditregistry.dm.maintenance.PortalUser;
-import com.bsbnb.creditregistry.dm.maintenance.Sysconfig;
-import com.bsbnb.creditregistry.dm.maintenance.mail.MailMessage;
-import com.bsbnb.creditregistry.dm.maintenance.mail.MailMessageParameter;
-import com.bsbnb.creditregistry.dm.maintenance.mail.MailTemplateParameter;
+//import com.bsbnb.creditregistry.dm.ReportMessage;
+//import com.bsbnb.creditregistry.dm.ReportMessageAttachment;
+//import com.bsbnb.creditregistry.dm.maintenance.CrossCheck;
+//import com.bsbnb.creditregistry.dm.maintenance.PortalUser;
+//import com.bsbnb.creditregistry.dm.maintenance.Sysconfig;
+//import com.bsbnb.creditregistry.dm.maintenance.mail.MailMessage;
+//import com.bsbnb.creditregistry.dm.maintenance.mail.MailMessageParameter;
+//import com.bsbnb.creditregistry.dm.maintenance.mail.MailTemplateParameter;
 //import com.bsbnb.creditregistry.dm.ref.Creditor;
 //import com.bsbnb.creditregistry.dm.ref.Shared;
 //import com.bsbnb.creditregistry.dm.ref.shared.ReportType;
-import com.bsbnb.creditregistry.dm.ref.shared.SharedType;
+//import com.bsbnb.creditregistry.dm.ref.shared.SharedType;
 
 //import com.bsbnb.creditregistry.ejb.api.ReportBeanRemoteBusiness;
-import com.bsbnb.creditregistry.ejb.api.ReportMessageBeanRemoteBusiness;
-import com.bsbnb.creditregistry.ejb.api.maintenance.CrossCheckBeanRemoteBusiness;
+//import com.bsbnb.creditregistry.ejb.api.ReportMessageBeanRemoteBusiness;
+//import com.bsbnb.creditregistry.ejb.api.maintenance.CrossCheckBeanRemoteBusiness;
 //import com.bsbnb.creditregistry.ejb.api.maintenance.PortalUserBeanRemoteBusiness;
-import com.bsbnb.creditregistry.ejb.api.maintenance.SysconfigBeanRemoteBusiness;
-import com.bsbnb.creditregistry.ejb.api.maintenance.mail.MailMessageBeanRemoteBusiness;
-
-import com.bsbnb.creditregistry.ejb.ref.business.remote.IRemoteSharedBusiness;
-import com.bsbnb.creditregistry.ejb.ref.exception.ResultInconsistentException;
-import com.bsbnb.creditregistry.ejb.ref.exception.ResultNotFoundException;
+//import com.bsbnb.creditregistry.ejb.api.maintenance.SysconfigBeanRemoteBusiness;
+//import com.bsbnb.creditregistry.ejb.api.maintenance.mail.MailMessageBeanRemoteBusiness;
+//
+//import com.bsbnb.creditregistry.ejb.ref.business.remote.IRemoteSharedBusiness;
+//import com.bsbnb.creditregistry.ejb.ref.exception.ResultInconsistentException;
+//import com.bsbnb.creditregistry.ejb.ref.exception.ResultNotFoundException;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
-import kz.bsbnb.usci.cr.model.Creditor;
-import kz.bsbnb.usci.cr.model.Report;
-import kz.bsbnb.usci.cr.model.ReportType;
-import kz.bsbnb.usci.cr.model.Shared;
+import kz.bsbnb.usci.core.service.ReportMessageBeanRemoteBusiness;
+import kz.bsbnb.usci.cr.model.*;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import static com.bsbnb.creditregistry.portlets.approval.ApprovalApplication.log;
@@ -54,34 +52,41 @@ import javax.naming.NamingException;
 public class BeanDataProvider implements DataProvider {
     private RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean;
     private RmiProxyFactoryBean reportBusinessFactoryBean;
+    private RmiProxyFactoryBean reportMessageBusinessFactoryBean;
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private ReportBeanRemoteBusiness reportBusiness;
-
     private ReportMessageBeanRemoteBusiness reportMessageBusiness;
-    private SysconfigBeanRemoteBusiness sysconfigBusiness;
-    private CrossCheckBeanRemoteBusiness crossCheckBusiness;
-    private IRemoteSharedBusiness sharedBusiness;
-    private MailMessageBeanRemoteBusiness mailMessageBusiness;
+
+//    private SysconfigBeanRemoteBusiness sysconfigBusiness;
+//    private CrossCheckBeanRemoteBusiness crossCheckBusiness;
+//    private IRemoteSharedBusiness sharedBusiness;
+//    private MailMessageBeanRemoteBusiness mailMessageBusiness;
 
     public BeanDataProvider() {
+        // portalUserBeanRemoteBusiness
         portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
         portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
         portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
-
         portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
-
+        // reportBeanRemoteBusiness
         reportBusinessFactoryBean = new RmiProxyFactoryBean();
         reportBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/reportBeanRemoteBusiness");
         reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
-
         reportBusinessFactoryBean.afterPropertiesSet();
         reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
+
+        // reportMessageBeanRemoteBusiness
+        reportMessageBusinessFactoryBean = new RmiProxyFactoryBean();
+        reportMessageBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/reportMessageBeanRemoteBusiness");
+        reportMessageBusinessFactoryBean.setServiceInterface(ReportMessageBeanRemoteBusiness.class);
+        reportMessageBusinessFactoryBean.afterPropertiesSet();
+        reportMessageBusiness = (ReportMessageBeanRemoteBusiness) reportMessageBusinessFactoryBean.getObject();
     }
 
     @Override
@@ -91,20 +96,14 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public List<ReportDisplayBean> getReportsForDate(List<Creditor> accessibleCreditors, Date reportDate) {
-        List<Report> reports = reportBusiness.getReportsByReportDate(reportDate);
-        List<ReportDisplayBean> displayBeans = new ArrayList<ReportDisplayBean>(reports.size());
+        List<Report> reports = reportBusiness.getReportsByReportDateAndCreditors(reportDate, accessibleCreditors);
+        List<ReportDisplayBean> displayBeans = new ArrayList<>(reports.size());
         int rownum = 1;
-        Set<Long> accessibleCreditorIds = new HashSet<Long>(accessibleCreditors.size());
-        for (Creditor accessibleCreditor : accessibleCreditors) {
-            accessibleCreditorIds.add(accessibleCreditor.getId());
-        }
         for (Report report : reports) {
-            if (accessibleCreditorIds.contains(report.getCreditor().getId())) {
-                ReportDisplayBean displayBean = new ReportDisplayBean(report);
-                displayBean.setRownum(rownum);
-                displayBeans.add(displayBean);
-                rownum++;
-            }
+            ReportDisplayBean displayBean = new ReportDisplayBean(report);
+            displayBean.setRownum(rownum);
+            displayBeans.add(displayBean);
+            rownum++;
         }
         return displayBeans;
     }
@@ -127,65 +126,70 @@ public class BeanDataProvider implements DataProvider {
     @Override
     public Date getInitialReportDate() {
         try {
-            Sysconfig initialReportDateConfig = sysconfigBusiness.getSysconfigByKey("INITIAL_REPORT_DATE");
-            String initialReportDateString = initialReportDateConfig.getValue();
-            SimpleDateFormat initialReportDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            return initialReportDateFormat.parse(initialReportDateString);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            return dateFormat.parse(Report.INITIAL_REPORT_DATE_STR);
         } catch (ParseException pe) {
-            log.log(Level.SEVERE, "Initial report date is incorrectly formatted", pe);
+            throw new RuntimeException("Initial report date is incorrectly formatted");
         }
-        return null;
     }
 
     @Override
     public Report getReport(Creditor creditor, Date reportDate) {
-        return reportBusiness.getByCreditor_ReportDate(creditor, reportDate);
+        List<Creditor> creditors = new ArrayList<>();
+        creditors.add(creditor);
+        List<Report> reports = reportBusiness.getReportsByReportDateAndCreditors(reportDate, creditors);
+        if (reports.size() > 1) {
+            throw new RuntimeException("Reports size > 1");
+        }
+        return reports.isEmpty() ? null : reports.get(0);
     }
 
     @Override
     public CrossCheck getLastCrossCheck(Creditor creditor, Date reportDate) {
-        List<CrossCheck> crossChecks = crossCheckBusiness.loadCrossCheck(Arrays.asList(creditor.getId()), reportDate);
-        return crossChecks.isEmpty() ? null : crossChecks.get(0);
+//        List<CrossCheck> crossChecks = crossCheckBusiness.loadCrossCheck(Arrays.asList(creditor.getId()), reportDate);
+//        return crossChecks.isEmpty() ? null : crossChecks.get(0);
+        return null;
     }
 
     @Override
     public void updateReportStatus(Report report, ReportType status) {
-        Shared sharedStatus = sharedBusiness.findByC_T(status.getCode(), SharedType.REPORT_TYPE.getType());
-        report.setStatus(sharedStatus);
-        reportBusiness.updateReport(report);
+//        Shared sharedStatus = sharedBusiness.findByC_T(status.getCode(), SharedType.REPORT_TYPE.getType());
+//        report.setStatus(sharedStatus);
+//        reportBusiness.updateReport(report);
     }
 
     @Override
     public List<ReportMessageAttachment> getReportAttachments(Report report) {
-        return reportMessageBusiness.getAttachmentsByReport(report);
+//        return reportMessageBusiness.getAttachmentsByReport(report);
+        return null;
     }
 
     @Override
     public void sendApprovalNotifications(Creditor creditor, Report report, String username, Date sendDate, String text) {
-        List<PortalUser> notificationRecipients = portalUserBusiness.getPortalUsersHavingAccessToCreditor(creditor);
-        Properties mailMessageParameters = new Properties();
-        mailMessageParameters.setProperty("CREDITOR", creditor.getName());
-        mailMessageParameters.setProperty("STATUS", report.getStatus().getNameRu());
-        mailMessageParameters.setProperty("USERNAME", username);
-        mailMessageParameters.setProperty("REPORT_DATE", DATE_FORMAT.format(report.getReportDate()));
-        mailMessageParameters.setProperty("UPDATE_TIME", TIME_FORMAT.format(sendDate));
-        mailMessageParameters.setProperty("TEXT", text);
-        for (PortalUser portalUser : notificationRecipients) {
-            mailMessageBusiness.sendMailMessage("APPROVAL_UPDATE", portalUser.getUserId(), mailMessageParameters);
-        }
+//        List<PortalUser> notificationRecipients = portalUserBusiness.getPortalUsersHavingAccessToCreditor(creditor);
+//        Properties mailMessageParameters = new Properties();
+//        mailMessageParameters.setProperty("CREDITOR", creditor.getName());
+//        mailMessageParameters.setProperty("STATUS", report.getStatus().getNameRu());
+//        mailMessageParameters.setProperty("USERNAME", username);
+//        mailMessageParameters.setProperty("REPORT_DATE", DATE_FORMAT.format(report.getReportDate()));
+//        mailMessageParameters.setProperty("UPDATE_TIME", TIME_FORMAT.format(sendDate));
+//        mailMessageParameters.setProperty("TEXT", text);
+//        for (PortalUser portalUser : notificationRecipients) {
+//            mailMessageBusiness.sendMailMessage("APPROVAL_UPDATE", portalUser.getUserId(), mailMessageParameters);
+//        }
     }
 
-    private MailMessageParameter getMailMessageParameter(MailMessage mailMessage, MailTemplateParameter templateParameter, String value) {
-        MailMessageParameter mailMessageParameter = new MailMessageParameter();
-        mailMessageParameter.setMailMessage(mailMessage);
-        mailMessageParameter.setMailTemplateParameter(templateParameter);
-        mailMessageParameter.setValue(value);
-        return mailMessageParameter;
-    }
+//    private MailMessageParameter getMailMessageParameter(MailMessage mailMessage, MailTemplateParameter templateParameter, String value) {
+//        MailMessageParameter mailMessageParameter = new MailMessageParameter();
+//        mailMessageParameter.setMailMessage(mailMessage);
+//        mailMessageParameter.setMailTemplateParameter(templateParameter);
+//        mailMessageParameter.setValue(value);
+//        return mailMessageParameter;
+//    }
 
     @Override
     public void updateLastManualEditDate(Report report) {
-        report.setLastManualEditDate(new Date());
-        reportBusiness.updateReport(report);
+//        report.setLastManualEditDate(new Date());
+//        reportBusiness.updateReport(report);
     }
 }
