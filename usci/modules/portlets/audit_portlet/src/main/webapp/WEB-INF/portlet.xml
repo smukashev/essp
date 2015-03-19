@@ -12,7 +12,7 @@
         <portlet-class>com.vaadin.terminal.gwt.server.ApplicationPortlet2</portlet-class>
         <init-param>
             <name>application</name>
-            <value>com.bsbnb.creditregistry.portlets.audit.AuditApplication</value>
+            <value>com.bsbnb.usci.portlets.audit.AuditApplication</value>
         </init-param>
         <init-param>
             <name>view-jsp</name>
