@@ -13,7 +13,7 @@
         <portlet-class>com.vaadin.terminal.gwt.server.ApplicationPortlet2</portlet-class>
         <init-param>
             <name>application</name>
-            <value>com.bsbnb.creditregistry.portlets.protocol.ProtocolApplication</value>
+            <value>com.bsbnb.usci.portlets.protocol.ProtocolApplication</value>
         </init-param>
         <expiration-cache>0</expiration-cache>
 
