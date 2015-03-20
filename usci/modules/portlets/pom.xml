@@ -26,6 +26,7 @@
         <module>upload-portlet</module>
         <module>credit-registry-report-portlet</module>
         <module>credit-registry-audit-portlet</module>
+        <module>crosscheck-portlet</module>
         <module>signing-portlet</module>
         <!--<module>credit-registry-approval-portlet</module>-->
         <module>translit-util</module>
