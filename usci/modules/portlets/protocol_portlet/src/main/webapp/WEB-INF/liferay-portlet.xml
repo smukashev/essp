@@ -3,7 +3,7 @@
 
 <liferay-portlet-app>
     <portlet>
-        <portlet-name>credit-registry-protocol-portlet</portlet-name>
+        <portlet-name>protocol_portlet</portlet-name>
         <icon>/multiple_disks.png</icon>
         <instanceable>true</instanceable>
         <ajaxable>false</ajaxable>
