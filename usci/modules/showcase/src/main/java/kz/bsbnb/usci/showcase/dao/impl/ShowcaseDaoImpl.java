@@ -183,12 +183,14 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
 
                     table.addColumn(column);
                 } else {
+                    IMetaType metaType = showcaseHolder.getShowCaseMeta().getActualMeta().getEl(sf.getPath());
+
                     Column column = new Column();
                     column.setName(COLUMN_PREFIX + sf.getColumnName());
                     column.setPrimaryKey(false);
                     column.setRequired(false);
-                    column.setType("NUMERIC");
-                    column.setSize("14,0");
+                    column.setType(getDBType(metaType));
+                    column.setSize(getDBSize(metaType));
                     column.setAutoIncrement(false);
 
                     table.addColumn(column);

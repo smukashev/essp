@@ -15,6 +15,7 @@ public class ShowCase extends Persistable {
     private String title;
     private MetaClass meta;
     private String downPath = "";
+    private boolean isFinal = false;
 
     private ArrayList<ShowCaseField> fields = new ArrayList<ShowCaseField>();
     private ArrayList<ShowCaseField> customFields = new ArrayList<ShowCaseField>();
@@ -77,6 +78,14 @@ public class ShowCase extends Persistable {
 
     public void addFilterField(ShowCaseField field) {
         filterFields.add(field);
+    }
+
+    public boolean isFinal() {
+        return isFinal;
+    }
+
+    public void setFinal(boolean isFinal) {
+        this.isFinal = isFinal;
     }
 
     public MetaClass getActualMeta() {

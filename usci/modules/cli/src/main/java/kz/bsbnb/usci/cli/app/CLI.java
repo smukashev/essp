@@ -2502,23 +2502,17 @@ public class CLI {
         if(showcaseServiceFactoryBean == null || showcaseService == null)
             initSC();
 
-        if (args.get(0).equals("debug")) {
-            MetaClass meta = metaClassRepository.getMetaClass("credit");
-            System.out.println("ok");
-        } else if (args.get(0).equals("status")) {
+        if (args.get(0).equals("status")) {
             System.out.println(showCase.toString());
 
-            for (ShowCaseField sf : showCase.getFieldsList()) {
+            for (ShowCaseField sf : showCase.getFieldsList())
                 System.out.println(sf.getAttributePath() + ", " + sf.getColumnName());
-            }
 
-            for (ShowCaseField sf : showCase.getCustomFieldsList()) {
+            for (ShowCaseField sf : showCase.getCustomFieldsList())
                 System.out.println("* " + sf.getAttributePath() + ", " + sf.getColumnName());
-            }
 
-            for (ShowCaseField sf : showCase.getFilterFieldsList()) {
+            for (ShowCaseField sf : showCase.getFilterFieldsList())
                 System.out.println("% " + sf.getAttributePath() + ", " + sf.getColumnName());
-            }
         } else if (args.get(0).equals("set")) {
             if (args.size() != 3)
                 throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
@@ -2535,7 +2529,10 @@ public class CLI {
                 MetaClass metaClass = showCase.getMeta();
                 if (metaClass.getEl(args.get(2)) == null)
                     throw new IllegalArgumentException("no such path for downPath:" + args.get(2));
+
                 showCase.setDownPath(args.get(2));
+            } else if(args.get(1).equals("final")) {
+                showCase.setFinal(true);
             } else
                 throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
 
