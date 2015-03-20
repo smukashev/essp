@@ -17,6 +17,10 @@ public class Shared implements Serializable {
     private String nameKz;
     private Integer orderNum;
 
+    public Shared() {
+
+    }
+
     /**
      * @return the id
      */

@@ -115,12 +115,12 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public List<ReportMessage> getReportMessages(Report report) {
-        return reportMessageBusiness.getMessagesByReport(report);
+        return reportBusiness.getMessagesByReport(report);
     }
 
     @Override
     public void addNewMessage(ReportMessage message, Report report, List<ReportMessageAttachment> attachments) {
-        reportMessageBusiness.addNewMessage(report, message, attachments);
+        reportBusiness.addNewMessage(message, report, attachments);
     }
 
     @Override
@@ -146,6 +146,7 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public CrossCheck getLastCrossCheck(Creditor creditor, Date reportDate) {
+        /* todo: implement */
 //        List<CrossCheck> crossChecks = crossCheckBusiness.loadCrossCheck(Arrays.asList(creditor.getId()), reportDate);
 //        return crossChecks.isEmpty() ? null : crossChecks.get(0);
         return null;
@@ -153,6 +154,7 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public void updateReportStatus(Report report, ReportType status) {
+        /* todo: implement */
 //        Shared sharedStatus = sharedBusiness.findByC_T(status.getCode(), SharedType.REPORT_TYPE.getType());
 //        report.setStatus(sharedStatus);
 //        reportBusiness.updateReport(report);
@@ -160,12 +162,12 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public List<ReportMessageAttachment> getReportAttachments(Report report) {
-//        return reportMessageBusiness.getAttachmentsByReport(report);
-        return null;
+        return reportBusiness.getAttachmentsByReport(report);
     }
 
     @Override
     public void sendApprovalNotifications(Creditor creditor, Report report, String username, Date sendDate, String text) {
+        /* todo: implement */
 //        List<PortalUser> notificationRecipients = portalUserBusiness.getPortalUsersHavingAccessToCreditor(creditor);
 //        Properties mailMessageParameters = new Properties();
 //        mailMessageParameters.setProperty("CREDITOR", creditor.getName());
@@ -189,6 +191,7 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public void updateLastManualEditDate(Report report) {
+        /* todo: implement */
 //        report.setLastManualEditDate(new Date());
 //        reportBusiness.updateReport(report);
     }

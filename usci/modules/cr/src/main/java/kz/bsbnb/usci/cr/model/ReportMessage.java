@@ -1,17 +1,24 @@
 package kz.bsbnb.usci.cr.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by n.seitkozhayev on 2/18/15.
  */
-public class ReportMessage {
+public class ReportMessage implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Long id;
-    private Report report;
+    private transient Report report;
     private String username;
     private Date sendDate;
     private String text;
+
+    public ReportMessage() {
+
+    }
 
     public Long getId() {
         return id;

@@ -1,14 +1,15 @@
 package kz.bsbnb.usci.cr.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 
-public class Report {
+public class Report implements Serializable {
 
     public final static String INITIAL_REPORT_DATE_STR = "01/04/2013";
 
-    public final static HashMap<Long, String> STATUS_NAME_MAP = new HashMap<>();
-    public final static HashMap<Long, String> STATUS_CODE_MAP = new HashMap<>();
+    public final static HashMap<Long, String> STATUS_NAME_MAP = new HashMap<Long, String>();
+    public final static HashMap<Long, String> STATUS_CODE_MAP = new HashMap<Long, String>();
 
     static {
         STATUS_NAME_MAP.put(90l, "В процессе");
@@ -39,7 +40,10 @@ public class Report {
     private Date beginningDate;
     private Date endDate;
     private Date lastManualEditDate;
-    private Shared status;
+    private transient Shared status;
+
+    public Report() {
+    }
 
     public Long getId() {
         return id;
@@ -61,7 +65,7 @@ public class Report {
         return statusId;
     }
 
-    public void setStatusId(Long status) {
+    public void setStatusId(Long statusId) {
         this.statusId = statusId;
     }
 

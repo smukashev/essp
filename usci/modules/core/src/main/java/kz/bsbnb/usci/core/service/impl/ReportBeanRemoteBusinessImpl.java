@@ -1,10 +1,7 @@
 package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
-import kz.bsbnb.usci.cr.model.Creditor;
-import kz.bsbnb.usci.cr.model.Report;
-import kz.bsbnb.usci.cr.model.ReportType;
-import kz.bsbnb.usci.cr.model.Shared;
+import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.persistance.dao.IReportDao;
 import kz.bsbnb.usci.eav.persistance.dao.IUserDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,13 +45,6 @@ public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness
     @Deprecated
     public Report getByCreditor_ReportDate(Creditor creditor, Date reportDate)
     {
-        Report r = new Report();
-        Shared s = new Shared();
-
-        s.setCode(ReportType.RECIPIENCY_IN_PROGRESS.getCode());
-
-//        r.setStatus(s);
-
         return null;
     }
 
@@ -62,4 +52,21 @@ public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness
     public List<Report> getReportsByReportDateAndCreditors(Date reportDate, List<Creditor> creditors) {
         return reportDao.getReportsByReportDateAndCreditors(reportDate, creditors);
     }
+
+    @Override
+    public List<ReportMessage> getMessagesByReport(Report report) {
+        return reportDao.getMessagesByReport(report);
+    }
+
+    @Override
+    public List<ReportMessageAttachment> getAttachmentsByReport(Report report) {
+        return reportDao.getAttachmentsByReport(report);
+    }
+
+    @Override
+    public void addNewMessage(ReportMessage message, Report report, List<ReportMessageAttachment> attachments) {
+        reportDao.addNewMessage(message, report, attachments);
+    }
+
+
 }
