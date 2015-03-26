@@ -2592,8 +2592,11 @@ public class CLI {
                 throw new IllegalArgumentException();
             }
         } else if (args.get(0).equals("save")) {
-            showcaseService.add(showCase);
-            System.out.println(showCase.getName() + ": Showcase successfully added!");
+            long scId = showcaseService.add(showCase);
+            if(scId > 0)
+                System.out.println(showCase.getName() + ": Showcase successfully added!");
+            else
+                System.err.println("Couldn't save " + showCase.getName());
             showCase = null;
         } else if (args.get(0).equals("listSC")) {
             List<ShowcaseHolder> list = showcaseService.list();

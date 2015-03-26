@@ -232,13 +232,16 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         }
 
         Column column = new Column();
-        column.setName("cdc");
+        column.setName("CDC");
         column.setPrimaryKey(false);
         column.setRequired(false);
-        column.setDefaultValue("0");
-        column.setType("NUMERIC");
+        column.setType("DATE");
         table.addColumn(column);
-
+        Index indexCDC = new NonUniqueIndex();
+        indexCDC.setName("ind_" + tableName + "_CDC");
+        indexCDC.addColumn(new IndexColumn("CDC"));
+        table.addIndex(indexCDC);
+        table.addColumn(column);
 
         column = new Column();
         column.setName("OPEN_DATE");
@@ -246,7 +249,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         column.setRequired(false);
         column.setType("DATE");
         Index indexOD = new NonUniqueIndex();
-        indexOD.setName("ind_" + tableName + "_02");
+        indexOD.setName("ind_" + tableName + "_OPEN_DATE");
         indexOD.addColumn(new IndexColumn("OPEN_DATE"));
         table.addIndex(indexOD);
         table.addColumn(column);
@@ -257,7 +260,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         column.setRequired(false);
         column.setType("DATE");
         Index indexCD = new NonUniqueIndex();
-        indexCD.setName("ind_" + tableName + "_03");
+        indexCD.setName("ind_" + tableName + "_CLOSE_DATE");
         indexCD.addColumn(new IndexColumn("CLOSE_DATE"));
         table.addIndex(indexCD);
         table.addColumn(column);
@@ -683,7 +686,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
     public ShowCase load(long id) {
         Select select = context
                 .select(EAV_SC_SHOWCASES.ID, EAV_SC_SHOWCASES.TITLE, EAV_SC_SHOWCASES.TABLE_NAME,
-                        EAV_SC_SHOWCASES.NAME, EAV_SC_SHOWCASES.CLASS_NAME, EAV_SC_SHOWCASES.DOWN_PATH)
+                        EAV_SC_SHOWCASES.NAME, EAV_SC_SHOWCASES.CLASS_NAME, EAV_SC_SHOWCASES.DOWN_PATH,
+                        EAV_SC_SHOWCASES.IS_FINAL)
                 .from(EAV_SC_SHOWCASES)
                 .where(EAV_SC_SHOWCASES.ID.equal(id));
 
@@ -706,6 +710,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         showCase.setTitle((String) row.get(EAV_SC_SHOWCASES.TITLE.getName()));
         showCase.setTableName((String) row.get(EAV_SC_SHOWCASES.TABLE_NAME.getName()));
         showCase.setDownPath((String) row.get(EAV_SC_SHOWCASES.DOWN_PATH.getName()));
+        showCase.setFinal(((Integer) row.get(EAV_SC_SHOWCASES.IS_FINAL)) == 0);
 
         String metaClassName = (String) row.get(EAV_SC_SHOWCASES.CLASS_NAME.getName());
         MetaClass metaClass = metaService.getMetaClass(metaClassName);
@@ -845,7 +850,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
                 .set(EAV_SC_SHOWCASES.TABLE_NAME, showCase.getTableName())
                 .set(EAV_SC_SHOWCASES.TITLE, showCase.getTitle())
                 .set(EAV_SC_SHOWCASES.CLASS_NAME, showCase.getMeta().getClassName())
-                .set(EAV_SC_SHOWCASES.DOWN_PATH, showCase.getDownPath());
+                .set(EAV_SC_SHOWCASES.DOWN_PATH, showCase.getDownPath())
+                .set(EAV_SC_SHOWCASES.IS_FINAL, showCase.isFinal() ? 1 : 0);
 
         logger.debug(insert.toString());
 
@@ -885,6 +891,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
                 .set(EAV_SC_SHOWCASES.as(tableAlias).NAME, showCaseSaving.getName())
                 .set(EAV_SC_SHOWCASES.as(tableAlias).TABLE_NAME, showCaseSaving.getTableName())
                 .set(EAV_SC_SHOWCASES.as(tableAlias).TITLE, showCaseSaving.getTitle())
+                .set(EAV_SC_SHOWCASES.as(tableAlias).DOWN_PATH, showCaseSaving.getDownPath())
+                .set(EAV_SC_SHOWCASES.as(tableAlias).IS_FINAL, showCaseSaving.isFinal() ? 1 : 0)
                 .where(EAV_SC_SHOWCASES.as(tableAlias).as(tableAlias).ID.equal(showCaseSaving.getId()));
 
         logger.debug(update.toString());
