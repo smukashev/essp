@@ -52,6 +52,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 } else if (queueEntry.getBaseEntityApplied().getOperation() == OperationType.NEW) {
                     throw new UnsupportedOperationException("Operation new not supported in showcase");
                 } else {
+                    boolean found = false;
                     for (ShowcaseHolder holder : holders) {
                         if (!holder.getShowCaseMeta().getMeta().getClassName()
                                 .equals(queueEntry.getBaseEntityApplied().getMeta().getClassName()))
@@ -62,8 +63,14 @@ public class ShowcaseMessageConsumer implements MessageListener {
                                     holder));
 
                             futures.add(future);
+
+                            found = true;
                         }
                     }
+
+                    if(!found)
+                        logger.warn("MetaClass " + queueEntry.getBaseEntityApplied().getMeta().getClassName() +
+                            " couldn't find matching ShowCase");
 
                     for (Future f : futures) {
                         try {
