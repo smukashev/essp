@@ -34,7 +34,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     private static final int SC_HISTORY_THREADS_COUNT = 10;
     private static final int SLEEP_TIME_MILLIS = 1000;
 
-    private Map<Integer, Thread> scHistoryThreads = new HashMap<>();
+    private Map<Integer, Thread> scHistoryThreads = new HashMap<Integer, Thread>();
 
     @Override
     public void start(String metaName, Long id, Date reportDate) {
@@ -138,8 +138,8 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
         private Long maxIdToProcess;
 
         public IdSupplier() {
-            idsToProcess = new ArrayList<>();
-            processedIds = new ArrayList<>();
+            idsToProcess = new ArrayList<Long>();
+            processedIds = new ArrayList<Long>();
             maxIdToProcess = -1L;
         }
 
@@ -206,7 +206,8 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
                     try {
                         producer.produce(entry);
                     } catch (InterruptedException e) {
-                        // do nothing, finish loading
+                        if(logger.isWarnEnabled())
+                            logger.warn("InterruptedException: " + e.getMessage());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
