@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface ShowcaseService {
-    public void add(ShowCase showCase);
+    public long add(ShowCase showCase);
 
     public List<ShowcaseHolder> list();
 
