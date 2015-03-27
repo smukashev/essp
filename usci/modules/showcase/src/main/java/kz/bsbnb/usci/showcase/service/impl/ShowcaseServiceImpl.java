@@ -26,11 +26,12 @@ public class ShowcaseServiceImpl implements ShowcaseService {
     private ShowcaseDao showcaseDao;
 
     @Override
-    public void add(ShowCase showCase) {
+    public long add(ShowCase showCase) {
         ShowcaseHolder scHolder = new ShowcaseHolder();
         long id = showcaseDao.save(showCase);
         scHolder.setShowCaseMeta(showCase);
         showcaseDao.createTables(scHolder);
+        return id;
     }
 
     @Override
