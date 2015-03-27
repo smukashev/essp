@@ -2988,6 +2988,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         ArrayList<RefListItem> entityIds = new ArrayList<RefListItem>();
 
+        // TODO: fix
+
         Select select = context.select().from(
                 context.select(
                         EAV_BE_ENTITIES.ID,

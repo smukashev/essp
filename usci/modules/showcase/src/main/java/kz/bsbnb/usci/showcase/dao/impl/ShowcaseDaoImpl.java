@@ -181,11 +181,17 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
                     column.setType("NUMERIC");
                     column.setSize("14,0");
                     column.setAutoIncrement(false);
-
-                    table.addColumn(column);
                 } else {
                     MetaClass root = metaService.getMetaClass("credit"); // TODO: fix credit arg
-                    IMetaType metaType = root.getEl(sf.getAttributePath());
+                    String path;
+
+                    if(sf.getAttributePath() == null || sf.getAttributePath().equals("")) {
+                        path = sf.getAttributeName();
+                    } else {
+                        path = sf.getAttributePath();
+                    }
+
+                    IMetaType metaType = root.getEl(path);
 
                     if(metaType.isComplex()) {
                         column.setType("NUMERIC");
