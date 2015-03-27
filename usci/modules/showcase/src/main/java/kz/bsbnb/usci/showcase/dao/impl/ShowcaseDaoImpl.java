@@ -112,7 +112,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
     }
 
     private void createTable(HistoryState historyState, ShowcaseHolder showcaseHolder) {
-        String tableName = null;
+        String tableName;
         switch (historyState) {
             case ACTUAL:
                 tableName = getActualTableName(showcaseHolder.getShowCaseMeta());
@@ -172,8 +172,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         // Custom fields
         if (showcaseHolder.getShowCaseMeta().getCustomFieldsList().size() > 0) {
             for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
+                Column column = new Column();
+
                 if (sf.getAttributePath().equals("ROOT")) { // ROOT ID
-                    Column column = new Column();
                     column.setName(COLUMN_PREFIX + sf.getColumnName());
                     column.setPrimaryKey(false);
                     column.setRequired(false);
@@ -183,18 +184,24 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
 
                     table.addColumn(column);
                 } else {
-                    IMetaType metaType = showcaseHolder.getShowCaseMeta().getActualMeta().getEl(sf.getPath());
+                    MetaClass root = metaService.getMetaClass("credit"); // TODO: fix credit arg
+                    IMetaType metaType = root.getEl(sf.getAttributePath());
 
-                    Column column = new Column();
+                    if(metaType.isComplex()) {
+                        column.setType("NUMERIC");
+                        column.setSize("14,0");
+                    } else {
+                        column.setType(getDBType(metaType));
+                        column.setSize(getDBSize(metaType));
+                    }
+
                     column.setName(COLUMN_PREFIX + sf.getColumnName());
                     column.setPrimaryKey(false);
                     column.setRequired(false);
-                    column.setType(getDBType(metaType));
-                    column.setSize(getDBSize(metaType));
                     column.setAutoIncrement(false);
-
-                    table.addColumn(column);
                 }
+
+                table.addColumn(column);
             }
         }
 
@@ -236,7 +243,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         column.setPrimaryKey(false);
         column.setRequired(false);
         column.setType("DATE");
-        table.addColumn(column);
         Index indexCDC = new NonUniqueIndex();
         indexCDC.setName("ind_" + tableName + "_CDC");
         indexCDC.addColumn(new IndexColumn("CDC"));
@@ -710,7 +716,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         showCase.setTitle((String) row.get(EAV_SC_SHOWCASES.TITLE.getName()));
         showCase.setTableName((String) row.get(EAV_SC_SHOWCASES.TABLE_NAME.getName()));
         showCase.setDownPath((String) row.get(EAV_SC_SHOWCASES.DOWN_PATH.getName()));
-        showCase.setFinal(((Integer) row.get(EAV_SC_SHOWCASES.IS_FINAL.getName())) == 0);
+        showCase.setFinal((row.get(EAV_SC_SHOWCASES.IS_FINAL.getName())).equals(0));
 
         String metaClassName = (String) row.get(EAV_SC_SHOWCASES.CLASS_NAME.getName());
         MetaClass metaClass = metaService.getMetaClass(metaClassName);
@@ -903,8 +909,15 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
 
         deleteFields(showCaseSaving.getId());
 
-        for (ShowCaseField showCaseFieldSaving : showCaseSaving.getFieldsList())
-            insertField(showCaseFieldSaving, showCaseFieldSaving.getId());
+        for (ShowCaseField sf : showCaseSaving.getFieldsList())
+            insertField(sf, showCaseSaving.getId());
+
+        for(ShowCaseField sf : showCaseSaving.getCustomFieldsList())
+            insertField(sf, showCaseSaving.getId());
+
+        for(ShowCaseField sf : showCaseSaving.getFilterFieldsList())
+            insertField(sf, showCaseSaving.getId());
+
     }
 
     long insertWithId(String query, Object[] values) {
