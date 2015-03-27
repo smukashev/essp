@@ -710,7 +710,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         showCase.setTitle((String) row.get(EAV_SC_SHOWCASES.TITLE.getName()));
         showCase.setTableName((String) row.get(EAV_SC_SHOWCASES.TABLE_NAME.getName()));
         showCase.setDownPath((String) row.get(EAV_SC_SHOWCASES.DOWN_PATH.getName()));
-        showCase.setFinal(((Integer) row.get(EAV_SC_SHOWCASES.IS_FINAL)) == 0);
+        showCase.setFinal(((Integer) row.get(EAV_SC_SHOWCASES.IS_FINAL.getName())) == 0);
 
         String metaClassName = (String) row.get(EAV_SC_SHOWCASES.CLASS_NAME.getName());
         MetaClass metaClass = metaService.getMetaClass(metaClassName);
