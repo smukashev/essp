@@ -652,7 +652,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
             case INTEGER:
                 return "NUMERIC";
             case DATE:
-                return "TIMESTAMP";
+                return "DATE";
+                // return "TIMESTAMP";
             case STRING:
                 return "VARCHAR";
             case BOOLEAN:
