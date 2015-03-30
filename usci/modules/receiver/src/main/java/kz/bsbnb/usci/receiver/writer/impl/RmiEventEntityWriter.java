@@ -44,6 +44,8 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
     @Autowired
     protected SQLQueriesStats sqlStats;
 
+    private final boolean RULES_ENABLED  = false;
+
     @PostConstruct
     public void init() {
         logger.info("Writer init");
@@ -88,12 +90,15 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
             entityStatusJModel.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
 
             statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
-            try {
-                long t1 = System.currentTimeMillis();
-                rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());
-                sqlStats.put(entity.getMeta().getClassName() + "_parser", System.currentTimeMillis() - t1);
-            } catch(Exception e) {
-                logger.error("Can't run rules: " + e.getMessage());
+
+            if(RULES_ENABLED) {
+                try {
+                    long t1 = System.currentTimeMillis();
+                    rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());
+                    sqlStats.put(entity.getMeta().getClassName() + "_parser", System.currentTimeMillis() - t1);
+                } catch (Exception e) {
+                    logger.error("Can't run rules: " + e.getMessage());
+                }
             }
 
             if (entity.getValidationErrors().size() > 0) {
