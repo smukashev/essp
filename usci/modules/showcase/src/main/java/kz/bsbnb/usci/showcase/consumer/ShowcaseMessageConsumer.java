@@ -109,7 +109,14 @@ public class ShowcaseMessageConsumer implements MessageListener {
         @Override
         public void run() {
             long t1 = System.currentTimeMillis();
-            showcaseDao.generate(entity, holder);
+
+            try {
+                showcaseDao.generate(entity, holder);
+            } catch(Exception e) {
+                // TODO: SC_LOGS
+                //
+            }
+
             long t2 = System.currentTimeMillis() - t1;
             stats.put("showcase", t2);
         }
