@@ -26,6 +26,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     protected IBaseEntityProcessorDao baseEntityProcessorDao;
     @Autowired
     protected ShowcaseMessageProducer producer;
+
     private Map<String, QueueViewMBean> queueViewBeanCache = new HashMap<String, QueueViewMBean>();
     private Map<Long, Thread> SCThreads = new HashMap<Long, Thread>();
 
@@ -147,13 +148,12 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
             if (idsToProcess.isEmpty()) {
                 List<Long> entityIds = baseEntityProcessorDao.getSCEntityIds(ENTITY_COUNT_PER_LOAD, maxIdToProcess);
                 idsToProcess.addAll(entityIds);
-            }
 
-            if (idsToProcess.isEmpty()) {
-                return null;
+                if (!idsToProcess.isEmpty()) {
+                    // get last id
+                    maxIdToProcess = idsToProcess.get(idsToProcess.size() - 1);
+                }
             }
-
-            maxIdToProcess = idsToProcess.get(idsToProcess.size() - 1);
 
             return idsToProcess.isEmpty() ? null : idsToProcess.remove(0);
         }
@@ -189,11 +189,11 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
             while (true) {
                 Long entityId = idSupplier.supply();
 
-                logger.info("STARTED LOADING (entityId = %s, threadIndex = %s)", entityId, index);
-                System.out.printf("STARTED LOADING (entityId = %s, threadIndex = %s)\n", entityId, index);
+                logger.info("LOADED (entityId = %s, threadIndex = %s)", entityId, index);
+                System.out.printf("LOADED (entityId = %s, threadIndex = %s)\n", entityId, index);
 
                 if (entityId == null) {
-                    onFinish(false);
+                    onFinish(FinishReason.NO_MORE_ENTITIES);
                     return;
                 }
 
@@ -205,21 +205,19 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
 
                     try {
                         producer.produce(entry);
-                    } catch (InterruptedException e) {
-                        if(logger.isWarnEnabled())
-                            logger.warn("InterruptedException: " + e.getMessage());
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        onFinish(FinishReason.EXCEPTION);
+                        throw new RuntimeException(e);
                     }
                 }
 
                 idSupplier.done(entityId);
 
-                logger.info("FINISHED LOADING (entityId = %s, threadIndex = %s)", entityId, index);
-                System.out.printf("FINISHED LOADING (entityId = %s, threadIndex = %s)\n", entityId, index);
+                logger.info("SENT TO ACTIVEMQ (entityId = %s, threadIndex = %s)", entityId, index);
+                System.out.printf("SENT TO ACTIVEMQ (entityId = %s, threadIndex = %s)\n", entityId, index);
 
                 if (Thread.interrupted()) {
-                    onFinish(true);
+                    onFinish(FinishReason.INTERRUPT);
                     return;
                 }
 
@@ -231,9 +229,10 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
             }
         }
 
-        public synchronized void onFinish(boolean afterInterrupt) {
-            logger.info("FINISH LOADING ENTITIES HISTORY TO SHOWCASE (threadIndex = %s, afterInterrupt = %s)", index, afterInterrupt);
-            System.out.printf("FINISH LOADING ENTITIES HISTORY TO SHOWCASE (threadIndex = %s, afterInterrupt = %s)\n", index, afterInterrupt);
+        // must be called no matter how HistorySender finish
+        public synchronized void onFinish(FinishReason finishReason) {
+            logger.info("FINISHED LOADING ENTITIES HISTORY TO SHOWCASE (threadIndex = %s, reason = %s)", index, finishReason);
+            System.out.printf("FINISH LOADING ENTITIES HISTORY TO SHOWCASE (threadIndex = %s, reason = %s)\n", index, finishReason);
 
             scHistoryThreads.remove(index);
 
@@ -241,6 +240,12 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
                 idSupplier.clearProcessedLeft();
             }
         }
+    }
+
+    private enum FinishReason {
+        NO_MORE_ENTITIES,
+        INTERRUPT,
+        EXCEPTION
     }
 
     private class Sender implements Runnable {

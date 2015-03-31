@@ -89,7 +89,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
     }
 
     private ArrayList<ShowcaseHolder> populateHolders() {
-        holders = new ArrayList<ShowcaseHolder>();
+        ArrayList<ShowcaseHolder> holders = new ArrayList<ShowcaseHolder>();
         List<Long> list;
 
         Select select = context.select(EAV_SC_SHOWCASES.ID).from(EAV_SC_SHOWCASES);

@@ -13,8 +13,6 @@ import java.util.Map;
 public class ShowcaseHolder implements Serializable {
     private ShowCase showCaseMeta;
 
-    private Map<String, String> prefixToColumn;
-
     public ShowcaseHolder() {
         super();
     }
@@ -36,7 +34,7 @@ public class ShowcaseHolder implements Serializable {
     }
 
     public Map<String, String> generatePaths() {
-        prefixToColumn = new HashMap<String, String>();
+        Map<String, String> prefixToColumn = new HashMap<String, String>();
 
         Map<String, Integer> nextNumber = new HashMap<String, Integer>();
         Map<String, String> columnToPrefix = new HashMap<String, String>();

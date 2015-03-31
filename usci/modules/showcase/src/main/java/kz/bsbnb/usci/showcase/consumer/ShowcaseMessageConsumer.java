@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
+import kz.bsbnb.usci.showcase.generated.Showcase;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -48,16 +50,17 @@ public class ShowcaseMessageConsumer implements MessageListener {
                             queueEntry.getBaseEntityApplied().getMeta().getClassName());
 
                     showcaseDao.deleteById(h, queueEntry.getBaseEntityApplied());
-                    message.acknowledge();
                 } else if (queueEntry.getBaseEntityApplied().getOperation() == OperationType.NEW) {
                     throw new UnsupportedOperationException("Operation new not supported in showcase");
                 } else {
                     boolean found = false;
+
                     for (ShowcaseHolder holder : holders) {
                         if (!holder.getShowCaseMeta().getMeta().getClassName()
                                 .equals(queueEntry.getBaseEntityApplied().getMeta().getClassName()))
                             continue;
 
+                        // TODO check transactionality, probably need to be run in single thread
                         if (scId == null || scId == holder.getShowCaseMeta().getId()) {
                             Future future = exec.submit(new CarteageGenerator(queueEntry.getBaseEntityApplied(),
                                     holder));
@@ -73,27 +76,21 @@ public class ShowcaseMessageConsumer implements MessageListener {
                             " couldn't find matching ShowCase");
 
                     for (Future f : futures) {
-                        try {
-                            f.get();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
-                        } catch(Exception e) {
-                            e.printStackTrace();
-                        }
+                        f.get();
                     }
 
                     futures.removeAll(futures);
 
                     long t4 = System.currentTimeMillis() - t3;
                     stats.put("message", t4);
-
-                    message.acknowledge();
                 }
             }
-        } catch (JMSException e) {
-            logger.error(e.getMessage(), e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (e instanceof RuntimeException) {
+                throw (RuntimeException) e;
+            }
+            throw new RuntimeException(e);
         }
     }
 
