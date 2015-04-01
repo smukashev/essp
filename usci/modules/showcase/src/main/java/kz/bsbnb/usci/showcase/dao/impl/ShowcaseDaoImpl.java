@@ -329,8 +329,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
             }
         }
 
-        sql.append("OPEN_DATE, CLOSE_DATE");
-        values.append("?, ? )");
+        sql.append("CDC, OPEN_DATE, CLOSE_DATE");
+        values.append("SYSDATE, ?, ? )");
         vals[i++] = openDate;
         vals[i] = closeDate;
 
