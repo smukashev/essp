@@ -68,5 +68,8 @@ public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness
         reportDao.addNewMessage(message, report, attachments);
     }
 
-
+    @Override
+    public void updateReport(Report report) {
+        reportDao.updateReport(report);
+    }
 }
