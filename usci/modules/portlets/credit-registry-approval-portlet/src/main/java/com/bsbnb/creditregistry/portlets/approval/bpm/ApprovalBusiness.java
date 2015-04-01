@@ -78,8 +78,6 @@ public class ApprovalBusiness {
         }
         payloadAsString += "]}";
 
-        System.out.println(payloadAsString);
-
         return consumeResponse(executePostRequest(apiURI, payloadAsString),true);
     }
 
@@ -161,9 +159,7 @@ public class ApprovalBusiness {
         String serviceUri = "/API/bpm/process?f=activationState%3dENABLED&f=name%3d" + serviceName;
         HttpResponse response = executeGetRequest(serviceUri);
         String content = consumeResponseIfNecessary(response);
-        System.out.println(content);
         content = content.substring(8, content.indexOf(',') - 1);
-        System.out.println(content);
         return Long.parseLong(content);
     }
 
