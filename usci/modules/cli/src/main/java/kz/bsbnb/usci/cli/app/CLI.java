@@ -1152,15 +1152,14 @@ public class CLI {
         jobDispatcher.addThread(new DeleteJob(getEntityService(url), id));
     }
 
-    public void removeAllEntityById(long metaClassId, String url) {
+    public void removeAllEntityByMetaId(long metaClassId) {
         RmiProxyFactoryBean serviceFactory = null;
 
         IEntityService entityServiceCore = null;
 
         try {
             serviceFactory = new RmiProxyFactoryBean();
-            //batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
-            serviceFactory.setServiceUrl(args.get(2));
+            serviceFactory.setServiceUrl("rmi://127.0.0.1:1099/entityService");
             serviceFactory.setServiceInterface(IEntityService.class);
             serviceFactory.setRefreshStubOnConnectFailure(true);
 
@@ -1171,6 +1170,9 @@ public class CLI {
         }
 
         IMetaClass metaClass = metaClassDao.load(metaClassId);
+
+        if(entityServiceCore == null)
+            throw new NullPointerException("EntityService is null!");
 
         entityServiceCore.removeAllByMetaClass(metaClass);
     }
@@ -2101,10 +2103,11 @@ public class CLI {
                 }
             } else if (args.get(0).equals("rmall")) {
                 if (args.size() > 2) {
-                    removeAllEntityById(Long.parseLong(args.get(1)), args.get(2));
+                    removeAllEntityByMetaId(Long.parseLong(args.get(1)));
+                    System.out.println("All entities with CLASS_ID " + args.get(1) + " has been removed");
                 } else {
-                    System.out.println("Argument needed: <rmall> <id> <service_url>");
-                    System.out.println("Example: rmall 100 rmi://127.0.0.1:1099/batchEntryService");
+                    System.out.println("Argument needed: <rmall> <meta_class_id>");
+                    System.out.println("Example: rmall 59");
                 }
             } else if (args.get(0).equals("read")) {
                 if (args.size() > 2) {

@@ -1034,6 +1034,9 @@
 			<column name="execution_time" required="true" type = "TIMESTAMP"  />
 			<column name="status" required="true" type="NUMERIC" size="1" />
 			<column name="error_msg" type="VARCHAR" size="250" />
+			<column name="contract_no" type = "VARCHAR" size="64" />
+			<column name="contract_date" required="true" type = "TIMESTAMP"  />
+			<column name="credit_id" type = "NUMERIC" size="14,0" />
 	</table>
 
 	<!-- entity_editor portlet tables -->
