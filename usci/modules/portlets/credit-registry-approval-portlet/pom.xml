@@ -9,9 +9,9 @@
 
     <properties>
         <liferay.version>6.1.2</liferay.version>
-        <liferay.auto.deploy.dir>/home/a.tkachenko/software/liferay/deploy</liferay.auto.deploy.dir>
-        <liferay.app.server.deploy.dir>/home/a.tkachenko/software/liferay/deploy</liferay.app.server.deploy.dir>
-        <liferay.app.server.portal.dir>/home/a.tkachenko/software/liferay/deploy</liferay.app.server.portal.dir>
+        <liferay.auto.deploy.dir>/home/nurlan/Software/glassfish3/deploy</liferay.auto.deploy.dir>
+        <liferay.app.server.deploy.dir>/home/nurlan/Software/glassfish3/deploy</liferay.app.server.deploy.dir>
+        <liferay.app.server.portal.dir>/home/nurlan/Software/glassfish3/deploy</liferay.app.server.portal.dir>
     </properties>
 
     <build>
@@ -34,8 +34,8 @@
                 <version>2.5</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -341,5 +341,10 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>-->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.2</version>
+        </dependency>
     </dependencies>
 </project>
