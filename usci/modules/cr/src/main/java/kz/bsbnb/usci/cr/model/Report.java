@@ -20,6 +20,7 @@ public class Report implements Serializable {
         STATUS_NAME_MAP.put(76l, "Отконтроллирован с ошибками");
         STATUS_NAME_MAP.put(77l, "Отконтроллирован без ошибок");
         STATUS_NAME_MAP.put(128l, "Утвержден организацией");
+        STATUS_NAME_MAP.put(127l, "Идет подтверждение");
 
         STATUS_CODE_MAP.put(90l, "RECIPIENCY_IN_PROGRESS");
         STATUS_CODE_MAP.put(91l, "CROSS_CHECK_ERROR");
@@ -29,6 +30,7 @@ public class Report implements Serializable {
         STATUS_CODE_MAP.put(76l, "WE");
         STATUS_CODE_MAP.put(77l, "WOE");
         STATUS_CODE_MAP.put(128l, "ORGANIZATION_APPROVED");
+        STATUS_CODE_MAP.put(127l, "ORGANIZATION_APPROVING");
     }
 
     private Long id;
@@ -118,7 +120,7 @@ public class Report implements Serializable {
     }
 
     public Shared getStatus() {
-        if (status == null && statusId != null) {
+        if (statusId != null && (status == null || status.getId() != statusId.longValue())) {
             status = new Shared();
             status.setId(statusId);
             status.setCode(STATUS_CODE_MAP.get(statusId));
