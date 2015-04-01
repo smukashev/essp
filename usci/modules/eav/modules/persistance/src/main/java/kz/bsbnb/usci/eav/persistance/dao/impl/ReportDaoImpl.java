@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IReportDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -193,5 +194,15 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
         }
 
 
+    }
+
+    @Override
+    public void updateReport(Report report) {
+        Update update = context
+                .update(EAV_REPORT)
+                .set(EAV_REPORT.STATUS_ID, report.getStatusId())
+                .set(EAV_REPORT.LAST_MANUAL_EDIT_DATE, DataUtils.convert(report.getLastManualEditDate()))
+                .where(EAV_REPORT.ID.equal(report.getId()));
+        updateWithStats(update.getSQL(), update.getBindValues().toArray());
     }
 }
