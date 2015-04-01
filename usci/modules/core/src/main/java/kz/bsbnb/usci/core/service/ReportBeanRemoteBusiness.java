@@ -21,4 +21,6 @@ public interface ReportBeanRemoteBusiness
     public List<ReportMessageAttachment> getAttachmentsByReport(Report report);
 
     public void addNewMessage(ReportMessage message, Report report, List<ReportMessageAttachment> attachments);
+
+    public void updateReport(Report report);
 }
