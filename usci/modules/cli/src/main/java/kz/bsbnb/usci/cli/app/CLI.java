@@ -2653,13 +2653,15 @@ public class CLI {
                 populate = true;
             }
 
-            Long creditorId = null;
+            Queue<Long> creditorIdsQueue = new LinkedList<Long>();
 
             if (args.size() > 2) {
-                creditorId = Long.valueOf(args.get(2));
+                for (int i = 2; i < args.size(); i++) {
+                    creditorIdsQueue.add(Long.valueOf(args.get(i)));
+                }
             }
 
-            showcaseService.startLoadHistory(populate, creditorId);
+            showcaseService.startLoadHistory(populate, creditorIdsQueue);
 
         } else if (args.get(0).equals("stopLoad")) {
             if (args.size() > 1) {

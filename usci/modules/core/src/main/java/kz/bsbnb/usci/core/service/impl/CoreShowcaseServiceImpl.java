@@ -46,15 +46,38 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     }
 
     @Override
-    public void startLoadHistory(boolean populate, Long creditorId) {
-        if (populate) {
-            if (creditorId != null) {
-                baseEntityProcessorDao.populateSC(creditorId);
-            } else {
-                baseEntityProcessorDao.populateSC();
+    public void startLoadHistory(final boolean populate, final Queue<Long> creditorIdsQueue) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (populate) {
+                    if (creditorIdsQueue != null) {
+
+                        while (!creditorIdsQueue.isEmpty()) {
+                            baseEntityProcessorDao.populateSC(creditorIdsQueue.poll());
+                            startHistoryThreads();
+                            waitHistoryThreads();
+                        }
+                    } else {
+                        baseEntityProcessorDao.populateSC();
+                        startHistoryThreads();
+                    }
+                }
+            }
+        }).start();
+    }
+
+    private void waitHistoryThreads() {
+        while (!scHistoryThreads.isEmpty()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
+    }
 
+    private void startHistoryThreads() {
         IdSupplier idSupplier = new IdSupplier();
 
         for (int i = 0; i < SC_HISTORY_THREADS_COUNT; i++) {

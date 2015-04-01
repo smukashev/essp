@@ -2,6 +2,7 @@ package kz.bsbnb.usci.core.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Queue;
 
 public interface CoreShowcaseService {
     public void start(String metaName, Long id, Date reportDate);
@@ -14,7 +15,7 @@ public interface CoreShowcaseService {
 
     List<Long> listLoading();
 
-    void startLoadHistory(boolean populate, Long creditorId);
+    void startLoadHistory(boolean populate, Queue<Long> creditorIds);
 
     void stopHistory();
 }

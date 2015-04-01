@@ -4,10 +4,7 @@ import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public interface ShowcaseService {
     public long add(ShowCase showCase);
@@ -17,7 +14,9 @@ public interface ShowcaseService {
     public ShowCase load(String name);
 
     public void startLoad(String name, Date reportDate);
-    void startLoadHistory(boolean populate, Long creditorId);
+
+    void startLoadHistory(boolean populate, Queue<Long> creditorIds);
+
     void stopLoadHistory();
 
     public HashMap<String, QueryEntry> getSQLStats();
