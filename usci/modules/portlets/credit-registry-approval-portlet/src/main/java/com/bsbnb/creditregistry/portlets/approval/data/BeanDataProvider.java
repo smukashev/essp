@@ -1,49 +1,15 @@
 package com.bsbnb.creditregistry.portlets.approval.data;
 
-//import com.bsbnb.creditregistry.dm.Report;
-//import com.bsbnb.creditregistry.dm.ReportMessage;
-//import com.bsbnb.creditregistry.dm.ReportMessageAttachment;
-//import com.bsbnb.creditregistry.dm.maintenance.CrossCheck;
-//import com.bsbnb.creditregistry.dm.maintenance.PortalUser;
-//import com.bsbnb.creditregistry.dm.maintenance.Sysconfig;
-//import com.bsbnb.creditregistry.dm.maintenance.mail.MailMessage;
-//import com.bsbnb.creditregistry.dm.maintenance.mail.MailMessageParameter;
-//import com.bsbnb.creditregistry.dm.maintenance.mail.MailTemplateParameter;
-//import com.bsbnb.creditregistry.dm.ref.Creditor;
-//import com.bsbnb.creditregistry.dm.ref.Shared;
-//import com.bsbnb.creditregistry.dm.ref.shared.ReportType;
-//import com.bsbnb.creditregistry.dm.ref.shared.SharedType;
-
-//import com.bsbnb.creditregistry.ejb.api.ReportBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.api.ReportMessageBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.CrossCheckBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.PortalUserBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.SysconfigBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.mail.MailMessageBeanRemoteBusiness;
-//
-//import com.bsbnb.creditregistry.ejb.ref.business.remote.IRemoteSharedBusiness;
-//import com.bsbnb.creditregistry.ejb.ref.exception.ResultInconsistentException;
-//import com.bsbnb.creditregistry.ejb.ref.exception.ResultNotFoundException;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
-import kz.bsbnb.usci.core.service.ReportMessageBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
-import static com.bsbnb.creditregistry.portlets.approval.ApprovalApplication.log;
-import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.logging.Level;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 /**
  *
@@ -52,19 +18,12 @@ import javax.naming.NamingException;
 public class BeanDataProvider implements DataProvider {
     private RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean;
     private RmiProxyFactoryBean reportBusinessFactoryBean;
-    private RmiProxyFactoryBean reportMessageBusinessFactoryBean;
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private ReportBeanRemoteBusiness reportBusiness;
-    private ReportMessageBeanRemoteBusiness reportMessageBusiness;
-
-//    private SysconfigBeanRemoteBusiness sysconfigBusiness;
-//    private CrossCheckBeanRemoteBusiness crossCheckBusiness;
-//    private IRemoteSharedBusiness sharedBusiness;
-//    private MailMessageBeanRemoteBusiness mailMessageBusiness;
 
     public BeanDataProvider() {
         // portalUserBeanRemoteBusiness
@@ -80,13 +39,6 @@ public class BeanDataProvider implements DataProvider {
         reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
         reportBusinessFactoryBean.afterPropertiesSet();
         reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
-
-        // reportMessageBeanRemoteBusiness
-        reportMessageBusinessFactoryBean = new RmiProxyFactoryBean();
-        reportMessageBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/reportMessageBeanRemoteBusiness");
-        reportMessageBusinessFactoryBean.setServiceInterface(ReportMessageBeanRemoteBusiness.class);
-        reportMessageBusinessFactoryBean.afterPropertiesSet();
-        reportMessageBusiness = (ReportMessageBeanRemoteBusiness) reportMessageBusinessFactoryBean.getObject();
     }
 
     @Override
@@ -154,10 +106,8 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public void updateReportStatus(Report report, ReportType status) {
-        /* todo: implement */
-//        Shared sharedStatus = sharedBusiness.findByC_T(status.getCode(), SharedType.REPORT_TYPE.getType());
-//        report.setStatus(sharedStatus);
-//        reportBusiness.updateReport(report);
+        report.setStatusId(ReportType.STATUS_CODE_ID_MAP.get(status.getCode()));
+        reportBusiness.updateReport(report);
     }
 
     @Override
@@ -191,8 +141,7 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public void updateLastManualEditDate(Report report) {
-        /* todo: implement */
-//        report.setLastManualEditDate(new Date());
-//        reportBusiness.updateReport(report);
+        report.setLastManualEditDate(new Date());
+        reportBusiness.updateReport(report);
     }
 }
