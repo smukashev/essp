@@ -2,6 +2,7 @@ package com.bsbnb.creditregistry.portlets.approval.ui;
 
 import com.bsbnb.creditregistry.portlets.approval.ApprovalPortletResource;
 import com.bsbnb.creditregistry.portlets.approval.PortletEnvironmentFacade;
+import com.bsbnb.creditregistry.portlets.approval.bpm.ApprovalBusiness;
 import com.bsbnb.creditregistry.portlets.approval.data.CrossCheckLink;
 import com.bsbnb.creditregistry.portlets.approval.data.DataProvider;
 import com.bsbnb.util.translit.Transliterator;
@@ -156,7 +157,7 @@ public class ReportDateLayout extends VerticalLayout {
                 + report.getActualCount(), Label.CONTENT_XHTML);
         contractsCountLabel.setSizeUndefined();
 
-        String reportStatusCaption = String.format(environment.getResourceString(Localization.REPORT_STATUS_LABEL_CAPTION), report.getStatus().getNameRu());
+        final String reportStatusCaption = String.format(environment.getResourceString(Localization.REPORT_STATUS_LABEL_CAPTION), report.getStatus().getNameRu());
         Label reportStatusLabel = new Label("<b style='text-align: center'>" + reportStatusCaption + "</b>", Label.CONTENT_XHTML);
         reportStatusLabel.setSizeUndefined();
 
@@ -170,10 +171,20 @@ public class ReportDateLayout extends VerticalLayout {
                     }
                 });
             } else if (environment.isBankUser() && reportDate.equals(currentReportDate)
-                    && !ReportType.ORGANIZATION_APPROVED.getCode().equals(report.getStatus().getCode())) {
+                    && !ReportType.ORGANIZATION_APPROVED.getCode().equals(report.getStatus().getCode())
+                    && !ReportType.ORGANIZATION_APPROVING.getCode().equals(report.getStatus().getCode())) {
                 approveReportButton = new Button(approveReportButtonCaption, new Button.ClickListener() {
                     public void buttonClick(Button.ClickEvent event) {
-                        updateReportStatus(ReportType.ORGANIZATION_APPROVED);
+                        ApprovalBusiness approvalBusiness = new ApprovalBusiness();
+                        HashMap<String, String> data = new HashMap<>();
+                        data.put("reportId", report.getId().toString());
+                        data.put("actualCount", report.getActualCount().toString());
+                        data.put("creditorName",creditor.getName().replace("\"", "\\\""));
+                        data.put("begDate", Long.toString(report.getBeginningDate().getTime()));
+                        data.put("endDate", Long.toString(report.getEndDate().getTime()));
+                        data.put("userName", environment.getUsername());
+                                approvalBusiness.startApprovalProcess(data);
+                        updateReportStatus(ReportType.ORGANIZATION_APPROVING);
                     }
                 });
             }
@@ -181,7 +192,7 @@ public class ReportDateLayout extends VerticalLayout {
         Button undoApproveReportButton = null;
         if (environment.isNbUser()
                 && (report.getStatus().getCode().equals(ReportType.RECIPIENCY_COMPLETED.getCode())
-                || report.getStatus().getCode().equals(ReportType.ORGANIZATION_APPROVED.getCode()))) {
+                || report.getStatus().getCode().equals(ReportType.  ORGANIZATION_APPROVED.getCode()))) {
             String undoApproveReportButtonCaption = environment.getResourceString(Localization.UNDO_APPROVE_REPORT_BUTTON_CAPTION);
             undoApproveReportButton = new Button(undoApproveReportButtonCaption, new Button.ClickListener() {
                 public void buttonClick(Button.ClickEvent event) {
