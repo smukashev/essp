@@ -42,9 +42,9 @@ public class ShowcaseServiceImpl implements ShowcaseService {
     }
 
     @Override
-    public void startLoadHistory(boolean populate, Long creditorId) {
+    public void startLoadHistory(boolean populate, Queue<Long> creditorIds) {
         CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
-        coreShowcaseService.startLoadHistory(populate, creditorId);
+        coreShowcaseService.startLoadHistory(populate, creditorIds);
     }
 
     @Override
