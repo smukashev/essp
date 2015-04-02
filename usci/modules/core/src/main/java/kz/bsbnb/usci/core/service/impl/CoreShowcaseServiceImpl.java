@@ -214,43 +214,36 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
         @Override
         public void run() {
             while (true) {
-                Long entityId = idSupplier.supply();
-
-                System.out.printf("LOADED (entityId = %s, threadIndex = %s)\n", entityId, index);
-
-                if (entityId == null) {
-                    onFinish(FinishReason.NO_MORE_ENTITIES);
-                    return;
-                }
-
-                List<Date> reportDates = baseEntityProcessorDao.getEntityReportDates(entityId);
-
-                for (Date reportDate : reportDates) {
-                    QueueEntry entry = new QueueEntry()
-                            .setBaseEntityApplied(baseEntityProcessorDao.loadByReportDate(entityId, reportDate));
-
-                    try {
-                        producer.produce(entry);
-                    } catch (Exception e) {
-                        onFinish(FinishReason.EXCEPTION);
-                        // SC_BAD_ID
-                        throw new RuntimeException(e);
-                    }
-                }
-
-                idSupplier.done(entityId);
-
-                System.out.printf("SENT TO ACTIVEMQ (entityId = %s, threadIndex = %s)\n", entityId, index);
-
-                if (Thread.interrupted()) {
-                    System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-                    onFinish(FinishReason.INTERRUPT);
-                    return;
-                }
-
                 try {
+                    Long entityId = idSupplier.supply();
+
+                    System.out.printf("LOADED (entityId = %s, threadIndex = %s)\n", entityId, index);
+
+                    if (entityId == null) {
+                        onFinish(FinishReason.NO_MORE_ENTITIES);
+                        return;
+                    }
+
+                    List<Date> reportDates = baseEntityProcessorDao.getEntityReportDates(entityId);
+
+                    for (Date reportDate : reportDates) {
+                        QueueEntry entry = new QueueEntry()
+                                .setBaseEntityApplied(baseEntityProcessorDao.loadByReportDate(entityId, reportDate));
+
+                            producer.produce(entry);
+                    }
+
+                    idSupplier.done(entityId);
+
+                    System.out.printf("SENT TO ACTIVEMQ (entityId = %s, threadIndex = %s)\n", entityId, index);
+
                     Thread.sleep(SLEEP_TIME_MILLIS);
-                } catch (InterruptedException e) {
+
+                } catch (Exception e) {
+                    if (e instanceof InterruptedException || Thread.interrupted()) {
+                        onFinish(FinishReason.INTERRUPT);
+                        return;
+                    }
                     e.printStackTrace();
                 }
             }
@@ -258,7 +251,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
 
         // must be called no matter how HistorySender finish
         public void onFinish(FinishReason finishReason) {
-            System.out.printf("FINISH LOADING ENTITIES HISTORY TO SHOWCASE (threadIndex = %s, reason = %s)\n", index, finishReason);
+            System.out.printf("FINISH REASON: %s, threadIndex = %s\n", finishReason, index);
 
             scHistoryThreads.remove(index);
 
@@ -271,7 +264,6 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     private enum FinishReason {
         NO_MORE_ENTITIES,
         INTERRUPT,
-        EXCEPTION
     }
 
     private class Sender implements Runnable {
