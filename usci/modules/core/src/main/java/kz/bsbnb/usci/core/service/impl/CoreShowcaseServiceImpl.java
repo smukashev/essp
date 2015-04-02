@@ -52,7 +52,6 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
             public void run() {
                 if (populate) {
                     if (creditorIdsQueue != null) {
-
                         while (!creditorIdsQueue.isEmpty()) {
                             baseEntityProcessorDao.populateSC(creditorIdsQueue.poll());
                             startHistoryThreads();
@@ -62,6 +61,8 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
                         baseEntityProcessorDao.populateSC();
                         startHistoryThreads();
                     }
+                } else {
+                    startHistoryThreads();
                 }
             }
         }).start();
@@ -157,8 +158,8 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     }
 
     private class IdSupplier {
-        private List<Long> idsToProcess;
-        private List<Long> processedIds;
+        private final List<Long> idsToProcess;
+        private final List<Long> processedIds;
         private Long maxIdToProcess;
 
         public IdSupplier() {
@@ -167,26 +168,29 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
             maxIdToProcess = -1L;
         }
 
-        public synchronized Long supply() {
-            if (idsToProcess.isEmpty()) {
-                List<Long> entityIds = baseEntityProcessorDao.getSCEntityIds(ENTITY_COUNT_PER_LOAD, maxIdToProcess);
-                idsToProcess.addAll(entityIds);
+        public Long supply() {
+            synchronized (idsToProcess) {
+                if (idsToProcess.isEmpty()) {
+                    List<Long> entityIds = baseEntityProcessorDao.getSCEntityIds(ENTITY_COUNT_PER_LOAD, maxIdToProcess);
+                    idsToProcess.addAll(entityIds);
 
-                if (!idsToProcess.isEmpty()) {
-                    // get last id
-                    maxIdToProcess = idsToProcess.get(idsToProcess.size() - 1);
+                    if (!idsToProcess.isEmpty()) {
+                        maxIdToProcess = idsToProcess.get(idsToProcess.size() - 1);
+                    }
                 }
-            }
 
-            return idsToProcess.isEmpty() ? null : idsToProcess.remove(0);
+                return idsToProcess.isEmpty() ? null : idsToProcess.remove(0);
+            }
         }
 
-        public synchronized void done(Long entityId) {
-            processedIds.add(entityId);
+        public void done(Long entityId) {
+            synchronized (processedIds) {
+                processedIds.add(entityId);
 
-            if (processedIds.size() == ENTITY_COUNT_PER_CLEAR) {
-                baseEntityProcessorDao.removeSCEntityIds(processedIds);
-                processedIds.clear();
+                if (processedIds.size() == ENTITY_COUNT_PER_CLEAR) {
+                    baseEntityProcessorDao.removeSCEntityIds(processedIds);
+                    processedIds.clear();
+                }
             }
         }
 
@@ -212,7 +216,6 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
             while (true) {
                 Long entityId = idSupplier.supply();
 
-                logger.info("LOADED (entityId = %s, threadIndex = %s)", entityId, index);
                 System.out.printf("LOADED (entityId = %s, threadIndex = %s)\n", entityId, index);
 
                 if (entityId == null) {
@@ -230,16 +233,17 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
                         producer.produce(entry);
                     } catch (Exception e) {
                         onFinish(FinishReason.EXCEPTION);
+                        // SC_BAD_ID
                         throw new RuntimeException(e);
                     }
                 }
 
                 idSupplier.done(entityId);
 
-                logger.info("SENT TO ACTIVEMQ (entityId = %s, threadIndex = %s)", entityId, index);
                 System.out.printf("SENT TO ACTIVEMQ (entityId = %s, threadIndex = %s)\n", entityId, index);
 
                 if (Thread.interrupted()) {
+                    System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
                     onFinish(FinishReason.INTERRUPT);
                     return;
                 }
@@ -253,8 +257,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
         }
 
         // must be called no matter how HistorySender finish
-        public synchronized void onFinish(FinishReason finishReason) {
-            logger.info("FINISHED LOADING ENTITIES HISTORY TO SHOWCASE (threadIndex = %s, reason = %s)", index, finishReason);
+        public void onFinish(FinishReason finishReason) {
             System.out.printf("FINISH LOADING ENTITIES HISTORY TO SHOWCASE (threadIndex = %s, reason = %s)\n", index, finishReason);
 
             scHistoryThreads.remove(index);

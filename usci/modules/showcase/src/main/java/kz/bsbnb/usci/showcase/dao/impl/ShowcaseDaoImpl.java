@@ -40,6 +40,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
+import static kz.bsbnb.usci.showcase.generated.Tables.EAV_SC_BAD_ENTITIES;
 import static kz.bsbnb.usci.showcase.generated.Tables.EAV_SC_SHOWCASES;
 import static kz.bsbnb.usci.showcase.generated.Tables.EAV_SC_SHOWCASE_FIELDS;
 
@@ -931,6 +932,22 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplateSC.update(new GenericInsertPreparedStatementCreator(query, values), keyHolder);
         return keyHolder.getKey().longValue();
+    }
+
+    @Override
+    public Long insertBadEntity(long entityId, long scId, Date report_date, String stackTrace, String message) {
+        Insert insert = context
+                .insertInto(EAV_SC_BAD_ENTITIES)
+                .set(EAV_SC_BAD_ENTITIES.ENTITY_ID, entityId)
+                .set(EAV_SC_BAD_ENTITIES.SC_ID, scId)
+                .set(EAV_SC_BAD_ENTITIES.REPORT_DATE, DataUtils.convert(report_date))
+                .set(EAV_SC_BAD_ENTITIES.STACK_TRACE, stackTrace)
+                .set(EAV_SC_BAD_ENTITIES.MESSAGE, message);
+
+        if(logger.isDebugEnabled())
+            logger.debug(insert.toString());
+
+        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
     public enum HistoryState {

@@ -29,4 +29,13 @@
       <reference local="showcase_id" foreign="id"/>
     </foreign-key>-->
   </table>
+
+  <table name="eav_sc_bad_entities">
+    <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+    <column name="entity_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+    <column name="sc_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+    <column name="report_date" primaryKey="false" required="true" type="DATE" size="128" autoIncrement="false"/>
+    <column name="stack_trace" primaryKey="false" required="false" type="VARCHAR" size="2048" autoIncrement="false"/>
+    <column name="message" primaryKey="false" required="true" type="VARCHAR" size="2048" autoIncrement="false"/>
+  </table>
 </database>

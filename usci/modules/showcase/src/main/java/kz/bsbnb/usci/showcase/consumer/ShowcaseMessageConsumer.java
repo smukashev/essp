@@ -34,14 +34,22 @@ public class ShowcaseMessageConsumer implements MessageListener {
     private ExecutorService exec = Executors.newCachedThreadPool();
 
     @Override
-    public void onMessage(Message message) {
-        try {
-            if (message instanceof ObjectMessage) {
-                long t3 = System.currentTimeMillis();
+    public void onMessage(Message message) {if (message instanceof ObjectMessage) {
+            long t3 = System.currentTimeMillis();
 
-                ObjectMessage om = (ObjectMessage) message;
-                QueueEntry queueEntry = (QueueEntry) om.getObject();
-                Long scId = queueEntry.getScId();
+            ObjectMessage om = (ObjectMessage) message;
+            QueueEntry queueEntry = null;
+
+            try {
+                queueEntry = (QueueEntry) om.getObject();
+            } catch(JMSException jms) {
+                jms.printStackTrace();
+                return;
+            }
+
+            Long scId = queueEntry.getScId();
+
+            try {
                 ArrayList<Future> futures = new ArrayList<Future>();
                 List<ShowcaseHolder> holders = showcaseDao.getHolders();
 
@@ -60,7 +68,6 @@ public class ShowcaseMessageConsumer implements MessageListener {
                                 .equals(queueEntry.getBaseEntityApplied().getMeta().getClassName()))
                             continue;
 
-                        // TODO check transactionality, probably need to be run in single thread
                         if (scId == null || scId == holder.getShowCaseMeta().getId()) {
                             Future future = exec.submit(new CarteageGenerator(queueEntry.getBaseEntityApplied(),
                                     holder));
@@ -72,25 +79,28 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     }
 
                     if(!found)
-                        logger.warn("MetaClass " + queueEntry.getBaseEntityApplied().getMeta().getClassName() +
-                            " couldn't find matching ShowCase");
+                        System.err.println("MetaClass " + queueEntry.getBaseEntityApplied().getMeta().getClassName() +
+                                " couldn't find matching ShowCase");
 
-                    for (Future f : futures) {
+                    for (Future f : futures)
                         f.get();
-                    }
 
                     futures.removeAll(futures);
 
                     long t4 = System.currentTimeMillis() - t3;
                     stats.put("message", t4);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+
+                StringBuilder sb = new StringBuilder();
+
+                for(StackTraceElement s : e.getStackTrace())
+                    sb.append(s.toString());
+
+                showcaseDao.insertBadEntity(queueEntry.getBaseEntityApplied().getId(), scId,
+                        queueEntry.getBaseEntityApplied().getReportDate(), sb.toString(), e.getMessage());
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            }
-            throw new RuntimeException(e);
         }
     }
 
@@ -106,14 +116,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
         @Override
         public void run() {
             long t1 = System.currentTimeMillis();
-
-            try {
-                showcaseDao.generate(entity, holder);
-            } catch(Exception e) {
-                // TODO: SC_LOGS
-                //
-            }
-
+            showcaseDao.generate(entity, holder);
             long t2 = System.currentTimeMillis() - t1;
             stats.put("showcase", t2);
         }
