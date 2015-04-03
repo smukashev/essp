@@ -955,6 +955,7 @@
 
 	<!-- Table for showcase entity revisions -->
 	<table name="sc_entities">
+			<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 			<column name="entity_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 			<index name="eav_ind_023_01">
 							<index-column name="entity_id"/>

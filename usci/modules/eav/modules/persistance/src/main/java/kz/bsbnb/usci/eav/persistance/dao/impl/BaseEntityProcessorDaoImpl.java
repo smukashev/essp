@@ -31,10 +31,13 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
@@ -3885,7 +3888,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         MetaClass metaClass = metaClassRepository.getMetaClass("credit");
         IMetaAttribute metaAttribute = metaClass.getMetaAttribute("creditor");
 
-        Insert insert = context.insertInto(SC_ENTITIES).select(
+        Insert insert = context.insertInto(SC_ENTITIES, SC_ENTITIES.ENTITY_ID).select(
                 context.selectDistinct(EAV_BE_COMPLEX_VALUES.ENTITY_ID)
                         .from(EAV_BE_COMPLEX_VALUES)
                         .where(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID.eq(metaAttribute.getId()))
@@ -3921,13 +3924,21 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public List<Long> getSCEntityIds(int limit, Long prevMaxId) {
-        Select select = context.select(SC_ENTITIES.ENTITY_ID).from(SC_ENTITIES)
-                .where(SC_ENTITIES.ENTITY_ID.gt(prevMaxId))
-                .orderBy(SC_ENTITIES.ENTITY_ID).limit(limit);
-        Select select2 = context.select(select.field(0)).from(select);
-        List<Long> list = jdbcTemplate.queryForList(select2.getSQL(), Long.class, select2.getBindValues().toArray());
-        return list;
+    public List<Long[]> getSCEntityIds(int limit, Long prevMaxId) {
+        Select select = context.select(SC_ENTITIES.ID, SC_ENTITIES.ENTITY_ID).from(SC_ENTITIES)
+                .where(SC_ENTITIES.ID.gt(prevMaxId))
+                .orderBy(SC_ENTITIES.ID).limit(limit);
+        Select select2 = context.select(select.field(0), select.field(1)).from(select);
+        List<Long[]> result = jdbcTemplate.query(select2.getSQL(), select2.getBindValues().toArray(), new RowMapper<Long[]>() {
+            @Override
+            public Long[] mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Long[] row = new Long[2];
+                row[0] = rs.getLong(SC_ENTITIES.ID.getName());
+                row[1] = rs.getLong(SC_ENTITIES.ENTITY_ID.getName());
+                return row;
+            }
+        });
+        return result;
     }
 
     @Override

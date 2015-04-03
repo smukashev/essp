@@ -36,6 +36,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     private static final int SLEEP_TIME_MILLIS = 1000;
 
     private Map<Integer, Thread> scHistoryThreads = new HashMap<Integer, Thread>();
+    private Thread historyParentThread;
 
     @Override
     public void start(String metaName, Long id, Date reportDate) {
@@ -47,35 +48,22 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
 
     @Override
     public void startLoadHistory(final boolean populate, final Queue<Long> creditorIdsQueue) {
-        new Thread(new Runnable() {
+        historyParentThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 if (populate) {
                     if (creditorIdsQueue != null) {
                         while (!creditorIdsQueue.isEmpty()) {
                             baseEntityProcessorDao.populateSC(creditorIdsQueue.poll());
-                            startHistoryThreads();
-                            waitHistoryThreads();
                         }
                     } else {
                         baseEntityProcessorDao.populateSC();
-                        startHistoryThreads();
                     }
-                } else {
-                    startHistoryThreads();
                 }
+                startHistoryThreads();
             }
-        }).start();
-    }
-
-    private void waitHistoryThreads() {
-        while (!scHistoryThreads.isEmpty()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        });
+        historyParentThread.start();
     }
 
     private void startHistoryThreads() {
@@ -158,12 +146,12 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     }
 
     private class IdSupplier {
-        private final List<Long> idsToProcess;
+        private final List<Long[]> idsToProcess;
         private final List<Long> processedIds;
         private Long maxIdToProcess;
 
         public IdSupplier() {
-            idsToProcess = new ArrayList<Long>();
+            idsToProcess = new ArrayList<Long[]>();
             processedIds = new ArrayList<Long>();
             maxIdToProcess = -1L;
         }
@@ -171,15 +159,15 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
         public Long supply() {
             synchronized (idsToProcess) {
                 if (idsToProcess.isEmpty()) {
-                    List<Long> entityIds = baseEntityProcessorDao.getSCEntityIds(ENTITY_COUNT_PER_LOAD, maxIdToProcess);
+                    List<Long[]> entityIds = baseEntityProcessorDao.getSCEntityIds(ENTITY_COUNT_PER_LOAD, maxIdToProcess);
                     idsToProcess.addAll(entityIds);
 
                     if (!idsToProcess.isEmpty()) {
-                        maxIdToProcess = idsToProcess.get(idsToProcess.size() - 1);
+                        maxIdToProcess = idsToProcess.get(idsToProcess.size() - 1)[0];
                     }
                 }
 
-                return idsToProcess.isEmpty() ? null : idsToProcess.remove(0);
+                return idsToProcess.isEmpty() ? null : idsToProcess.remove(0)[1];
             }
         }
 
