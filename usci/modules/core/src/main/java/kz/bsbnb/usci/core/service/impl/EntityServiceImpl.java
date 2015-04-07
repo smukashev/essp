@@ -68,7 +68,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             entityStatus.addProperty(StatusProperties.CONTRACT_NO, contractNo);
             entityStatus.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
 
-            statusSingleton.addContractStatus(entity.getBatchId(), entityStatus);
+            statusSingleton.addContractStatus(baseEntity.getBatchId(), entityStatus);
         } catch (Exception e) {
             //TODO: Remove hardcode (credit specific attributes)
             Date contractDate = null;
