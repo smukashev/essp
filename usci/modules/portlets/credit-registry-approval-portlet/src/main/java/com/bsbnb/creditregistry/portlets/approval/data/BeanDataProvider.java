@@ -28,14 +28,14 @@ public class BeanDataProvider implements DataProvider {
     public BeanDataProvider() {
         // portalUserBeanRemoteBusiness
         portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
+        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://172.17.110.165:1099/portalUserBeanRemoteBusiness");
         portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
         portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
         // reportBeanRemoteBusiness
         reportBusinessFactoryBean = new RmiProxyFactoryBean();
-        reportBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/reportBeanRemoteBusiness");
+        reportBusinessFactoryBean.setServiceUrl("rmi://172.17.110.165:1099/reportBeanRemoteBusiness");
         reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
         reportBusinessFactoryBean.afterPropertiesSet();
         reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
@@ -49,7 +49,7 @@ public class BeanDataProvider implements DataProvider {
     @Override
     public List<ReportDisplayBean> getReportsForDate(List<Creditor> accessibleCreditors, Date reportDate) {
         List<Report> reports = reportBusiness.getReportsByReportDateAndCreditors(reportDate, accessibleCreditors);
-        List<ReportDisplayBean> displayBeans = new ArrayList<>(reports.size());
+        List<ReportDisplayBean> displayBeans = new ArrayList<ReportDisplayBean>(reports.size());
         int rownum = 1;
         for (Report report : reports) {
             ReportDisplayBean displayBean = new ReportDisplayBean(report);
@@ -87,7 +87,7 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public Report getReport(Creditor creditor, Date reportDate) {
-        List<Creditor> creditors = new ArrayList<>();
+        List<Creditor> creditors = new ArrayList<Creditor>();
         creditors.add(creditor);
         List<Report> reports = reportBusiness.getReportsByReportDateAndCreditors(reportDate, creditors);
         if (reports.size() > 1) {

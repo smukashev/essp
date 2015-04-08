@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.bsbnb</groupId>
-    <artifactId>credit-registry-approval-portlet</artifactId>
+    <groupId>kz.bsbnb</groupId>
+    <artifactId>approval-portlet</artifactId>
     <packaging>war</packaging>
-    <name>credit-registry-approval-portlet</name>
+    <name>approval-portlet</name>
     <version>0.1</version>
 
     <properties>
@@ -34,8 +34,8 @@
                 <version>2.5</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -46,7 +46,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>credit-registry-approval-portlet</finalName>
+        <finalName>approval-portlet</finalName>
     </build>
 
     <dependencies>
@@ -281,7 +281,7 @@
             </exclusions>
         </dependency>-->
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>com.bsbnb</groupId>
             <artifactId>vaadin-messagebox</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -315,12 +315,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>com.bsbnb</groupId>
             <artifactId>translit-util</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>com.bsbnb</groupId>
             <artifactId>vaadin-filterable-selector</artifactId>
             <version>${project.version}</version>
         </dependency>

@@ -56,7 +56,7 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
 
     @Override
     public ArrayList<Long> findAll(BaseEntity entity) {
-        ArrayList<Long> res = new ArrayList<>();
+        ArrayList<Long> res = new ArrayList<Long>();
 
         BaseEntity primaryContract = (BaseEntity) entity.getEl("primary_contract");
         BaseEntity creditor = (BaseEntity) entity.getEl("creditor");

@@ -176,7 +176,7 @@ public class ReportDateLayout extends VerticalLayout {
                 approveReportButton = new Button(approveReportButtonCaption, new Button.ClickListener() {
                     public void buttonClick(Button.ClickEvent event) {
                         ApprovalBusiness approvalBusiness = new ApprovalBusiness();
-                        HashMap<String, String> data = new HashMap<>();
+                        HashMap<String, String> data = new HashMap<String, String>();
                         data.put("reportId", report.getId().toString());
                         data.put("actualCount", report.getActualCount().toString());
                         data.put("creditorName",creditor.getName().replace("\"", "\\\""));
@@ -203,11 +203,11 @@ public class ReportDateLayout extends VerticalLayout {
 
         List<ReportMessage> messages = provider.getReportMessages(report);
         List<ReportMessageAttachment> attachments = provider.getReportAttachments(report);
-        HashMap<Long, List<ReportMessageAttachment>> attachmentsByMessages = new HashMap<>(attachments.size());
+        HashMap<Long, List<ReportMessageAttachment>> attachmentsByMessages = new HashMap<Long, List<ReportMessageAttachment>>(attachments.size());
         for (ReportMessageAttachment attachment : attachments) {
             List<ReportMessageAttachment> messageAttachments;
             if (!attachmentsByMessages.containsKey(attachment.getReportMessage().getId())) {
-                messageAttachments = new ArrayList<>();
+                messageAttachments = new ArrayList<ReportMessageAttachment>();
             } else {
                 messageAttachments = attachmentsByMessages.get(attachment.getReportMessage().getId());
             }

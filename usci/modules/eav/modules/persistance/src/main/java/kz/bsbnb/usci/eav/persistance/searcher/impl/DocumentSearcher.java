@@ -54,7 +54,7 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
 
     @Override
     public ArrayList<Long> findAll(BaseEntity entity) {
-        ArrayList<Long> res = new ArrayList<>();
+        ArrayList<Long> res = new ArrayList<Long>();
 
         BaseEntity docType = (BaseEntity) entity.getEl("doc_type");
 

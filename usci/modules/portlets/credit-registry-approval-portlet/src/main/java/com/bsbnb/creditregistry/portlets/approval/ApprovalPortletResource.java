@@ -8,7 +8,7 @@ import com.vaadin.terminal.ExternalResource;
  */
 public class ApprovalPortletResource extends ExternalResource {
     
-    private static final String CONTEXT_NAME = "credit-registry-approval-portlet";
+    private static final String CONTEXT_NAME = "approval-portlet";
     
     public static final ApprovalPortletResource EXCEL_ICON = new ApprovalPortletResource("excel.png");
     public static final ApprovalPortletResource ARROW_LEFT_ICON = new ApprovalPortletResource("arrow_left.png");

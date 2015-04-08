@@ -36,8 +36,8 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
     IBaseEntityProcessorDao baseEntityProcessorDao;
 
     public List<Report> getReportsByReportDateAndCreditors(Date reportDate, List<Creditor> creditors) {
-        ArrayList<Report> reports = new ArrayList<>();
-        HashMap<Long, Creditor> creditorMap = new HashMap<>();
+        ArrayList<Report> reports = new ArrayList<Report>();
+        HashMap<Long, Creditor> creditorMap = new HashMap<Long, Creditor>();
         for (Creditor creditor : creditors) {
             creditorMap.put(creditor.getId(), creditor);
         }
@@ -106,7 +106,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
 
     @Override
     public List<ReportMessage> getMessagesByReport(Report report) {
-        ArrayList<ReportMessage> reportMessages = new ArrayList<>();
+        ArrayList<ReportMessage> reportMessages = new ArrayList<ReportMessage>();
 
         SelectForUpdateStep select = context
                 .select()
@@ -131,7 +131,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
 
     @Override
     public List<ReportMessageAttachment> getAttachmentsByReport(Report report) {
-        ArrayList<ReportMessageAttachment> attachments = new ArrayList<>();
+        ArrayList<ReportMessageAttachment> attachments = new ArrayList<ReportMessageAttachment>();
 
         SelectForUpdateStep select = context
                 .select()

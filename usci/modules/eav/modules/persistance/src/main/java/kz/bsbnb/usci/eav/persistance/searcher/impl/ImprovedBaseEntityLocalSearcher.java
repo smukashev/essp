@@ -254,7 +254,7 @@ public class ImprovedBaseEntityLocalSearcher extends JDBCSupport {
                         } else {
 
                             MetaClass childMetaClass = (MetaClass) metaSet.getMemberType();
-                            List<Long> childBaseEntityIds = new ArrayList<>();
+                            List<Long> childBaseEntityIds = new ArrayList<Long>();
                             for (IBaseValue childBaseValue : baseSet.get()) {
                                 BaseEntity childBaseEntity = (BaseEntity) childBaseValue.getValue();
 
