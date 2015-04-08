@@ -24,6 +24,7 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -45,7 +46,7 @@ import static kz.bsbnb.usci.showcase.generated.Tables.EAV_SC_SHOWCASES;
 import static kz.bsbnb.usci.showcase.generated.Tables.EAV_SC_SHOWCASE_FIELDS;
 
 @Component
-public class ShowcaseDaoImpl implements ShowcaseDao {
+public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     private final static String TABLES_PREFIX = "R_";
     private final static String COLUMN_PREFIX = "";
     private final static String HISTORY_POSTFIX = "_HIS";
@@ -68,14 +69,18 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
         this.jdbcTemplateSC = new JdbcTemplate(dataSourceSC);
     }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        holders = populateHolders();
+    }
+
     public ArrayList<ShowcaseHolder> getHolders() {
-        if (holders == null) holders = populateHolders();
+        // if (holders == null) holders = populateHolders();
         return holders;
     }
 
     public ShowcaseHolder getHolderByClassName(String className) {
-        if (holders == null)
-            holders = populateHolders();
+        // if (holders == null) holders = populateHolders();
 
         for (ShowcaseHolder h : holders) {
             if (h.getShowCaseMeta().getMeta().getClassName().equals(className))
@@ -565,8 +570,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
             stats.put("showcase: updateLeftRange", t2);
         }
 
-        int n = showcaseHolder.getShowCaseMeta().getFieldsList().size() /*+
-                showcaseHolder.getShowCaseMeta().getCustomFieldsList().size()*/;
+        int n = showcaseHolder.getShowCaseMeta().getFieldsList().size();
 
         ShowCaseEntries[] showCases = new ShowCaseEntries[n];
         int i = 0;
@@ -577,13 +581,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao {
                     field.getColumnName(), showcaseHolder.generatePaths());
             i++;
         }
-
-        /*for (ShowCaseField field : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
-            showCases[i] = new ShowCaseEntries(entity, field.getAttributeName().equals("") ?
-                    field.getAttributePath() : field.getAttributePath() + "." + field.getAttributeName(),
-                    field.getColumnName(), null, field);
-            i++;
-        }*/
 
         int allRecordsSize = 0;
         for (i = 0; i < n; i++)
