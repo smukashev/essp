@@ -1,11 +1,9 @@
 package kz.bsbnb.usci.cli.app.ref;
 
-import kz.bsbnb.usci.cli.app.ref.refs.Creditor;
-import kz.bsbnb.usci.cli.app.ref.reps.CreditorRepository;
+import org.apache.commons.lang.NotImplementedException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -113,7 +111,6 @@ public class BaseCrawler {
 
     }
 
-
     /**
      * Simply adds new tag to ther parent tag
      *
@@ -127,13 +124,12 @@ public class BaseCrawler {
         element.appendChild(newElement);
     }
 
-
     public String getClassName(){
         throw new NotImplementedException();
     }
 
     public HashMap getRepository(){
-        throw new  NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public Class  getRef(){

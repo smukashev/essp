@@ -1,9 +1,8 @@
 package kz.bsbnb.usci.cli.app.ref;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 
 /**
  * Created with IntelliJ IDEA.
