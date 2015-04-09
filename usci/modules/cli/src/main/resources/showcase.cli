@@ -241,6 +241,7 @@ showcase save
 showcase set name CORE_TURNOVER
 showcase set tableName CORE_TURNOVER
 showcase set downPath change
+showcase set final
 
 showcase list add turnover.issue.debt.amount debt_amount
 showcase list add turnover.issue.debt.amount_currency debt_amount_currency
@@ -264,6 +265,7 @@ showcase save
 showcase set name CORE_CREDIT_FLOW
 showcase set tableName CORE_CREDIT_FLOW
 showcase set downPath change
+showcase set final
 
 showcase list add credit_flow.classification
 showcase list add credit_flow.provision.provision_kfn.balance_account ba1
@@ -323,6 +325,7 @@ showcase save
 showcase set name CORE_REMAINS
 showcase set tableName CORE_REMAINS
 showcase set downPath change
+showcase set final
 
 showcase list add remains.limit.value limit_value
 showcase list add remains.limit.value_currency limit_cvalue
