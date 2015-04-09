@@ -2540,7 +2540,7 @@ public class CLI {
 
                 showCase.setDownPath(args.get(2));
             } else if(args.get(1).equals("final")) {
-                showCase.setFinal(true);
+                showCase.setFinal(Boolean.parseBoolean(args.get(2)));
             } else
                 throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
 
