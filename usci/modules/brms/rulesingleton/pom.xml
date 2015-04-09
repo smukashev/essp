@@ -10,6 +10,8 @@
 
     <properties>
         <drools.version>5.5.0.Final</drools.version>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
 
 	<build>
@@ -20,6 +22,15 @@
 			</resource>
 		</resources>
 		<plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
@@ -46,7 +57,6 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
 	</build>
 
