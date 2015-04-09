@@ -22,7 +22,7 @@
         <property name="password" value="${jdbcSC.password}"/>
         <property name="initialSize" value="${jdbcSC.initialSize}"/>
         <property name="maxActive" value="${jdbcSC.maxActive}"/>
-        <property name="validationQuery" value="${jdbcSC.validationQuery}"/>
+        <!--<property name="validationQuery" value="${jdbcSC.validationQuery}"/>-->
         <property name="testOnBorrow" value="${jdbcSC.testOnBorrow}"/>
         <property name="testOnReturn" value="${jdbcSC.testOnReturn}"/>
     </bean>
