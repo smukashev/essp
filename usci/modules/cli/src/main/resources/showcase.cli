@@ -389,6 +389,7 @@ showcase save
 showcase set meta portfolio_flow_kfn
 showcase set name CORE_PORTFOLIO_FLOW_KFN
 showcase set tableName CORE_PORTFOLIO_FLOW_KFN
+showcase set final true
 
 showcase list add details.balance_account
 showcase list add details.value
@@ -403,6 +404,7 @@ showcase save
 showcase set meta portfolio_flow_msfo
 showcase set name CORE_PORTFOLIO_FLOW_MSFO
 showcase set tableName CORE_PORTFOLIO_FLOW_MSFO
+showcase set final true
 
 showcase list add details.balance_account
 showcase list add details.value
