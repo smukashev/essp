@@ -2107,7 +2107,7 @@ public class CLI {
                     System.out.println("Example: rm 100 rmi://127.0.0.1:1099/batchEntryService");
                 }
             } else if (args.get(0).equals("rmall")) {
-                if (args.size() > 2) {
+                if (args.size() > 1) {
                     removeAllEntityByMetaId(Long.parseLong(args.get(1)));
                     System.out.println("All entities with CLASS_ID " + args.get(1) + " has been removed");
                 } else {
