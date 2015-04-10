@@ -7,22 +7,21 @@ import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import java.util.*;
 
 public interface ShowcaseService {
-    public long add(ShowCase showCase);
+    long add(ShowCase showCase);
 
-    public List<ShowcaseHolder> list();
+    List<ShowcaseHolder> list();
 
-    public ShowCase load(String name);
+    ShowCase load(String name);
 
-    public void startLoad(String name, Date reportDate);
+    void startLoad(String name, Date reportDate);
 
     void startLoadHistory(boolean populate, Queue<Long> creditorIds);
 
     void stopLoadHistory();
 
-    public HashMap<String, QueryEntry> getSQLStats();
+    HashMap<String, QueryEntry> getSQLStats();
 
-    public void reloadCash();
-
+    void reloadCash();
 
     void stopLoad(String name);
 
@@ -33,7 +32,4 @@ public interface ShowcaseService {
     List<String> listLoading();
 
     ShowCase load(Long id);
-
-    List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate);
-
 }

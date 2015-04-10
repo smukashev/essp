@@ -32,9 +32,6 @@ public interface ShowcaseDao {
 
     ShowcaseHolder getHolderByClassName(String className);
 
-    @Transactional
-    List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate);
-
-    Long insertBadEntity(long entityId, long scId, Date report_date, String strackTrace, String message);
+    Long insertBadEntity(Long entityId, Long scId, Date report_date, String strackTrace, String message);
 
 }

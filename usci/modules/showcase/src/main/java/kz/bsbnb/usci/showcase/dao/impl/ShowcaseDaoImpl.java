@@ -858,18 +858,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         throw new RuntimeException("Unimplemented");
     }
 
-    @Transactional
-    @Override
-    public List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate) {
-        ShowCase showcase = load(id);
-
-        Select select = context.selectFrom(DSL.tableByName(TABLES_PREFIX + showcase.getTableName())).
-                limit(limit).offset(offset);
-
-        return jdbcTemplateSC.queryForList(select.getSQL(),
-                select.getBindValues().toArray());
-    }
-
     private long insertField(ShowCaseField showCaseField, long showCaseId) {
         Insert insert = context
                 .insertInto(EAV_SC_SHOWCASE_FIELDS)
@@ -970,7 +958,10 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     @Override
-    public Long insertBadEntity(long entityId, long scId, Date report_date, String stackTrace, String message) {
+    public Long insertBadEntity(Long entityId, Long scId, Date report_date, String stackTrace, String message) {
+        if(scId == null)
+            scId = 0L;
+
         Insert insert = context
                 .insertInto(EAV_SC_BAD_ENTITIES)
                 .set(EAV_SC_BAD_ENTITIES.ENTITY_ID, entityId)
