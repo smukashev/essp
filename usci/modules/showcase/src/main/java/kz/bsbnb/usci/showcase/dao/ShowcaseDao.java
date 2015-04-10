@@ -12,29 +12,29 @@ import java.util.Map;
 
 public interface ShowcaseDao {
 
-    public void createTables(ShowcaseHolder showcaseHolder);
+    void createTables(ShowcaseHolder showcaseHolder);
 
-    public void generate(IBaseEntity entity, ShowcaseHolder showcaseHolder);
+    void generate(IBaseEntity entity, ShowcaseHolder showcaseHolder);
 
-    public ArrayList<ShowcaseHolder> getHolders();
+    ArrayList<ShowcaseHolder> getHolders();
 
-    public long save(ShowCase showCaseForSave);
+    long save(ShowCase showCaseForSave);
 
-    public void remove(ShowCase showCase);
+    void remove(ShowCase showCase);
 
-    public ShowCase load(String name);
+    ShowCase load(String name);
 
-    public ShowCase load(long id);
+    ShowCase load(long id);
 
-    public void reloadCache();
+    void reloadCache();
 
-    public int deleteById(ShowcaseHolder holder, IBaseEntity e);
+    int deleteById(ShowcaseHolder holder, IBaseEntity e);
 
-    public ShowcaseHolder getHolderByClassName(String className);
+    ShowcaseHolder getHolderByClassName(String className);
 
     @Transactional
     List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate);
 
-    public Long insertBadEntity(long entityId, long scId, Date report_date, String strackTrace, String message);
+    Long insertBadEntity(long entityId, long scId, Date report_date, String strackTrace, String message);
 
 }
