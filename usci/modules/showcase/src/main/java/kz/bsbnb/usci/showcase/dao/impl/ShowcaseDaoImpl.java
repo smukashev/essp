@@ -113,7 +113,10 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
     public void createTables(ShowcaseHolder showcaseHolder) {
         createTable(HistoryState.ACTUAL, showcaseHolder);
-        createTable(HistoryState.HISTORY, showcaseHolder);
+
+        if(!showcaseHolder.getShowCaseMeta().isFinal())
+            createTable(HistoryState.HISTORY, showcaseHolder);
+
         getHolders().add(showcaseHolder);
     }
 
@@ -135,7 +138,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         //table.setDescription();
 
         Column idColumn = new Column();
-
         idColumn.setName("ID");
         idColumn.setPrimaryKey(true);
         idColumn.setRequired(true);
@@ -218,7 +220,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         }
 
         Index indexR = new NonUniqueIndex();
-        indexR.setName("ind_" + tableName + "_01");
+        indexR.setName("ind_" + tableName + "_" + prefixToColumn.get("root") + "_id");
         indexR.addColumn(new IndexColumn(COLUMN_PREFIX + prefixToColumn.get("root") + "_id"));
         table.addIndex(indexR);
 
@@ -261,27 +263,40 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         table.addIndex(indexCDC);
         table.addColumn(column);
 
-        column = new Column();
-        column.setName("OPEN_DATE");
-        column.setPrimaryKey(false);
-        column.setRequired(false);
-        column.setType("DATE");
-        Index indexOD = new NonUniqueIndex();
-        indexOD.setName("ind_" + tableName + "_OPEN_DATE");
-        indexOD.addColumn(new IndexColumn("OPEN_DATE"));
-        table.addIndex(indexOD);
-        table.addColumn(column);
+        if(!showcaseHolder.getShowCaseMeta().isFinal()) {
+            column = new Column();
+            column.setName("OPEN_DATE");
+            column.setPrimaryKey(false);
+            column.setRequired(false);
+            column.setType("DATE");
+            Index indexOD = new NonUniqueIndex();
+            indexOD.setName("ind_" + tableName + "_OPEN_DATE");
+            indexOD.addColumn(new IndexColumn("OPEN_DATE"));
+            table.addIndex(indexOD);
+            table.addColumn(column);
 
-        column = new Column();
-        column.setName("CLOSE_DATE");
-        column.setPrimaryKey(false);
-        column.setRequired(false);
-        column.setType("DATE");
-        Index indexCD = new NonUniqueIndex();
-        indexCD.setName("ind_" + tableName + "_CLOSE_DATE");
-        indexCD.addColumn(new IndexColumn("CLOSE_DATE"));
-        table.addIndex(indexCD);
-        table.addColumn(column);
+            column = new Column();
+            column.setName("CLOSE_DATE");
+            column.setPrimaryKey(false);
+            column.setRequired(false);
+            column.setType("DATE");
+            Index indexCD = new NonUniqueIndex();
+            indexCD.setName("ind_" + tableName + "_CLOSE_DATE");
+            indexCD.addColumn(new IndexColumn("CLOSE_DATE"));
+            table.addIndex(indexCD);
+            table.addColumn(column);
+        } else {
+            column = new Column();
+            column.setName("REP_DATE");
+            column.setPrimaryKey(false);
+            column.setRequired(false);
+            column.setType("DATE");
+            Index indexRD = new NonUniqueIndex();
+            indexRD.setName("ind_" + tableName + "_REP_DATE");
+            indexRD.addColumn(new IndexColumn("REP_DATE"));
+            table.addIndex(indexRD);
+            table.addColumn(column);
+        }
 
         model.addTable(table);
 
@@ -302,7 +317,14 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         sql = new StringBuilder("insert into ").append(tableName).append("(");
 
-        Object[] vals = new Object[map.size() + 2 + showCaseHolder.getShowCaseMeta().getCustomFieldsList().size()];
+        Object[] vals;
+
+        if(!showCaseHolder.getShowCaseMeta().isFinal()) {
+            vals = new Object[map.size() + 2 + showCaseHolder.getShowCaseMeta().getCustomFieldsList().size()];
+        } else {
+            vals = new Object[map.size() + 1 + showCaseHolder.getShowCaseMeta().getCustomFieldsList().size()];
+        }
+
         int i = 0;
 
         for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -314,7 +336,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         for(ShowCaseField sf : showCaseHolder.getShowCaseMeta().getCustomFieldsList()) {
             sql.append(sf.getColumnName()).append(",");
             values.append("? ,");
-            Object o = null;
+            Object o;
 
             if(sf.getAttributePath().equals("")) {
                 o = entity.getEl(sf.getAttributeName());
@@ -335,10 +357,16 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             }
         }
 
-        sql.append("CDC, OPEN_DATE, CLOSE_DATE");
-        values.append("SYSDATE, ?, ? )");
-        vals[i++] = openDate;
-        vals[i] = closeDate;
+        if(!showCaseHolder.getShowCaseMeta().isFinal()) {
+            sql.append("CDC, OPEN_DATE, CLOSE_DATE");
+            values.append("SYSDATE, ?, ? )");
+            vals[i++] = openDate;
+            vals[i] = closeDate;
+        } else {
+            sql.append("CDC, REP_DATE");
+            values.append("SYSDATE, ?)");
+            vals[i] = openDate;
+        }
 
         sql.append(") values ").append(values);
 
@@ -421,8 +449,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     void moveActualToHistory(IBaseEntity entity, ShowcaseHolder showcaseHolder) {
         StringBuilder select = new StringBuilder();
         StringBuilder sql = new StringBuilder("insert into %s");
-
-        // TODO: Filter
 
         for (String s : showcaseHolder.generatePaths().values())
             select.append(COLUMN_PREFIX).append(s).append("_id").append(",");
@@ -522,52 +548,65 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
     @Transactional
     void dbCarteageGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
-        Date openDate;
+        Date openDate = null;
         Date closeDate = null;
         String sql;
 
-        // get open date of existing showcase
-        try {
-            sql = "SELECT OPEN_DATE FROM %s WHERE %s%s_ID = ? AND ROWNUM = 1";
+        if(!showcaseHolder.getShowCaseMeta().isFinal()) {
+            // get open date of existing showcase
+            try {
+                sql = "SELECT OPEN_DATE FROM %s WHERE %s%s_ID = ? AND ROWNUM = 1";
+                sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                        COLUMN_PREFIX, showcaseHolder.getRootClassName());
+
+                long t1 = System.currentTimeMillis();
+                openDate = (Date) jdbcTemplateSC.queryForMap(sql, entity.getId()).get("OPEN_DATE");
+                long t2 = System.currentTimeMillis() - t1;
+                stats.put("SELECT OPEN_DATE FROM %s WHERE %sROOT_ID = ?", t2);
+            } catch (EmptyResultDataAccessException e) {
+                openDate = null;
+            }
+
+            if (openDate == null || openDate.compareTo(entity.getReportDate()) <= 0) {
+                long t1 = System.currentTimeMillis();
+                updateLeftRange(HistoryState.ACTUAL, entity, showcaseHolder);
+                moveActualToHistory(entity, showcaseHolder);
+                long t2 = System.currentTimeMillis() - t1;
+
+                stats.put("moveToActual", t2);
+                openDate = entity.getReportDate();
+            } else {
+                sql = "SELECT MIN(OPEN_DATE) as OPEN_DATE FROM %s WHERE %s%s_ID = ? AND OPEN_DATE > ? ";
+                sql = String.format(sql, getHistoryTableName(showcaseHolder.getShowCaseMeta()),
+                        COLUMN_PREFIX, showcaseHolder.getRootClassName());
+
+                long t3 = System.currentTimeMillis();
+                closeDate = (Date) jdbcTemplateSC.queryForMap(sql, entity.getId(),
+                        entity.getReportDate()).get("OPEN_DATE");
+                long t4 = System.currentTimeMillis() - t3;
+                stats.put("SELECT MIN(OPEN_DATE) as OPEN_DATE FROM %s WHERE %sROOT_ID = ? AND OPEN_DATE > ? ", t4);
+
+                if (closeDate == null)
+                    closeDate = openDate;
+
+                openDate = entity.getReportDate();
+
+                long t1 = System.currentTimeMillis();
+                updateLeftRange(HistoryState.HISTORY, entity, showcaseHolder);
+                long t2 = System.currentTimeMillis() - t1;
+                stats.put("showcase: updateLeftRange", t2);
+            }
+        } else {
+            openDate = entity.getReportDate();
+
+            sql = "DELETE FROM %s WHERE %s%s_ID = ? and REP_DATE = ?";
             sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
                     COLUMN_PREFIX, showcaseHolder.getRootClassName());
 
-            long t1 = System.currentTimeMillis();
-            openDate = (Date) jdbcTemplateSC.queryForMap(sql, entity.getId()).get("OPEN_DATE");
-            long t2 = System.currentTimeMillis() - t1;
-            stats.put("SELECT OPEN_DATE FROM %s WHERE %sROOT_ID = ?", t2);
-        } catch (EmptyResultDataAccessException e) {
-            openDate = null;
-        }
+            int rows = jdbcTemplateSC.update(sql, entity.getId(), openDate);
 
-        if (openDate == null || openDate.compareTo(entity.getReportDate()) <= 0) {
-            long t1 = System.currentTimeMillis();
-            updateLeftRange(HistoryState.ACTUAL, entity, showcaseHolder);
-            moveActualToHistory(entity, showcaseHolder);
-            long t2 = System.currentTimeMillis() - t1;
-
-            stats.put("moveToActual", t2);
-            openDate = entity.getReportDate();
-        } else {
-            sql = "SELECT MIN(OPEN_DATE) as OPEN_DATE FROM %s WHERE %s%s_ID = ? AND OPEN_DATE > ? ";
-            sql = String.format(sql, getHistoryTableName(showcaseHolder.getShowCaseMeta()),
-                    COLUMN_PREFIX, showcaseHolder.getRootClassName());
-
-            long t3 = System.currentTimeMillis();
-            closeDate = (Date) jdbcTemplateSC.queryForMap(sql, entity.getId(),
-                    entity.getReportDate()).get("OPEN_DATE");
-            long t4 = System.currentTimeMillis() - t3;
-            stats.put("SELECT MIN(OPEN_DATE) as OPEN_DATE FROM %s WHERE %sROOT_ID = ? AND OPEN_DATE > ? ", t4);
-
-            if (closeDate == null)
-                closeDate = openDate;
-
-            openDate = entity.getReportDate();
-
-            long t1 = System.currentTimeMillis();
-            updateLeftRange(HistoryState.HISTORY, entity, showcaseHolder);
-            long t2 = System.currentTimeMillis() - t1;
-            stats.put("showcase: updateLeftRange", t2);
+            logger.debug(sql, entity.getId(), openDate);
+            logger.debug("Rows deleted from " + getActualTableName(showcaseHolder.getShowCaseMeta()) + ": " + rows);
         }
 
         int n = showcaseHolder.getShowCaseMeta().getFieldsList().size();
@@ -651,7 +690,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 return "NUMERIC";
             case DATE:
                 return "DATE";
-                // return "TIMESTAMP";
             case STRING:
                 return "VARCHAR";
             case BOOLEAN:
@@ -721,7 +759,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         showCase.setTitle((String) row.get(EAV_SC_SHOWCASES.TITLE.getName()));
         showCase.setTableName((String) row.get(EAV_SC_SHOWCASES.TABLE_NAME.getName()));
         showCase.setDownPath((String) row.get(EAV_SC_SHOWCASES.DOWN_PATH.getName()));
-        showCase.setFinal((row.get(EAV_SC_SHOWCASES.IS_FINAL.getName())).equals(0));
+        showCase.setFinal((row.get(EAV_SC_SHOWCASES.IS_FINAL.getName())).toString().equals("1"));
 
         String metaClassName = (String) row.get(EAV_SC_SHOWCASES.CLASS_NAME.getName());
         MetaClass metaClass = metaService.getMetaClass(metaClassName);
