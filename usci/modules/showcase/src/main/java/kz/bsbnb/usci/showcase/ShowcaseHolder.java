@@ -34,10 +34,10 @@ public class ShowcaseHolder implements Serializable {
     }
 
     public Map<String, String> generatePaths() {
-        Map<String, String> prefixToColumn = new HashMap<String, String>();
+        Map<String, String> prefixToColumn = new HashMap<>();
 
-        Map<String, Integer> nextNumber = new HashMap<String, Integer>();
-        Map<String, String> columnToPrefix = new HashMap<String, String>();
+        Map<String, Integer> nextNumber = new HashMap<>();
+        Map<String, String> columnToPrefix = new HashMap<>();
 
         MetaClass metaClass = showCaseMeta.getActualMeta();
 
@@ -70,7 +70,16 @@ public class ShowcaseHolder implements Serializable {
                     temp[i] = ((MetaClass) metaSet.getMemberType()).getClassName();
                 }
 
-                if (!prefixToColumn.containsKey(prefix)) {
+                // Filter prefixes
+                boolean hasFilter = false;
+                for(ShowCaseField sf : showCaseMeta.getFilterFieldsList()) {
+                    if(path.equals(sf.getAttributePath())) {
+                        hasFilter = true;
+                        break;
+                    }
+                }
+
+                if (!hasFilter && !prefixToColumn.containsKey(prefix)) {
                     if (!nextNumber.containsKey(temp[i]))
                         nextNumber.put(temp[i], 1);
 
@@ -96,7 +105,7 @@ public class ShowcaseHolder implements Serializable {
     @Override
     public String toString() {
         return "ShowcaseHolder{" +
-                "showCaseMeta=" + showCaseMeta.getTableName() +
+                "showCaseMeta=" + (showCaseMeta == null ? null : showCaseMeta.getTableName()) +
                 '}';
     }
 }

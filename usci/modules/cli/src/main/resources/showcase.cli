@@ -373,10 +373,13 @@ showcase set tableName CORE_DEBTOR_INFO
 showcase set downPath subjects
 
 showcase list add organization.bank_relations.bank_relation
-showcase list add person.bank_relations.bank_relation
+showcase list add organization.bank_relations.creditor
 
-# showcase --filter organization.bank_relations
-# showcase --filter person.bank_relations
+showcase list add person.bank_relations.bank_relation
+showcase list add person.bank_relations.creditor
+
+showcase list addFilter organization.bank_relations
+showcase list addFilter person.bank_relations
 
 showcase save
 

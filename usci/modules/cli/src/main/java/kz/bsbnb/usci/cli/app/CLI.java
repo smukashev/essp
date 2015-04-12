@@ -2579,24 +2579,19 @@ public class CLI {
 
                 showCase.addCustomField(path, name, args.get(4), customMeta);
             } else if (args.get(1).equals("addFilter")) {
-                MetaClass filterMeta = metaClassRepository.getMetaClass(args.get(2));
+                String path = null;
+                String name = null;
 
-                if(filterMeta == null)
-                    throw new UnsupportedOperationException("MetaClass can't be null");
-
-                String path = "";
-                String name = args.get(3);
-
-                if (args.get(3).lastIndexOf('.') != -1) {
-                    path = args.get(3).substring(0, args.get(3).lastIndexOf('.'));
-                    name = args.get(3).substring(args.get(3).lastIndexOf('.') + 1);
+                if (args.get(2).lastIndexOf('.') != -1) {
+                    path = args.get(2).substring(0, args.get(2).lastIndexOf('.'));
+                    name = args.get(2).substring(args.get(2).lastIndexOf('.') + 1);
                 }
 
-                showCase.addFilterField(path, name, args.get(4), filterMeta);
+                showCase.addFilterField(path, name);
             } else {
                 System.err.println("Example: showcase list add [path] [columnName] {columnAlias}");
                 System.err.println("Example: showcase list addCustom metaClass [path] [columnName] {columnAlias}");
-                System.err.println("Example: showcase list addFilter metaClass [path] [columnName]");
+                System.err.println("Example: showcase list addFilter [path]");
                 throw new IllegalArgumentException();
             }
         } else if (args.get(0).equals("save")) {

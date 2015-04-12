@@ -75,13 +75,10 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     public ArrayList<ShowcaseHolder> getHolders() {
-        // if (holders == null) holders = populateHolders();
         return holders;
     }
 
     public ShowcaseHolder getHolderByClassName(String className) {
-        // if (holders == null) holders = populateHolders();
-
         for (ShowcaseHolder h : holders) {
             if (h.getShowCaseMeta().getMeta().getClassName().equals(className))
                 return h;
@@ -95,7 +92,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     private ArrayList<ShowcaseHolder> populateHolders() {
-        ArrayList<ShowcaseHolder> holders = new ArrayList<ShowcaseHolder>();
+        ArrayList<ShowcaseHolder> holders = new ArrayList<>();
         List<Long> list;
 
         Select select = context.select(EAV_SC_SHOWCASES.ID).from(EAV_SC_SHOWCASES);
@@ -156,8 +153,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             // Filter check
             if(!showcaseHolder.getShowCaseMeta().getFilterFieldsList().isEmpty()) {
                 for(ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFilterFieldsList()) {
-                    if(sf.getAttributePath().equals(prefix) && sf.getColumnName().
-                            equalsIgnoreCase(prefixToColumn.get(prefix) + "_ID")) {
+                    if(sf.getAttributePath().equals(prefix) ||
+                            ("root." + sf.getAttributePath()).equals(prefix)) {
                         hasFilter = true;
                         break;
                     }
@@ -450,8 +447,19 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         StringBuilder select = new StringBuilder();
         StringBuilder sql = new StringBuilder("insert into %s");
 
-        for (String s : showcaseHolder.generatePaths().values())
-            select.append(COLUMN_PREFIX).append(s).append("_id").append(",");
+        for (String s : showcaseHolder.generatePaths().values()) {
+            boolean hasFilter = false;
+
+            for(ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFilterFieldsList()) {
+                if(s.equals(sf.getAttributePath()))  {
+                    hasFilter = true;
+                    break;
+                }
+            }
+
+            if(!hasFilter)
+                select.append(COLUMN_PREFIX).append(s).append("_id").append(",");
+        }
 
         // default fields
         for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFieldsList()) {
@@ -629,7 +637,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         boolean[] usedGroup = new boolean[n];
         int[] id = new int[allRecordsSize];
 
-        List<HashMap> entries = new ArrayList<HashMap>(allRecordsSize);
+        List<HashMap> entries = new ArrayList<>(allRecordsSize);
 
         int yk = 0;
         for (i = 0; i < n; i++)
@@ -1006,7 +1014,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
     class ShowCaseEntries {
         public final String columnName;
-        final List<HashMap> entries = new ArrayList<HashMap>();
+        final List<HashMap> entries = new ArrayList<>();
         final Map<String, String> prefixToColumn;
 
         ShowCaseEntries(IBaseEntity entity, String path, String columnName, Map<String, String> prefixToColumn) {
@@ -1037,7 +1045,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             String path = (curPath.indexOf('.') == -1) ? curPath : curPath.substring(0, curPath.indexOf('.'));
             String nextPath = curPath.indexOf('.') == -1 ? null : curPath.substring(curPath.indexOf('.') + 1);
             IMetaAttribute attribute = curMeta.getMetaAttribute(path);
-            map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
+
+            if(prefixToColumn.get(prefix) != null)
+                map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
 
             if (!attribute.getMetaType().isComplex()) {
                 map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
