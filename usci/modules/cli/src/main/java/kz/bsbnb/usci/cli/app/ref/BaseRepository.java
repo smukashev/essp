@@ -96,11 +96,7 @@ public class BaseRepository implements  Runnable
              */
 
 
-        //(new CreditorCrawler()).work();
-        //(new CreditorBranchCrawler()).work();
-        (new EconSectorCrawler()).work();
-
-        /*
+        (new CreditorCrawler()).work();
         (new SubjectTypeCrawler()).work();
         (new CreditorDocCrawler()).work();
         (new BalanceAccountCrawler()).work();
@@ -124,9 +120,7 @@ public class BaseRepository implements  Runnable
         //(new SharedCrawler()).work();
         (new CreditorBranchCrawler()).work();
         (new NokbdbCrawler()).work();
-        */
-
-
+        (new EconSectorCrawler()).work();
     }
 
     public static void main( String[] args )
