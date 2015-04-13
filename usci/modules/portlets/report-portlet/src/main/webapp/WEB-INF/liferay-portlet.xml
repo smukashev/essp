@@ -5,7 +5,7 @@
     <portlet>
         <portlet-name>report-portlet</portlet-name>
         <icon>/icon.png</icon>
-        <configuration-action-class>kz.bsbnb.creditregistry.portlets.report.ConfigurationActionImpl</configuration-action-class>
+        <configuration-action-class>kz.bsbnb.usci.portlet.report.ConfigurationActionImpl</configuration-action-class>
         <instanceable>true</instanceable>
         <ajaxable>false</ajaxable>
         <header-portlet-css>/VAADIN/themes/custom/styles.css</header-portlet-css>
