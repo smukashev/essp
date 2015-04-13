@@ -1,14 +1,8 @@
 package com.bsbnb.usci.portlets.protocol.data;
 
-//import com.bsbnb.creditregistry.ejb.ref.exception.ResultInconsistentException;
-//import com.bsbnb.creditregistry.ejb.ref.exception.ResultNotFoundException;
 import java.util.Date;
 import java.util.LinkedHashMap;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.InputFileBeanRemoteBusiness;
 import java.util.ArrayList;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.InputInfoBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.PortalUserBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.ProtocolBeanRemoteBusiness;
 import com.bsbnb.usci.portlets.protocol.PortletEnvironmentFacade;
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Link;
@@ -102,8 +96,8 @@ public class BeanDataProvider implements DataProvider {
     }
 
     public List<InputInfoDisplayBean> getInputInfosByCreditors(List<Creditor> creditors, Date reportDate) {
-        List<InputInfo> inputInfoList = inputInfoBusiness.getAllInputInfosBy_Creditors_By_RepDateSortedBy_Id_Desc(creditors,reportDate);
-        List<InputInfoDisplayBean> result = new ArrayList<InputInfoDisplayBean>(inputInfoList.size());
+        List<InputInfo> inputInfoList = inputInfoBusiness.getAllInputInfos(creditors,reportDate);
+        List<InputInfoDisplayBean> result = new ArrayList<>(inputInfoList.size());
         for (InputInfo inputInfo : inputInfoList) {
                 result.add(new InputInfoDisplayBean(inputInfo,this));
         }
@@ -114,19 +108,19 @@ public class BeanDataProvider implements DataProvider {
         List<ProtocolDisplayBean> list = getProtocolsByInputInfo(inputInfo);
         Map<SharedDisplayBean, Map<String, List<ProtocolDisplayBean>>> result = new LinkedHashMap<SharedDisplayBean, Map<String, List<ProtocolDisplayBean>>>(list.size());
         for (ProtocolDisplayBean protocol : list) {
-            Map<String, List<ProtocolDisplayBean>> innerMap = null;
+            Map<String, List<ProtocolDisplayBean>> innerMap;
             SharedDisplayBean shared = new SharedDisplayBean(protocol.getType());
             if (result.containsKey(shared)) {
                 innerMap = result.get(shared);
             } else {
-                innerMap = new LinkedHashMap<String, List<ProtocolDisplayBean>>();
+                innerMap = new LinkedHashMap<>();
                 result.put(shared, innerMap);
             }
-            List<ProtocolDisplayBean> innerList = null;
+            List<ProtocolDisplayBean> innerList;
             if (innerMap.containsKey(protocol.getDescription())) {
                 innerList = innerMap.get(protocol.getDescription());
             } else {
-                innerList = new ArrayList<ProtocolDisplayBean>();
+                innerList = new ArrayList<>();
                 innerMap.put(protocol.getDescription(), innerList);
             }
             innerList.add(protocol);
