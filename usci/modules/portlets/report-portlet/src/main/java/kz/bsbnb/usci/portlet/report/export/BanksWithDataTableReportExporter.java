@@ -24,8 +24,16 @@ public class BanksWithDataTableReportExporter extends TableReportExporter {
         table.setCellStyleGenerator(new Table.CellStyleGenerator() {
             public String getStyle(Object itemId, Object propertyId) {
                 Item item = table.getItem(itemId);
-                String statusIDString = item.getItemProperty("STATUS-ID").getValue().toString();
-                int statusID = (int) Double.parseDouble(statusIDString);
+                String statusIDString = null;
+
+                if(item.getItemProperty("STATUS-ID") != null &&
+                        item.getItemProperty("STATUS-ID").getValue() != null)
+                    statusIDString = item.getItemProperty("STATUS-ID").getValue().toString();
+
+                int statusID = 0;
+                if(statusIDString != null)
+                    statusID = (int) Double.parseDouble(statusIDString);
+
                 switch (statusID) {
                     case ConstantValues.REPORT_STATUS_OK:
                         return "lightblue";
@@ -36,6 +44,7 @@ public class BanksWithDataTableReportExporter extends TableReportExporter {
                     case ConstantValues.ORGANIZATION_APPROVED:
                         return "orange";
                 }
+
                 return "white";
             }
         });
