@@ -2,28 +2,48 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>kz.bsbnb</groupId>
-  <artifactId>usci</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>USCI</name>
-  <inceptionYear>2013</inceptionYear>
-  <packaging>pom</packaging>
-  <description>Uniform System of Collecting Indicators</description>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>kz.bsbnb</groupId>
+    <artifactId>usci</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>USCI</name>
+    <inceptionYear>2013</inceptionYear>
+    <packaging>pom</packaging>
+    <description>Uniform System of Collecting Indicators</description>
 
-  <modules>
-      <module>modules/eav</module>
-      <module>modules/core</module>
-      <module>modules/receiver</module>
-      <module>modules/sync</module>
-      <module>modules/brms</module>
-      <module>modules/portlets</module>
-      <module>modules/bconv</module>
-      <module>modules/cli</module>
-      <module>modules/cr</module>
-      <module>modules/parent</module>
-      <module>modules/showcase</module>
-  </modules>
+    <properties>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+    </properties>
+
+
+    <modules>
+        <module>modules/eav</module>
+        <module>modules/core</module>
+        <module>modules/receiver</module>
+        <module>modules/sync</module>
+        <module>modules/brms</module>
+        <module>modules/portlets</module>
+        <module>modules/bconv</module>
+        <module>modules/cli</module>
+        <module>modules/cr</module>
+        <module>modules/parent</module>
+        <module>modules/showcase</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <distributionManagement>
         <repository>
