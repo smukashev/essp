@@ -32,4 +32,6 @@ public interface ShowcaseService {
     List<String> listLoading();
 
     ShowCase load(Long id);
+
+    List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate);
 }

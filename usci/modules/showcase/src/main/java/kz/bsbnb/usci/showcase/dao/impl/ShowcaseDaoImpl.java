@@ -1080,4 +1080,16 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             }
         }
     }
+
+    @Transactional
+    @Override
+    public List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate) {
+        ShowCase showcase = load(id);
+
+        Select select = context.selectFrom(DSL.tableByName(TABLES_PREFIX + showcase.getTableName())).
+                limit(limit).offset(offset);
+
+        return jdbcTemplateSC.queryForList(select.getSQL(),
+                select.getBindValues().toArray());
+    }
 }

@@ -111,4 +111,9 @@ public class ShowcaseServiceImpl implements ShowcaseService {
     public ShowCase load(Long id) {
         return showcaseDao.load(id);
     }
+
+    @Override
+    public List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate) {
+        return showcaseDao.view(id, offset, limit, reportDate);
+    }
 }
