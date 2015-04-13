@@ -9,18 +9,8 @@ import java.util.HashMap;
 
 public class FinanceSource extends BaseRef {
 
-    private HashMap hm;
-
     public FinanceSource(HashMap hm){
-        this.hm = hm;
-    }
-
-    public String get(String s){
-        return (String) hm.get(s);
-    }
-
-    public String getKeyName(){
-        return "ID";
+        super(hm);
     }
 
     @Override

@@ -8,11 +8,8 @@ import java.util.HashMap;
 
 
 public class ContactType extends BaseRef {
-
-    private HashMap hm;
-
     public ContactType(HashMap hm){
-        this.hm = hm;
+        super(hm);
     }
 
     public String get(String s){

@@ -8,11 +8,8 @@ import java.util.HashMap;
 
 
 public class LegalForm extends BaseRef {
-
-    private HashMap hm;
-
     public LegalForm(HashMap hm){
-        this.hm = hm;
+        super(hm);
     }
 
     public String get(String s){

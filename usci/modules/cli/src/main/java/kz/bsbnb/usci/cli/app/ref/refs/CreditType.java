@@ -8,11 +8,8 @@ import java.util.HashMap;
 
 
 public class CreditType extends BaseRef {
-
-    private HashMap hm;
-
     public CreditType(HashMap hm){
-        this.hm = hm;
+        super(hm);
     }
 
     public String get(String s){

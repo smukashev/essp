@@ -9,18 +9,8 @@ import java.util.HashMap;
 
 public class Currency extends BaseRef {
 
-    private HashMap hm;
-
     public Currency(HashMap hm){
-        this.hm = hm;
-    }
-
-    public String get(String s){
-        return (String) hm.get(s);
-    }
-
-    public String getKeyName(){
-        return "ID";
+       super(hm);
     }
 
     @Override

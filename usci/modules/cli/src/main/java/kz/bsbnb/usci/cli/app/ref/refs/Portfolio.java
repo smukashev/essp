@@ -8,19 +8,8 @@ import java.util.HashMap;
 
 
 public class Portfolio extends BaseRef {
-
-    private HashMap hm;
-
     public Portfolio(HashMap hm){
-        this.hm = hm;
-    }
-
-    public String get(String s){
-        return (String) hm.get(s);
-    }
-
-    public String getKeyName(){
-        return "ID";
+        super(hm);
     }
 
     @Override

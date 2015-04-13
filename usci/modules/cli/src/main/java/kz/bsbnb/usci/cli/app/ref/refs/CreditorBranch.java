@@ -9,10 +9,8 @@ import java.util.HashMap;
 
 public class CreditorBranch extends BaseRef {
 
-    private HashMap hm;
-
     public CreditorBranch(HashMap hm){
-        this.hm = hm;
+        super(hm);
     }
 
     public String get(String s){

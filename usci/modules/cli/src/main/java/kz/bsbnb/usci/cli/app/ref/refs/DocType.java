@@ -16,10 +16,8 @@ import java.util.HashSet;
  */
 public class DocType extends BaseRef {
 
-    private HashMap hm;
-
     public DocType(HashMap hm){
-       this.hm = hm;
+       super(hm);
     }
 
     public String get(String s){

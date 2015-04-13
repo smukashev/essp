@@ -10,10 +10,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
@@ -52,6 +49,8 @@ public class BaseCrawler {
 
     public void work(){
 
+        fileName = "C:\\refs\\";
+
         try {
             rootElement = getDocument().createElement("batch");
             getDocument().appendChild(rootElement);
@@ -74,6 +73,8 @@ public class BaseCrawler {
             //Output to console for testing
             //StreamResult result = new StreamResult(System.out);
 
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
             transformer.transform(source, result);
 
             document = null;

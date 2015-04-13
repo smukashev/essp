@@ -566,6 +566,16 @@ meta add --name=ref_credit_type --attribute=name_kz --type=string
 meta add --name=ref_credit_type --attribute=name_ru --type=string
 
 #====================================
+#= REF_ECON_SECTOR
+#====================================
+
+meta create --name=ref_econ_sector --reference
+meta add --name=ref_econ_sector --attribute=code --type=string
+meta key --name=ref_econ_sector --attribute=code
+meta add --name=ref_econ_sector --attribute=name_kz --type=string
+meta add --name=ref_econ_sector --attribute=name_ru --type=string
+
+#====================================
 #= PLEDGE
 #====================================
 

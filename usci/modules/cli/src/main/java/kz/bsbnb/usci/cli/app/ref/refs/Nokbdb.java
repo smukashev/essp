@@ -13,11 +13,8 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class Nokbdb extends BaseRef {
-
-    private HashMap hm;
-
     public Nokbdb(HashMap hm) {
-        this.hm = hm;
+        super(hm);
     }
 
     public HashMap getHm() {

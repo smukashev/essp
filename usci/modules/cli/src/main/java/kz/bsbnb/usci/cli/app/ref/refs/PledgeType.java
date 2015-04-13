@@ -8,11 +8,8 @@ import java.util.HashMap;
 
 
 public class PledgeType extends BaseRef {
-
-    private HashMap hm;
-
     public PledgeType(HashMap hm){
-        this.hm = hm;
+        super(hm);
     }
 
     public String get(String s){

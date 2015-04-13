@@ -14,10 +14,8 @@ import java.util.HashMap;
  */
 public class Country extends BaseRef {
 
-    private HashMap hm;
-
     public Country(HashMap hm){
-        this.hm = hm;
+        super(hm);
     }
 
     public String get(String s){

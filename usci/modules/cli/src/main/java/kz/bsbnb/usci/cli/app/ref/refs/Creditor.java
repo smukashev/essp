@@ -17,11 +17,8 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class Creditor extends BaseRef {
-
-    private HashMap hm;
-
     public Creditor(HashMap hm){
-        this.hm = hm;
+        super(hm);
     }
 
     public String get(String s){
