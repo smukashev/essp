@@ -110,7 +110,7 @@ public class ShowCaseField extends Persistable {
 
     @Override
     public String toString() {
-        return columnName;
+        return attributePath + (attributeName != null && attributeName.length() > 0 ? "." + attributeName : "");
     }
 
     public final static class ShowCaseFieldTypes {

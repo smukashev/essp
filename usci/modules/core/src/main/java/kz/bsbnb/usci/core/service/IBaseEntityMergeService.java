@@ -7,6 +7,6 @@ package kz.bsbnb.usci.core.service;
  */
 public interface IBaseEntityMergeService {
 
-    public void mergeBaseEntities(long leftEntityId, long rightEntityId, String json);
+    void mergeBaseEntities(long leftEntityId, long rightEntityId, String json);
 
 }

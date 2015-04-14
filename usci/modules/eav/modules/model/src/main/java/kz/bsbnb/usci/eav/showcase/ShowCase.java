@@ -171,7 +171,7 @@ public class ShowCase extends Persistable {
         }
     }
 
-    public void addFilterField(String path, String name, String columnName, MetaClass meta) {
+    public void addFilterField(String path, String name) {
         if (meta == null)
             throw new IllegalArgumentException("meta not set for showcase");
 
@@ -184,10 +184,10 @@ public class ShowCase extends Persistable {
 
         ShowCaseField showCaseField = new ShowCaseField();
         showCaseField.setAttributeId(attr.getId());
-        showCaseField.setName(columnName);
+        showCaseField.setName(name);
         showCaseField.setAttributePath(path);
         showCaseField.setAttributeName(name);
-        showCaseField.setColumnName(columnName);
+        showCaseField.setColumnName(name);
         showCaseField.setTitle(attr.getTitle());
         showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.FILTER);
 
@@ -213,10 +213,13 @@ public class ShowCase extends Persistable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder().append("name='").append(name).append(", tableName='")
-                .append(tableName);
-        if(meta != null) sb.append(meta.getClassName());
-        sb.append(", downPath='").append(downPath);
-        return sb.toString();
+        return "ShowCase{" +
+                "name='" + name + '\'' +
+                ", tableName='" + tableName + '\'' +
+                ", title='" + title + '\'' +
+                ", downPath='" + downPath + '\'' +
+                ", isFinal=" + isFinal +
+                ", meta=" + (meta != null ? meta.getClassName() : null) +
+                '}';
     }
 }

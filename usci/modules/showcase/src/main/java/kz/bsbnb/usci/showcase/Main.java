@@ -5,9 +5,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.rmi.RMISecurityManager;
 
-/**
- * Created by almaz on 6/25/14.
- */
 public class Main {
     public static void main(String args[]) {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");

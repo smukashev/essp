@@ -12,7 +12,6 @@
     <properties>
         <releaseCandidate>1</releaseCandidate>
         <spring.version>3.2.0.RELEASE</spring.version>
-        <java.version>1.7</java.version>
         <jackson.mapper.version>1.5.6</jackson.mapper.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -21,6 +20,8 @@
         <log4j.version>1.2.16</log4j.version>
         <slf4jVersion>1.6.1</slf4jVersion>
         <jackson.mapper.version>1.5.6</jackson.mapper.version>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
 
     <parent>
@@ -38,6 +39,15 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
               <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -67,11 +77,6 @@
     </build>
 
     <dependencies>
-        <!--<dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>9.1-901.jdbc4</version>
-        </dependency>-->
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>

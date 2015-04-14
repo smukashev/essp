@@ -5,7 +5,6 @@ import kz.bsbnb.usci.cr.model.Protocol;
 
 import java.util.List;
 
-public interface ProtocolBeanRemoteBusiness
-{
-    public List<Protocol> getProtocolsBy_InputInfo(InputInfo inputInfoId);
+public interface ProtocolBeanRemoteBusiness {
+    List<Protocol> getProtocolsBy_InputInfo(InputInfo inputInfoId);
 }

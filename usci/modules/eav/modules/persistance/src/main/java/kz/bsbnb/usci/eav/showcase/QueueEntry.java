@@ -2,14 +2,8 @@ package kz.bsbnb.usci.eav.showcase;
 
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.OperationType;
-import kz.bsbnb.usci.eav.model.base.impl.OperationTypes;
-
 import java.io.Serializable;
 
-/**
- * Created by almaz on 6/18/14.
- */
 public class QueueEntry implements Serializable {
     private IBaseEntity baseEntitySaving;
     private IBaseEntity baseEntityLoaded;

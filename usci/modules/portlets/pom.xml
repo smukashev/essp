@@ -21,14 +21,15 @@
     <modules>
         <module>vaadin-messagebox</module>
         <module>vaadin-filterable-selector</module>
+        <module>static</module>
+        <module>translit-util</module>
         <module>administration-portlet</module>
         <module>protocol_portlet</module>
         <module>upload-portlet</module>
-        <module>credit-registry-report-portlet</module>
+        <module>report-portlet</module>
         <module>crosscheck-portlet</module>
         <module>audit_portlet</module>
         <module>signing-portlet</module>
-        <module>translit-util</module>
         <module>meta_editor</module>
         <module>entity_editor</module>
         <module>ref_editor</module>
@@ -36,7 +37,6 @@
         <module>rules_portlet</module>
         <module>batch_entry_list</module>
         <module>showcase-portlet</module>
-        <module>static</module>
     </modules>
 
     <distributionManagement>

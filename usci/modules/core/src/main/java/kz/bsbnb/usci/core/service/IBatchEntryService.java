@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface IBatchEntryService
 {
-    public long save(BatchEntry batchEntry);
-    public BatchEntry load(long batchEntryId);
-    public List<BatchEntry> getListByUser(long userId);
+    long save(BatchEntry batchEntry);
+    BatchEntry load(long batchEntryId);
+    List<BatchEntry> getListByUser(long userId);
 }

@@ -6,7 +6,6 @@ import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
-import kz.bsbnb.usci.showcase.generated.Showcase;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,9 +15,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -34,11 +31,12 @@ public class ShowcaseMessageConsumer implements MessageListener {
     private ExecutorService exec = Executors.newCachedThreadPool();
 
     @Override
-    public void onMessage(Message message) {if (message instanceof ObjectMessage) {
+    public void onMessage(Message message) {
+        if (message instanceof ObjectMessage) {
             long t3 = System.currentTimeMillis();
 
             ObjectMessage om = (ObjectMessage) message;
-            QueueEntry queueEntry = null;
+            QueueEntry queueEntry;
 
             try {
                 queueEntry = (QueueEntry) om.getObject();
@@ -50,7 +48,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
             Long scId = queueEntry.getScId();
 
             try {
-                ArrayList<Future> futures = new ArrayList<Future>();
+                ArrayList<Future> futures = new ArrayList<>();
                 List<ShowcaseHolder> holders = showcaseDao.getHolders();
 
                 if (queueEntry.getBaseEntityApplied().getOperation() == OperationType.DELETE) {

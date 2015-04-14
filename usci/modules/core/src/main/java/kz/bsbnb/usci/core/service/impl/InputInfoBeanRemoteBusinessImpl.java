@@ -92,7 +92,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     }
 
     @Override
-    public List<InputInfo> getAllInputInfosBy_Creditors_By_RepDateSortedBy_Id_Desc(List<Creditor> creditorsList, Date reportDate)
+    public List<InputInfo> getAllInputInfos(List<Creditor> creditorsList, Date reportDate)
     {
         ArrayList<InputInfo> list = new ArrayList<InputInfo>();
 

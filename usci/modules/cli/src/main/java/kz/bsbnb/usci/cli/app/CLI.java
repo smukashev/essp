@@ -2107,7 +2107,7 @@ public class CLI {
                     System.out.println("Example: rm 100 rmi://127.0.0.1:1099/batchEntryService");
                 }
             } else if (args.get(0).equals("rmall")) {
-                if (args.size() > 2) {
+                if (args.size() > 1) {
                     removeAllEntityByMetaId(Long.parseLong(args.get(1)));
                     System.out.println("All entities with CLASS_ID " + args.get(1) + " has been removed");
                 } else {
@@ -2540,7 +2540,7 @@ public class CLI {
 
                 showCase.setDownPath(args.get(2));
             } else if(args.get(1).equals("final")) {
-                showCase.setFinal(true);
+                showCase.setFinal(Boolean.parseBoolean(args.get(2)));
             } else
                 throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
 
@@ -2579,24 +2579,19 @@ public class CLI {
 
                 showCase.addCustomField(path, name, args.get(4), customMeta);
             } else if (args.get(1).equals("addFilter")) {
-                MetaClass filterMeta = metaClassRepository.getMetaClass(args.get(2));
+                String path = null;
+                String name = null;
 
-                if(filterMeta == null)
-                    throw new UnsupportedOperationException("MetaClass can't be null");
-
-                String path = "";
-                String name = args.get(3);
-
-                if (args.get(3).lastIndexOf('.') != -1) {
-                    path = args.get(3).substring(0, args.get(3).lastIndexOf('.'));
-                    name = args.get(3).substring(args.get(3).lastIndexOf('.') + 1);
+                if (args.get(2).lastIndexOf('.') != -1) {
+                    path = args.get(2).substring(0, args.get(2).lastIndexOf('.'));
+                    name = args.get(2).substring(args.get(2).lastIndexOf('.') + 1);
                 }
 
-                showCase.addFilterField(path, name, args.get(4), filterMeta);
+                showCase.addFilterField(path, name);
             } else {
                 System.err.println("Example: showcase list add [path] [columnName] {columnAlias}");
                 System.err.println("Example: showcase list addCustom metaClass [path] [columnName] {columnAlias}");
-                System.err.println("Example: showcase list addFilter metaClass [path] [columnName]");
+                System.err.println("Example: showcase list addFilter [path]");
                 throw new IllegalArgumentException();
             }
         } else if (args.get(0).equals("save")) {

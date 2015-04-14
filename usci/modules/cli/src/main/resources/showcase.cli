@@ -241,6 +241,7 @@ showcase save
 showcase set name CORE_TURNOVER
 showcase set tableName CORE_TURNOVER
 showcase set downPath change
+showcase set final true
 
 showcase list add turnover.issue.debt.amount debt_amount
 showcase list add turnover.issue.debt.amount_currency debt_amount_currency
@@ -264,6 +265,7 @@ showcase save
 showcase set name CORE_CREDIT_FLOW
 showcase set tableName CORE_CREDIT_FLOW
 showcase set downPath change
+showcase set final true
 
 showcase list add credit_flow.classification
 showcase list add credit_flow.provision.provision_kfn.balance_account ba1
@@ -323,6 +325,7 @@ showcase save
 showcase set name CORE_REMAINS
 showcase set tableName CORE_REMAINS
 showcase set downPath change
+showcase set final true
 
 showcase list add remains.limit.value limit_value
 showcase list add remains.limit.value_currency limit_cvalue
@@ -370,10 +373,13 @@ showcase set tableName CORE_DEBTOR_INFO
 showcase set downPath subjects
 
 showcase list add organization.bank_relations.bank_relation
-showcase list add person.bank_relations.bank_relation
+showcase list add organization.bank_relations.creditor
 
-# showcase --filter organization.bank_relations
-# showcase --filter person.bank_relations
+showcase list add person.bank_relations.bank_relation
+showcase list add person.bank_relations.creditor
+
+showcase list addFilter organization.bank_relations
+showcase list addFilter person.bank_relations
 
 showcase save
 
@@ -386,6 +392,7 @@ showcase save
 showcase set meta portfolio_flow_kfn
 showcase set name CORE_PORTFOLIO_FLOW_KFN
 showcase set tableName CORE_PORTFOLIO_FLOW_KFN
+showcase set final true
 
 showcase list add details.balance_account
 showcase list add details.value
@@ -400,6 +407,7 @@ showcase save
 showcase set meta portfolio_flow_msfo
 showcase set name CORE_PORTFOLIO_FLOW_MSFO
 showcase set tableName CORE_PORTFOLIO_FLOW_MSFO
+showcase set final true
 
 showcase list add details.balance_account
 showcase list add details.value
