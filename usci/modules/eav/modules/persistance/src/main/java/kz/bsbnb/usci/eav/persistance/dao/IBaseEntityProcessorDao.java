@@ -96,7 +96,7 @@ public interface IBaseEntityProcessorDao
     }
 
     public IBaseEntity merge(IBaseEntity baseEntityLeft, IBaseEntity baseEntityRight,
-                             IBaseEntityMergeManager mergeManager, MergeResultChoice choice);
+                             IBaseEntityMergeManager mergeManager, MergeResultChoice choice, boolean deleteUnused);
 
     public void populate(String metaName, Long id, Date reportDate);
 

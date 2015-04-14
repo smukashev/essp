@@ -131,6 +131,21 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         return rows.size() > 0;
     }
 
+    @Override
+    public void setDeleted(long id, boolean deleted) {
+        // TODO @maksat check
+        byte bDeleted = (byte) (deleted ? 1 : 0);
+        Update update = context.update(EAV_BE_ENTITIES).set(EAV_BE_ENTITIES.DELETED, bDeleted).where(EAV_BE_ENTITIES.ID.equal(id));
+
+        logger.debug(update.toString());
+
+        int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
+        if (count != 1)
+        {
+            throw new RuntimeException("UPDATE operation should update only one record.");
+        }
+    }
+
     public IBaseEntity load(long id)
     {
         MetaClass metaClass = (MetaClass)getMetaClass(id);

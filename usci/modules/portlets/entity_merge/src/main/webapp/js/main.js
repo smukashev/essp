@@ -484,13 +484,17 @@ Ext.onReady(function() {
         text: label_VIEW,
         handler : function (){
             leftEntityId = Ext.getCmp("leftEntityId");
+            leftReportDate = Ext.getCmp("leftReportDate");
             rightEntityId = Ext.getCmp("rightEntityId");
+            rightReportDate = Ext.getCmp("rightReportDate");
 
             entityStore.load({
                 params: {
                     op : 'LIST_ENTITY',
                     leftEntityId: leftEntityId.getValue(),
-                    rightEntityId: rightEntityId.getValue()
+                    leftReportDate: leftReportDate.getValue(),
+                    rightEntityId: rightEntityId.getValue(),
+                    rightReportDate : rightReportDate.getValue()
                 },
                 callback: function(records, operation, success) {
                     if (!success) {
@@ -509,8 +513,13 @@ Ext.onReady(function() {
             rootNode = tree.getRootNode();
 
             var JSONstr = createJSON(rootNode.childNodes[0], "", true)
-            leftEntityId = Ext.getCmp("leftEntityId");
-            rightEntityId = Ext.getCmp("rightEntityId");
+            var leftEntityId = Ext.getCmp("leftEntityId");
+            var rightEntityId = Ext.getCmp("rightEntityId");
+            var leftReportDate = Ext.getCmp("leftReportDate");
+            var rightReportDate = Ext.getCmp("rightReportDate");
+            var deleteUnusedChecked = document.getElementById('deleteUnused').checked;
+
+            console.log("asd");
 
             Ext.Ajax.request({
                 url: dataUrl,
@@ -519,7 +528,10 @@ Ext.onReady(function() {
                     op: 'SAVE_JSON',
                     json_data: JSONstr,
                     leftEntityId: leftEntityId.getValue(),
-                    rightEntityId: rightEntityId.getValue()
+                    rightEntityId: rightEntityId.getValue(),
+                    leftReportDate: leftReportDate.getValue(),
+                    rightReportDate : rightReportDate.getValue(),
+                    deleteUnused : deleteUnusedChecked
                 },
                 success: function() {
                     Ext.MessageBox.alert(label_DB_SUCCESS_TITLE, label_DB_SUCCESS);
@@ -682,20 +694,53 @@ Ext.onReady(function() {
             }],
         dockedItems: [
             {
-                fieldLabel: label_LEFT_ENTITY_ID,
-                id: 'leftEntityId',
-                name: 'leftEntityId',
-                xtype: 'textfield',
-                margin: '10 10 10 10',
-                value: (givenEntityId == "null" ? "" : givenEntityId)
+                xtype: 'panel',
+                layout: 'hbox',
+                items: [
+                    {
+                        fieldLabel: label_LEFT_ENTITY_ID,
+                        id: 'leftEntityId',
+                        name: 'leftEntityId',
+                        xtype: 'textfield',
+                        margin: '10 10 10 10',
+                        value: (givenEntityId == "null" ? "" : givenEntityId)
+                    },
+                    {
+                        fieldLabel: label_LEFT_REPORT_DATE,
+                        id: 'leftReportDate',
+                        name: 'leftReportDate',
+                        xtype: 'datefield',
+                        format: 'd/m/Y',
+                        margin: '10 10 10 10'
+                    },
+                    {
+                        fieldLabel: label_DELETE_UNUSED,
+                        xtype: 'component',
+                        html: "<div style='padding-top: 20px;'><input type='checkbox' id='deleteUnused' name='deleteUnused' value='deleteUnused'/> " + label_DELETE_UNUSED + "</div>"
+                    }
+                ]
             },
             {
-                fieldLabel: label_RIGHT_ENTITY_ID,
-                id: 'rightEntityId',
-                name: 'rightEntityId',
-                xtype: 'textfield',
-                margin: '10 10 10 10',
-                value: (givenEntityId == "null" ? "" : givenEntityId)
+                xtype: 'panel',
+                layout: 'hbox',
+                items: [
+                    {
+                        fieldLabel: label_RIGHT_ENTITY_ID,
+                        id: 'rightEntityId',
+                        name: 'rightEntityId',
+                        xtype: 'textfield',
+                        margin: '10 10 10 10',
+                        value: (givenEntityId == "null" ? "" : givenEntityId)
+                    },
+                    {
+                        fieldLabel: label_RIGHT_REPORT_DATE,
+                        id: 'rightReportDate',
+                        name: 'rightReportDate',
+                        xtype: 'datefield',
+                        format: 'd/m/Y',
+                        margin: '10 10 10 10'
+                    },
+                ]
             },
             buttonShow, buttonShowXML, buttonXML
         ]
@@ -758,5 +803,5 @@ Ext.onReady(function() {
                    defaults :{
                        bodyPadding: 0
                    },
-                   items: [mergeCandidatesGrid, mainEntityEditorPanel] });
+                   items: [/*mergeCandidatesGrid,*/ mainEntityEditorPanel] });
 });

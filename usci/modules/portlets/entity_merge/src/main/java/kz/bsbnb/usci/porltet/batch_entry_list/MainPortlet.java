@@ -17,12 +17,15 @@ import kz.bsbnb.usci.porltet.batch_entry_list.model.json.MetaClassList;
 import kz.bsbnb.usci.porltet.batch_entry_list.model.json.MetaClassListEntry;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -499,18 +502,31 @@ public class MainPortlet extends MVCPortlet {
             Gson gson = new Gson();
 
             switch (operationType) {
-                case SAVE_JSON:
+                case SAVE_JSON: {
                     String json = resourceRequest.getParameter("json_data");
                     String leftEntity = resourceRequest.getParameter("leftEntityId");
+                    String leftReportDt = resourceRequest.getParameter("leftReportDate");
                     String rightEntity = resourceRequest.getParameter("rightEntityId");
+                    String rightReportDt = resourceRequest.getParameter("rightReportDate");
+                    String deleteUnused = resourceRequest.getParameter("deleteUnused");
+
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                    Date leftRD = df.parse(leftReportDt);
+                    Date rightRD = df.parse(rightReportDt);
+
                     System.out.println(json);
                     System.out.println("\n THE LEFT ENTITY ID: " + leftEntity);
                     System.out.println("\n THE RIGHT ENTITY ID: " + rightEntity);
-                    entityMergeService.mergeBaseEntities(Long.parseLong(leftEntity), Long.parseLong(rightEntity), json);
+                    System.out.println("\n THE LEFT ENTITY REPORT DATE: " + leftReportDt);
+                    System.out.println("\n THE RIGHT ENTITY REPORT DATE: " + rightReportDt);
+                    System.out.println("\n DELETE UNUSED: " + deleteUnused);
+
+                    entityMergeService.mergeBaseEntities(Long.parseLong(leftEntity), Long.parseLong(rightEntity), leftRD, rightRD, json, "true".equals(deleteUnused));
 
                     writer.write("{\"success\": true }");
 
                     break;
+                }
                 case LIST_CLASSES:
                     MetaClassList classesListJson = new MetaClassList();
                     List<MetaClassName> metaClassesList = metaFactoryService.getMetaClassesNames();
@@ -567,14 +583,27 @@ public class MainPortlet extends MVCPortlet {
                     }
 
                     break;
-                case LIST_ENTITY:
+                case LIST_ENTITY: {
                     String leftEntityId = resourceRequest.getParameter("leftEntityId");
+                    String leftReportDate = resourceRequest.getParameter("leftReportDate");
                     String rightEntityId = resourceRequest.getParameter("rightEntityId");
-                    System.out.println("\n >>>>>>>>>>>>>> RECEIVED: " + leftEntityId + "  " + rightEntityId);
+                    String rightReportDate = resourceRequest.getParameter("rightReportDate");
+
+                    System.out.println("\n THE LEFT ENTITY ID: " + leftEntityId);
+                    System.out.println("\n THE RIGHT ENTITY ID: " + rightEntityId);
+                    System.out.println("\n THE LEFT ENTITY REPORT DATE: " + leftReportDate);
+                    System.out.println("\n THE RIGHT ENTITY REPORT DATE: " + rightReportDate);
+
                     if ((leftEntityId != null && leftEntityId.trim().length() > 0) &&
-                            (rightEntityId != null && rightEntityId.trim().length() > 0)) {
-                        BaseEntity entityLeft = entityService.load(Integer.parseInt(leftEntityId));
-                        BaseEntity entityRight = entityService.load(Integer.parseInt(rightEntityId));
+                            (rightEntityId != null && rightEntityId.trim().length() > 0) &&
+                            StringUtils.isNotEmpty(leftReportDate) && StringUtils.isNotEmpty(rightReportDate)) {
+
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                        Date leftRD = df.   parse(leftReportDate);
+                        Date rightRD = df.parse(rightReportDate);
+
+                        BaseEntity entityLeft = entityService.load(Integer.parseInt(leftEntityId), leftRD);
+                        BaseEntity entityRight = entityService.load(Integer.parseInt(rightEntityId), rightRD);
 
                         writer.write("{\"text\":\".\",\"children\": [\n" +
                                 entityToJson(entityLeft, entityRight, entityLeft.getMeta().getClassTitle(),
@@ -582,6 +611,7 @@ public class MainPortlet extends MVCPortlet {
                                 "]}");
                     }
                     break;
+                }
                 case GET_CANDIDATES:
                     // DUMMY DATA
                     writer.write("[{'type': 'credit', 'name_1':'0128', 'name_2': '02121', 'id_1':'5214', 'id_2':'36598'}, " +

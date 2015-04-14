@@ -31,4 +31,6 @@ public interface IBaseEntityDao extends IPersistableDao {
 
     public boolean isDeleted(long id);
 
+    public void setDeleted(long id, boolean deleted);
+
 }

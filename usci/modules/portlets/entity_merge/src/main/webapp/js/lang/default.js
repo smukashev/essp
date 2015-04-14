@@ -30,3 +30,7 @@ var label_DB_SUCCESS_TITLE="Внимание!";
 var label_DB_FAILURE_TITLE="Ошибка!";
 var label_MERGE_PANEL="Панель объединения";
 var label_MERGE_CANDIDATES="Кандидаты на объединение";
+
+var label_LEFT_REPORT_DATE = "Отчетная дата первой сущности";
+var label_RIGHT_REPORT_DATE = "Отчетная дата второй сущности";
+var label_DELETE_UNUSED = "Удалять неиспользуемые сущности"

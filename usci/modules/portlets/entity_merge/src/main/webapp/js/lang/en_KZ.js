@@ -30,3 +30,7 @@ var label_DB_SUCCESS_TITLE="Назар аударыңыз!";
 var label_DB_FAILURE_TITLE="Қате!";
 var label_MERGE_PANEL="Бiрiктiру панелi";
 var label_MERGE_CANDIDATES="Бiрiктiруге тиiстi кандидаттар";
+
+var label_LEFT_REPORT_DATE = "Бірінші мәннің есеп күні";
+var label_RIGHT_REPORT_DATE = "Екінші мәннің есеп күні";
+var label_DELETE_UNUSED = "Пайдаланылмайтын мәндерді жою"
