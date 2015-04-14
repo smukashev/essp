@@ -333,6 +333,7 @@ showcase list add remains.limit.balance_account
 
 showcase list add remains.interest.current.value interest_current_value
 showcase list add remains.interest.current.value_currency interest_current_cvalue
+
 showcase list add remains.interest.pastdue.value  interest_pastdue_value
 showcase list add remains.interest.pastdue.value_currency  interest_pastdue_cvalue
 showcase list add remains.interest.pastdue.open_date interest_pastdue_open_date
@@ -346,16 +347,21 @@ showcase list add remains.interest.write_off.value_currency interest_wrt_cvalue
 showcase list add remains.debt.current.value debt_current_value
 showcase list add remains.debt.current.value_currency debt_cur_cvalue
 showcase list add remains.debt.current.balance_account
+
 showcase list add remains.debt.pastdue.value debt_pas_value
 showcase list add remains.debt.pastdue.value_currency debt_pas_cvalue
 showcase list add remains.debt.pastdue.balance_account
+
 showcase list add remains.debt.write_off.value debt_wrt_value
 showcase list add remains.debt.write_off.value_currency debt_wrt_cvalue
 showcase list add remains.debt.write_off.balance_account
+
 showcase list add remains.discount.value debt_dis_value
 showcase list add remains.discount.value_currency debt_dis_cvalue
 showcase list add remains.discount.balance_account
+
 showcase list add remains.discounted_value.value discounted_value
+
 showcase list add remains.correction.value corr_value
 showcase list add remains.correction.value_currency corr_cvalue
 showcase list add remains.correction.balance_account
