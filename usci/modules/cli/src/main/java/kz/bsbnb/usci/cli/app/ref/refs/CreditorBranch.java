@@ -45,6 +45,13 @@ public class CreditorBranch extends BaseRef {
         Creditor mo = (Creditor) hm.get("main_office");
         mo.buildElement(main_office);
 
+        Region r = (Region) hm.get("region");
+        if(r != null) {
+            Element region = getDocument().createElement("region");
+            root.appendChild(region);
+            r.buildElement(region);
+        }
+
 
     }
 }
