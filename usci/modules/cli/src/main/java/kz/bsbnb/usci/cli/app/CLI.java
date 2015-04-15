@@ -2279,7 +2279,7 @@ public class CLI {
             if (args.get(0).equals("debug")) {
 
                 DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
-                Date date = dateFormatter.parse("01.03.2014");
+                Date date = dateFormatter.parse("05.04.2015");
 
                 try {
                     CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, date);
@@ -2364,6 +2364,7 @@ public class CLI {
                 try {
                     CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, reportDate);
                     currentBaseEntity = reader.read();
+                    reader.close();
                     rulesSingleton.runRules(currentBaseEntity, currentPackageName, currentDate);
 
                     for (String s : currentBaseEntity.getValidationErrors())

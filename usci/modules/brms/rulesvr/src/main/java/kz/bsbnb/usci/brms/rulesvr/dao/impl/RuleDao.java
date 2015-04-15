@@ -82,7 +82,7 @@ public class RuleDao implements IRuleDao {
                 "SELECT rule_id FROM " + PREFIX_ + "rule_package_versions WHERE package_versions_id = \n" +
                 "(SELECT id FROM " + PREFIX_ + "package_versions WHERE REPORT_DATE = \n" +
                 "    (SELECT MAX(REPORT_DATE) FROM " + PREFIX_ + "package_versions WHERE package_id = ? AND REPORT_DATE <= ? ) \n" +
-                " AND package_id = ? rownum = 1\n" +
+                " AND package_id = ? AND rownum = 1\n" +
                 " ))";
 
 

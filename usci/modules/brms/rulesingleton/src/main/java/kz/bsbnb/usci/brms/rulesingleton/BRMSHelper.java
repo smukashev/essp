@@ -1,5 +1,9 @@
 package kz.bsbnb.usci.brms.rulesingleton;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 public class BRMSHelper
 {
     public static boolean isValidRNN(String rnn)
@@ -29,5 +33,34 @@ public class BRMSHelper
                 break;
         }
         return (k == Integer.parseInt(rnn.substring(11, 12)));
+    }
+    public static List getInvalidIINs(Object list){
+        List ret = new ArrayList();
+        for(Object o : (LinkedList)list) {
+            String s = (String) o ;
+            if(!checkIIN(s))
+                ret.add(s);
+        }
+        return ret;
+    }
+
+    private static int[] weights = new int[]{1,2,3,4,5,6,7,8,9,10,11,1,2};
+
+    public static boolean checkIIN(String iin){
+        int sum = 0;
+        if(iin.length() != 12)
+            return false;
+
+        for(int i=0;i<11;i++)
+            sum += (iin.charAt(i) - '0' ) * weights[i];
+        sum %= 11;
+        int last = iin.charAt(11) - '0';
+        if(sum ==  10) {
+            sum = 0;
+            for(int i=0;i<11;i++)
+                sum+=(iin.charAt(i) - '0') * weights[i+2];
+            sum %= 11;
+        }
+        return sum == last;
     }
 }

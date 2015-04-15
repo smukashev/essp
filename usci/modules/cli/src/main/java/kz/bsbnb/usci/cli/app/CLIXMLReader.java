@@ -85,12 +85,14 @@ public class CLIXMLReader
         batchRepository.addBatch(batch);
     }
 
+    private FileInputStream inputStream;
+
     public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchRepository batchRepository, Date repDate) throws FileNotFoundException
     {
         logger.info("Reader init.");
         metaClassRepository = metaRepo;
 
-        FileInputStream inputStream = new FileInputStream(fileName);
+        inputStream = new FileInputStream(fileName);
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
 
@@ -208,6 +210,17 @@ public class CLIXMLReader
         }
 
         return null;
+    }
+
+    public void close() {
+        try {
+            xmlEventReader.close();
+            inputStream.close();
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean endElement(String localName) {
