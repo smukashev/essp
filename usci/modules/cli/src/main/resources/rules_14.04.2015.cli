@@ -12,7 +12,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && ( BRMSHelper.getInvalidIINs(getEls("{get}subjects[person!=null]person.docs[doc_type.code=06]no")).size() > 0))
 then
-  $entity.addValidationError("обнаружен некорректный иин: " + $entity.getEls("{get}subjects[person!=null]person.docs[doc_type.code=06]no") );
+  $entity.addValidationError("обнаружен некорректный иин: " + BRMSHelper.getInvalidIINs($entity.getEls("{get}subjects[person!=null]person.docs[doc_type.code=06]no")) );
 end
 $$$
 
