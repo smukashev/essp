@@ -1,0 +1,22 @@
+#rule set date
+#rule create package credit_parser
+rule rc
+rule set package credit_parser
+rule set version
+
+
+rule read $$$
+title: iin_algo_check
+rule "iin algo check"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && ( BRMSHelper.getInvalidIINs(getEls("{get}subjects[person!=null]person.docs[doc_type.code=06]no")).size() > 0))
+then
+  $entity.addValidationError("обнаружен некорректный иин: " + $entity.getEls("{get}subjects[person!=null]person.docs[doc_type.code=06]no") );
+end
+$$$
+
+rule save
+
+
+
