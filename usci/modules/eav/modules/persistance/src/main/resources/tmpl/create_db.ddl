@@ -10,6 +10,7 @@
 		<column name="last_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
 		<column name="middle_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
 		<column name="modified_date" primaryKey="false" required="false" type="DATE"/>
+		<column name="is_active" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="1"/>
 	</table>
 	<table name="eav_a_creditor_state">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
