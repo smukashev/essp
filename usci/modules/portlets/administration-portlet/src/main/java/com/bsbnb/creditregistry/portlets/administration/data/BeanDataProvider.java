@@ -16,11 +16,6 @@ import java.util.List;
 
 import static com.bsbnb.creditregistry.portlets.administration.AdministrationApplication.log;
 
-//import com.bsbnb.creditregistry.dm.maintenance.PortalUser;
-//import com.bsbnb.creditregistry.dm.ref.Creditor;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.PortalUserBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.ref.business.remote.IRemoteCreditorBusiness;
-
 /**
  * @author Aidar.Myrzahanov
  */
@@ -103,7 +98,7 @@ public class BeanDataProvider implements DataProvider {
     private void synchronizePortalUsersWithDatabase() {
         try {
             List<User> liferayUserList = UserLocalServiceUtil.getUsers(0, UserLocalServiceUtil.getUsersCount());
-            List<PortalUser> portalUserList = new ArrayList<PortalUser>(liferayUserList.size());
+            List<PortalUser> portalUserList = new ArrayList<>(liferayUserList.size());
             for (User liferayUser : liferayUserList) {
                 portalUserList.add(convert(liferayUser));
             }

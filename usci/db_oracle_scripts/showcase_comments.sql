@@ -21,7 +21,7 @@ comment on COLUMN R_CORE_CREDIT_FLOW.KFN_VALUE is 'Фактически сфор
 comment on COLUMN R_CORE_CREDIT.MSFO_VALUE is 'Фактически сформированная сумма провизий (резервов), по неоднородным кредитам по требованиям МСФО';
 comment on COLUMN R_CORE_CREDIT.MSFO_O_B_VALUE is 'Фактически сформированная сумма провизий (резервов), по неоднородным кредитам по требованиям МСФО (по лимиту кредитной карты/овердрафту)';
 
-comment on COLUMN R_CORE_DEBTOR_INFO.CREDITOR1_ID is 'organizaiton creditor';
+comment on COLUMN R_CORE_DEBTOR_INFO.CREDITOR1_ID is 'organization creditor';
 comment on COLUMN R_CORE_DEBTOR_INFO.CREDITOR2_ID is 'person creditor';
 comment on COLUMN R_CORE_DEBTOR_INFO.BANK_RELATION1_ID is 'organization bank_relation';
 comment on COLUMN R_CORE_DEBTOR_INFO.BANK_RELATION2_ID is 'person bank_relation';
