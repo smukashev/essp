@@ -329,16 +329,17 @@ showcase set final true
 
 showcase list add remains.limit.value limit_value
 showcase list add remains.limit.value_currency limit_cvalue
-showcase list add remains.limit.balance_account
+showcase list add remains.limit.balance_account ba_limit
 
 showcase list add remains.interest.current.value interest_current_value
 showcase list add remains.interest.current.value_currency interest_current_cvalue
+showcase list add remains.interest.current.balance_account ba_interest_current
 
 showcase list add remains.interest.pastdue.value  interest_pastdue_value
 showcase list add remains.interest.pastdue.value_currency  interest_pastdue_cvalue
 showcase list add remains.interest.pastdue.open_date interest_pastdue_open_date
 showcase list add remains.interest.pastdue.close_date  interest_pastdue_close_date
-showcase list add remains.interest.pastdue.balance_account
+showcase list add remains.interest.pastdue.balance_account ba_interest_pastdue
 
 showcase list add remains.interest.write_off.date interest_wrt_date
 showcase list add remains.interest.write_off.value interest_wrt_value
@@ -346,25 +347,30 @@ showcase list add remains.interest.write_off.value_currency interest_wrt_cvalue
 
 showcase list add remains.debt.current.value debt_current_value
 showcase list add remains.debt.current.value_currency debt_cur_cvalue
-showcase list add remains.debt.current.balance_account
+showcase list add remains.debt.current.balance_account ba_debt_current
 
 showcase list add remains.debt.pastdue.value debt_pas_value
 showcase list add remains.debt.pastdue.value_currency debt_pas_cvalue
-showcase list add remains.debt.pastdue.balance_account
+showcase list add remains.debt.pastdue.balance_account ba_debt_pastdue
+showcase list add remains.debt.pastdue.open_date debt_pastdue_open_date
+showcase list add remains.debt.pastdue.close_date debt_pastdue_close_date
 
 showcase list add remains.debt.write_off.value debt_wrt_value
 showcase list add remains.debt.write_off.value_currency debt_wrt_cvalue
-showcase list add remains.debt.write_off.balance_account
+showcase list add remains.debt.write_off.balance_account ba_debt_wrt
+showcase list add remains.debt.write_off.date debt_wrt_date
 
 showcase list add remains.discount.value debt_dis_value
 showcase list add remains.discount.value_currency debt_dis_cvalue
-showcase list add remains.discount.balance_account
+showcase list add remains.discount.balance_account ba_discount
 
 showcase list add remains.discounted_value.value discounted_value
 
 showcase list add remains.correction.value corr_value
 showcase list add remains.correction.value_currency corr_cvalue
 showcase list add remains.correction.balance_account
+
+showcase list addCustom credit root credit_id
 
 showcase save
 
