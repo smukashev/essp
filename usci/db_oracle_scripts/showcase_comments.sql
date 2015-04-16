@@ -1,10 +1,12 @@
 comment on COLUMN R_CORE_REMAINS.BALANCE_ACCOUNT1_ID is 'limit';
-comment on COLUMN R_CORE_REMAINS.BALANCE_ACCOUNT2_ID is 'interest.pastdue';
-comment on COLUMN R_CORE_REMAINS.BALANCE_ACCOUNT3_ID is 'debt.current';
-comment on COLUMN R_CORE_REMAINS.BALANCE_ACCOUNT4_ID is 'debt.pastdue';
-comment on COLUMN R_CORE_REMAINS.BALANCE_ACCOUNT5_ID is 'debt.write_off';
-comment on COLUMN R_CORE_REMAINS.BALANCE_ACCOUNT6_ID is 'discount';
-comment on COLUMN R_CORE_REMAINS.BALANCE_ACCOUNT7_ID is 'correction';
+comment on COLUMN R_CORE_REMAINS.BALANCE_ACCOUNT2_ID is 'interest.current';
+comment on COLUMN R_CORE_REMAINS.BALANCE_ACCOUNT3_ID is 'interest.pastdue';
+comment on COLUMN R_CORE_REMAINS.BALANCE_ACCOUNT4_ID is 'debt.current';
+comment on COLUMN R_CORE_REMAINS.BALANCE_ACCOUNT5_ID is 'debt.pastdue';
+comment on COLUMN R_CORE_REMAINS.BALANCE_ACCOUNT6_ID is 'debt.write_off';
+comment on COLUMN R_CORE_REMAINS.BALANCE_ACCOUNT7_ID is 'discount';
+comment on COLUMN R_CORE_REMAINS.BALANCE_ACCOUNT8_ID is 'correction';
+
 
 comment on COLUMN R_CORE_REMAINS.DEBT_CURRENT_VALUE is 'Остаток основного долга -  непросроченный основной долг';
 comment on COLUMN R_CORE_REMAINS.DEBT_PAS_VALUE is 'Остаток основного долга -  просроченный основной долг';
@@ -18,8 +20,8 @@ comment on COLUMN R_CORE_REMAINS.DEBT_DIS_VALUE is 'Дисконтированн
 comment on COLUMN R_CORE_REMAINS.LIMIT_VALUE is 'Остаток лимита кредитной карты/овердрафта';
 
 comment on COLUMN R_CORE_CREDIT_FLOW.KFN_VALUE is 'Фактически сформированная сумма провизий (резервов), по неоднородным кредитам по требованиям уполномоченного органа';
-comment on COLUMN R_CORE_CREDIT.MSFO_VALUE is 'Фактически сформированная сумма провизий (резервов), по неоднородным кредитам по требованиям МСФО';
-comment on COLUMN R_CORE_CREDIT.MSFO_O_B_VALUE is 'Фактически сформированная сумма провизий (резервов), по неоднородным кредитам по требованиям МСФО (по лимиту кредитной карты/овердрафту)';
+comment on COLUMN R_CORE_CREDIT_FLOW.MSFO_VALUE is 'Фактически сформированная сумма провизий (резервов), по неоднородным кредитам по требованиям МСФО';
+comment on COLUMN R_CORE_CREDIT_FLOW.MSFO_O_B_VALUE is 'Фактически сформированная сумма провизий (резервов), по неоднородным кредитам по требованиям МСФО (по лимиту кредитной карты/овердрафту)';
 
 comment on COLUMN R_CORE_DEBTOR_INFO.CREDITOR1_ID is 'organization creditor';
 comment on COLUMN R_CORE_DEBTOR_INFO.CREDITOR2_ID is 'person creditor';
