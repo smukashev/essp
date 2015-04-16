@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.porltet.batch_entry_list;
+package kz.bsbnb.usci.porltet.entity_merge;
 
 import com.google.gson.Gson;
 import com.liferay.util.bridges.mvc.MVCPortlet;
@@ -9,8 +9,8 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.porltet.batch_entry_list.model.json.MetaClassList;
-import kz.bsbnb.usci.porltet.batch_entry_list.model.json.MetaClassListEntry;
+import kz.bsbnb.usci.porltet.entity_merge.model.json.MetaClassList;
+import kz.bsbnb.usci.porltet.entity_merge.model.json.MetaClassListEntry;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 

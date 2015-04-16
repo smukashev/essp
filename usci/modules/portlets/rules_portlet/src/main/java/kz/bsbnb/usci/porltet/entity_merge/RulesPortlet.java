@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.porltet.batch_entry_list;
+package kz.bsbnb.usci.porltet.entity_merge;
 
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
@@ -6,8 +6,7 @@ import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.porltet.batch_entry_list.model.json.JsonMaker;
-import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.porltet.entity_merge.model.json.JsonMaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

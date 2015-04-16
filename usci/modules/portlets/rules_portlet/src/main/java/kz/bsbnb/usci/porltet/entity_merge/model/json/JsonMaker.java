@@ -1,8 +1,7 @@
-package kz.bsbnb.usci.porltet.batch_entry_list.model.json;
+package kz.bsbnb.usci.porltet.entity_merge.model.json;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

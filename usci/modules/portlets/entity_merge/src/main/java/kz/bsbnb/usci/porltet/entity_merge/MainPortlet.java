@@ -1,28 +1,36 @@
-package kz.bsbnb.usci.porltet.batch_entry_list;
+package kz.bsbnb.usci.porltet.entity_merge;
 
 import com.google.gson.Gson;
+import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.core.service.IBaseEntityMergeService;
+import kz.bsbnb.usci.core.service.ISearcherFormService;
+import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.BaseContainerType;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
-import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.porltet.batch_entry_list.model.json.MetaClassList;
-import kz.bsbnb.usci.porltet.batch_entry_list.model.json.MetaClassListEntry;
+import kz.bsbnb.usci.eav.util.Pair;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,6 +38,9 @@ public class MainPortlet extends MVCPortlet {
     private IMetaFactoryService metaFactoryService;
     private IEntityService entityService;
     private IBaseEntityMergeService entityMergeService;
+
+    private RmiProxyFactoryBean searcherFormEntryServiceFactoryBean;
+    private ISearcherFormService searcherFormService;
 
     void connectToServices() {
         try {
@@ -56,6 +67,15 @@ public class MainPortlet extends MVCPortlet {
 
             entityMergeServiceFactoryBean.afterPropertiesSet();
             entityMergeService = (IBaseEntityMergeService) entityMergeServiceFactoryBean.getObject();
+
+            searcherFormEntryServiceFactoryBean = new RmiProxyFactoryBean();
+            searcherFormEntryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/searcherFormService");
+            searcherFormEntryServiceFactoryBean.setServiceInterface(ISearcherFormService.class);
+            searcherFormEntryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+            searcherFormEntryServiceFactoryBean.afterPropertiesSet();
+            searcherFormService = (ISearcherFormService) searcherFormEntryServiceFactoryBean.getObject();
+
         } catch (Exception e) {
             System.out.println("Can\"t initialise services: " + e.getMessage());
         }
@@ -495,43 +515,104 @@ public class MainPortlet extends MVCPortlet {
 
         try {
             OperationTypes operationType = OperationTypes.valueOf(getParam("op", resourceRequest));
+            User currentUser = PortalUtil.getUser(resourceRequest);
 
             Gson gson = new Gson();
 
             switch (operationType) {
-                case SAVE_JSON:
+                case SAVE_JSON: {
                     String json = resourceRequest.getParameter("json_data");
                     String leftEntity = resourceRequest.getParameter("leftEntityId");
+                    String leftReportDt = resourceRequest.getParameter("leftReportDate");
                     String rightEntity = resourceRequest.getParameter("rightEntityId");
+                    String rightReportDt = resourceRequest.getParameter("rightReportDate");
+                    String deleteUnused = resourceRequest.getParameter("deleteUnused");
+
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+                    Date leftRD = df.parse(leftReportDt);
+                    Date rightRD = df.parse(rightReportDt);
+
                     System.out.println(json);
                     System.out.println("\n THE LEFT ENTITY ID: " + leftEntity);
                     System.out.println("\n THE RIGHT ENTITY ID: " + rightEntity);
-                    entityMergeService.mergeBaseEntities(Long.parseLong(leftEntity), Long.parseLong(rightEntity), json);
+                    System.out.println("\n THE LEFT ENTITY REPORT DATE: " + leftReportDt);
+                    System.out.println("\n THE RIGHT ENTITY REPORT DATE: " + rightReportDt);
+                    System.out.println("\n DELETE UNUSED: " + deleteUnused);
+
+                    entityMergeService.mergeBaseEntities(Long.parseLong(leftEntity), Long.parseLong(rightEntity), leftRD, rightRD, json, "true".equals(deleteUnused));
 
                     writer.write("{\"success\": true }");
 
                     break;
-                case LIST_CLASSES:
-                    MetaClassList classesListJson = new MetaClassList();
-                    List<MetaClassName> metaClassesList = metaFactoryService.getMetaClassesNames();
+                }
+                case GET_FORM:
+                    String metaName = resourceRequest.getParameter("meta");
+                    String generatedForm = searcherFormService.getDom(currentUser.getUserId(), metaFactoryService.getMetaClass(metaName));
+                    writer.write(generatedForm);
+                    break;
+                case FIND_ACTION:
+                    Enumeration<String> list = resourceRequest.getParameterNames();
 
-                    classesListJson.setTotal(metaClassesList.size());
+                    String metaString = resourceRequest.getParameter("metaClass");
 
-                    for (MetaClassName metaName : metaClassesList) {
-                        MetaClassListEntry metaClassListEntry = new MetaClassListEntry();
+                    MetaClass metaClass = metaFactoryService.getMetaClass(metaString);
+                    BaseEntity baseEntity = new BaseEntity(metaClass, new Date());
 
-                        metaClassListEntry.setClassId("" + metaName.getId());
-                        if (metaName.getClassTitle() != null
-                                && metaName.getClassTitle().trim().length() > 0)
-                            metaClassListEntry.setClassName(metaName.getClassTitle());
-                        else
-                            metaClassListEntry.setClassName(metaName.getClassName());
+                    while(list.hasMoreElements()) {
+                        String attribute = list.nextElement();
 
-                        classesListJson.getData().add(metaClassListEntry);
+                        if(attribute.equals("op") || attribute.equals("metaClass"))
+                            continue;
+
+                        Object value;
+                        String parameterValue = resourceRequest.getParameter(attribute);
+
+                        IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
+                        if(metaAttribute == null)
+                            continue;
+                        IMetaType metaType = metaAttribute.getMetaType();
+
+                        if(metaType.isSet() || metaType.isSetOfSets())
+                            throw new UnsupportedOperationException("Not yet implemented");
+
+                        if(metaType.isComplex()) {
+                            BaseEntity childBaseEntity = new BaseEntity((MetaClass) metaType, new Date());
+                            childBaseEntity.setId(Long.valueOf(parameterValue));
+                            value = childBaseEntity;
+
+                        } else {
+                            MetaValue metaValue = (MetaValue) metaType;
+                            value = DataTypes.fromString(metaValue.getTypeCode(), parameterValue);
+                        }
+
+                        Batch b = new Batch(new Date(), currentUser.getUserId());
+                        b.setId(777L);
+
+                        baseEntity.put(attribute, BaseValueFactory.create(
+                                BaseContainerType.BASE_ENTITY,
+                                metaAttribute.getMetaType(),
+                                b, 1, value));
                     }
 
-                    writer.write(gson.toJson(classesListJson));
+                    baseEntity = entityService.search(baseEntity);
 
+                    long ret = -1;
+
+                    if(baseEntity.getId() > 0)
+                        ret = baseEntity.getId();
+
+                    writer.write("{\"success\": true, \"data\":\""+ ret +"\"}");
+
+                    break;
+                case LIST_CLASSES:
+                    List<Pair> classes = searcherFormService.getMetaClasses(currentUser.getUserId());
+
+                    System.out.println("classes.size() = " + classes.size());
+
+                    if(classes.size() < 1)
+                        throw new RuntimeException("no.any.rights");
+                    writer.write("{\"success\":\"true\", \"data\": " + gson.toJson(classes) + "}");
                     break;
                 case LIST_BY_CLASS:
                     String metaId = resourceRequest.getParameter("metaId");
@@ -567,14 +648,27 @@ public class MainPortlet extends MVCPortlet {
                     }
 
                     break;
-                case LIST_ENTITY:
+                case LIST_ENTITY: {
                     String leftEntityId = resourceRequest.getParameter("leftEntityId");
+                    String leftReportDate = resourceRequest.getParameter("leftReportDate");
                     String rightEntityId = resourceRequest.getParameter("rightEntityId");
-                    System.out.println("\n >>>>>>>>>>>>>> RECEIVED: " + leftEntityId + "  " + rightEntityId);
+                    String rightReportDate = resourceRequest.getParameter("rightReportDate");
+
+                    System.out.println("\n THE LEFT ENTITY ID: " + leftEntityId);
+                    System.out.println("\n THE RIGHT ENTITY ID: " + rightEntityId);
+                    System.out.println("\n THE LEFT ENTITY REPORT DATE: " + leftReportDate);
+                    System.out.println("\n THE RIGHT ENTITY REPORT DATE: " + rightReportDate);
+
                     if ((leftEntityId != null && leftEntityId.trim().length() > 0) &&
-                            (rightEntityId != null && rightEntityId.trim().length() > 0)) {
-                        BaseEntity entityLeft = entityService.load(Integer.parseInt(leftEntityId));
-                        BaseEntity entityRight = entityService.load(Integer.parseInt(rightEntityId));
+                            (rightEntityId != null && rightEntityId.trim().length() > 0) &&
+                            StringUtils.isNotEmpty(leftReportDate) && StringUtils.isNotEmpty(rightReportDate)) {
+
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                        Date leftRD = df.   parse(leftReportDate);
+                        Date rightRD = df.parse(rightReportDate);
+
+                        BaseEntity entityLeft = entityService.load(Integer.parseInt(leftEntityId), leftRD);
+                        BaseEntity entityRight = entityService.load(Integer.parseInt(rightEntityId), rightRD);
 
                         writer.write("{\"text\":\".\",\"children\": [\n" +
                                 entityToJson(entityLeft, entityRight, entityLeft.getMeta().getClassTitle(),
@@ -582,6 +676,7 @@ public class MainPortlet extends MVCPortlet {
                                 "]}");
                     }
                     break;
+                }
                 case GET_CANDIDATES:
                     // DUMMY DATA
                     writer.write("[{'type': 'credit', 'name_1':'0128', 'name_2': '02121', 'id_1':'5214', 'id_2':'36598'}, " +
@@ -616,6 +711,8 @@ public class MainPortlet extends MVCPortlet {
         LIST_CLASSES,
         LIST_ENTITY,
         SAVE_JSON,
+        GET_FORM,
+        FIND_ACTION,
         LIST_BY_CLASS,
         GET_CANDIDATES,
         NULL
