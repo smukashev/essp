@@ -3378,7 +3378,7 @@ public class CLI {
             System.out.println(entityList.get(1));
             System.out.println("\n >>>>>>>>>>>>>>>RESULT!!!<<<<<<<<<<<<<<<<<<< ");
             IBaseEntity result = baseEntityProcessorDao.merge(entityList.get(0), entityList.get(1), mergeManager,
-                    IBaseEntityProcessorDao.MergeResultChoice.LEFT);
+                    IBaseEntityProcessorDao.MergeResultChoice.LEFT, true);
 
             System.out.println(result);
         } else {

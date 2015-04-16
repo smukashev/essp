@@ -1,4 +1,3 @@
-
 Ext.require([
     'Ext.tab.*',
     'Ext.tree.*',
@@ -7,8 +6,13 @@ Ext.require([
     'Ext.ux.CheckColumn'
 ]);
 
-var currentClassId = null;
-
+var tabs;
+var grid;
+var store;
+var currentClass;
+var currentClass2;
+var regex = /^\S+-(\d+)-(\S+)-(\S+)$/;
+var errors = [];
 
 function createJSON(currentNode, offset, first){
 
@@ -226,87 +230,6 @@ function createJSON(currentNode, offset, first){
 
 }
 
-var grid;
-var store;
-
-function createItemsGrid(itemId) {
-    if(grid == null) {
-        Ext.define('myModel', {
-            extend: 'Ext.data.Model',
-            fields: ['id','code','title']
-        });
-
-        store = Ext.create('Ext.data.Store', {
-            model: 'myModel',
-            remoteGroup: true,
-            buffered: true,
-            leadingBufferZone: 300,
-            pageSize: 100,
-            proxy: {
-                type: 'ajax',
-                url: dataUrl,
-                extraParams: {op : 'LIST_BY_CLASS', metaId : itemId},
-                actionMethods: {
-                    read: 'POST'
-                },
-                reader: {
-                    type: 'json',
-                    root: 'data',
-                    totalProperty: 'total'
-                }
-            },
-            autoLoad: true,
-            remoteSort: true
-        });
-
-        grid = Ext.create('Ext.grid.Panel', {
-            id: "itemsGrid",
-            height: "100%",
-            store: store,
-
-            columns: [
-                {
-                    text     : 'ID',
-                    dataIndex: 'id',
-                    flex:1
-                },
-                {
-                    text     : label_CODE,
-                    dataIndex: 'code',
-                    flex:1
-                },
-                {
-                    text     : label_TITLE,
-                    dataIndex: 'title',
-                    flex:3
-                }
-            ],
-            title: label_ITEMS,
-            listeners : {
-                itemdblclick: function(dv, record, item, index, e) {
-                    entityId = Ext.getCmp("leftEntityId");
-                    entityId.setValue(record.get('id'));
-                }
-            }
-        });
-
-        return grid;
-    } else {
-        store.load({
-            params: {
-                metaId: itemId,
-                op : 'LIST_BY_CLASS'
-            },
-            callback: function(records, operation, success) {
-                if (!success) {
-                    Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA);
-                }
-            }
-        });
-    }
-}
-
-
 function markEntityKeepLeft(){
 
     var grid = Ext.getCmp('entityTreeView');
@@ -395,14 +318,142 @@ function setMegrePair(idLeft, idRight){
 
 }
 
+function getForm(){
+    currentClass = Ext.getCmp('edClass').value;
+    Ext.Ajax.request({
+        url: dataUrl,
+        method: 'POST',
+        params: {
+            op: 'GET_FORM',
+            meta: currentClass
+        },
+        success: function(data){
+            document.getElementById('entity-editor-form').innerHTML = data.responseText;
+        }
+    });
+}
+
+function getForm2(){
+    currentClass2 = Ext.getCmp('edClass2').value;
+    Ext.Ajax.request({
+        url: dataUrl,
+        method: 'POST',
+        params: {
+            op: 'GET_FORM',
+            meta: currentClass2
+        },
+        success: function(data){
+            document.getElementById('entity-editor-form2').innerHTML = data.responseText;
+        }
+    });
+}
+
+function find(control){
+    var nextDiv = control.parentNode.nextSibling;
+    var inputDiv = control.previousSibling.previousSibling;
+
+    var info = inputDiv.id.match(regex);
+
+
+    var params = {op : 'FIND_ACTION', metaClass: info[2]};
+    for(var i=0;i<errors.length;i++)
+        errors[i].style.display = 'none';
+
+    errors = [];
+
+    for (var  i = 0; i < nextDiv.childNodes.length; i++) {
+        var preKeyElem = nextDiv.childNodes[i];
+        if(preKeyElem.className.indexOf('leaf') > -1) {
+            filterLeaf(preKeyElem, params);
+        } else {
+            filterNode(preKeyElem, params);
+        }
+    }
+
+    if(errors.length > 0) {
+        for (var i = 0; i < errors.length; i++) {
+            errors[i].style.display = 'inline';
+        }
+        return;
+    } else {
+        var loadDiv = control.nextSibling;
+        loadDiv.style.display = 'inline';
+    }
+
+
+    Ext.Ajax.request({
+        url: dataUrl,
+        method: 'POST',
+        params: params,
+        success: function(response) {
+            var data = JSON.parse(response.responseText);
+            if(data.data > -1)
+                inputDiv.value = data.data;
+            else
+                inputDiv.value = '';
+
+            loadDiv.style.display = 'none';
+        },
+        failure: function() {
+            console.log('woops');
+        }
+    });
+}
+
+function filterLeaf(control, queryObject){
+    for(var i =0 ;i<control.childNodes.length;i++) {
+        var childControl = control.childNodes[i];
+        if(childControl.tagName == 'INPUT' || childControl.tagName=='SELECT') {
+            var info =  childControl.id.match(regex);
+            var id = info[1];
+
+            if(childControl.value.length == 0) {
+                errors.push(document.getElementById('err-' + id));
+            }
+
+            queryObject[info[3]] = childControl.value;
+        }
+    }
+}
+
+function filterNode(control, queryObject){
+    for(var i =0; i<control.childNodes.length;i++) {
+        var childControl = control.childNodes[i];
+        if(childControl.className != undefined && childControl.className.indexOf('leaf') > -1) {
+            filterLeaf(childControl, queryObject);
+            break;
+        }
+    }
+}
+
+function getLeftEntityId() {
+    var currentTab = tabs.getActiveTab();
+    var currentTabIndex = tabs.items.indexOf(currentTab);
+
+    if (currentTab == 0) {
+        return Ext.getCmp("leftEntityId").getValue();
+    } else {
+        return document.getElementsByClassName('inp-%d')[0].value;
+    }
+}
+
+function getRightEntityId() {
+    var currentTab = tabs.getActiveTab();
+    var currentTabIndex = tabs.items.indexOf(currentTab);
+
+    if (currentTab == 0) {
+        return Ext.getCmp("rightEntityId").getValue();
+    } else {
+        return document.getElementsByClassName('inp-%d')[1].value;
+    }
+}
 
 Ext.onReady(function() {
     grid = null;
 
-
     Ext.define('classesStoreModel', {
         extend: 'Ext.data.Model',
-        fields: ['classId','className']
+        fields: ['id','name']
     });
 
     var classesStore = Ext.create('Ext.data.Store', {
@@ -428,26 +479,6 @@ Ext.onReady(function() {
     Ext.define('refStoreModel', {
         extend: 'Ext.data.Model',
         fields: ['id','title']
-    });
-
-    var refStore = Ext.create('Ext.data.Store', {
-        model: 'refStoreModel',
-        pageSize: 100,
-        proxy: {
-            type: 'ajax',
-            url: dataUrl,
-            extraParams: {op : 'LIST_BY_CLASS'},
-            actionMethods: {
-                read: 'POST'
-            },
-            reader: {
-                type: 'json',
-                root: 'data',
-                totalProperty: 'total'
-            }
-        },
-        autoLoad: false,
-        remoteSort: true
     });
 
     Ext.define('entityModel', {
@@ -518,8 +549,6 @@ Ext.onReady(function() {
             var leftReportDate = Ext.getCmp("leftReportDate");
             var rightReportDate = Ext.getCmp("rightReportDate");
             var deleteUnusedChecked = document.getElementById('deleteUnused').checked;
-
-            console.log("asd");
 
             Ext.Ajax.request({
                 url: dataUrl,
@@ -674,24 +703,14 @@ Ext.onReady(function() {
     });
 
     mainEntityEditorPanel = Ext.create('Ext.panel.Panel', {
-        title : label_MERGE_PANEL,
+        title : label_MERGE_PANEL_BY_ID,
         preventHeader: true,
         width : '100%',
-        height: '700px',
+        height: '100%',
         layout : 'border',
         defaults : {
             padding: '3'
         },
-        items  : [
-            {
-                xtype : 'panel',
-                region: 'center',
-                preventHeader: true,
-                width: "60%",
-                autoScroll:false,
-                layout: 'fit',
-                items: [entityGrid]
-            }],
         dockedItems: [
             {
                 xtype: 'panel',
@@ -712,11 +731,6 @@ Ext.onReady(function() {
                         xtype: 'datefield',
                         format: 'd/m/Y',
                         margin: '10 10 10 10'
-                    },
-                    {
-                        fieldLabel: label_DELETE_UNUSED,
-                        xtype: 'component',
-                        html: "<div style='padding-top: 20px;'><input type='checkbox' id='deleteUnused' name='deleteUnused' value='deleteUnused'/> " + label_DELETE_UNUSED + "</div>"
                     }
                 ]
             },
@@ -741,67 +755,138 @@ Ext.onReady(function() {
                         margin: '10 10 10 10'
                     },
                 ]
-            },
-            buttonShow, buttonShowXML, buttonXML
+            }
         ]
     });
 
-    Ext.define('candidateModel', {
-            extend: 'Ext.data.Model',
-            fields: [
-                {name: 'type',      type: 'string'},
-                {name: 'name_1',    type: 'string'},
-                {name: 'name_2',    type: 'string'},
-                {name: 'id_1',      type: 'string'},
-                {name: 'id_2',      type: 'string'}
-            ]
-        });
-
-    var candidateStore = Ext.create('Ext.data.Store', {
-             model: 'candidateModel',
-             autoLoad: true,
-             proxy: {
-                type: 'ajax',
-                url: dataUrl,
-                extraParams: {op : 'GET_CANDIDATES'}
-                }
-        });
-
-
-
-    mergeCandidatesGrid =  Ext.create('Ext.grid.Panel', {
-          title : label_MERGE_CANDIDATES,
-          store: candidateStore,
-          columns: [
-              {text: "Type", width:100, dataIndex:'type'},
-              {text: "Name 1", width:250, dataIndex:'name_1'},
-              {text: "Name 2", width: 250, dataIndex:'name_2'},
-              {text: "ID 1", width: 100, dataIndex:'id_1'},
-              {text: "ID 2", width: 100, dataIndex:'id_2'},
-              {
-                  text: label_MERGE,
-                  width: 100,
-                  sortable: true,
-                  renderer:
-                  function (value, metaData, record, rowIndex, colIndex, store, view) {
-                    return '<center><input type="button" onclick="setMegrePair(\''+record.get('id_1')+'\', \''+record.get('id_2')+'\')" value="'+ label_MERGE +'"/></center>'
+    var clientEntityEditorPanel = Ext.create('Ext.panel.Panel', {
+        title : label_MERGE_PANEL_BY_ID,
+        preventHeader: true,
+        width : '100%',
+        height: '100%',
+        defaults : {
+            padding: '3'
+        },
+        dockedItems: [
+            {
+                xtype: 'panel',
+                layout: 'hbox',
+                items: [
+                    {
+                        xtype: 'panel',
+                        layout: 'vbox',
+                        items: [
+                            {
+                                id: 'edClass',
+                                xtype: 'combobox',
+                                store: classesStore,
+                                labelWidth: 70,
+                                valueField:'name',
+                                displayField:'name',
+                                fieldLabel: label_CLASS
+                            },
+                            {
+                                xtype: 'component',
+                                html: "<a href='#' onclick='getForm();'>" +LABEL_UPDATE+ "</a>"
+                            },
+                            {
+                                xtype: 'datefield',
+                                id: 'edDate',
+                                fieldLabel: label_date,
+                                format: 'd.m.Y'
+                            },
+                            {
+                                xtype: 'component',
+                                html: '<div id="entity-editor-form" style="height: 350px;">Hello World</div>'
+                            }
+                        ]
+                    },
+                    {
+                        xtype: 'panel',
+                        layout: 'vbox',
+                        items: [
+                            {
+                                id: 'edClass2',
+                                xtype: 'combobox',
+                                store: classesStore,
+                                labelWidth: 70,
+                                valueField:'name',
+                                displayField:'name',
+                                fieldLabel: label_CLASS
+                            },
+                            {
+                                xtype: 'component',
+                                html: "<a href='#' onclick='getForm2();'>" +LABEL_UPDATE+ "</a>"
+                            },
+                            {
+                                xtype: 'datefield',
+                                id: 'edDate2',
+                                fieldLabel: label_date,
+                                format: 'd.m.Y'
+                            },
+                            {
+                                xtype: 'component',
+                                html: '<div id="entity-editor-form2" style="height: 350px;">Hello World</div>'
+                            }
+                        ]
                     }
-              }
+                ]
+            }
+        ]
+    });
 
-          ],
-          width: 900,
-          height: 500
-      });
+    tabs = Ext.widget('tabpanel', {
+        id:"tabs",
+        width: '100%',
+        height: '100%',
+        activeTab: 0,
+        defaults :{
+           bodyPadding: 0
+        },
+        items: [mainEntityEditorPanel, clientEntityEditorPanel]
+    });
 
-
-       var tabs = Ext.widget('tabpanel', {
-                   id:"tabs",
-                   renderTo: 'tabs',
-                   width: '100%',
-                   height: '100%',
-                   activeTab: 0,
-                   defaults :{
-                       bodyPadding: 0
-                   },
-                   items: [/*mergeCandidatesGrid,*/ mainEntityEditorPanel] });
+    var rootPanel = Ext.create('Ext.panel.Panel', {
+        renderTo: 'merge-content',
+        width : '100%',
+        height: '700px',
+        preventHeader: true,
+        layout: 'border',
+        items: [
+            {
+                region: 'north',
+                height: '50%',
+                split: true,
+                items: [tabs]
+            },
+            {
+                region: 'south',
+                height: '50%',
+                split: true,
+                items: [
+                    {
+                        region: 'north',
+                        height: '10%',
+                        width: '100%',
+                        layout: 'hbox',
+                        split: true,
+                        items: [
+                            buttonShow, buttonShowXML, buttonXML,
+                            {
+                                fieldLabel: label_DELETE_UNUSED,
+                                xtype: 'component',
+                                html: "<div style='padding-left: 20px; padding-top: 5px;'><input type='checkbox' id='deleteUnused' name='deleteUnused' value='deleteUnused'/> " + label_DELETE_UNUSED + "</div>"
+                            }
+                        ]
+                    },
+                    {
+                        region: 'north',
+                        height: '10%',
+                        split: true,
+                        items: [entityGrid]
+                    }
+                ]
+            }
+        ]
+    });
 });
