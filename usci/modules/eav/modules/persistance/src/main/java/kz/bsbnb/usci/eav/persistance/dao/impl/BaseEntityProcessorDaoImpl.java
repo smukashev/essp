@@ -3719,7 +3719,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                 baseEntityManager.registerAsUpdated(newBaseValueRight);
 
-                if (metaType.isComplex()) {
+                if (metaType.isComplex() && !metaType.isReference()) {
                     //baseEntityManager.registerAsDeleted((IPersistable)baseValueRight.getValue());
 //                    baseEntityManager.registerUnusedBaseEntity((IBaseEntity) baseValueRight.getValue());
                     if (deleteUnused) {
@@ -3751,7 +3751,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 }
 
                 baseEntityManager.registerAsUpdated(newBaseValueLeft);
-                if (metaType.isComplex()) {
+                if (metaType.isComplex() && !metaType.isReference()) {
                     //baseEntityManager.registerAsDeleted((IPersistable) baseValueLeft.getValue());
 //                    baseEntityManager.registerUnusedBaseEntity((IBaseEntity) baseValueLeft.getValue());
                     if (deleteUnused) {

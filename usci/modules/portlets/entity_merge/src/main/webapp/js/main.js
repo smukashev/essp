@@ -8,7 +8,6 @@ Ext.require([
 
 var tabs;
 var grid;
-var store;
 var currentClass;
 var currentClass2;
 var regex = /^\S+-(\d+)-(\S+)-(\S+)$/;
@@ -308,16 +307,6 @@ function markEntityKeepBoth(){
     Ext.getCmp("entityTreeView").getView().refresh();
 }
 
-function setMegrePair(idLeft, idRight){
-    var tabs = Ext.getCmp("tabs");
-    tabs.setActiveTab(1);
-    var leftEntityId = Ext.getCmp("leftEntityId");
-    var rightEntityId = Ext.getCmp("rightEntityId");
-    leftEntityId.setValue(idLeft);
-    rightEntityId.setValue(idRight);
-
-}
-
 function getForm(){
     currentClass = Ext.getCmp('edClass').value;
     Ext.Ajax.request({
@@ -430,10 +419,10 @@ function getLeftEntityId() {
     var currentTab = tabs.getActiveTab();
     var currentTabIndex = tabs.items.indexOf(currentTab);
 
-    if (currentTab == 0) {
+    if (currentTabIndex == 0) {
         return Ext.getCmp("leftEntityId").getValue();
     } else {
-        return document.getElementsByClassName('inp-%d')[0].value;
+        return document.getElementsByClassName('inp-1')[0].value;
     }
 }
 
@@ -441,10 +430,32 @@ function getRightEntityId() {
     var currentTab = tabs.getActiveTab();
     var currentTabIndex = tabs.items.indexOf(currentTab);
 
-    if (currentTab == 0) {
+    if (currentTabIndex == 0) {
         return Ext.getCmp("rightEntityId").getValue();
     } else {
-        return document.getElementsByClassName('inp-%d')[1].value;
+        return document.getElementsByClassName('inp-1')[1].value;
+    }
+}
+
+function getLeftReportDate() {
+    var currentTab = tabs.getActiveTab();
+    var currentTabIndex = tabs.items.indexOf(currentTab);
+
+    if (currentTabIndex == 0) {
+        return Ext.getCmp("leftReportDate").getValue();
+    } else {
+        return Ext.getCmp("edDate").getValue();
+    }
+}
+
+function getRightReportDate() {
+    var currentTab = tabs.getActiveTab();
+    var currentTabIndex = tabs.items.indexOf(currentTab);
+
+    if (currentTabIndex == 0) {
+        return Ext.getCmp("rightReportDate").getValue();
+    } else {
+        return Ext.getCmp("edDate2").getValue();
     }
 }
 
@@ -514,18 +525,16 @@ Ext.onReady(function() {
         id: "entityEditorShowBtn",
         text: label_VIEW,
         handler : function (){
-            leftEntityId = Ext.getCmp("leftEntityId");
             leftReportDate = Ext.getCmp("leftReportDate");
-            rightEntityId = Ext.getCmp("rightEntityId");
             rightReportDate = Ext.getCmp("rightReportDate");
 
             entityStore.load({
                 params: {
                     op : 'LIST_ENTITY',
-                    leftEntityId: leftEntityId.getValue(),
-                    leftReportDate: leftReportDate.getValue(),
-                    rightEntityId: rightEntityId.getValue(),
-                    rightReportDate : rightReportDate.getValue()
+                    leftEntityId: getLeftEntityId(),
+                    leftReportDate: getLeftReportDate(),
+                    rightEntityId: getRightEntityId(),
+                    rightReportDate : getRightReportDate()
                 },
                 callback: function(records, operation, success) {
                     if (!success) {
@@ -544,8 +553,6 @@ Ext.onReady(function() {
             rootNode = tree.getRootNode();
 
             var JSONstr = createJSON(rootNode.childNodes[0], "", true)
-            var leftEntityId = Ext.getCmp("leftEntityId");
-            var rightEntityId = Ext.getCmp("rightEntityId");
             var leftReportDate = Ext.getCmp("leftReportDate");
             var rightReportDate = Ext.getCmp("rightReportDate");
             var deleteUnusedChecked = document.getElementById('deleteUnused').checked;
@@ -556,10 +563,10 @@ Ext.onReady(function() {
                 params: {
                     op: 'SAVE_JSON',
                     json_data: JSONstr,
-                    leftEntityId: leftEntityId.getValue(),
-                    rightEntityId: rightEntityId.getValue(),
-                    leftReportDate: leftReportDate.getValue(),
-                    rightReportDate : rightReportDate.getValue(),
+                    leftEntityId: getLeftEntityId(),
+                    rightEntityId: getRightEntityId(),
+                    leftReportDate: getLeftReportDate(),
+                    rightReportDate : getRightReportDate(),
                     deleteUnused : deleteUnusedChecked
                 },
                 success: function() {
@@ -634,6 +641,7 @@ Ext.onReady(function() {
         store: entityStore,
         multiSelect: true,
         singleExpand: true,
+        height: 300,
         autoScroll: true,
         columns: [{
             xtype: 'treecolumn',
@@ -729,7 +737,7 @@ Ext.onReady(function() {
                         id: 'leftReportDate',
                         name: 'leftReportDate',
                         xtype: 'datefield',
-                        format: 'd/m/Y',
+                        format: 'd.m.Y',
                         margin: '10 10 10 10'
                     }
                 ]
@@ -751,7 +759,7 @@ Ext.onReady(function() {
                         id: 'rightReportDate',
                         name: 'rightReportDate',
                         xtype: 'datefield',
-                        format: 'd/m/Y',
+                        format: 'd.m.Y',
                         margin: '10 10 10 10'
                     },
                 ]
@@ -839,6 +847,7 @@ Ext.onReady(function() {
         id:"tabs",
         width: '100%',
         height: '100%',
+        layout: 'fit',
         activeTab: 0,
         defaults :{
            bodyPadding: 0
@@ -881,7 +890,7 @@ Ext.onReady(function() {
                     },
                     {
                         region: 'north',
-                        height: '10%',
+                        height: '90%',
                         split: true,
                         items: [entityGrid]
                     }
