@@ -779,10 +779,13 @@ Ext.onReady(function() {
             {
                 xtype: 'panel',
                 layout: 'hbox',
+                border: 0,
                 items: [
                     {
                         xtype: 'panel',
                         layout: 'vbox',
+                        padding: 15,
+                        border: 0,
                         items: [
                             {
                                 id: 'edClass',
@@ -805,13 +808,15 @@ Ext.onReady(function() {
                             },
                             {
                                 xtype: 'component',
-                                html: '<div id="entity-editor-form" style="height: 350px;">Hello World</div>'
+                                html: '<div id="entity-editor-form" style="height: 350px;"></div>'
                             }
                         ]
                     },
                     {
                         xtype: 'panel',
                         layout: 'vbox',
+                        padding: 15,
+                        border: 0,
                         items: [
                             {
                                 id: 'edClass2',
@@ -834,7 +839,7 @@ Ext.onReady(function() {
                             },
                             {
                                 xtype: 'component',
-                                html: '<div id="entity-editor-form2" style="height: 350px;">Hello World</div>'
+                                html: '<div id="entity-editor-form2" style="height: 350px;"></div>'
                             }
                         ]
                     }
