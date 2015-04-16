@@ -29,9 +29,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_SET_VALUES;
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_VALUES;
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITIES;
+import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 /**
  * @author alexandr.motov
@@ -131,21 +129,6 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         return rows.size() > 0;
     }
 
-    @Override
-    public void setDeleted(long id, boolean deleted) {
-        // TODO @maksat check
-        byte bDeleted = (byte) (deleted ? 1 : 0);
-        Update update = context.update(EAV_BE_ENTITIES).set(EAV_BE_ENTITIES.DELETED, bDeleted).where(EAV_BE_ENTITIES.ID.equal(id));
-
-        logger.debug(update.toString());
-
-        int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
-        if (count != 1)
-        {
-            throw new RuntimeException("UPDATE operation should update only one record.");
-        }
-    }
-
     public IBaseEntity load(long id)
     {
         MetaClass metaClass = (MetaClass)getMetaClass(id);
@@ -230,6 +213,44 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
             logger.error("Can't load instance of BaseEntity, empty data set.");
         }
         return null;
+    }
+
+    @Override
+    public boolean isUsed(long baseEntityId, long exceptContainingId) {
+        String complexValuesTableAlias = "cv";
+        String complexSetValuesTableAlias = "csv";
+        String complexSetsTableAlias = "cs";
+
+        //TODO: refactor, remove dual, make selectOne()
+        Select select = context
+                .select(DSL.val(1L).as("ex_flag"))
+                .from("dual")
+                .where(
+                        DSL.exists(
+                                context.select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID)
+                                .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
+                                .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))
+                                .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.notEqual(exceptContainingId))
+                        )
+                ).or(
+                        DSL.exists(
+                                context.select(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID)
+                                .from(
+                                        EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias)
+                                        .join(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias)).on(
+                                                EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).SET_ID
+                                                .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).SET_ID)
+                                        )
+                                )
+                                .where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))
+                                .and(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).ENTITY_ID.notEqual(exceptContainingId))
+                        )
+                );
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        return rows.size() > 0;
     }
 
     @Override

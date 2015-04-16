@@ -715,7 +715,7 @@ Ext.onReady(function() {
         preventHeader: true,
         width : '100%',
         height: '100%',
-        layout : 'border',
+        border: 0,
         defaults : {
             padding: '3'
         },
@@ -723,6 +723,7 @@ Ext.onReady(function() {
             {
                 xtype: 'panel',
                 layout: 'hbox',
+                border: 0,
                 items: [
                     {
                         fieldLabel: label_LEFT_ENTITY_ID,
@@ -745,6 +746,7 @@ Ext.onReady(function() {
             {
                 xtype: 'panel',
                 layout: 'hbox',
+                border: 0,
                 items: [
                     {
                         fieldLabel: label_RIGHT_ENTITY_ID,
@@ -854,6 +856,7 @@ Ext.onReady(function() {
         height: '100%',
         layout: 'fit',
         activeTab: 0,
+        border: 0,
         defaults :{
            bodyPadding: 0
         },

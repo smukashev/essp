@@ -3724,8 +3724,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 //                    baseEntityManager.registerUnusedBaseEntity((IBaseEntity) baseValueRight.getValue());
                     if (deleteUnused) {
                         BaseEntity be = (BaseEntity) baseValueRight.getValue();
-                        be.setOperation(OperationType.DELETE);
-                        baseEntityManager.registerAsDeleted(be);
+
+                        if (!isEntityUsedElse(be.getId(), baseValueRight.getBaseContainer().getId())) {
+                            be.setOperation(OperationType.DELETE);
+                            baseEntityManager.registerAsDeleted(be);
+                        }
                     }
                 }
 
@@ -3756,8 +3759,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 //                    baseEntityManager.registerUnusedBaseEntity((IBaseEntity) baseValueLeft.getValue());
                     if (deleteUnused) {
                         BaseEntity be = (BaseEntity) baseValueLeft.getValue();
-                        be.setOperation(OperationType.DELETE);
-                        baseEntityManager.registerAsDeleted(be);
+
+                        if (!isEntityUsedElse(be.getId(), baseValueLeft.getBaseContainer().getId())) {
+                            be.setOperation(OperationType.DELETE);
+                            baseEntityManager.registerAsDeleted(be);
+                        }
                     }
                 }
 
@@ -3813,6 +3819,13 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 }
             }
         }
+    }
+
+    private boolean isEntityUsedElse(long entityIdToCheck, long entityIdContaining) {
+        IBaseEntityDao baseEntityDao = persistableDaoPool
+                .getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
+        boolean used = baseEntityDao.isUsed(entityIdToCheck, entityIdContaining);
+        return used;
     }
 
     /**
