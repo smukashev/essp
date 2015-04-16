@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.porltet.batch_entry_list;
+package kz.bsbnb.usci.porltet.entity_merge;
 import com.google.gson.Gson;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.eav.model.Batch;

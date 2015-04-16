@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.porltet.batch_entry_list;
+package kz.bsbnb.usci.porltet.entity_merge;
 
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;

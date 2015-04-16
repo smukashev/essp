@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.porltet.batch_entry_list;
+package kz.bsbnb.usci.porltet.entity_merge;
 
 import com.google.gson.Gson;
 import com.liferay.portal.model.User;
@@ -15,13 +15,10 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
-import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.Pair;
-import kz.bsbnb.usci.porltet.batch_entry_list.model.json.MetaClassList;
-import kz.bsbnb.usci.porltet.batch_entry_list.model.json.MetaClassListEntry;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.commons.lang.StringUtils;
