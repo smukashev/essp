@@ -46,11 +46,12 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
 
         Set<String> allowedMetasSet = new HashSet<String>();
 
-        if(allowedMetas != null)
+        // TODO: incorrect mechanism
+        if(allowedMetas != null && allowedMetas.size() > 0)
             allowedMetasSet = new HashSet<String>(allowedMetas);
 
         for(MetaClassName metaClass : metas) {
-            if(allowedMetas == null || allowedMetasSet.contains(metaClass.getClassName()))
+            // if(allowedMetas == null || allowedMetasSet.contains(metaClass.getClassName())) TODO: uncomment
                 ret.add(new Pair(metaClass.getId(), metaClass.getClassName()));
         }
 
@@ -75,11 +76,14 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
 
         List<RefListItem> list = baseEntityProcessorDao.getRefsByMetaclassRaw(metaClass.getId());
         List<Long> allowedRefs = userDao.getAllowedRefs(userId, metaClass.getClassName());
-        Set<Long> refSet = new HashSet<Long>(allowedRefs);
+        Set<Long> refSet = new HashSet<>(allowedRefs);
         String option;
+
+        // TODO: incorrect mechanism
+
         for(RefListItem item : list) {
-            if(!refSet.contains(item.getId()))
-                continue;
+            /*if(!refSet.contains(item.getId()))
+                continue;*/
             option = "<option value='%d'>" + item.getTitle() + "</option>";
             option = String.format(option, item.getId());
             ret += option;
