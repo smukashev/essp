@@ -22,7 +22,7 @@ public class MainPortlet extends MVCPortlet {
 
     private IBatchProcessService batchProcessService;
 
-    private final static String TMP_FILE_DIR = "/home/a.tkachenko/temp_files";
+    private final static String TMP_FILE_DIR = "/home/ktulbassiyev/Batches";
 
     private IBatchEntryService batchEntryService;
 
@@ -127,12 +127,15 @@ public class MainPortlet extends MVCPortlet {
 
                     File f = File.createTempFile("tmp", ".zip", new File(TMP_FILE_DIR));
 
+                    // TODO: fix report date
+
                     String manifest = "<manifest>\n" +
                             "\t<type>1</type>\n" +
                             "\t<name>data.xml</name>\n" +
-                            "\t<userid>" + currentUser.getUserId() + "</userid>\n" +
+                            // "\t<userid>" + currentUser.getUserId() + "</userid>\n" +
+                            "\t<userid>100500</userid>\n" +
                             "\t<size>10</size>\n" +
-                            "\t<date>10.10.10</date>\n" +
+                            "\t<date>01.04.2015</date>\n" +
                             "</manifest>";
 
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
