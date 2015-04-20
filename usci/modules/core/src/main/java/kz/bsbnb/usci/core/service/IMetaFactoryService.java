@@ -30,6 +30,8 @@ public interface IMetaFactoryService {
 
     MetaClass getMetaClass(String name);
 
+    MetaClass getMetaClass(Long metaId);
+
     boolean saveMetaClass(MetaClass meta);
 
     boolean delMetaClass(String className);

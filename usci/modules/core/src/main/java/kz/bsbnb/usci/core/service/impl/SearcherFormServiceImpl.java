@@ -52,7 +52,7 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
 
         for(MetaClassName metaClass : metas) {
             // if(allowedMetas == null || allowedMetasSet.contains(metaClass.getClassName())) TODO: uncomment
-                ret.add(new Pair(metaClass.getId(), metaClass.getClassName()));
+                ret.add(new Pair(metaClass.getId(), metaClass.getClassTitle()));
         }
 
         return ret;
@@ -102,12 +102,12 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
 
         String ret =
                 "<div class='node'><div class='leaf'> %s : " +
-                        "<input type=\"text\" id='inp-%d-%s-%s' class='inp-%d' readonly /> " +
+                        "<input type=\"text\" id='inp-%d-%d-%s' class='inp-%d' readonly /> " +
                         "<a href='#' onclick='find(this);'>найти</a>" +
                         "<div class='loading'>loading</div>" +
                         "<div class='not-filled' id = 'err-%d'>not.filled</div></div><div class='node'>";
 
-        ret = String.format(ret, metaClass.getClassName(), id, metaClass.getClassName(), attribute, id, id);
+        ret = String.format(ret, ((MetaClass)metaClass).getClassTitle(), id, metaClass.getId(), attribute, id, id);
 
         for(String attr : metaClass.getAttributeNames()) {
             IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attr);

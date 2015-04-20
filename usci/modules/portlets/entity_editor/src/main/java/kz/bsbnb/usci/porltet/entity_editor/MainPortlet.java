@@ -344,16 +344,16 @@ public class MainPortlet extends MVCPortlet {
                     writer.write("{\"success\":\"true\", \"data\": " + gson.toJson(classes) + "}");
                     break;
                 case GET_FORM:
-                    String metaName = resourceRequest.getParameter("meta");
-                    String generatedForm = searcherFormService.getDom(currentUser.getUserId(), metaFactoryService.getMetaClass(metaName));
+                    Long metaId = Long.valueOf(resourceRequest.getParameter("metaId"));
+                    String generatedForm = searcherFormService.getDom(currentUser.getUserId(), metaFactoryService.getMetaClass(metaId));
                     writer.write(generatedForm);
                     break;
                 case FIND_ACTION:
                     Enumeration<String> list = resourceRequest.getParameterNames();
 
-                    String metaString = resourceRequest.getParameter("metaClass");
+                    metaId = Long.valueOf(resourceRequest.getParameter("metaClass"));
 
-                    MetaClass metaClass = metaFactoryService.getMetaClass(metaString);
+                    MetaClass metaClass = metaFactoryService.getMetaClass(metaId);
                     BaseEntity baseEntity = new BaseEntity(metaClass, new Date());
 
                     while(list.hasMoreElements()) {
