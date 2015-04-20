@@ -1,6 +1,6 @@
-//var label_SEND = 'Отправить';
-//var label_EDIT = 'Редактировать_d';
-//var label_DATE = 'Дата_d';
+var label_SEND = 'Отправить';
+var label_EDIT = 'Редактировать_d';
+var label_DATE = 'Дата_d';
 var label_CODE = 'Код_d';
 var label_TITLE = 'Наименоваие_d';
 var label_ITEMS = 'Элементы_d';
@@ -18,4 +18,4 @@ var label_INPUT_FORM = "Форма ввода_d";
 var label_REF = 'Справочник_d';
 var label_ITEMS = 'Элементы_d';
 var label_ENTITY_ID = 'Идентификатор сущности_d';
-//var label_DEL = 'Удалить_d';
+var label_DEL = 'Удалить_d';
