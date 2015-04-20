@@ -200,7 +200,7 @@ Ext.onReady(function() {
                 }
             });
         },
-        maxWidth: 50,
+        maxWidth: 70,
         shadow: true
     });
 
@@ -228,7 +228,7 @@ Ext.onReady(function() {
                 }
             });
         },
-        maxWidth: 50
+        maxWidth: 70
     });
 
     var buttonShowXML = Ext.create('Ext.button.Button', {

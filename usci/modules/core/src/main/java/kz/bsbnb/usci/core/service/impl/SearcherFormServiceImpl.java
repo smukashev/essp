@@ -103,7 +103,7 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
         String ret =
                 "<div class='node'><div class='leaf'> %s : " +
                         "<input type=\"text\" id='inp-%d-%s-%s' class='inp-%d' readonly /> " +
-                        "<a href='#' onclick='find(this);'>find</a>" +
+                        "<a href='#' onclick='find(this);'>найти</a>" +
                         "<div class='loading'>loading</div>" +
                         "<div class='not-filled' id = 'err-%d'>not.filled</div></div><div class='node'>";
 
