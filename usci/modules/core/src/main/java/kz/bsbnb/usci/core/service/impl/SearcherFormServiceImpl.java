@@ -104,8 +104,8 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
                 "<div class='node'><div class='leaf'> %s : " +
                         "<input type=\"text\" id='inp-%d-%d-%s' class='inp-%d' readonly /> " +
                         "<a href='#' onclick='find(this);'>найти</a>" +
-                        "<div class='loading'>loading</div>" +
-                        "<div class='not-filled' id = 'err-%d'>not.filled</div></div><div class='node'>";
+                        "<div class='loading'>загрузка</div>" +
+                        "<div class='not-filled' id = 'err-%d'>не заполнено</div></div><div class='node'>";
 
         ret = String.format(ret, ((MetaClass)metaClass).getClassTitle(), id, metaClass.getId(), attribute, id, id);
 
@@ -127,9 +127,9 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
                                 "<div class='not-filled' id='err-%d'>not.filled</div></div>";
                     else
                         divSimple = "<div class='leaf'> %s: <input type = 'text' id='inp-%d-%s-%s' />" +
-                                "<div class='not-filled' id='err-%d'>not.filled</div></div>";
+                                "<div class='not-filled' id='err-%d'>не заполнено</div></div>";
                     long nextId = nextId();
-                    divSimple = String.format(divSimple, metaAttribute.getName(), nextId, "simple", attr , nextId);
+                    divSimple = String.format(divSimple, metaAttribute.getTitle(), nextId, "simple", attr , nextId);
                     ret += divSimple;
                 }
             }
