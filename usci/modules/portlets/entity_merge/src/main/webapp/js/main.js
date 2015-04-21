@@ -793,7 +793,6 @@ Ext.onReady(function() {
                                 id: 'edClass',
                                 xtype: 'combobox',
                                 store: classesStore,
-                                labelWidth: 70,
                                 valueField:'name',
                                 displayField:'name',
                                 fieldLabel: label_CLASS
@@ -815,6 +814,9 @@ Ext.onReady(function() {
                         ]
                     },
                     {
+                        xtype: 'tbfill'
+                    },
+                    {
                         xtype: 'panel',
                         layout: 'vbox',
                         padding: 15,
@@ -824,7 +826,6 @@ Ext.onReady(function() {
                                 id: 'edClass2',
                                 xtype: 'combobox',
                                 store: classesStore,
-                                labelWidth: 70,
                                 valueField:'name',
                                 displayField:'name',
                                 fieldLabel: label_CLASS
