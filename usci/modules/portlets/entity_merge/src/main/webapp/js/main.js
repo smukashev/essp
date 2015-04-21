@@ -794,7 +794,7 @@ Ext.onReady(function() {
                                 xtype: 'combobox',
                                 store: classesStore,
                                 labelWidth: 70,
-                                valueField:'name',
+                                valueField:'id',
                                 displayField:'name',
                                 fieldLabel: label_CLASS
                             },
@@ -825,7 +825,7 @@ Ext.onReady(function() {
                                 xtype: 'combobox',
                                 store: classesStore,
                                 labelWidth: 70,
-                                valueField:'name',
+                                valueField:'id',
                                 displayField:'name',
                                 fieldLabel: label_CLASS
                             },
