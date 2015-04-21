@@ -540,7 +540,8 @@ public class MainPortlet extends MVCPortlet {
                     System.out.println("\n THE RIGHT ENTITY REPORT DATE: " + rightReportDt);
                     System.out.println("\n DELETE UNUSED: " + deleteUnused);
 
-                    entityMergeService.mergeBaseEntities(Long.parseLong(leftEntity), Long.parseLong(rightEntity), leftRD, rightRD, json, "true".equals(deleteUnused));
+                    entityMergeService.mergeBaseEntities(Long.parseLong(leftEntity), Long.parseLong(rightEntity),
+                            leftRD, rightRD, json, "true".equals(deleteUnused));
 
                     writer.write("{\"success\": true }");
 
@@ -548,7 +549,10 @@ public class MainPortlet extends MVCPortlet {
                 }
                 case GET_FORM:
                     String metaName = resourceRequest.getParameter("meta");
-                    String generatedForm = searcherFormService.getDom(currentUser.getUserId(), metaFactoryService.getMetaClass(metaName));
+
+                    String generatedForm = searcherFormService.getDom(currentUser.getUserId(),
+                            metaFactoryService.getMetaClass(metaName));
+
                     writer.write(generatedForm);
                     break;
                 case FIND_ACTION:
@@ -606,12 +610,16 @@ public class MainPortlet extends MVCPortlet {
 
                     break;
                 case LIST_CLASSES:
-                    List<Pair> classes = searcherFormService.getMetaClasses(currentUser.getUserId());
+                    Long userId = 0L;
 
-                    System.out.println("classes.size() = " + classes.size());
+                    if(currentUser != null)
+                        userId = currentUser.getUserId();
+
+                    List<Pair> classes = searcherFormService.getMetaClasses(userId);
 
                     if(classes.size() < 1)
                         throw new RuntimeException("no.any.rights");
+
                     writer.write("{\"success\":\"true\", \"data\": " + gson.toJson(classes) + "}");
                     break;
                 case LIST_BY_CLASS:
