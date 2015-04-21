@@ -1,6 +1,6 @@
-var label_SEND = 'Отправить_en';
-var label_EDIT = 'Редактировать_en';
-var label_DATE = 'Дата_en';
+var label_SEND = 'Отправить';
+var label_EDIT = 'Редактировать';
+var label_DATE = 'Дата';
 var label_CODE = 'Коды';
 var label_TITLE = 'Аты';
 var label_ITEMS = 'Элементтер';
@@ -19,4 +19,4 @@ var label_REF = 'Анықтама';
 var label_ITEMS = 'Элементтер';
 var label_ENTITY_ID = 'Болмыс идентификаторы';
 var label_Date = 'Дата';
-var label_DEL = 'Удалить_en';
+var label_DEL = 'Удалить';
