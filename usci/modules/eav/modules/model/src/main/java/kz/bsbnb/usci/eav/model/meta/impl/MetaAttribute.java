@@ -140,7 +140,9 @@ public class MetaAttribute extends Persistable implements IMetaAttribute
 
     public String getTitle()
     {
-        return title;
+        if(title != null)
+            return title;
+        return getName();
     }
 
     public void setTitle(String title)

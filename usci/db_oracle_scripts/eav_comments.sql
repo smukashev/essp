@@ -21,3 +21,10 @@ update eav_m_classes set title = 	'Вид обеспечения'	WHERE NAME = '
 update eav_m_classes set title = 	'Тип организации выкупившей (принявший) заем (условное обязательство)'	WHERE NAME = 'ref_portfolio';
 update eav_m_classes set title = 	'Области'	WHERE NAME = 'ref_region';
 update eav_m_classes set title = 	'Тип организации выкупившей (принявший) заем (условное обязательство)'	WHERE NAME = 'ref_subject_type';
+update eav_m_classes set title = 	'Договор займа/условного обязательства(кредит)'	WHERE NAME = 'credit';
+update eav_m_classes set title = 	'Физическое лицо'	WHERE NAME = 'person';
+update eav_m_classes set title = 	'Юридическое лицо'	WHERE NAME = 'organization';
+update eav_m_classes set title = 	'Договор'	WHERE NAME = 'primary_contract';
+
+update eav_m_simple_attributes set title = 'номер' where name='no';
+update eav_m_simple_attributes set title = 'дата' where name='date';
