@@ -31,11 +31,9 @@ var label_DB_FAILURE_TITLE="Қате!";
 var label_MERGE_PANEL_BY_ID="Идентификатор бойынша бiрiктiру панелi";
 var label_MERGE_PANEL="Бiрiктiру панелi";
 var label_MERGE_CANDIDATES="Бiрiктiруге тиiстi кандидаттар";
-
 var label_LEFT_REPORT_DATE = "Бірінші мәннің есеп күні";
 var label_RIGHT_REPORT_DATE = "Екінші мәннің есеп күні";
 var label_DELETE_UNUSED = "Пайдаланылмайтын мәндерді жою";
-
 var label_CLASS = "Класс";
 var LABEL_UPDATE = 'Жанарту';
 var label_date = 'Күні';
