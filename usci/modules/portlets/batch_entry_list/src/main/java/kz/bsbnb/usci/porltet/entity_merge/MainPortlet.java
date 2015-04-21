@@ -22,7 +22,7 @@ public class MainPortlet extends MVCPortlet {
 
     private IBatchProcessService batchProcessService;
 
-    private final static String TMP_FILE_DIR = "/home/ktulbassiyev/Batches";
+    private final static String TMP_FILE_DIR = System.getProperty("user.home") + "/Batches";
 
     private IBatchEntryService batchEntryService;
 
@@ -67,7 +67,9 @@ public class MainPortlet extends MVCPortlet {
 
     enum OperationTypes {
         LIST_ENTRIES,
-        SEND_XML
+        SEND_XML,
+        GET_ENTRY,
+        DELETE_ENTRY
     }
 
     @Override
@@ -78,12 +80,17 @@ public class MainPortlet extends MVCPortlet {
         try {
             OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
 
+            User currentUser = PortalUtil.getUser(resourceRequest);
+
+            if (currentUser == null) {
+                writer.write("{\"success\": false, \"errorMessage\": \"Not logged in\"}");
+                return;
+            }
+
             Gson gson = new Gson();
 
             switch (operationType) {
                 case LIST_ENTRIES:
-                    User currentUser = PortalUtil.getUser(resourceRequest);
-
                     List<BatchEntry> entries = batchEntryService.getListByUser(currentUser.getUserId());
 
                     writer.write("{\"total\":" + entries.size());
@@ -109,8 +116,6 @@ public class MainPortlet extends MVCPortlet {
 
                     break;
                 case SEND_XML:
-                    currentUser = PortalUtil.getUser(resourceRequest);
-
                     entries = batchEntryService.getListByUser(currentUser.getUserId());
 
                     String xml =
@@ -161,6 +166,17 @@ public class MainPortlet extends MVCPortlet {
                     batchProcessService.processBatch(f.getPath(), currentUser.getUserId());
 
                     break;
+                case GET_ENTRY: {
+                    String id = resourceRequest.getParameter("id");
+                    BatchEntry batchEntry = batchEntryService.load(Long.valueOf(id));
+                    writer.write(batchEntry.getValue());
+                    break;
+                }
+                case DELETE_ENTRY: {
+                    String id = resourceRequest.getParameter("id");
+                    batchEntryService.delete(Long.valueOf(id));
+                    break;
+                }
                 default:
                     break;
             }

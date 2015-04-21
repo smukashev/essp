@@ -28,4 +28,11 @@ public class BatchEntryServiceImpl implements IBatchEntryService {
     {
         return batchEntriesDao.getBatchEntriesByUserId(userId);
     }
+
+    @Override
+    public void delete(long batchEntryId) {
+        BatchEntry batchEntry = new BatchEntry();
+        batchEntry.setId(batchEntryId);
+        batchEntriesDao.remove(batchEntry);
+    }
 }

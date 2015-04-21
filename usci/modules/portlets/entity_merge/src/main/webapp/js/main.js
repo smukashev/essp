@@ -770,7 +770,7 @@ Ext.onReady(function() {
     });
 
     var clientEntityEditorPanel = Ext.create('Ext.panel.Panel', {
-        title : label_MERGE_PANEL_BY_ID,
+        title : label_MERGE_PANEL,
         preventHeader: true,
         width : '100%',
         height: '100%',
@@ -784,64 +784,82 @@ Ext.onReady(function() {
                 border: 0,
                 items: [
                     {
-                        xtype: 'panel',
-                        layout: 'vbox',
-                        padding: 15,
-                        border: 0,
+                        border: 1,
+                        padding: 10,
                         items: [
                             {
-                                id: 'edClass',
-                                xtype: 'combobox',
-                                store: classesStore,
-                                labelWidth: 70,
-                                valueField:'id',
-                                displayField:'name',
-                                fieldLabel: label_CLASS
-                            },
-                            {
-                                xtype: 'component',
-                                html: "<a href='#' onclick='getForm();'>" +LABEL_UPDATE+ "</a>"
-                            },
-                            {
-                                xtype: 'datefield',
-                                id: 'edDate',
-                                fieldLabel: label_date,
-                                format: 'd.m.Y'
-                            },
-                            {
-                                xtype: 'component',
-                                html: '<div id="entity-editor-form" style="height: 350px;"></div>'
+                                xtype: 'panel',
+                                layout: 'vbox',
+                                padding: 15,
+                                border: 0,
+                                items: [
+                                    {
+                                        id: 'edClass',
+                                        xtype: 'combobox',
+                                        labelWidth: 350,
+                                        store: classesStore,
+                                        valueField:'id',
+                                        displayField:'name',
+                                        fieldLabel: label_CLASS
+                                    },
+
+                                    {
+                                        xtype: 'component',
+                                        html: "<a href='#' onclick='getForm();'>" +LABEL_UPDATE+ "</a>"
+                                    },
+                                    {
+                                        xtype: 'datefield',
+                                        id: 'edDate',
+                                        labelWidth: 350,
+                                        fieldLabel: label_date,
+                                        format: 'd.m.Y'
+                                    },
+                                    {
+                                        xtype: 'component',
+                                        html: '<div id="entity-editor-form" style="height: 350px;"></div>'
+                                    }
+                                ]
                             }
                         ]
                     },
                     {
-                        xtype: 'panel',
-                        layout: 'vbox',
-                        padding: 15,
-                        border: 0,
+                        xtype: 'tbfill'
+                    },
+                    {
+                        border: 1,
+                        padding: 10,
                         items: [
                             {
-                                id: 'edClass2',
-                                xtype: 'combobox',
-                                store: classesStore,
-                                labelWidth: 70,
-                                valueField:'id',
-                                displayField:'name',
-                                fieldLabel: label_CLASS
-                            },
-                            {
-                                xtype: 'component',
-                                html: "<a href='#' onclick='getForm2();'>" +LABEL_UPDATE+ "</a>"
-                            },
-                            {
-                                xtype: 'datefield',
-                                id: 'edDate2',
-                                fieldLabel: label_date,
-                                format: 'd.m.Y'
-                            },
-                            {
-                                xtype: 'component',
-                                html: '<div id="entity-editor-form2" style="height: 350px;"></div>'
+                                xtype: 'panel',
+                                layout: 'vbox',
+                                padding: 15,
+                                border: 0,
+                                items: [
+                                    {
+                                        id: 'edClass2',
+                                        xtype: 'combobox',
+                                        store: classesStore,
+                                        labelWidth: 350,
+                                        valueField:'id',
+                                        displayField:'name',
+                                        fieldLabel: label_CLASS
+                                    },
+                                    {
+                                        xtype: 'component',
+                                        html: "<a href='#' onclick='getForm2();'>" +LABEL_UPDATE+ "</a>"
+                                    },
+                                    {
+                                        xtype: 'datefield',
+                                        id: 'edDate2',
+                                        labelWidth: 350,
+                                        fieldLabel: label_date,
+                                        format: 'd.m.Y'
+                                    },
+                                    {
+                                        xtype: 'component',
+                                        html: '<div id="entity-editor-form2" style="height: 350px;"></div>'
+                                    }
+                                ]
                             }
                         ]
                     }
