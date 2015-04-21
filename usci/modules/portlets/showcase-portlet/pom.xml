@@ -9,8 +9,8 @@
     <version>1.0-SNAPSHOT</version>
     <properties>
         <liferay.maven.plugin.version>6.2.10.6</liferay.maven.plugin.version>
-        <liferay.version>6.2.1</liferay.version>
-        <liferay.auto.deploy.dir>/home/almaz/software/liferay-portal-6.2-ce-ga2/deploy</liferay.auto.deploy.dir>
+        <liferay.version>6.1.2</liferay.version>
+        <liferay.auto.deploy.dir>/home/ktulbassiyev/glassfish3/deploy</liferay.auto.deploy.dir>
         <liferay.app.server.deploy.dir>/home/almaz/software/liferay-portal-6.2-ce-ga2/tomcat-7.0.42/webapps</liferay.app.server.deploy.dir>
         <liferay.app.server.lib.global.dir>/home/almaz/software/liferay-portal-6.2-ce-ga2/tomcat-7.0.42/lib/ext</liferay.app.server.lib.global.dir>
         <liferay.app.server.portal.dir>/home/almaz/software/liferay-portal-6.2-ce-ga2/tomcat-7.0.42/webapps/ROOT</liferay.app.server.portal.dir>
