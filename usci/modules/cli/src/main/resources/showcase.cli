@@ -59,8 +59,8 @@ showcase save
 #   3. Organization
 #==================================================================================
 
-showcase set name CORE_ORGANIZATION
-showcase set tableName CORE_ORGANIZATION
+showcase set name CORE_ORG
+showcase set tableName CORE_ORG
 showcase set downPath subjects.organization
 
 showcase list add is_se
@@ -222,8 +222,8 @@ showcase save
 #   11. Organization name
 #==================================================================================
 
-showcase set name CORE_ORGANIZATION_NAME
-showcase set tableName CORE_ORGANIZATION_NAME
+showcase set name CORE_ORG_NAME
+showcase set tableName CORE_ORG_NAME
 showcase set downPath subjects.organization
 
 showcase list add names.name
