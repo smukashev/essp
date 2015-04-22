@@ -31,7 +31,7 @@ public class CreditorBranchParser extends BatchParser {
     @Override
     public void init()
     {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("creditor_branch"), new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor_branch"), new Date());
     }
 
     @Override
@@ -42,16 +42,16 @@ public class CreditorBranchParser extends BatchParser {
             currentBaseEntity.put("code", new BaseValue(batch, index, event.asCharacters().getData()));
         } else if(localName.equals("docs")) {
             //ctCreditorDocs = new CtCreditor.Docs();
-            currentDocSet = new BaseSet(metaClassRepository.getMetaClass("doc1"));
+            currentDocSet = new BaseSet(metaClassRepository.getMetaClass("document"));
         } else if(localName.equals("doc")) {
             //currentDoc = new CtDoc();
             //currentDoc.setDocType(attributes.getValue("doc_type"));
-            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("doc1"), new Date());
+            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"), new Date());
 
             BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), new Date());
 
             docType.put("code", new BaseValue(batch, index,
-                    new Integer(event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())));
+                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
 
             currentDoc.put("doc_type", new BaseValue(batch, index,
                     docType));

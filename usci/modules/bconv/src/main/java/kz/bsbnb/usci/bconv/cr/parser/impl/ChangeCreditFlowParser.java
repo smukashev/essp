@@ -48,9 +48,7 @@ public class ChangeCreditFlowParser extends BatchParser {
                     new Date()
             );
             event = (XMLEvent) xmlReader.next();
-            classification.put("code",new BaseValue(batch,index,
-                    new Integer(event.asCharacters().getData()))
-            );
+            classification.put("code",new BaseValue(batch,index, event.asCharacters().getData()));
             currentBaseEntity.put("classification",new BaseValue(batch,index,classification));
         } else if(localName.equals("provision")) {
             currentProvision = new BaseEntity(metaClassRepository.getMetaClass("provision"),new Date());

@@ -75,7 +75,7 @@ public class SubjectPersonParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"), new Date());
 
-            bankRelation.put("code", new BaseValue(batch, index, new Integer(event.asCharacters().getData())));
+            bankRelation.put("code", new BaseValue(batch, index, event.asCharacters().getData()));
 
             bankRelations.put(new BaseValue(batch, index, bankRelation));
         } else if(localName.equals("addresses")) {
@@ -99,7 +99,7 @@ public class SubjectPersonParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             BaseEntity region = new BaseEntity(metaClassRepository.getMetaClass("ref_region"), new Date());
 
-            region.put("code", new BaseValue(batch, index, new Integer(event.asCharacters().getData())));
+            region.put("code", new BaseValue(batch, index, event.asCharacters().getData()));
 
             currentAddress.put("region", new BaseValue(batch, index,
                     region
@@ -135,7 +135,7 @@ public class SubjectPersonParser extends BatchParser {
             contacts.put(new BaseValue(batch, index, currentContact));
         } else if(localName.equals("names")) {
             //names = new CtPerson.Names();
-            names = new BaseSet(metaClassRepository.getMetaClass("name"));
+            names = new BaseSet(metaClassRepository.getMetaClass("person_name"));
         } else if(localName.equals("name")) {
             /*name = new CtPerson.Names.Name();
 
@@ -149,7 +149,7 @@ public class SubjectPersonParser extends BatchParser {
             } else {
                 throw new UnknownValException(localName, attributes.getValue("lang"));
             } */
-            currentName = new BaseEntity(metaClassRepository.getMetaClass("name"), new Date());
+            currentName = new BaseEntity(metaClassRepository.getMetaClass("person_name"), new Date());
 
             currentName.put("lang", new BaseValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("lang")).getValue()));
@@ -169,7 +169,7 @@ public class SubjectPersonParser extends BatchParser {
                     event.asCharacters().getData()
                 ));
         } else if(localName.equals("docs")) {
-            BaseSet personDocs = new BaseSet(metaClassRepository.getMetaClass("doc1"));
+            BaseSet personDocs = new BaseSet(metaClassRepository.getMetaClass("document"));
 
             while(true) {
                 subjectPersonDocsParser.parse(xmlReader, batch, index);

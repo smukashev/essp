@@ -28,7 +28,7 @@ public class ChangeRemainsCorrectionParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("correction"),new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains_correction"),new Date());
     }
 
     @Override

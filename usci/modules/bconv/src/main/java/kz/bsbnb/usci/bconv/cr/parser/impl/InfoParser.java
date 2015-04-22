@@ -41,7 +41,7 @@ public class InfoParser extends BatchParser {
     private BaseSet docs;
     private BaseEntity currentDoc;
     private BaseValue accountDate;
-    private BaseValue reportDate;
+    private BaseValue<Date> reportDate;
     private BaseValue actualCreditCount;
 
 
@@ -54,16 +54,16 @@ public class InfoParser extends BatchParser {
             //currentBaseEntity.put("code",new BaseValue(batch,index,777));
         } else if(localName.equals("code")) {
         } else if(localName.equals("docs")) {
-            docs = new BaseSet(metaClassRepository.getMetaClass("doc1"));
+            docs = new BaseSet(metaClassRepository.getMetaClass("document"));
             //docs = new Docs();
         } else if(localName.equals("doc")) {
             //currentDoc = new CtDoc();
             //currentDoc.setDocType(attributes.getValue("doc_type"));
-            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("doc1"),new Date());
+            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"),new Date());
 
             BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),new Date());
             docType.put("code",new BaseValue(batch,index,
-                    new Integer(event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())));
+                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
             currentDoc.put("doc_type",new BaseValue(batch,index,docType));
         } else if(localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
@@ -81,7 +81,7 @@ public class InfoParser extends BatchParser {
         } else if(localName.equals("report_date")) {
             event = (XMLEvent) xmlReader.next();
             try {
-                reportDate = new BaseValue(batch,index,dateFormat.parse(event.asCharacters().getData()));
+                reportDate = new BaseValue<Date>(batch,index,dateFormat.parse(event.asCharacters().getData()));
             } catch (ParseException e) {
                 System.out.println(e.getMessage());
             }
@@ -135,7 +135,7 @@ public class InfoParser extends BatchParser {
         return accountDate;
     }
 
-    public BaseValue getReportDate() {
+    public BaseValue<Date> getReportDate() {
         return reportDate;
     }
 

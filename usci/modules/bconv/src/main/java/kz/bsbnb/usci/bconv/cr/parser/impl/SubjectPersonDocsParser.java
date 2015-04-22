@@ -30,7 +30,7 @@ public class SubjectPersonDocsParser extends BatchParser {
     @Override
     public void init()
     {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("doc1"), new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("document"), new Date());
     }
     
     @Override
@@ -43,7 +43,7 @@ public class SubjectPersonDocsParser extends BatchParser {
             BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), new Date());
 
             docType.put("code", new BaseValue(batch, index,
-                    new Integer(event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())));
+                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
 
             currentBaseEntity.put("doc_type", new BaseValue(batch, index,
                     docType));

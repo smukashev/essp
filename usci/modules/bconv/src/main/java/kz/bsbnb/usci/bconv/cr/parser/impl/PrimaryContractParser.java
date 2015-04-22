@@ -52,7 +52,7 @@ public class PrimaryContractParser extends BatchParser {
                 currentBaseEntity.put("no", new BaseValue(batch, index, event.asCharacters().getData()));
             } else if(localName.equals("date")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("contract_date", new BaseValue(batch, index,
+                currentBaseEntity.put("date", new BaseValue(batch, index,
                         dateFormat.parse(event.asCharacters().getData())
                     ));
             } else {

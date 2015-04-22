@@ -38,7 +38,7 @@ public class ChangeRemainsDebtParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("debt1"),new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains_debt"),new Date());
 
     }
 
@@ -47,15 +47,15 @@ public class ChangeRemainsDebtParser extends BatchParser {
         if(localName.equals("debt")) {
         } else if(localName.equals("current")) {
             //ctRemainsTypeCurrent = new CtRemainsTypeCurrentNonNegative();
-            fieldCurrent = new BaseEntity(metaClassRepository.getMetaClass("current"),new Date());
+            fieldCurrent = new BaseEntity(metaClassRepository.getMetaClass("remains_debt_current"),new Date());
             debtWay = localName;
         } else if(localName.equals("pastdue")) {
             //ctRemainsTypePastdue = new CtRemainsTypePastdueNonNegative();
-            fieldPastDue = new BaseEntity(metaClassRepository.getMetaClass("pastdue"),new Date());
+            fieldPastDue = new BaseEntity(metaClassRepository.getMetaClass("remains_debt_pastdue"),new Date());
             debtWay = localName;
         } else if(localName.equals("write_off")) {
             //ctRemainsTypeDebtWriteOff = new CtRemainsTypeDebtWriteOff();
-            fieldWriteOf = new BaseEntity(metaClassRepository.getMetaClass("write_off"),new Date());
+            fieldWriteOf = new BaseEntity(metaClassRepository.getMetaClass("remains_debt_write_off"),new Date());
             debtWay = localName;
         } else if(localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();

@@ -28,7 +28,7 @@ public class ChangeRemainsLimitParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("limit"),new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains_limit"),new Date());
     }
 
     @Override

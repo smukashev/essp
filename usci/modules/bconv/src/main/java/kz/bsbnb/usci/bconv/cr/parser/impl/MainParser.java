@@ -124,9 +124,15 @@ public class MainParser extends BatchParser {
                 //my add
                 //currentBaseEntity.put("actual_credit_count",new BaseValue(batch,index,43));
                 currentBaseEntity.put("creditor", new BaseValue(batch,index,infoParser.getCurrentBaseEntity()));
-                currentBaseEntity.put("account_date", infoParser.getAccountDate());
-                currentBaseEntity.put("report_date", infoParser.getReportDate());
-                currentBaseEntity.put("actual_credit_count", infoParser.getActualCreditCount());
+
+                // TODO possibly should be removed, we don't have such a field
+//                currentBaseEntity.put("account_date", infoParser.getAccountDate());
+
+//                currentBaseEntity.put("report_date", infoParser.getReportDate());
+                currentBaseEntity.setReportDate(infoParser.getReportDate().getValue());
+
+                // TODO possibly should be removed, we don't have such a field
+//                currentBaseEntity.put("actual_credit_count", infoParser.getActualCreditCount());
 
                 hasMorePackages = true;
             } else {

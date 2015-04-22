@@ -40,7 +40,7 @@ public class PledgesParser extends BatchParser {
         } else if(localName.equals("pledge_type")) {
             event = (XMLEvent) xmlReader.next();
             BaseEntity pledgeType = new BaseEntity(metaClassRepository.getMetaClass("ref_pledge_type"),new Date());
-            pledgeType.put("code",new BaseValue(batch,index,new Integer(event.asCharacters().getData())));
+            pledgeType.put("code",new BaseValue(batch,index,event.asCharacters().getData()));
             currentBaseEntity.put("pledge_type",new BaseValue(batch,index,pledgeType));
         } else if(localName.equals("contract")) {
             //ctContractBase = new CtContractBase();

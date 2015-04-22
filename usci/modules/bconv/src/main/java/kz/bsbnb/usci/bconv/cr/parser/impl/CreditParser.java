@@ -48,10 +48,9 @@ public class CreditParser extends BatchParser {
     }
 
 
-    @Override
-    public void init()
+    public void setCurrentBaseEntity(BaseEntity baseEntity)
     {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit"), new Date());
+        currentBaseEntity = baseEntity;
     }
 
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {

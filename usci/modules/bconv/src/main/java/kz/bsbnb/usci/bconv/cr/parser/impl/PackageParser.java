@@ -66,11 +66,9 @@ public class PackageParser extends BatchParser {
             } else {
                 throw new UnknownValException(localName, attributes.getValue("operation_type"));
             } */
-            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ct_package"), new Date());
-            currentBaseEntity.put("operation_type", new BaseValue(batch, index,
-                    event.asStartElement().getAttributeByName(new QName("operation_type")).getValue()));
-            currentBaseEntity.put("no", new BaseValue(batch, index,
-                    new Double(event.asStartElement().getAttributeByName(new QName("no")).getValue())));
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit"), new Date());
+            currentBaseEntity.setIndex(Long.parseLong(event.asStartElement().getAttributeByName(new QName("no")).getValue()));
+            creditParser.setCurrentBaseEntity(currentBaseEntity);
         } else if(localName.equals("primary_contract")) {
             primaryContractParser.parse(xmlReader, batch, index);
             BaseEntity primaryContract = primaryContractParser.getCurrentBaseEntity();
@@ -84,14 +82,14 @@ public class PackageParser extends BatchParser {
             BaseEntity creditType = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_type"), new Date());
 
             creditType.put("code", new BaseValue(batch, index,
-                    new Integer(event.asStartElement().getAttributeByName(new QName("credit_type")).getValue())));
+                    event.asStartElement().getAttributeByName(new QName("credit_type")).getValue()));
 
             credit.put("credit_type", new BaseValue(batch, index,
                     creditType));
             //System.out.println(credit.toString());
-            currentBaseEntity.put("credit", new BaseValue(batch, index, credit));
         } else if(localName.equals("subjects")) {
-            BaseEntity subjects = new BaseEntity(metaClassRepository.getMetaClass("subject"), new Date());
+//            BaseEntity subjects = new BaseEntity(metaClassRepository.getMetaClass("subject"), new Date());
+            BaseSet subjects = new BaseSet(metaClassRepository.getMetaClass("subject"));
 
             while(true) {
                 subjectsParser.parse(xmlReader, batch, index);
