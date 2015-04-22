@@ -579,62 +579,78 @@ public class ZipFilesMonitor{
 
     public void readFiles(String filename, Long userId) {
         BatchInfo batchInfo = new BatchInfo();
-        try{
 
+        try {
             ZipFile zipFile = new ZipFile(filename);
-
             ZipEntry manifestEntry = zipFile.getEntry("manifest.xml");
 
-            InputStream inManifest = zipFile.getInputStream(manifestEntry);
+            if(manifestEntry == null) {
+                int fileCount = 0;
+                ZipEntry dataXmlFile = null;
+                Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
-            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                while(entries.hasMoreElements()) {
+                    if(fileCount >= 1)
+                        throw new UnsupportedOperationException("Zip file must contain exactly one file");
 
-            DocumentBuilder documentBuilder = null;
-            try {
-                documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            } catch (ParserConfigurationException e) {
-                e.printStackTrace();
+                    dataXmlFile = entries.nextElement();
+                    fileCount++;
+                }
+
+                if(dataXmlFile == null)
+                    throw new NullPointerException("Zip file contains corrupted xml file");
+
+                if(userId == null)
+                    userId = 100500L;
+
+                batchInfo.setBatchType("2");
+                batchInfo.setBatchName(dataXmlFile.getName());
+                batchInfo.setUserId(userId);
+                /*batchInfo.setSize(dataXmlFile.getSize());*/
+                Date date = DataTypeUtil.convertDateToFirstDay(new Date(), 0);
+                batchInfo.setRepDate(date);
+
+                zipFile.close();
+                saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));
+            } else {
+                InputStream inManifest = zipFile.getInputStream(manifestEntry);
+                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder documentBuilder = null;
+
+                try {
+                    documentBuilder = documentBuilderFactory.newDocumentBuilder();
+                } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                }
+
+                Document document = null;
+                try {
+                    document = documentBuilder.parse(inManifest);
+                } catch (SAXException e) {
+                    e.printStackTrace();
+                }
+
+
+                batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent());
+                batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent());
+
+                batchInfo.setUserId(userId == null ?
+                        Long.parseLong(document.getElementsByTagName("userid").item(0).getTextContent()) : userId);
+
+                batchInfo.setSize(Long.parseLong(document.getElementsByTagName("size").item(0).getTextContent()));
+                Date date = null;
+
+                try {
+                    date = new SimpleDateFormat("dd.MM.yyyy").parse(
+                            document.getElementsByTagName("date").item(0).getTextContent());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                batchInfo.setRepDate(date);
+                zipFile.close();
+                saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));
             }
-
-            Document document = null;
-            try {
-                document = documentBuilder.parse(inManifest);
-            } catch (SAXException e) {
-                e.printStackTrace();
-            }
-
-
-            batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent());
-            batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent());
-
-            batchInfo.setUserId(
-                    userId == null ?
-                    Long.parseLong(document.getElementsByTagName("userid").item(0).getTextContent()) :
-                            userId
-            );
-
-            batchInfo.setSize(Long.parseLong(document.getElementsByTagName("size").item(0).getTextContent()));
-
-
-            Date date = null;
-            try {
-                date = new SimpleDateFormat("dd.MM.yyyy").parse(document.getElementsByTagName("date").item(0).getTextContent());
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-
-            batchInfo.setRepDate(date);
-
-            zipFile.close();
-
-            //ZipEntry dataEntry = zipFile.getEntry(batchInfo.getBatchName());
-            //InputStream inData = zipFile.getInputStream(dataEntry);
-
-
-            saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));
-
-
         }catch(IOException e){
             e.printStackTrace();
         }
@@ -672,7 +688,7 @@ public class ZipFilesMonitor{
 
             batchInfo.setUserId(100500L);
             NodeList nlist = document.getElementsByTagName("property");
-            HashMap<String, String> params = new HashMap<String, String>();
+            HashMap<String, String> params = new HashMap<>();
             for (int i = 0; i < nlist.getLength(); i++) {
                 Node node = nlist.item(i);
                 NodeList childrenList = node.getChildNodes();
@@ -691,7 +707,6 @@ public class ZipFilesMonitor{
             }
 
             batchInfo.setAdditionalParams(params);
-
             batchInfo.setSize(Long.parseLong(document.getElementsByTagName("size").item(0).getTextContent()));
 
 
@@ -702,16 +717,8 @@ public class ZipFilesMonitor{
                 e.printStackTrace();
             }
 
-
             batchInfo.setRepDate(date);
-
-            System.out.println(batchInfo.getSize());
-            System.out.println(batchInfo.getRepDate());
-
             zipFile.close();
-
-            //ZipEntry dataEntry = zipFile.getEntry(batchInfo.getBatchName());
-            //InputStream inData = zipFile.getInputStream(dataEntry);
 
             saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));
         }catch(IOException e){
