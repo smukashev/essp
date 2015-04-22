@@ -2,10 +2,6 @@ package com.bsbnb.usci.portlets.protocol.data;
 
 import java.util.Date;
 
-//import com.bsbnb.creditregistry.dm.maintenance.Message;
-//import com.bsbnb.creditregistry.dm.maintenance.Protocol;
-//import com.bsbnb.creditregistry.dm.ref.Shared;
-//import com.bsbnb.creditregistry.dm.ref.shared.MessageType;
 import com.bsbnb.usci.portlets.protocol.PortletEnvironmentFacade;
 import com.bsbnb.usci.portlets.protocol.ProtocolPortletResource;
 import com.vaadin.terminal.Resource;
@@ -36,9 +32,9 @@ public class ProtocolDisplayBean {
     }
 
     public static Resource getIconByMessageTypeCode(String code) {
-        if(code==null) {
+        if(code==null)
             code = "";
-        }
+
         ProtocolPortletResource resource = null;
         if (code.equals(MessageType.CRITICAL_ERROR.getCode())) {
             resource = ProtocolPortletResource.CRITICAL_ERROR_ICON;
@@ -55,12 +51,13 @@ public class ProtocolDisplayBean {
 
     public String getMessage() {
         Message message = protocol.getMessage();
-        if (message == null) {
+
+        if (message == null)
             return "";
-        }
-        if (PortletEnvironmentFacade.get().isLanguageKazakh()) {
+
+        if (PortletEnvironmentFacade.get().isLanguageKazakh())
             return message.getNameKz();
-        }
+
         return message.getNameRu();
     }
     

@@ -41,7 +41,7 @@ public class InputInfoDisplayBean implements Button.ClickListener {
         if (inputInfo != null && inputInfo.getCreditor() != null) {
             return inputInfo.getCreditor().getName();
         }
-        return "";
+        return "CREDITOR NAME";
     }
 
     /**
