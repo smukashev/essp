@@ -452,7 +452,7 @@ rule "remains interest pastdue value"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,26)}credit_type.code") > 0
-                && getEl("change.remains.interest.pastdue.value") == null ) 
+                && getEl("change.remains.interest.pastdue.value") == null )
 then
   $entity.addValidationError("Отсутствует остаток вознограждения просроченной задолженности ");
 end
@@ -860,21 +860,6 @@ $$$
 rule save
 
 rule read $$$
-title: maturity_date in change
-rule "maturity date in change"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-                && getEls("{setString(01,02,03,09,10,11,12,13,14,15,16,17,18,25,26)}credit_type.code") > 0
-                && getEl("change.maturity_date")!=null
-                && getEl("change.remains.interest.write_off.date") == null ) 
-then
-  $entity.addValidationError("Дата списания с баланса вознограждения обязательна при наличии вознограждения");
-end
-$$$
-
-rule save
-
-rule read $$$
 title: msfo value in change
 rule "msfo value in change"
 when
@@ -1194,6 +1179,7 @@ rule "jur at least 1 doc"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{setString(17,18,19)}credit_type.code") == 0
+            && getEls("{count}subjects.organization") > 0
             && (getEls("{count}subjects[organization!=null]organization[docs=null]") > 0 
                   || getEls("{count}subjects[organization!=null]organization[docs!=null]docs") == 0 )
             )
@@ -1210,6 +1196,7 @@ rule "jur head cnt > 1"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{setString(17,18,19)}credit_type.code") == 0
+            && getEls("{count}subjects[organization!=null]") > 0
             && getEls("{count}subjects[organization!=null]organization[is_se=false]head") == 0)
 then
   $entity.addValidationError("Хотя бы один руководитель обязателен для данного типа кредита (не ИП)");
