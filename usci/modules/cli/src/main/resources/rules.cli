@@ -1196,10 +1196,9 @@ rule "jur head cnt > 1"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
             && getEls("{setString(17,18,19)}credit_type.code") == 0
-            && getEls("{count}subjects[organization!=null]") > 0
-            && getEls("{count}subjects[organization!=null]organization[is_se=false]head") == 0)
+            && getEls("{count}subjects.organization[is_se=false][head=null]") > 0)
 then
-  $entity.addValidationError("Хотя бы один руководитель обязателен для данного типа кредита (не ИП)");
+  $entity.addValidationError("Хотя бы один руководитель организации обязателен для данного типа кредита (не ИП)");
 end
 $$$
 
@@ -1214,7 +1213,7 @@ rule "nat doc_type"
 when
     $entity: BaseEntity(getMeta().getClassName() == "credit"
     && getEl("credit_type.code") != "18"
-    && getEls("{count}subjects[person!=null]person[docs!=null]docs[doc_type.code=null]") > 0 ) 
+    && getEls("{count}subjects.person.docs[doc_type.code=null]") > 0 )
 then
   $entity.addValidationError("Тип документа должен указваться для физ. лица");
 end
@@ -1228,7 +1227,7 @@ rule "nat doc_no"
 when
     $entity: BaseEntity(getMeta().getClassName() == "credit"
     && getEl("credit_type.code") != "19"
-    && getEls("{count}subjects[person!=null]person[docs!=null]docs[no=null]") > 0 ) 
+    && getEls("{count}subjects.person.docs[no=null]") > 0 )
 then
   $entity.addValidationError("Номер документа должен указваться для физ. лица");
 end
@@ -1242,7 +1241,7 @@ rule "nat region"
 when
     $entity: BaseEntity(getMeta().getClassName() == "credit"
     && getEl("credit_type.code") != "19"
-    && getEls("{count}subjects[person!=null]person[country.code_numeric=398]addresses[region.code=null]") > 0 ) 
+    && getEls("{count}subjects.person[country.code_numeric=398]addresses[region.code=null]") > 0 )
 then
   $entity.addValidationError("Регион должен указваться для Казахстана");
 end
@@ -1256,7 +1255,7 @@ rule "nat address detail"
 when
     $entity: BaseEntity(getMeta().getClassName() == "credit"
     && getEl("credit_type.code") != "19"
-    && getEls("{count}subjects[person!=null]person[addresses!=null]addresses[details=null]") > 0 ) 
+    && getEls("{count}subjects.person.addresses[details=null]") > 0 )
 then
   $entity.addValidationError("Адрес должен указываться для физ. лица");
 end
@@ -1270,7 +1269,7 @@ rule "nat address_type"
 when
     $entity: BaseEntity(getMeta().getClassName() == "credit"
     && getEl("credit_type.code") != "19"
-    && getEls("{count}subjects[person!=null]person[addresses!=null]addresses[type=null]") > 0 ) 
+    && getEls("{count}subjects.person.addresses[type=null]") > 0 )
 then
   $entity.addValidationError("Тип адреса должен указываться для физ. лица");
 end
@@ -1284,7 +1283,7 @@ rule "nat address"
 when
     $entity: BaseEntity(getMeta().getClassName() == "credit"
     && getEl("credit_type.code") != "19"
-    && getEls("{count}subjects[person!=null]person[addresses=null]") > 0 ) 
+    && getEls("{count}subjects.person[addresses=null]") > 0 )
 then
   $entity.addValidationError("Адрес должен указываться для физ. лица");
 end
@@ -1297,7 +1296,7 @@ title: nat_country
 rule "nat country"
 when
     $entity: BaseEntity(getMeta().getClassName() == "credit"
-    && getEls("{count}subjects[person!=null]person[country=null]") > 0 ) 
+    && getEls("{count}subjects.person[country=null]") > 0 )
 then
   $entity.addValidationError("Страна должна указываться для физ. лица");
 end
@@ -1310,7 +1309,7 @@ title: nat_offshore
 rule "nat offshore"
 when
     $entity: BaseEntity(getMeta().getClassName() == "credit"
-    && getEls("{count}subjects[person!=null]person[offshore!=null][offshore.code=null]") > 0 ) 
+    && getEls("{count}subjects.person[offshore!=null][offshore.code=null]") > 0 )
 then
   $entity.addValidationError("Код оффшора должнен указываться если входит в перечень оффшорных зон");
 end
@@ -1323,7 +1322,7 @@ title: nat_bank_relations
 rule "nat bank_relations"
 when
     $entity: BaseEntity(getMeta().getClassName() == "credit"
-    && getEls("{count}subjects[person!=null]person[bank_relations=null]") > 0 ) 
+    && getEls("{count}subjects.person[bank_relations=null]") > 0 )
 then
   $entity.addValidationError("Признак связанности с банком обязателен для физ. лиц");
 end
@@ -1337,9 +1336,8 @@ rule "nat subject_person cnt(doc) > 0"
 when
     $entity: BaseEntity(getMeta().getClassName() == "credit"
     && getEl("credit_type.code") != "18"
-    && ( getEls("{count}subjects[person!=null]person[docs=null]") > 0  
-        || getEls("{count}subjects[person!=null]person[docs!=null]docs") == 0  )
-        )
+    && ( getEls("{count}subjects.person[docs=null]") > 0)
+    )
 then
   $entity.addValidationError("Хотя бы 1 документ указывается для физ. лица");
 end
