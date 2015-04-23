@@ -44,7 +44,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
     @Autowired
     protected SQLQueriesStats sqlStats;
 
-    private final boolean RULES_ENABLED  = false;
+    private final boolean RULES_ENABLED  = true;
 
     @PostConstruct
     public void init() {

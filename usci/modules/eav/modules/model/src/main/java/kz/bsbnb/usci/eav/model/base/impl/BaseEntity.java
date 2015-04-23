@@ -30,6 +30,7 @@ import java.util.Date;
  */
 public class BaseEntity extends BaseContainer implements IBaseEntity
 {
+    private static final long serialVersionUID = 1L;
 
     Logger logger = LoggerFactory.getLogger(BaseEntity.class);
 
