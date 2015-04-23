@@ -17,7 +17,7 @@ Ext.onReady(function() {
                     op: 'SEND_XML'
                 },
                 success: function() {
-                    console.log('success');
+                    Ext.MessageBox.alert(LABEL_SUCCESS, LABEL_SEND_APPROVAL);
                 },
                 failure: function() {
                     console.log('woops');
