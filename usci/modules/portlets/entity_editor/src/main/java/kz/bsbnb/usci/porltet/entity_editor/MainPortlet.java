@@ -419,10 +419,13 @@ public class MainPortlet extends MVCPortlet {
                 case LIST_ENTITY:
                     String entityId = resourceRequest.getParameter("entityId");
 
-                    Date date = new Date();
+                    Date date = null;
 
                     if(resourceRequest.getParameter("date") != null)
                         date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+
+                    if(date == null)
+                        date = new Date();
 
                     if (entityId != null && entityId.trim().length() > 0) {
                         //BaseEntity entity = entityService.load(Integer.parseInt(entityId));
