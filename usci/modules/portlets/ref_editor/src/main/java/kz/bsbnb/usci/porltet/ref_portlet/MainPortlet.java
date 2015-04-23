@@ -387,7 +387,9 @@ public class MainPortlet extends MVCPortlet {
                                 writer.write("\"" + key + "\":\"" + id.getValue(key) + "\",");
                             }
 
-                            writer.write("\"title\":\"" + id.getTitle() + "\"");
+                            String title = id.getTitle() != null ? id.getTitle() : (String)id.getValue("VALUE");
+
+                            writer.write("\"title\":\"" + title + "\"");
                             writer.write("}");
                         }
 
