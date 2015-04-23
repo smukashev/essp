@@ -4,6 +4,9 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityIntegerValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -31,7 +34,7 @@ public class SubjectOrganizationHeadDocsParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("doc2"), new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("document"), batch.getRepDate());
     }
 
     @Override
@@ -43,19 +46,19 @@ public class SubjectOrganizationHeadDocsParser extends BatchParser {
             //ctDoc.setDocType(attributes.getValue("doc_type"));
 
             //my code
-            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),new Date());
+            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),batch.getRepDate());
 
-            docType.put("code",new BaseValue(batch,index,
+            docType.put("code",new BaseEntityIntegerValue(batch,index,
                     new Integer(event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())));
 
-            currentBaseEntity.put("doc_type",new BaseValue(batch,index,docType));
+            currentBaseEntity.put("doc_type",new BaseEntityComplexValue(batch,index,docType));
         } else if(localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("name",new BaseValue(batch,index,
+            currentBaseEntity.put("name",new BaseEntityStringValue(batch,index,
                     event.asCharacters().getData()));
         } else if(localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("no",new BaseValue(batch,index,
+            currentBaseEntity.put("no",new BaseEntityStringValue(batch,index,
                     event.asCharacters().getData()));
         } else {
             throw new UnknownTagException(localName);

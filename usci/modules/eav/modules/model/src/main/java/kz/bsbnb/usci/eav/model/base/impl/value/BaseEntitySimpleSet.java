@@ -16,4 +16,8 @@ public class BaseEntitySimpleSet extends BaseValue<IBaseSet> implements IBaseVal
         super(id, batch, index, reportDate, value, closed, last);
     }
 
+    public BaseEntitySimpleSet(Batch batch, long index, IBaseSet value) {
+        super(batch, index, value);
+    }
+
 }

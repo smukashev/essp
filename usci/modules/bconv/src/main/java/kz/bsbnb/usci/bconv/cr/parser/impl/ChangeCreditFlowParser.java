@@ -7,6 +7,9 @@ import java.util.Date;
 
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDoubleValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -36,7 +39,7 @@ public class ChangeCreditFlowParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit_flow"),new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit_flow"),batch.getRepDate());
     }
 
     @Override
@@ -46,13 +49,13 @@ public class ChangeCreditFlowParser extends BatchParser {
         } else if(localName.equals("classification")) {
             BaseEntity classification = new BaseEntity(
                     metaClassRepository.getMetaClass("ref_classification"),
-                    new Date()
+                    batch.getRepDate()
             );
             event = (XMLEvent) xmlReader.next();
-            classification.put("code",new BaseValue(batch,index, event.asCharacters().getData()));
-            currentBaseEntity.put("classification",new BaseValue(batch,index,classification));
+            classification.put("code",new BaseEntityStringValue(batch,index, event.asCharacters().getData()));
+            currentBaseEntity.put("classification",new BaseEntityComplexValue(batch,index,classification));
         } else if(localName.equals("provision")) {
-            currentProvisionGroup = new BaseEntity(metaClassRepository.getMetaClass("provision_group"),new Date());
+            currentProvisionGroup = new BaseEntity(metaClassRepository.getMetaClass("provision_group"),batch.getRepDate());
 
             currentProvisionKfn = null;
             currentProvisionMsfo = null;
@@ -60,30 +63,30 @@ public class ChangeCreditFlowParser extends BatchParser {
         } else if(localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
             getCurrentProvisionKfn().put("value",
-                    new BaseValue(batch,index, new Double(event.asCharacters().getData())));
+                    new BaseEntityDoubleValue(batch,index, new Double(event.asCharacters().getData())));
         } else if(localName.equals("balance_account")) {
             event = (XMLEvent) xmlReader.next();
-            BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),new Date());
-            balanceAccount.put("no_", new BaseValue(batch, index, event.asCharacters().getData()));
-            getCurrentProvisionKfn().put("balance_account", new BaseValue(batch, index, balanceAccount));
+            BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),batch.getRepDate());
+            balanceAccount.put("no_", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
+            getCurrentProvisionKfn().put("balance_account", new BaseEntityComplexValue(batch, index, balanceAccount));
         } else if(localName.equals("value_msfo")) {
             event = (XMLEvent) xmlReader.next();
             getCurrentProvisionMsfo().put("value",
-                    new BaseValue(batch, index, new Double(event.asCharacters().getData())));
+                    new BaseEntityDoubleValue(batch, index, new Double(event.asCharacters().getData())));
         } else if(localName.equals("balance_account_msfo")) {
             event = (XMLEvent) xmlReader.next();
-            BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),new Date());
-            balanceAccount.put("no_", new BaseValue(batch, index, event.asCharacters().getData()));
-            getCurrentProvisionMsfo().put("balance_account", new BaseValue(batch,index,balanceAccount));
+            BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),batch.getRepDate());
+            balanceAccount.put("no_", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
+            getCurrentProvisionMsfo().put("balance_account", new BaseEntityComplexValue(batch,index,balanceAccount));
         } else if(localName.equals("value_msfo_over_balance")) {
             event = (XMLEvent) xmlReader.next();
             getCurrentProvisionMsfoOverB().put("value",
-                    new BaseValue(batch, index, new Double(event.asCharacters().getData())));
+                    new BaseEntityDoubleValue(batch, index, new Double(event.asCharacters().getData())));
         } else if(localName.equals("balance_account_msfo_over_balance")) {
             event = (XMLEvent) xmlReader.next();
-            BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),new Date());
-            balanceAccount.put("no_", new BaseValue(batch, index, event.asCharacters().getData()));
-            getCurrentProvisionMsfoOverB().put("balance_account", new BaseValue(batch, index, balanceAccount));
+            BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),batch.getRepDate());
+            balanceAccount.put("no_", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
+            getCurrentProvisionMsfoOverB().put("balance_account", new BaseEntityComplexValue(batch, index, balanceAccount));
         } else {
             throw new UnknownTagException(localName);
         }
@@ -113,15 +116,15 @@ public class ChangeCreditFlowParser extends BatchParser {
         } else if(localName.equals("provision")) {
             //ctCreditFlow.setProvision(ctProvision);
             if(currentProvisionKfn != null)
-               currentProvisionGroup.put("provision_kfn", new BaseValue(batch,index,currentProvisionKfn));
+               currentProvisionGroup.put("provision_kfn", new BaseEntityComplexValue(batch,index,currentProvisionKfn));
 
             if(currentProvisionMsfo != null)
-                currentProvisionGroup.put("provision_msfo", new BaseValue(batch,index,currentProvisionMsfo));
+                currentProvisionGroup.put("provision_msfo", new BaseEntityComplexValue(batch,index,currentProvisionMsfo));
 
             if(currentProvisionMsfoOverB != null)
-                currentProvisionGroup.put("provision_msfo_over_balance", new BaseValue(batch,index,currentProvisionMsfoOverB));
+                currentProvisionGroup.put("provision_msfo_over_balance", new BaseEntityComplexValue(batch,index,currentProvisionMsfoOverB));
 
-            currentBaseEntity.put("provision", new BaseValue(batch, index, currentProvisionGroup));
+            currentBaseEntity.put("provision", new BaseEntityComplexValue(batch, index, currentProvisionGroup));
 
         } else if(localName.equals("balance_account")) {
             //ctProvision.setBalanceAccount(contents.toString());
@@ -144,19 +147,19 @@ public class ChangeCreditFlowParser extends BatchParser {
 
     private BaseEntity getCurrentProvisionKfn() {
         if(currentProvisionKfn == null)
-            currentProvisionKfn = new BaseEntity(metaClassRepository.getMetaClass("provision"),new Date());
+            currentProvisionKfn = new BaseEntity(metaClassRepository.getMetaClass("provision"),batch.getRepDate());
         return currentProvisionKfn;
     }
 
     private BaseEntity getCurrentProvisionMsfo() {
         if(currentProvisionMsfo == null)
-            currentProvisionMsfo = new BaseEntity(metaClassRepository.getMetaClass("provision"),new Date());
+            currentProvisionMsfo = new BaseEntity(metaClassRepository.getMetaClass("provision"),batch.getRepDate());
         return currentProvisionMsfo;
     }
 
     private BaseEntity getCurrentProvisionMsfoOverB() {
         if(currentProvisionMsfoOverB == null)
-            currentProvisionMsfoOverB = new BaseEntity(metaClassRepository.getMetaClass("provision"),new Date());
+            currentProvisionMsfoOverB = new BaseEntity(metaClassRepository.getMetaClass("provision"),batch.getRepDate());
         return currentProvisionMsfoOverB;
     }
 }

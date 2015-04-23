@@ -5,6 +5,7 @@ import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -33,7 +34,7 @@ public class SubjectCreditorParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("creditor"),new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("creditor"),batch.getRepDate());
     }
 
     @Override
@@ -41,27 +42,27 @@ public class SubjectCreditorParser extends BatchParser {
         if(localName.equals("creditor")) {
         } else if(localName.equals("code")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("code",new BaseValue(batch,index,event.asCharacters().getData()));
+            currentBaseEntity.put("code",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
         } else if(localName.equals("docs")) {
             //docs = new CtCreditor.Docs();
-            docs = new BaseSet(metaClassRepository.getMetaClass("doc4"));
+            docs = new BaseSet(metaClassRepository.getMetaClass("document"));
         } else if(localName.equals("doc")) {
              //ctDoc = new CtDoc();
             //ctDoc.setDocType(attributes.getValue("doc_type"));
-            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("doc4"),new Date());
-            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), new Date());
-            docType.put("code",new BaseValue(batch,index,
+            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"),batch.getRepDate());
+            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), batch.getRepDate());
+            docType.put("code",new BaseEntityIntegerValue(batch,index,
                     new Integer(event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())));
-            currentDoc.put("doc_type",new BaseValue(batch,index,docType));
+            currentDoc.put("doc_type",new BaseEntityComplexValue(batch,index,docType));
             /*currentDoc.put("doc_type",new BaseValue(batch,index,
                     event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())
             );*/
         } else if(localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("name",new BaseValue(batch,index,event.asCharacters().getData()));
+            currentDoc.put("name",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
         } else if(localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("no",new BaseValue(batch,index,event.asCharacters().getData()));
+            currentDoc.put("no",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
         } else {
             throw new UnknownTagException(localName);
         }
@@ -79,10 +80,10 @@ public class SubjectCreditorParser extends BatchParser {
             //ctCreditor.setCode(contents.toString());
         } else if(localName.equals("docs")) {
             //ctCreditor.setDocs(docs);
-            currentBaseEntity.put("docs",new BaseValue(batch,index,docs));
+            currentBaseEntity.put("docs",new BaseEntityComplexSet(batch,index,docs));
         } else if(localName.equals("doc")) {
             //docs.getDoc().add(ctDoc);
-            docs.put(new BaseValue(batch,index,currentDoc));
+            docs.put(new BaseSetComplexValue(batch,index,currentDoc));
         } else if(localName.equals("name")) {
             //ctDoc.setName(contents.toString());
         } else if(localName.equals("no")) {

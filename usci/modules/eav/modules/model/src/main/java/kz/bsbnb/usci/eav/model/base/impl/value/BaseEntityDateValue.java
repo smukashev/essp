@@ -15,4 +15,8 @@ public class BaseEntityDateValue extends BaseValue<Date> implements IBaseValue<D
         super(id, batch, index, reportDate, value, closed, last);
     }
 
+    public BaseEntityDateValue(Batch batch, long index, Date value) {
+        super(batch, index, value);
+    }
+
 }

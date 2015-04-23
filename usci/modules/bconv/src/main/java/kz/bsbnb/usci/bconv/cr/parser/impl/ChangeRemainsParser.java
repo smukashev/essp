@@ -7,6 +7,7 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -49,7 +50,7 @@ public class ChangeRemainsParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity= new BaseEntity(metaClassRepository.getMetaClass("remains"),new Date());
+        currentBaseEntity= new BaseEntity(metaClassRepository.getMetaClass("remains"),batch.getRepDate());
     }
 
     @Override
@@ -57,26 +58,26 @@ public class ChangeRemainsParser extends BatchParser {
         if(localName.equals("remains")) {
         } else if(localName.equals("debt")) {
             changeRemainsDebtParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("debt",new BaseValue(batch,index,changeRemainsDebtParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("debt",new BaseEntityComplexValue(batch,index,changeRemainsDebtParser.getCurrentBaseEntity()));
         } else if(localName.equals("interest")) {
             changeRemainsInterestParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("interest", new BaseValue(batch,index,
+            currentBaseEntity.put("interest", new BaseEntityComplexValue(batch,index,
                     changeRemainsInterestParser.getCurrentBaseEntity()));
         } else if(localName.equals("discount")) {
             changeRemainsDiscountParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("discount",new BaseValue(batch,index,
+            currentBaseEntity.put("discount",new BaseEntityComplexValue(batch,index,
                     changeRemainsDiscountParser.getCurrentBaseEntity()));
         } else if(localName.equals("correction")) {
             changeRemainsCorrectionParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("correction",new BaseValue(batch,index,
+            currentBaseEntity.put("correction",new BaseEntityComplexValue(batch,index,
                     changeRemainsCorrectionParser.getCurrentBaseEntity()));
         } else if(localName.equals("discounted_value")) {
             changeRemainsDiscountedValueParser.parse(xmlReader, batch, index);
             currentBaseEntity.put("discounted_value",
-                    new BaseValue(batch, index, changeRemainsDiscountedValueParser.getCurrentBaseEntity()));
+                    new BaseEntityComplexValue(batch, index, changeRemainsDiscountedValueParser.getCurrentBaseEntity()));
         } else if(localName.equals("limit")) {
             changeRemainsLimitParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("limit",new BaseValue(batch,index,changeRemainsLimitParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("limit",new BaseEntityComplexValue(batch,index,changeRemainsLimitParser.getCurrentBaseEntity()));
         } else {
             throw new UnknownTagException(localName);
         }

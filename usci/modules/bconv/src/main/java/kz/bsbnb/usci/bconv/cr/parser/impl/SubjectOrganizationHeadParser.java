@@ -5,6 +5,9 @@ import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexSet;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseSetComplexValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -36,7 +39,7 @@ public class SubjectOrganizationHeadParser extends BatchParser {
 
     @Override
     public void init(){
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("head"),new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("head"),batch.getRepDate());
     }
 
     @Override
@@ -44,26 +47,26 @@ public class SubjectOrganizationHeadParser extends BatchParser {
             throws SAXException {
         if(localName.equals("head")) {
         } else if(localName.equals("names")) {
-            BaseSet headNames = new BaseSet(metaClassRepository.getMetaClass("name2"));
+            BaseSet headNames = new BaseSet(metaClassRepository.getMetaClass("person_name"));
             while(true){
                subjectOrganizationHeadNamesParser.parse(xmlReader,batch,index);
                if(subjectOrganizationHeadNamesParser.hasMore()){
-                    headNames.put(new BaseValue(batch,index, subjectOrganizationHeadNamesParser.getCurrentBaseEntity()));
+                    headNames.put(new BaseSetComplexValue(batch,index, subjectOrganizationHeadNamesParser.getCurrentBaseEntity()));
                } else break;
             }
-            currentBaseEntity.put("names", new BaseValue(batch, index, headNames));
+            currentBaseEntity.put("names", new BaseEntityComplexSet(batch, index, headNames));
         } else if(localName.equals("docs")) {
             //subjectOrganizationHeadDocsParser.parse(xmlReader, batch, index);
 
             //my code
-            BaseSet docs = new BaseSet(metaClassRepository.getMetaClass("doc2"));
+            BaseSet docs = new BaseSet(metaClassRepository.getMetaClass("document"));
             while(true){
                 subjectOrganizationHeadDocsParser.parse(xmlReader,batch,index);
                 if(subjectOrganizationHeadDocsParser.hasMore()){
-                    docs.put(new BaseValue(batch,index,subjectOrganizationHeadDocsParser.getCurrentBaseEntity()));
+                    docs.put(new BaseSetComplexValue(batch,index,subjectOrganizationHeadDocsParser.getCurrentBaseEntity()));
                 } else break;
             }
-            currentBaseEntity.put("docs", new BaseValue(batch,index,docs));
+            currentBaseEntity.put("docs", new BaseEntityComplexSet(batch,index,docs));
 
         } else {
             throw new UnknownTagException(localName);

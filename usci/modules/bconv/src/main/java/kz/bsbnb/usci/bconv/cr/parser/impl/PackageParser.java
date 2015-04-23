@@ -7,6 +7,10 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexSet;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseSetComplexValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import org.apache.log4j.Logger;
@@ -66,25 +70,25 @@ public class PackageParser extends BatchParser {
             } else {
                 throw new UnknownValException(localName, attributes.getValue("operation_type"));
             } */
-            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit"), new Date());
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit"), batch.getRepDate());
             currentBaseEntity.setIndex(Long.parseLong(event.asStartElement().getAttributeByName(new QName("no")).getValue()));
             creditParser.setCurrentBaseEntity(currentBaseEntity);
         } else if(localName.equals("primary_contract")) {
             primaryContractParser.parse(xmlReader, batch, index);
             BaseEntity primaryContract = primaryContractParser.getCurrentBaseEntity();
 
-            currentBaseEntity.put("primary_contract", new BaseValue(batch, index, primaryContract));
+            currentBaseEntity.put("primary_contract", new BaseEntityComplexValue(batch, index, primaryContract));
         } else if(localName.equals("credit")) {
             //attributes.getValue("credit_type")
             creditParser.parse(xmlReader, batch, index);
             BaseEntity credit = creditParser.getCurrentBaseEntity();
 
-            BaseEntity creditType = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_type"), new Date());
+            BaseEntity creditType = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_type"), batch.getRepDate());
 
-            creditType.put("code", new BaseValue(batch, index,
+            creditType.put("code", new BaseEntityStringValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("credit_type")).getValue()));
 
-            credit.put("credit_type", new BaseValue(batch, index,
+            credit.put("credit_type", new BaseEntityComplexValue(batch, index,
                     creditType));
             //System.out.println(credit.toString());
         } else if(localName.equals("subjects")) {
@@ -97,14 +101,14 @@ public class PackageParser extends BatchParser {
                     BaseEntity subject = subjectsParser.getCurrentBaseEntity();
                     if (subject != null) {
                         subjects.put(subject.getMeta().getClassName(),
-                                new BaseValue(batch, index, subject));
+                                new BaseSetComplexValue(batch, index, subject));
                     }
                 } else {
                     break;
                 }
             }
 
-            currentBaseEntity.put("subjects", new BaseValue(batch, index, subjects));
+            currentBaseEntity.put("subjects", new BaseEntityComplexSet(batch, index, subjects));
         } else if(localName.equals("pledges")) {
             //pledgesParser.parse(xmlReader, batch, index);
 
@@ -112,14 +116,14 @@ public class PackageParser extends BatchParser {
             while(true){
                pledgesParser.parse(xmlReader,batch,index);
                if(pledgesParser.hasMore()){
-                  pledges.put(new BaseValue(batch,index,pledgesParser.getCurrentBaseEntity()));
+                  pledges.put(new BaseSetComplexValue(batch,index,pledgesParser.getCurrentBaseEntity()));
                } else break;
             }
-            currentBaseEntity.put("pledges",new BaseValue(batch,index,pledges));
+            currentBaseEntity.put("pledges",new BaseEntityComplexSet(batch,index,pledges));
 
         } else if(localName.equals("change")) {
             changeParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("change",new BaseValue(batch,index,changeParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("change",new BaseEntityComplexValue(batch,index,changeParser.getCurrentBaseEntity()));
         } else {
             throw new UnknownTagException(localName);
         }

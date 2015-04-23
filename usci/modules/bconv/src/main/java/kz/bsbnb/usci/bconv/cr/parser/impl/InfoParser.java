@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
-import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -51,7 +51,7 @@ public class InfoParser extends BatchParser {
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("info")) {
         } else if(localName.equals("creditor")) {
-            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor"),new Date());
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor"),batch.getRepDate());
             //currentBaseEntity.put("code",new BaseValue(batch,index,777));
         } else if(localName.equals("code")) {
         } else if(localName.equals("docs")) {
@@ -60,35 +60,35 @@ public class InfoParser extends BatchParser {
         } else if(localName.equals("doc")) {
             //currentDoc = new CtDoc();
             //currentDoc.setDocType(attributes.getValue("doc_type"));
-            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"),new Date());
+            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"),batch.getRepDate());
 
-            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),new Date());
+            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),batch.getRepDate());
             docType.put("code",new BaseEntityStringValue(batch,index,
                     event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
-            currentDoc.put("doc_type",new BaseValue(batch,index,docType));
+            currentDoc.put("doc_type",new BaseEntityComplexValue(batch,index,docType));
         } else if(localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("name",new BaseValue(batch,index,event.asCharacters().getData()));
+            currentDoc.put("name",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
         } else if(localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("no",new BaseValue(batch,index,event.asCharacters().getData()));
+            currentDoc.put("no",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
         } else if(localName.equals("account_date")) {
             event = (XMLEvent) xmlReader.next();
             try {
-                accountDate = new BaseValue(batch,index,dateFormat.parse(event.asCharacters().getData()));
+                accountDate = new BaseEntityDateValue(batch,index,dateFormat.parse(event.asCharacters().getData()));
             } catch (ParseException e) {
                 System.out.println(e.getMessage());
             }
         } else if(localName.equals("report_date")) {
             event = (XMLEvent) xmlReader.next();
             try {
-                reportDate = new BaseValue<Date>(batch,index,dateFormat.parse(event.asCharacters().getData()));
+                reportDate = new BaseEntityDateValue(batch,index,dateFormat.parse(event.asCharacters().getData()));
             } catch (ParseException e) {
                 System.out.println(e.getMessage());
             }
         } else if(localName.equals("actual_credit_count")) {
             event = (XMLEvent) xmlReader.next();
-            actualCreditCount = new BaseValue(batch,index,new Integer(event.asCharacters().getData()));
+            actualCreditCount = new BaseEntityIntegerValue(batch,index,new Integer(event.asCharacters().getData()));
         } else {
             throw new UnknownTagException(localName);
         }
@@ -109,10 +109,10 @@ public class InfoParser extends BatchParser {
             } else if(localName.equals("code")) {
                 //ctCreditor.setCode(contents.toString());
             } else if(localName.equals("docs")) {
-                currentBaseEntity.put("docs",new BaseValue(batch,index,docs));
+                currentBaseEntity.put("docs",new BaseEntityComplexSet(batch,index,docs));
             } else if(localName.equals("doc")) {
                 //docs.getDoc().add(currentDoc);
-                docs.put(new BaseValue(batch,index,currentDoc));
+                docs.put(new BaseSetComplexValue(batch,index,currentDoc));
             } else if(localName.equals("name")) {
                 //currentDoc.setName(contents.toString());
             } else if(localName.equals("no")) {
