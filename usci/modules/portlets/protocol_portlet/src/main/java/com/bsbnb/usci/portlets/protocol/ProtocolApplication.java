@@ -30,14 +30,8 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 
 public class ProtocolApplication extends Application {
-    //TODO: Разбивать по страницам
-    //TODO: Загрузка данных в отдельном потоке
-    //TODO: Обрабатывать get-параметры в URL
-    //TODO: Выравнивание столбцов таблицы протокола по ширине
-    //TODO: Перенос строк в таблице
-
     private static final long serialVersionUID = 2096197512742005243L;
-    public static final String CONTEXT_NAME = "credit-registry-protocol-portlet";
+    public static final String CONTEXT_NAME = "protocol_portlet";
     public static final Logger log = Logger.getLogger(ProtocolApplication.class.getCanonicalName());
 
     @Override
@@ -60,9 +54,10 @@ public class ProtocolApplication extends Application {
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
             try {
                 User user = PortalUtil.getUser(request);
-                if (user == null) {
+
+                if (user == null)
                     return;
-                }
+
                 setTheme("custom");
                 log.log(Level.INFO, "User ID: {0}", user.getUserId());
                 Window mainWindow = new Window();
@@ -90,25 +85,6 @@ public class ProtocolApplication extends Application {
         @Override
         public void handleResourceRequest(ResourceRequest request,
                 ResourceResponse response, Window window) {
-        }
-    }
-
-    /**
-     * Показывает краткую страницу JSP для не-максимального режима просмотра
-     */
-    public void writeViewPageHtml(RenderRequest request, RenderResponse response, Window window, String path)
-            throws IOException, PortletException {
-        PortletContext context = null;
-        // только portlet 2.0
-        if (getContext() instanceof PortletApplicationContext2) {
-            PortletApplicationContext2 ctx = (PortletApplicationContext2) getContext();
-            context = ctx.getPortletSession().getPortletContext();
-        }
-        if (context != null) {
-            PortletRequestDispatcher portletRequestDispatcher = context.getRequestDispatcher(path);
-            if (portletRequestDispatcher != null) {
-                portletRequestDispatcher.include(request, response);
-            }
         }
     }
 }

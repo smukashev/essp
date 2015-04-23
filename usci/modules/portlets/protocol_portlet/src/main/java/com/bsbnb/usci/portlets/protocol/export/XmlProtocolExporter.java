@@ -34,7 +34,8 @@ public class XmlProtocolExporter extends ProtocolExporter {
             sb.append("\t").append("<no>").append(protocol.getDescription() == null ? "" : protocol.getDescription()).append("</no>").append("\n");
             String primaryContractDateString = protocol.getPrimaryContractDate()==null ? "" : sdf.format(protocol.getPrimaryContractDate());
             sb.append("\t").append("<contractdate>").append(primaryContractDateString).append("</contractdate>").append("\n");
-            sb.append("\t").append("<messagecode>").append(protocol.getMessageCode()).append("</messagecode>").append("\n");
+            /*sb.append("\t").append("<messagecode>").append(protocol.getMessageCode()).append("</messagecode>").append("\n");*/
+            sb.append("\t").append("<messagecode>").append(protocol.getMessageTypeString()).append("</messagecode>").append("\n");
             sb.append("\t").append("<message>").append(protocol.getMessage() == null ? "" : protocol.getMessage()).append("</message>").append("\n");
             sb.append("\t").append("<note>").append(protocol.getNote() == null ? "" : protocol.getNote()).append("</note>").append("\n");
             sb.append("</protocolRecord>").append("\n");

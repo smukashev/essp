@@ -1,11 +1,5 @@
 package com.bsbnb.usci.portlets.protocol.data;
 
-import java.util.Date;
-
-//import com.bsbnb.creditregistry.dm.maintenance.Message;
-//import com.bsbnb.creditregistry.dm.maintenance.Protocol;
-//import com.bsbnb.creditregistry.dm.ref.Shared;
-//import com.bsbnb.creditregistry.dm.ref.shared.MessageType;
 import com.bsbnb.usci.portlets.protocol.PortletEnvironmentFacade;
 import com.bsbnb.usci.portlets.protocol.ProtocolPortletResource;
 import com.vaadin.terminal.Resource;
@@ -16,15 +10,22 @@ import kz.bsbnb.usci.cr.model.MessageType;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.Shared;
 
+import java.util.Date;
+import java.util.HashMap;
+
 /**
- *
  * @author Aidar.Myrzahanov
  */
 public class ProtocolDisplayBean {
-
     private Protocol protocol;
     private boolean isText = false;
     private String text;
+    private Embedded statusIcon;
+    private Link link;
+
+    private final HashMap<String, String> messageTypeString = new HashMap<String, String>();
+
+
 
     public ProtocolDisplayBean(Protocol protocol) {
         this.protocol = protocol;
@@ -36,9 +37,9 @@ public class ProtocolDisplayBean {
     }
 
     public static Resource getIconByMessageTypeCode(String code) {
-        if(code==null) {
+        if (code == null)
             code = "";
-        }
+
         ProtocolPortletResource resource = null;
         if (code.equals(MessageType.CRITICAL_ERROR.getCode())) {
             resource = ProtocolPortletResource.CRITICAL_ERROR_ICON;
@@ -55,24 +56,28 @@ public class ProtocolDisplayBean {
 
     public String getMessage() {
         Message message = protocol.getMessage();
-        if (message == null) {
+
+        if (message == null)
             return "";
-        }
-        if (PortletEnvironmentFacade.get().isLanguageKazakh()) {
+
+        if (PortletEnvironmentFacade.get().isLanguageKazakh())
             return message.getNameKz();
-        }
+
         return message.getNameRu();
     }
-    
-    private Embedded statusIcon;
 
     public Embedded getStatusIcon() {
         if (statusIcon == null) {
             Resource resource = getIconByMessageTypeCode(getMessageTypeCode());
             statusIcon = new Embedded("", resource);
-            statusIcon.setDescription(getMessageTypeName());;
+            statusIcon.setDescription(getMessageTypeName());
         }
+
         return statusIcon;
+    }
+
+    public void setStatusIcon(Embedded statusIcon) {
+        this.statusIcon = statusIcon;
     }
 
     public Shared getType() {
@@ -95,6 +100,10 @@ public class ProtocolDisplayBean {
         return protocol;
     }
 
+    public void setProtocol(Protocol protocol) {
+        this.protocol = protocol;
+    }
+
     public String getNote() {
         return protocol.getNote();
     }
@@ -109,6 +118,21 @@ public class ProtocolDisplayBean {
 
     public String getMessageTypeCode() {
         return protocol.getMessageType().getCode();
+    }
+
+    public String getMessageTypeString() {
+        switch(getMessageTypeCode()) {
+            case "CHECK_IN_PARSER":
+                return "Проверка";
+            case "WAITING":
+                return "В очереди";
+            case "PROCESSING":
+                return "Обработка";
+            case "COMPLETED":
+                return "Завершен";
+            default:
+                return "Неизвестно";
+        }
     }
 
     public String getMessageCode() {
@@ -129,6 +153,10 @@ public class ProtocolDisplayBean {
         return text;
     }
 
+    public void setText(String text) {
+        this.text = text;
+    }
+
     public String getMessageTypeName() {
         Shared messageType = protocol.getMessageType();
         if (messageType == null) {
@@ -137,15 +165,15 @@ public class ProtocolDisplayBean {
         return PortletEnvironmentFacade.get().isLanguageKazakh() ? messageType.getNameKz() : messageType.getNameRu();
     }
 
-    private Link link;
-
-    public Link getLink()
-    {
+    public Link getLink() {
         return link;
     }
 
-    public void setLink(Link link)
-    {
+    public void setLink(Link link) {
         this.link = link;
+    }
+
+    public void setIsText(boolean isText) {
+        this.isText = isText;
     }
 }

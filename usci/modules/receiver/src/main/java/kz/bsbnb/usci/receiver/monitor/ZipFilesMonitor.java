@@ -688,7 +688,7 @@ public class ZipFilesMonitor{
 
             batchInfo.setUserId(100500L);
             NodeList nlist = document.getElementsByTagName("property");
-            HashMap<String, String> params = new HashMap<>();
+            HashMap<String, String> params = new HashMap<String, String>();
             for (int i = 0; i < nlist.getLength(); i++) {
                 Node node = nlist.item(i);
                 NodeList childrenList = node.getChildNodes();
