@@ -17,10 +17,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author k.tulbassiyev
@@ -46,11 +43,15 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
     private final boolean RULES_ENABLED  = true;
 
+    private Set<String> metaRules = new HashSet<>();
+
     @PostConstruct
     public void init() {
         logger.info("Writer init");
         rulesSingleton.reloadCache();
         entityService = (IEntityService) rmiProxyFactoryBean.getObject();
+
+        metaRules.add("credit");
     }
 
     @Override
@@ -91,7 +92,8 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
             statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
 
-            if(RULES_ENABLED) {
+            if(RULES_ENABLED && entity != null && entity.getMeta() != null &&
+                    metaRules.contains(entity.getMeta().getClassName())) {
                 try {
                     long t1 = System.currentTimeMillis();
                     rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());
