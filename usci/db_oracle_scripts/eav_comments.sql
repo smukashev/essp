@@ -28,3 +28,7 @@ update eav_m_classes set title = 	'Договор'	WHERE NAME = 'primary_contrac
 
 update eav_m_simple_attributes set title = 'номер' where name='no';
 update eav_m_simple_attributes set title = 'дата' where name='date';
+
+update eav_m_complex_attributes set title = 'тип субъекта' where name = 'subject_type';
+
+update eav_m_complex_set set title = 'документы' where name = 'docs';
