@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -62,7 +63,7 @@ public class InfoParser extends BatchParser {
             currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"),new Date());
 
             BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),new Date());
-            docType.put("code",new BaseValue(batch,index,
+            docType.put("code",new BaseEntityStringValue(batch,index,
                     event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
             currentDoc.put("doc_type",new BaseValue(batch,index,docType));
         } else if(localName.equals("name")) {

@@ -89,7 +89,6 @@ public class CREntityReader<T> extends CommonReader<T> {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
 
-        // TODO maks
         ZipInputStream zis = new ZipInputStream(inputStream);
 
         byte[] buffer = new byte[4096];
@@ -163,8 +162,8 @@ public class CREntityReader<T> extends CommonReader<T> {
                 return null;
             }
 
-            System.out.println("####");
-            System.out.println(entity.toString());
+//            System.out.println("####");
+//            System.out.println(entity.toString());
 
             return entity;
         }

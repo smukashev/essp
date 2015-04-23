@@ -40,6 +40,9 @@ public class ChangeRemainsParser extends BatchParser {
     @Autowired
     private ChangeRemainsLimitParser changeRemainsLimitParser;
 
+    @Autowired
+    private ChangeRemainsDiscountedValueParser changeRemainsDiscountedValueParser;
+
     public ChangeRemainsParser() {
         super();
     }
@@ -68,11 +71,9 @@ public class ChangeRemainsParser extends BatchParser {
             currentBaseEntity.put("correction",new BaseValue(batch,index,
                     changeRemainsCorrectionParser.getCurrentBaseEntity()));
         } else if(localName.equals("discounted_value")) {
-            //ctRemainsTypeDiscountedValue = new CtRemainsTypeDiscountedValue();
-        } else if(localName.equals("value")) {
-            event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("discounted_value",new BaseValue(batch, index,
-                    new Double(event.asCharacters().getData())));
+            changeRemainsDiscountedValueParser.parse(xmlReader, batch, index);
+            currentBaseEntity.put("discounted_value",
+                    new BaseValue(batch, index, changeRemainsDiscountedValueParser.getCurrentBaseEntity()));
         } else if(localName.equals("limit")) {
             changeRemainsLimitParser.parse(xmlReader, batch, index);
             currentBaseEntity.put("limit",new BaseValue(batch,index,changeRemainsLimitParser.getCurrentBaseEntity()));

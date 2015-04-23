@@ -3,9 +3,9 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.*;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -116,14 +116,14 @@ public class MainParser extends BatchParser {
 
     public void parseNextPackage() throws SAXException
     {
-        System.out.println("Package #" + index++ + " " + currentTag);
+//        System.out.println("Package #" + index++ + " " + currentTag);
         if (currentTag.equals("packages")) {
             packageParser.parse(xmlReader, batch, index);
             if (packageParser.hasMore()) {
                 currentBaseEntity = packageParser.getCurrentBaseEntity();
                 //my add
                 //currentBaseEntity.put("actual_credit_count",new BaseValue(batch,index,43));
-                currentBaseEntity.put("creditor", new BaseValue(batch,index,infoParser.getCurrentBaseEntity()));
+                currentBaseEntity.put("creditor", new BaseEntityComplexValue(batch, index, infoParser.getCurrentBaseEntity()));
 
                 // TODO possibly should be removed, we don't have such a field
 //                currentBaseEntity.put("account_date", infoParser.getAccountDate());
@@ -165,7 +165,7 @@ public class MainParser extends BatchParser {
 
     public void skipNextPackage() throws SAXException
     {
-        System.out.println("Package #" + index++ + " skipped.");
+//        System.out.println("Package #" + index++ + " skipped.");
 
         while(xmlReader.hasNext()) {
             XMLEvent event = (XMLEvent) xmlReader.next();
