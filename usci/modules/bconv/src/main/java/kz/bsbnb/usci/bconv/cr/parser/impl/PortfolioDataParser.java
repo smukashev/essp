@@ -45,9 +45,8 @@ public class PortfolioDataParser extends BatchParser {
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_data"),batch.getRepDate());
-        portfolioFlow = new BaseSet(metaClassRepository.getMetaClass("ct_portfolio_flow_base"));
-        portfolioFlowMsfo = new BaseSet(metaClassRepository.getMetaClass("ct_portfolio_flow_msfo"));
-
+        portfolioFlow = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_kfn"));
+        portfolioFlowMsfo = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_msfo"));
     }
 
     @Override
@@ -58,10 +57,11 @@ public class PortfolioDataParser extends BatchParser {
             hasMore = portfolioFlowParser.hasMore();
             //currentBaseEntity = portfolioFlowParser.getCurrentBaseEntity();
             BaseEntity t = portfolioFlowParser.getCurrentBaseEntity();
-            t.put("creditor",new BaseEntityComplexValue(batch,index,infoParser.getCurrentBaseEntity()));
-            t.put("account_date",infoParser.getAccountDate());
-            t.put("actual_credit_count",infoParser.getActualCreditCount());
-            t.put("report_date",infoParser.getReportDate());
+            // TODO possibly remove, no such fields
+//            t.put("creditor",new BaseEntityComplexValue(batch,index,infoParser.getCurrentBaseEntity()));
+//            t.put("account_date",infoParser.getAccountDate());
+//            t.put("actual_credit_count",infoParser.getActualCreditCount());
+//            t.put("report_date",infoParser.getReportDate());
             portfolioFlow.put(new BaseSetComplexValue(batch,index,portfolioFlowParser.getCurrentBaseEntity()));
 
             //return true;
@@ -70,10 +70,11 @@ public class PortfolioDataParser extends BatchParser {
             hasMore = portfolioFlowMsfoParser.hasMore();
             //currentBaseEntity = portfolioFlowMsfoParser.getCurrentBaseEntity();
             BaseEntity t = portfolioFlowMsfoParser.getCurrentBaseEntity();
-            t.put("creditor",new BaseEntityComplexValue(batch,index,infoParser.getCurrentBaseEntity()));
-            t.put("account_date",infoParser.getAccountDate());
-            t.put("actual_credit_count",infoParser.getActualCreditCount());
-            t.put("report_date",infoParser.getReportDate());
+            // TODO possibly remove, no such fields
+//            t.put("creditor",new BaseEntityComplexValue(batch,index,infoParser.getCurrentBaseEntity()));
+//            t.put("account_date",infoParser.getAccountDate());
+//            t.put("actual_credit_count",infoParser.getActualCreditCount());
+//            t.put("report_date",infoParser.getReportDate());
             portfolioFlowMsfo.put(new BaseSetComplexValue(batch,index,t));
 
             //return true;

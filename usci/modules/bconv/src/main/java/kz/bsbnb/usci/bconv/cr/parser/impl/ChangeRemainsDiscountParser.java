@@ -33,7 +33,7 @@ public class ChangeRemainsDiscountParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("discount"),batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains_discount"),batch.getRepDate());
     }
 
     @Override

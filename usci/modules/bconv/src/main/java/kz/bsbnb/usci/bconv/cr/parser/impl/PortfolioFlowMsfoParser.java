@@ -36,7 +36,7 @@ public class PortfolioFlowMsfoParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ct_portfolio_flow_msfo"),batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_flow_msfo"),batch.getRepDate()); // TODO invalid metaClass
     }
 
     @Override
@@ -48,10 +48,10 @@ public class PortfolioFlowMsfoParser extends BatchParser {
               portfolio.put("code",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
               currentBaseEntity.put("portfolio",new BaseEntityComplexValue(batch,index,portfolio));
         } else if(localName.equals("details")) {
-            currentDetails = new BaseSet(metaClassRepository.getMetaClass("detail"));
+            currentDetails = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_detail"));
             //details = new Details();
         } else if(localName.equals("detail")) {
-            currentDetail = new BaseEntity(metaClassRepository.getMetaClass("detail"),batch.getRepDate());
+            currentDetail = new BaseEntity(metaClassRepository.getMetaClass("portfolio_flow_detail"),batch.getRepDate());
             //detail = new Detail();
         } else if(localName.equals("balance_account")) {
             BaseEntity ba = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),batch.getRepDate());

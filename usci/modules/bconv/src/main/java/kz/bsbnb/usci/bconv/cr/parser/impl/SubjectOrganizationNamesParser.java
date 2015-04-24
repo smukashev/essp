@@ -48,7 +48,7 @@ public class SubjectOrganizationNamesParser extends BatchParser {
             } else {
                 throw new UnknownValException(localName, attributes.getValue("lang"));
             }*/
-            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("jur_name"),batch.getRepDate());
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("organization_name"),batch.getRepDate());
             currentBaseEntity.put("lang",new BaseEntityStringValue(batch,index,
                     event.asStartElement().getAttributeByName(new QName("lang")).getValue()));
             event = (XMLEvent) xmlReader.next();

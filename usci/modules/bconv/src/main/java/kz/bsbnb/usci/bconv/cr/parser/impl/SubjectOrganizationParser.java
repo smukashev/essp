@@ -168,7 +168,7 @@ public class SubjectOrganizationParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             currentBaseEntity.put("is_se",new BaseEntityBooleanValue(batch,index,new Boolean(event.asCharacters().getData())));
         } else if(localName.equals("docs")) {
-            BaseSet organizationDocs = new BaseSet(metaClassRepository.getMetaClass("doc3"));
+            BaseSet organizationDocs = new BaseSet(metaClassRepository.getMetaClass("document"));
 
             while(true){
                subjectOrganizationDocsParser.parse(xmlReader, batch, index);
