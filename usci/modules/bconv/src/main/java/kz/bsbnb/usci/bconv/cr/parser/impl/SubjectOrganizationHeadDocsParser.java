@@ -48,8 +48,8 @@ public class SubjectOrganizationHeadDocsParser extends BatchParser {
             //my code
             BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),batch.getRepDate());
 
-            docType.put("code",new BaseEntityIntegerValue(batch,index,
-                    new Integer(event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())));
+            docType.put("code",new BaseEntityStringValue(batch,index,
+                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
 
             currentBaseEntity.put("doc_type",new BaseEntityComplexValue(batch,index,docType));
         } else if(localName.equals("name")) {

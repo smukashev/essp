@@ -120,8 +120,8 @@ public class SubjectPersonParser extends BatchParser {
 
             BaseEntity contactType = new BaseEntity(metaClassRepository.getMetaClass("ref_contact_type"), batch.getRepDate());
 
-            contactType.put("code", new BaseEntityIntegerValue(batch, index,
-                    new Integer(event.asStartElement().getAttributeByName(new QName("contact_type")).getValue())));
+            contactType.put("code", new BaseEntityStringValue(batch, index,
+                    event.asStartElement().getAttributeByName(new QName("contact_type")).getValue()));
 
             currentContact.put("contact_type", new BaseEntityComplexValue(batch, index, contactType));
 
@@ -131,7 +131,7 @@ public class SubjectPersonParser extends BatchParser {
             contactDetails.put(new BaseSetStringValue(batch, index, event.asCharacters().getData()));
 
             // TODO incorrect set attribute name
-            currentContact.put("st_contact_details", new BaseEntitySimpleSet(batch, index,
+            currentContact.put("details", new BaseEntitySimpleSet(batch, index,
                     contactDetails
                 ));
 

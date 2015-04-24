@@ -87,7 +87,7 @@ public class CreditParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
                 BaseEntity creditPurpose = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_purpose"), batch.getRepDate());
 
-                creditPurpose.put("code", new BaseEntityIntegerValue(batch, index, new Integer(event.asCharacters().getData())));
+                creditPurpose.put("code", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
 
                 currentBaseEntity.put("credit_purpose", new BaseEntityComplexValue(batch, index,
                         creditPurpose
@@ -96,7 +96,7 @@ public class CreditParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
                 BaseEntity creditObject = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_object"), batch.getRepDate());
 
-                creditObject.put("code", new BaseEntityIntegerValue(batch, index, new Integer(event.asCharacters().getData())));
+                creditObject.put("code", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
 
                 currentBaseEntity.put("credit_object", new BaseEntityComplexValue(batch, index,
                         creditObject
@@ -110,7 +110,7 @@ public class CreditParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
                 BaseEntity financeSource = new BaseEntity(metaClassRepository.getMetaClass("ref_finance_source"), batch.getRepDate());
 
-                financeSource.put("code", new BaseEntityIntegerValue(batch, index, new Integer(event.asCharacters().getData())));
+                financeSource.put("code", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
 
                 currentBaseEntity.put("finance_source", new BaseEntityComplexValue(batch, index,
                         financeSource

@@ -47,8 +47,8 @@ public class SubjectOrganizationDocsParser extends BatchParser {
             //my code
 
             BaseEntity organizationDoc = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),batch.getRepDate());
-            organizationDoc.put("code",new BaseEntityIntegerValue(batch,index,
-                    new Integer(event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())));
+            organizationDoc.put("code",new BaseEntityStringValue(batch,index,
+                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
 
             currentBaseEntity.put("doc_type",new BaseEntityComplexValue(batch,index,organizationDoc));
 

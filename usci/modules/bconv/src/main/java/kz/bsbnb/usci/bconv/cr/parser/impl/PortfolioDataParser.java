@@ -90,8 +90,8 @@ public class PortfolioDataParser extends BatchParser {
         if(localName.equals("portfolio_data")) {
             //batch.setPortfolioData(portfolioData);
             //xmlReader.setContentHandler(contentHandler);
-            currentBaseEntity.put("portfolio_flow",new BaseEntityComplexSet(batch,index,portfolioFlow));
-            currentBaseEntity.put("portfolio_flow_msfo", new BaseEntityComplexSet(batch,index,portfolioFlowMsfo));
+            currentBaseEntity.put("portfolio_flows_kfn",new BaseEntityComplexSet(batch,index,portfolioFlow));
+            currentBaseEntity.put("portfolio_flows_msfo", new BaseEntityComplexSet(batch,index,portfolioFlowMsfo));
             return true;
         } else if(localName.equals("portfolio_flow")) {
         } else if(localName.equals("portfolio_flow_msfo")) {

@@ -36,6 +36,9 @@ public class ChangeParser extends BatchParser {
 
     @Autowired
     private ChangeCreditFlowParser changeCreditFlowParser;
+
+    private BaseEntityDateValue maturityDate;
+    private BaseEntityDateValue prolongationDate;
     
     public ChangeParser() {
         super();
@@ -62,18 +65,15 @@ public class ChangeParser extends BatchParser {
         } else if(localName.equals("maturity_date")) {
             event = (XMLEvent) xmlReader.next();
             try{
-              currentBaseEntity.put("maturity_date",new BaseEntityDateValue(batch,index,
-                      dateFormat.parse(event.asCharacters().getData()))
-              );
+              maturityDate = new BaseEntityDateValue(batch,index, dateFormat.parse(event.asCharacters().getData()));
             } catch (ParseException e){
                 System.out.println(e.getMessage());
             }
         } else if(localName.equals("prolongation_date")) {
             event = (XMLEvent) xmlReader.next();
             try{
-                currentBaseEntity.put("prolongation_date",new BaseEntityDateValue(batch,index,
-                        dateFormat.parse(event.asCharacters().getData()))
-                );
+                prolongationDate = new BaseEntityDateValue(batch,index,
+                        dateFormat.parse(event.asCharacters().getData()));
             } catch (ParseException e){
                 System.out.println(e.getMessage());
             }
@@ -106,5 +106,13 @@ public class ChangeParser extends BatchParser {
         }*/
 
         return false;
+    }
+
+    public BaseEntityDateValue getMaturityDate() {
+        return maturityDate;
+    }
+
+    public BaseEntityDateValue getProlongationDate() {
+        return prolongationDate;
     }
 }

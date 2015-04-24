@@ -55,7 +55,7 @@ public class SubjectOrganizationNamesParser extends BatchParser {
             //BaseSet baseSet = new BaseSet(new MetaValue(DataTypes.STRING));
             //baseSet.put(new BaseValue(batch,index,event.asCharacters().getData()));
             // TODO check attribute name
-            currentBaseEntity.put("st_string", new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
+            currentBaseEntity.put("name", new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
         } else {
             throw new UnknownTagException(localName);
         }

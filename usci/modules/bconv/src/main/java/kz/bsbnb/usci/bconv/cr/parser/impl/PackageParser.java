@@ -124,6 +124,14 @@ public class PackageParser extends BatchParser {
         } else if(localName.equals("change")) {
             changeParser.parse(xmlReader, batch, index);
             currentBaseEntity.put("change",new BaseEntityComplexValue(batch,index,changeParser.getCurrentBaseEntity()));
+
+            if (changeParser.getMaturityDate() != null) {
+                currentBaseEntity.put("maturity_date", changeParser.getMaturityDate());
+            }
+            if (changeParser.getProlongationDate() != null) {
+                currentBaseEntity.put("prolongation_date", changeParser.getProlongationDate());
+            }
+
         } else {
             throw new UnknownTagException(localName);
         }

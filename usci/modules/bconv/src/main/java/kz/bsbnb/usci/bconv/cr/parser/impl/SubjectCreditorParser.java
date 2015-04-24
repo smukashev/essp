@@ -51,8 +51,8 @@ public class SubjectCreditorParser extends BatchParser {
             //ctDoc.setDocType(attributes.getValue("doc_type"));
             currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"),batch.getRepDate());
             BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), batch.getRepDate());
-            docType.put("code",new BaseEntityIntegerValue(batch,index,
-                    new Integer(event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())));
+            docType.put("code",new BaseEntityStringValue(batch,index,
+                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
             currentDoc.put("doc_type",new BaseEntityComplexValue(batch,index,docType));
             /*currentDoc.put("doc_type",new BaseValue(batch,index,
                     event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())

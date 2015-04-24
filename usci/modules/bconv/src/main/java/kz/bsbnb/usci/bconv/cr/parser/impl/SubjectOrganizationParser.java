@@ -79,7 +79,7 @@ public class SubjectOrganizationParser extends BatchParser {
             //my code
             BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"),batch.getRepDate());
             event = (XMLEvent) xmlReader.next();
-            bankRelation.put("code",new BaseEntityIntegerValue(batch,index,new Integer(event.asCharacters().getData())));
+            bankRelation.put("code",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
             bankRelations.put(new BaseSetComplexValue(batch,index,bankRelation));
         } else if(localName.equals("addresses")) {
             //addresses = new Addresses();
@@ -102,7 +102,7 @@ public class SubjectOrganizationParser extends BatchParser {
         } else if(localName.equals("region")) {
             BaseEntity region = new BaseEntity(metaClassRepository.getMetaClass("ref_region"),batch.getRepDate());
             event = (XMLEvent) xmlReader.next();
-            region.put("code",new BaseEntityIntegerValue(batch,index,new Integer(event.asCharacters().getData())));
+            region.put("code",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
             currentAddress.put("region",new BaseEntityComplexValue(batch,index,region));
         } else if(localName.equals("details")) {
             event = (XMLEvent) xmlReader.next();
@@ -118,8 +118,8 @@ public class SubjectOrganizationParser extends BatchParser {
 
             BaseEntity contactType = new BaseEntity(metaClassRepository.getMetaClass("ref_contact_type"), new Date());
 
-            contactType.put("code", new BaseEntityIntegerValue(batch, index,
-                    new Integer(event.asStartElement().getAttributeByName(new QName("contact_type")).getValue())));
+            contactType.put("code", new BaseEntityStringValue(batch, index,
+                    event.asStartElement().getAttributeByName(new QName("contact_type")).getValue()));
 
             currentContact.put("contact_type", new BaseEntityComplexValue(batch, index, contactType));
 
@@ -127,7 +127,7 @@ public class SubjectOrganizationParser extends BatchParser {
 
             event = (XMLEvent) xmlReader.next();
             contactDetails.put(new BaseSetStringValue(batch, index, event.asCharacters().getData()));
-            currentContact.put("st_contact_details", new BaseEntitySimpleSet(batch, index,
+            currentContact.put("details", new BaseEntitySimpleSet(batch, index,
                     contactDetails
             ));
 
@@ -149,7 +149,7 @@ public class SubjectOrganizationParser extends BatchParser {
         } else if(localName.equals("legal_form")) {
             BaseEntity legalForm = new BaseEntity(metaClassRepository.getMetaClass("ref_legal_form"),batch.getRepDate());
             event = (XMLEvent) xmlReader.next();
-            legalForm.put("code",new BaseEntityIntegerValue(batch,index,new Integer(event.asCharacters().getData())));
+            legalForm.put("code",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
             currentBaseEntity.put("legal_form",new BaseEntityComplexValue(batch,index,legalForm));
         } else if(localName.equals("enterprise_type")) {
             event = (XMLEvent) xmlReader.next();
@@ -161,8 +161,8 @@ public class SubjectOrganizationParser extends BatchParser {
         } else if(localName.equals("econ_trade")) {
             event = (XMLEvent) xmlReader.next();
             BaseEntity econTrade = new BaseEntity(metaClassRepository.getMetaClass("ref_econ_trade"), batch.getRepDate());
-            econTrade.put("code", new BaseEntityIntegerValue(batch, index,
-                    new Integer(event.asCharacters().getData())));
+            econTrade.put("code", new BaseEntityStringValue(batch, index,
+                    event.asCharacters().getData()));
             currentBaseEntity.put("econ_trade", new BaseEntityComplexValue(batch,index,econTrade));
         } else if(localName.equals("is_se")) {
             event = (XMLEvent) xmlReader.next();
