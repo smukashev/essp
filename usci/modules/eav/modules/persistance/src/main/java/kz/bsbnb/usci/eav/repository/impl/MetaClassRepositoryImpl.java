@@ -118,6 +118,12 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
         cache.clear();
         names.clear();
         lock.writeLock().unlock();
+
+        try {
+            afterPropertiesSet();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
