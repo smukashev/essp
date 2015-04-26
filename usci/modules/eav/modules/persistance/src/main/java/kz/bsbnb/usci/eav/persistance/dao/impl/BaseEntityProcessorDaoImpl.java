@@ -35,6 +35,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -76,6 +77,24 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Autowired
     public void setApplyListener(IDaoListener applyListener) {
         this.applyListener = applyListener;
+    }
+
+    private static final boolean refsCacheEnalbed = true;
+    public static final HashMap<Long, List<RefListItem>> refsCache =
+            new HashMap<Long, List<RefListItem>>();
+
+    @PostConstruct
+    public void init() {
+        if(refsCacheEnalbed) {
+            List<MetaClassName> metaClassNames = metaClassRepository.getRefNames();
+
+            System.out.println(" -- Initializing cache for references");
+
+            for(MetaClassName metaClassName : metaClassNames)
+                refsCache.put(metaClassName.getId(), getRefsByMetaclass(metaClassName.getId()));
+
+            System.out.println(" -- Cache is ready to use -- ");
+        }
     }
 
     public IBaseEntity loadByMaxReportDate(long id, Date actualReportDate, boolean caching) {
@@ -2989,6 +3008,13 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     public List<RefListItem> getRefsByMetaClass(long metaClassId, boolean raw) {
 
+        if(refsCacheEnalbed) {
+            List<RefListItem> refsList = refsCache.get(metaClassId);
+
+            if(refsList != null)
+                return refsList;
+        }
+
         ArrayList<RefListItem> entityIds = new ArrayList<RefListItem>();
 
         // TODO: fix
@@ -3111,6 +3137,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             entityIds.add(rli);
         }
+
+        if(refsCacheEnalbed)
+            refsCache.put(metaClassId, entityIds);
 
         return entityIds;
     }
