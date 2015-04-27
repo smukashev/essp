@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface ISearcherFormService {
     List<Pair> getMetaClasses(long userId);
+
     String getDom(long userId, IMetaClass metaClass);
 }
