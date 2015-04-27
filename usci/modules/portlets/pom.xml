@@ -23,6 +23,7 @@
         <module>vaadin-filterable-selector</module>
         <module>static</module>
         <module>translit-util</module>
+        <module>approval-portlet</module>
         <module>administration-portlet</module>
         <module>protocol_portlet</module>
         <module>upload-portlet</module>

@@ -4,7 +4,7 @@
     <groupId>kz.bsbnb</groupId>
     <artifactId>approval-portlet</artifactId>
     <packaging>war</packaging>
-    <name>approval-portlet</name>
+    <name>USCI Portlets: ApprovalPortlet</name>
     <version>0.1</version>
 
     <properties>
@@ -34,8 +34,8 @@
                 <version>2.5</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -74,214 +74,8 @@
             <version>2.0</version>
             <scope>provided</scope>
         </dependency>
-        
-        <!-- vaadin dependencies -->
-        <!-- javax dependencies -->
-        <!--<dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>credit-registry-ejb-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>javax.ejb</artifactId>
-                    <groupId>org.glassfish</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>javax.persistence</artifactId>
-                    <groupId>org.eclipse.persistence</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>stax-api</artifactId>
-                    <groupId>javax.xml.stream</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>credit-registry-ejb-ref-api</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>credit-registry-util</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>persistence-util</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>eclipselink</artifactId>
-                    <groupId>org.eclipse.persistence</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-impl</artifactId>
-                    <groupId>com.sun.xml.bind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-api</artifactId>
-                    <groupId>javax.xml.bind</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>credit-registry-dm</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commons-beanutils</artifactId>
-                    <groupId>commons-beanutils</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>commons-logging</artifactId>
-                    <groupId>commons-logging</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>javax.persistence</artifactId>
-                    <groupId>org.eclipse.persistence</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>stax-api</artifactId>
-                    <groupId>javax.xml.stream</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>credit-registry-ejb-ref-api</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>credit-registry-util</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>persistence-util</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>eclipselink</artifactId>
-                    <groupId>org.eclipse.persistence</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-impl</artifactId>
-                    <groupId>com.sun.xml.bind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-api</artifactId>
-                    <groupId>javax.xml.bind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>commons-lang</artifactId>
-                    <groupId>commons-lang</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>credit-registry-ejb-ref-api</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>stax-api</artifactId>
-                    <groupId>javax.xml.stream</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>credit-registry-ejb-ref-api</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>credit-registry-util</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>persistence-util</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>eclipselink</artifactId>
-                    <groupId>org.eclipse.persistence</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-impl</artifactId>
-                    <groupId>com.sun.xml.bind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-api</artifactId>
-                    <groupId>javax.xml.bind</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>credit-registry-util</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>stax-api</artifactId>
-                    <groupId>javax.xml.stream</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>credit-registry-ejb-ref-api</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>credit-registry-util</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>persistence-util</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>eclipselink</artifactId>
-                    <groupId>org.eclipse.persistence</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-impl</artifactId>
-                    <groupId>com.sun.xml.bind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-api</artifactId>
-                    <groupId>javax.xml.bind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>commons-compress</artifactId>
-                    <groupId>org.apache.commons</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>persistence-util</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>stax-api</artifactId>
-                    <groupId>javax.xml.stream</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>credit-registry-ejb-ref-api</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>credit-registry-util</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>persistence-util</artifactId>
-                    <groupId>com.bsbnb</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>eclipselink</artifactId>
-                    <groupId>org.eclipse.persistence</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-impl</artifactId>
-                    <groupId>com.sun.xml.bind</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxb-api</artifactId>
-                    <groupId>javax.xml.bind</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>-->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>com.bsbnb</groupId>
             <artifactId>vaadin-messagebox</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -315,16 +109,15 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>com.bsbnb</groupId>
             <artifactId>translit-util</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>com.bsbnb</groupId>
             <artifactId>vaadin-filterable-selector</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>kz.bsbnb.usci</groupId>
             <artifactId>cr</artifactId>
@@ -335,11 +128,5 @@
             <artifactId>core</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-        <!--<dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>-->
     </dependencies>
 </project>
