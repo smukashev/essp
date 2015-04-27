@@ -183,7 +183,7 @@ public class ReportDateLayout extends VerticalLayout {
                         data.put("begDate", Long.toString(report.getBeginningDate().getTime()));
                         data.put("endDate", Long.toString(report.getEndDate().getTime()));
                         data.put("userName", environment.getUsername());
-                                approvalBusiness.startApprovalProcess(data);
+                        approvalBusiness.startApprovalProcess(data);
                         updateReportStatus(ReportType.ORGANIZATION_APPROVING);
                     }
                 });

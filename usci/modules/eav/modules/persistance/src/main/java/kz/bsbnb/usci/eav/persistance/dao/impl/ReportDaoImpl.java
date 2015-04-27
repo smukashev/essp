@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.eav.persistance.generated.tables.records.ReportRecord;
 import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IReportDao;
@@ -53,14 +52,14 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
         for (Map<String, Object> row : rows) {
             Report report = new Report();
             report.setId(((BigDecimal)row.get(EAV_REPORT.ID.getName())).longValue());
-            report.setCreditor(creditorMap.get(row.get(EAV_REPORT.CREDITOR_ID.getName())));
+            report.setCreditor(creditorMap.get(((BigDecimal) row.get(EAV_REPORT.CREDITOR_ID.getName())).longValue()));
             report.setTotalCount(((BigDecimal) row.get(EAV_REPORT.TOTAL_COUNT.getName())).longValue());
             report.setActualCount(((BigDecimal) row.get(EAV_REPORT.ACTUAL_COUNT.getName())).longValue());
             report.setBeginningDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.BEG_DATE.getName())));
             report.setEndDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.END_DATE.getName())));
             report.setLastManualEditDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.LAST_MANUAL_EDIT_DATE.getName())));
-            report.setStatusId(((BigDecimal)row.get(EAV_REPORT.STATUS_ID.getName())).longValue());
-
+            report.setStatusId(((BigDecimal) row.get(EAV_REPORT.STATUS_ID.getName())).longValue());
+            report.setReportDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.REPORT_DATE.getName())));
             reports.add(report);
         }
 

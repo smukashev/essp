@@ -28,14 +28,14 @@ public class BeanDataProvider implements DataProvider {
     public BeanDataProvider() {
         // portalUserBeanRemoteBusiness
         portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://172.17.110.165:1099/portalUserBeanRemoteBusiness");
+        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://localhost:1099/portalUserBeanRemoteBusiness");
         portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
         portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
         // reportBeanRemoteBusiness
         reportBusinessFactoryBean = new RmiProxyFactoryBean();
-        reportBusinessFactoryBean.setServiceUrl("rmi://172.17.110.165:1099/reportBeanRemoteBusiness");
+        reportBusinessFactoryBean.setServiceUrl("rmi://localhost:1099/reportBeanRemoteBusiness");
         reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
         reportBusinessFactoryBean.afterPropertiesSet();
         reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();

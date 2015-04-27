@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class ApprovalBusiness {
 
-    private static final String BONITA_URI = "http://172.17.110.165:8081/bonita";
+    private static final String BONITA_URI = "http://localhost:8080/bonita";
 
     /**
      * Human user username
@@ -159,8 +159,21 @@ public class ApprovalBusiness {
         String serviceUri = "/API/bpm/process?f=activationState%3dENABLED&f=name%3d" + serviceName;
         HttpResponse response = executeGetRequest(serviceUri);
         String content = consumeResponseIfNecessary(response);
-        content = content.substring(8, content.indexOf(',') - 1);
-        return Long.parseLong(content);
+        /*content = content.substring(8, content.indexOf(',') - 1);*/
+
+        int s1 = content.indexOf("\"id\"");
+        int s2 = content.indexOf(",", s1);
+        content = content.substring(s1 + 6, s2 - 1);
+
+        Long processId = null;
+
+        try {
+            processId = Long.parseLong(content);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return processId;
     }
 
     public void loginAs(String username, String password) {
