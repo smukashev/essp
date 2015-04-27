@@ -5,11 +5,10 @@ import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.model.json.*;
-import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
+import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import kz.bsbnb.usci.sync.service.IBatchService;
@@ -77,6 +76,8 @@ public class ZipFilesMonitor{
     public static final int MAX_SYNC_QUEUE_SIZE = 512;
 
     private static final long WAIT_TIMEOUT = 360; //in 10 sec units
+
+    private int GLOBAL_COUNT = 0;
 
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
@@ -546,6 +547,28 @@ public class ZipFilesMonitor{
                 }
             }
         }
+
+        // ------------------------------------
+        Report report = new Report();
+
+        Creditor creditor = new Creditor();
+        creditor.setId(cId);
+
+        report.setCreditor(creditor);
+        report.setStatusId(67L);
+        report.setActualCount(10L);
+        report.setBeginningDate(new Date());
+        report.setLastManualEditDate(new Date());
+        report.setTotalCount(GLOBAL_COUNT + 10L);
+        report.setEndDate(new Date());
+        report.setReportDate(batchInfo.getRepDate());
+
+        GLOBAL_COUNT += 10L; // TODO: fix
+
+        ReportBeanRemoteBusiness reportBeanRemoteBusiness = serviceFactory.getReportBeanRemoteBusinessService();
+        reportBeanRemoteBusiness.insert(report, "Auditor");
+
+        // ------------------------------------
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
                 batchInfo.getUserId(), cId);

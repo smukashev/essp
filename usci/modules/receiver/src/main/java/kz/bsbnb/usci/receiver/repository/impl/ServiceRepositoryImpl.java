@@ -6,6 +6,7 @@ import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -38,11 +39,16 @@ public class ServiceRepositoryImpl implements IServiceRepository {
     @Qualifier(value = "remoteCreditorService")
     private RmiProxyFactoryBean remoteCreditorService;
 
+    @Autowired
+    @Qualifier(value = "reportBeanRemoteBusiness")
+    private RmiProxyFactoryBean reportBeanRemoteBusiness;
+
     private IEntityService entityService;
     private IBatchService batchService;
     private IMetaFactoryService metaFactoryService;
     private PortalUserBeanRemoteBusiness userService;
     private RemoteCreditorBusiness remoteCreditorBusiness;
+    private ReportBeanRemoteBusiness reportBeanRemoteBusinessService;
 
     @PostConstruct
     public void init() {
@@ -51,6 +57,7 @@ public class ServiceRepositoryImpl implements IServiceRepository {
         metaFactoryService = (IMetaFactoryService) metaFactoryRmiService.getObject();
         userService = (PortalUserBeanRemoteBusiness) remoteUserService.getObject();
         remoteCreditorBusiness = (RemoteCreditorBusiness) remoteCreditorService.getObject();
+        reportBeanRemoteBusinessService = (ReportBeanRemoteBusiness) reportBeanRemoteBusiness.getObject();
     }
 
     @Override
@@ -74,9 +81,15 @@ public class ServiceRepositoryImpl implements IServiceRepository {
         return userService;
     }
 
+    @Override
     public RemoteCreditorBusiness getRemoteCreditorBusiness()
     {
         return remoteCreditorBusiness;
+    }
+
+    @Override
+    public ReportBeanRemoteBusiness getReportBeanRemoteBusinessService() {
+        return reportBeanRemoteBusinessService;
     }
 }
 

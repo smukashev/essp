@@ -43,7 +43,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
     private final boolean RULES_ENABLED  = true;
 
-    private Set<String> metaRules = new HashSet<>();
+    private Set<String> metaRules = new HashSet<String>();
 
     @PostConstruct
     public void init() {

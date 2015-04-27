@@ -23,10 +23,7 @@ import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.tool.Quote;
-import org.jooq.DSLContext;
-import org.jooq.Delete;
-import org.jooq.Insert;
-import org.jooq.Select;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,14 +83,21 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @PostConstruct
     public void init() {
         if(refsCacheEnalbed) {
-            List<MetaClassName> metaClassNames = metaClassRepository.getRefNames();
+            List<MetaClassName> metaClassNames = null;
+            try {
+                metaClassNames = metaClassRepository.getRefNames();
+            } catch (Exception e) {
+                System.out.println("Cache couldn't initialize");
+            }
 
-            System.out.println(" -- Initializing cache for references");
+            if(metaClassNames != null) {
+                System.out.println(" -- Initializing cache for references");
 
-            for(MetaClassName metaClassName : metaClassNames)
-                refsCache.put(metaClassName.getId(), getRefsByMetaclass(metaClassName.getId()));
+                for (MetaClassName metaClassName : metaClassNames)
+                    refsCache.put(metaClassName.getId(), getRefsByMetaclass(metaClassName.getId()));
 
-            System.out.println(" -- Cache is ready to use -- ");
+                System.out.println(" -- Cache is ready to use -- ");
+            }
         }
     }
 

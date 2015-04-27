@@ -6,11 +6,11 @@
         <param-value>true</param-value>
     </context-param>
     <servlet>
-        <servlet-name>credit-registry-approval-portlet</servlet-name>
+        <servlet-name>approval-portlet</servlet-name>
         <servlet-class>com.liferay.portal.kernel.servlet.PortletServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>credit-registry-approval-portlet</servlet-name>
-        <url-pattern>/credit-registry-approval-portlet/*</url-pattern>
+        <servlet-name>approval-portlet</servlet-name>
+        <url-pattern>/approval-portlet/*</url-pattern>
     </servlet-mapping>
 </web-app>

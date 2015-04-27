@@ -34,6 +34,33 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
     @Autowired
     IBaseEntityProcessorDao baseEntityProcessorDao;
 
+    public Long insertReport(Report report, String username) {
+        InsertOnDuplicateStep insert = context.insertInto(
+                EAV_REPORT,
+                EAV_REPORT.USERNAME,
+                EAV_REPORT.CREDITOR_ID,
+                EAV_REPORT.REPORT_DATE,
+                EAV_REPORT.STATUS_ID,
+                EAV_REPORT.TOTAL_COUNT,
+                EAV_REPORT.ACTUAL_COUNT,
+                EAV_REPORT.BEG_DATE,
+                EAV_REPORT.END_DATE,
+                EAV_REPORT.LAST_MANUAL_EDIT_DATE
+        ).values(username,
+                report.getCreditor().getId(),
+                DataUtils.convert(report.getReportDate()),
+                report.getStatusId(),
+                report.getTotalCount(),
+                report.getActualCount(),
+                DataUtils.convert(report.getBeginningDate()),
+                DataUtils.convert(report.getEndDate()),
+                DataUtils.convert(report.getLastManualEditDate()));
+
+        Long reportId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+
+        return reportId;
+    }
+
     public List<Report> getReportsByReportDateAndCreditors(Date reportDate, List<Creditor> creditors) {
         ArrayList<Report> reports = new ArrayList<Report>();
         HashMap<Long, Creditor> creditorMap = new HashMap<Long, Creditor>();

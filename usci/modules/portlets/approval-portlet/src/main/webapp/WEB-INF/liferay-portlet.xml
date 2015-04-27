@@ -3,7 +3,7 @@
 
 <liferay-portlet-app>
     <portlet>
-        <portlet-name>credit-registry-approval-portlet</portlet-name>
+        <portlet-name>approval-portlet</portlet-name>
         <icon>/accept.png</icon>
         <instanceable>true</instanceable>
         <ajaxable>false</ajaxable>

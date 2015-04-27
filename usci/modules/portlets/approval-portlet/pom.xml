@@ -46,7 +46,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>credit-registry-approval-portlet</finalName>
+        <finalName>approval-portlet</finalName>
     </build>
 
     <dependencies>

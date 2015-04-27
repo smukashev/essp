@@ -40,6 +40,11 @@ public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness
         }
     }
 
+    @Override
+    public Long insert(Report report, String username) {
+        return reportDao.insertReport(report, username);
+    }
+
 
     @Override
     @Deprecated

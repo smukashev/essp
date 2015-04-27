@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 
 public interface ReportBeanRemoteBusiness {
+    public Long insert(Report report, String username);
+
     public Date getReportDate(long creditorId);
 
     public Report getByCreditor_ReportDate(Creditor creditor, Date reportDate);
