@@ -1,8 +1,9 @@
 package kz.bsbnb.usci.cli.app.ref;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import java.util.HashMap;
 
 
 /**
@@ -13,6 +14,20 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  * To change this template use File | Settings | File Templates.
  */
 public class BaseRef {
+    protected HashMap hm;
+
+    public String get(String s){
+        return (String) hm.get(s);
+    }
+
+    public String getKeyName(){
+        return "ID";
+    }
+
+    public BaseRef(HashMap hm){
+        this.hm = hm;
+    }
+
     public void indent(int shft){
         for(int i=0;i<shft;i++)
             System.out.print("  ");

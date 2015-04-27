@@ -19,6 +19,8 @@ public interface IBaseEntityDao extends IPersistableDao {
 
     public boolean isUsed(long baseEntityId);
 
+    public boolean isUsed(long baseEntityId, long exceptContainingId);
+
     public boolean deleteRecursive(long baseEntityId);
 
     public boolean deleteRecursive(long baseEntityId, IMetaClass metaClass);

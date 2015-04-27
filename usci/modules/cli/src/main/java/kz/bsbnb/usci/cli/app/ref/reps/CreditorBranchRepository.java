@@ -44,6 +44,8 @@ public class CreditorBranchRepository extends BaseRepository {
                     tmp.put("main_office",CreditorRepository.getById((String) tmp.get("MAIN_OFFICE_ID")));
                 }
 
+                if(tmp.get("REGION_ID") != null)
+                    tmp.put("region",RegionRepository.getById((String)tmp.get("REGION_ID")));
                 CreditorBranch dt = new CreditorBranch(tmp);
                 hm.put(dt.get(dt.getKeyName()),dt);
             }

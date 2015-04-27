@@ -10,21 +10,30 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by almaz on 7/2/14.
- */
 public interface ShowcaseDao {
 
-    public void createTables(ShowcaseHolder showcaseHolder);
-    public void generate(IBaseEntity entity, ShowcaseHolder showcaseHolder);
-    public ArrayList<ShowcaseHolder> getHolders();
-    public long save(ShowCase showCaseForSave);
-    public void remove(ShowCase showCase);
-    public ShowCase load(String name);
-    public ShowCase load(long id);
-    public void reloadCache();
-    public int deleteById(ShowcaseHolder holder, IBaseEntity e);
-    public ShowcaseHolder getHolderByClassName(String className);
+    void createTables(ShowcaseHolder showcaseHolder);
+
+    void generate(IBaseEntity entity, ShowcaseHolder showcaseHolder);
+
+    ArrayList<ShowcaseHolder> getHolders();
+
+    long save(ShowCase showCaseForSave);
+
+    void remove(ShowCase showCase);
+
+    ShowCase load(String name);
+
+    ShowCase load(long id);
+
+    void reloadCache();
+
+    int deleteById(ShowcaseHolder holder, IBaseEntity e);
+
+    ShowcaseHolder getHolderByClassName(String className);
+
+    Long insertBadEntity(Long entityId, Long scId, Date report_date, String strackTrace, String message);
+
     @Transactional
     List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate);
 }

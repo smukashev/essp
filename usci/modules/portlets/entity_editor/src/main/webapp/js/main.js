@@ -16,7 +16,7 @@ function getForm(){
         method: 'POST',
         params: {
             op: 'GET_FORM',
-            meta: currentClass
+            metaId: currentClass
         },
         success: function(data){
             document.getElementById('entity-editor-form').innerHTML = data.responseText;
@@ -200,7 +200,7 @@ Ext.onReady(function() {
                 }
             });
         },
-        maxWidth: 50,
+        maxWidth: 70,
         shadow: true
     });
 
@@ -228,7 +228,7 @@ Ext.onReady(function() {
                 }
             });
         },
-        maxWidth: 50
+        maxWidth: 70
     });
 
     var buttonShowXML = Ext.create('Ext.button.Button', {
@@ -440,7 +440,7 @@ Ext.onReady(function() {
                     xtype: 'combobox',
                     store: classesStore,
                     labelWidth: 70,
-                    valueField:'name',
+                    valueField:'id',
                     displayField:'name',
                     fieldLabel: label_CLASS
                 }, {

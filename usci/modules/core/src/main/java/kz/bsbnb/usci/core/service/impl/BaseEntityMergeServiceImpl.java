@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -23,15 +24,15 @@ public class BaseEntityMergeServiceImpl implements IBaseEntityMergeService {
     IBaseEntityProcessorDao baseEntityProcessorDao;
 
     @Override
-    public void mergeBaseEntities(long leftEntityId, long rightEntityId, String json) {
-
+    public void mergeBaseEntities(long leftEntityId, long rightEntityId, Date leftReportDate, Date rightReportDate,
+                                  String json, boolean deleteUnused) {
         IBaseEntityMergeManager mergeManager = constructMergeManagerFromJson(json);
 
-        IBaseEntity leftEntity = baseEntityProcessorDao.load(leftEntityId);
-        IBaseEntity rightEntity = baseEntityProcessorDao.load(rightEntityId);
-        IBaseEntity result = null;
+        IBaseEntity leftEntity = baseEntityProcessorDao.loadByMaxReportDate(leftEntityId, leftReportDate);
+        IBaseEntity rightEntity = baseEntityProcessorDao.loadByMaxReportDate(rightEntityId, rightReportDate);
+
         if(mergeManager != null && leftEntity != null && rightEntity != null){
-            result = baseEntityProcessorDao.merge(leftEntity, rightEntity, mergeManager,  IBaseEntityProcessorDao.MergeResultChoice.LEFT);
+            baseEntityProcessorDao.merge(leftEntity, rightEntity, mergeManager,  IBaseEntityProcessorDao.MergeResultChoice.LEFT, deleteUnused);
         }
 
     }

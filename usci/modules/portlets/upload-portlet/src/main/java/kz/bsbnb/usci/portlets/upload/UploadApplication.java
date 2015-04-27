@@ -28,7 +28,6 @@ public class UploadApplication extends Application {
     private static final long serialVersionUID = 2096197512742005243L;
     public static final Logger log = Logger.getLogger(SingleUploadComponent.class.getCanonicalName());
 
-    //TODO: Выдавать стандартную ошибку авторизации пользователя
     @Override
     public void init() {
         setMainWindow(new Window());
@@ -41,7 +40,6 @@ public class UploadApplication extends Application {
         } else {
             getMainWindow().showNotification("Not inited via Portal!", Notification.TYPE_ERROR_MESSAGE);
         }
-
     }
 
     private class SamplePortletListener implements PortletListener {
@@ -51,8 +49,12 @@ public class UploadApplication extends Application {
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
             try {
+                if(PortalUtil.getUser(request) == null)
+                    return;
+
                 Window mainWindow = new Window();
-                mainWindow.addComponent(new MainLayout(new UploadPortletEnvironmentFacade(PortalUtil.getUser(request))));
+                mainWindow.addComponent(new MainLayout(
+                        new UploadPortletEnvironmentFacade(PortalUtil.getUser(request))));
                 setMainWindow(mainWindow);
             } catch (PortalException pe) {
                 log.log(Level.SEVERE, "", pe);

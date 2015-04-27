@@ -13,10 +13,9 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class DebtorType extends BaseRef {
-    private HashMap hm;
 
     public DebtorType(HashMap hm){
-        this.hm = hm;
+        super(hm);
     }
 
     public String get(String s){

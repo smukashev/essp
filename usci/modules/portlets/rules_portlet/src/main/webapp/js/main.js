@@ -87,18 +87,18 @@ function initGrid(){
                 }]
             },
             {
-                text     : 'Title',
+                text     : 'Название',
                 dataIndex: 'name',
                 width: 200,
                 flex: 1,
                 field: {
                     allowBlank: false
                 }
-            } ,
+            }/* ,
             {
                 text : 'Id6nik',
-                dataIndex: 'id'
-            }
+                dataIndex: 'id',
+            }*/
         ],
         listeners : {
             cellclick: function(grid, td, cellIndex, newValue, tr, rowIndex, e, eOpts){
@@ -139,7 +139,7 @@ function initGrid(){
         dockedItems: [{
             xtype: 'toolbar',
             items: [{
-                text: 'add',
+                text: 'добавить',
                 icon: contextPathUrl + '/pics/add.png',
                 id: 'btnNewRule',
                 handler: function(e1,e2){
@@ -201,7 +201,7 @@ function initGrid(){
                     Ext.EventObject.stopPropagation();
                 }
             },{
-                text: 'run',
+                text: 'запуск',
                 id:    'btnRun',
                 icon: contextPathUrl + '/pics/run.png',
                 handler: function(){
@@ -240,7 +240,7 @@ function initGrid(){
                     }, this, false, this.lastValue);
                 }
             },{
-                text: 'flush',
+                text: 'сброс',
                 icon: contextPathUrl + '/pics/bin.png',
                 id: 'btnFlush',
                 handler: function(){
@@ -266,7 +266,7 @@ function initGrid(){
                     });
                 }
             },{
-                text: 'copy',
+                text: 'копировать',
                 id: 'btnCopy',
                 icon: contextPathUrl + '/pics/copy2.png',
                 //disabled: true,
@@ -553,7 +553,7 @@ Ext.onReady(function(){
                                     store: packageStore,
                                     valueField:'id',
                                     displayField:'name',
-                                    fieldLabel: 'Choose',
+                                    fieldLabel: 'Выберите пакет',
                                     listeners: {
                                         change: function(){
                                             updateRules();
@@ -562,7 +562,7 @@ Ext.onReady(function(){
                                 }, {
                                     xtype: 'datefield',
                                     id: 'elemDatePackage',
-                                    fieldLabel: 'date',
+                                    fieldLabel: 'дата',
                                     listeners: {
                                         change: function(){
                                             updateRules();

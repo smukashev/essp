@@ -10,6 +10,7 @@
 		<column name="last_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
 		<column name="middle_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
 		<column name="modified_date" primaryKey="false" required="false" type="DATE"/>
+		<column name="is_active" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="1"/>
 	</table>
 	<table name="eav_a_creditor_state">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -952,6 +953,19 @@
 				<unique-column name="showcase_id"/>
 			</unique>
 	</table>
+
+	<!-- Table for showcase entity revisions -->
+	<table name="sc_entities">
+			<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+			<column name="entity_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+			<index name="eav_ind_023_01">
+							<index-column name="entity_id"/>
+					</index>
+			<unique name="ind_uk_sc_023_00">
+				<unique-column name="entity_id"/>
+			</unique>
+	</table>
+	<!-- Table for showcase entity revisions -->
 
 	<!-- DROOLS -->
 	<table name="logic_packages">

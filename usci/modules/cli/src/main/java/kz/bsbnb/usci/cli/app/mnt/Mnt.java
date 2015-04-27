@@ -57,7 +57,7 @@ public class Mnt {
 
     public void commandMaintenance(String line) {
 
-        String commandUsage = "Arguments: mnt [delScript|keyScript] from core:core_sep_2014@10.10.11.44:CREDITS [creditor_id=36] [--all] > C:\\zips\\batch.zip";
+        String commandUsage = "Arguments: mnt [delScript|keyScript|changeScript] from core:core_sep_2014@10.10.11.44:CREDITS [creditor_id=36] [--all] > C:\\zips\\batch.zip";
 
         if(line.contains("changeScript")) {
             commandMaintenanceChange(line);

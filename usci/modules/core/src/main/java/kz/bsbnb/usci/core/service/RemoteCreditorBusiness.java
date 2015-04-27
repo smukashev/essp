@@ -4,9 +4,8 @@ import kz.bsbnb.usci.cr.model.Creditor;
 
 import java.util.List;
 
-public interface RemoteCreditorBusiness
-{
-    public List<Creditor> findMainOfficeCreditors();
-    public boolean creditorApproved(Creditor cred);
-    public int contractCount(Creditor cred);
+public interface RemoteCreditorBusiness {
+    List<Creditor> findMainOfficeCreditors();
+    boolean creditorApproved(Creditor cred);
+    int contractCount(Creditor cred);
 }

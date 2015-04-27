@@ -8,11 +8,8 @@ import java.util.HashMap;
 
 
 public class EnterpriseType extends BaseRef {
-
-    private HashMap hm;
-
     public EnterpriseType(HashMap hm){
-        this.hm = hm;
+        super(hm);
     }
 
     public String get(String s){

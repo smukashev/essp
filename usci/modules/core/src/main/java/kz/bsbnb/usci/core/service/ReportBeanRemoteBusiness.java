@@ -8,8 +8,7 @@ import kz.bsbnb.usci.cr.model.ReportMessageAttachment;
 import java.util.Date;
 import java.util.List;
 
-public interface ReportBeanRemoteBusiness
-{
+public interface ReportBeanRemoteBusiness {
     public Date getReportDate(long creditorId);
 
     public Report getByCreditor_ReportDate(Creditor creditor, Date reportDate);

@@ -1,11 +1,6 @@
 package kz.bsbnb.usci.showcase.consumer;
 
-import javax.annotation.PostConstruct;
-import javax.jms.*;
-import javax.xml.transform.Result;
-
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
@@ -15,96 +10,103 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.ObjectMessage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-/**
- *
- * Message Listener. Consumes messages from ActiveMQ and passes them for further processing.
- * <p>
- *     Starts a thread for every Showcase defined in the application and processes messages in parallel.
- * </p>
- *
- */
-
 @Component
-public class ShowcaseMessageConsumer implements MessageListener{
+public class ShowcaseMessageConsumer implements MessageListener {
 
+    final static Logger logger = Logger.getLogger(ShowcaseMessageConsumer.class);
     @Autowired
     SQLQueriesStats stats;
     @Autowired
     ShowcaseDao showcaseDao;
-
-    final static Logger logger = Logger.getLogger(ShowcaseMessageConsumer.class);
-
-    private Random r = new Random();
     private ExecutorService exec = Executors.newCachedThreadPool();
 
     @Override
     public void onMessage(Message message) {
-        try {
-            if (message instanceof ObjectMessage) {
-                long t3 = System.currentTimeMillis();
+        if (message instanceof ObjectMessage) {
+            long t3 = System.currentTimeMillis();
 
-                ObjectMessage om = (ObjectMessage) message;
-                QueueEntry queueEntry = (QueueEntry) om.getObject();
-                Long scId = queueEntry.getScId();
-                ArrayList<Future> futures = new ArrayList<Future>();
+            ObjectMessage om = (ObjectMessage) message;
+            QueueEntry queueEntry;
+
+            try {
+                queueEntry = (QueueEntry) om.getObject();
+            } catch(JMSException jms) {
+                jms.printStackTrace();
+                return;
+            }
+
+            Long scId = queueEntry.getScId();
+
+            try {
+                ArrayList<Future> futures = new ArrayList<>();
                 List<ShowcaseHolder> holders = showcaseDao.getHolders();
 
-                if(queueEntry.getBaseEntityApplied().getOperation() == OperationType.DELETE) {
+                if (queueEntry.getBaseEntityApplied().getOperation() == OperationType.DELETE) {
                     ShowcaseHolder h = showcaseDao.getHolderByClassName(
                             queueEntry.getBaseEntityApplied().getMeta().getClassName());
 
                     showcaseDao.deleteById(h, queueEntry.getBaseEntityApplied());
-                    message.acknowledge();
-                } else if(queueEntry.getBaseEntityApplied().getOperation() == OperationType.NEW) {
+                } else if (queueEntry.getBaseEntityApplied().getOperation() == OperationType.NEW) {
                     throw new UnsupportedOperationException("Operation new not supported in showcase");
                 } else {
-                    for(ShowcaseHolder holder : holders) {
-                        if(!holder.getShowCaseMeta().getMeta().getClassName()
+                    boolean found = false;
+
+                    for (ShowcaseHolder holder : holders) {
+                        if (!holder.getShowCaseMeta().getMeta().getClassName()
                                 .equals(queueEntry.getBaseEntityApplied().getMeta().getClassName()))
                             continue;
 
-                        if(scId == null || scId == holder.getShowCaseMeta().getId()){
-                            Future future = exec.submit(new CarteageGenerator(queueEntry.getBaseEntityApplied(), holder));
+                        if (scId == null || scId == holder.getShowCaseMeta().getId()) {
+                            Future future = exec.submit(new CarteageGenerator(queueEntry.getBaseEntityApplied(),
+                                    holder));
+
                             futures.add(future);
+
+                            found = true;
                         }
                     }
 
-                    for(Future f : futures){
-                        try {
-                            f.get();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    if(!found)
+                        System.err.println("MetaClass " + queueEntry.getBaseEntityApplied().getMeta().getClassName() +
+                                " couldn't find matching ShowCase");
+
+                    for (Future f : futures)
+                        f.get();
+
                     futures.removeAll(futures);
 
                     long t4 = System.currentTimeMillis() - t3;
                     stats.put("message", t4);
-
-                    message.acknowledge();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+
+                StringBuilder sb = new StringBuilder();
+
+                for(StackTraceElement s : e.getStackTrace())
+                    sb.append(s.toString());
+
+                showcaseDao.insertBadEntity(queueEntry.getBaseEntityApplied().getId(), scId,
+                        queueEntry.getBaseEntityApplied().getReportDate(), sb.toString(), e.getMessage());
             }
-        } catch (JMSException e) {
-            logger.error(e.getMessage(), e);
         }
     }
 
-    private class CarteageGenerator implements Runnable{
-
+    private class CarteageGenerator implements Runnable {
         private IBaseEntity entity;
         private ShowcaseHolder holder;
 
-        public CarteageGenerator(IBaseEntity entity, ShowcaseHolder holder){
+        public CarteageGenerator(IBaseEntity entity, ShowcaseHolder holder) {
             this.entity = entity;
             this.holder = holder;
         }
@@ -112,12 +114,9 @@ public class ShowcaseMessageConsumer implements MessageListener{
         @Override
         public void run() {
             long t1 = System.currentTimeMillis();
-            //showcaseDao.dbCarteageGenerate(entity, holder);
-            showcaseDao.generate(entity,holder);
+            showcaseDao.generate(entity, holder);
             long t2 = System.currentTimeMillis() - t1;
-            //stats.put("showcase " + holder.getShowCaseMeta().getName(), t2);
             stats.put("showcase", t2);
-            System.out.print("." + (r.nextInt(50) == 25 ? "\n" : ""));
         }
     }
 }

@@ -17,7 +17,7 @@ Ext.onReady(function() {
                     op: 'SEND_XML'
                 },
                 success: function() {
-                    console.log('success');
+                    Ext.MessageBox.alert(LABEL_SUCCESS, LABEL_SEND_APPROVAL);
                 },
                 failure: function() {
                     console.log('woops');
@@ -66,9 +66,64 @@ Ext.onReady(function() {
                 sortable: false,
                 items: [{
                     icon: contextPathUrl + '/pics/edit.png',
-                    tooltip: label_EDIT,
+                    tooltip: label_VIEW,
                     handler: function (grid, rowIndex, colIndex) {
+                        var rec = store.getAt(rowIndex);
+                        id_field = rec.get('id');
 
+                        Ext.Ajax.request({
+                            url: dataUrl,
+                            method: 'POST',
+                            params: {
+                                op: 'GET_ENTRY',
+                                id: id_field
+                            },
+                            success: function(response) {
+                                var xmlStr = response.responseText;
+
+                                var buttonClose = Ext.create('Ext.button.Button', {
+                                    id: "itemFormCancel",
+                                    text: label_CLOSE,
+                                    handler : function (){
+                                        Ext.getCmp('xmlFromWin').destroy();
+                                    }
+                                });
+
+                                var xmlForm = Ext.create('Ext.form.Panel', {
+                                    id: 'xmlForm',
+                                    region: 'center',
+                                    width: 615,
+                                    fieldDefaults: {
+                                        msgTarget: 'side'
+                                    },
+                                    defaults: {
+                                        anchor: '100%'
+                                    },
+
+                                    bodyPadding: '5 5 0',
+                                    items: [{
+                                        fieldLabel: 'XML',
+                                        name: 'id',
+                                        xtype: 'textarea',
+                                        value: xmlStr,
+                                        height: 615
+                                    }],
+
+                                    buttons: [buttonClose]
+                                });
+
+                                xmlFromWin = new Ext.Window({
+                                    id: "xmlFromWin",
+                                    layout: 'fit',
+                                    title:'XML',
+                                    modal: true,
+                                    maximizable: true,
+                                    items:[xmlForm]
+                                });
+
+                                xmlFromWin.show();
+                            }
+                        });
                     }}
                 ]
             },
@@ -81,22 +136,20 @@ Ext.onReady(function() {
                     icon: contextPathUrl + '/pics/delete.png',
                     tooltip: label_DEL,
                     handler: function (grid, rowIndex, colIndex) {
-                        /*var rec = store.getAt(rowIndex);
+                        var rec = store.getAt(rowIndex);
                         id_field = rec.get('id');
+
                         Ext.Ajax.request({
-                            url: 'item.php',
-                            waitMsg:'Идет удаление...',
-                            params : {op : 4, id: id_field},
-                            actionMethods: {
-                                read: 'POST'
+                            url: dataUrl,
+                            method: 'POST',
+                            params: {
+                                op: 'DELETE_ENTRY',
+                                id: id_field
                             },
-                            success: function(response, opts) {
-                                reloadInfinitStore(store);
-                            },
-                            failure: function(response, opts) {
-                                alert("error");
+                            success: function() {
+                                store.load();
                             }
-                        });*/
+                        });
                     }}
                 ]
             },

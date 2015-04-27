@@ -9,20 +9,30 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author k.tulbassiyev
- */
 public interface IMetaFactoryService {
-    public BaseEntity getBaseEntity(String className);
-    public BaseEntity getBaseEntity(MetaClass metaClass);
-    public BaseEntity getBaseEntity(String className, Date reportDate);
-    public BaseEntity getBaseEntity(MetaClass metaClass, Date reportDate);
-    public BaseSet getBaseSet(IMetaType meta);
-    public List<BaseEntity> getBaseEntities();
-    public List<MetaClass> getMetaClasses();
-    public List<MetaClassName> getMetaClassesNames();
-    public List<MetaClassName> getRefNames();
-    public MetaClass getMetaClass(String name);
-    public boolean saveMetaClass(MetaClass meta);
-    public boolean delMetaClass(String className);
+    BaseEntity getBaseEntity(String className);
+
+    BaseEntity getBaseEntity(MetaClass metaClass);
+
+    BaseEntity getBaseEntity(String className, Date reportDate);
+
+    BaseEntity getBaseEntity(MetaClass metaClass, Date reportDate);
+
+    BaseSet getBaseSet(IMetaType meta);
+
+    List<BaseEntity> getBaseEntities();
+
+    List<MetaClass> getMetaClasses();
+
+    List<MetaClassName> getMetaClassesNames();
+
+    List<MetaClassName> getRefNames();
+
+    MetaClass getMetaClass(String name);
+
+    MetaClass getMetaClass(Long metaId);
+
+    boolean saveMetaClass(MetaClass meta);
+
+    boolean delMetaClass(String className);
 }

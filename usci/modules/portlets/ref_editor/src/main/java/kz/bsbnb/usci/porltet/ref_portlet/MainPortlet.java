@@ -387,7 +387,9 @@ public class MainPortlet extends MVCPortlet {
                                 writer.write("\"" + key + "\":\"" + id.getValue(key) + "\",");
                             }
 
-                            writer.write("\"title\":\"" + id.getTitle() + "\"");
+                            String title = id.getTitle() != null ? id.getTitle() : (String)id.getValue("VALUE");
+
+                            writer.write("\"title\":\"" + title + "\"");
                             writer.write("}");
                         }
 
@@ -398,7 +400,14 @@ public class MainPortlet extends MVCPortlet {
                 case LIST_ENTITY:
                     String entityId = getParam("entityId", resourceRequest);
                     if (entityId != null && entityId.trim().length() > 0) {
-                        Date date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+                        Date date = null;
+
+                        if(resourceRequest.getParameter("date") != null)
+                            date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+
+                        if(date == null)
+                            date = new Date();
+
                         BaseEntity entity = entityService.load(Integer.parseInt(entityId), date);
 
                         writer.write("{\"text\":\".\",\"children\": [\n" +

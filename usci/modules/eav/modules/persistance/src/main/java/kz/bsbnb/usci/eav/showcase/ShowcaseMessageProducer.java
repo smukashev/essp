@@ -13,10 +13,6 @@ import javax.jms.Message;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
-/**
- * Created by almaz on 6/24/14.
- */
-
 @Component
 public class ShowcaseMessageProducer {
 
@@ -34,7 +30,6 @@ public class ShowcaseMessageProducer {
     }
 
     public void produce(final QueueEntry queueEntry) throws Exception {
-
         if (jmsTemplate != null) {
             MessageCreator mc = new MessageCreator() {
                 public Message createMessage(Session session) throws JMSException {

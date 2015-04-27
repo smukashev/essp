@@ -1,19 +1,14 @@
 package kz.bsbnb.usci.cli.app.ref;
 
-import kz.bsbnb.usci.cli.app.ref.refs.Creditor;
-import kz.bsbnb.usci.cli.app.ref.reps.CreditorRepository;
+import org.apache.commons.lang.NotImplementedException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
@@ -52,6 +47,8 @@ public class BaseCrawler {
 
     public void work(){
 
+        fileName = "C:\\refs\\";
+
         try {
             rootElement = getDocument().createElement("batch");
             getDocument().appendChild(rootElement);
@@ -74,6 +71,8 @@ public class BaseCrawler {
             //Output to console for testing
             //StreamResult result = new StreamResult(System.out);
 
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
             transformer.transform(source, result);
 
             document = null;
@@ -113,7 +112,6 @@ public class BaseCrawler {
 
     }
 
-
     /**
      * Simply adds new tag to ther parent tag
      *
@@ -127,13 +125,12 @@ public class BaseCrawler {
         element.appendChild(newElement);
     }
 
-
     public String getClassName(){
         throw new NotImplementedException();
     }
 
     public HashMap getRepository(){
-        throw new  NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public Class  getRef(){

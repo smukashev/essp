@@ -95,6 +95,7 @@ public class BaseRepository implements  Runnable
                     System.out.print(CreditorRepository.getById(i+"").asXml(0));
              */
 
+
         (new CreditorCrawler()).work();
         (new SubjectTypeCrawler()).work();
         (new CreditorDocCrawler()).work();
@@ -119,8 +120,7 @@ public class BaseRepository implements  Runnable
         //(new SharedCrawler()).work();
         (new CreditorBranchCrawler()).work();
         (new NokbdbCrawler()).work();
-
-
+        (new EconSectorCrawler()).work();
     }
 
     public static void main( String[] args )
@@ -131,7 +131,7 @@ public class BaseRepository implements  Runnable
     public static Statement getStatement(){
         try {
             if(connection == null){
-                    connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1522:XE", "CORE","CORE_2013");
+                    connection = DriverManager.getConnection("jdbc:oracle:thin:@10.10.20.44:1521:CREDITS", "core","core_sep_2014");
                     return statement = connection.createStatement();
             }
 

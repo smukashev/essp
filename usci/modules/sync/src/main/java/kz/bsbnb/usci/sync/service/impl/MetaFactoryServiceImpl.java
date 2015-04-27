@@ -85,6 +85,11 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     }
 
     @Override
+    public MetaClass getMetaClass(Long metaId) {
+        return remoteMetaFactoryService.getMetaClass(metaId);
+    }
+
+    @Override
     public boolean saveMetaClass(MetaClass meta)
     {
         return remoteMetaFactoryService.saveMetaClass(meta);

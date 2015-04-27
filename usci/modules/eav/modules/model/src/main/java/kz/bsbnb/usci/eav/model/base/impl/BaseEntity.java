@@ -30,6 +30,7 @@ import java.util.Date;
  */
 public class BaseEntity extends BaseContainer implements IBaseEntity
 {
+    private static final long serialVersionUID = 1L;
 
     Logger logger = LoggerFactory.getLogger(BaseEntity.class);
 
@@ -627,33 +628,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         return result;
     }
 
-
-    private Object[] queue;
-    private int queueStart;
-    private int queueEnd;
-
-    private void initQueue(){
-        queue = new Object[10000];
-        queueStart = 0;
-        queueEnd = 0;
-    }
-
-    private synchronized void enQueue(Object o){
-        queue[queueEnd++] = o;
-    }
-
-    private synchronized int queueSize(){
-        return queueEnd - queueStart;
-    }
-
-    private synchronized Object deQueue(){
-        if(queueSize()==0) throw new RuntimeException("queue is empty");
-        return queue[queueStart++];
-    }
-
+    private Queue queue;
 
     public synchronized Object getEls(String path){
-      initQueue();
+      queue = new LinkedList();
       StringBuilder str = new StringBuilder();
       String[] operations = new String[500];
       boolean[] isFilter = new boolean[500];
@@ -752,19 +730,19 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
       }
 
         List ret = new LinkedList();
-        enQueue(this);
-        enQueue(0);
+        queue.add(this);
+        queue.add(0);
         int retCount = 0;
 
-        while(queueSize() > 0){
-            Object curO = deQueue();
-            int step = (Integer) deQueue();
+        while(queue.size() > 0){
+            Object curO = queue.poll();
+            int step = (Integer) queue.poll();
+
+            if(curO == null)
+                continue;
 
             if(step == yk)
             {
-                if(curO == null)
-                    continue;
-
                 if(function.startsWith("count")) {
                     retCount ++;
                 }
@@ -783,22 +761,22 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                  IMetaAttribute nextAttribute = curMeta.getMetaAttribute(operations[step]);
 
                if(!nextAttribute.getMetaType().isComplex()){ // transition to BASIC type
-                   enQueue(curBE.getEl(operations[step]));
-                   enQueue(step + 1);
+                   queue.add(curBE.getEl(operations[step]));
+                   queue.add(step + 1);
                } else if(nextAttribute.getMetaType().isSet()){ //transition to array
                    BaseSet next = (BaseSet)curBE.getEl(operations[step]);
                    if(next!=null){
                      for(Object o: next.get()){
                          {
-                             enQueue(((BaseValue) o).getValue());
-                             enQueue(step+1);
+                             queue.add(((BaseValue) o).getValue());
+                             queue.add(step+1);
                          }
                      }
                    }
                } else{ //transition to simple
                    BaseEntity next =  (BaseEntity) curBE.getEl(operations[step]);
-                     enQueue(next);
-                     enQueue(step+1);
+                   queue.add(next);
+                   queue.add(step + 1);
                  }
            }else{
                String [] parts;
@@ -817,9 +795,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                if(inv) expr = !expr;
 
                if(expr){
-                   enQueue(curO);
-                   enQueue(step+1);
-
+                   queue.add(curO);
+                   queue.add(step+1);
                }
            }
         }
@@ -832,6 +809,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     public Object getEl(String path)
     {
+        if(path.equals("ROOT"))
+            return getId();
+
         StringTokenizer tokenizer = new StringTokenizer(path, ".");
 
         BaseEntity entity = this;
@@ -850,7 +830,13 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
             }
 
             IMetaAttribute attribute = theMeta.getMetaAttribute(token);
-            IMetaType type = attribute.getMetaType();
+
+            IMetaType type = null;
+            try {
+                type = attribute.getMetaType();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             if (entity == null)
                 return null;

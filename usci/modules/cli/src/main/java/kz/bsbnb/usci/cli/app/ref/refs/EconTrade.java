@@ -8,11 +8,8 @@ import java.util.HashMap;
 
 
 public class EconTrade extends BaseRef {
-
-    private HashMap hm;
-
     public EconTrade(HashMap hm){
-        this.hm = hm;
+        super(hm);
     }
 
     public String get(String s){

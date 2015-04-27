@@ -31,10 +31,14 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
@@ -73,6 +77,24 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Autowired
     public void setApplyListener(IDaoListener applyListener) {
         this.applyListener = applyListener;
+    }
+
+    private static final boolean refsCacheEnalbed = true;
+    public static final HashMap<Long, List<RefListItem>> refsCache =
+            new HashMap<Long, List<RefListItem>>();
+
+    @PostConstruct
+    public void init() {
+        if(refsCacheEnalbed) {
+            List<MetaClassName> metaClassNames = metaClassRepository.getRefNames();
+
+            System.out.println(" -- Initializing cache for references");
+
+            for(MetaClassName metaClassName : metaClassNames)
+                refsCache.put(metaClassName.getId(), getRefsByMetaclass(metaClassName.getId()));
+
+            System.out.println(" -- Cache is ready to use -- ");
+        }
     }
 
     public IBaseEntity loadByMaxReportDate(long id, Date actualReportDate, boolean caching) {
@@ -2986,7 +3008,16 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     public List<RefListItem> getRefsByMetaClass(long metaClassId, boolean raw) {
 
+        if(refsCacheEnalbed) {
+            List<RefListItem> refsList = refsCache.get(metaClassId);
+
+            if(refsList != null)
+                return refsList;
+        }
+
         ArrayList<RefListItem> entityIds = new ArrayList<RefListItem>();
+
+        // TODO: fix
 
         Select select = context.select().from(
                 context.select(
@@ -3107,6 +3138,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             entityIds.add(rli);
         }
 
+        if(refsCacheEnalbed)
+            refsCache.put(metaClassId, entityIds);
+
         return entityIds;
     }
 
@@ -3177,6 +3211,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
      * @param baseEntityManager - base entity manager which will hold all the changes to database resulting
      *                          from the merge operation
      * @param choice            - MergeResultChoice object - determines the resulting entity
+     * @param deleteUnused
      * @return IBaseEntity containing the result of the merge operation. Depending on
      * choice it is either left or right entity
      * @author dakkuliyev
@@ -3185,7 +3220,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
      * the database.
      */
     private IBaseEntity mergeBaseEntity(IBaseEntity baseEntityLeft, IBaseEntity baseEntityRight, IBaseEntityMergeManager mergeManager,
-                                        IBaseEntityManager baseEntityManager, MergeResultChoice choice) {
+                                        IBaseEntityManager baseEntityManager, MergeResultChoice choice, boolean deleteUnused) {
 
         // although it is safe to assume that both entities exist in DB, it is still worth checking
         if (baseEntityLeft.getId() < 1 && baseEntityRight.getId() < 1) {
@@ -3220,11 +3255,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     if (metaType.isSet()) {
                         // merge set
                         mergeSet(baseEntityApplied, baseValueLeft, baseValueRight,
-                                mergeManager, baseEntityManager, choice);
+                                mergeManager, baseEntityManager, choice, deleteUnused);
                     } else {
                         // merge value
                         mergeValue(baseEntityApplied, baseValueLeft, baseValueRight,
-                                mergeManager, baseEntityManager, choice);
+                                mergeManager, baseEntityManager, choice, deleteUnused);
                     }
                 } else {
                     // get child manager for this attribute
@@ -3237,11 +3272,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         if (metaType.isSet()) {
                             // merge set
                             mergeSet(baseEntityApplied, baseValueLeft, baseValueRight,
-                                    mergeManager.getChildManager(attrKey), baseEntityManager, choice);
+                                    mergeManager.getChildManager(attrKey), baseEntityManager, choice, deleteUnused);
                         } else {
                             // merge value
                             mergeValue(baseEntityApplied, baseValueLeft, baseValueRight,
-                                    mergeManager.getChildManager(attrKey), baseEntityManager, choice);
+                                    mergeManager.getChildManager(attrKey), baseEntityManager, choice, deleteUnused);
                         }
 
                     } else {
@@ -3436,6 +3471,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
      * @param baseEntityManager - base entity manager which will hold all the changes to database resulting
      *                          from the merge operation
      * @param choice            - MergeResultChoice object - determines the resulting entity
+     * @param deleteUnused
      * @author dakkuliyev
      * Given right and left base values, merge manager object, base entity manager object,
      * and merge result choice perform merge operation. Does not perform any operations in
@@ -3445,7 +3481,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
      */
     private void mergeSet(IBaseEntity baseEntity, IBaseValue baseValueLeft, IBaseValue baseValueRight,
                           IBaseEntityMergeManager mergeManager,
-                          IBaseEntityManager baseEntityManager, MergeResultChoice choice) {
+                          IBaseEntityManager baseEntityManager, MergeResultChoice choice, boolean deleteUnused) {
         IMetaAttribute metaAttribute = baseValueLeft.getMetaAttribute();
         IMetaType metaType = metaAttribute.getMetaType();
 
@@ -3601,7 +3637,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         }
 
                         IBaseEntity currentEntity = mergeBaseEntity(childBaseEntityLeft, childBaseEntityRight, mergeManager.getChildManager(idKey),
-                                baseEntityManager, choice);
+                                baseEntityManager, choice, deleteUnused);
 
                         //if(mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_BOTH){
                         if (choice == MergeResultChoice.LEFT) {
@@ -3677,6 +3713,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
      * @param baseEntityManager - base entity manager which will hold all the changes to database resulting
      *                          from the merge operation
      * @param choice            - MergeResultChoice object - determines the resulting entity
+     * @param deleteUnused
      * @author dakkuliyev
      * Given right and left base values, merge manager object, base entity manager object,
      * and merge result choice perform merge operation. Does not perform any operations in
@@ -3686,7 +3723,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
      */
     private void mergeValue(IBaseContainer baseEntity, IBaseValue baseValueLeft, IBaseValue baseValueRight,
                             IBaseEntityMergeManager mergeManager, IBaseEntityManager baseEntityManager,
-                            MergeResultChoice choice) {
+                            MergeResultChoice choice, boolean deleteUnused) {
         IMetaAttribute metaAttribute = baseValueLeft.getMetaAttribute();
         IMetaType metaType = metaAttribute.getMetaType();
 
@@ -3714,9 +3751,17 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                 baseEntityManager.registerAsUpdated(newBaseValueRight);
 
-                if (metaType.isComplex()) {
+                if (metaType.isComplex() && !metaType.isReference()) {
                     //baseEntityManager.registerAsDeleted((IPersistable)baseValueRight.getValue());
-                    baseEntityManager.registerUnusedBaseEntity((IBaseEntity) baseValueRight.getValue());
+//                    baseEntityManager.registerUnusedBaseEntity((IBaseEntity) baseValueRight.getValue());
+                    if (deleteUnused) {
+                        BaseEntity be = (BaseEntity) baseValueRight.getValue();
+
+                        if (!isEntityUsedElse(be.getId(), baseValueRight.getBaseContainer().getId())) {
+                            be.setOperation(OperationType.DELETE);
+                            baseEntityManager.registerAsDeleted(be);
+                        }
+                    }
                 }
 
             } else if (mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_RIGHT) {
@@ -3741,9 +3786,17 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 }
 
                 baseEntityManager.registerAsUpdated(newBaseValueLeft);
-                if (metaType.isComplex()) {
+                if (metaType.isComplex() && !metaType.isReference()) {
                     //baseEntityManager.registerAsDeleted((IPersistable) baseValueLeft.getValue());
-                    baseEntityManager.registerUnusedBaseEntity((IBaseEntity) baseValueLeft.getValue());
+//                    baseEntityManager.registerUnusedBaseEntity((IBaseEntity) baseValueLeft.getValue());
+                    if (deleteUnused) {
+                        BaseEntity be = (BaseEntity) baseValueLeft.getValue();
+
+                        if (!isEntityUsedElse(be.getId(), baseValueLeft.getBaseContainer().getId())) {
+                            be.setOperation(OperationType.DELETE);
+                            baseEntityManager.registerAsDeleted(be);
+                        }
+                    }
                 }
 
             }
@@ -3763,9 +3816,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             IBaseEntityMergeManager childMergeManager = mergeManager.getChildManager(idKey);
             IBaseEntity currentApplied = null;
             if (childMergeManager == null) {
-                currentApplied = mergeBaseEntity(baseEntityLeft, baseEntityRight, mergeManager, baseEntityManager, choice);
+                currentApplied = mergeBaseEntity(baseEntityLeft, baseEntityRight, mergeManager, baseEntityManager, choice, deleteUnused);
             } else {
-                currentApplied = mergeBaseEntity(baseEntityLeft, baseEntityRight, childMergeManager, baseEntityManager, choice);
+                currentApplied = mergeBaseEntity(baseEntityLeft, baseEntityRight, childMergeManager, baseEntityManager, choice, deleteUnused);
             }
 
             if (mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_BOTH) {
@@ -3800,6 +3853,13 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
+    private boolean isEntityUsedElse(long entityIdToCheck, long entityIdContaining) {
+        IBaseEntityDao baseEntityDao = persistableDaoPool
+                .getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
+        boolean used = baseEntityDao.isUsed(entityIdToCheck, entityIdContaining);
+        return used;
+    }
+
     /**
      * Given two entities, merge manager. and merge result choice, perform merge
      * operation and return resulting base entity. The choice of the resulting entity
@@ -3814,10 +3874,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
      * choice it is either left or right entity
      */
     public IBaseEntity merge(IBaseEntity baseEntityLeft, IBaseEntity baseEntityRight,
-                             IBaseEntityMergeManager mergeManager, MergeResultChoice choice) {
+                             IBaseEntityMergeManager mergeManager, MergeResultChoice choice, boolean deleteUnused) {
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
         IBaseEntity resultingBaseEntity = mergeBaseEntity(baseEntityLeft, baseEntityRight,
-                mergeManager, baseEntityManager, choice);
+                mergeManager, baseEntityManager, choice, deleteUnused);
 
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>RESULT ENTITY<<<<<<<<<<<<<<<<<<<<<<<<<<");
         System.out.println(resultingBaseEntity);
@@ -3868,6 +3928,31 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
+    public void populateSC() {
+        Long id = metaClassRepository.getMetaClass("credit").getId();
+        Insert insert = context.insertInto(SC_ENTITIES, SC_ENTITIES.ENTITY_ID).select(
+                context.select(EAV_BE_ENTITIES.ID)
+                        .from(EAV_BE_ENTITIES)
+                        .where(EAV_BE_ENTITIES.CLASS_ID.eq(id))
+        );
+        jdbcTemplate.update(insert.getSQL(), insert.getBindValues().toArray());
+    }
+
+    @Override
+    public void populateSC(Long creditorId) {
+        MetaClass metaClass = metaClassRepository.getMetaClass("credit");
+        IMetaAttribute metaAttribute = metaClass.getMetaAttribute("creditor");
+
+        Insert insert = context.insertInto(SC_ENTITIES, SC_ENTITIES.ENTITY_ID).select(
+                context.selectDistinct(EAV_BE_COMPLEX_VALUES.ENTITY_ID)
+                        .from(EAV_BE_COMPLEX_VALUES)
+                        .where(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID.eq(metaAttribute.getId()))
+                        .and(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.eq(creditorId))
+        );
+        jdbcTemplate.update(insert.getSQL(), insert.getBindValues().toArray());
+    }
+
+    @Override
     public List<Long> getNewTableIds(Long id) {
         List<Long> list;
         Select select = context.select(SC_ID_BAG.ID).from(SC_ID_BAG).where(SC_ID_BAG.SHOWCASE_ID.eq(id)).limit(10);
@@ -3894,8 +3979,42 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
+    public List<Long[]> getSCEntityIds(int limit, Long prevMaxId) {
+        Select select = context.select(SC_ENTITIES.ID, SC_ENTITIES.ENTITY_ID).from(SC_ENTITIES)
+                .where(SC_ENTITIES.ID.gt(prevMaxId))
+                .orderBy(SC_ENTITIES.ID).limit(limit);
+        Select select2 = context.select(select.field(0), select.field(1)).from(select);
+        List<Long[]> result = jdbcTemplate.query(select2.getSQL(), select2.getBindValues().toArray(), new RowMapper<Long[]>() {
+            @Override
+            public Long[] mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Long[] row = new Long[2];
+                row[0] = rs.getLong(SC_ENTITIES.ID.getName());
+                row[1] = rs.getLong(SC_ENTITIES.ENTITY_ID.getName());
+                return row;
+            }
+        });
+        return result;
+    }
+
+    @Override
+    public List<Date> getEntityReportDates(Long entityId) {
+        Select select = context.select(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE)
+                .from(EAV_BE_ENTITY_REPORT_DATES)
+                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(entityId))
+                .orderBy(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE);
+        List<Date> reportDates = jdbcTemplate.queryForList(select.getSQL(), Date.class, select.getBindValues().toArray());
+        return reportDates;
+    }
+
+    @Override
     public void removeSCEntityIds(List<Long> list, Long id) {
         Delete delete = context.delete(SC_ID_BAG).where(SC_ID_BAG.ID.in(list).and(SC_ID_BAG.SHOWCASE_ID.eq(id)));
+        jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
+    }
+
+    @Override
+    public void removeSCEntityIds(List<Long> entityIds) {
+        Delete delete = context.delete(SC_ENTITIES).where(SC_ENTITIES.ENTITY_ID.in(entityIds));
         jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
     }
 

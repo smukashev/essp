@@ -13,9 +13,9 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IUserDao;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.Pair;
+import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,12 +46,13 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
 
         Set<String> allowedMetasSet = new HashSet<String>();
 
-        if(allowedMetas != null)
+        // TODO: incorrect mechanism
+        if(allowedMetas != null && allowedMetas.size() > 0)
             allowedMetasSet = new HashSet<String>(allowedMetas);
 
         for(MetaClassName metaClass : metas) {
-            if(allowedMetas == null || allowedMetasSet.contains(metaClass.getClassName()))
-                ret.add(new Pair(metaClass.getId(), metaClass.getClassName()));
+            // if(allowedMetas == null || allowedMetasSet.contains(metaClass.getClassName())) TODO: uncomment
+                ret.add(new Pair(metaClass.getId(), metaClass.getClassTitle()));
         }
 
         return ret;
@@ -71,15 +72,18 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
 
     public String getDomRef(long userId, IMetaClass metaClass, String attr) {
         String ret = "<div class='leaf'> %s: <select id='ref-%d-%s-%s'>";
-        ret = String.format(ret, metaClass.getClassName(), nextId(), metaClass.getClassName(), attr);
+        ret = String.format(ret, ((MetaClass)metaClass).getClassTitle(), nextId(), metaClass.getClassName(), attr);
 
         List<RefListItem> list = baseEntityProcessorDao.getRefsByMetaclassRaw(metaClass.getId());
         List<Long> allowedRefs = userDao.getAllowedRefs(userId, metaClass.getClassName());
-        Set<Long> refSet = new HashSet<Long>(allowedRefs);
+        Set<Long> refSet = new HashSet<>(allowedRefs);
         String option;
+
+        // TODO: incorrect mechanism
+
         for(RefListItem item : list) {
-            if(!refSet.contains(item.getId()))
-                continue;
+            /*if(!refSet.contains(item.getId()))
+                continue;*/
             option = "<option value='%d'>" + item.getTitle() + "</option>";
             option = String.format(option, item.getId());
             ret += option;
@@ -98,12 +102,12 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
 
         String ret =
                 "<div class='node'><div class='leaf'> %s : " +
-                        "<input type=\"text\" id='inp-%d-%s-%s' readonly /> " +
-                        "<a href='#' onclick='find(this);'>find</a>" +
-                        "<div class='loading'>loading</div>" +
-                        "<div class='not-filled' id = 'err-%d'>not.filled</div></div><div class='node'>";
+                        "<input type=\"text\" id='inp-%d-%d-%s' class='inp-%d' readonly /> " +
+                        "<a href='#' onclick='find(this);'>найти</a>" +
+                        "<div class='loading'>загрузка</div>" +
+                        "<div class='not-filled' id = 'err-%d'>не заполнено</div></div><div class='node'>";
 
-        ret = String.format(ret, metaClass.getClassName(), id, metaClass.getClassName(), attribute, id);
+        ret = String.format(ret, ((MetaClass)metaClass).getClassTitle(), id, metaClass.getId(), attribute, id, id);
 
         for(String attr : metaClass.getAttributeNames()) {
             IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attr);
@@ -123,9 +127,9 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
                                 "<div class='not-filled' id='err-%d'>not.filled</div></div>";
                     else
                         divSimple = "<div class='leaf'> %s: <input type = 'text' id='inp-%d-%s-%s' />" +
-                                "<div class='not-filled' id='err-%d'>not.filled</div></div>";
+                                "<div class='not-filled' id='err-%d'>не заполнено</div></div>";
                     long nextId = nextId();
-                    divSimple = String.format(divSimple, metaAttribute.getName(), nextId, "simple", attr , nextId);
+                    divSimple = String.format(divSimple, metaAttribute.getTitle(), nextId, "simple", attr , nextId);
                     ret += divSimple;
                 }
             }

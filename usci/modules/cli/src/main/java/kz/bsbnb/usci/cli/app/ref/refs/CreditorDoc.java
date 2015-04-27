@@ -14,18 +14,8 @@ import java.util.HashMap;
  */
 public class CreditorDoc extends BaseRef {
 
-    private HashMap hm;
-
     public CreditorDoc(HashMap hm){
-        this.hm = hm;
-    }
-
-    public String get(String s){
-        return (String) hm.get(s);
-    }
-
-    public String getKeyName(){
-        return "ID";
+        super(hm);
     }
 
     @Override

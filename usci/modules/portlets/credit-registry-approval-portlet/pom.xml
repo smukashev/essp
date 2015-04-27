@@ -9,9 +9,9 @@
 
     <properties>
         <liferay.version>6.1.2</liferay.version>
-        <liferay.auto.deploy.dir>/home/nurlan/Software/glassfish3/deploy</liferay.auto.deploy.dir>
-        <liferay.app.server.deploy.dir>/home/nurlan/Software/glassfish3/deploy</liferay.app.server.deploy.dir>
-        <liferay.app.server.portal.dir>/home/nurlan/Software/glassfish3/deploy</liferay.app.server.portal.dir>
+        <liferay.auto.deploy.dir>/home/a.tkachenko/software/liferay/deploy</liferay.auto.deploy.dir>
+        <liferay.app.server.deploy.dir>/home/a.tkachenko/software/liferay/deploy</liferay.app.server.deploy.dir>
+        <liferay.app.server.portal.dir>/home/a.tkachenko/software/liferay/deploy</liferay.app.server.portal.dir>
     </properties>
 
     <build>
@@ -34,8 +34,8 @@
                 <version>2.5</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.5</source>
+                    <target>1.5</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -46,7 +46,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>approval-portlet</finalName>
+        <finalName>credit-registry-approval-portlet</finalName>
     </build>
 
     <dependencies>
@@ -281,7 +281,7 @@
             </exclusions>
         </dependency>-->
         <dependency>
-            <groupId>com.bsbnb</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>vaadin-messagebox</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -315,12 +315,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.bsbnb</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>translit-util</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.bsbnb</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>vaadin-filterable-selector</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -341,10 +341,5 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>-->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.2</version>
-        </dependency>
     </dependencies>
 </project>

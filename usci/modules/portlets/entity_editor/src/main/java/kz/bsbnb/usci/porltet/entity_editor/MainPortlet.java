@@ -344,16 +344,16 @@ public class MainPortlet extends MVCPortlet {
                     writer.write("{\"success\":\"true\", \"data\": " + gson.toJson(classes) + "}");
                     break;
                 case GET_FORM:
-                    String metaName = resourceRequest.getParameter("meta");
-                    String generatedForm = searcherFormService.getDom(currentUser.getUserId(), metaFactoryService.getMetaClass(metaName));
+                    Long metaId = Long.valueOf(resourceRequest.getParameter("metaId"));
+                    String generatedForm = searcherFormService.getDom(currentUser.getUserId(), metaFactoryService.getMetaClass(metaId));
                     writer.write(generatedForm);
                     break;
                 case FIND_ACTION:
                     Enumeration<String> list = resourceRequest.getParameterNames();
 
-                    String metaString = resourceRequest.getParameter("metaClass");
+                    metaId = Long.valueOf(resourceRequest.getParameter("metaClass"));
 
-                    MetaClass metaClass = metaFactoryService.getMetaClass(metaString);
+                    MetaClass metaClass = metaFactoryService.getMetaClass(metaId);
                     BaseEntity baseEntity = new BaseEntity(metaClass, new Date());
 
                     while(list.hasMoreElements()) {
@@ -418,7 +418,15 @@ public class MainPortlet extends MVCPortlet {
                     break;
                 case LIST_ENTITY:
                     String entityId = resourceRequest.getParameter("entityId");
-                    Date date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+
+                    Date date = null;
+
+                    if(resourceRequest.getParameter("date") != null)
+                        date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+
+                    if(date == null)
+                        date = new Date();
+
                     if (entityId != null && entityId.trim().length() > 0) {
                         //BaseEntity entity = entityService.load(Integer.parseInt(entityId));
                         BaseEntity entity = entityService.load(Long.valueOf(entityId), date);

@@ -9,10 +9,8 @@ import java.util.HashMap;
 
 public class CreditorBranch extends BaseRef {
 
-    private HashMap hm;
-
     public CreditorBranch(HashMap hm){
-        this.hm = hm;
+        super(hm);
     }
 
     public String get(String s){
@@ -46,6 +44,13 @@ public class CreditorBranch extends BaseRef {
 
         Creditor mo = (Creditor) hm.get("main_office");
         mo.buildElement(main_office);
+
+        Region r = (Region) hm.get("region");
+        if(r != null) {
+            Element region = getDocument().createElement("region");
+            root.appendChild(region);
+            r.buildElement(region);
+        }
 
 
     }

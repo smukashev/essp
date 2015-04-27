@@ -23,6 +23,7 @@ public interface IMetaFactoryService {
     public List<MetaClassName> getMetaClassesNames();
     public List<MetaClassName> getRefNames();
     public MetaClass getMetaClass(String name);
+    public MetaClass getMetaClass(Long metaId);
     public boolean saveMetaClass(MetaClass meta);
     public boolean delMetaClass(String className);
 }

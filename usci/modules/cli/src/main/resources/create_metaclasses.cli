@@ -1,7 +1,7 @@
 # Warning this line clears DB!
-clear
+# clear
 # Recreate DB
-init
+# init
 
 #====================================
 #= REF_DEBTOR_TYPE
@@ -496,6 +496,7 @@ meta add --name=ref_creditor_branch --attribute=code --type=string
 meta add --name=ref_creditor_branch --attribute=name --type=string
 meta add --name=ref_creditor_branch --attribute=short_name --type=string
 meta add --name=ref_creditor_branch --attribute=main_office --type=meta_class --childname=ref_creditor --keytype=any --immutable
+meta add --name=ref_creditor_branch --attribute=region --type=meta_class --childname=ref_region --keytype=any --immutable
 meta add --name=ref_creditor_branch --attribute=docs --type=meta_class --childname=document --array
 meta key --name=ref_creditor_branch --attribute=docs
 
@@ -564,6 +565,16 @@ meta key --name=ref_credit_type --attribute=code
 meta add --name=ref_credit_type --attribute=kind_id --type=integer
 meta add --name=ref_credit_type --attribute=name_kz --type=string
 meta add --name=ref_credit_type --attribute=name_ru --type=string
+
+#====================================
+#= REF_ECON_SECTOR
+#====================================
+
+meta create --name=ref_econ_sector --reference
+meta add --name=ref_econ_sector --attribute=code --type=string
+meta key --name=ref_econ_sector --attribute=code
+meta add --name=ref_econ_sector --attribute=name_kz --type=string
+meta add --name=ref_econ_sector --attribute=name_ru --type=string
 
 #====================================
 #= PLEDGE
