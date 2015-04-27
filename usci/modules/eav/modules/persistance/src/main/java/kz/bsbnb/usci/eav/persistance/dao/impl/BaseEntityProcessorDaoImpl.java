@@ -80,6 +80,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public static final HashMap<Long, List<RefListItem>> refsCache =
             new HashMap<Long, List<RefListItem>>();
 
+    public static final HashMap<Long, List<RefListItem>> refsCacheRaw =
+            new HashMap<Long, List<RefListItem>>();
+
     @PostConstruct
     public void init() {
         if(refsCacheEnalbed) {
@@ -91,10 +94,25 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             }
 
             if(metaClassNames != null) {
-                System.out.println(" -- Initializing cache for references");
+                System.out.println(" -- Initializing cache for references at: " + new Date());
 
-                for (MetaClassName metaClassName : metaClassNames)
-                    refsCache.put(metaClassName.getId(), getRefsByMetaclass(metaClassName.getId()));
+                for (MetaClassName metaClassName : metaClassNames) {
+                    //refsCache.put(metaClassName.getId(), getRefsByMetaclass(metaClassName.getId()));
+                    List<RefListItem> rawList = getRefsByMetaClass(metaClassName.getId(), true);
+                    List<RefListItem> list = new ArrayList<RefListItem>();
+
+                    for(RefListItem rli : rawList) {
+                        RefListItem item = new RefListItem();
+                        item.setId(rli.getId());
+                        item.setCode(rli.getCode());
+                        item.setTitle(Quote.addSlashes(rli.getTitle()));
+                        list.add(item);
+                    }
+
+                    refsCache.put(metaClassName.getId(), list);
+                    refsCacheRaw.put(metaClassName.getId(), rawList);
+
+                }
 
                 System.out.println(" -- Cache is ready to use -- ");
             }
@@ -3013,7 +3031,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public List<RefListItem> getRefsByMetaClass(long metaClassId, boolean raw) {
 
         if(refsCacheEnalbed) {
-            List<RefListItem> refsList = refsCache.get(metaClassId);
+            List<RefListItem> refsList;
+            if(raw)
+                refsList = refsCacheRaw.get(metaClassId);
+            else
+                refsList = refsCache.get(metaClassId);
 
             if(refsList != null)
                 return refsList;
