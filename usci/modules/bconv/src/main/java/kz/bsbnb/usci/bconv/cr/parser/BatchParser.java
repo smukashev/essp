@@ -107,8 +107,4 @@ public abstract class BatchParser {
         return index;
     }
 
-    public void setIndex(long index)
-    {
-        this.index = index;
-    }
 }

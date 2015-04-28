@@ -133,7 +133,7 @@ public class CREntityReader<T> extends CommonReader<T> {
 
         try
         {
-            crParser.parse(xmlEventReader, batch, 0);
+            crParser.parse(xmlEventReader, batch, 1L);
         } catch (SAXException e)
         {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -146,12 +146,12 @@ public class CREntityReader<T> extends CommonReader<T> {
 
         T entity = (T)crParser.getCurrentBaseEntity();
 
-        long index = crParser.getIndex() - 1;
+        long index = crParser.getIndex();
 
         if (crParser.hasMore()) {
             try
             {
-                crParser.parseNextPackage();
+                crParser.parse(xmlEventReader, batch, index);
             } catch (SAXException e)
             {
                 EntityStatusJModel entityStatusJModel = new EntityStatusJModel(index,

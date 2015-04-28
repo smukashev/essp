@@ -144,14 +144,4 @@ public class InfoParser extends BatchParser {
         return actualCreditCount;
     }
 
-    @Override
-    public void setIndex(long index)
-    {
-        super.setIndex(index);
-
-        accountDate.setIndex(index);
-        reportDate.setIndex(index);
-        actualCreditCount.setIndex(index);
-        currentBaseEntity.setIndex(index);
-    }
 }

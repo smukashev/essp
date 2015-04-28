@@ -35,7 +35,7 @@ public class PortfolioFlowParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_flow_kfn"),batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ct_portfolio_flow_base"),batch.getRepDate());
     }
 
     @Override
@@ -49,10 +49,10 @@ public class PortfolioFlowParser extends BatchParser {
             currentBaseEntity.put("portfolio",new BaseEntityComplexValue(batch,index,portfolio));
         } else if(localName.equals("details")) {
             //details = new Details();
-            currentDetails = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_detail"));
+            currentDetails = new BaseSet(metaClassRepository.getMetaClass("detail"));
         } else if(localName.equals("detail")) {
             //detail = new Detail();
-            currentDetail = new BaseEntity(metaClassRepository.getMetaClass("portfolio_flow_detail"),batch.getRepDate());
+            currentDetail = new BaseEntity(metaClassRepository.getMetaClass("detail"),batch.getRepDate());
         } else if(localName.equals("balance_account")) {
             BaseEntity ba = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),batch.getRepDate());
             event = (XMLEvent) xmlReader.next();
@@ -70,14 +70,7 @@ public class PortfolioFlowParser extends BatchParser {
     
     @Override
     public boolean endElement(String localName) throws SAXException {
-
-        if(localName.equals("portfolio_data")){
-            hasMore = false;
-            return true;
-        }else if(localName.equals("portfolio_flow")) {
-            //portfolioData.getPortfolioFlow().add(ctPortfolioFlowBase);
-            //xmlReader.setContentHandler(contentHandler);
-            hasMore = true;
+        if(localName.equals("portfolio_flow")) {
             return true;
         } else if(localName.equals("portfolio")) {
             //ctPortfolioFlowBase.setPortfolio(contents.toString());

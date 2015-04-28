@@ -73,13 +73,7 @@ public class PortfolioFlowMsfoParser extends BatchParser {
     
     @Override
     public boolean endElement(String localName) throws SAXException {
-        if(localName.equals("portfolio_data")){
-            hasMore = false;
-            return true;
-        } else if(localName.equals("portfolio_flow_msfo")) {
-            //portfolioData.getPortfolioFlowMsfo().add(ctPortfolioFlowMsfo);
-            //xmlReader.setContentHandler(contentHandler);
-            hasMore = true;
+        if(localName.equals("portfolio_flow_msfo")) {
             return true;
         } else if(localName.equals("portfolio")) {
             //ctPortfolioFlowMsfo.setPortfolio(contents.toString());
