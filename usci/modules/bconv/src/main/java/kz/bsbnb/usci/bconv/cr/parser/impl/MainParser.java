@@ -96,6 +96,10 @@ public class MainParser extends BatchParser {
             hasMore = true;
             parseNextPackage();
             return true;
+        } else if(localName.equals("package")) {
+            hasMore = true;
+            parseNextPackage();
+            return true;
         } else if(localName.equals("portfolio_data")) {
             hasMore = true;
             portfolioDataParser.parse(xmlReader, batch, index);
