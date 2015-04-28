@@ -5,9 +5,6 @@ import com.bsbnb.usci.portlets.crosscheck.dm.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * Created by ktulbassiyev on 11/20/14.
- */
 public class ModelHelper {
     public static Creditor convertToCreditor(ResultSet rs) throws SQLException {
         Creditor c = new Creditor();

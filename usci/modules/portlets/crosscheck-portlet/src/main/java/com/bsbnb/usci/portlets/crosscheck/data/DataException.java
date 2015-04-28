@@ -1,9 +1,6 @@
 package com.bsbnb.usci.portlets.crosscheck.data;
 
-/**
- *
- * @author Aidar.Myrzahanov
- */
+
 public class DataException extends Exception{
     public DataException() {
         super();

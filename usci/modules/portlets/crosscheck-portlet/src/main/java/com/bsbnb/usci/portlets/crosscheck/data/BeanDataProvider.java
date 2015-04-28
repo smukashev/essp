@@ -30,10 +30,6 @@ import java.util.logging.Level;
 
 import static com.bsbnb.usci.portlets.crosscheck.CrossCheckApplication.log;
 
-/**
- *
- * @author Aidar.Myrzahanov
- */
 public class BeanDataProvider implements DataProvider {
     private PortletEnvironmentFacade facade;
 
@@ -65,7 +61,7 @@ public class BeanDataProvider implements DataProvider {
         Statement stmt = null;
         String query = "SELECT t0.ID, t0.CHANGE_DATE, t0.CODE, t0.NAME, t0.SHORT_NAME, " +
                 "t0.SHUTDOWN_DATE, t0.MAIN_OFFICE_ID, t0.SUBJECT_TYPE " +
-                "FROM R_REF_CREDITOR t0, EAV_A_CREDITOR_USER t2, EAV_A_USER t1 " +
+                "FROM SHOWCASE.R_REF_CREDITOR t0, CORE.EAV_A_CREDITOR_USER t2, CORE,EAV_A_USER t1 " +
                 "WHERE ((t1.USER_ID = " + BigInteger.valueOf(facade.getUserID()) +") " +
                 "AND ((t2.CREDITOR_ID = t0.ID) AND (t1.USER_ID = t2.USER_ID))) " +
                 "ORDER BY t0.NAME ASC";
@@ -110,7 +106,7 @@ public class BeanDataProvider implements DataProvider {
         Connection conn = getConnection();
         Statement stmt = null;
         String query = "SELECT ID, DATE_BEGIN, DATE_END, REPORT_DATE, STATUS_ID, STATUS_Name, USER_NAME, CREDITOR_ID " +
-                "FROM CROSS_CHECK " +
+                "FROM SHOWCASE.CROSS_CHECK " +
                 "WHERE ((CREDITOR_ID IN (";
 
         for (int i = 0; i < creditors.length; i++) {
@@ -163,7 +159,7 @@ public class BeanDataProvider implements DataProvider {
         Connection conn = getConnection();
         Statement stmt = null;
         String query =  "SELECT ID, DESCRIPTION, DIFF, INNER_VALUE, IS_ERROR, OUTER_VALUE, CROSS_CHECK_ID, MESSAGE_ID " +
-                        "FROM CROSS_CHECK_MESSAGE " +
+                        "FROM SHOWCASE.CROSS_CHECK_MESSAGE " +
                         "WHERE (CROSS_CHECK_ID = " + crossCheck.getId() + ") " +
                         "ORDER BY ID ASC";
 
@@ -212,7 +208,7 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT MAX(CHANGE_DATE) AS MAX_CHANGE_DATE FROM R_REF_CREDITOR";
+        String query = "SELECT MAX(CHANGE_DATE) AS MAX_CHANGE_DATE FROM SHOWCASE.R_REF_CREDITOR";
 
         log.log(Level.INFO, "getFirstNotApprovedDate: " + query);
 
@@ -246,7 +242,7 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT MAX(CHANGE_DATE) AS MAX_CHANGE_DATE FROM R_REF_CREDITOR";
+        String query = "SELECT MAX(CHANGE_DATE) AS MAX_CHANGE_DATE FROM SHOWCASE.R_REF_CREDITOR";
 
         log.log(Level.INFO, "getLastApprovedDate: " + query);
 

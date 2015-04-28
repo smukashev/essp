@@ -56,7 +56,36 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
                 DataUtils.convert(report.getEndDate()),
                 DataUtils.convert(report.getLastManualEditDate()));
 
-        Long reportId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        Long reportId = 1L;
+        try {
+            reportId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        } catch (Exception e) {
+            Update update = context.update(EAV_REPORT)
+                    .set(EAV_REPORT.USERNAME, username)
+                    .set(EAV_REPORT.CREDITOR_ID, report.getCreditor().getId())
+                            .set(EAV_REPORT.REPORT_DATE, DataUtils.convert(report.getReportDate()))
+                                    .set(EAV_REPORT.STATUS_ID, report.getStatusId())
+                                    .set(EAV_REPORT.TOTAL_COUNT, report.getTotalCount())
+                                            .set(EAV_REPORT.ACTUAL_COUNT, report.getActualCount())
+                                                    .set(EAV_REPORT.BEG_DATE, DataUtils.convert(report.getBeginningDate()))
+                                                            .set(EAV_REPORT.END_DATE, DataUtils.convert(report.getEndDate()))
+                                                                    .set(EAV_REPORT.LAST_MANUAL_EDIT_DATE, DataUtils.convert(report.getLastManualEditDate()))
+                                                                    .where(EAV_REPORT.USERNAME.equal(username)).and(EAV_REPORT.REPORT_DATE.eq(DataUtils.convert(report.getBeginningDate())));
+
+            updateWithStats(update.getSQL(), update.getBindValues().toArray());
+
+            SelectForUpdateStep select = context
+                    .select()
+                    .from(EAV_REPORT)
+                    .where(EAV_REPORT.USERNAME.equal(username)).and(EAV_REPORT.REPORT_DATE.eq(DataUtils.convert(report.getBeginningDate())));
+
+            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+            for (Map<String, Object> row : rows) {
+                reportId = ((BigDecimal)row.get(EAV_REPORT.ID.getName())).longValue();
+                break;
+            }
+        }
 
         return reportId;
     }
