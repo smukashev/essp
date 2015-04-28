@@ -80,6 +80,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public static final HashMap<Long, List<RefListItem>> refsCache =
             new HashMap<Long, List<RefListItem>>();
 
+    public static final HashMap<Long, List<RefListItem>> refsCacheRaw =
+            new HashMap<Long, List<RefListItem>>();
+
     @PostConstruct
     public void init() {
         if(refsCacheEnalbed) {
@@ -91,10 +94,25 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             }
 
             if(metaClassNames != null) {
-                System.out.println(" -- Initializing cache for references");
+                System.out.println(" -- Initializing cache for references at: " + new Date());
 
-                for (MetaClassName metaClassName : metaClassNames)
-                    refsCache.put(metaClassName.getId(), getRefsByMetaclass(metaClassName.getId()));
+                for (MetaClassName metaClassName : metaClassNames) {
+                    //refsCache.put(metaClassName.getId(), getRefsByMetaclass(metaClassName.getId()));
+                    List<RefListItem> rawList = getRefsByMetaClass(metaClassName.getId(), true);
+                    List<RefListItem> list = new ArrayList<RefListItem>();
+
+                    for(RefListItem rli : rawList) {
+                        RefListItem item = new RefListItem();
+                        item.setId(rli.getId());
+                        item.setCode(rli.getCode());
+                        item.setTitle(Quote.addSlashes(rli.getTitle()));
+                        list.add(item);
+                    }
+
+                    refsCache.put(metaClassName.getId(), list);
+                    refsCacheRaw.put(metaClassName.getId(), rawList);
+
+                }
 
                 System.out.println(" -- Cache is ready to use -- ");
             }
@@ -3013,7 +3031,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public List<RefListItem> getRefsByMetaClass(long metaClassId, boolean raw) {
 
         if(refsCacheEnalbed) {
-            List<RefListItem> refsList = refsCache.get(metaClassId);
+            List<RefListItem> refsList;
+            if(raw)
+                refsList = refsCacheRaw.get(metaClassId);
+            else
+                refsList = refsCache.get(metaClassId);
 
             if(refsList != null)
                 return refsList;
@@ -3088,59 +3110,66 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         Iterator<Map<String, Object>> i = rows.iterator();
-        while (i.hasNext()) {
-            RefListItem rli = new RefListItem();
+        RefListItem rli = null;
+        long prevId = -1;
 
+        while (i.hasNext()) {
             Map<String, Object> row = i.next();
             long id = ((BigDecimal) row.get("ID")).longValue();
-            long old_id = id;
+
+            if(prevId != id) {
+                if(rli != null)
+                    entityIds.add(rli);
+                rli = new RefListItem();
+            }
+            prevId = id;
 
             logger.debug("#####################");
 
             rli.setId(id);
-            while (old_id == id) {
-                if (((String) row.get("NAME")).equals("code")) {
-                    String code = (String) row.get("VALUE");
-                    if(!raw)
-                        code = Quote.addSlashes(code);
-                    rli.setCode(code);
-                } else if (((String) row.get("NAME")).startsWith("name_")) {
-                    String value = (String) row.get("VALUE");
-                    if(!raw)
-                        value = Quote.addSlashes(value);
-                    rli.setTitle(value);
-                } else if (((String) row.get("NAME")).startsWith("name")) {
-                    String value = (String) row.get("VALUE");
-                    if(!raw)
-                        value = Quote.addSlashes(value);
-                    rli.setTitle(value);
-                }
 
-                for (String key : row.keySet()) {
-                    if (key.equals("NAME") || key.startsWith("name_")) {
-                        continue;
-                    }
-
-                    String value = row.get(key).toString();
-
-                    if(!raw)
-                        value = Quote.addSlashes(value);
-
-                    //System.out.println("###% " + value);
-
-                    rli.addValue(key, value);
-                }
-
-                if (!i.hasNext())
-                    break;
-
-                row = i.next();
-                old_id = id;
-                id = ((BigDecimal) row.get("ID")).longValue();
+            if (((String) row.get("NAME")).equals("code")) {
+                String code = (String) row.get("VALUE");
+                if(!raw)
+                    code = Quote.addSlashes(code);
+                rli.setCode(code);
+            } else if (((String) row.get("NAME")).startsWith("name_")) {
+                String value = (String) row.get("VALUE");
+                if(!raw)
+                    value = Quote.addSlashes(value);
+                rli.setTitle(value);
+            } else if (((String) row.get("NAME")).startsWith("name")) {
+                String value = (String) row.get("VALUE");
+                if(!raw)
+                    value = Quote.addSlashes(value);
+                rli.setTitle(value);
             }
 
-            entityIds.add(rli);
+            for (String key : row.keySet()) {
+                if (key.equals("NAME") || key.startsWith("name_")) {
+                    continue;
+                }
+
+                String value = row.get(key).toString();
+
+                if(!raw)
+                    value = Quote.addSlashes(value);
+
+                //System.out.println("###% " + value);
+
+                rli.addValue(key, value);
+            }
+
+            //if (!i.hasNext())
+            //    break;
+
+            //row = i.next();
+            //old_id = id;
+            //id = ((BigDecimal) row.get("ID")).longValue();
         }
+
+        if(rli!=null)
+            entityIds.add(rli);
 
         if(refsCacheEnalbed)
             refsCache.put(metaClassId, entityIds);
