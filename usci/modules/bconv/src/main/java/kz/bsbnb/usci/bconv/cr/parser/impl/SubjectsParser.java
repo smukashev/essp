@@ -4,6 +4,8 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,7 @@ public class SubjectsParser extends BatchParser {
 
     @Autowired
     private SubjectCreditorParser subjectCreditorParser;
-    
+
     public SubjectsParser() {
         super();
     }
@@ -42,15 +44,19 @@ public class SubjectsParser extends BatchParser {
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("subjects")) {
         } else if(localName.equals("subject")) {
-            //currentSubject = new CtSubject();
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("subject"), batch.getRepDate());
         } else if(localName.equals("person")) {
             subjectPersonParser.parse(xmlReader, batch, index);
-            currentBaseEntity = subjectPersonParser.getCurrentBaseEntity();
+            currentBaseEntity.put("person",
+                    new BaseEntityComplexValue(batch, index, subjectPersonParser.getCurrentBaseEntity()));
         } else if(localName.equals("organization")) {
             subjectOrganizationParser.parse(xmlReader, batch, index);
-            currentBaseEntity = subjectOrganizationParser.getCurrentBaseEntity();
+            currentBaseEntity.put("organization",
+                    new BaseEntityComplexValue(batch, index, subjectOrganizationParser.getCurrentBaseEntity()));
         } else if(localName.equals("creditor")) {
             subjectCreditorParser.parse(xmlReader, batch, index);
+            currentBaseEntity.put("creditor",
+                    new BaseEntityComplexValue(batch, index, subjectCreditorParser.getCurrentBaseEntity()));
         } else {
             throw new UnknownTagException(localName);
         }

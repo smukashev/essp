@@ -30,6 +30,8 @@ public class ChangeTurnoverParser extends BatchParser {
         super();
     }
 
+    private BaseEntity currentIssue;
+
     private BaseEntity currentInterest;
     boolean interestFlag = false;
 
@@ -38,18 +40,17 @@ public class ChangeTurnoverParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("turnover_issue"),batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("turnover"),batch.getRepDate());
     }
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("turnover")) {
         } else if(localName.equals("issue")) {
-            //ctTurnoverTypeBase = new CtTurnoverTypeBase();
+            currentIssue = new BaseEntity(metaClassRepository.getMetaClass("turnover_issue"),batch.getRepDate());
         } else if(localName.equals("debt")) {
             currentDebt = new BaseEntity(metaClassRepository.getMetaClass("turnover_issue_debt"),batch.getRepDate());
             debtFlag = true;
-            //ctTurnoverAmount = new CtTurnoverAmount();
         } else if(localName.equals("interest")) {
             currentInterest = new BaseEntity(metaClassRepository.getMetaClass("turnover_issue_interest"), batch.getRepDate());
             interestFlag = true;
@@ -85,14 +86,15 @@ public class ChangeTurnoverParser extends BatchParser {
             //xmlReader.setContentHandler(contentHandler);
             return true;
         } else if(localName.equals("issue")) {
+            currentBaseEntity.put("issue",new BaseEntityComplexValue(batch,index,currentIssue));
            //ctTurnover.setIssue(ctTurnoverTypeBase);
         } else if(localName.equals("debt")) {
             //ctTurnoverTypeBase.setDebt(ctTurnoverAmount);
             debtFlag = false;
-            currentBaseEntity.put("debt",new BaseEntityComplexValue(batch,index,currentDebt));
+            currentIssue.put("debt",new BaseEntityComplexValue(batch,index,currentDebt));
         } else if(localName.equals("interest")) {
             interestFlag = false;
-            currentBaseEntity.put("interest",new BaseEntityComplexValue(batch,index,currentInterest));
+            currentIssue.put("interest",new BaseEntityComplexValue(batch,index,currentInterest));
             //ctTurnoverTypeBase.setInterest(ctTurnoverAmount);
         } else if(localName.equals("amount")) {
             //ctTurnoverAmount.setAmount(new BigDecimal(contents.toString()));
