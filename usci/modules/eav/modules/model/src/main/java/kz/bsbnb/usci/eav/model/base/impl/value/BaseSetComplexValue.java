@@ -16,4 +16,8 @@ public class BaseSetComplexValue extends BaseSetValue<IBaseEntity> {
         super(id, batch, index, reportDate, value, closed, last);
     }
 
+    public BaseSetComplexValue(Batch batch, long index, IBaseEntity value) {
+        super(batch, index, value);
+    }
+
 }

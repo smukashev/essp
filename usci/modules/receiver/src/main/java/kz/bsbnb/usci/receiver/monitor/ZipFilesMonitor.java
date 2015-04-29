@@ -630,7 +630,35 @@ public class ZipFilesMonitor{
                 batchInfo.setBatchName(dataXmlFile.getName());
                 batchInfo.setUserId(userId);
                 /*batchInfo.setSize(dataXmlFile.getSize());*/
-                Date date = DataTypeUtil.convertDateToFirstDay(new Date(), 0);
+//                Date date = DataTypeUtil.convertDateToFirstDay(new Date(), 0);
+//                batchInfo.setRepDate(date);
+
+                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder documentBuilder = null;
+
+                try {
+                    documentBuilder = documentBuilderFactory.newDocumentBuilder();
+                } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                }
+
+                Document document = null;
+
+                try {
+                    document = documentBuilder.parse(zipFile.getInputStream(dataXmlFile));
+                } catch (SAXException e) {
+                    e.printStackTrace();
+                }
+
+                Date date = null;
+
+                try {
+                    date = new SimpleDateFormat("yyyy-MM-dd").parse(
+                            document.getElementsByTagName("report_date").item(0).getTextContent());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
                 batchInfo.setRepDate(date);
 
                 zipFile.close();

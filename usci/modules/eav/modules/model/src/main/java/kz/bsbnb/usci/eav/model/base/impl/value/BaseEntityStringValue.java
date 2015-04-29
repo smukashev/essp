@@ -15,4 +15,8 @@ public class BaseEntityStringValue extends BaseValue<String> implements IBaseVal
         super(id, batch, index, reportDate, value, closed, last);
     }
 
+    public BaseEntityStringValue(Batch batch, long index, String value) {
+        super(batch, index, value);
+    }
+
 }

@@ -5,6 +5,7 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownValException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -43,18 +44,18 @@ public class SubjectOrganizationHeadNamesParser extends BatchParser {
                 throw new UnknownValException(localName, attributes.getValue("lang"));
             } */
             //my code
-            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("name2"),new Date());
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("person_name"),batch.getRepDate());
 
 
         } else if(localName.equals("firstname")) {
              event = (XMLEvent) xmlReader.next();
-             currentBaseEntity.put("firstname", new BaseValue(batch,index,  event.asCharacters().getData()));
+             currentBaseEntity.put("firstname", new BaseEntityStringValue(batch,index,  event.asCharacters().getData()));
         } else if(localName.equals("lastname")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("lastname", new BaseValue(batch,index,  event.asCharacters().getData()));
+            currentBaseEntity.put("lastname", new BaseEntityStringValue(batch,index,  event.asCharacters().getData()));
         } else if(localName.equals("middlename")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("middlename", new BaseValue(batch,index,  event.asCharacters().getData()));
+            currentBaseEntity.put("middlename", new BaseEntityStringValue(batch,index,  event.asCharacters().getData()));
         } else {
             throw new UnknownTagException(localName);
         }

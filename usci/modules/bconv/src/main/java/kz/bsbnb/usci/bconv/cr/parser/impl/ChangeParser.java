@@ -4,6 +4,8 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDateValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -34,6 +36,9 @@ public class ChangeParser extends BatchParser {
 
     @Autowired
     private ChangeCreditFlowParser changeCreditFlowParser;
+
+    private BaseEntityDateValue maturityDate;
+    private BaseEntityDateValue prolongationDate;
     
     public ChangeParser() {
         super();
@@ -41,7 +46,7 @@ public class ChangeParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("change"),new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("change"),batch.getRepDate());
     }
 
     @Override
@@ -49,29 +54,26 @@ public class ChangeParser extends BatchParser {
         if(localName.equals("change")) {
         } else if(localName.equals("turnover")) {
             changeTurnoverParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("turnover",new BaseValue(batch,index,changeTurnoverParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("turnover",new BaseEntityComplexValue(batch,index,changeTurnoverParser.getCurrentBaseEntity()));
         } else if(localName.equals("remains")) {
             changeRemainsParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("remains",new BaseValue(batch,index,changeRemainsParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("remains",new BaseEntityComplexValue(batch,index,changeRemainsParser.getCurrentBaseEntity()));
         } else if(localName.equals("credit_flow")) {
             changeCreditFlowParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("credit_flow",new BaseValue(batch,index,
+            currentBaseEntity.put("credit_flow",new BaseEntityComplexValue(batch,index,
                     changeCreditFlowParser.getCurrentBaseEntity()));
         } else if(localName.equals("maturity_date")) {
             event = (XMLEvent) xmlReader.next();
             try{
-              currentBaseEntity.put("maturity_date",new BaseValue(batch,index,
-                      dateFormat.parse(event.asCharacters().getData()))
-              );
+              maturityDate = new BaseEntityDateValue(batch,index, dateFormat.parse(event.asCharacters().getData()));
             } catch (ParseException e){
                 System.out.println(e.getMessage());
             }
         } else if(localName.equals("prolongation_date")) {
             event = (XMLEvent) xmlReader.next();
             try{
-                currentBaseEntity.put("prolongation_date",new BaseValue(batch,index,
-                        dateFormat.parse(event.asCharacters().getData()))
-                );
+                prolongationDate = new BaseEntityDateValue(batch,index,
+                        dateFormat.parse(event.asCharacters().getData()));
             } catch (ParseException e){
                 System.out.println(e.getMessage());
             }
@@ -104,5 +106,13 @@ public class ChangeParser extends BatchParser {
         }*/
 
         return false;
+    }
+
+    public BaseEntityDateValue getMaturityDate() {
+        return maturityDate;
+    }
+
+    public BaseEntityDateValue getProlongationDate() {
+        return prolongationDate;
     }
 }

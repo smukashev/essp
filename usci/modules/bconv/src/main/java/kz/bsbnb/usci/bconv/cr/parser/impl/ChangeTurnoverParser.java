@@ -7,6 +7,8 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDoubleValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -36,7 +38,7 @@ public class ChangeTurnoverParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("issue"),new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("turnover_issue"),batch.getRepDate());
     }
 
     @Override
@@ -45,29 +47,29 @@ public class ChangeTurnoverParser extends BatchParser {
         } else if(localName.equals("issue")) {
             //ctTurnoverTypeBase = new CtTurnoverTypeBase();
         } else if(localName.equals("debt")) {
-            currentDebt = new BaseEntity(metaClassRepository.getMetaClass("debt"),new Date());
+            currentDebt = new BaseEntity(metaClassRepository.getMetaClass("turnover_issue_debt"),batch.getRepDate());
             debtFlag = true;
             //ctTurnoverAmount = new CtTurnoverAmount();
         } else if(localName.equals("interest")) {
-            currentInterest = new BaseEntity(metaClassRepository.getMetaClass("interest"), new Date());
+            currentInterest = new BaseEntity(metaClassRepository.getMetaClass("turnover_issue_interest"), batch.getRepDate());
             interestFlag = true;
             //ctTurnoverAmount = new CtTurnoverAmount();
         } else if(localName.equals("amount")) {
              if(interestFlag){
                  event = (XMLEvent) xmlReader.next();
-                 currentInterest.put("amount",new BaseValue(batch, index,new Double(event.asCharacters().getData())));
+                 currentInterest.put("amount",new BaseEntityDoubleValue(batch, index,new Double(event.asCharacters().getData())));
              }else if(debtFlag){
                  event = (XMLEvent) xmlReader.next();
-                 currentDebt.put("amount",new BaseValue(batch, index,new Double(event.asCharacters().getData())));
+                 currentDebt.put("amount",new BaseEntityDoubleValue(batch, index,new Double(event.asCharacters().getData())));
              }
 
         } else if(localName.equals("amount_currency")) {
             if(interestFlag){
                 event = (XMLEvent) xmlReader.next();
-                currentInterest.put("amount_currency",new BaseValue(batch, index,new Double(event.asCharacters().getData())));
+                currentInterest.put("amount_currency",new BaseEntityDoubleValue(batch, index,new Double(event.asCharacters().getData())));
             }else if(debtFlag){
                 event = (XMLEvent) xmlReader.next();
-                currentDebt.put("amount_currency",new BaseValue(batch, index,new Double(event.asCharacters().getData())));
+                currentDebt.put("amount_currency",new BaseEntityDoubleValue(batch, index,new Double(event.asCharacters().getData())));
             }
         } else {
             throw new UnknownTagException(localName);
@@ -87,10 +89,10 @@ public class ChangeTurnoverParser extends BatchParser {
         } else if(localName.equals("debt")) {
             //ctTurnoverTypeBase.setDebt(ctTurnoverAmount);
             debtFlag = false;
-            currentBaseEntity.put("debt",new BaseValue(batch,index,currentDebt));
+            currentBaseEntity.put("debt",new BaseEntityComplexValue(batch,index,currentDebt));
         } else if(localName.equals("interest")) {
             interestFlag = false;
-            currentBaseEntity.put("interest",new BaseValue(batch,index,currentInterest));
+            currentBaseEntity.put("interest",new BaseEntityComplexValue(batch,index,currentInterest));
             //ctTurnoverTypeBase.setInterest(ctTurnoverAmount);
         } else if(localName.equals("amount")) {
             //ctTurnoverAmount.setAmount(new BigDecimal(contents.toString()));
