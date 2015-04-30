@@ -5,6 +5,8 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import java.io.Serializable;
 
 public class QueueEntry implements Serializable {
+    private final static long serialVersionUID = 1L;
+
     private IBaseEntity baseEntitySaving;
     private IBaseEntity baseEntityLoaded;
     private IBaseEntity baseEntityApplied;
