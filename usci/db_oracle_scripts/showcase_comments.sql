@@ -28,6 +28,10 @@ comment on COLUMN R_CORE_DEBTOR_INFO.CREDITOR2_ID is 'person creditor';
 comment on COLUMN R_CORE_DEBTOR_INFO.BANK_RELATION1_ID is 'organization bank_relation';
 comment on COLUMN R_CORE_DEBTOR_INFO.BANK_RELATION2_ID is 'person bank_relation';
 
-comment on COLUMN SHOWCASE.R_CORE_CREDIT.PORTFOLIO1_ID is 'portfolio_essp';
-comment on COLUMN SHOWCASE.R_CORE_CREDIT.PORTFOLIO2_ID is 'portfolio';
-comment on COLUMN SHOWCASE.R_CORE_CREDIT.PORTFOLIO_MSFO_ID  is 'portfolio_msfo';
+comment on COLUMN R_CORE_CREDIT.PORTFOLIO1_ID is 'portfolio_essp';
+comment on COLUMN R_CORE_CREDIT.PORTFOLIO2_ID is 'portfolio';
+comment on COLUMN R_CORE_CREDIT.PORTFOLIO_MSFO_ID  is 'portfolio_msfo';
+
+comment on COLUMN R_CORE_CREDIT_FLOW.BALANCE_ACCOUNT1_ID is 'kfn';
+comment on COLUMN R_CORE_CREDIT_FLOW.BALANCE_ACCOUNT2_ID is 'msfo';
+comment on COLUMN R_CORE_CREDIT_FLOW.BALANCE_ACCOUNT3_ID is 'msfo_o_b';
