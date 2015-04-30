@@ -15,4 +15,8 @@ public class BaseSetStringValue extends BaseSetValue<String> {
         super(id, batch, index, reportDate, value, closed, last);
     }
 
+    public BaseSetStringValue(Batch batch, long index, String value) {
+        super(batch, index, value);
+    }
+
 }

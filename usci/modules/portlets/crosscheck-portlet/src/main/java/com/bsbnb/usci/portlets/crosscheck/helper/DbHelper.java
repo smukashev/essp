@@ -20,7 +20,7 @@ public class DbHelper {
     public static Creditor getCreditor(Connection conn, BigInteger id) {
         Statement stmt = null;
         String query = "SELECT ID, MAIN_OFFICE_ID, SUBJECT_TYPE, NAME, SHORT_NAME, CODE, " +
-                "SHUTDOWN_DATE, CHANGE_DATE, NOKBDB_CODE FROM R_REF_CREDITOR WHERE ID = " + id;
+                "SHUTDOWN_DATE, CHANGE_DATE, NOKBDB_CODE FROM SHOWCASE.R_REF_CREDITOR WHERE ID = " + id;
 
         // log.log(Level.INFO, "getCreditor: " + query);
 
@@ -47,7 +47,7 @@ public class DbHelper {
     public static CrossCheck getCrossCheck(Connection conn, BigInteger id) {
         Statement stmt = null;
         String query = "SELECT ID, DATE_BEGIN, DATE_END, CREDITOR_ID, REPORT_DATE, STATUS_ID, USER_NAME, STATUS_NAME " +
-                "FROM CROSS_CHECK WHERE ID = " + id;
+                "FROM SHOWCASE.CROSS_CHECK WHERE ID = " + id;
 
         // log.log(Level.INFO, "getCrossCheck: " + query);
 
@@ -74,9 +74,7 @@ public class DbHelper {
 
     public static Message getMessage(Connection conn, BigInteger id) {
         Statement stmt = null;
-        String query = "SELECT ID, CODE, NAME_RU, NAME_KZ, NOTE FROM MESSAGE WHERE ID = " + id;
-
-        // log.log(Level.INFO, "getMessage: " + query);
+        String query = "SELECT ID, CODE, NAME_RU, NAME_KZ, NOTE FROM SHOWCASE.MESSAGE WHERE ID = " + id;
 
         try {
             stmt = conn.createStatement();

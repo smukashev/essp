@@ -17,10 +17,6 @@ import javax.sql.DataSource;
 import static com.bsbnb.usci.portlets.crosscheck.CrossCheckApplication.log;
 import com.bsbnb.usci.portlets.crosscheck.dm.Creditor;
 
-/**
- *
- * @author Marat.Madybayev
- */
 public class CrossCheckExecutor {
 
     private static CrossCheckExecutor instance = new CrossCheckExecutor();

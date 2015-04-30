@@ -11,22 +11,15 @@ import org.springframework.stereotype.Component;
 import javax.jms.JMSException;
 import java.util.ArrayList;
 
-/**
- * Created by a.tkachenko on 5/14/14.
- */
-
 @Component
-public class EntityProcessorListenerImpl implements IDaoListener
-{
-    final static Logger logger = Logger.getLogger(EntityProcessorListenerImpl.class);
-    //private ArrayList<ShowCaseHolder> holders = new ArrayList<ShowCaseHolder>();
-
+public class EntityProcessorListenerImpl implements IDaoListener {
     @Autowired
     ShowcaseMessageProducer producer;
 
     @Override
-    public void applyToDBEnded(IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntity baseEntityApplied, IBaseEntityManager entityManager)
-    {
+    public void applyToDBEnded(IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded,
+                               IBaseEntity baseEntityApplied, IBaseEntityManager entityManager) {
+
         QueueEntry queueEntry = new QueueEntry()
                 .setBaseEntityApplied(baseEntityApplied)
                 .setBaseEntityLoaded(baseEntityLoaded)
@@ -39,8 +32,4 @@ public class EntityProcessorListenerImpl implements IDaoListener
             throw new RuntimeException(e.getMessage());
         }
     }
-
-    //public void addShowCaseHolder(ShowCaseHolder holder) {
-    //    holders.add(holder);
-    //}
 }

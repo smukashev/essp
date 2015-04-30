@@ -7,6 +7,8 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownValException;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDateValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +42,7 @@ public class PrimaryContractParser extends BatchParser {
     @Override
     public void init()
     {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"), new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"), batch.getRepDate());
     }
 
     @Override
@@ -49,10 +51,10 @@ public class PrimaryContractParser extends BatchParser {
             if(localName.equals("primary_contract")) {
             } else if(localName.equals("no")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("no", new BaseValue(batch, index, event.asCharacters().getData()));
+                currentBaseEntity.put("no", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
             } else if(localName.equals("date")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("contract_date", new BaseValue(batch, index,
+                currentBaseEntity.put("date", new BaseEntityDateValue(batch, index,
                         dateFormat.parse(event.asCharacters().getData())
                     ));
             } else {
