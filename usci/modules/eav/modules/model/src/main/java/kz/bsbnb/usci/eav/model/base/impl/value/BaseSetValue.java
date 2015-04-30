@@ -18,6 +18,10 @@ public class BaseSetValue<T> extends BaseValue<T> implements IBaseValue<T>, IBas
         super(id, batch, index, reportDate, value, closed, last);
     }
 
+    public BaseSetValue(Batch batch, long index, T value) {
+        super(batch, index, value);
+    }
+
     public HistoryType getHistoryType() {
         return historyType;
     }

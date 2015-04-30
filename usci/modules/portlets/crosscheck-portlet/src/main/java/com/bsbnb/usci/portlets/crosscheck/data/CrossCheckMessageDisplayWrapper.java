@@ -4,10 +4,6 @@ import com.bsbnb.usci.portlets.crosscheck.CrossCheckPortletEnvironmentFacade;
 import com.bsbnb.usci.portlets.crosscheck.dm.CrossCheckMessage;
 import com.bsbnb.usci.portlets.crosscheck.dm.Message;
 
-/**
- *
- * @author Aidar.Myrzahanov
- */
 public class CrossCheckMessageDisplayWrapper {
 
     private CrossCheckMessage crossCheckMessage;
@@ -31,15 +27,17 @@ public class CrossCheckMessageDisplayWrapper {
     public String getDescription() {
         if (crossCheckMessage.getMessage() != null) {
             Message message = crossCheckMessage.getMessage();
-            return "KZ".equals(CrossCheckPortletEnvironmentFacade.get().getCurrentLanguage()) ? message.getNameKz() : message.getNameRu();
+            return "KZ".equals(CrossCheckPortletEnvironmentFacade.get().getCurrentLanguage()) ?
+                    message.getNameKz() : message.getNameRu();
         }
+
         return description;
     }
 
     public String getHelp() {
-        if (crossCheckMessage.getMessage() != null) {
+        if (crossCheckMessage.getMessage() != null)
             return crossCheckMessage.getMessage().getNote();
-        }
+
         return help;
     }
 

@@ -99,6 +99,7 @@ public class BeanDataProvider implements DataProvider {
         List<InputInfo> inputInfoList = inputInfoBusiness.getAllInputInfos(creditors,reportDate);
         List<InputInfoDisplayBean> result = new ArrayList<>(inputInfoList.size());
         for (InputInfo inputInfo : inputInfoList) {
+            if(inputInfo != null && inputInfo.getCreditor() != null)
                 result.add(new InputInfoDisplayBean(inputInfo,this));
         }
         return result;

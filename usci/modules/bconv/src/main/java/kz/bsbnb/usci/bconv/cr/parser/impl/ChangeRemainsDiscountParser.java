@@ -7,6 +7,9 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDoubleValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -30,7 +33,7 @@ public class ChangeRemainsDiscountParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("discount"),new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains_discount"),batch.getRepDate());
     }
 
     @Override
@@ -38,16 +41,16 @@ public class ChangeRemainsDiscountParser extends BatchParser {
         if(localName.equals("discount")) {
         } else if(localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value",new BaseValue(batch,index,new Double(event.asCharacters().getData())));
+            currentBaseEntity.put("value",new BaseEntityDoubleValue(batch,index,new Double(event.asCharacters().getData())));
         } else if(localName.equals("value_currency")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value_currency",new BaseValue(batch,index,
+            currentBaseEntity.put("value_currency",new BaseEntityDoubleValue(batch,index,
                     new Double(event.asCharacters().getData())));
         } else if(localName.equals("balance_account")) {
             event = (XMLEvent) xmlReader.next();
-            BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),new Date());
-            balanceAccount.put("no_",new BaseValue(batch,index,event.asCharacters().getData()));
-            currentBaseEntity.put("balance_account", new BaseValue(batch,index,balanceAccount) );
+            BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),batch.getRepDate());
+            balanceAccount.put("no_",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
+            currentBaseEntity.put("balance_account", new BaseEntityComplexValue(batch,index,balanceAccount) );
         } else {
             throw new UnknownTagException(localName);
         }

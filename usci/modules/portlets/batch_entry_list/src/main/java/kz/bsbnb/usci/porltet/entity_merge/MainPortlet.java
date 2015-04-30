@@ -22,7 +22,7 @@ public class MainPortlet extends MVCPortlet {
 
     private IBatchProcessService batchProcessService;
 
-    private final static String TMP_FILE_DIR = System.getProperty("user.home") + "/Batches";
+    private final static String TMP_FILE_DIR = "C:/zips";
 
     private IBatchEntryService batchEntryService;
 

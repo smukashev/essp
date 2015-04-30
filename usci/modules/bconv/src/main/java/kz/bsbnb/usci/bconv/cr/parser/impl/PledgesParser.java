@@ -4,6 +4,9 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDoubleValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -34,22 +37,22 @@ public class PledgesParser extends BatchParser {
         } else if(localName.equals("pledge")) {
             //ctPledge = new CtPledge();
 
-            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("pledge"), new Date());
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("pledge"), batch.getRepDate());
 
 
         } else if(localName.equals("pledge_type")) {
             event = (XMLEvent) xmlReader.next();
-            BaseEntity pledgeType = new BaseEntity(metaClassRepository.getMetaClass("ref_pledge_type"),new Date());
-            pledgeType.put("code",new BaseValue(batch,index,new Integer(event.asCharacters().getData())));
-            currentBaseEntity.put("pledge_type",new BaseValue(batch,index,pledgeType));
+            BaseEntity pledgeType = new BaseEntity(metaClassRepository.getMetaClass("ref_pledge_type"),batch.getRepDate());
+            pledgeType.put("code",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
+            currentBaseEntity.put("pledge_type",new BaseEntityComplexValue(batch,index,pledgeType));
         } else if(localName.equals("contract")) {
             //ctContractBase = new CtContractBase();
         } else if(localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("contract",new BaseValue(batch,index,event.asCharacters().getData()));
+            currentBaseEntity.put("contract",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
         } else if(localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value",new BaseValue(batch,index,new Double(event.asCharacters().getData())));
+            currentBaseEntity.put("value",new BaseEntityDoubleValue(batch,index,new Double(event.asCharacters().getData())));
         } else {
             throw new UnknownTagException(localName);
         }

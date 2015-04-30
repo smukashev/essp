@@ -16,4 +16,8 @@ public class BaseEntityComplexValue extends BaseValue<IBaseEntity> implements IB
         super(id, batch, index, reportDate, value, closed, last);
     }
 
+    public BaseEntityComplexValue(Batch batch, long index, IBaseEntity value) {
+        super(batch, index, value);
+    }
+
 }

@@ -6,6 +6,7 @@ import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
@@ -47,13 +48,14 @@ public class SubjectOrganizationNamesParser extends BatchParser {
             } else {
                 throw new UnknownValException(localName, attributes.getValue("lang"));
             }*/
-            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("jur_name"),new Date());
-            currentBaseEntity.put("lang",new BaseValue(batch,index,
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("organization_name"),batch.getRepDate());
+            currentBaseEntity.put("lang",new BaseEntityStringValue(batch,index,
                     event.asStartElement().getAttributeByName(new QName("lang")).getValue()));
             event = (XMLEvent) xmlReader.next();
             //BaseSet baseSet = new BaseSet(new MetaValue(DataTypes.STRING));
             //baseSet.put(new BaseValue(batch,index,event.asCharacters().getData()));
-            currentBaseEntity.put("st_string", new BaseValue(batch,index,event.asCharacters().getData()));
+            // TODO check attribute name
+            currentBaseEntity.put("name", new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
         } else {
             throw new UnknownTagException(localName);
         }

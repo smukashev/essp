@@ -5,14 +5,16 @@ import kz.bsbnb.usci.core.service.RemoteCreditorBusiness;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 
 /**
  * @author k.tulbassiyev
  */
 public interface IServiceRepository {
-    public IEntityService getEntityService();
-    public IBatchService getBatchService();
-    public IMetaFactoryService getMetaFactoryService();
-    public PortalUserBeanRemoteBusiness getUserService();
-    public RemoteCreditorBusiness getRemoteCreditorBusiness();
+    IEntityService getEntityService();
+    IBatchService getBatchService();
+    IMetaFactoryService getMetaFactoryService();
+    PortalUserBeanRemoteBusiness getUserService();
+    RemoteCreditorBusiness getRemoteCreditorBusiness();
+    ReportBeanRemoteBusiness getReportBeanRemoteBusinessService();
 }

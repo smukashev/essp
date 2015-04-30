@@ -342,7 +342,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         } else {
 
                             MetaClass childMetaClass = (MetaClass) metaSet.getMemberType();
-                            List<Long> childBaseEntityIds = new ArrayList<>();
+                            List<Long> childBaseEntityIds = new ArrayList<Long>();
                             for (IBaseValue childBaseValue : baseSet.get()) {
                                 BaseEntity childBaseEntity = (BaseEntity) childBaseValue.getValue();
                                 //Long childBaseEntityId = findSingle(childBaseEntity);
@@ -433,7 +433,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
     @Override
     public ArrayList<Long> findAll(BaseEntity baseEntity) {
-        ArrayList<Long> result = new ArrayList<>();
+        ArrayList<Long> result = new ArrayList<Long>();
         if (baseEntity.getValueCount() == 0) {
             return result;
         }

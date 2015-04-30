@@ -1,28 +1,44 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>kz.bsbnb</groupId>
-  <artifactId>static</artifactId>
-  <version>usci</version>
-  <name>USCI Portlets: Static</name>
-  <inceptionYear>2013</inceptionYear>
-  <packaging>war</packaging>
-  <description>static content for portlets</description>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>kz.bsbnb</groupId>
+    <artifactId>static</artifactId>
+    <version>usci</version>
+    <name>USCI Portlets: Static</name>
+    <inceptionYear>2013</inceptionYear>
+    <packaging>war</packaging>
+    <description>static content for portlets</description>
 
-  <properties>
+    <properties>
         <liferay.version>6.1.1</liferay.version>
         <liferay.auto.deploy.dir>/soft/glassfish3/deploy</liferay.auto.deploy.dir>
         <liferay.app.server.deploy.dir>/soft/glassfish3/deploy</liferay.app.server.deploy.dir>
         <liferay.app.server.portal.dir>/soft/glassfish3/deploy</liferay.app.server.portal.dir>
         <couchbase.client.version>1.1.4</couchbase.client.version>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
-  <dependencies>
-    <dependency>
+
+    <dependencies>
+        <dependency>
             <groupId>com.liferay.portal</groupId>
             <artifactId>portal-service</artifactId>
             <version>${liferay.version}</version>
@@ -64,8 +80,8 @@
             <version>2.0</version>
             <scope>provided</scope>
         </dependency>
-  
-  </dependencies>
+
+    </dependencies>
 
     <distributionManagement>
         <repository>

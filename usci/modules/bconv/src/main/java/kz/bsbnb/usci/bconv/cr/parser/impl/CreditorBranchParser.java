@@ -5,6 +5,10 @@ import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexSet;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseSetComplexValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -31,7 +35,7 @@ public class CreditorBranchParser extends BatchParser {
     @Override
     public void init()
     {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("creditor_branch"), new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor_branch"), batch.getRepDate());
     }
 
     @Override
@@ -39,28 +43,28 @@ public class CreditorBranchParser extends BatchParser {
         if(localName.equals("creditor_branch")) {
         } else if(localName.equals("code")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("code", new BaseValue(batch, index, event.asCharacters().getData()));
+            currentBaseEntity.put("code", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
         } else if(localName.equals("docs")) {
             //ctCreditorDocs = new CtCreditor.Docs();
-            currentDocSet = new BaseSet(metaClassRepository.getMetaClass("doc1"));
+            currentDocSet = new BaseSet(metaClassRepository.getMetaClass("document"));
         } else if(localName.equals("doc")) {
             //currentDoc = new CtDoc();
             //currentDoc.setDocType(attributes.getValue("doc_type"));
-            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("doc1"), new Date());
+            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"), batch.getRepDate());
 
-            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), new Date());
+            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), batch.getRepDate());
 
-            docType.put("code", new BaseValue(batch, index,
-                    new Integer(event.asStartElement().getAttributeByName(new QName("doc_type")).getValue())));
+            docType.put("code", new BaseEntityStringValue(batch, index,
+                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
 
-            currentDoc.put("doc_type", new BaseValue(batch, index,
+            currentDoc.put("doc_type", new BaseEntityComplexValue(batch, index,
                     docType));
         } else if(localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("name", new BaseValue(batch, index, event.asCharacters().getData()));
+            currentDoc.put("name", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
         } else if(localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("no", new BaseValue(batch, index, event.asCharacters().getData()));
+            currentDoc.put("no", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
         } else {
             throw new UnknownTagException(localName);
         }
@@ -78,10 +82,10 @@ public class CreditorBranchParser extends BatchParser {
             //ctCreditor.setCode(contents.toString());
         } else if(localName.equals("docs")) {
             //ctCreditor.setDocs(ctCreditorDocs);
-            currentBaseEntity.put("docs", new BaseValue(batch, index, currentDocSet));
+            currentBaseEntity.put("docs", new BaseEntityComplexSet(batch, index, currentDocSet));
         } else if(localName.equals("doc")) {
             //ctCreditorDocs.getDoc().add(currentDoc);
-            currentDocSet.put(new BaseValue(batch, index, currentDoc));
+            currentDocSet.put(new BaseSetComplexValue(batch, index, currentDoc));
         } else if(localName.equals("name")) {
             //currentDoc.setName(contents.toString());
         } else if(localName.equals("no")) {

@@ -15,4 +15,8 @@ public class BaseEntityDoubleValue extends BaseValue<Double> implements IBaseVal
         super(id, batch, index, reportDate, value, closed, last);
     }
 
+    public BaseEntityDoubleValue(Batch batch, long index, Double value) {
+        super(batch, index, value);
+    }
+
 }

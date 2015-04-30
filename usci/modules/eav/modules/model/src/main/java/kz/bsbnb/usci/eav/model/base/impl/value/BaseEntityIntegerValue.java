@@ -15,4 +15,8 @@ public class BaseEntityIntegerValue extends BaseValue<Integer> implements IBaseV
         super(id, batch, index, reportDate, value, closed, last);
     }
 
+    public BaseEntityIntegerValue(Batch batch, long index, Integer value) {
+        super(batch, index, value);
+    }
+
 }

@@ -72,7 +72,7 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
 
     public String getDomRef(long userId, IMetaClass metaClass, String attr) {
         String ret = "<div class='leaf'> %s: <select id='ref-%d-%s-%s'>";
-        ret = String.format(ret, metaClass.getClassName(), nextId(), metaClass.getClassName(), attr);
+        ret = String.format(ret, ((MetaClass)metaClass).getClassTitle(), nextId(), metaClass.getClassName(), attr);
 
         List<RefListItem> list = baseEntityProcessorDao.getRefsByMetaclassRaw(metaClass.getId());
         List<Long> allowedRefs = userDao.getAllowedRefs(userId, metaClass.getClassName());

@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.cr.model;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -9,9 +8,9 @@ import java.util.List;
  * @author alexandr.motov
  */
 public class SubjectType implements Serializable {
-    private static final long serialVersionUID = 2115312865112267609L;
+    private static final long serialVersionUID = 2115312865112267610L;
 
-    private long id;
+    private Long id;
     private String code;
     private String nameRu;
     private String nameKz;
@@ -27,14 +26,14 @@ public class SubjectType implements Serializable {
     public SubjectType() {
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
     /**
      * @param id the id to set
      */
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     
@@ -163,16 +162,11 @@ public class SubjectType implements Serializable {
             return false;
         }
         final SubjectType other = (SubjectType) obj;
-        if (this.id != other.id && !(this.id == other.id)) {
-            return false;
-        }
-        return true;
+        return id.equals(other.getId());
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 37 * hash + (int)this.id;
-        return hash;
+        return id.hashCode();
     }
 }

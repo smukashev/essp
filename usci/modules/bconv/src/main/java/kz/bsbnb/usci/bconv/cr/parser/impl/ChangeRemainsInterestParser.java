@@ -9,6 +9,10 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownValException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDateValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDoubleValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -38,7 +42,7 @@ public class ChangeRemainsInterestParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("interest1"),new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains_interest"),batch.getRepDate());
     }
 
     @Override
@@ -46,19 +50,19 @@ public class ChangeRemainsInterestParser extends BatchParser {
         if(localName.equals("interest")) {
         } else if(localName.equals("current")) {
             //ctRemainsTypeCurrent = new CtRemainsTypeCurrent();
-            fieldCurrent = new BaseEntity(metaClassRepository.getMetaClass("current1"),new Date());
+            fieldCurrent = new BaseEntity(metaClassRepository.getMetaClass("remains_interest_current"),batch.getRepDate());
             interestWay = localName;
         } else if(localName.equals("pastdue")) {
             //ctRemainsTypePastdue = new CtRemainsTypePastdue();
-            fieldPastDue = new BaseEntity(metaClassRepository.getMetaClass("pastdue1"),new Date());
+            fieldPastDue = new BaseEntity(metaClassRepository.getMetaClass("remains_interest_pastdue"),batch.getRepDate());
             interestWay = localName;
         } else if(localName.equals("write_off")) {
             //ctRemainsTypeInterestWriteOff = new CtRemainsTypeInterestWriteOff();
-            fieldWriteOf = new BaseEntity(metaClassRepository.getMetaClass("write_off1"),new Date());
+            fieldWriteOf = new BaseEntity(metaClassRepository.getMetaClass("remains_interest_write_off"),batch.getRepDate());
             interestWay = localName;
         } else if(localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
-            BaseValue baseValue = new BaseValue(batch,index,new Double(event.asCharacters().getData()));
+            BaseValue baseValue = new BaseEntityDoubleValue(batch,index,new Double(event.asCharacters().getData()));
             if(interestWay.equals("current")){
                 fieldCurrent.put("value",baseValue);
             }else if(interestWay.equals("pastdue")){
@@ -68,7 +72,7 @@ public class ChangeRemainsInterestParser extends BatchParser {
             }
         } else if(localName.equals("value_currency")) {
             event = (XMLEvent) xmlReader.next();
-            BaseValue baseValue = new BaseValue(batch,index,new Double(event.asCharacters().getData()));
+            BaseValue baseValue = new BaseEntityDoubleValue(batch,index,new Double(event.asCharacters().getData()));
             if(interestWay.equals("current")){
                 fieldCurrent.put("value_currency",baseValue);
             }else if(interestWay.equals("pastdue")){
@@ -78,9 +82,9 @@ public class ChangeRemainsInterestParser extends BatchParser {
             }
         } else if(localName.equals("balance_account")) {
             event = (XMLEvent) xmlReader.next();
-            BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),new Date());
-            baseEntity.put("no_",new BaseValue(batch,index,event.asCharacters().getData()));
-            BaseValue baseValue = new BaseValue(batch,index,baseEntity);
+            BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),batch.getRepDate());
+            baseEntity.put("no_",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
+            BaseValue baseValue = new BaseEntityComplexValue(batch,index,baseEntity);
             if(interestWay.equals("current")){
                 fieldCurrent.put("balance_account",baseValue);
             }else if(interestWay.equals("pastdue")){
@@ -91,21 +95,21 @@ public class ChangeRemainsInterestParser extends BatchParser {
         } else if(localName.equals("open_date")) {
             event = (XMLEvent) xmlReader.next();
             try{
-                fieldPastDue.put("open_date",new BaseValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
+                fieldPastDue.put("open_date",new BaseEntityDateValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
             }catch(ParseException e){
                 System.out.println(e.getMessage());
             }
         } else if(localName.equals("close_date")) {
             event = (XMLEvent) xmlReader.next();
             try {
-                fieldPastDue.put("close_date",new BaseValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
+                fieldPastDue.put("close_date",new BaseEntityDateValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
             } catch (ParseException e) {
                 System.out.println(e.getMessage());
             }
         } else if(localName.equals("date")) {
             event = (XMLEvent) xmlReader.next();
             try {
-                fieldWriteOf.put("date",new BaseValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
+                fieldWriteOf.put("date",new BaseEntityDateValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
             } catch (ParseException e) {
                 System.out.println(e.getMessage());
             }
@@ -125,13 +129,13 @@ public class ChangeRemainsInterestParser extends BatchParser {
                 return true;
             } else if(localName.equals("current")) {
                 //interest.setCurrent(ctRemainsTypeCurrent);
-                currentBaseEntity.put("current",new BaseValue(batch,index,fieldCurrent));
+                currentBaseEntity.put("current",new BaseEntityComplexValue(batch,index,fieldCurrent));
             } else if(localName.equals("pastdue")) {
                 //interest.setPastdue(ctRemainsTypePastdue);
-                currentBaseEntity.put("pastdue",new BaseValue(batch,index,fieldPastDue));
+                currentBaseEntity.put("pastdue",new BaseEntityComplexValue(batch,index,fieldPastDue));
             } else if(localName.equals("write_off")) {
                 //interest.setWriteOff(ctRemainsTypeInterestWriteOff);
-                currentBaseEntity.put("write_off",new BaseValue(batch,index,fieldWriteOf));
+                currentBaseEntity.put("write_off",new BaseEntityComplexValue(batch,index,fieldWriteOf));
             } else if(localName.equals("value")) {
                 if(interestWay.equals("current")) {
                     //ctRemainsTypeCurrent.setValue(new BigDecimal(contents.toString()));

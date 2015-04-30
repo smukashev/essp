@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
@@ -24,8 +25,13 @@ import javax.annotation.PostConstruct;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Stack;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * @author k.tulbassiyev
@@ -81,18 +87,53 @@ public class CREntityReader<T> extends CommonReader<T> {
 
         ByteArrayInputStream inputStream = new ByteArrayInputStream(batchFullJModel.getContent());
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
+
+        ZipInputStream zis = new ZipInputStream(inputStream);
+
+        byte[] buffer = new byte[4096];
+        ByteArrayOutputStream out = null;
 
         try {
-            xmlEventReader = inputFactory.createXMLEventReader(inputStream);
-        } catch (XMLStreamException e) {
-            e.printStackTrace();
+            zis.getNextEntry();
+            int len;
+            /*
+            out = new ByteArrayOutputStream((int)entry.getSize());
+            int size = (int)entry.getSize();
+            while ((len = zis.read(buffer, 0, Math.min(buffer.length, size))) > 0) {
+                size -= len;
+                out.write(buffer, 0, len);
+                if (size <= 0)
+                    break;
+            }
+            */
+            // modified for generated batch files
+            out = new ByteArrayOutputStream(4096);
+            while ((len = zis.read(buffer, 0, 4096)) > 0) {
+                out.write(buffer, 0, len);
+            }
+        } catch (IOException e) {
+            logger.error("Batch: " + batchId + " error in entity reader.");
+            statusSingleton.addBatchStatus(batchId,
+                    new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
+            throw new RuntimeException(e);
         }
+
+        try {
+            if (out != null)
+                xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
+        } catch (XMLStreamException e) {
+            statusSingleton.addBatchStatus(batchId,
+                    new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
+            throw new RuntimeException(e);
+        }
+        //
 
         batch = batchService.load(batchId);
 
         try
         {
-            crParser.parse(xmlEventReader, batch, 0);
+            crParser.parse(xmlEventReader, batch, 1L);
         } catch (SAXException e)
         {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -105,12 +146,12 @@ public class CREntityReader<T> extends CommonReader<T> {
 
         T entity = (T)crParser.getCurrentBaseEntity();
 
-        long index = crParser.getIndex() - 1;
+        long index = crParser.getIndex();
 
         if (crParser.hasMore()) {
             try
             {
-                crParser.parseNextPackage();
+                crParser.parse(xmlEventReader, batch, index);
             } catch (SAXException e)
             {
                 EntityStatusJModel entityStatusJModel = new EntityStatusJModel(index,
@@ -121,8 +162,8 @@ public class CREntityReader<T> extends CommonReader<T> {
                 return null;
             }
 
-            System.out.println("####");
-            System.out.println(entity.toString());
+//            System.out.println("####");
+//            System.out.println(entity.toString());
 
             return entity;
         }

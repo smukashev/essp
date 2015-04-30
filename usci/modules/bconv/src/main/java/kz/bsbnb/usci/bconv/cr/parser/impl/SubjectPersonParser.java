@@ -6,6 +6,7 @@ import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class SubjectPersonParser extends BatchParser {
     @Override
     public void init()
     {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("person"), new Date());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("person"), batch.getRepDate());
     }
 
     @Override
@@ -58,14 +59,14 @@ public class SubjectPersonParser extends BatchParser {
         if(localName.equals("person")) {
         } else if(localName.equals("country")) {
             event = (XMLEvent) xmlReader.next();
-            BaseEntity country = new BaseEntity(metaClassRepository.getMetaClass("ref_country"), new Date());
+            BaseEntity country = new BaseEntity(metaClassRepository.getMetaClass("ref_country"), batch.getRepDate());
 
-            country.put("code_numeric", new BaseValue(batch, index, new Integer(event.asCharacters().getData())));
+            country.put("code_numeric", new BaseEntityIntegerValue(batch, index, new Integer(event.asCharacters().getData())));
 
-            currentBaseEntity.put("country", new BaseValue(batch, index, country));
+            currentBaseEntity.put("country", new BaseEntityComplexValue(batch, index, country));
         } else if(localName.equals("offshore")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("offshore", new BaseValue(batch, index,
+            currentBaseEntity.put("offshore", new BaseEntityStringValue(batch, index,
                     event.asCharacters().getData()
                 ));
         } else if(localName.equals("bank_relations")) {
@@ -73,11 +74,11 @@ public class SubjectPersonParser extends BatchParser {
             bankRelations = new BaseSet(metaClassRepository.getMetaClass("ref_bank_relation"));
         } else if(localName.equals("bank_relation")) {
             event = (XMLEvent) xmlReader.next();
-            BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"), new Date());
+            BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"), batch.getRepDate());
 
-            bankRelation.put("code", new BaseValue(batch, index, new Integer(event.asCharacters().getData())));
+            bankRelation.put("code", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
 
-            bankRelations.put(new BaseValue(batch, index, bankRelation));
+            bankRelations.put(new BaseSetComplexValue(batch, index, bankRelation));
         } else if(localName.equals("addresses")) {
             //addresses = new CtEntity.Addresses();
             addresses = new BaseSet(metaClassRepository.getMetaClass("address"));
@@ -91,22 +92,22 @@ public class SubjectPersonParser extends BatchParser {
             } else {
                 throw new UnknownValException(localName, attributes.getValue("type"));
             } */
-            currentAddress = new BaseEntity(metaClassRepository.getMetaClass("address"), new Date());
+            currentAddress = new BaseEntity(metaClassRepository.getMetaClass("address"), batch.getRepDate());
 
-            currentAddress.put("type", new BaseValue(batch, index,
+            currentAddress.put("type", new BaseEntityStringValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("type")).getValue()));
         } else if(localName.equals("region")) {
             event = (XMLEvent) xmlReader.next();
-            BaseEntity region = new BaseEntity(metaClassRepository.getMetaClass("ref_region"), new Date());
+            BaseEntity region = new BaseEntity(metaClassRepository.getMetaClass("ref_region"), batch.getRepDate());
 
-            region.put("code", new BaseValue(batch, index, new Integer(event.asCharacters().getData())));
+            region.put("code", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
 
-            currentAddress.put("region", new BaseValue(batch, index,
+            currentAddress.put("region", new BaseEntityComplexValue(batch, index,
                     region
                 ));
         } else if(localName.equals("details")) {
             event = (XMLEvent) xmlReader.next();
-            currentAddress.put("details", new BaseValue(batch, index,
+            currentAddress.put("details", new BaseEntityStringValue(batch, index,
                     event.asCharacters().getData()
                 ));
         } else if(localName.equals("contacts")) {
@@ -115,27 +116,29 @@ public class SubjectPersonParser extends BatchParser {
         } else if(localName.equals("contact")) {
             //ctContact = new CtContact();
             //ctContact.setContactType(attributes.getValue("contact_type"));
-            currentContact = new BaseEntity(metaClassRepository.getMetaClass("contact"), new Date());
+            currentContact = new BaseEntity(metaClassRepository.getMetaClass("contact"), batch.getRepDate());
 
-            BaseEntity contactType = new BaseEntity(metaClassRepository.getMetaClass("ref_contact_type"), new Date());
+            BaseEntity contactType = new BaseEntity(metaClassRepository.getMetaClass("ref_contact_type"), batch.getRepDate());
 
-            contactType.put("code", new BaseValue(batch, index,
-                    new Integer(event.asStartElement().getAttributeByName(new QName("contact_type")).getValue())));
+            contactType.put("code", new BaseEntityStringValue(batch, index,
+                    event.asStartElement().getAttributeByName(new QName("contact_type")).getValue()));
 
-            currentContact.put("contact_type", new BaseValue(batch, index, contactType));
+            currentContact.put("contact_type", new BaseEntityComplexValue(batch, index, contactType));
 
             BaseSet contactDetails = new BaseSet(new MetaValue(DataTypes.STRING));
 
             event = (XMLEvent) xmlReader.next();
-            contactDetails.put(new BaseValue(batch, index, event.asCharacters().getData()));
-            currentContact.put("st_contact_details", new BaseValue(batch, index,
+            contactDetails.put(new BaseSetStringValue(batch, index, event.asCharacters().getData()));
+
+            // TODO incorrect set attribute name
+            currentContact.put("details", new BaseEntitySimpleSet(batch, index,
                     contactDetails
                 ));
 
-            contacts.put(new BaseValue(batch, index, currentContact));
+            contacts.put(new BaseSetComplexValue(batch, index, currentContact));
         } else if(localName.equals("names")) {
             //names = new CtPerson.Names();
-            names = new BaseSet(metaClassRepository.getMetaClass("name"));
+            names = new BaseSet(metaClassRepository.getMetaClass("person_name"));
         } else if(localName.equals("name")) {
             /*name = new CtPerson.Names.Name();
 
@@ -149,38 +152,38 @@ public class SubjectPersonParser extends BatchParser {
             } else {
                 throw new UnknownValException(localName, attributes.getValue("lang"));
             } */
-            currentName = new BaseEntity(metaClassRepository.getMetaClass("name"), new Date());
+            currentName = new BaseEntity(metaClassRepository.getMetaClass("person_name"), batch.getRepDate());
 
-            currentName.put("lang", new BaseValue(batch, index,
+            currentName.put("lang", new BaseEntityStringValue(batch, index,
                     event.asStartElement().getAttributeByName(new QName("lang")).getValue()));
         } else if(localName.equals("firstname")) {
             event = (XMLEvent) xmlReader.next();
-            currentName.put("firstname", new BaseValue(batch, index,
+            currentName.put("firstname", new BaseEntityStringValue(batch, index,
                     event.asCharacters().getData()
                 ));
         } else if(localName.equals("lastname")) {
             event = (XMLEvent) xmlReader.next();
-            currentName.put("lastname", new BaseValue(batch, index,
+            currentName.put("lastname", new BaseEntityStringValue(batch, index,
                     event.asCharacters().getData()
                 ));
         } else if(localName.equals("middlename")) {
             event = (XMLEvent) xmlReader.next();
-            currentName.put("middlename", new BaseValue(batch, index,
+            currentName.put("middlename", new BaseEntityStringValue(batch, index,
                     event.asCharacters().getData()
                 ));
         } else if(localName.equals("docs")) {
-            BaseSet personDocs = new BaseSet(metaClassRepository.getMetaClass("doc1"));
+            BaseSet personDocs = new BaseSet(metaClassRepository.getMetaClass("document"));
 
             while(true) {
                 subjectPersonDocsParser.parse(xmlReader, batch, index);
                 if (subjectPersonDocsParser.hasMore()) {
-                    personDocs.put(new BaseValue(batch, index, subjectPersonDocsParser.getCurrentBaseEntity()));
+                    personDocs.put(new BaseSetComplexValue(batch, index, subjectPersonDocsParser.getCurrentBaseEntity()));
                 } else {
                     break;
                 }
             }
 
-            currentBaseEntity.put("docs", new BaseValue(batch, index, personDocs));
+            currentBaseEntity.put("docs", new BaseEntityComplexSet(batch, index, personDocs));
         } else {
             throw new UnknownTagException(localName);
         }
@@ -201,31 +204,31 @@ public class SubjectPersonParser extends BatchParser {
             //ctPerson.setOffshore(contents.toString());
         } else if(localName.equals("bank_relations")) {
             //ctPerson.setBankRelations(bankRelations);
-            currentBaseEntity.put("bank_relations", new BaseValue(batch, index, bankRelations));
+            currentBaseEntity.put("bank_relations", new BaseEntityComplexSet(batch, index, bankRelations));
         } else if(localName.equals("bank_relation")) {
             //bankRelations.getBankRelation().add(contents.toString());
         } else if(localName.equals("addresses")) {
             //ctPerson.setAddresses(addresses);
-            currentBaseEntity.put("addresses", new BaseValue(batch, index, addresses));
+            currentBaseEntity.put("addresses", new BaseEntityComplexSet(batch, index, addresses));
         } else if(localName.equals("address")) {
             //addresses.getAddress().add(ctAddress);
-            addresses.put(new BaseValue(batch, index, currentAddress));
+            addresses.put(new BaseSetComplexValue(batch, index, currentAddress));
         } else if(localName.equals("region")) {
             //ctAddress.setRegion(contents.toString());
         } else if(localName.equals("details")) {
             //ctAddress.setDetails(contents.toString());
         } else if(localName.equals("contacts")) {
             //ctPerson.setContacts(contacts);
-            currentBaseEntity.put("contacts", new BaseValue(batch, index, contacts));
+            currentBaseEntity.put("contacts", new BaseEntityComplexSet(batch, index, contacts));
         } else if(localName.equals("contact")) {
             //ctContact.setValue(contents.toString());
             //contacts.getContact().add(ctContact);
         } else if(localName.equals("names")) {
             //ctPerson.setNames(names);
-            currentBaseEntity.put("names", new BaseValue(batch, index, names));
+            currentBaseEntity.put("names", new BaseEntityComplexSet(batch, index, names));
         } else if(localName.equals("name")) {
             //names.getName().add(name);
-            names.put(new BaseValue(batch, index, currentName));
+            names.put(new BaseSetComplexValue(batch, index, currentName));
         } else if(localName.equals("firstname")) {
             //name.setFirstname(contents.toString());
         } else if(localName.equals("lastname")) {
