@@ -57,15 +57,15 @@ public class BatchDao implements IBatchDao
 
     private long saveBatch(Batch batch){
 
-        if (batch.getRepoDate() == null)
+        if (batch.getRepDate() == null)
         {
             throw new IllegalArgumentException("Report date must be set before instance " +
                     "of Batch saving to the DB.");
         }
 
         String SQL = "INSERT INTO " + PREFIX_ + "packages(NAME, REPORT_DATE) VALUES (?, ?)";
-        jdbcTemplate.update(SQL,batch.getName(),batch.getRepoDate());
-        System.out.println("Created batch with repodate"+batch.getRepoDate()+" called "+batch.getName());
+        jdbcTemplate.update(SQL,batch.getName(),batch.getRepDate());
+        System.out.println("Created batch with repodate"+batch.getRepDate()+" called "+batch.getName());
 
         SQL = "SELECT id FROM " + PREFIX_ + "packages WHERE NAME = ?";
         long id = jdbcTemplate.queryForLong(SQL,batch.getName());
@@ -80,7 +80,7 @@ public class BatchDao implements IBatchDao
         }
 
        String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, REPORT_DATE) VALUES(?, ?)";
-        jdbcTemplate.update(SQL,batchId,batch.getRepoDate());
+        jdbcTemplate.update(SQL,batchId,batch.getRepDate());
     }
 
 

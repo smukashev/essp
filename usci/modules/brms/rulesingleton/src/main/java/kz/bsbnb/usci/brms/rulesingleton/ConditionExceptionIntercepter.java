@@ -15,7 +15,7 @@ public class ConditionExceptionIntercepter
         try {
             return pjp.proceed();
         } catch (Exception e) {
-            System.out.println("Got some nasty exception!");
+            System.out.println("Got some nasty exception: " + e.getMessage());
             return true;
         }
     }
