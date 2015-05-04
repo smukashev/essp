@@ -20,4 +20,6 @@ public interface IReportDao {
     public List<ReportMessageAttachment> getAttachmentsByReport(Report report);
     public void addNewMessage(ReportMessage message, Report report, List<ReportMessageAttachment> attachments);
     public void updateReport(Report report);
+    public Report getReport(long creditorId, Date reportDate);
+    public void setTotalCount(long reportId, long totalCount);
 }

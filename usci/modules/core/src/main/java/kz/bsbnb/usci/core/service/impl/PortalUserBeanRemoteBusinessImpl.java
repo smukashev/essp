@@ -81,4 +81,9 @@ public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBus
     {
         return userDao.getPortalUserCreditorList(userId);
     }
+
+    @Override
+    public PortalUser getUser(long userId) {
+        return userDao.getUser(userId);
+    }
 }

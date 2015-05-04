@@ -260,4 +260,46 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
                 .where(EAV_REPORT.ID.equal(report.getId()));
         updateWithStats(update.getSQL(), update.getBindValues().toArray());
     }
+
+    @Override
+    public void setTotalCount(long reportId, long totalCount) {
+        Update update = context
+                .update(EAV_REPORT)
+                .set(EAV_REPORT.TOTAL_COUNT, totalCount)
+                .where(EAV_REPORT.ID.equal(reportId));
+        updateWithStats(update.getSQL(), update.getBindValues().toArray());
+    }
+
+    @Override
+    public Report getReport(long creditorId, Date reportDate) {
+        Select select = context.select().from(EAV_REPORT)
+                .where(EAV_REPORT.CREDITOR_ID.equal(creditorId))
+                .and(EAV_REPORT.REPORT_DATE.equal(DataUtils.convert(reportDate)));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.isEmpty()) {
+            return null;
+        }
+
+        Map<String, Object> row = rows.get(0);
+
+        Report report = new Report();
+        report.setId(((BigDecimal) row.get(EAV_REPORT.ID.getName())).longValue());
+        {
+            Creditor creditor = new Creditor();
+            creditor.setId(((BigDecimal) row.get(EAV_REPORT.CREDITOR_ID.getName())).longValue());
+
+            report.setCreditor(creditor);
+        }
+        report.setTotalCount(((BigDecimal) row.get(EAV_REPORT.TOTAL_COUNT.getName())).longValue());
+        report.setActualCount(((BigDecimal) row.get(EAV_REPORT.ACTUAL_COUNT.getName())).longValue());
+        report.setBeginningDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.BEG_DATE.getName())));
+        report.setEndDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.END_DATE.getName())));
+        report.setLastManualEditDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.LAST_MANUAL_EDIT_DATE.getName())));
+        report.setStatusId(((BigDecimal) row.get(EAV_REPORT.STATUS_ID.getName())).longValue());
+        report.setReportDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.REPORT_DATE.getName())));
+
+        return report;
+    }
 }

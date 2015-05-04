@@ -3,6 +3,7 @@ package kz.bsbnb.usci.receiver.monitor;
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
+import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.model.json.*;
 import kz.bsbnb.usci.sync.service.IEntityService;
@@ -14,7 +15,6 @@ import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -76,8 +76,6 @@ public class ZipFilesMonitor{
     public static final int MAX_SYNC_QUEUE_SIZE = 512;
 
     private static final long WAIT_TIMEOUT = 360; //in 10 sec units
-
-    private int GLOBAL_COUNT = 0;
 
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
@@ -423,6 +421,7 @@ public class ZipFilesMonitor{
                         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
                         jobParametersBuilder.addParameter("batchId", new JobParameter(nextJob.getBatchId()));
                         jobParametersBuilder.addParameter("userId", new JobParameter(nextJob.getBatchInfo().getUserId()));
+                        jobParametersBuilder.addParameter("reportId", new JobParameter(nextJob.getBatchInfo().getReportId()));
 
                         Job job = jobs.get(nextJob.getBatchInfo().getBatchType());
 
@@ -549,24 +548,8 @@ public class ZipFilesMonitor{
         }
 
         // ------------------------------------
-        Report report = new Report();
 
-        Creditor creditor = new Creditor();
-        creditor.setId(cId);
-
-        report.setCreditor(creditor);
-        report.setStatusId(67L);
-        report.setActualCount(10L);
-        report.setBeginningDate(new Date());
-        report.setLastManualEditDate(new Date());
-        report.setTotalCount(GLOBAL_COUNT + 10L);
-        report.setEndDate(new Date());
-        report.setReportDate(batchInfo.getRepDate());
-
-        GLOBAL_COUNT += 10L; // TODO: fix
-
-        ReportBeanRemoteBusiness reportBeanRemoteBusiness = serviceFactory.getReportBeanRemoteBusinessService();
-        reportBeanRemoteBusiness.insert(report, "Auditor");
+        checkAndFillEavReport(cId, batchInfo);
 
         // ------------------------------------
 
@@ -579,6 +562,55 @@ public class ZipFilesMonitor{
 
             sender.addJob(batchId, batchInfo);
         }
+    }
+
+    private void checkAndFillEavReport(long creditorId, BatchInfo batchInfo) {
+        ReportBeanRemoteBusiness reportBeanRemoteBusiness = serviceFactory.getReportBeanRemoteBusinessService();
+
+        Report existing = reportBeanRemoteBusiness.getReport(creditorId, batchInfo.getRepDate());
+
+        if (existing != null) {
+            if (ReportStatus.COMPLETED.getStatusId().equals(existing.getStatusId())) {
+                throw new RuntimeException("Report with status COMPLETED already exists for creditorId = "
+                        + creditorId +  ", reportDate = " + batchInfo.getRepDate());
+            }
+        } else {
+            Date lastApprovedDate = reportBeanRemoteBusiness.getLastApprovedDate(creditorId);
+
+            try {
+                Date expectedDate = lastApprovedDate != null
+                        ? DataTypeUtil.plus(lastApprovedDate, Calendar.MONTH, 1)
+                        : new SimpleDateFormat("dd/MM/yyyy").parse(Report.INITIAL_REPORT_DATE_STR);
+
+                if (!batchInfo.getRepDate().equals(expectedDate)) {
+                    throw new RuntimeException("Reports must be supplied in order month by month");
+                }
+
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        Report report = new Report();
+        {
+            Creditor creditor = new Creditor();
+            creditor.setId(creditorId);
+            report.setCreditor(creditor);
+        }
+        report.setStatusId(ReportStatus.IN_PROGRESS.getStatusId());
+        report.setTotalCount(batchInfo.getTotalCount());
+        report.setActualCount(batchInfo.getActualCount());
+        report.setReportDate(batchInfo.getRepDate());
+        report.setBeginningDate(new Date());
+        report.setLastManualEditDate(new Date());
+
+        PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
+
+        PortalUser portalUser = userService.getUser(batchInfo.getUserId());
+
+        Long reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
+
+        batchInfo.setReportId(reportId);
     }
 
     public byte[] inputStreamToByte(InputStream in) throws IOException {
@@ -660,6 +692,12 @@ public class ZipFilesMonitor{
                 }
 
                 batchInfo.setRepDate(date);
+
+                {
+                    String actualCreditCount = document.getElementsByTagName("actual_credit_count").item(0).getTextContent();
+                    batchInfo.setActualCount(Integer.parseInt(actualCreditCount));
+                    batchInfo.setTotalCount(0);
+                }
 
                 zipFile.close();
                 saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));

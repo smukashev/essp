@@ -54,6 +54,12 @@ public class PackageParser extends BatchParser {
     
     private Logger logger = Logger.getLogger(PackageParser.class);
 
+    private int totalCount = 0;
+
+    public int getTotalCount() {
+        return totalCount;
+    }
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName)
             throws SAXException {
@@ -149,7 +155,10 @@ public class PackageParser extends BatchParser {
             hasMore = false;
         } else if(localName.equals("package")) {
             //handlePackage(currentPackage);
+            totalCount++;
+
             hasMore = true;
+
         } else {
             throw new UnknownTagException(localName);
         }

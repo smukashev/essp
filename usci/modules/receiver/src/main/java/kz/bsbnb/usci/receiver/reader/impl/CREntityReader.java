@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 import org.apache.log4j.Logger;
@@ -17,6 +18,7 @@ import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -46,6 +48,7 @@ public class CREntityReader<T> extends CommonReader<T> {
 
     private IBatchService batchService;
     private IMetaFactoryService metaFactoryService;
+    private ReportBeanRemoteBusiness reportService;
 
     private CouchbaseClient couchbaseClient;
     private Gson gson = new Gson();
@@ -55,12 +58,16 @@ public class CREntityReader<T> extends CommonReader<T> {
     @Autowired
     private MainParser crParser;
 
+    @Value("#{jobParameters['batchId']}")
+    private Long reportId;
+
     @PostConstruct
     public void init() {
         logger.info("Reader init.");
         batchService = serviceRepository.getBatchService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
         couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
+        reportService = serviceRepository.getReportBeanRemoteBusinessService();
 
         int counter = 100;
         Object obj = null;
@@ -176,6 +183,8 @@ public class CREntityReader<T> extends CommonReader<T> {
         //batchFullJModel.setStatus(statusJModel);
 
         //couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
+
+        reportService.setTotalCount(reportId, crParser.getPackageCount());
 
         return null;
     }
