@@ -72,7 +72,7 @@
         <property name="jobRepository" ref="jobRepository" />
         <property name="taskExecutor">
             <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor">
-                <property name="concurrencyLimit" value="2" />
+                <property name="concurrencyLimit" value="5" />
             </bean>
         </property>
     </bean>
