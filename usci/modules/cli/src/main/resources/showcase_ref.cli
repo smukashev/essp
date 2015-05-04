@@ -156,14 +156,15 @@ showcase save
 #=================================================================================
  
 showcase set meta ref_creditor_branch
- 
-showcase set name REF_CREDITOR_BRANCH
-showcase set tableName REF_CREDITOR_BRANCH
- 
+
+showcase set name REF_CREDITOR_BRANCH2
+showcase set tableName REF_CREDITOR_BRANCH2
+
 showcase list add code
 showcase list add name
 showcase list add short_name
 showcase list add main_office.code code_main_office
+showcase list add region.code region_code
 
 showcase save
 #---------------------------------------------------------------------------------
