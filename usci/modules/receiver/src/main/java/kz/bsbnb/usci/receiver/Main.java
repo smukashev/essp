@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.receiver.entry;
+package kz.bsbnb.usci.receiver;
 
 import kz.bsbnb.usci.tool.couchbase.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.ParseException;
 
-public class SimpleZipMain {
+public class Main {
     public static void main(String args[]) throws IOException, ParserConfigurationException,
             SAXException, ParseException, InterruptedException {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextZip.xml");
@@ -27,7 +27,7 @@ public class SimpleZipMain {
 
         ZipFilesMonitor monitor = ctx.getBean(ZipFilesMonitor.class);
 
-        monitor.monitor(Paths.get("C:\\zips"));
+        monitor.monitor(Paths.get("/home/ktulbassiyev/Batches"));
 
     }
 }
