@@ -1,7 +1,7 @@
-#rule set date 01.04.2001
-#rule create package afk
+rule set date 01.04.2001
+rule create package credit_parser
 rule rc
-rule set package afk
+rule set package credit_parser
 rule set version
 
 #dogovor start

@@ -4,6 +4,7 @@ import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
+import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
@@ -41,7 +42,8 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
     @Autowired
     protected SQLQueriesStats sqlStats;
 
-    private final boolean RULES_ENABLED  = true;
+    @Autowired
+    protected Global global;
 
     private Set<String> metaRules = new HashSet<String>();
 
@@ -92,11 +94,14 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
             statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
 
-            if(RULES_ENABLED && entity != null && entity.getMeta() != null &&
+            if(global.isRulesEnabled() && entity.getMeta() != null &&
                     metaRules.contains(entity.getMeta().getClassName())) {
                 try {
                     long t1 = System.currentTimeMillis();
-                    rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser", entity.getReportDate());
+
+                    rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser",
+                            entity.getReportDate());
+
                     sqlStats.put(entity.getMeta().getClassName() + "_parser", System.currentTimeMillis() - t1);
                 } catch (Exception e) {
                     logger.error("Can't run rules: " + e.getMessage());

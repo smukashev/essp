@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver;
 
+import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.tool.couchbase.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
@@ -19,15 +20,10 @@ public class Main {
             SAXException, ParseException, InterruptedException {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextZip.xml");
 
-        IServiceRepository serviceFactory = ctx.getBean(IServiceRepository.class);
-
-        IBatchService batchService = serviceFactory.getBatchService();
-        ICouchbaseClientFactory couchbaseClientFactory = ctx.getBean(ICouchbaseClientFactory.class);
-        StatusSingleton statusSingleton = ctx.getBean(StatusSingleton.class);
+        Global b = ctx.getBean(Global.class);
 
         ZipFilesMonitor monitor = ctx.getBean(ZipFilesMonitor.class);
-
-        monitor.monitor(Paths.get("/home/ktulbassiyev/Batches"));
+        monitor.monitor(Paths.get(b.getBatchesDir()));
 
     }
 }
