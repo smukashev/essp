@@ -152,18 +152,19 @@ showcase save
  
  
 #=================================================================================
-#  8.REF_CREDITOR_BRANCH*
+#  8.REF_CREDITOR_BRANCH
 #=================================================================================
  
 showcase set meta ref_creditor_branch
- 
+
 showcase set name REF_CREDITOR_BRANCH
 showcase set tableName REF_CREDITOR_BRANCH
- 
+
 showcase list add code
 showcase list add name
 showcase list add short_name
 showcase list add main_office.code code_main_office
+showcase list add region.code region_code
 
 showcase save
 #---------------------------------------------------------------------------------
@@ -375,7 +376,7 @@ showcase save
  
  
 #=================================================================================
-#  20.REF_PORTFOLIO*
+#  20.REF_PORTFOLIO
 #=================================================================================
  
 showcase set meta ref_portfolio

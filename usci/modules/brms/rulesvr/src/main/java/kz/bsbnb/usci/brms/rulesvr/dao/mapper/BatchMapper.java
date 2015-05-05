@@ -15,7 +15,7 @@ public class BatchMapper implements RowMapper<Batch> {
         Batch batch = new Batch();
         batch.setId(resultSet.getLong("id"));
         batch.setName(resultSet.getString("name"));
-        batch.setRepoDate(resultSet.getDate("report_date"));
+        batch.setRepDate(resultSet.getDate("report_date"));
         batch.setDescription(resultSet.getString("description"));
         return batch;
     }

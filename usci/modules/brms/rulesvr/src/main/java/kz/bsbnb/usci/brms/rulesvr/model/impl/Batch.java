@@ -38,11 +38,11 @@ public class Batch extends Persistable implements IBatch
         this.name = name;
     }
 
-    public void setRepoDate(Date repoDate) {
+    public void setRepDate(Date repoDate) {
         this.repDate = repoDate;
     }
 
-    public Date getRepoDate() {
+    public Date getRepDate() {
         return repDate;
     }
 

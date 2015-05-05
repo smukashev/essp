@@ -22,7 +22,6 @@
     <import resource="applicationContextDroolsSingleton.xml" />
 
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
-    <context:component-scan base-package="kz.bsbnb.usci.eav" />
     <context:component-scan base-package="kz.bsbnb.usci.bconv" />
     <context:component-scan base-package="kz.bsbnb.usci.brms.rulesingleton" />
     <context:component-scan base-package="kz.bsbnb.usci.receiver" />
@@ -73,7 +72,7 @@
         <property name="jobRepository" ref="jobRepository" />
         <property name="taskExecutor">
             <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor">
-                <property name="concurrencyLimit" value="2" />
+                <property name="concurrencyLimit" value="5" />
             </bean>
         </property>
     </bean>

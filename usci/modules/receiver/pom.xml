@@ -133,7 +133,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>kz.bsbnb.usci.receiver.entry.SimpleZipMain</mainClass>
+                            <mainClass>kz.bsbnb.usci.receiver.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

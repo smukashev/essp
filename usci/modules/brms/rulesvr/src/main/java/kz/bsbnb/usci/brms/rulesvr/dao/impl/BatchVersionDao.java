@@ -1,13 +1,18 @@
 package kz.bsbnb.usci.brms.rulesvr.dao.impl;
 
 import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulesvr.persistable.JDBCSupport;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import kz.bsbnb.usci.brms.rulesvr.dao.IBatchVersionDao;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -15,40 +20,17 @@ import java.util.List;
 /**
  * @author abukabayev
  */
-public class BatchVersionDao implements IBatchVersionDao {
-    private JdbcTemplate jdbcTemplate;
+public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
     private final String PREFIX_ = "LOGIC_";
 
-    public boolean testConnection()
-    {
-        try
-        {
-            return !jdbcTemplate.getDataSource().getConnection().isClosed();
-        }
-        catch (SQLException e)
-        {
-            return false;
-        }
-    }
-
-
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
-
-    public long saveBatchVersion(Batch batch){
+    public long saveBatchVersion(final Batch batch){
         if(batch.getId() < 1)
         {
             throw new IllegalArgumentException("Batch does not have id. Can't create batch version.");
         }
 
         String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, REPORT_DATE) VALUES(?, ?)";
-        jdbcTemplate.update(SQL,batch.getId(),batch.getRepoDate());
-
-        SQL = "SELECT id FROM " + PREFIX_ + "package_versions WHERE REPORT_DATE = ? AND package_id = ?";
-        long id = jdbcTemplate.queryForLong(SQL,batch.getRepoDate(),batch.getId());
-
-        return id;
+        return insertWithId(SQL, new Object[]{batch.getId(), DataUtils.convert(batch.getRepDate())});
     }
 
     @Override
@@ -59,12 +41,7 @@ public class BatchVersionDao implements IBatchVersionDao {
         }
 
         String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, REPORT_DATE) VALUES(?, ?)";
-        jdbcTemplate.update(SQL,batch.getId(),date);
-
-        SQL = "SELECT id FROM " + PREFIX_ + "package_versions WHERE REPORT_DATE = ? AND package_id = ?";
-        long id = jdbcTemplate.queryForLong(SQL,date,batch.getId());
-
-        return id;
+        return insertWithId(SQL,new Object[]{batch.getId(), DataUtils.convert(date)});
     }
 
     public BatchVersion getBatchVersion(Batch batch){
