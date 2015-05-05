@@ -157,8 +157,8 @@ showcase save
  
 showcase set meta ref_creditor_branch
 
-showcase set name REF_CREDITOR_BRANCH2
-showcase set tableName REF_CREDITOR_BRANCH2
+showcase set name REF_CREDITOR_BRANCH
+showcase set tableName REF_CREDITOR_BRANCH
 
 showcase list add code
 showcase list add name
