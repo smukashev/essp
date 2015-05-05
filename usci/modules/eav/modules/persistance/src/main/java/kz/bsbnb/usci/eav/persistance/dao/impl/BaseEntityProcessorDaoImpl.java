@@ -28,6 +28,7 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,16 +77,15 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         this.applyListener = applyListener;
     }
 
-    private static final boolean refsCacheEnalbed = true;
-    public static final HashMap<Long, List<RefListItem>> refsCache =
-            new HashMap<Long, List<RefListItem>>();
+    @Value("${refs.cache.enabled}")
+    public static boolean refsCacheEnabled;
 
-    public static final HashMap<Long, List<RefListItem>> refsCacheRaw =
-            new HashMap<Long, List<RefListItem>>();
+    public static final HashMap<Long, List<RefListItem>> refsCache = new HashMap<Long, List<RefListItem>>();
+    public static final HashMap<Long, List<RefListItem>> refsCacheRaw = new HashMap<Long, List<RefListItem>>();
 
     @PostConstruct
     public void init() {
-        if(refsCacheEnalbed) {
+        if(refsCacheEnabled && refsCache.size() == 0 && refsCacheRaw.size() == 0) {
             List<MetaClassName> metaClassNames = null;
             try {
                 metaClassNames = metaClassRepository.getRefNames();
@@ -3030,7 +3030,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     public List<RefListItem> getRefsByMetaClass(long metaClassId, boolean raw) {
 
-        if(refsCacheEnalbed) {
+        if(refsCacheEnabled) {
             List<RefListItem> refsList;
             if(raw)
                 refsList = refsCacheRaw.get(metaClassId);
@@ -3171,7 +3171,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         if(rli!=null)
             entityIds.add(rli);
 
-        if(refsCacheEnalbed)
+        if(refsCacheEnabled)
             refsCache.put(metaClassId, entityIds);
 
         return entityIds;
