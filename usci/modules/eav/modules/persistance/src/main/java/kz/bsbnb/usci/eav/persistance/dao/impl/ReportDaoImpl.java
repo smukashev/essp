@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.eav.persistance.generated.tables.records.EavReportRecord;
 import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IReportDao;
@@ -252,13 +253,25 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
     }
 
     @Override
-    public void updateReport(Report report) {
-        Update update = context
-                .update(EAV_REPORT)
+    public void updateReport(Report report, String username) {
+        UpdateSetMoreStep<EavReportRecord> update = context.update(EAV_REPORT)
+                .set(EAV_REPORT.TOTAL_COUNT, report.getTotalCount())
+                .set(EAV_REPORT.ACTUAL_COUNT, report.getActualCount())
                 .set(EAV_REPORT.STATUS_ID, report.getStatusId())
-                .set(EAV_REPORT.LAST_MANUAL_EDIT_DATE, DataUtils.convert(report.getLastManualEditDate()))
-                .where(EAV_REPORT.ID.equal(report.getId()));
+                .set(EAV_REPORT.LAST_MANUAL_EDIT_DATE, DataUtils.convert(report.getLastManualEditDate()));
+
+        if (username != null) {
+            update.set(EAV_REPORT.USERNAME, username);
+        }
+
+        update.where(EAV_REPORT.ID.equal(report.getId()));
+
         updateWithStats(update.getSQL(), update.getBindValues().toArray());
+    }
+
+    @Override
+    public void updateReport(Report report) {
+        updateReport(report, null);
     }
 
     @Override

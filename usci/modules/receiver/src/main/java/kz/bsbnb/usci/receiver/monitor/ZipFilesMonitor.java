@@ -591,26 +591,35 @@ public class ZipFilesMonitor{
             }
         }
 
-        Report report = new Report();
-        {
-            Creditor creditor = new Creditor();
-            creditor.setId(creditorId);
-            report.setCreditor(creditor);
+        if (existing != null) {
+            existing.setStatusId(ReportStatus.IN_PROGRESS.getStatusId());
+            existing.setTotalCount(batchInfo.getTotalCount());
+            existing.setActualCount(batchInfo.getActualCount());
+            existing.setLastManualEditDate(new Date());
+
+            PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
+            PortalUser portalUser = userService.getUser(batchInfo.getUserId());
+            reportBeanRemoteBusiness.updateReport(existing, portalUser.getScreenName());
+            batchInfo.setReportId(existing.getId());
+        } else {
+            Report report = new Report();
+            {
+                Creditor creditor = new Creditor();
+                creditor.setId(creditorId);
+                report.setCreditor(creditor);
+            }
+            report.setStatusId(ReportStatus.IN_PROGRESS.getStatusId());
+            report.setTotalCount(batchInfo.getTotalCount());
+            report.setActualCount(batchInfo.getActualCount());
+            report.setReportDate(batchInfo.getRepDate());
+            report.setBeginningDate(new Date());
+            report.setLastManualEditDate(new Date());
+
+            PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
+            PortalUser portalUser = userService.getUser(batchInfo.getUserId());
+            Long reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
+            batchInfo.setReportId(reportId);
         }
-        report.setStatusId(ReportStatus.IN_PROGRESS.getStatusId());
-        report.setTotalCount(batchInfo.getTotalCount());
-        report.setActualCount(batchInfo.getActualCount());
-        report.setReportDate(batchInfo.getRepDate());
-        report.setBeginningDate(new Date());
-        report.setLastManualEditDate(new Date());
-
-        PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
-
-        PortalUser portalUser = userService.getUser(batchInfo.getUserId());
-
-        Long reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
-
-        batchInfo.setReportId(reportId);
     }
 
     public byte[] inputStreamToByte(InputStream in) throws IOException {

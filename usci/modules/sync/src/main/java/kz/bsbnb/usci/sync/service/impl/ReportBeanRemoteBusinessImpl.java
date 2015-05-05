@@ -75,8 +75,8 @@ public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness
     }
 
     @Override
-    public void updateReport(Report report) {
-        remoteReportBusiness.updateReport(report);
+    public void updateReport(Report report, String username) {
+        remoteReportBusiness.updateReport(report, username);
     }
 
     @Override

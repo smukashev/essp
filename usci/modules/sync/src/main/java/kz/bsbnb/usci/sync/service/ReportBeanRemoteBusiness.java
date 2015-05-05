@@ -27,7 +27,7 @@ public interface ReportBeanRemoteBusiness {
 
     public void addNewMessage(ReportMessage message, Report report, List<ReportMessageAttachment> attachments);
 
-    public void updateReport(Report report);
+    public void updateReport(Report report, String username);
 
     public void setTotalCount(long reportId, long totalCount);
 

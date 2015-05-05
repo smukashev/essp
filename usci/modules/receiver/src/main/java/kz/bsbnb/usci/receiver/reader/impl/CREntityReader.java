@@ -58,7 +58,7 @@ public class CREntityReader<T> extends CommonReader<T> {
     @Autowired
     private MainParser crParser;
 
-    @Value("#{jobParameters['batchId']}")
+    @Value("#{jobParameters['reportId']}")
     private Long reportId;
 
     @PostConstruct
