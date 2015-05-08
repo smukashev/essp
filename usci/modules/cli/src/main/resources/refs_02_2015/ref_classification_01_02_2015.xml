@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <entity class="ref_classification">
+      <code>21</code>
+      <comment_kz>5 % - при своевременной и полной оплате платежей</comment_kz>
+      <comment_ru>5 % - при своевременной и полной оплате платежей</comment_ru>
+      <is_input_value>1</is_input_value>
+      <name_kz>Сомнительный 1 категории</name_kz>
+      <name_ru>Сомнительный 1 категории</name_ru>
+      <provision_debt>5</provision_debt>
+      <provision_portfolio_max>5</provision_portfolio_max>
+      <provision_portfolio_min>.01</provision_portfolio_min>
+      <value_>5</value_>
+    </entity>
+    <entity class="ref_classification">
+      <code>10</code>
+      <is_input_value>1</is_input_value>
+      <name_kz>Стандартный</name_kz>
+      <name_ru>Стандартный</name_ru>
+    </entity>
+    <entity class="ref_classification">
+      <code>25</code>
+      <comment_kz>50 % - во всех случаях</comment_kz>
+      <comment_ru>50 % - во всех случаях</comment_ru>
+      <is_input_value>1</is_input_value>
+      <name_kz>Сомнительный 5 категории</name_kz>
+      <name_ru>Сомнительный 5 категории</name_ru>
+      <provision_debt>50</provision_debt>
+      <provision_portfolio_max>50</provision_portfolio_max>
+      <provision_portfolio_min>25.01</provision_portfolio_min>
+      <value_>50</value_>
+    </entity>
+    <entity class="ref_classification">
+      <code>24</code>
+      <comment_kz>25 % - при задержке или неполной оплате платежей</comment_kz>
+      <comment_ru>25 % - при задержке или неполной оплате платежей</comment_ru>
+      <is_input_value>1</is_input_value>
+      <name_kz>Сомнительный 4 категории</name_kz>
+      <name_ru>Сомнительный 4 категории</name_ru>
+      <provision_debt>25</provision_debt>
+      <provision_portfolio_max>25</provision_portfolio_max>
+      <provision_portfolio_min>20.01</provision_portfolio_min>
+      <value_>25</value_>
+    </entity>
+    <entity class="ref_classification">
+      <code>23</code>
+      <comment_kz>20 % - при своевременной и полной оплате платежей</comment_kz>
+      <comment_ru>20 % - при своевременной и полной оплате платежей</comment_ru>
+      <is_input_value>1</is_input_value>
+      <name_kz>Сомнительный 3 категории</name_kz>
+      <name_ru>Сомнительный 3 категории</name_ru>
+      <provision_debt>20</provision_debt>
+      <provision_portfolio_max>20</provision_portfolio_max>
+      <provision_portfolio_min>10.01</provision_portfolio_min>
+      <value_>20</value_>
+    </entity>
+    <entity class="ref_classification">
+      <code>22</code>
+      <comment_kz>10 % - при задержке или неполной оплате платежей</comment_kz>
+      <comment_ru>10 % - при задержке или неполной оплате платежей</comment_ru>
+      <is_input_value>1</is_input_value>
+      <name_kz>Сомнительный 2 категории</name_kz>
+      <name_ru>Сомнительный 2 категории</name_ru>
+      <provision_debt>10</provision_debt>
+      <provision_portfolio_max>10</provision_portfolio_max>
+      <provision_portfolio_min>5.01</provision_portfolio_min>
+      <value_>10</value_>
+    </entity>
+    <entity class="ref_classification">
+      <code>30</code>
+      <comment_kz> 100 % - во всех случаях</comment_kz>
+      <comment_ru> 100 % - во всех случаях</comment_ru>
+      <is_input_value>1</is_input_value>
+      <name_kz>Безнадежный</name_kz>
+      <name_ru>Безнадежный</name_ru>
+      <provision_debt>100</provision_debt>
+      <provision_portfolio_max>100</provision_portfolio_max>
+      <provision_portfolio_min>50.01</provision_portfolio_min>
+      <value_>100</value_>
+    </entity>
+  </entities>
+</batch>
