@@ -373,7 +373,12 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao
                 .from(EAV_A_USER)
                 .where(EAV_A_USER.USER_ID.eq(userId));
 
-        Map<String, Object> row = queryForListWithStats(select.getSQL(), select.getBindValues().toArray()).get(0);
+        List<Map<String, Object>> list = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if(list == null || list.isEmpty())
+            return null;
+
+        Map<String, Object> row = list.get(0);
 
         PortalUser portalUser = new PortalUser();
 
