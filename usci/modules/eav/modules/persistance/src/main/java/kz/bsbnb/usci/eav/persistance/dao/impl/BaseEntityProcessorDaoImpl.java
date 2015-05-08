@@ -78,7 +78,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Value("${refs.cache.enabled}")
-    public static boolean refsCacheEnabled;
+    private boolean refsCacheEnabled;
 
     public static final HashMap<Long, List<RefListItem>> refsCache = new HashMap<Long, List<RefListItem>>();
     public static final HashMap<Long, List<RefListItem>> refsCacheRaw = new HashMap<Long, List<RefListItem>>();
@@ -2957,11 +2957,34 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         applyToDb(baseEntityManager);
 
+        reloadCacheIfRef(baseEntity);
+
         if (applyListener != null)
             applyListener.applyToDBEnded(entityHolder.saving, entityHolder.loaded,
                     entityHolder.applied, baseEntityManager);
 
         return baseEntityApplied;
+    }
+
+    private void reloadCacheIfRef(IBaseEntity baseEntity) {
+        if (baseEntity.getMeta().isReference()) {
+            refsCache.put(baseEntity.getMeta().getId(), null);
+            refsCacheRaw.put(baseEntity.getMeta().getId(), null);
+
+            List<RefListItem> rawList = getRefsByMetaClass(baseEntity.getMeta().getId(), true);
+            List<RefListItem> list = new ArrayList<RefListItem>();
+
+            for(RefListItem rli : rawList) {
+                RefListItem item = new RefListItem();
+                item.setId(rli.getId());
+                item.setCode(rli.getCode());
+                item.setTitle(Quote.addSlashes(rli.getTitle()));
+                list.add(item);
+            }
+
+            refsCache.put(baseEntity.getMeta().getId(), list);
+            refsCacheRaw.put(baseEntity.getMeta().getId(), rawList);
+        }
     }
 
     public boolean checkReportDateExists(long baseEntityId, Date reportDate) {
