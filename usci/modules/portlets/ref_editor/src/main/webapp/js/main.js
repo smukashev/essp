@@ -231,15 +231,6 @@ Ext.onReady(function() {
         maxWidth: 200
     });
 
-    var buttonAdd = Ext.create('Ext.button.Button', {
-        id: "entityEditorAddBtn",
-        text: 'Добавить новую запись',
-        handler : function (){
-            alert('asd');
-        },
-        maxWidth: 200
-    });
-
     var buttonXML = Ext.create('Ext.button.Button', {
         id: "entityEditorXmlBtn",
         text: label_SAVE,
@@ -263,48 +254,6 @@ Ext.onReady(function() {
                     console.log('woops');
                 }
             });
-
-            /*var buttonClose = Ext.create('Ext.button.Button', {
-             id: "itemFormCancel",
-             text: 'Отмена',
-             handler : function (){
-             Ext.getCmp('xmlFromWin').destroy();
-             }
-             });
-
-             var xmlForm = Ext.create('Ext.form.Panel', {
-             id: 'xmlForm',
-             region: 'center',
-             width: 615,
-             fieldDefaults: {
-             msgTarget: 'side'
-             },
-             defaults: {
-             anchor: '100%'
-             },
-
-             bodyPadding: '5 5 0',
-             items: [{
-             fieldLabel: 'XML',
-             name: 'id',
-             xtype: 'textarea',
-             value: xmlStr,
-             height: 615
-             }],
-
-             buttons: [buttonClose]
-             });
-
-             xmlFromWin = new Ext.Window({
-             id: "xmlFromWin",
-             layout: 'fit',
-             title:'XML',
-             modal: true,
-             maximizable: true,
-             items:[xmlForm]
-             });
-
-             xmlFromWin.show();*/
         },
         maxWidth: 200
     });
@@ -362,6 +311,110 @@ Ext.onReady(function() {
         },
         maxWidth: 200
     });
+
+    var modalWindow = Ext.create("Ext.Window",{
+        title : 'Добавление записи',
+        width : 400,
+        modal : true,
+        closable : false,
+        items  : [
+            {
+                id: "ModalFormPannel",
+                width: "100%",
+                defaults: {
+                    anchor: '100%'
+                },
+                autoScroll:true
+            }],
+        tbar : [{
+            text : 'Сохранить новую запись' ,
+            handler :function(){
+                var tree = Ext.getCmp('entityTreeView');
+                rootNode = tree.getRootNode();
+
+                var selectedNode = tree.getSelectionModel().getLastSelected();
+
+                var children = selectedNode.childNodes;
+
+                for(var i = 0; i < children.length; i++){
+                    if(children[i].data.simple) {
+                        if(children[i].data.type == "DATE") {
+                            children[i].data.value = Ext.getCmp(children[i].data.code + "FromItem1")
+                                .getSubmitValue();
+                        } else {
+                            children[i].data.value = Ext.getCmp(children[i].data.code + "FromItem1")
+                                .getValue();
+                        }
+                    }
+                }
+
+                var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
+
+                Ext.Ajax.request({
+                    url: dataUrl,
+                    method: 'POST',
+                    params: {
+                        xml_data: xmlStr,
+                        op: 'SAVE_XML'
+                    },
+                    success: function() {
+                        console.log('success');
+                    },
+                    failure: function() {
+                        console.log('woops');
+                    }
+                });
+
+                this.up('.window').close();
+            }
+        }]
+    });
+
+    var buttonAdd = Ext.create('Ext.button.Button', {
+        id: "entityEditorAddBtn",
+        text: 'Добавить новую запись',
+        handler : function (){
+            var tree = Ext.getCmp('entityTreeView');
+            var selectionModel = tree.getSelectionModel();
+            var selectedNode = selectionModel.getLastSelected();
+
+            var children = selectedNode.childNodes;
+
+            var form1 = Ext.getCmp('ModalFormPannel');
+
+            // form.removeAll();
+
+            for(var i = 0; i < children.length; i++){
+                if(children[i].data.simple) {
+                    if(children[i].data.type == "DATE") {
+                        form1.add(Ext.create("Ext.form.field.Date",
+                            {
+                                id: children[i].data.code + "FromItem1",
+                                fieldLabel: children[i].data.title,
+                                width: "100%",
+                                format: 'd.m.Y'/*,
+                             value: new Date(
+                             children[i].data.value.
+                             replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1'))*/
+                            }));
+                    } else {
+                        form1.add(Ext.create("Ext.form.field.Text",
+                            {
+                                id: children[i].data.code + "FromItem1",
+                                fieldLabel: children[i].data.title,
+                                width: "100%",
+                                // value: children[i].data.value
+                            }));
+                    }
+                }
+            }
+
+            form1.doLayout();
+
+            modalWindow.show();
+        }
+    });
+
 
     var entityGrid = Ext.create('Ext.tree.Panel', {
         //collapsible: true,
