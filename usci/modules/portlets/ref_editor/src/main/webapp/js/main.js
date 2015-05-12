@@ -231,6 +231,15 @@ Ext.onReady(function() {
         maxWidth: 200
     });
 
+    var buttonAdd = Ext.create('Ext.button.Button', {
+        id: "entityEditorAddBtn",
+        text: 'Добавить новую запись',
+        handler : function (){
+            alert('asd');
+        },
+        maxWidth: 200
+    });
+
     var buttonXML = Ext.create('Ext.button.Button', {
         id: "entityEditorXmlBtn",
         text: label_SAVE,
@@ -256,62 +265,8 @@ Ext.onReady(function() {
             });
 
             /*var buttonClose = Ext.create('Ext.button.Button', {
-                id: "itemFormCancel",
-                text: 'Отмена',
-                handler : function (){
-                    Ext.getCmp('xmlFromWin').destroy();
-                }
-            });
-
-            var xmlForm = Ext.create('Ext.form.Panel', {
-                id: 'xmlForm',
-                region: 'center',
-                width: 615,
-                fieldDefaults: {
-                    msgTarget: 'side'
-                },
-                defaults: {
-                    anchor: '100%'
-                },
-
-                bodyPadding: '5 5 0',
-                items: [{
-                    fieldLabel: 'XML',
-                    name: 'id',
-                    xtype: 'textarea',
-                    value: xmlStr,
-                    height: 615
-                }],
-
-                buttons: [buttonClose]
-            });
-
-            xmlFromWin = new Ext.Window({
-                id: "xmlFromWin",
-                layout: 'fit',
-                title:'XML',
-                modal: true,
-                maximizable: true,
-                items:[xmlForm]
-            });
-
-            xmlFromWin.show();*/
-        },
-        maxWidth: 200
-    });
-
-    var buttonShowXML = Ext.create('Ext.button.Button', {
-        id: "entityEditorShowXmlBtn",
-        text: 'XML',
-        handler : function (){
-            var tree = Ext.getCmp('entityTreeView');
-            rootNode = tree.getRootNode();
-
-            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
-
-            var buttonClose = Ext.create('Ext.button.Button', {
              id: "itemFormCancel",
-             text: label_CANCEL,
+             text: 'Отмена',
              handler : function (){
              Ext.getCmp('xmlFromWin').destroy();
              }
@@ -349,7 +304,61 @@ Ext.onReady(function() {
              items:[xmlForm]
              });
 
-             xmlFromWin.show();
+             xmlFromWin.show();*/
+        },
+        maxWidth: 200
+    });
+
+    var buttonShowXML = Ext.create('Ext.button.Button', {
+        id: "entityEditorShowXmlBtn",
+        text: 'XML',
+        handler : function (){
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+
+            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
+
+            var buttonClose = Ext.create('Ext.button.Button', {
+                id: "itemFormCancel",
+                text: label_CANCEL,
+                handler : function (){
+                    Ext.getCmp('xmlFromWin').destroy();
+                }
+            });
+
+            var xmlForm = Ext.create('Ext.form.Panel', {
+                id: 'xmlForm',
+                region: 'center',
+                width: 615,
+                fieldDefaults: {
+                    msgTarget: 'side'
+                },
+                defaults: {
+                    anchor: '100%'
+                },
+
+                bodyPadding: '5 5 0',
+                items: [{
+                    fieldLabel: 'XML',
+                    name: 'id',
+                    xtype: 'textarea',
+                    value: xmlStr,
+                    height: 615
+                }],
+
+                buttons: [buttonClose]
+            });
+
+            xmlFromWin = new Ext.Window({
+                id: "xmlFromWin",
+                layout: 'fit',
+                title:'XML',
+                modal: true,
+                maximizable: true,
+                items:[xmlForm]
+            });
+
+            xmlFromWin.show();
         },
         maxWidth: 200
     });
@@ -496,15 +505,15 @@ Ext.onReady(function() {
                 },
                 bodyPadding: '5 5 0',
                 autoScroll:true
-            },{
-                xtype : 'panel',
-                region: 'south',
-                preventHeader: true,
-                width: "60%",
-                height: 150,
-                autoScroll:true,
-                items: [ createItemsGrid()]
-            }],
+            },/*{
+             xtype : 'panel',
+             region: 'south',
+             preventHeader: true,
+             width: "60%",
+             height: 150,
+             autoScroll:true,
+             items: [ createItemsGrid()]
+             }*/],
         dockedItems: [
             {
                 fieldLabel: label_REF,
@@ -556,7 +565,7 @@ Ext.onReady(function() {
             }
         ],
         tbar: [
-            buttonShow, buttonXML, buttonShowXML
+            buttonAdd, buttonShow, buttonXML, buttonShowXML
         ]
     });
 });
