@@ -2957,7 +2957,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         applyToDb(baseEntityManager);
 
-        reloadCacheIfRef(baseEntity);
+        reloadCacheIfRef(baseEntityApplied);
 
         if (applyListener != null)
             applyListener.applyToDBEnded(entityHolder.saving, entityHolder.loaded,
@@ -2967,24 +2967,56 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     private void reloadCacheIfRef(IBaseEntity baseEntity) {
-        if (baseEntity.getMeta().isReference()) {
-            refsCache.put(baseEntity.getMeta().getId(), null);
-            refsCacheRaw.put(baseEntity.getMeta().getId(), null);
+        if (baseEntity.getMeta().isReference() && refsCacheEnabled) {
+            RefListItem refListItem = findRefListItemById(baseEntity.getMeta().getId(), baseEntity.getId(), false);
+            RefListItem refListItemRaw = findRefListItemById(baseEntity.getMeta().getId(), baseEntity.getId(), true);
 
-            List<RefListItem> rawList = getRefsByMetaClass(baseEntity.getMeta().getId(), true);
-            List<RefListItem> list = new ArrayList<RefListItem>();
+            if (OperationType.DELETE.equals(baseEntity.getOperation())) { // delete
+                refsCache.get(baseEntity.getMeta().getId()).remove(refListItem);
+                refsCacheRaw.get(baseEntity.getMeta().getId()).remove(refListItemRaw);
+            } else {
+                IBaseEntity baseEntityPrepared = prepare(((BaseEntity) baseEntity).clone());
+                IBaseEntity baseEntityPostPrepared = postPrepare(((BaseEntity) baseEntityPrepared).clone(), null);
+                baseEntity = baseEntityPostPrepared;
 
-            for(RefListItem rli : rawList) {
-                RefListItem item = new RefListItem();
-                item.setId(rli.getId());
-                item.setCode(rli.getCode());
-                item.setTitle(Quote.addSlashes(rli.getTitle()));
-                list.add(item);
+                if (refListItem == null) {
+                    refListItem = new RefListItem();
+                    refListItemRaw = new RefListItem();
+                    refListItem.setId(baseEntityPostPrepared.getId());
+                    refListItemRaw.setId(baseEntityPostPrepared.getId());
+
+                    refsCache.get(baseEntity.getMeta().getId()).add(refListItem);
+                    refsCacheRaw.get(baseEntity.getMeta().getId()).add(refListItemRaw);
+                }
+
+                for (IBaseValue value : baseEntity.get()) {
+                    if (!value.getMetaAttribute().getMetaType().isComplex()
+                            && !value.getMetaAttribute().getMetaType().isSet()) {
+                        if (value.getMetaAttribute().getName().startsWith("name")) {
+                            refListItem.setTitle((String) value.getValue());
+                            refListItemRaw.setTitle(Quote.addSlashes((String) value.getValue()));
+                        } else if (value.getMetaAttribute().getName().equals("code")) {
+                            refListItem.setCode(String.valueOf(value.getValue()));
+                            refListItemRaw.setCode(String.valueOf(value.getValue()));
+                        }
+                        refListItem.addValue(value.getMetaAttribute().getName(), value.getValue());
+                        refListItemRaw.addValue(value.getMetaAttribute().getName(), value.getValue());
+                    }
+                }
             }
-
-            refsCache.put(baseEntity.getMeta().getId(), list);
-            refsCacheRaw.put(baseEntity.getMeta().getId(), rawList);
         }
+    }
+
+    private RefListItem findRefListItemById(long metaId, long id, boolean raw) {
+        List<RefListItem> refListItems = raw ? refsCacheRaw.get(metaId) : refsCache.get(metaId);
+
+        for (RefListItem refListItem : refListItems) {
+            if (refListItem.getId() == id) {
+                return refListItem;
+            }
+        }
+
+        return null;
     }
 
     public boolean checkReportDateExists(long baseEntityId, Date reportDate) {
