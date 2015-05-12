@@ -1,17 +1,26 @@
 package com.bsbnb.usci.portlets.protocol.data;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
 
 //import com.bsbnb.creditregistry.dm.maintenance.InputFile;
 //import com.bsbnb.creditregistry.dm.maintenance.InputInfo;
 import com.bsbnb.usci.portlets.protocol.PortletEnvironmentFacade;
+import com.bsbnb.usci.portlets.protocol.couchbase.CouchbaseProvider;
+import com.couchbase.client.CouchbaseClient;
+import com.google.gson.Gson;
 import com.vaadin.terminal.FileResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.BaseTheme;
 import kz.bsbnb.usci.cr.model.InputFile;
 import kz.bsbnb.usci.cr.model.InputInfo;
+import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 
 /**
  *
@@ -21,6 +30,10 @@ public class InputInfoDisplayBean implements Button.ClickListener {
 
     private InputInfo inputInfo;
     private DataProvider provider;
+
+    private final String path = "/home/ktulbassiyev/";
+
+    private static CouchbaseProvider couchbaseProvider = CouchbaseProvider.getInstance();
 
     public InputInfoDisplayBean(InputInfo inputInfo, DataProvider provider) {
         this.inputInfo = inputInfo;
@@ -54,6 +67,7 @@ public class InputInfoDisplayBean implements Button.ClickListener {
     public Button getFileLink() {
         Button result = new Button(getFileName(), this);
         result.setStyleName(BaseTheme.BUTTON_LINK);
+        result.addListener(this);
         return result;
     }
 
@@ -108,18 +122,42 @@ public class InputInfoDisplayBean implements Button.ClickListener {
 
     public void buttonClick(ClickEvent event) {
         Button button = event.getButton();
-        if (inputInfo != null) {
-            InputFile inputFile = provider.getFileByInputInfo(this);
-            if (inputFile != null) {
-                FileResource resource = new FileResource(new File(inputFile.getFilePath()), button.getApplication()) {
-                    @Override
-                    public String getFilename() {
-                        return getFileName(); 
-                    }
-                    
-                };
-                button.getWindow().open(resource, "_blank");
+
+        final BigInteger batchId = inputInfo.getId();
+
+        final BatchFullJModel batchFullJModel = couchbaseProvider.getBatchFullModel(batchId);
+
+        final File batchFile = new File(path + "batch_" + batchId + ".zip");
+
+        if(!batchFile.exists()) {
+            try {
+                batchFile.createNewFile();
+            } catch(IOException e) {
+                e.printStackTrace();
             }
+        } else {
+            batchFile.delete();
         }
+
+        FileOutputStream fos = null;
+
+        try {
+            fos = new FileOutputStream(batchFile);
+            fos.write(batchFullJModel.getContent());
+            fos.close();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        FileResource resource = new FileResource(batchFile, button.getApplication()) {
+            @Override
+            public String getFilename() {
+                return batchFile.getName();
+            }
+
+        };
+
+        button.getWindow().open(resource, "_blank");
+
     }
 }
