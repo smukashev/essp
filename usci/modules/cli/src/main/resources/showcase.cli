@@ -86,9 +86,9 @@ showcase set tableName CORE_DEBTOR
 
 showcase list add subjects.person
 showcase list add subjects.organization
-showcase list add subjects.creditor cln_creditor_id
+showcase list add subjects.creditor creditor_id
 
-showcase list addCustom credit creditor creditor_id
+showcase list addCustom credit creditor creditor_sender_id
 
 showcase save
 
