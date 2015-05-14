@@ -70,14 +70,14 @@ public class ParametersComponent extends VerticalLayout {
                     DateField dateField = new DateField();
                     dateField.setDateFormat("dd.MM.yyyy");
                     dateField.setCaption(localizedParameterName);
-                    dateField.setValue(ReportApplication.getDefaultReportDate());
+                    dateField.setValue(new Date());
                     parameterComponent = dateField;
                     break;
                 case TIME: 
                     DateField timeField = new DateField();
                     timeField.setDateFormat("dd.MM.yyyy HH:mm:ss");
                     timeField.setCaption(localizedParameterName);
-                    timeField.setValue(ReportApplication.getDefaultReportDate());
+                    timeField.setValue(new Date());
                     parameterComponent = timeField;
                     break;
                 case LIST:
