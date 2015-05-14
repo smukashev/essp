@@ -85,7 +85,7 @@
                             connection-factory="jmsConsumerConnectionFactory"
                             acknowledge="client"
                             concurrency="${jms.consumerCount}"
-                            prefetch="100">
+                            prefetch="${jms.prefetch}">
                             <!--acknowledge="auto">-->
         <jms:listener destination="showcaseQueue" ref="showcaseMessageConsumer" />
     </jms:listener-container>
