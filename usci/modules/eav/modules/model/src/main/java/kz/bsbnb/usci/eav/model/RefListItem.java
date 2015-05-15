@@ -6,6 +6,8 @@ import java.util.Set;
 
 public class RefListItem implements Serializable
 {
+    private static final long serialVersionUID = 0L;
+
     private long id;
     private String title;
     private String code;

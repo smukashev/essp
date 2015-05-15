@@ -490,6 +490,8 @@ Ext.onReady(function() {
 
                 var children = selectedNode.childNodes;
 
+                console.log(children); // TODO remove
+
                 var form = Ext.getCmp('EntityEditorFormPannel');
                 form.removeAll();
                 for(var i = 0; i < children.length; i++){
@@ -515,6 +517,18 @@ Ext.onReady(function() {
                                     value: children[i].data.value,
                                     disabled: children[i].data.isKey
                                 }));
+                        }
+                    } else {
+                        if(children[i].data.type == "META_CLASS") {
+                            form.add(
+                                Ext.create("Ext.form.field.ComboBox", {
+                                    id: children[i].data.code + "FromItem",
+                                    fieldLabel: children[i].data.title,
+                                    width: "100%",
+                                    value: children[i].data.value,
+                                    disabled: children[i].data.isKey
+                                })
+                            );
                         }
                     }
                 }
