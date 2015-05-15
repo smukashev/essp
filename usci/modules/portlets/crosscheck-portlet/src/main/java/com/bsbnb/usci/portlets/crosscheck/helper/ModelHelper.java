@@ -25,7 +25,7 @@ public class ModelHelper {
         cc.setId(rs.getBigDecimal("ID"));
         cc.setUsername(rs.getString("USER_NAME"));
         cc.setStatus(rs.getInt("STATUS_ID"));
-        cc.setStatusName(rs.getString("STATUS_Name"));
+        cc.setStatusName(rs.getString("STATUS_NAME"));
         cc.setDateBegin(rs.getDate("DATE_BEGIN"));
         cc.setDateEnd(rs.getDate("DATE_END"));
         cc.setReportDate(rs.getDate("REPORT_DATE"));

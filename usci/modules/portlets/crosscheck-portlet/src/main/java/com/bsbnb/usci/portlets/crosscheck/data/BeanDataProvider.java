@@ -16,6 +16,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -59,11 +60,11 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT t0.ID, t0.CHANGE_DATE, t0.CODE, t0.NAME, t0.SHORT_NAME, " +
-                "t0.SHUTDOWN_DATE, t0.MAIN_OFFICE_ID, t0.SUBJECT_TYPE " +
-                "FROM SHOWCASE.R_REF_CREDITOR t0, CORE.EAV_A_CREDITOR_USER t2, CORE,EAV_A_USER t1 " +
+        String query = "SELECT t0.REF_CREDITOR_ID AS ID, t0.OPEN_DATE AS CHANGE_DATE, t0.CODE, t0.NAME, t0.SHORT_NAME, " +
+                "t0.CLOSE_DATE AS SHUTDOWN_DATE, 0 AS MAIN_OFFICE_ID, t0.SUBJECT_TYPE_ID " +
+                "FROM CORE.R_REF_CREDITOR t0, CORE.EAV_A_CREDITOR_USER t2, CORE.EAV_A_USER t1 " +
                 "WHERE ((t1.USER_ID = " + BigInteger.valueOf(facade.getUserID()) +") " +
-                "AND ((t2.CREDITOR_ID = t0.ID) AND (t1.USER_ID = t2.USER_ID))) " +
+                "AND ((t2.CREDITOR_ID = t0.REF_CREDITOR_ID) AND (t1.USER_ID = t2.USER_ID))) " +
                 "ORDER BY t0.NAME ASC";
 
         log.log(Level.INFO, "getCreditorsList: " + query);
@@ -105,8 +106,8 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT ID, DATE_BEGIN, DATE_END, REPORT_DATE, STATUS_ID, STATUS_Name, USER_NAME, CREDITOR_ID " +
-                "FROM SHOWCASE.CROSS_CHECK " +
+        String query = "SELECT ID, DATE_BEGIN, DATE_END, REPORT_DATE, STATUS_ID, 0 AS STATUS_NAME, USER_NAME, CREDITOR_ID " +
+                "FROM CROSS_CHECK " +
                 "WHERE ((CREDITOR_ID IN (";
 
         for (int i = 0; i < creditors.length; i++) {
@@ -159,7 +160,7 @@ public class BeanDataProvider implements DataProvider {
         Connection conn = getConnection();
         Statement stmt = null;
         String query =  "SELECT ID, DESCRIPTION, DIFF, INNER_VALUE, IS_ERROR, OUTER_VALUE, CROSS_CHECK_ID, MESSAGE_ID " +
-                        "FROM SHOWCASE.CROSS_CHECK_MESSAGE " +
+                        "FROM CROSS_CHECK_MESSAGE " +
                         "WHERE (CROSS_CHECK_ID = " + crossCheck.getId() + ") " +
                         "ORDER BY ID ASC";
 
@@ -171,7 +172,8 @@ public class BeanDataProvider implements DataProvider {
 
             while (rs.next()) {
                 CrossCheck cc = DbHelper.getCrossCheck(conn, rs.getBigDecimal("CROSS_CHECK_ID").toBigInteger());
-                Message m = DbHelper.getMessage(conn, rs.getBigDecimal("MESSAGE_ID").toBigInteger());
+                BigDecimal messageId = rs.getBigDecimal("MESSAGE_ID");
+                Message m = DbHelper.getMessage(conn, messageId != null ? messageId.toBigInteger() : BigInteger.valueOf(7)); // TODO fix
                 CrossCheckMessage cm = ModelHelper.convertToCrossCheckMessage(rs, cc, m);
                 cList.add(cm);
             }
@@ -208,7 +210,7 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT MAX(CHANGE_DATE) AS MAX_CHANGE_DATE FROM SHOWCASE.R_REF_CREDITOR";
+        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM R_REF_CREDITOR";
 
         log.log(Level.INFO, "getFirstNotApprovedDate: " + query);
 
@@ -242,7 +244,7 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT MAX(CHANGE_DATE) AS MAX_CHANGE_DATE FROM SHOWCASE.R_REF_CREDITOR";
+        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM R_REF_CREDITOR";
 
         log.log(Level.INFO, "getLastApprovedDate: " + query);
 
