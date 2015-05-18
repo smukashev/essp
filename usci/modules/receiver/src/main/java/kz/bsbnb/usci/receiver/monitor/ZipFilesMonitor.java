@@ -27,6 +27,7 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -467,6 +468,7 @@ public class ZipFilesMonitor{
     }
 
     public void saveData(BatchInfo batchInfo, String filename, byte[] bytes){
+        // TODO: fix hardcoded settings
         receiverStatusSingleton.batchReceived();
 
         IBatchService batchService = serviceFactory.getBatchService();
@@ -492,15 +494,27 @@ public class ZipFilesMonitor{
             }
         } else {
             if(batchInfo.getAdditionalParams() != null) {
+                String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
+                String docValue = batchInfo.getAdditionalParams().get("DOC_VALUE");
+
+                if(docType == null) docType = "";
+                if(docValue == null) docValue = "";
+
                 String creditorCode = batchInfo.getAdditionalParams().get("CODE");
 
+                if(creditorCode == null && docType.equals("15"))
+                    creditorCode = docValue;
+
                 boolean foundCreditor = false;
-                for (Creditor creditor : creditors) {
-                    if (creditor.getCode() != null) {
-                        if (creditor.getCode().equals(creditorCode)) {
-                            cId = creditor.getId();
-                            foundCreditor = true;
-                            break;
+
+                if(creditorCode != null) {
+                    for (Creditor creditor : creditors) {
+                        if (creditor.getCode() != null) {
+                            if (creditor.getCode().equals(creditorCode)) {
+                                cId = creditor.getId();
+                                foundCreditor = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -508,12 +522,14 @@ public class ZipFilesMonitor{
                 if (!foundCreditor) {
                     String creditorBIN = batchInfo.getAdditionalParams().get("BIN");
 
-                    for (Creditor creditor : creditors) {
-                        if (creditor.getBIN() != null) {
-                            if (creditor.getBIN().equals(creditorBIN)) {
-                                cId = creditor.getId();
-                                foundCreditor = true;
-                                break;
+                    if(creditorBIN != null) {
+                        for (Creditor creditor : creditors) {
+                            if (creditor.getBIN() != null) {
+                                if (creditor.getBIN().equals(creditorBIN)) {
+                                    cId = creditor.getId();
+                                    foundCreditor = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -521,12 +537,14 @@ public class ZipFilesMonitor{
                     if (!foundCreditor) {
                         String creditorRNN = batchInfo.getAdditionalParams().get("RNN");
 
-                        for (Creditor creditor : creditors) {
-                            if (creditor.getRNN() != null) {
-                                if (creditor.getRNN().equals(creditorRNN)) {
-                                    cId = creditor.getId();
-                                    foundCreditor = true;
-                                    break;
+                        if(creditorRNN != null) {
+                            for (Creditor creditor : creditors) {
+                                if (creditor.getRNN() != null) {
+                                    if (creditor.getRNN().equals(creditorRNN)) {
+                                        cId = creditor.getId();
+                                        foundCreditor = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -670,9 +688,6 @@ public class ZipFilesMonitor{
                 batchInfo.setBatchType("2");
                 batchInfo.setBatchName(dataXmlFile.getName());
                 batchInfo.setUserId(userId);
-                /*batchInfo.setSize(dataXmlFile.getSize());*/
-//                Date date = DataTypeUtil.convertDateToFirstDay(new Date(), 0);
-//                batchInfo.setRepDate(date);
 
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = null;
@@ -686,6 +701,7 @@ public class ZipFilesMonitor{
                 Document document = null;
 
                 try {
+                    // TODO: fix OutOfMemory
                     document = documentBuilder.parse(zipFile.getInputStream(dataXmlFile));
                 } catch (SAXException e) {
                     e.printStackTrace();
@@ -702,10 +718,21 @@ public class ZipFilesMonitor{
 
                 batchInfo.setRepDate(date);
 
-                {
-                    String actualCreditCount = document.getElementsByTagName("actual_credit_count").item(0).getTextContent();
-                    batchInfo.setActualCount(Integer.parseInt(actualCreditCount));
-                    batchInfo.setTotalCount(0);
+                String actualCreditCount = document.getElementsByTagName("actual_credit_count").item(0).getTextContent();
+                batchInfo.setActualCount(Integer.parseInt(actualCreditCount));
+                batchInfo.setTotalCount(0);
+
+                try {
+                    NamedNodeMap map = document.getElementsByTagName("doc").item(0).getAttributes();
+                    Node n  = map.getNamedItem("doc_type");
+                    String doc_type = n.getTextContent();
+
+                    String doc_value = document.getElementsByTagName("doc").item(0).getTextContent();
+
+                    batchInfo.addParam("DOC_TYPE", doc_type);
+                    batchInfo.addParam("DOC_VALUE", doc_value);
+                } catch(Exception e) {
+                    e.printStackTrace();
                 }
 
                 zipFile.close();
