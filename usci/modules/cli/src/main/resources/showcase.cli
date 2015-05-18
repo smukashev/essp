@@ -408,6 +408,7 @@ showcase set name CORE_PORTFOLIO_FLOW_KFN
 showcase set tableName CORE_PORTFOLIO_FLOW_KFN
 showcase set final true
 
+showcase list add creditor portfolio_creditor_id
 showcase list add portfolio_flows_kfn.details.balance_account
 showcase list add portfolio_flows_kfn.details.value
 showcase list add portfolio_flows_kfn.portfolio.creditor
@@ -423,6 +424,7 @@ showcase set name CORE_PORTFOLIO_FLOW_MSFO
 showcase set tableName CORE_PORTFOLIO_FLOW_MSFO
 showcase set final true
 
+showcase list add creditor portfolio_creditor_id
 showcase list add portfolio_flows_msfo.details.balance_account
 showcase list add portfolio_flows_msfo.details.value
 showcase list add portfolio_flows_msfo.portfolio.creditor

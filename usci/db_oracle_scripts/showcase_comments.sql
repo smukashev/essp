@@ -35,3 +35,9 @@ comment on COLUMN R_CORE_CREDIT.PORTFOLIO_MSFO_ID  is 'portfolio_msfo';
 comment on COLUMN R_CORE_CREDIT_FLOW.BALANCE_ACCOUNT1_ID is 'kfn';
 comment on COLUMN R_CORE_CREDIT_FLOW.BALANCE_ACCOUNT2_ID is 'msfo';
 comment on COLUMN R_CORE_CREDIT_FLOW.BALANCE_ACCOUNT3_ID is 'msfo_o_b';
+
+comment on COLUMN R_CORE_PORTFOLIO_FLOW_KFN.CREDITOR1_ID is 'portfolio.creditor';
+comment on COLUMN R_CORE_PORTFOLIO_FLOW_KFN.CREDITOR2_ID is 'portfolio_flows_kfn.portfolio.creditor';
+
+comment on COLUMN R_CORE_PORTFOLIO_FLOW_MSFO.CREDITOR1_ID is 'portfolio.creditor';
+comment on COLUMN R_CORE_PORTFOLIO_FLOW_MSFO.CREDITOR2_ID is 'portfolio_flows_msfo.portfolio.creditor';
