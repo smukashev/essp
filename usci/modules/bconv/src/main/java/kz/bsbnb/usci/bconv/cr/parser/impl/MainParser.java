@@ -125,4 +125,8 @@ public class MainParser extends BatchParser {
 
         return false;
     }
+
+    public int getPackageCount() {
+        return packageParser.getTotalCount();
+    }
 }

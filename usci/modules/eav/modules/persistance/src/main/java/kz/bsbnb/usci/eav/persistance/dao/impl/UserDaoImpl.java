@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
@@ -364,5 +365,34 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao
         }
 
         return list;
+    }
+
+    @Override
+    public PortalUser getUser(long userId) {
+        Select select = context.select()
+                .from(EAV_A_USER)
+                .where(EAV_A_USER.USER_ID.eq(userId));
+
+        List<Map<String, Object>> list = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if(list == null || list.isEmpty())
+            return null;
+
+        Map<String, Object> row = list.get(0);
+
+        PortalUser portalUser = new PortalUser();
+
+        portalUser.setId(BigInteger.valueOf(Long.parseLong(row.get(EAV_A_USER.ID.getName()).toString())));
+        portalUser.setUserId(Long.parseLong(row.get(EAV_A_USER.ID.getName()).toString()));
+        portalUser.setScreenName((String) row.get(EAV_A_USER.SCREEN_NAME.getName()));
+        portalUser.setEmailAddress((String) row.get(EAV_A_USER.EMAIL.getName()));
+        portalUser.setFirstName((String) row.get(EAV_A_USER.FIRST_NAME.getName()));
+        portalUser.setLastName((String) row.get(EAV_A_USER.LAST_NAME.getName()));
+        portalUser.setMiddleName((String) row.get(EAV_A_USER.MIDDLE_NAME.getName()));
+        portalUser.setModifiedDate(DataUtils.convert((Timestamp) row.get(EAV_A_USER.MODIFIED_DATE.getName())));
+
+        portalUser.setCreditorList(getPortalUserCreditorList(portalUser.getUserId()));
+
+        return portalUser;
     }
 }

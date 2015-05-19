@@ -17,4 +17,6 @@ public interface PortalUserBeanRemoteBusiness {
     void synchronize(List<PortalUser> users);
 
     List<Creditor> getMainCreditorsInAlphabeticalOrder(long userId);
+
+    PortalUser getUser(long userId);
 }

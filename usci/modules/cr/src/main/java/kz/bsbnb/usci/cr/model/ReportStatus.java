@@ -5,9 +5,11 @@ package kz.bsbnb.usci.cr.model;
  */
 public enum ReportStatus {
 
-    IN_PROGRESS(90l),
-    ORGANIZATION_APPROVED(128l),
-    COMPLETED(92l);
+    IN_PROGRESS(90L),
+    WE(76L),
+    WOE(77L),
+    ORGANIZATION_APPROVED(128L),
+    COMPLETED(92L);
 
     private Long statusId;
 

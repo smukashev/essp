@@ -46,7 +46,7 @@ public class ReportController {
         EntityManager em = getEntityManager();
         try {
             em.clear();
-            TypedQuery<ReportLoad> q = em.createQuery("SELECT rl FROM ReportLoad rl WHERE rl.portalUserId = :userId ORDER BY rl.id desc", ReportLoad.class);
+            TypedQuery<ReportLoad> q = em.createQuery("SELECT rl FROM ReportLoad rl WHERE rl.portalUserId = :userId ORDER BY rl.startTime desc", ReportLoad.class);
             q.setParameter("userId", portalUserId);
             return q.getResultList();
         } finally {
@@ -92,7 +92,7 @@ public class ReportController {
                 userIds.add(coworker.getUserId());
             }
             em.clear();
-            TypedQuery<ReportLoad> q = em.createQuery("SELECT rl FROM ReportLoad rl WHERE rl.portalUserId in :userIds ORDER BY rl.id desc", ReportLoad.class);
+            TypedQuery<ReportLoad> q = em.createQuery("SELECT rl FROM ReportLoad rl WHERE rl.portalUserId in :userIds ORDER BY rl.startTime desc", ReportLoad.class);
             q.setParameter("userIds", userIds);
             return q.getResultList();
         } finally {

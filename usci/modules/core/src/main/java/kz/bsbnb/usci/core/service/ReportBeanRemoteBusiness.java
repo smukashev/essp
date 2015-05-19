@@ -13,6 +13,10 @@ public interface ReportBeanRemoteBusiness {
 
     Date getReportDate(long creditorId);
 
+    Date getLastApprovedDate(long creditorId);
+
+    Report getReport(long creditorId, Date reportDate);
+
     Report getByCreditor_ReportDate(Creditor creditor, Date reportDate);
 
     List<Report> getReportsByReportDateAndCreditors(Date reportDate, List<Creditor> creditors);
@@ -23,5 +27,9 @@ public interface ReportBeanRemoteBusiness {
 
     void addNewMessage(ReportMessage message, Report report, List<ReportMessageAttachment> attachments);
 
+    void updateReport(Report report, String username);
+
     void updateReport(Report report);
+
+    void setTotalCount(long reportId, long totalCount);
 }

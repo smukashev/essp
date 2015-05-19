@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <entity class="ref_region">
+      <code>71</code>
+      <name_kz>Астана қ.</name_kz>
+      <name_ru>г.Астана</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>75</code>
+      <name_kz>Алматы қ.</name_kz>
+      <name_ru>г.Алматы</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>55</code>
+      <name_kz>Павлодар облысы</name_kz>
+      <name_ru>Павлодарская область</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>63</code>
+      <name_kz>Шығыс Қазақстан облысы</name_kz>
+      <name_ru>Восточно-Казахстанская область</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>59</code>
+      <name_kz>Солтүстік Қазақстан облысы</name_kz>
+      <name_ru>Северо-Казахстанская область</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>51</code>
+      <name_kz>Оңтүстік Қазақстан облысы</name_kz>
+      <name_ru>Южно-Казахстанская область</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>19</code>
+      <name_kz>Алматы облысы</name_kz>
+      <name_ru>Алматинская область</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>15</code>
+      <name_kz>Ақтөбе облысы</name_kz>
+      <name_ru>Актюбинская область</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>11</code>
+      <name_kz>Ақмола облысы</name_kz>
+      <name_ru>Акмолинская область</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>43</code>
+      <name_kz>Қызылорда облысы</name_kz>
+      <name_ru>Кызылординская область</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>35</code>
+      <name_kz>Қарағанды облысы</name_kz>
+      <name_ru>Карагандинская область</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>31</code>
+      <name_kz>Жамбыл облысы</name_kz>
+      <name_ru>Жамбылская область</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>27</code>
+      <name_kz>Батыс Қазақстан облысы</name_kz>
+      <name_ru>Западно-Казахстанская область</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>23</code>
+      <name_kz>Атырау облысы</name_kz>
+      <name_ru>Атырауская область</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>47</code>
+      <name_kz>Маңғыстау облысы</name_kz>
+      <name_ru>Мангистауская область</name_ru>
+    </entity>
+    <entity class="ref_region">
+      <code>39</code>
+      <name_kz>Қостанай облысы</name_kz>
+      <name_ru>Костанайская область</name_ru>
+    </entity>
+  </entities>
+</batch>

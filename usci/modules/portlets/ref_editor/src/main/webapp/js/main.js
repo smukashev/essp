@@ -254,10 +254,22 @@ Ext.onReady(function() {
                     console.log('woops');
                 }
             });
+        },
+        maxWidth: 200
+    });
 
-            /*var buttonClose = Ext.create('Ext.button.Button', {
+    var buttonShowXML = Ext.create('Ext.button.Button', {
+        id: "entityEditorShowXmlBtn",
+        text: 'XML',
+        handler : function (){
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+
+            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
+
+            var buttonClose = Ext.create('Ext.button.Button', {
                 id: "itemFormCancel",
-                text: 'Отмена',
+                text: label_CANCEL,
                 handler : function (){
                     Ext.getCmp('xmlFromWin').destroy();
                 }
@@ -295,64 +307,114 @@ Ext.onReady(function() {
                 items:[xmlForm]
             });
 
-            xmlFromWin.show();*/
+            xmlFromWin.show();
         },
         maxWidth: 200
     });
 
-    var buttonShowXML = Ext.create('Ext.button.Button', {
-        id: "entityEditorShowXmlBtn",
-        text: 'XML',
+    var modalWindow = Ext.create("Ext.Window",{
+        title : 'Добавление записи',
+        width : 400,
+        modal : true,
+        closable : false,
+        items  : [
+            {
+                id: "ModalFormPannel",
+                width: "100%",
+                defaults: {
+                    anchor: '100%'
+                },
+                autoScroll:true
+            }],
+        tbar : [{
+            text : 'Сохранить новую запись' ,
+            handler :function(){
+                var tree = Ext.getCmp('entityTreeView');
+                rootNode = tree.getRootNode();
+
+                var selectedNode = tree.getSelectionModel().getLastSelected();
+
+                var children = selectedNode.childNodes;
+
+                for(var i = 0; i < children.length; i++){
+                    if(children[i].data.simple) {
+                        if(children[i].data.type == "DATE") {
+                            children[i].data.value = Ext.getCmp(children[i].data.code + "FromItem1")
+                                .getSubmitValue();
+                        } else {
+                            children[i].data.value = Ext.getCmp(children[i].data.code + "FromItem1")
+                                .getValue();
+                        }
+                    }
+                }
+
+                var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
+
+                Ext.Ajax.request({
+                    url: dataUrl,
+                    method: 'POST',
+                    params: {
+                        xml_data: xmlStr,
+                        op: 'SAVE_XML'
+                    },
+                    success: function() {
+                        console.log('success');
+                    },
+                    failure: function() {
+                        console.log('woops');
+                    }
+                });
+
+                this.up('.window').close();
+            }
+        }]
+    });
+
+    var buttonAdd = Ext.create('Ext.button.Button', {
+        id: "entityEditorAddBtn",
+        text: 'Добавить новую запись',
         handler : function (){
             var tree = Ext.getCmp('entityTreeView');
-            rootNode = tree.getRootNode();
+            var selectionModel = tree.getSelectionModel();
+            var selectedNode = selectionModel.getLastSelected();
 
-            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
+            var children = selectedNode.childNodes;
 
-            var buttonClose = Ext.create('Ext.button.Button', {
-             id: "itemFormCancel",
-             text: label_CANCEL,
-             handler : function (){
-             Ext.getCmp('xmlFromWin').destroy();
-             }
-             });
+            var form1 = Ext.getCmp('ModalFormPannel');
 
-             var xmlForm = Ext.create('Ext.form.Panel', {
-             id: 'xmlForm',
-             region: 'center',
-             width: 615,
-             fieldDefaults: {
-             msgTarget: 'side'
-             },
-             defaults: {
-             anchor: '100%'
-             },
+            // form.removeAll();
 
-             bodyPadding: '5 5 0',
-             items: [{
-             fieldLabel: 'XML',
-             name: 'id',
-             xtype: 'textarea',
-             value: xmlStr,
-             height: 615
-             }],
+            for(var i = 0; i < children.length; i++){
+                if(children[i].data.simple) {
+                    if(children[i].data.type == "DATE") {
+                        form1.add(Ext.create("Ext.form.field.Date",
+                            {
+                                id: children[i].data.code + "FromItem1",
+                                fieldLabel: children[i].data.title,
+                                width: "100%",
+                                format: 'd.m.Y'/*,
+                             value: new Date(
+                             children[i].data.value.
+                             replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1'))*/
+                            }));
+                    } else {
+                        form1.add(Ext.create("Ext.form.field.Text",
+                            {
+                                id: children[i].data.code + "FromItem1",
+                                fieldLabel: children[i].data.title,
+                                width: "100%",
+                                // value: children[i].data.value
+                            }));
+                    }
+                }
+            }
 
-             buttons: [buttonClose]
-             });
+            form1.doLayout();
 
-             xmlFromWin = new Ext.Window({
-             id: "xmlFromWin",
-             layout: 'fit',
-             title:'XML',
-             modal: true,
-             maximizable: true,
-             items:[xmlForm]
-             });
-
-             xmlFromWin.show();
-        },
-        maxWidth: 200
+            modalWindow.show();
+        }
     });
+
 
     var entityGrid = Ext.create('Ext.tree.Panel', {
         //collapsible: true,
@@ -428,6 +490,8 @@ Ext.onReady(function() {
 
                 var children = selectedNode.childNodes;
 
+                console.log(children); // TODO remove
+
                 var form = Ext.getCmp('EntityEditorFormPannel');
                 form.removeAll();
                 for(var i = 0; i < children.length; i++){
@@ -453,6 +517,18 @@ Ext.onReady(function() {
                                     value: children[i].data.value,
                                     disabled: children[i].data.isKey
                                 }));
+                        }
+                    } else {
+                        if(children[i].data.type == "META_CLASS") {
+                            form.add(
+                                Ext.create("Ext.form.field.ComboBox", {
+                                    id: children[i].data.code + "FromItem",
+                                    fieldLabel: children[i].data.title,
+                                    width: "100%",
+                                    value: children[i].data.value,
+                                    disabled: children[i].data.isKey
+                                })
+                            );
                         }
                     }
                 }
@@ -496,15 +572,15 @@ Ext.onReady(function() {
                 },
                 bodyPadding: '5 5 0',
                 autoScroll:true
-            },{
-                xtype : 'panel',
-                region: 'south',
-                preventHeader: true,
-                width: "60%",
-                height: 150,
-                autoScroll:true,
-                items: [ createItemsGrid()]
-            }],
+            },/*{
+             xtype : 'panel',
+             region: 'south',
+             preventHeader: true,
+             width: "60%",
+             height: 150,
+             autoScroll:true,
+             items: [ createItemsGrid()]
+             }*/],
         dockedItems: [
             {
                 fieldLabel: label_REF,
@@ -556,7 +632,7 @@ Ext.onReady(function() {
             }
         ],
         tbar: [
-            buttonShow, buttonXML, buttonShowXML
+            buttonAdd, buttonShow, buttonXML, buttonShowXML
         ]
     });
 });

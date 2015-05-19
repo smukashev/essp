@@ -3,6 +3,7 @@ package kz.bsbnb.usci.receiver.monitor;
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
+import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.model.json.*;
 import kz.bsbnb.usci.sync.service.IEntityService;
@@ -14,7 +15,6 @@ import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -27,6 +27,7 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -76,8 +77,6 @@ public class ZipFilesMonitor{
     public static final int MAX_SYNC_QUEUE_SIZE = 512;
 
     private static final long WAIT_TIMEOUT = 360; //in 10 sec units
-
-    private int GLOBAL_COUNT = 0;
 
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
@@ -423,6 +422,7 @@ public class ZipFilesMonitor{
                         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
                         jobParametersBuilder.addParameter("batchId", new JobParameter(nextJob.getBatchId()));
                         jobParametersBuilder.addParameter("userId", new JobParameter(nextJob.getBatchInfo().getUserId()));
+                        jobParametersBuilder.addParameter("reportId", new JobParameter(nextJob.getBatchInfo().getReportId()));
 
                         Job job = jobs.get(nextJob.getBatchInfo().getBatchType());
 
@@ -468,6 +468,7 @@ public class ZipFilesMonitor{
     }
 
     public void saveData(BatchInfo batchInfo, String filename, byte[] bytes){
+        // TODO: fix hardcoded settings
         receiverStatusSingleton.batchReceived();
 
         IBatchService batchService = serviceFactory.getBatchService();
@@ -492,16 +493,28 @@ public class ZipFilesMonitor{
                 haveError = true;
             }
         } else {
-            if(batchInfo.getAdditionalParams() != null) {
+            if(batchInfo.getAdditionalParams() != null && batchInfo.getAdditionalParams().size() > 0) {
+                String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
+                String docValue = batchInfo.getAdditionalParams().get("DOC_VALUE");
+
+                if(docType == null) docType = "";
+                if(docValue == null) docValue = "";
+
                 String creditorCode = batchInfo.getAdditionalParams().get("CODE");
 
+                if(creditorCode == null && docType.equals("15"))
+                    creditorCode = docValue;
+
                 boolean foundCreditor = false;
-                for (Creditor creditor : creditors) {
-                    if (creditor.getCode() != null) {
-                        if (creditor.getCode().equals(creditorCode)) {
-                            cId = creditor.getId();
-                            foundCreditor = true;
-                            break;
+
+                if(creditorCode != null) {
+                    for (Creditor creditor : creditors) {
+                        if (creditor.getCode() != null) {
+                            if (creditor.getCode().equals(creditorCode)) {
+                                cId = creditor.getId();
+                                foundCreditor = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -509,12 +522,14 @@ public class ZipFilesMonitor{
                 if (!foundCreditor) {
                     String creditorBIN = batchInfo.getAdditionalParams().get("BIN");
 
-                    for (Creditor creditor : creditors) {
-                        if (creditor.getBIN() != null) {
-                            if (creditor.getBIN().equals(creditorBIN)) {
-                                cId = creditor.getId();
-                                foundCreditor = true;
-                                break;
+                    if(creditorBIN != null) {
+                        for (Creditor creditor : creditors) {
+                            if (creditor.getBIN() != null) {
+                                if (creditor.getBIN().equals(creditorBIN)) {
+                                    cId = creditor.getId();
+                                    foundCreditor = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -522,12 +537,14 @@ public class ZipFilesMonitor{
                     if (!foundCreditor) {
                         String creditorRNN = batchInfo.getAdditionalParams().get("RNN");
 
-                        for (Creditor creditor : creditors) {
-                            if (creditor.getRNN() != null) {
-                                if (creditor.getRNN().equals(creditorRNN)) {
-                                    cId = creditor.getId();
-                                    foundCreditor = true;
-                                    break;
+                        if(creditorRNN != null) {
+                            for (Creditor creditor : creditors) {
+                                if (creditor.getRNN() != null) {
+                                    if (creditor.getRNN().equals(creditorRNN)) {
+                                        cId = creditor.getId();
+                                        foundCreditor = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -548,27 +565,7 @@ public class ZipFilesMonitor{
             }
         }
 
-        // ------------------------------------
-        Report report = new Report();
-
-        Creditor creditor = new Creditor();
-        creditor.setId(cId);
-
-        report.setCreditor(creditor);
-        report.setStatusId(67L);
-        report.setActualCount(10L);
-        report.setBeginningDate(new Date());
-        report.setLastManualEditDate(new Date());
-        report.setTotalCount(GLOBAL_COUNT + 10L);
-        report.setEndDate(new Date());
-        report.setReportDate(batchInfo.getRepDate());
-
-        GLOBAL_COUNT += 10L; // TODO: fix
-
-        ReportBeanRemoteBusiness reportBeanRemoteBusiness = serviceFactory.getReportBeanRemoteBusinessService();
-        reportBeanRemoteBusiness.insert(report, "Auditor");
-
-        // ------------------------------------
+        checkAndFillEavReport(cId, batchInfo);
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
                 batchInfo.getUserId(), cId);
@@ -578,6 +575,80 @@ public class ZipFilesMonitor{
                     new BatchStatusJModel(BatchStatuses.WAITING, null, new Date(), batchInfo.getUserId()));
 
             sender.addJob(batchId, batchInfo);
+        }
+    }
+
+    private void checkAndFillEavReport(long creditorId, BatchInfo batchInfo) {
+        ReportBeanRemoteBusiness reportBeanRemoteBusiness = serviceFactory.getReportBeanRemoteBusinessService();
+
+        Report existing = reportBeanRemoteBusiness.getReport(creditorId, batchInfo.getRepDate());
+
+        if (existing != null) {
+            if (ReportStatus.COMPLETED.getStatusId().equals(existing.getStatusId())) {
+                throw new RuntimeException("Report with status COMPLETED already exists for creditorId = "
+                        + creditorId +  ", reportDate = " + batchInfo.getRepDate());
+            }
+        } else {
+            Date lastApprovedDate = reportBeanRemoteBusiness.getLastApprovedDate(creditorId);
+
+            try {
+                Date expectedDate = lastApprovedDate != null
+                        ? DataTypeUtil.plus(lastApprovedDate, Calendar.MONTH, 1)
+                        : new SimpleDateFormat("dd/MM/yyyy").parse(Report.INITIAL_REPORT_DATE_STR);
+
+                if (!batchInfo.getRepDate().equals(expectedDate)) {
+                    throw new RuntimeException("Reports must be supplied in order month by month");
+                }
+
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (existing != null) {
+            existing.setStatusId(ReportStatus.IN_PROGRESS.getStatusId());
+            existing.setTotalCount(batchInfo.getTotalCount());
+            existing.setActualCount(batchInfo.getActualCount());
+            existing.setLastManualEditDate(new Date());
+
+            PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
+            PortalUser portalUser = userService.getUser(batchInfo.getUserId());
+
+            if(portalUser != null) {
+                reportBeanRemoteBusiness.updateReport(existing, portalUser.getScreenName());
+            } else {
+                // todo: fix
+                reportBeanRemoteBusiness.updateReport(existing, "Test");
+            }
+
+            batchInfo.setReportId(existing.getId());
+        } else {
+            Report report = new Report();
+
+            Creditor creditor = new Creditor();
+            creditor.setId(creditorId);
+            report.setCreditor(creditor);
+
+            report.setStatusId(ReportStatus.IN_PROGRESS.getStatusId());
+            report.setTotalCount(batchInfo.getTotalCount());
+            report.setActualCount(batchInfo.getActualCount());
+            report.setReportDate(batchInfo.getRepDate());
+            report.setBeginningDate(new Date());
+            report.setLastManualEditDate(new Date());
+
+            PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
+            PortalUser portalUser = userService.getUser(batchInfo.getUserId());
+
+            Long reportId;
+
+            if(portalUser != null) {
+                reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
+            } else {
+                // todo: fix
+                reportId = reportBeanRemoteBusiness.insert(report, "Test");
+            }
+
+            batchInfo.setReportId(reportId);
         }
     }
 
@@ -629,9 +700,6 @@ public class ZipFilesMonitor{
                 batchInfo.setBatchType("2");
                 batchInfo.setBatchName(dataXmlFile.getName());
                 batchInfo.setUserId(userId);
-                /*batchInfo.setSize(dataXmlFile.getSize());*/
-//                Date date = DataTypeUtil.convertDateToFirstDay(new Date(), 0);
-//                batchInfo.setRepDate(date);
 
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = null;
@@ -645,6 +713,7 @@ public class ZipFilesMonitor{
                 Document document = null;
 
                 try {
+                    // TODO: fix OutOfMemory
                     document = documentBuilder.parse(zipFile.getInputStream(dataXmlFile));
                 } catch (SAXException e) {
                     e.printStackTrace();
@@ -660,6 +729,26 @@ public class ZipFilesMonitor{
                 }
 
                 batchInfo.setRepDate(date);
+
+                String actualCreditCount = document.getElementsByTagName("actual_credit_count").item(0).getTextContent();
+                batchInfo.setActualCount(Integer.parseInt(actualCreditCount));
+                batchInfo.setTotalCount(0);
+
+                try {
+                    NamedNodeMap map = document.getElementsByTagName("doc").item(0).getAttributes();
+                    Node n  = map.getNamedItem("doc_type");
+                    String docType = n.getTextContent();
+
+                    String docValue = document.getElementsByTagName("doc").item(0).getTextContent();
+
+                    if(docType != null && docValue != null &&
+                            docType.length() > 0 && docValue.length() > 0) {
+                        batchInfo.addParam("DOC_TYPE", docType);
+                        batchInfo.addParam("DOC_VALUE", docValue);
+                    }
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
 
                 zipFile.close();
                 saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));

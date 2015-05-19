@@ -35,6 +35,16 @@ public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness
     }
 
     @Override
+    public Date getLastApprovedDate(long creditorId) {
+        return remoteReportBusiness.getLastApprovedDate(creditorId);
+    }
+
+    @Override
+    public Report getReport(long creditorId, Date reportDate) {
+        return remoteReportBusiness.getReport(creditorId, reportDate);
+    }
+
+    @Override
     public Long insert(Report report, String username) {
         return remoteReportBusiness.insert(report, username);
     }
@@ -65,7 +75,12 @@ public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness
     }
 
     @Override
-    public void updateReport(Report report) {
-        remoteReportBusiness.updateReport(report);
+    public void updateReport(Report report, String username) {
+        remoteReportBusiness.updateReport(report, username);
+    }
+
+    @Override
+    public void setTotalCount(long reportId, long totalCount) {
+        remoteReportBusiness.setTotalCount(reportId, totalCount);
     }
 }

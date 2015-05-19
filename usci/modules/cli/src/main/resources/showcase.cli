@@ -86,7 +86,9 @@ showcase set tableName CORE_DEBTOR
 
 showcase list add subjects.person
 showcase list add subjects.organization
-showcase list add subjects.creditor
+showcase list add subjects.creditor creditor_id
+
+showcase list addCustom credit creditor creditor_sender_id
 
 showcase save
 
@@ -406,6 +408,7 @@ showcase set name CORE_PORTFOLIO_FLOW_KFN
 showcase set tableName CORE_PORTFOLIO_FLOW_KFN
 showcase set final true
 
+showcase list add creditor portfolio_creditor_id
 showcase list add portfolio_flows_kfn.details.balance_account
 showcase list add portfolio_flows_kfn.details.value
 showcase list add portfolio_flows_kfn.portfolio.creditor
@@ -421,6 +424,7 @@ showcase set name CORE_PORTFOLIO_FLOW_MSFO
 showcase set tableName CORE_PORTFOLIO_FLOW_MSFO
 showcase set final true
 
+showcase list add creditor portfolio_creditor_id
 showcase list add portfolio_flows_msfo.details.balance_account
 showcase list add portfolio_flows_msfo.details.value
 showcase list add portfolio_flows_msfo.portfolio.creditor

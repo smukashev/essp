@@ -6,6 +6,8 @@ import java.util.Set;
 
 public class RefListItem implements Serializable
 {
+    private static final long serialVersionUID = 0L;
+
     private long id;
     private String title;
     private String code;
@@ -53,4 +55,17 @@ public class RefListItem implements Serializable
     public Set<String> getKeys() {
         return values.keySet();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        RefListItem that = (RefListItem) o;
+
+        if (id != that.id) return false;
+
+        return true;
+    }
+
 }

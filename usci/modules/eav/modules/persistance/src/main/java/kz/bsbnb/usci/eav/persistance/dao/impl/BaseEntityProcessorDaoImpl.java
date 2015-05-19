@@ -28,6 +28,7 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,16 +77,15 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         this.applyListener = applyListener;
     }
 
-    private static final boolean refsCacheEnalbed = true;
-    public static final HashMap<Long, List<RefListItem>> refsCache =
-            new HashMap<Long, List<RefListItem>>();
+    @Value("${refs.cache.enabled}")
+    private boolean refsCacheEnabled;
 
-    public static final HashMap<Long, List<RefListItem>> refsCacheRaw =
-            new HashMap<Long, List<RefListItem>>();
+    public static final HashMap<Long, List<RefListItem>> refsCache = new HashMap<Long, List<RefListItem>>();
+    public static final HashMap<Long, List<RefListItem>> refsCacheRaw = new HashMap<Long, List<RefListItem>>();
 
     @PostConstruct
     public void init() {
-        if(refsCacheEnalbed) {
+        if(refsCacheEnabled && refsCache.size() == 0 && refsCacheRaw.size() == 0) {
             List<MetaClassName> metaClassNames = null;
             try {
                 metaClassNames = metaClassRepository.getRefNames();
@@ -2957,11 +2957,66 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         applyToDb(baseEntityManager);
 
+        reloadCacheIfRef(baseEntityApplied);
+
         if (applyListener != null)
             applyListener.applyToDBEnded(entityHolder.saving, entityHolder.loaded,
                     entityHolder.applied, baseEntityManager);
 
         return baseEntityApplied;
+    }
+
+    private void reloadCacheIfRef(IBaseEntity baseEntity) {
+        if (baseEntity.getMeta().isReference() && refsCacheEnabled) {
+            RefListItem refListItem = findRefListItemById(baseEntity.getMeta().getId(), baseEntity.getId(), false);
+            RefListItem refListItemRaw = findRefListItemById(baseEntity.getMeta().getId(), baseEntity.getId(), true);
+
+            if (OperationType.DELETE.equals(baseEntity.getOperation())) { // delete
+                refsCache.get(baseEntity.getMeta().getId()).remove(refListItem);
+                refsCacheRaw.get(baseEntity.getMeta().getId()).remove(refListItemRaw);
+            } else {
+                IBaseEntity baseEntityPrepared = prepare(((BaseEntity) baseEntity).clone());
+                IBaseEntity baseEntityPostPrepared = postPrepare(((BaseEntity) baseEntityPrepared).clone(), null);
+                baseEntity = baseEntityPostPrepared;
+
+                if (refListItem == null) {
+                    refListItem = new RefListItem();
+                    refListItemRaw = new RefListItem();
+                    refListItem.setId(baseEntityPostPrepared.getId());
+                    refListItemRaw.setId(baseEntityPostPrepared.getId());
+
+                    refsCache.get(baseEntity.getMeta().getId()).add(refListItem);
+                    refsCacheRaw.get(baseEntity.getMeta().getId()).add(refListItemRaw);
+                }
+
+                for (IBaseValue value : baseEntity.get()) {
+                    if (!value.getMetaAttribute().getMetaType().isComplex()
+                            && !value.getMetaAttribute().getMetaType().isSet()) {
+                        if (value.getMetaAttribute().getName().startsWith("name")) {
+                            refListItem.setTitle((String) value.getValue());
+                            refListItemRaw.setTitle(Quote.addSlashes((String) value.getValue()));
+                        } else if (value.getMetaAttribute().getName().equals("code")) {
+                            refListItem.setCode(String.valueOf(value.getValue()));
+                            refListItemRaw.setCode(String.valueOf(value.getValue()));
+                        }
+                        refListItem.addValue(value.getMetaAttribute().getName(), value.getValue());
+                        refListItemRaw.addValue(value.getMetaAttribute().getName(), value.getValue());
+                    }
+                }
+            }
+        }
+    }
+
+    private RefListItem findRefListItemById(long metaId, long id, boolean raw) {
+        List<RefListItem> refListItems = raw ? refsCacheRaw.get(metaId) : refsCache.get(metaId);
+
+        for (RefListItem refListItem : refListItems) {
+            if (refListItem.getId() == id) {
+                return refListItem;
+            }
+        }
+
+        return null;
     }
 
     public boolean checkReportDateExists(long baseEntityId, Date reportDate) {
@@ -3030,7 +3085,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     public List<RefListItem> getRefsByMetaClass(long metaClassId, boolean raw) {
 
-        if(refsCacheEnalbed) {
+        if(refsCacheEnabled) {
             List<RefListItem> refsList;
             if(raw)
                 refsList = refsCacheRaw.get(metaClassId);
@@ -3171,7 +3226,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         if(rli!=null)
             entityIds.add(rli);
 
-        if(refsCacheEnalbed)
+        if(refsCacheEnabled)
             refsCache.put(metaClassId, entityIds);
 
         return entityIds;
