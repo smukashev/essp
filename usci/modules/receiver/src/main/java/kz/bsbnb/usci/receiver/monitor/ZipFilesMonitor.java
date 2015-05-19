@@ -493,7 +493,7 @@ public class ZipFilesMonitor{
                 haveError = true;
             }
         } else {
-            if(batchInfo.getAdditionalParams() != null) {
+            if(batchInfo.getAdditionalParams() != null && batchInfo.getAdditionalParams().size() > 0) {
                 String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
                 String docValue = batchInfo.getAdditionalParams().get("DOC_VALUE");
 
@@ -565,11 +565,7 @@ public class ZipFilesMonitor{
             }
         }
 
-        // ------------------------------------
-
         checkAndFillEavReport(cId, batchInfo);
-
-        // ------------------------------------
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
                 batchInfo.getUserId(), cId);
@@ -621,11 +617,11 @@ public class ZipFilesMonitor{
             batchInfo.setReportId(existing.getId());
         } else {
             Report report = new Report();
-            {
-                Creditor creditor = new Creditor();
-                creditor.setId(creditorId);
-                report.setCreditor(creditor);
-            }
+
+            Creditor creditor = new Creditor();
+            creditor.setId(creditorId);
+            report.setCreditor(creditor);
+
             report.setStatusId(ReportStatus.IN_PROGRESS.getStatusId());
             report.setTotalCount(batchInfo.getTotalCount());
             report.setActualCount(batchInfo.getActualCount());
@@ -635,7 +631,15 @@ public class ZipFilesMonitor{
 
             PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
             PortalUser portalUser = userService.getUser(batchInfo.getUserId());
-            Long reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
+
+            Long reportId;
+
+            if(portalUser != null) {
+                reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
+            } else {
+                // todo: fix
+                reportId = reportBeanRemoteBusiness.insert(report, "Test");
+            }
             batchInfo.setReportId(reportId);
         }
     }
@@ -725,12 +729,15 @@ public class ZipFilesMonitor{
                 try {
                     NamedNodeMap map = document.getElementsByTagName("doc").item(0).getAttributes();
                     Node n  = map.getNamedItem("doc_type");
-                    String doc_type = n.getTextContent();
+                    String docType = n.getTextContent();
 
-                    String doc_value = document.getElementsByTagName("doc").item(0).getTextContent();
+                    String docValue = document.getElementsByTagName("doc").item(0).getTextContent();
 
-                    batchInfo.addParam("DOC_TYPE", doc_type);
-                    batchInfo.addParam("DOC_VALUE", doc_value);
+                    if(docType != null && docValue != null &&
+                            docType.length() > 0 && docValue.length() > 0) {
+                        batchInfo.addParam("DOC_TYPE", docType);
+                        batchInfo.addParam("DOC_VALUE", docValue);
+                    }
                 } catch(Exception e) {
                     e.printStackTrace();
                 }
