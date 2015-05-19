@@ -10,8 +10,11 @@ import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.MetaClassName;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
@@ -19,6 +22,7 @@ import kz.bsbnb.usci.porltet.ref_portlet.model.json.MetaClassList;
 import kz.bsbnb.usci.porltet.ref_portlet.model.json.MetaClassListEntry;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
@@ -91,7 +95,8 @@ public class MainPortlet extends MVCPortlet {
         LIST_CLASSES,
         LIST_ENTITY,
         SAVE_XML,
-        LIST_BY_CLASS
+        LIST_BY_CLASS,
+        LIST_ATTRIBUTES
     }
 
     private String testNull(String str) {
@@ -107,7 +112,7 @@ public class MainPortlet extends MVCPortlet {
         return outStr;
     }
 
-    private String entityToJson(BaseEntity entity, String title, String code) {
+    private String entityToJson(BaseEntity entity, String title, String code, IMetaAttribute attr, boolean asRoot) {
         MetaClass meta = entity.getMeta();
 
         if (title == null) {
@@ -118,10 +123,15 @@ public class MainPortlet extends MVCPortlet {
 
         str += "\"title\": \"" + title + "\",";
         str += "\"code\": \"" + code + "\",";
-        str += "\"value\": \"" + clearSlashes(testNull(meta.getClassTitle())) + "\",";
+//        str += "\"value\": \"" + clearSlashes(testNull(meta.getClassTitle())) + "\",";
+        str += "\"value\": \"" + entity.getId() + "\",";
         str += "\"simple\": false,";
         str += "\"array\": false,";
+        str += "\"ref\": " + entity.getMeta().isReference() + ",";
+        str += "\"isKey\": " + (attr != null ? attr.isKey() : false) + ",";
+        str += "\"root\": " + asRoot + ",";
         str += "\"type\": \"META_CLASS\",";
+        str += "\"metaId\": \"" + entity.getMeta().getId() + "\",";
         str += "\"iconCls\":\"folder\",";
         str += "\"children\":[";
 
@@ -142,7 +152,8 @@ public class MainPortlet extends MVCPortlet {
                     first = false;
                 }
 
-                str +=  entityToJson((BaseEntity)(value.getValue()), attrTitle, innerClassesNames);
+                str +=  entityToJson((BaseEntity)(value.getValue()), attrTitle, innerClassesNames,
+                        meta.getMetaAttribute(innerClassesNames), false);
             }
 
         }
@@ -251,8 +262,7 @@ public class MainPortlet extends MVCPortlet {
                         first = false;
                     }
 
-                    str +=  entityToJson((BaseEntity)(value.getValue()), "[" + i + "]",
-                                "[" + i + "]");
+                    str +=  entityToJson((BaseEntity)(value.getValue()), "[" + i + "]", "[" + i + "]", null, false);
                     i++;
                 }
 
@@ -395,14 +405,35 @@ public class MainPortlet extends MVCPortlet {
 
                         writer.write("]}");
                     }
+                    break;
+                case LIST_ATTRIBUTES:
+                    String entityId = getParam("entityId", resourceRequest);
+
+                    if (StringUtils.isNotEmpty(entityId)) {
+                        Date date = null;
+
+                        if(StringUtils.isNotEmpty(resourceRequest.getParameter("date")))
+                            date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+
+                        if(date == null)
+                            date = new Date();
+
+                        BaseEntity entity = entityService.load(Integer.parseInt(entityId), date);
+
+                        writer.write(getAttributesJson(entity));
+                    }
 
                     break;
                 case LIST_ENTITY:
-                    String entityId = getParam("entityId", resourceRequest);
+                    entityId = getParam("entityId", resourceRequest);
+                    String asRootStr = getParam("asRoot", resourceRequest);
+
+                    boolean asRoot = StringUtils.isNotEmpty(asRootStr) ? Boolean.valueOf(asRootStr) : false;
+
                     if (entityId != null && entityId.trim().length() > 0) {
                         Date date = null;
 
-                        if(resourceRequest.getParameter("date") != null)
+                        if(StringUtils.isNotEmpty(resourceRequest.getParameter("date")))
                             date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
 
                         if(date == null)
@@ -412,7 +443,7 @@ public class MainPortlet extends MVCPortlet {
 
                         writer.write("{\"text\":\".\",\"children\": [\n" +
                                 entityToJson(entity, entity.getMeta().getClassTitle(),
-                                        entity.getMeta().getClassName()) +
+                                        entity.getMeta().getClassName(), null, asRoot) +
                                 "]}");
                     }
                     break;
@@ -423,6 +454,47 @@ public class MainPortlet extends MVCPortlet {
             e.printStackTrace();
             writer.write("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}");
         }
+    }
+
+    private String getAttributesJson(BaseEntity entity) {
+        IMetaClass meta = entity.getMeta();
+
+        StringBuilder result = new StringBuilder();
+
+        result.append("{\"total\":");
+        result.append(meta.getAttributeNames().size());
+        result.append(",\"data\":[");
+
+        boolean first = true;
+
+        for (String attrName : meta.getAttributeNames()) {
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(attrName);
+
+            if (first) {
+                first = false;
+            } else {
+                result.append(",");
+            }
+            result.append("{");
+
+            result.append("\"name\":");
+            result.append("\"");
+            result.append(attrName);
+            result.append("\"");
+
+            result.append(",\"title\":");
+            result.append("\"");
+            result.append(metaAttribute.getTitle());
+            result.append("\"");
+
+            result.append("}");
+        }
+
+        result.append("]}");
+
+        // TODO
+
+        return result.toString();
     }
 
     private String getParam(String name, ResourceRequest resourceRequest) {

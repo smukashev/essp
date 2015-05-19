@@ -55,6 +55,7 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first) {
 
 var grid;
 var store;
+var subEntityStore;
 
 function createItemsGrid(itemId) {
     if(grid == null) {
@@ -133,6 +134,28 @@ function createItemsGrid(itemId) {
     }
 }
 
+function loadSubEntity(subNode) {
+    var subEntityId = Ext.getCmp(subNode.data.code + "FromItem").getValue();
+
+    subEntityStore.load({
+        params: {
+            op : 'LIST_ENTITY',
+            entityId: subEntityId,
+            date: Ext.getCmp('edDate').value,
+            asRoot: false
+        },
+        callback: function(records, operation, success) {
+            if (!success) {
+                Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
+            } else {
+                subNode.data.value = records[0].data.value;
+                subNode.data.children = records[0].data.children;
+                subNode.childNodes = records[0].childNodes;
+            }
+        }
+    });
+}
+
 Ext.onReady(function() {
     grid = null;
 
@@ -194,13 +217,26 @@ Ext.onReady(function() {
             {name: 'value',     type: 'string'},
             {name: 'simple',     type: 'boolean'},
             {name: 'array',     type: 'boolean'},
+            {name: 'ref',     type: 'boolean'},
             {name: 'type',     type: 'string'},
-            {name: 'isKey',     type: 'boolean'}
+            {name: 'isKey',     type: 'boolean'},
+            {name: 'metaId',     type: 'string'}
         ]
     });
 
     var entityStore = Ext.create('Ext.data.TreeStore', {
         model: 'entityModel',
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op : 'LIST_ENTITY'}
+        },
+        folderSort: true
+    });
+
+    subEntityStore = Ext.create('Ext.data.TreeStore', {
+        model: 'entityModel',
+        storeId: 'subEntityStore',
         proxy: {
             type: 'ajax',
             url: dataUrl,
@@ -219,7 +255,8 @@ Ext.onReady(function() {
                 params: {
                     op : 'LIST_ENTITY',
                     entityId: entityId.getValue(),
-                    date: Ext.getCmp('edDate').value
+                    date: Ext.getCmp('edDate').value,
+                    asRoot: true
                 },
                 callback: function(records, operation, success) {
                     if (!success) {
@@ -480,8 +517,16 @@ Ext.onReady(function() {
                                     children[i].data.value = Ext.getCmp(children[i].data.code + "FromItem")
                                         .getValue();
                                 }
+                            } else {
+                                if(children[i].data.type == "META_CLASS") {
+                                    loadSubEntity(children[i]);
+                                }
                             }
                         }
+
+                        console.log("selectedNode", selectedNode);
+
+                        selectedNode.appendChild();
 
                         Ext.getCmp("entityTreeView").getView().refresh();
                     }
@@ -490,50 +535,107 @@ Ext.onReady(function() {
 
                 var children = selectedNode.childNodes;
 
-                console.log(children); // TODO remove
-
                 var form = Ext.getCmp('EntityEditorFormPannel');
                 form.removeAll();
+
+                form.add(Ext.create("Ext.form.field.ComboBox", {
+                    id: "attributesCombo",
+                    //fieldLabel: "Attributes:",
+                    width: "100%",
+                    store: Ext.create('Ext.data.Store', {
+                        model: 'attrsStoreModel',
+                        pageSize: 100,
+                        proxy: {
+                            type: 'ajax',
+                            url: dataUrl,
+                            extraParams: {
+                                op : 'LIST_ATTRIBUTES',
+                                entityId: selectedNode.data.value,
+                                date: Ext.getCmp('edDate').value
+                            },
+                            actionMethods: {
+                                read: 'POST'
+                            },
+                            reader: {
+                                type: 'json',
+                                root: 'data',
+                                totalProperty: 'total'
+                            }
+                        },
+                        autoLoad: true,
+                        remoteSort: true
+                    }),
+                    displayField: 'title',
+                    valueField: 'name'
+                }));
+
+                form.add(Ext.create('Ext.button.Button', {
+                    id: "btnFormSave",
+                    text: "Добавить поле",
+                    handler : function () {
+                        form.add(
+
+                        );
+                    }
+                }));
+
                 for(var i = 0; i < children.length; i++){
-                    if(children[i].data.simple) {
-                        if(children[i].data.type == "DATE") {
-                            form.add(Ext.create("Ext.form.field.Date",
-                                {
-                                    id: children[i].data.code + "FromItem",
-                                    fieldLabel: children[i].data.title,
-                                    width: "100%",
-                                    format: 'd.m.Y',
-                                    value: new Date(
-                                        children[i].data.value.
-                                            replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1')),
-                                    disabled: children[i].data.isKey
-                                }));
-                        } else {
-                            form.add(Ext.create("Ext.form.field.Text",
-                                {
-                                    id: children[i].data.code + "FromItem",
-                                    fieldLabel: children[i].data.title,
-                                    width: "100%",
-                                    value: children[i].data.value,
-                                    disabled: children[i].data.isKey
-                                }));
-                        }
+                    var disabled = children[i].data.isKey || children[i].data.array
+                        || (!selectedNode.data.root && selectedNode.data.ref)
+                        || (selectedNode.data.array && !children[i].data.simple && !children[i].data.ref);
+
+                    if (children[i].data.type == "DATE") {
+                        form.add(Ext.create("Ext.form.field.Date",
+                            {
+                                id: children[i].data.code + "FromItem",
+                                fieldLabel: children[i].data.title,
+                                width: "100%",
+                                format: 'd.m.Y',
+                                value: new Date(
+                                    children[i].data.value.
+                                        replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1')),
+                                disabled: disabled
+                            }));
+                    } else if (children[i].data.ref) {
+                        form.add(Ext.create("Ext.form.field.ComboBox", {
+                            id: children[i].data.code + "FromItem",
+                            fieldLabel: children[i].data.title,
+                            width: "100%",
+                            disabled: disabled,
+                            store: Ext.create('Ext.data.Store', {
+                                model: 'refStoreModel',
+                                pageSize: 100,
+                                proxy: {
+                                    type: 'ajax',
+                                    url: dataUrl,
+                                    extraParams: {op : 'LIST_BY_CLASS', metaId: children[i].data.metaId},
+                                    actionMethods: {
+                                        read: 'POST'
+                                    },
+                                    reader: {
+                                        type: 'json',
+                                        root: 'data',
+                                        totalProperty: 'total'
+                                    }
+                                },
+                                autoLoad: true,
+                                remoteSort: true
+                            }),
+                            displayField: 'title',
+                            valueField: 'id',
+                            value: children[i].data.value
+                        }));
                     } else {
-                        if(children[i].data.type == "META_CLASS") {
-                            form.add(
-                                Ext.create("Ext.form.field.ComboBox", {
-                                    id: children[i].data.code + "FromItem",
-                                    fieldLabel: children[i].data.title,
-                                    width: "100%",
-                                    value: children[i].data.value,
-                                    disabled: children[i].data.isKey
-                                })
-                            );
-                        }
+                        form.add(Ext.create("Ext.form.field.Text",
+                            {
+                                id: children[i].data.code + "FromItem",
+                                fieldLabel: children[i].data.title,
+                                width: "100%",
+                                value: children[i].data.value,
+                                disabled: disabled
+                            }));
                     }
                 }
-
-                form.add(buttonSaveAttributes);
 
                 form.doLayout();
             }
