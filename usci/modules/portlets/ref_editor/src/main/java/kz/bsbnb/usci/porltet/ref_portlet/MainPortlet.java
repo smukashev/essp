@@ -10,10 +10,7 @@ import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.IMetaClass;
-import kz.bsbnb.usci.eav.model.meta.IMetaType;
-import kz.bsbnb.usci.eav.model.meta.MetaClassName;
+import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
@@ -407,25 +404,16 @@ public class MainPortlet extends MVCPortlet {
                     }
                     break;
                 case LIST_ATTRIBUTES:
-                    String entityId = getParam("entityId", resourceRequest);
+                    metaId = getParam("metaId", resourceRequest);
 
-                    if (StringUtils.isNotEmpty(entityId)) {
-                        Date date = null;
-
-                        if(StringUtils.isNotEmpty(resourceRequest.getParameter("date")))
-                            date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
-
-                        if(date == null)
-                            date = new Date();
-
-                        BaseEntity entity = entityService.load(Integer.parseInt(entityId), date);
-
-                        writer.write(getAttributesJson(entity));
+                    if (StringUtils.isNotEmpty(metaId)) {
+                        MetaClass metaClass = metaFactoryService.getMetaClass(Long.valueOf(metaId));
+                        writer.write(getAttributesJson(metaClass));
                     }
 
                     break;
                 case LIST_ENTITY:
-                    entityId = getParam("entityId", resourceRequest);
+                    String entityId = getParam("entityId", resourceRequest);
                     String asRootStr = getParam("asRoot", resourceRequest);
 
                     boolean asRoot = StringUtils.isNotEmpty(asRootStr) ? Boolean.valueOf(asRootStr) : false;
@@ -456,9 +444,7 @@ public class MainPortlet extends MVCPortlet {
         }
     }
 
-    private String getAttributesJson(BaseEntity entity) {
-        IMetaClass meta = entity.getMeta();
-
+    private String getAttributesJson(IMetaClass meta) {
         StringBuilder result = new StringBuilder();
 
         result.append("{\"total\":");
@@ -477,7 +463,7 @@ public class MainPortlet extends MVCPortlet {
             }
             result.append("{");
 
-            result.append("\"name\":");
+            result.append("\"code\":");
             result.append("\"");
             result.append(attrName);
             result.append("\"");
@@ -487,14 +473,54 @@ public class MainPortlet extends MVCPortlet {
             result.append(metaAttribute.getTitle());
             result.append("\"");
 
+            result.append(",\"isKey\":");
+            result.append("\"");
+            result.append(metaAttribute.isKey());
+            result.append("\"");
+
+            result.append(",\"array\":");
+            result.append("\"");
+            result.append(metaAttribute.getMetaType().isSet());
+            result.append("\"");
+
+            result.append(",\"simple\":");
+            result.append("\"");
+            result.append(!metaAttribute.getMetaType().isComplex());
+            result.append("\"");
+
+            result.append(",\"ref\":");
+            result.append("\"");
+            result.append(metaAttribute.getMetaType().isReference());
+            result.append("\"");
+
+            if (metaAttribute.getMetaType().isComplex() && !metaAttribute.getMetaType().isSet()) {
+                result.append(",\"metaId\":");
+                result.append("\"");
+                result.append(((IMetaClass)metaAttribute.getMetaType()).getId());
+                result.append("\"");
+            }
+
+            result.append(",\"type\":");
+            result.append("\"");
+            result.append(getMetaTypeStr(metaAttribute.getMetaType()));
+            result.append("\"");
+
             result.append("}");
         }
 
         result.append("]}");
 
-        // TODO
-
         return result.toString();
+    }
+
+    private String getMetaTypeStr(IMetaType metaType) {
+        if (metaType.isSet())
+            return "META_SET";
+        else if (metaType.isComplex()) {
+            return "META_CLASS";
+        } else {
+            return ((IMetaValue)metaType).getTypeCode().name();
+        }
     }
 
     private String getParam(String name, ResourceRequest resourceRequest) {
