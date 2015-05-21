@@ -217,6 +217,7 @@ function addField(form, attr, isEdit, isNew, node) {
                 },
                 autoLoad: true,
                 remoteSort: true
+
             }),
             displayField: 'title',
             valueField: 'id',
@@ -239,7 +240,7 @@ function addAttributesCombo(form, metaId, isEdit) {
 
     form.add(Ext.create("Ext.form.field.ComboBox", {
         id: "attributesCombo" + idSuffix,
-        fieldLabel: "Attribute:",
+        fieldLabel: "Атрибут:",
         width: "100%",
         store: Ext.create('Ext.data.Store', {
             storeId: 'attrsStore' + idSuffix,
@@ -262,7 +263,28 @@ function addAttributesCombo(form, metaId, isEdit) {
                 }
             },
             autoLoad: isEdit,
-            remoteSort: true
+            remoteSort: true,
+            listeners : {
+                load : function (obj, records) {
+                    var tree = Ext.getCmp('entityTreeView');
+                    var selectedNode = tree.getSelectionModel().getLastSelected();
+                    var store = Ext.StoreMgr.lookup('attrsStore' + idSuffix);
+                    var count = 0;
+
+                    for (i = 0; i < records.length; i++) {
+                        var rec = records[i].data;
+
+                        var exists = false;
+
+                        for (j = 0; j < selectedNode.childNodes.length; j++) {
+                            if (rec.code == selectedNode.childNodes[j].data.code) {
+                                store.removeAt(i - count);
+                                count++;
+                            }
+                        }
+                    }
+                }
+            }
         }),
         displayField: 'title',
         valueField: 'code',
@@ -292,6 +314,10 @@ function addAttributesCombo(form, metaId, isEdit) {
             }
         }
     }));
+}
+
+function addArrayElementButton(form, selectedNode) {
+    console.log("selectedNode = ", selectedNode);
 }
 
 var newEditFormItems = [];
@@ -530,9 +556,15 @@ Ext.onReady(function() {
                 var tree = Ext.getCmp('entityTreeView');
                 rootNode = tree.getRootNode();
 
+                var classesCombo = Ext.getCmp('entityEditorComplexTypeCombo');
+                var value = classesCombo.getValue();
+                var rec = classesCombo.findRecordByValue(value);
+
                 rootNode.appendChild({
                     leaf: false,
-                    title: "ASDQWEZXC"
+                    title: rec.data.className,
+                    code: rec.data.className,
+                    type: "META_CLASS"
                 });
 
                 var mainNode = rootNode.getChildAt(0);
@@ -659,6 +691,8 @@ Ext.onReady(function() {
                         var tree = Ext.getCmp('entityTreeView');
                         var selectedNode = tree.getSelectionModel().getLastSelected();
 
+                        console.log("selectedNode = ", selectedNode);
+
                         var children = selectedNode.childNodes;
 
                         for(var i = 0; i < children.length; i++){
@@ -694,6 +728,8 @@ Ext.onReady(function() {
                         }
 
                         Ext.getCmp("entityTreeView").getView().refresh();
+
+                        console.log("selectedNode = ", selectedNode);
                     }
                 });
 
@@ -703,8 +739,12 @@ Ext.onReady(function() {
                 var form = Ext.getCmp('EntityEditorFormPannel');
                 form.removeAll(true);
 
-                if (!selectedNode.data.simple && !selectedNode.data.array) {
-                    addAttributesCombo(form, selectedNode.data.metaId, true);
+                if (!selectedNode.data.simple) {
+                    if (!selectedNode.data.array) {
+                        addAttributesCombo(form, selectedNode.data.metaId, true);
+                    } else {
+                        addArrayElementButton(form, selectedNode.data);
+                    }
                 }
 
                 for(var i = 0; i < children.length; i++){
