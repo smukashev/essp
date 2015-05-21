@@ -66,7 +66,7 @@ function createItemsGrid(itemId) {
         store = Ext.create('Ext.data.Store', {
             model: 'myModel',
             remoteGroup: true,
-            buffered: true,
+            //buffered: true,
             leadingBufferZone: 300,
             pageSize: 100,
             proxy: {
@@ -572,7 +572,7 @@ Ext.onReady(function() {
                 },
                 bodyPadding: '5 5 0',
                 autoScroll:true
-            },/*{
+            },{
              xtype : 'panel',
              region: 'south',
              preventHeader: true,
@@ -580,7 +580,7 @@ Ext.onReady(function() {
              height: 150,
              autoScroll:true,
              items: [ createItemsGrid()]
-             }*/],
+             }],
         dockedItems: [
             {
                 fieldLabel: label_REF,
