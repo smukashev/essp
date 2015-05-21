@@ -325,14 +325,14 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         int i = 0;
 
         for (Map.Entry<String, Object> entry : map.entrySet()) {
-            sql.append(COLUMN_PREFIX).append(entry.getKey()).append(",");
-            values.append("? ,");
+            sql.append(COLUMN_PREFIX).append(entry.getKey()).append(", ");
+            values.append("?, ");
             vals[i++] = entry.getValue();
         }
 
         for(ShowCaseField sf : showCaseHolder.getShowCaseMeta().getCustomFieldsList()) {
-            sql.append(sf.getColumnName()).append(",");
-            values.append("? ,");
+            sql.append(sf.getColumnName()).append(", ");
+            values.append("?, ");
             Object o;
 
             if(sf.getAttributePath().equals("")) {
@@ -556,12 +556,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
     @Transactional
     void dbCarteageGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
-        Date openDate = null;
+        Date openDate;
         Date closeDate = null;
         String sql;
 
         if(!showcaseHolder.getShowCaseMeta().isFinal()) {
-            // get open date of existing showcase
             try {
                 sql = "SELECT OPEN_DATE FROM %s WHERE %s%s_ID = ? AND ROWNUM = 1";
                 sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),

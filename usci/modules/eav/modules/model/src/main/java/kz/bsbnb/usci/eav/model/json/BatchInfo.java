@@ -10,7 +10,7 @@ public class BatchInfo {
     private Long size;
     private Long userId;
     private Date repDate;
-    private HashMap<String, String> additionalParams;
+    private HashMap<String, String> additionalParams = new HashMap<String, String>();
 
     private long reportId;
     private long totalCount;
@@ -64,6 +64,10 @@ public class BatchInfo {
     public void setAdditionalParams(HashMap<String, String> additionalParams)
     {
         this.additionalParams = additionalParams;
+    }
+
+    public void addParam(String name, String value) {
+        this.additionalParams.put(name, value);
     }
 
 

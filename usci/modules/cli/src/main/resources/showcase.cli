@@ -280,6 +280,7 @@ showcase list add credit_flow.provision.provision_msfo_over_balance.balance_acco
 showcase list add credit_flow.provision.provision_msfo_over_balance.value msfo_o_b_value
 
 showcase list addCustom credit root credit_id
+showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -373,6 +374,7 @@ showcase list add remains.correction.value_currency corr_cvalue
 showcase list add remains.correction.balance_account
 
 showcase list addCustom credit root credit_id
+showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -408,6 +410,7 @@ showcase set name CORE_PORTFOLIO_FLOW_KFN
 showcase set tableName CORE_PORTFOLIO_FLOW_KFN
 showcase set final true
 
+showcase list add creditor portfolio_creditor_id
 showcase list add portfolio_flows_kfn.details.balance_account
 showcase list add portfolio_flows_kfn.details.value
 showcase list add portfolio_flows_kfn.portfolio.creditor
@@ -422,6 +425,7 @@ showcase set meta portfolio_data
 showcase set name CORE_PORTFOLIO_FLOW_MSFO
 showcase set tableName CORE_PORTFOLIO_FLOW_MSFO
 showcase set final true
+
 
 showcase list add portfolio_flows_msfo.details.balance_account
 showcase list add portfolio_flows_msfo.details.value
