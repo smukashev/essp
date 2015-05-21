@@ -135,6 +135,8 @@ function createItemsGrid(itemId) {
 }
 
 function loadSubEntity(subNode, isEdit) {
+    subNode.removeAll();
+
     idSuffix = isEdit ? "_edit" : "_add";
 
     var subEntityId = Ext.getCmp(subNode.data.code + "FromItem" + idSuffix).getValue();
@@ -152,13 +154,17 @@ function loadSubEntity(subNode, isEdit) {
             } else {
                 subNode.data.value = records[0].data.value;
                 subNode.data.children = records[0].data.children;
-                subNode.childNodes = records[0].childNodes;
+                //subNode.childNodes = records[0].childNodes;
+
+                for (i = 0; i < records[0].childNodes.length; i++) {
+                    subNode.appendChild(records[0].childNodes[i]);
+                }
             }
         }
     });
 }
 
-function addField(form, attr, isEdit, node) {
+function addField(form, attr, isEdit, isNew, node) {
     if (isEdit) {
         idSuffix = "_edit";
         newItems = newEditFormItems;
@@ -167,7 +173,9 @@ function addField(form, attr, isEdit, node) {
         newItems = newAddFormItems;
     }
 
-    newItems.push(attr);
+    if (isNew) {
+        newItems.push(attr);
+    }
 
     var disabled = attr.isKey || attr.array
         || (node && !node.root && node.ref)
@@ -278,7 +286,7 @@ function addAttributesCombo(form, metaId, isEdit) {
 
             if (!Ext.getCmp(rec.data.code + "FromItem" + idSuffix)) {
                 //form.remove(buttonSaveAttributes, false);
-                addField(form, rec.data, isEdit);
+                addField(form, rec.data, isEdit, true);
                 //form.add(buttonSaveAttributes);
                 //form.doLayout();
             }
@@ -374,6 +382,7 @@ Ext.onReady(function() {
 
     var entityStore = Ext.create('Ext.data.TreeStore', {
         model: 'entityModel',
+        storeId: 'entityStore',
         proxy: {
             type: 'ajax',
             url: dataUrl,
@@ -410,6 +419,10 @@ Ext.onReady(function() {
                     if (!success) {
                         Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
                     }
+
+                    var tree = Ext.getCmp('entityTreeView');
+                    var rootNode = tree.getRootNode();
+                    console.log("rootNode = ", rootNode);
                 }
             });
         },
@@ -524,14 +537,13 @@ Ext.onReady(function() {
 
                 var mainNode = rootNode.getChildAt(0);
 
-                console.log("newAddFormItems = ", newAddFormItems);
-
                 for (i = 0; i < newAddFormItems.length; i++) {
                     mainNode.appendChild(newAddFormItems[i]);
                     var currentNode = mainNode.getChildAt(i);
 
                     if(newAddFormItems[i].simple) {
-                        currentNode.leaf = true;
+                        currentNode.data.leaf = true;
+                        currentNode.data.iconCls = "file";
 
                         if(newAddFormItems[i].type == "DATE") {
                             currentNode.data.value = Ext.getCmp(newAddFormItems[i].code + "FromItem_add")
@@ -543,6 +555,9 @@ Ext.onReady(function() {
 
                     } else {
                         if(newAddFormItems[i].type == "META_CLASS") {
+                            currentNode.data.leaf = false;
+                            currentNode.data.iconCls = "folder";
+
                             loadSubEntity(currentNode, false);
                         }
                     }
@@ -551,6 +566,8 @@ Ext.onReady(function() {
                 tree.getView().refresh();
 
                 this.up('.window').close();
+
+                console.log("rootNode = ", rootNode);
             }
         }]
     });
@@ -576,7 +593,7 @@ Ext.onReady(function() {
                 callback: function(records, operation, success) {
                     for (i = 0; i < store.data.items.length; i++) {
                         var rec = store.data.items[i];
-                        addField(form, rec.data, false);
+                        addField(form, rec.data, false, true);
                     }
 
                     form.doLayout();
@@ -596,6 +613,7 @@ Ext.onReady(function() {
         store: entityStore,
         multiSelect: true,
         singleExpand: true,
+        folderSort: true,
         columns: [{
             xtype: 'treecolumn',
             text: label_TITLE,
@@ -690,7 +708,7 @@ Ext.onReady(function() {
                 }
 
                 for(var i = 0; i < children.length; i++){
-                    addField(form, children[i].data, true, selectedNode.data);
+                    addField(form, children[i].data, true, false, selectedNode.data);
                 }
 
                 form.add(buttonSaveAttributes);
