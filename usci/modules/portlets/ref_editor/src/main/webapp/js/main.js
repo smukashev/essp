@@ -17,10 +17,10 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first) {
     } else {
         if(first) {
             xmlStr += offset + "<entity " +
-                (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
+            (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
         } else {
             xmlStr += offset + "<" + currentNode.data.code +
-                (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
+            (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
         }
     }
 
@@ -238,58 +238,81 @@ function addField(form, attr, isEdit, isNew, node) {
 function addAttributesCombo(form, metaId, isEdit) {
     idSuffix = isEdit ? "_edit" : "_add";
 
+    var store = Ext.create('Ext.data.Store', {
+        storeId: 'attrsStore' + idSuffix,
+        model: 'attrsStoreModel',
+        pageSize: 100,
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {
+                op : 'LIST_ATTRIBUTES',
+                metaId: metaId
+            },
+            actionMethods: {
+                read: 'POST'
+            },
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
+        },
+        autoLoad: isEdit,
+        remoteSort: true,
+        listeners : {
+            load : function (obj, records) {
+
+                var tree = Ext.getCmp('entityTreeView');
+                var selectedNode = tree.getSelectionModel().getLastSelected();
+                var localStore = Ext.StoreMgr.lookup('attrsStore' + idSuffix);
+                var count = 0;
+
+                for (i = 0; i < records.length; i++) {
+                    var rec = records[i].data;
+
+                    for (j = 0; j < selectedNode.childNodes.length; j++) {
+                        if (rec.code == selectedNode.childNodes[j].data.code) {
+                            localStore.removeAt(i - count);
+                            count++;
+                        }
+                    }
+                }
+
+                if (count == records.length) {
+                    console.log("REMOVE");
+
+                    var combo = Ext.getCmp("attributesCombo" + idSuffix);
+                    var btn = Ext.getCmp("btnFormAdd");
+                    form.remove(combo);
+                    form.remove(btn);
+                }
+            }
+        }
+    });
+
     form.add(Ext.create("Ext.form.field.ComboBox", {
         id: "attributesCombo" + idSuffix,
         fieldLabel: "Атрибут:",
         width: "100%",
-        store: Ext.create('Ext.data.Store', {
-            storeId: 'attrsStore' + idSuffix,
-            model: 'attrsStoreModel',
-            pageSize: 100,
-            proxy: {
-                type: 'ajax',
-                url: dataUrl,
-                extraParams: {
-                    op : 'LIST_ATTRIBUTES',
-                    metaId: metaId
-                },
-                actionMethods: {
-                    read: 'POST'
-                },
-                reader: {
-                    type: 'json',
-                    root: 'data',
-                    totalProperty: 'total'
-                }
-            },
-            autoLoad: isEdit,
-            remoteSort: true,
-            listeners : {
-                load : function (obj, records) {
-                    var tree = Ext.getCmp('entityTreeView');
-                    var selectedNode = tree.getSelectionModel().getLastSelected();
-                    var store = Ext.StoreMgr.lookup('attrsStore' + idSuffix);
-                    var count = 0;
-
-                    for (i = 0; i < records.length; i++) {
-                        var rec = records[i].data;
-
-                        var exists = false;
-
-                        for (j = 0; j < selectedNode.childNodes.length; j++) {
-                            if (rec.code == selectedNode.childNodes[j].data.code) {
-                                store.removeAt(i - count);
-                                count++;
-                            }
-                        }
-                    }
-                }
-            }
-        }),
+        store: store,
+        editable: false,
         displayField: 'title',
         valueField: 'code',
         hidden: !isEdit
     }));
+
+    var combo = Ext.getCmp("attributesCombo" + idSuffix);
+    //combo.clearManagedListeners();
+    combo.on('click', function () {
+        console.log("click");
+        combo.expand();
+    });
+
+    combo.on('select', function () {
+        console.log("select");
+        combo.expand();
+    });
 
     form.add(Ext.create('Ext.button.Button', {
         id: "btnFormAdd",
