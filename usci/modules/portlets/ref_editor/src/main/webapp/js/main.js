@@ -111,7 +111,7 @@ function createItemsGrid(itemId) {
             ],
             title: label_ITEMS,
             listeners : {
-                itemdblclick: function(dv, record, item, index, e) {
+                itemclick: function(dv, record, item, index, e) {
                     entityId = Ext.getCmp("entityId");
                     entityId.setValue(record.get('id'));
                 }
@@ -322,7 +322,7 @@ Ext.onReady(function() {
             }
         },
         autoLoad: true,
-        remoteSort: true
+        remoteSort: true,
     });
 
     Ext.define('refStoreModel', {
@@ -345,25 +345,25 @@ Ext.onReady(function() {
         ]
     });
 
-    var refStore = Ext.create('Ext.data.Store', {
-        model: 'refStoreModel',
-        pageSize: 100,
-        proxy: {
-            type: 'ajax',
-            url: dataUrl,
-            extraParams: {op : 'LIST_BY_CLASS'},
-            actionMethods: {
-                read: 'POST'
-            },
-            reader: {
-                type: 'json',
-                root: 'data',
-                totalProperty: 'total'
-            }
-        },
-        autoLoad: false,
-        remoteSort: true
-    });
+    /*var refStore = Ext.create('Ext.data.Store', {
+     model: 'refStoreModel',
+     pageSize: 100,
+     proxy: {
+     type: 'ajax',
+     url: dataUrl,
+     extraParams: {op : 'LIST_BY_CLASS'},
+     actionMethods: {
+     read: 'POST'
+     },
+     reader: {
+     type: 'json',
+     root: 'data',
+     totalProperty: 'total'
+     }
+     },
+     autoLoad: false,
+     remoteSort: true
+     });*/
 
     Ext.define('entityModel', {
         extend: 'Ext.data.Model',
@@ -718,11 +718,28 @@ Ext.onReady(function() {
         }
     });
 
+    // --------------------------------------------
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+
+    if(dd<10) {
+        dd='0'+dd
+    }
+
+    if(mm<10) {
+        mm='0'+mm
+    }
+
+    today = mm+'/'+dd+'/'+yyyy;
+    // ------------------------------------------------
+
     mainEntityEditorPanel = Ext.create('Ext.panel.Panel', {
         title : 'Панель данных',
         preventHeader: true,
         width : '100%',
-        height: '500px',
+        height: '700px',
         renderTo : 'entity-editor-content',
         layout : 'border',
         defaults : {
@@ -751,14 +768,14 @@ Ext.onReady(function() {
                 bodyPadding: '5 5 0',
                 autoScroll:true
             },{
-             xtype : 'panel',
-             region: 'south',
-             preventHeader: true,
-             width: "60%",
-             height: 150,
-             autoScroll:true,
-             items: [ createItemsGrid()]
-             }],
+                xtype : 'panel',
+                region: 'north',
+                preventHeader: true,
+                width: "60%",
+                height: 250,
+                autoScroll:true,
+                items: [ createItemsGrid()]
+            }],
         dockedItems: [
             {
                 fieldLabel: label_REF,
@@ -771,42 +788,50 @@ Ext.onReady(function() {
                     change: function (field, newValue, oldValue) {
                         currentClassId = newValue;
 
-                        refStore.proxy.extraParams = {metaId: currentClassId, op: 'LIST_BY_CLASS'};
-                        Ext.getCmp('entityEditorrefCombo').value = null;
+                        /*
+                         refStore.proxy.extraParams = {metaId: currentClassId, op: 'LIST_BY_CLASS'};
+                         Ext.getCmp('entityEditorrefCombo').value = null;
 
-                        refStore.reload();
+                         refStore.reload();
+                         */
                         createItemsGrid(currentClassId);
                     }
                 },
-                maxWidth: 400
-            },{
-                fieldLabel: label_ITEMS,
-                id: 'entityEditorrefCombo',
-                xtype: 'combobox',
-                maxWidth: 400,
-                store: refStore,
-                valueField:'id',
-                displayField:'title',
-                listeners: {
-                    change: function (field, newValue, oldValue) {
-                        entityId = Ext.getCmp("entityId");
-                        entityId.setValue(newValue);
-                    }
-                }
-            },{
+                editable : false
+            },
+            /*{
+             fieldLabel: label_ITEMS,
+             id: 'entityEditorrefCombo',
+             xtype: 'combobox',
+             maxWidth: 400,
+             store: refStore,
+             valueField:'id',
+             displayField:'title',
+             listeners: {
+             change: function (field, newValue, oldValue) {
+             entityId = Ext.getCmp("entityId");
+             entityId.setValue(newValue);
+             }
+             }
+             },*/
+            {
                 fieldLabel: label_ENTITY_ID,
                 id: 'entityId',
                 name: 'entityId',
                 xtype: 'textfield',
-                maxWidth: 400,
+                disabled : true,
+                /*maxWidth: 400,*/
                 value: (givenEntityId == "null" ? "" : givenEntityId)
             }, {
                 fieldLabel: label_Date,
                 id: 'edDate',
                 xtype: 'datefield',
-                maxWidth: 400
-            }, {
-                xtype: 'tbseparator'
+                maxWidth: 400,
+                value : today
+            },
+            {
+                xtype: 'tbseparator',
+                height: 10
             }
         ],
         tbar: [
