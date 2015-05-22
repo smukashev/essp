@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
@@ -117,9 +118,14 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
                 if(metaType.isReference()) {
                     ret+=getDomRef( userId, (MetaClass) metaType, attr);
                 } else if (metaType.isComplex()) {
-                    if(metaType.isSet() || metaType.isSetOfSets())
+                    if(metaType.isSetOfSets())
                         throw new NotImplementedException();
-                    ret += getDom(userId, (MetaClass) metaType, attr);
+                    if(metaType.isSet()) {
+                        IMetaType childMeta = ((MetaSet) metaType).getMemberType();
+                        ret += getDom(userId, (MetaClass) childMeta, attr);
+                    } else {
+                        ret += getDom(userId, (MetaClass) metaType, attr);
+                    }
                 } else {
                     String divSimple;
                     if( ((MetaValue)metaType).getTypeCode().equals(DataTypes.DATE))
