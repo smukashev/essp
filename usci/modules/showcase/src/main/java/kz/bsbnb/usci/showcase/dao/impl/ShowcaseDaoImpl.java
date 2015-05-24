@@ -562,19 +562,32 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         if(!showcaseHolder.getShowCaseMeta().isFinal()) {
             try {
-                sql = "SELECT OPEN_DATE FROM %s WHERE %s%s_ID = ? AND ROWNUM = 1";
+                sql = "SELECT MAX(OPEN_DATE) AS OPEN_DATE FROM %s WHERE %s%s_ID = ?";
                 sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
                         COLUMN_PREFIX, showcaseHolder.getRootClassName());
 
                 long t1 = System.currentTimeMillis();
                 openDate = (Date) jdbcTemplateSC.queryForMap(sql, entity.getId()).get("OPEN_DATE");
                 long t2 = System.currentTimeMillis() - t1;
-                stats.put("SELECT OPEN_DATE FROM %s WHERE %sROOT_ID = ?", t2);
+                stats.put("SELECT MAX(OPEN_DATE) AS OPEN_DATE FROM %s WHERE %sROOT_ID = ?", t2);
             } catch (EmptyResultDataAccessException e) {
                 openDate = null;
             }
 
-            if (openDate == null || openDate.compareTo(entity.getReportDate()) <= 0) {
+            if (openDate == null) {
+                openDate = entity.getReportDate();
+            } else if(openDate.compareTo(entity.getReportDate()) == 0) {
+                openDate = entity.getReportDate();
+
+                sql = "DELETE FROM %s WHERE %s%s_ID = ? and OPEN_DATE = ?";
+                sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                        COLUMN_PREFIX, showcaseHolder.getRootClassName());
+
+                int rows = jdbcTemplateSC.update(sql, entity.getId(), openDate);
+
+                logger.debug(sql, entity.getId(), openDate);
+                logger.debug("Rows deleted from " + getActualTableName(showcaseHolder.getShowCaseMeta()) + ": " + rows);
+            } else if(openDate.compareTo(entity.getReportDate()) < 0) {
                 long t1 = System.currentTimeMillis();
                 updateLeftRange(HistoryState.ACTUAL, entity, showcaseHolder);
                 moveActualToHistory(entity, showcaseHolder);
