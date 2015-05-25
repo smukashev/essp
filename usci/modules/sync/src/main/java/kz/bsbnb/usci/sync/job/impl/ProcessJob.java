@@ -31,8 +31,7 @@ public class ProcessJob extends AbstractJob {
         //TODO: Remove hardcode (credit specific attributes)
         Date contractDate = null;
         String contractNo = null;
-        if (baseEntity.getMeta().getClassName().equals("credit"))
-        {
+        if (baseEntity.getMeta().getClassName().equals("credit")) {
             contractDate = (Date)baseEntity.getEl("primary_contract.date");
             contractNo = (String)baseEntity.getEl("primary_contract.no");
         }

@@ -63,8 +63,7 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     }
 
     @Override
-    public List<MetaClass> getMetaClasses()
-    {
+    public List<MetaClass> getMetaClasses() {
         return remoteMetaFactoryService.getMetaClasses();
     }
 
@@ -79,8 +78,7 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     }
 
     @Override
-    public MetaClass getMetaClass(String name)
-    {
+    public MetaClass getMetaClass(String name) {
         return remoteMetaFactoryService.getMetaClass(name);
     }
 
@@ -90,16 +88,12 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     }
 
     @Override
-    public boolean saveMetaClass(MetaClass meta)
-    {
+    public boolean saveMetaClass(MetaClass meta) {
         return remoteMetaFactoryService.saveMetaClass(meta);
     }
 
     @Override
-    public boolean delMetaClass(String className)
-    {
+    public boolean delMetaClass(String className) {
         return remoteMetaFactoryService.delMetaClass(className);
     }
-
-
 }

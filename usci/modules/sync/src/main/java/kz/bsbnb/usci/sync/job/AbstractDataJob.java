@@ -15,7 +15,7 @@ public abstract class AbstractDataJob extends AbstractJob {
     protected final List<BaseEntity> entities
             = Collections.synchronizedList(new ArrayList<BaseEntity>());
 
-    protected final List<ProcessJob> processingJobs = new ArrayList<ProcessJob>();
+    protected final List<ProcessJob> processingJobs = new ArrayList<>();
 
     protected final int SLEEP_TIME_NORMAL = 1000;
     protected final int SLEEP_TIME_LONG = 5000;
