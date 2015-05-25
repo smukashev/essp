@@ -6,9 +6,9 @@ import kz.bsbnb.usci.eav.util.Pair;
 import java.util.List;
 
 /**
- * Created by Bauyrzhan.Makhambeto on 05/03/2015.
+ *  @author Bauyrzhan.Makhambetov.
  */
 public interface ISearcherFormService {
-    public List<Pair> getMetaClasses(long userId);
-    public String getDom(long userId, IMetaClass metaClass);
+    List<Pair> getMetaClasses(long userId);
+    String getDom(long userId, IMetaClass metaClass);
 }
