@@ -45,7 +45,7 @@ public class CreditContractParser  extends BatchParser {
                 currentBaseEntity.put("no", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
             } else if(localName.equals("date")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("contract_date", new BaseEntityDateValue(batch, index,
+                currentBaseEntity.put("date", new BaseEntityDateValue(batch, index,
                         dateFormat.parse(event.asCharacters().getData())
                 ));
             } else {

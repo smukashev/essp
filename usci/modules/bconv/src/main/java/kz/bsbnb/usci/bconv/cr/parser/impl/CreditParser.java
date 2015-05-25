@@ -2,15 +2,21 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Stack;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.TypeErrorException;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.util.ParserUtils;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -43,9 +49,13 @@ public class CreditParser extends BatchParser {
 
     @Autowired
     private CreditorBranchParser creditorBranchParser;
-    
+
+    private MetaClass currencyMetaClass;
+
+    private List<IBaseEntity> refCurrencyList = new ArrayList<>();
+
     public CreditParser() {
-        super();        
+        super();
     }
 
 
@@ -62,10 +72,37 @@ public class CreditParser extends BatchParser {
                 BaseEntity creditContract = creditContractParser.getCurrentBaseEntity();
                 currentBaseEntity.put("contract", new BaseEntityComplexValue(batch, index, creditContract));
             } else if(localName.equals("currency")) {
-                event = (XMLEvent) xmlReader.next();
-                BaseEntity currency = new BaseEntity(metaClassRepository.getMetaClass("ref_currency"), batch.getRepDate());
+                if(currencyMetaClass == null) {
+                    try {
+                        currencyMetaClass = metaClassRepository.getMetaClass("ref_currency");
+                    } catch (Exception e) {
+                        // do nothing
+                    }
+                }
 
-                currency.put("code", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
+                if(currencyMetaClass != null && refCurrencyList.size() == 0) {
+                    List<Long> refCurrencyIds = baseEntityRepository.getBaseEntityProcessorDao().
+                            getEntityIDsByMetaclass(currencyMetaClass.getId());
+
+                    for (Long refCurrencyId : refCurrencyIds) {
+                        refCurrencyList.add(baseEntityRepository.getBaseEntityProcessorDao().load(refCurrencyId));
+                    }
+                }
+
+                event = (XMLEvent) xmlReader.next();
+                BaseEntity currency = new BaseEntity(currencyMetaClass, batch.getRepDate());
+
+                String currencyCode = null;
+
+                for(IBaseEntity entity : refCurrencyList) {
+                    IBaseValue shortName = entity.getBaseValue("short_name");
+                    if(shortName.getValue().toString().equals(event.asCharacters().getData())) {
+                        currencyCode = entity.getBaseValue("code").getValue().toString();
+                        break;
+                    }
+                }
+
+                currency.put("code", new BaseEntityStringValue(batch, index, currencyCode));
 
                 currentBaseEntity.put("currency", new BaseEntityComplexValue(batch, index, currency));
             } else if(localName.equals("interest_rate_yearly")) {

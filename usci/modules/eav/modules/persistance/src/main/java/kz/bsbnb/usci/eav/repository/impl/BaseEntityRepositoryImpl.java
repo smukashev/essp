@@ -87,6 +87,11 @@ public class BaseEntityRepositoryImpl implements IBaseEntityRepository {
     // TODO: Maybe use LinkedHashMap
     LoadingCache<BaseEntityKey, IBaseEntity> cache;
 
+    @Override
+    public IBaseEntityProcessorDao getBaseEntityProcessorDao() {
+        return this.baseEntityProcessorDao;
+    }
+
     public BaseEntityRepositoryImpl()
     {
         if (enabled)
