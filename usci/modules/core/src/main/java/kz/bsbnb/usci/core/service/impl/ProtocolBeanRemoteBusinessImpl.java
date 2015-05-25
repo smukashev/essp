@@ -42,7 +42,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
         try {
-            couchbaseClient = new CouchbaseClient(nodes, "test", "");
+            couchbaseClient = new CouchbaseClient(nodes, "test2", "");
         } catch (Exception e) {
             logger.error("Error connecting to Couchbase: " + e.getMessage());
         }
