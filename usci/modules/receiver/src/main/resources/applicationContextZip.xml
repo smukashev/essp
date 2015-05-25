@@ -21,7 +21,7 @@
     <import resource="classpath:database/hibernate.xml" />
     <import resource="applicationContextDroolsSingleton.xml" />
 
-    <context:component-scan base-package="kz.bsbnb.usci.eav.stats" />
+    <context:component-scan base-package="kz.bsbnb.usci.eav" />
     <context:component-scan base-package="kz.bsbnb.usci.bconv" />
     <context:component-scan base-package="kz.bsbnb.usci.brms.rulesingleton" />
     <context:component-scan base-package="kz.bsbnb.usci.receiver" />

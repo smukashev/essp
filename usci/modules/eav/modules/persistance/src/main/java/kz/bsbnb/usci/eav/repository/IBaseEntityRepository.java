@@ -1,33 +1,31 @@
 package kz.bsbnb.usci.eav.repository;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-/**
- *
- */
 public interface IBaseEntityRepository {
+    IBaseEntity getBaseEntity(long id, Date reportDate);
 
-    public IBaseEntity getBaseEntity(long id, Date reportDate);
+    void initialize();
 
-    public void initialize();
+    void setEnabled(boolean enabled);
 
-    public void setEnabled(boolean enabled);
+    boolean getEnabled();
 
-    public boolean getEnabled();
+    void setConcurrencyLevel(int concurrencyLevel);
 
-    public void setConcurrencyLevel(int concurrencyLevel);
+    int getConcurrencyLevel();
 
-    public int getConcurrencyLevel();
+    void setDuration(long duration);
 
-    public void setDuration(long duration);
+    long getDuration();
 
-    public long getDuration();
+    void setTimeUnit(TimeUnit timeUnit);
 
-    public void setTimeUnit(TimeUnit timeUnit);
+    TimeUnit getTimeUnit();
 
-    public TimeUnit getTimeUnit();
-
+    IBaseEntityProcessorDao getBaseEntityProcessorDao();
 }
