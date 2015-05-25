@@ -9,13 +9,11 @@ import kz.bsbnb.usci.core.service.ISearcherFormService;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.base.impl.BaseContainerType;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
+import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.Pair;
@@ -370,10 +368,19 @@ public class MainPortlet extends MVCPortlet {
                             continue;
                         IMetaType metaType = metaAttribute.getMetaType();
 
-                        if(metaType.isSet() || metaType.isSetOfSets())
+                        if(metaType.isSetOfSets())
                             throw new UnsupportedOperationException("Not yet implemented");
 
-                        if(metaType.isComplex()) {
+                        if(metaType.isSet()) {
+                            BaseSet childBaseSet = new BaseSet(metaType);
+                            IMetaType itemMeta = ((MetaSet) metaType).getMemberType();
+                            BaseEntity childBaseEntity = new BaseEntity((MetaClass) itemMeta, new Date());
+                            childBaseEntity.setId(Long.valueOf(parameterValue));
+                            Batch b = new Batch(new Date(), currentUser.getUserId());
+                            b.setId(777L);
+                            childBaseSet.put(BaseValueFactory.create(BaseContainerType.BASE_SET, itemMeta, b, 1, childBaseEntity));
+                            value = childBaseSet;
+                        } else if(metaType.isComplex()) {
                             BaseEntity childBaseEntity = new BaseEntity((MetaClass) metaType, new Date());
                             childBaseEntity.setId(Long.valueOf(parameterValue));
                             value = childBaseEntity;

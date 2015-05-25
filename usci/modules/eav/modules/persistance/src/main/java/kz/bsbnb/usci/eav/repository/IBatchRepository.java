@@ -7,15 +7,14 @@ import kz.bsbnb.usci.eav.model.Batch;
  *
  * @author a.motov
  */
-public interface IBatchRepository
-{
+public interface IBatchRepository {
     /**
      * Retrieves Batch from Dao.
      *
      * @param batchId - id of Batch in Storage
      * @return
      */
-    public Batch getBatch(long batchId);
+    Batch getBatch(long batchId);
 
     /**
      * Persists Batch using Dao.
@@ -23,7 +22,7 @@ public interface IBatchRepository
      * @param batch - id of Batch in Storage
      * @return
      */
-    public Batch addBatch(Batch batch);
+    Batch addBatch(Batch batch);
 
-    public void clearCache();
+    void clearCache();
 }

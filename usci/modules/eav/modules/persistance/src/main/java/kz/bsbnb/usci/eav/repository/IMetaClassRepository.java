@@ -8,14 +8,20 @@ import java.util.List;
 /**
  * Caches crud operations with MetaClass objects.
  */
-public interface IMetaClassRepository
-{
-    public MetaClass getMetaClass(String className);
-    public MetaClass getMetaClass(long id);
-    public List<MetaClass> getMetaClasses();
-    public void saveMetaClass(MetaClass meta);
-    public void resetCache();
-    public List<MetaClassName> getMetaClassesNames();
-    public List<MetaClassName> getRefNames();
-    public boolean delMetaClass(String className);
+public interface IMetaClassRepository {
+    MetaClass getMetaClass(String className);
+
+    MetaClass getMetaClass(long id);
+
+    List<MetaClass> getMetaClasses();
+
+    void saveMetaClass(MetaClass meta);
+
+    void resetCache();
+
+    List<MetaClassName> getMetaClassesNames();
+
+    List<MetaClassName> getRefNames();
+
+    boolean delMetaClass(String className);
 }

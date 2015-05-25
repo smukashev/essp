@@ -29,12 +29,12 @@ public class RemoteCreditorBusinessImpl implements RemoteCreditorBusiness
         List<BaseEntity> entities = baseEntityProcessorDao.getEntityByMetaclass(
                 metaClassRepository.getMetaClass("ref_creditor"));
 
-        ArrayList<Creditor> creditors = new ArrayList<Creditor>();
+        ArrayList<Creditor> creditors = new ArrayList<>();
 
         for (BaseEntity entity : entities) {
             Creditor creditor = new Creditor();
-
             creditor.setId(entity.getId());
+
             BaseValue value = (BaseValue)entity.getBaseValue("name");
             if (value != null)
                 creditor.setName((String)value.getValue());
@@ -62,12 +62,18 @@ public class RemoteCreditorBusinessImpl implements RemoteCreditorBusiness
                     BaseEntity docEntity = (BaseEntity)doc.getValue();
                     if(docEntity != null) {
                         String doc_type = (String)docEntity.getEl("doc_type.code");
-                        if (doc_type.equals("07")) {
+
+                        if(doc_type == null)
+                            doc_type = "07";
+
+                        if (doc_type.equals("07"))
                             creditor.setBIN((String)docEntity.getEl("no"));
-                        }
-                        if (doc_type.equals("11")) {
+
+                        if (doc_type.equals("11"))
                             creditor.setRNN((String)docEntity.getEl("no"));
-                        }
+
+                        if(doc_type.equals("15"))
+                            creditor.setBIK((String)docEntity.getEl("no"));
                     }
                 }
             }

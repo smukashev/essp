@@ -500,72 +500,49 @@ public class ZipFilesMonitor{
                 if(docType == null) docType = "";
                 if(docValue == null) docValue = "";
 
-                String creditorCode = batchInfo.getAdditionalParams().get("CODE");
-
-                if(creditorCode == null && docType.equals("15"))
-                    creditorCode = docValue;
-
                 boolean foundCreditor = false;
 
-                if(creditorCode != null) {
-                    for (Creditor creditor : creditors) {
-                        if (creditor.getCode() != null) {
-                            if (creditor.getCode().equals(creditorCode)) {
-                                cId = creditor.getId();
-                                foundCreditor = true;
-                                break;
-                            }
-                        }
+                for (Creditor creditor : creditors) {
+                    if(creditor.getBIK() != null && docType.equals("15") &&
+                            creditor.getBIK().equals(docValue)) {
+                        cId = creditor.getId();
+                        foundCreditor = true;
+                        break;
+
+                    }
+
+                    if(creditor.getBIN() != null && docType.equals("07") &&
+                            creditor.getBIN().equals(docValue)) {
+                        cId = creditor.getId();
+                        foundCreditor = true;
+                        break;
+
+                    }
+
+                    if(creditor.getRNN() != null && docType.equals("11") &&
+                            creditor.getRNN().equals(docValue)) {
+                        cId = creditor.getId();
+                        foundCreditor = true;
+                        break;
                     }
                 }
 
+
                 if (!foundCreditor) {
-                    String creditorBIN = batchInfo.getAdditionalParams().get("BIN");
+                    logger.error("Can't find creditor: " + docType +
+                            ", " + docValue);
 
-                    if(creditorBIN != null) {
-                        for (Creditor creditor : creditors) {
-                            if (creditor.getBIN() != null) {
-                                if (creditor.getBIN().equals(creditorBIN)) {
-                                    cId = creditor.getId();
-                                    foundCreditor = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    statusSingleton.addBatchStatus(batchId,
+                            new BatchStatusJModel(BatchStatuses.ERROR,
+                                    "Can't find creditor: " + docType + " or BIN: " +
+                                    ", " + docValue, new Date(), batchInfo.getUserId()));
 
-                    if (!foundCreditor) {
-                        String creditorRNN = batchInfo.getAdditionalParams().get("RNN");
-
-                        if(creditorRNN != null) {
-                            for (Creditor creditor : creditors) {
-                                if (creditor.getRNN() != null) {
-                                    if (creditor.getRNN().equals(creditorRNN)) {
-                                        cId = creditor.getId();
-                                        foundCreditor = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        if (!foundCreditor) {
-                            logger.error("Can't find creditor with code: " + creditorCode + " or BIN: " +
-                                    creditorBIN + "or RNN: " + creditorRNN);
-
-                            statusSingleton.addBatchStatus(batchId,
-                                    new BatchStatusJModel(BatchStatuses.ERROR,
-                                            "Can't find creditor with code: " + creditorCode + " or BIN: " +
-                                            creditorBIN + "or RNN: " + creditorRNN, new Date(), batchInfo.getUserId()));
-
-                            haveError = true;
-                        }
-                    }
+                    haveError = true;
                 }
             }
         }
 
-        checkAndFillEavReport(cId, batchInfo);
+        // checkAndFillEavReport(cId, batchInfo);
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
                 batchInfo.getUserId(), cId);
@@ -743,8 +720,8 @@ public class ZipFilesMonitor{
 
                     if(docType != null && docValue != null &&
                             docType.length() > 0 && docValue.length() > 0) {
-                        batchInfo.addParam("DOC_TYPE", docType);
-                        batchInfo.addParam("DOC_VALUE", docValue);
+                        batchInfo.addParam("DOC_TYPE", docType.replaceAll("\n", ""));
+                        batchInfo.addParam("DOC_VALUE", docValue.replaceAll("\n", ""));
                     }
                 } catch(Exception e) {
                     e.printStackTrace();
@@ -791,7 +768,7 @@ public class ZipFilesMonitor{
                 zipFile.close();
                 saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));
             }
-        }catch(IOException e){
+        }catch(Exception e) {
             e.printStackTrace();
         }
     }
