@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.*;
@@ -173,7 +174,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                     ii.setReceiverType(s);
                     ii.setStatus(s);
 
-                    if (DataTypeUtil.compareBeginningOfTheDay(ii.getReportDate(), reportDate) == 0) {
+                    if (reportDate == null || DataTypeUtil.compareBeginningOfTheDay(ii.getReportDate(), reportDate) == 0) {
                         list.add(ii);
                     }
 
