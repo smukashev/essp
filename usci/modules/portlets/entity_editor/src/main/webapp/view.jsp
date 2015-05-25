@@ -21,6 +21,7 @@
 <script>
     var dataUrl = '<%=getDataURL%>';
     var givenEntityId = '<%=renderRequest.getAttribute("entityId")%>';
+    var givenRepDate = '<%=renderRequest.getAttribute("repDate")%>';
     var contextPathUrl = '<%=request.getContextPath()%>';
 </script>
 
