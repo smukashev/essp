@@ -12,12 +12,13 @@ import java.util.Date;
  */
 public class CrossCheckLink extends Link implements Comparable<Object> {
 
-    public static final String URL_PREFIX = "https://rcredit.nationalbank.kz/cross-check#";
+    public static final String URL_PREFIX = "http://localhost:8081/cross-check?";
     public static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private Long orderValue;
 
     public CrossCheckLink(String caption, Long orderValue, Long creditorId, Date reportDate) {
-        super(caption, new ExternalResource(URL_PREFIX + creditorId + "/" + DEFAULT_DATE_FORMAT.format(reportDate)));
+        super(caption, new ExternalResource(
+                URL_PREFIX + "creditorId=" + creditorId + "&repDate=" + DEFAULT_DATE_FORMAT.format(reportDate)));
         this.orderValue = orderValue;
         setTargetName("_blank");
     }
