@@ -486,4 +486,23 @@ Ext.onReady(function() {
         }]
 
     });
+
+    if (givenEntityId && givenRepDate) {
+        var edDate = Ext.getCmp("edDate");
+        edDate.setValue(givenRepDate);
+
+        entityStore.load({
+            params: {
+                op : 'LIST_ENTITY',
+                entityId: givenEntityId,
+                date: givenRepDate
+            },
+            callback: function(records, operation, success) {
+                if (!success) {
+                    Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
+                }
+            }
+        });
+    }
+
 });

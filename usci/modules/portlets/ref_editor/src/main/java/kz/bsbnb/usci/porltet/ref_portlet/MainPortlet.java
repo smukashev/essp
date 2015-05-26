@@ -244,6 +244,26 @@ public class MainPortlet extends MVCPortlet {
         str += "\"array\": true,";
         str += "\"type\": \"META_SET\",";
         str += "\"iconCls\":\"folder\",";
+
+        {
+            StringBuilder result = new StringBuilder();
+            IMetaType memberType = set.getMemberType();
+
+            if (memberType.isComplex()) {
+                result.append("\"childMetaId\":");
+                result.append("\"");
+                result.append(((IMetaClass) memberType).getId());
+                result.append("\",");
+            }
+
+            result.append("\"childType\":");
+            result.append("\"");
+            result.append(getMetaTypeStr(memberType));
+            result.append("\",");
+
+            str += result.toString();
+        }
+
         str += "\"children\":[";
 
         boolean first = true;
@@ -504,6 +524,22 @@ public class MainPortlet extends MVCPortlet {
             result.append("\"");
             result.append(getMetaTypeStr(metaAttribute.getMetaType()));
             result.append("\"");
+
+            if (metaAttribute.getMetaType().isSet()) {
+                IMetaType memberType = ((IMetaSet) metaAttribute.getMetaType()).getMemberType();
+
+                if (memberType.isComplex()) {
+                    result.append(",\"childMetaId\":");
+                    result.append("\"");
+                    result.append(((IMetaClass) memberType).getId());
+                    result.append("\"");
+                }
+
+                result.append(",\"childType\":");
+                result.append("\"");
+                result.append(getMetaTypeStr(memberType));
+                result.append("\"");
+            }
 
             result.append("}");
         }

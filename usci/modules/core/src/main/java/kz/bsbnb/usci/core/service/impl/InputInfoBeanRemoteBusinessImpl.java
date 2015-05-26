@@ -5,6 +5,7 @@ import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.core.service.InputInfoBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.cr.model.DataTypeUtil;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.cr.model.Shared;
 import kz.bsbnb.usci.eav.model.json.BatchFullStatusJModel;
@@ -15,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.*;
@@ -172,7 +174,9 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                     ii.setReceiverType(s);
                     ii.setStatus(s);
 
-                    list.add(ii);
+                    if (reportDate == null || DataTypeUtil.compareBeginningOfTheDay(ii.getReportDate(), reportDate) == 0) {
+                        list.add(ii);
+                    }
 
                     batchFullStatusJModel = null;
                 }

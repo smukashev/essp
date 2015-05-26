@@ -93,7 +93,9 @@ public class MainPortlet extends MVCPortlet {
                 PortalUtil.getHttpServletRequest(renderRequest));
 
         String entityId = httpReq.getParameter("entityId");
+        String sRepDate = httpReq.getParameter("repDate");
         renderRequest.setAttribute("entityId", entityId);
+        renderRequest.setAttribute("repDate", sRepDate);
 
         super.doView(renderRequest, renderResponse);
     }

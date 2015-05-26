@@ -1,5 +1,7 @@
 package com.bsbnb.usci.portlets.protocol.data;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
@@ -30,6 +32,8 @@ public class BeanDataProvider implements DataProvider {
     private InputInfoBeanRemoteBusiness inputInfoBusiness;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private InputFileBeanRemoteBusiness inputFileBusiness;
+
+    private static final String ENTITY_EDITOR_PAGE = "http://localhost:8081/entity_editor";
 
     public BeanDataProvider() {
         initializeBeans();
@@ -83,12 +87,16 @@ public class BeanDataProvider implements DataProvider {
         List<Protocol> protocols = protocolBusiness.getProtocolsBy_InputInfo(inputInfo.getInputInfo());
         System.out.println("Protocols count: " + protocols.size());
         List<ProtocolDisplayBean> result = new ArrayList<ProtocolDisplayBean>();
+
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        String sRepDate = df.format(inputInfo.getInputInfo().getReportDate());
+
         for (Protocol protocol : protocols) {
             ProtocolDisplayBean pr = new ProtocolDisplayBean(protocol);
             if (protocol.getMessageType().getNameRu().equals("COMPLETED"))
                 pr.setLink(new Link("Просмотр",
-                        new ExternalResource("https://170.7.15.117/web/guest/31?entityId=" +
-                        protocol.getMessage().getNameRu())));
+                        new ExternalResource(ENTITY_EDITOR_PAGE + "?entityId=" +
+                        protocol.getMessage().getNameRu() + "&repDate=" + sRepDate)));
 
             result.add(pr);
         }
