@@ -54,6 +54,21 @@ public class ProtocolDisplayBean {
 
     }
 
+    public static Resource getIconByMessageTypeName(String name) {
+        if (name == null)
+            name = "";
+
+        ProtocolPortletResource resource = null;
+
+        if (name.equals("ERROR")) {
+            resource = ProtocolPortletResource.CRITICAL_ERROR_ICON;
+        } else {
+            resource = ProtocolPortletResource.OK_ICON;
+        }
+
+        return resource;
+    }
+
     public String getMessage() {
         Message message = protocol.getMessage();
 
@@ -68,7 +83,8 @@ public class ProtocolDisplayBean {
 
     public Embedded getStatusIcon() {
         if (statusIcon == null) {
-            Resource resource = getIconByMessageTypeCode(getMessageTypeCode());
+//            Resource resource = getIconByMessageTypeCode(getMessageTypeCode());
+            Resource resource = getIconByMessageTypeName(getMessageTypeName());
             statusIcon = new Embedded("", resource);
             statusIcon.setDescription(getMessageTypeName());
         }
