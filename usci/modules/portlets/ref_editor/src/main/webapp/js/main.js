@@ -363,7 +363,7 @@ Ext.onReady(function() {
 
     Ext.define('classesStoreModel', {
         extend: 'Ext.data.Model',
-        fields: ['classId','className']
+        fields: ['classId', 'className', 'classTitle']
     });
 
     var classesStore = Ext.create('Ext.data.Store', {
@@ -852,7 +852,7 @@ Ext.onReady(function() {
                 xtype: 'combobox',
                 store: classesStore,
                 valueField:'classId',
-                displayField:'className',
+                displayField:'classTitle',
                 listeners: {
                     change: function (field, newValue, oldValue) {
                         currentClassId = newValue;

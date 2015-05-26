@@ -14,11 +14,11 @@ update eav_m_classes set title = 	'Вид идентификационных д�
 update eav_m_classes set title = 	'Вид экономической деятельности'	WHERE NAME = 'ref_econ_sector';
 update eav_m_classes set title = 	'Источник финансирования организации, выдавшей заем'	WHERE NAME = 'ref_econ_trade';
 update eav_m_classes set title = 	'Организационно-правовая форма'	WHERE NAME = 'ref_enterprise_type';
-update eav_m_classes set title = 	'Оффшорные зоны'	WHERE NAME = 'ref_finance_source';
+update eav_m_classes set title = 	'Оффшорные зоны'	WHERE NAME = 'ref_offshore'; --'ref_finance_source';
 update eav_m_classes set title = 	'Вид обеспечения'	WHERE NAME = 'ref_legal_form';
-update eav_m_classes set title = 	'Портфель однородных кредитов'	WHERE NAME = 'ref_offshore';
+update eav_m_classes set title = 	'Портфель однородных кредитов'	WHERE NAME = 'ref_portfolio';
 update eav_m_classes set title = 	'Вид обеспечения'	WHERE NAME = 'ref_pledge_type';
-update eav_m_classes set title = 	'Тип организации выкупившей (принявший) заем (условное обязательство)'	WHERE NAME = 'ref_portfolio';
+--update eav_m_classes set title = 	'Тип организации выкупившей (принявший) заем (условное обязательство)'	WHERE NAME = 'ref_portfolio';
 update eav_m_classes set title = 	'Области'	WHERE NAME = 'ref_region';
 update eav_m_classes set title = 	'Тип организации выкупившей (принявший) заем (условное обязательство)'	WHERE NAME = 'ref_subject_type';
 update eav_m_classes set title = 	'Договор займа/условного обязательства(кредит)'	WHERE NAME = 'credit';
