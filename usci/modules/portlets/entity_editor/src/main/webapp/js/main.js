@@ -487,7 +487,8 @@ Ext.onReady(function() {
 
     });
 
-    if (givenEntityId && givenRepDate) {
+    if (givenEntityId && givenRepDate && givenEntityId.length && givenRepDate.length
+            && givenEntityId != "null" && givenRepDate != "null") {
         var edDate = Ext.getCmp("edDate");
         edDate.setValue(givenRepDate);
 
