@@ -4,6 +4,7 @@ public class MetaClassListEntry
 {
     private String className;
     private String classId;
+    private String classTitle;
 
     public String getClassName()
     {
@@ -23,5 +24,13 @@ public class MetaClassListEntry
     public void setClassId(String classId)
     {
         this.classId = classId;
+    }
+
+    public String getClassTitle() {
+        return classTitle;
+    }
+
+    public void setClassTitle(String classTitle) {
+        this.classTitle = classTitle;
     }
 }
