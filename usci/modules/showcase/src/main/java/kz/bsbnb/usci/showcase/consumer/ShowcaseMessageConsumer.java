@@ -66,7 +66,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                                 .equals(queueEntry.getBaseEntityApplied().getMeta().getClassName()))
                             continue;
 
-                        if (scId == null || scId == holder.getShowCaseMeta().getId()) {
+                        if (scId == null || scId == 0L || scId == holder.getShowCaseMeta().getId()) {
                             Future future = exec.submit(new CarteageGenerator(queueEntry.getBaseEntityApplied(),
                                     holder));
 

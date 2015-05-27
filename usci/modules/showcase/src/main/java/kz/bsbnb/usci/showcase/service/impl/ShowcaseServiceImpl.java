@@ -37,7 +37,14 @@ public class ShowcaseServiceImpl implements ShowcaseService {
     @Override
     public void startLoad(String name, Date reportDate) {
         CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
-        Long id = showcaseDao.load(name).getId();
+
+        Long id;
+        try {
+            id = showcaseDao.load(name).getId();
+        } catch(Exception e) {
+            id = 0L;
+        }
+
         coreShowcaseService.start("credit", id, reportDate);
     }
 
