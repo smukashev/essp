@@ -35,7 +35,7 @@ public class EntityServiceImpl implements IEntityService {
 
     @PostConstruct
     public void init() {
-        remoteEntityService  = (kz.bsbnb.usci.core.service.IEntityService) rmiProxyFactoryBean.getObject();
+        remoteEntityService = (kz.bsbnb.usci.core.service.IEntityService) rmiProxyFactoryBean.getObject();
     }
 
     @Override
@@ -52,12 +52,12 @@ public class EntityServiceImpl implements IEntityService {
 
     @Override
     public BaseEntity load(long id, Date date) {
-        return remoteEntityService.load(id,date);
+        return remoteEntityService.load(id, date);
     }
 
     @Override
     public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad) {
-        remoteEntityService.update(baseEntitySave,baseEntityLoad);
+        remoteEntityService.update(baseEntitySave, baseEntityLoad);
     }
 
     @Override
@@ -66,8 +66,7 @@ public class EntityServiceImpl implements IEntityService {
     }
 
     @Override
-    public List<Long> getEntityIDsByMetaclass(long id)
-    {
+    public List<Long> getEntityIDsByMetaclass(long id) {
         return remoteEntityService.getEntityIDsByMetaclass(id);
     }
 
@@ -76,8 +75,7 @@ public class EntityServiceImpl implements IEntityService {
     }
 
     @Override
-    public int getQueueSize()
-    {
+    public int getQueueSize() {
         return dataJob.getQueueSize();
     }
 
@@ -88,14 +86,12 @@ public class EntityServiceImpl implements IEntityService {
     }
 
     @Override
-    public SyncStatus getStatus()
-    {
+    public SyncStatus getStatus() {
         return syncStatusSingleton.getStatus();
     }
 
     @Override
-    public void remove(long id)
-    {
+    public void remove(long id) {
         remoteEntityService.remove(id);
     }
 }

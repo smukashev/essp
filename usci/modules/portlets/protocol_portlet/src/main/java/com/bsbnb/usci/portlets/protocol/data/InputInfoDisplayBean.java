@@ -31,7 +31,7 @@ public class InputInfoDisplayBean implements Button.ClickListener {
     private InputInfo inputInfo;
     private DataProvider provider;
 
-    private final String path = "c:\\tmp\\zips\\";
+    private final String path = "C:\\tmp_zips";
 
     private static CouchbaseProvider couchbaseProvider = CouchbaseProvider.getInstance();
 
@@ -61,7 +61,7 @@ public class InputInfoDisplayBean implements Button.ClickListener {
      * @return the fileName
      */
     public String getFileName() {
-        return inputInfo == null ? "" : new File(inputInfo.getFileName()).getName();
+        return inputInfo == null ? "" : inputInfo.getFileName();
     }
 
     public Button getFileLink() {

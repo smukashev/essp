@@ -15,8 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness
-{
+public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness {
     @Autowired
     @Qualifier(value = "reportBeanRemoteBusiness")
     RmiProxyFactoryBean rmiProxyFactoryBean;

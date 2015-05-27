@@ -12,16 +12,25 @@ import java.util.List;
  * @author k.tulbassiyev
  */
 public interface IEntityService {
-    public void process(List<BaseEntity> entities);
-    public BaseEntity load(long id);
-    public BaseEntity load(long id, Date date);
-    public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
-    public BaseEntity search(BaseEntity baseEntity);
-    public List<Long> getEntityIDsByMetaclass(long id);
-    public List<RefListItem> getRefsByMetaclass(long metaClassId);
-    public int getQueueSize();
-    public void setThreadsCount(int threadsCount, boolean allowAutoIncrement);
+    void process(List<BaseEntity> entities);
 
-    public SyncStatus getStatus();
-    public void remove(long id);
+    BaseEntity load(long id);
+
+    BaseEntity load(long id, Date date);
+
+    void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
+
+    BaseEntity search(BaseEntity baseEntity);
+
+    List<Long> getEntityIDsByMetaclass(long id);
+
+    List<RefListItem> getRefsByMetaclass(long metaClassId);
+
+    int getQueueSize();
+
+    void setThreadsCount(int threadsCount, boolean allowAutoIncrement);
+
+    SyncStatus getStatus();
+
+    void remove(long id);
 }
