@@ -968,8 +968,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                 }
             }
         } catch (Exception e) {
-            System.out.println("Entity: " + this.toString());
-            System.out.println("path: " + path);
+            e.printStackTrace();
         }
 
         return valueOut;

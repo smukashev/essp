@@ -71,13 +71,13 @@ public class SubjectPersonParser extends BatchParser {
                 ));
         } else if(localName.equals("bank_relations")) {
             //bankRelations = new CtEntity.BankRelations();
-            bankRelations = new BaseSet(metaClassRepository.getMetaClass("ref_bank_relation"));
+            bankRelations = new BaseSet(metaClassRepository.getMetaClass("bank_relation"));
         } else if(localName.equals("bank_relation")) {
             event = (XMLEvent) xmlReader.next();
-            BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"), batch.getRepDate());
-
-            bankRelation.put("code", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
-
+            BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("bank_relation"), batch.getRepDate());
+            BaseEntity refBankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"),batch.getRepDate());
+            refBankRelation.put("code",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
+            bankRelation.put("bank_relation", new BaseEntityComplexValue(batch, index, refBankRelation));
             bankRelations.put(new BaseSetComplexValue(batch, index, bankRelation));
         } else if(localName.equals("addresses")) {
             //addresses = new CtEntity.Addresses();

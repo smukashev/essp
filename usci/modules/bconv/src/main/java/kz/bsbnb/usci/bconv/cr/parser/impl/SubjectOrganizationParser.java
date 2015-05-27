@@ -68,18 +68,19 @@ public class SubjectOrganizationParser extends BatchParser {
             currentBaseEntity.put("country", new BaseEntityComplexValue(batch, index, country));
         } else if(localName.equals("offshore")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("offshore", new BaseEntityStringValue(batch, index,
-                    event.asCharacters().getData()
-            ));
+            BaseEntity offshore = new BaseEntity(metaClassRepository.getMetaClass("ref_offshore"), batch.getRepDate());
+            currentBaseEntity.put("offshore", new BaseEntityComplexValue(batch, index, offshore));
         } else if(localName.equals("bank_relations")) {
             //bankRelations = new BankRelations();
             //my code
-            bankRelations = new BaseSet(metaClassRepository.getMetaClass("ref_bank_relation"));
+            bankRelations = new BaseSet(metaClassRepository.getMetaClass("bank_relation"));
         } else if(localName.equals("bank_relation")) {
             //my code
-            BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"),batch.getRepDate());
             event = (XMLEvent) xmlReader.next();
-            bankRelation.put("code",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
+            BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("bank_relation"),batch.getRepDate());
+            BaseEntity refBankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"),batch.getRepDate());
+            refBankRelation.put("code",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
+            bankRelation.put("bank_relation", new BaseEntityComplexValue(batch, index, refBankRelation));
             bankRelations.put(new BaseSetComplexValue(batch,index,bankRelation));
         } else if(localName.equals("addresses")) {
             //addresses = new Addresses();
