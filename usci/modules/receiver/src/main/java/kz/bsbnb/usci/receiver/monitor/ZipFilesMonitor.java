@@ -95,7 +95,7 @@ public class ZipFilesMonitor{
         nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
         try {
-            couchbaseClient = new CouchbaseClient(nodes, "test", "");
+            couchbaseClient = new CouchbaseClient(nodes, "test2", "");
         } catch (Exception e) {
             logger.error("Error connecting to Couchbase: " + e.getMessage());
         }
@@ -148,7 +148,7 @@ public class ZipFilesMonitor{
         nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
         try {
-            couchbaseClient = new CouchbaseClient(nodes, "test", "");
+            couchbaseClient = new CouchbaseClient(nodes, "test2", "");
         } catch (Exception e) {
             logger.error("Error connecting to Couchbase: " + e.getMessage());
         }
@@ -542,7 +542,7 @@ public class ZipFilesMonitor{
             }
         }
 
-        // checkAndFillEavReport(cId, batchInfo);
+        checkAndFillEavReport(cId, batchInfo);
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
                 batchInfo.getUserId(), cId);
@@ -556,7 +556,7 @@ public class ZipFilesMonitor{
     }
 
     private void checkAndFillEavReport(long creditorId, BatchInfo batchInfo) {
-        ReportBeanRemoteBusiness reportBeanRemoteBusiness = serviceFactory.getReportBeanRemoteBusinessService();
+       /* ReportBeanRemoteBusiness reportBeanRemoteBusiness = serviceFactory.getReportBeanRemoteBusinessService();
 
         Report existing = reportBeanRemoteBusiness.getReport(creditorId, batchInfo.getRepDate());
 
@@ -574,7 +574,7 @@ public class ZipFilesMonitor{
                         : new SimpleDateFormat("dd/MM/yyyy").parse(Report.INITIAL_REPORT_DATE_STR);
 
                 if (!batchInfo.getRepDate().equals(expectedDate)) {
-                    throw new RuntimeException("Reports must be supplied in order month by month");
+                     throw new RuntimeException("Reports must be supplied in order month by month");
                 }
 
             } catch (ParseException e) {
@@ -590,22 +590,15 @@ public class ZipFilesMonitor{
 
             PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
             PortalUser portalUser = userService.getUser(batchInfo.getUserId());
-
-            if(portalUser != null) {
-                reportBeanRemoteBusiness.updateReport(existing, portalUser.getScreenName());
-            } else {
-                // todo: fix
-                reportBeanRemoteBusiness.updateReport(existing, "Test");
-            }
-
+            reportBeanRemoteBusiness.updateReport(existing, portalUser.getScreenName());
             batchInfo.setReportId(existing.getId());
         } else {
             Report report = new Report();
-
-            Creditor creditor = new Creditor();
-            creditor.setId(creditorId);
-            report.setCreditor(creditor);
-
+            {
+                Creditor creditor = new Creditor();
+                creditor.setId(creditorId);
+                report.setCreditor(creditor);
+            }
             report.setStatusId(ReportStatus.IN_PROGRESS.getStatusId());
             report.setTotalCount(batchInfo.getTotalCount());
             report.setActualCount(batchInfo.getActualCount());
@@ -615,18 +608,9 @@ public class ZipFilesMonitor{
 
             PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
             PortalUser portalUser = userService.getUser(batchInfo.getUserId());
-
-            Long reportId;
-
-            if(portalUser != null) {
-                reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
-            } else {
-                // todo: fix
-                reportId = reportBeanRemoteBusiness.insert(report, "Test");
-            }
-
+            Long reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
             batchInfo.setReportId(reportId);
-        }
+        }*/
     }
 
     public byte[] inputStreamToByte(InputStream in) throws IOException {

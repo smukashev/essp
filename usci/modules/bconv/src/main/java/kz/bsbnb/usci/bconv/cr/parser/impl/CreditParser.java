@@ -1,35 +1,25 @@
 package kz.bsbnb.usci.bconv.cr.parser.impl;
 
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Stack;
+import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.TypeErrorException;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
-import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
-import kz.bsbnb.usci.bconv.cr.parser.util.ParserUtils;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 /**
  *
@@ -57,7 +47,6 @@ public class CreditParser extends BatchParser {
     public CreditParser() {
         super();
     }
-
 
     public void setCurrentBaseEntity(BaseEntity baseEntity)
     {

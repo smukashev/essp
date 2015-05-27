@@ -376,10 +376,10 @@ public class MainPortlet extends MVCPortlet {
                         MetaClassListEntry metaClassListEntry = new MetaClassListEntry();
 
                         metaClassListEntry.setClassId("" + metaName.getId());
-                        if(metaName.getClassTitle() != null
-                                && metaName.getClassTitle().trim().length() > 0)
-                            metaClassListEntry.setClassName(metaName.getClassTitle());
-                        else
+//                        if(metaName.getClassTitle() != null
+//                                && metaName.getClassTitle().trim().length() > 0)
+                            metaClassListEntry.setClassTitle(metaName.getClassTitle());
+//                        else
                             metaClassListEntry.setClassName(metaName.getClassName());
 
                         classesListJson.getData().add(metaClassListEntry);
