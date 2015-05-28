@@ -11,6 +11,9 @@
 		<column name="middle_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
 		<column name="modified_date" primaryKey="false" required="false" type="DATE"/>
 		<column name="is_active" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="1"/>
+    <unique>
+      <unique-column name="user_id"/>
+    </unique>
 	</table>
 	<table name="eav_a_creditor_state">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -20,20 +23,24 @@
 			<reference local="creditor_id" foreign="id"/>
 		</foreign-key>-->
 	</table>
-	<table name="batch_entries">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="value" primaryKey="false" required="true" type="CLOB" size="14,0" autoIncrement="false"/>
-		<column name="updated_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-	</table>
 	<table name="eav_a_creditor_user">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+    <unique>
+      <unique-column name="user_id"/>
+      <unique-column name="creditor_id"/>
+    </unique>
 	</table>
+    <table name="batch_entries">
+    <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+    <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+    <column name="value" primaryKey="false" required="true" type="CLOB" size="14,0" autoIncrement="false"/>
+    <column name="updated_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+    <unique>
+    <unique-column name="id"/>
+    </unique>
+    </table>
 	<!--<table name="eav_m_array_key_filter">
       <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
       <column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
