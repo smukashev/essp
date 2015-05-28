@@ -223,7 +223,7 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao
             PortalUser user = new PortalUser();
 
             user.setId(BigInteger.valueOf(Long.parseLong(row.get(EAV_A_USER.ID.getName()).toString())));
-            user.setUserId(Long.parseLong(row.get(EAV_A_USER.ID.getName()).toString()));
+            user.setUserId(Long.parseLong(row.get(EAV_A_USER.USER_ID.getName()).toString()));
             user.setFirstName((String)row.get(EAV_A_USER.FIRST_NAME.getName()));
             user.setLastName((String) row.get(EAV_A_USER.LAST_NAME.getName()));
             user.setMiddleName((String) row.get(EAV_A_USER.MIDDLE_NAME.getName()));
