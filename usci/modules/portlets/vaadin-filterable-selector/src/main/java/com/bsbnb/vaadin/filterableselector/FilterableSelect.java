@@ -57,7 +57,13 @@ public class FilterableSelect<T> extends VerticalLayout {
             addComponent(displayLabel);
         } else if (itemsList.size() == 1) {
             displayLabel = new Label("<h2>" + itemsList.get(0).getCaption() + "</h2>", Label.CONTENT_XHTML);
-            Label creditorTypeLabel = new Label("<h3>" + itemsList.get(0).getType() + "</h3>", Label.CONTENT_XHTML);
+
+            Label creditorTypeLabel = null;
+            creditorTypeLabel = new Label("", Label.CONTENT_XHTML);
+
+            if(itemsList.get(0).getType() != null)
+                creditorTypeLabel = new Label("<h3>" + itemsList.get(0).getType() + "</h3>", Label.CONTENT_XHTML);
+
             addComponent(displayLabel);
             addComponent(creditorTypeLabel);
         } else {
