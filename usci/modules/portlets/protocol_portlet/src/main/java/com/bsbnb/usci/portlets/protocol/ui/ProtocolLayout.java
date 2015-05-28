@@ -193,8 +193,6 @@ public class ProtocolLayout extends VerticalLayout {
             }
         });
 
-        filesTable.sort(new String[]{"receiverDate"}, new boolean[]{false});
-
         filesTableLayout = new VerticalLayout();
         filesTableLayout.addComponent(filesTableHeaderLayout);
         filesTableLayout.addComponent(filesTable);
@@ -526,6 +524,11 @@ public class ProtocolLayout extends VerticalLayout {
         Date reportDate = (Date) reportDateField.getValue();
         List<InputInfoDisplayBean> inputInfoList = provider.getInputInfosByCreditors(creditors, reportDate);
         inputInfoContainer.addAll(inputInfoList);
+
+        filesTable.setSortContainerPropertyId("receiverDate");
+        filesTable.setSortAscending(false);
+        filesTable.sort();
+
         if (!inputInfoList.isEmpty()) {
             filesTableLayout.setVisible(true);
         } else {
