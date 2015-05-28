@@ -30,6 +30,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import javax.annotation.PostConstruct;
@@ -95,7 +96,7 @@ public class ZipFilesMonitor{
         nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
         try {
-            couchbaseClient = new CouchbaseClient(nodes, "test2", "");
+            couchbaseClient = new CouchbaseClient(nodes, "test", "");
         } catch (Exception e) {
             logger.error("Error connecting to Couchbase: " + e.getMessage());
         }
@@ -148,7 +149,7 @@ public class ZipFilesMonitor{
         nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
         try {
-            couchbaseClient = new CouchbaseClient(nodes, "test2", "");
+            couchbaseClient = new CouchbaseClient(nodes, "test", "");
         } catch (Exception e) {
             logger.error("Error connecting to Couchbase: " + e.getMessage());
         }
@@ -497,6 +498,12 @@ public class ZipFilesMonitor{
                 String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
                 String docValue = batchInfo.getAdditionalParams().get("DOC_VALUE");
 
+                String code = batchInfo.getAdditionalParams().get("CODE");
+                String bin = batchInfo.getAdditionalParams().get("BIN");
+                String bik = batchInfo.getAdditionalParams().get("BIK");
+                String rnn = batchInfo.getAdditionalParams().get("RNN");
+
+
                 if(docType == null) docType = "";
                 if(docValue == null) docValue = "";
 
@@ -525,8 +532,35 @@ public class ZipFilesMonitor{
                         foundCreditor = true;
                         break;
                     }
-                }
 
+                    if(code != null && code.length() > 0 && creditor.getCode() != null
+                            && creditor.getCode().length() > 0 && code.equals(creditor.getCode())) {
+                        cId = creditor.getId();
+                        foundCreditor = true;
+                        break;
+                    }
+
+                    if(bin != null && bin.length() > 0 && creditor.getBIN() != null
+                            && creditor.getBIN().length() > 0 && bin.equals(creditor.getBIN())) {
+                        cId = creditor.getId();
+                        foundCreditor = true;
+                        break;
+                    }
+
+                    if(bik != null && bik.length() > 0 && creditor.getBIK() != null
+                            && creditor.getBIK().length() > 0 && bik.equals(creditor.getBIK())) {
+                        cId = creditor.getId();
+                        foundCreditor = true;
+                        break;
+                    }
+
+                    if(rnn != null && rnn.length() > 0 && creditor.getRNN() != null
+                            && creditor.getRNN().length() > 0 && rnn.equals(creditor.getRNN())) {
+                        cId = creditor.getId();
+                        foundCreditor = true;
+                        break;
+                    }
+                }
 
                 if (!foundCreditor) {
                     logger.error("Can't find creditor: " + docType +
@@ -556,7 +590,7 @@ public class ZipFilesMonitor{
     }
 
     private void checkAndFillEavReport(long creditorId, BatchInfo batchInfo) {
-       /* ReportBeanRemoteBusiness reportBeanRemoteBusiness = serviceFactory.getReportBeanRemoteBusinessService();
+        ReportBeanRemoteBusiness reportBeanRemoteBusiness = serviceFactory.getReportBeanRemoteBusinessService();
 
         Report existing = reportBeanRemoteBusiness.getReport(creditorId, batchInfo.getRepDate());
 
@@ -610,7 +644,7 @@ public class ZipFilesMonitor{
             PortalUser portalUser = userService.getUser(batchInfo.getUserId());
             Long reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
             batchInfo.setReportId(reportId);
-        }*/
+        }
     }
 
     public byte[] inputStreamToByte(InputStream in) throws IOException {
@@ -749,6 +783,33 @@ public class ZipFilesMonitor{
                 }
 
                 batchInfo.setRepDate(date);
+
+                NodeList propertiesList = document.getElementsByTagName("properties");
+
+                for(int i = 0; i < propertiesList.getLength(); i++) {
+                    Node propertiesNode = propertiesList.item(i);
+
+                    if(propertiesNode.getNodeType() == Node.ELEMENT_NODE) {
+                        Element propertiesElement = (Element) propertiesNode;
+
+                        NodeList propertyList = propertiesElement.getElementsByTagName("property");
+
+                        for(int j = 0; j < propertyList.getLength(); j++) {
+                            Node propertyNode = propertyList.item(j);
+
+                            if(propertyNode.getNodeType() == Node.ELEMENT_NODE) {
+                                Element propertyElement = (Element) propertyNode;
+
+                                String name = propertyElement.getElementsByTagName("name").item(0).getTextContent();
+                                String value = propertyElement.getElementsByTagName("value").item(0).getTextContent();
+
+                                batchInfo.addParam(name, value);
+                            }
+                        }
+                    }
+                }
+
+
                 zipFile.close();
                 saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));
             }
