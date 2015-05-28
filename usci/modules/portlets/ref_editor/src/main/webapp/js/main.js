@@ -653,6 +653,12 @@ Ext.onReady(function() {
             form.removeAll();
             var classesCombo = Ext.getCmp('entityEditorComplexTypeCombo');
             var metaId = classesCombo.getValue();
+
+            if (!metaId) {
+                alert("Выберите справочник");
+                return;
+            }
+
             addAttributesCombo(form, metaId, false);
             modalWindow.show();
         }
@@ -823,7 +829,8 @@ Ext.onReady(function() {
 
                                 } else {
                                     selectedNode.appendChild(newEditFormItems[i]);
-                                    var subNode = selectedNode.getChildAt(children.length + i - 1);
+
+                                    var subNode = selectedNode.getChildAt(children.length - 1);
 
                                     if(newEditFormItems[i].ref && newEditFormItems[i].type == "META_CLASS") {
                                         loadSubEntity(subNode, true);
