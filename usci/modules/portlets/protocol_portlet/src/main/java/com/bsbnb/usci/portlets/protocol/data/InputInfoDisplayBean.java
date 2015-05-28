@@ -61,7 +61,7 @@ public class InputInfoDisplayBean implements Button.ClickListener {
      * @return the fileName
      */
     public String getFileName() {
-        return inputInfo == null ? "" : inputInfo.getFileName();
+        return inputInfo == null ? "" : new File(inputInfo.getFileName()).getName();
     }
 
     public Button getFileLink() {
