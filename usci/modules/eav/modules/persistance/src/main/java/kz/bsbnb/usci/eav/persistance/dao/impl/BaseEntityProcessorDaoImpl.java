@@ -83,6 +83,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public static final HashMap<Long, List<RefListItem>> refsCache = new HashMap<Long, List<RefListItem>>();
     public static final HashMap<Long, List<RefListItem>> refsCacheRaw = new HashMap<Long, List<RefListItem>>();
 
+    private final int SC_ID_BAG_LIMIT = 100;
+
     @PostConstruct
     public void init() {
         if(refsCacheEnabled && refsCache.size() == 0 && refsCacheRaw.size() == 0) {
@@ -4059,7 +4061,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     public List<Long> getSCEntityIds(Long id) {
         List<Long> list;
-        Select select = context.select(SC_ID_BAG.ID).from(SC_ID_BAG).where(SC_ID_BAG.SHOWCASE_ID.eq(id)).limit(10);
+        Select select = context.select(SC_ID_BAG.ID).from(SC_ID_BAG).where(SC_ID_BAG.SHOWCASE_ID.eq(id)).limit(SC_ID_BAG_LIMIT);
         Select select2 = context.select(select.field(0)).from(select);
         list = jdbcTemplate.queryForList(select2.getSQL(), Long.class, select2.getBindValues().toArray());
 
