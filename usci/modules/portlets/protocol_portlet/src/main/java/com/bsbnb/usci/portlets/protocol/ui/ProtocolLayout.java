@@ -75,7 +75,7 @@ public class ProtocolLayout extends VerticalLayout {
     private Label noProtocolsLabel;
 
     private static final String[] FILES_TABLE_VISIBLE_COLUMNS = new String[]{
-        "creditorName", "fileLink", "fileName", "receiverDate", "startDate", "completionDate", "statusName", "reportDate"};
+        "creditorName", "fileLink", "receiverDate", "startDate", "completionDate", "statusName", "reportDate"};
 
     private static final String[] FILES_TABLE_COLUMN_NAMES = new String[]{
         "creditorName", "fileLink", "fileName", "receiverDate", "completionDate", "statusName", "startDate",
