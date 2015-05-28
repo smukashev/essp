@@ -258,6 +258,8 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
         final Long scId;
         Date reportDate;
 
+        public static final int MIN_SIZE = 1000;
+
         public Sender(Long id) {
             this.scId = id;
         }
@@ -277,7 +279,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
             }
 
             while (true) {
-                if (queueMbean.getQueueSize() == 0) {
+                if (queueMbean.getQueueSize() == 0 && queueMbean.getQueueSize() <= MIN_SIZE) {
                     List<Long> list = baseEntityProcessorDao.getSCEntityIds(scId);
 
                     if (list.size() == 0) {
