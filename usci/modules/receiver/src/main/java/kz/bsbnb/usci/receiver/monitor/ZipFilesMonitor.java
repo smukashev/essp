@@ -576,7 +576,14 @@ public class ZipFilesMonitor{
             }
         }
 
-        checkAndFillEavReport(cId, batchInfo);
+        if(cId != null && cId > 0) {
+            checkAndFillEavReport(cId, batchInfo);
+        } else {
+            statusSingleton.addBatchStatus(batchId,
+                    new BatchStatusJModel(BatchStatuses.WAITING, null, new Date(), batchInfo.getUserId()));
+
+            haveError = true;
+        }
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
                 batchInfo.getUserId(), cId);

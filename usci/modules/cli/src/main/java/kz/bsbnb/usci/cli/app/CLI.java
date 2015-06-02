@@ -2638,14 +2638,15 @@ public class CLI {
                 System.out.println("Usage: loadSC <showcase name>");
             }
         } else if (args.get(0).equals("startLoad")) {
-            if (args.size() > 2) {
+            if (args.size() > 3) {
                 try {
-                    showcaseService.startLoad(args.get(1), sdfout.parse(args.get(2)));
+                    showcaseService.startLoad(args.get(1), sdfout.parse(args.get(2)),
+                            Boolean.parseBoolean(args.get(3).toString()));
                 } catch (ParseException e) {
                     System.out.println("Date format: \"dd.MM.yyyy\"");
                 }
             } else {
-                System.out.println("Usage: startLoad <showcase name> <report date>");
+                System.out.println("Usage: startLoad <showcase name> <report_date> populate");
             }
         } else if(args.get(0).equals("startLoadHistory")){
             boolean populate = false;
