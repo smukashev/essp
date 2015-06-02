@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.porltet.entity_merge;
 
 import com.liferay.util.bridges.mvc.MVCPortlet;
-import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.core.service.IEntityService;
@@ -24,9 +23,6 @@ public class RulesPortlet extends MVCPortlet{
     private RmiProxyFactoryBean batchServiceFactoryBean;
     private RmiProxyFactoryBean entityServiceFactoryBean;
 
-    @Autowired
-    private RulesSingleton rulesSingleton;
-
     private IRuleService ruleService;
     private IBatchService batchService;
     private IEntityService entityService;
@@ -36,8 +32,6 @@ public class RulesPortlet extends MVCPortlet{
     public void init() throws PortletException {
 
         ApplicationContext context = new ClassPathXmlApplicationContext("applicationContextPortlet.xml");
-        rulesSingleton = context.getBean("rulesSingleton",RulesSingleton.class);
-        rulesSingleton.reloadCache();
 
         entityServiceFactoryBean = new RmiProxyFactoryBean();
         entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
@@ -158,11 +152,11 @@ public class RulesPortlet extends MVCPortlet{
                     date = df.parse(resourceRequest.getParameter("date"));
                     baseEntityId = Long.parseLong(resourceRequest.getParameter("baseEntityId"));
                     BaseEntity be = (BaseEntity) entityService.load(baseEntityId);
-                    rulesSingleton.runRules(be, batchName, date);
+                    ruleService.runRules(be,batchName,date);
                     writer.write(JsonMaker.getJson(be.getValidationErrors()));
                     break;
                 case FLUSH:
-                    rulesSingleton.reloadCache();
+                    ruleService.reloadCache();
                     break;
                 case RENAME_RULE:
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));

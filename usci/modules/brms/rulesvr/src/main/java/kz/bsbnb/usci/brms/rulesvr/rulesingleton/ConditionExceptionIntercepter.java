@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.brms.rulesingleton;
+package kz.bsbnb.usci.brms.rulesvr.rulesingleton;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
