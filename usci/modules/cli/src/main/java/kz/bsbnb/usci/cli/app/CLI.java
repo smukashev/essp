@@ -9,7 +9,6 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
-import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
@@ -125,8 +124,6 @@ public class CLI {
     private IBaseEntityProcessorDao baseEntityProcessorDao;
     @Autowired
     private ImprovedBaseEntitySearcher searcher;
-    @Autowired
-    private RulesSingleton rulesSingleton;
 
     @Autowired
     ApplicationContext context;
@@ -145,7 +142,7 @@ public class CLI {
     private IBatchVersionService batchVersionService;
     private ShowcaseService showcaseService;
     private Rule currentRule;
-    private String currentPackageName = "afk";
+    private String currentPackageName = "credit_parser";
     private Date currentDate = new Date();
     private boolean started = false;
     private BatchVersion currentBatchVersion;
@@ -2230,8 +2227,6 @@ public class CLI {
 
 
         try {
-            rulesSingleton.reloadCache();
-
             entityServiceFactoryBean = new RmiProxyFactoryBean();
             entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
             entityServiceFactoryBean.setServiceInterface(IBaseEntityProcessorDao.class);
@@ -2359,15 +2354,15 @@ public class CLI {
             } else if (args.get(0).equals("run")) {
 
                 DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
-                Date reportDate = dateFormatter.parse("01.03.2014");
+                Date reportDate = dateFormatter.parse("02.05.2015");
 
                 try {
                     CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, reportDate);
                     currentBaseEntity = reader.read();
                     reader.close();
-                    rulesSingleton.runRules(currentBaseEntity, currentPackageName, currentDate);
+                    List<String> errors = ruleService.runRules(currentBaseEntity, currentPackageName,currentDate);
 
-                    for (String s : currentBaseEntity.getValidationErrors())
+                    for (String s : errors)
                         System.out.println("Validation error:" + s);
 
                 } catch (FileNotFoundException e) {
@@ -2381,8 +2376,7 @@ public class CLI {
                     currentBatchVersion = batchVersionService.getBatchVersion(currentPackageName, currentDate);
                 } else if (args.size() < 3) throw new IllegalArgumentException();
                 else if (args.get(1).equals("package")) {
-                    rulesSingleton.reloadCache();
-                    rulesSingleton.getRulePackageName(args.get(2), currentDate);
+                    ruleService.getRulePackageName(args.get(2), currentDate);
                     currentPackageName = args.get(2);
                 } else if (args.get(1).equals("date")) {
                     DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
@@ -2402,7 +2396,7 @@ public class CLI {
                 batchVersionService.save(batch);
                 System.out.println("ok batch created with id:" + id);
             } else if (args.get(0).equals("rc")) {
-                rulesSingleton.reloadCache();
+                ruleService.reloadCache();
             } else if (args.get(0).equals("eval")) {
                 System.out.println(currentBaseEntity.getEls(args.get(1)));
             } else if (args.get(0).equals("eval2")) {

@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.brms.rulesingleton;
+package kz.bsbnb.usci.brms.rulesvr.rulesingleton;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
