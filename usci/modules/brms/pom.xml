@@ -25,7 +25,6 @@
 
     <modules>
         <module>rulesvr</module>
-        <module>rulesingleton</module>
     </modules>
 
     <build>

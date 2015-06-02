@@ -4,6 +4,7 @@ import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
 
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -80,5 +81,17 @@ public interface IRuleService {
     public long createNewRuleInBatch(Rule rule, BatchVersion batchVersion);
 
     public void renameRule(long ruleId, String title);
+    /**
+     * ============================
+     * RuleSingleton interface
+     * ============================
+     */
+    public void reloadCache();
+
+    public List<String> runRules(BaseEntity entity, String pkgName, Date repDate);
+
+    //public List<String> runRules(BaseEntity entity, String pkgName, Date repDate);
+
+    public String getRulePackageName(String pkgName, Date repDate);
 
 }

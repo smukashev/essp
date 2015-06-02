@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.brms.rulesingleton;
+package kz.bsbnb.usci.brms.rulesvr.rulesingleton;
 
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
@@ -145,6 +145,7 @@ public class RulesSingleton
     }
 
     synchronized public void fillPackagesCache() {
+        kbase = KnowledgeBaseFactory.newKnowledgeBase();
         List<Batch> allBatches = remoteRuleBatchService.getAllBatches();
 
         rulePackageErrors.clear();
@@ -167,7 +168,7 @@ public class RulesSingleton
                 packages += "package " + curBatch.getName() + "_" + curVersion.getId() + "\n";
                 packages += "dialect \"mvel\"\n";
                 packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
-                packages += "import kz.bsbnb.usci.brms.rulesingleton.BRMSHelper;\n";
+                packages += "import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n";
 
                 for (Rule r : rules)
                 {

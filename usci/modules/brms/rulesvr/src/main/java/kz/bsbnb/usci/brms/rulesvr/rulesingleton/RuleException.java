@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.brms.rulesingleton;
+package kz.bsbnb.usci.brms.rulesvr.rulesingleton;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.drools.definition.rule.Rule;

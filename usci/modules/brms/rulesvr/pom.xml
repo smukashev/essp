@@ -22,6 +22,7 @@
         <jackson.mapper.version>1.5.6</jackson.mapper.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
+        <drools.version>5.5.0.Final</drools.version>
     </properties>
 
     <parent>
@@ -73,6 +74,93 @@
                     </archive>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <files>
+                        <file>src/main/resources/properties/oracle.properties</file>
+                    </files>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.oracle</groupId>
+                        <artifactId>ojdbc6</artifactId>
+                        <version>11.2.0.3.0</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <jdbc>
+                        <driver>${ds.driver}</driver>
+                        <url>${ds.url}</url>
+                        <user>${ds.user}</user>
+                        <password>${ds.password}</password>
+                    </jdbc>
+                    <generator>
+                        <name>org.jooq.util.DefaultGenerator</name>
+                        <database>
+                            <name>${jooq.db.name}</name>
+                            <includes>(LOGIC_.*)</includes>
+                            <excludes></excludes>
+                            <inputSchema>${jooq.db.schema}</inputSchema>
+                            <customTypes>
+                                <customType>
+                                    <name>java.lang.Integer</name>
+                                    <converter>kz.bsbnb.usci.tool.jooq.OracleIntegerConverter</converter>
+                                </customType>
+                                <customType>
+                                    <name>java.lang.Double</name>
+                                    <converter>kz.bsbnb.usci.tool.jooq.OracleDoubleConverter</converter>
+                                </customType>
+                                <customType>
+                                    <name>java.sql.Timestamp</name>
+                                    <converter>kz.bsbnb.usci.tool.jooq.OracleTimestampConverter</converter>
+                                </customType>
+                            </customTypes>
+                            <forcedTypes>
+                                <forcedType>
+                                    <name>java.lang.Integer</name>
+                                    <expressions>(.*\.CONTAINER_TYPE)|(.*INTEGER.*\.VALUE)</expressions>
+                                </forcedType>
+                                <forcedType>
+                                    <name>java.lang.Double</name>
+                                    <expressions>(.*DOUBLE.*\.VALUE)</expressions>
+                                </forcedType>
+                                <forcedType>
+                                    <name>java.sql.Timestamp</name>
+                                    <expressions>(.*\.RECEIPT_DATE)|(.*\.EVENT_BEGIN_DT)|(.*\.EVENT_END_DT)|(.*\.UPDATE_DATE)</expressions>
+                                </forcedType>
+                            </forcedTypes>
+                        </database>
+                        <target>
+                            <packageName>kz.bsbnb.usci.brms.rulesvr.generated</packageName>
+                            <directory>${basedir}/target/generated-sources/jooq</directory>
+                        </target>
+                    </generator>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -86,6 +174,36 @@
             <groupId>kz.bsbnb.usci.eav</groupId>
             <artifactId>model</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>kz.bsbnb.ddlutils</groupId>
+            <artifactId>ddlutils</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>kz.bsbnb.usci.eav</groupId>
+            <artifactId>tool</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-compiler</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-spring</artifactId>
+            <version>${drools.version}</version>
         </dependency>
     </dependencies>
 
