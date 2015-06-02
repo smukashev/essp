@@ -279,7 +279,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
             }
 
             while (true) {
-                if (queueMbean.getQueueSize() == 0 && queueMbean.getQueueSize() <= MIN_SIZE) {
+                if (queueMbean.getQueueSize() <= MIN_SIZE) {
                     List<Long> list = baseEntityProcessorDao.getSCEntityIds(scId);
 
                     if (list.size() == 0) {
@@ -288,7 +288,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
                         return;
                     }
                     for (Long id : list) {
-                        QueueEntry entry = new QueueEntry().setBaseEntityApplied(baseEntityProcessorDao.load(id))
+                        QueueEntry entry = new QueueEntry().setBaseEntityApplied(baseEntityProcessorDao.loadByReportDate(id, reportDate))
                                 .setScId(scId);
                         try {
                             producer.produce(entry);
