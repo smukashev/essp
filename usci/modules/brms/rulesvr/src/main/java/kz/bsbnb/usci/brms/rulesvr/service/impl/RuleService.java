@@ -143,6 +143,10 @@ public class RuleService implements IRuleService {
         return rulesSingleton.getRulePackageName(pkgName, repDate);
     }
 
+    @Override
+    public String getRuleErrors(String rule) {
+        return rulesSingleton.getRuleErrors(rule);
+    }
 
     //    public ListenerSingleton getListenerSingleton() {
 //        return listenerSingleton;

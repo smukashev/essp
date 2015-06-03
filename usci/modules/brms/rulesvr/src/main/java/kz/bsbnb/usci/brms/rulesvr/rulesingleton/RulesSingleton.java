@@ -118,10 +118,33 @@ public class RulesSingleton
                 ResourceType.DRL);
 
         if ( kbuilder.hasErrors() ) {
+            System.out.println(kbuilder.getErrors().toString());
             throw new IllegalArgumentException( kbuilder.getErrors().toString() );
         }
 
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+    }
+
+    public String getRuleErrors(String rule)
+    {
+        String packages = "";
+        packages += "package test \n";
+        packages += "dialect \"mvel\"\n";
+        packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
+        packages += "import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n";
+
+        rule = packages + rule;
+
+        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+
+        kbuilder.add(ResourceFactory.newInputStreamResource(new ByteArrayInputStream(rule.getBytes())),
+                ResourceType.DRL);
+
+        if ( kbuilder.hasErrors() ) {
+            return kbuilder.getErrors().toString();
+        }
+
+        return null;
     }
 
     private class PackageAgendaFilter implements AgendaFilter
@@ -260,6 +283,7 @@ public class RulesSingleton
         try {
             setRules(packages);
         } catch (Exception e) {
+            e.printStackTrace();
             rulePackageErrors.add(new RulePackageError(packageName + "_" + curVersion.getId(),
                     e.getMessage()));
         }

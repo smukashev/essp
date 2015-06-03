@@ -94,4 +94,6 @@ public interface IRuleService {
 
     public String getRulePackageName(String pkgName, Date repDate);
 
+    public String getRuleErrors(String rule);
+
 }

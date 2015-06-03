@@ -120,6 +120,9 @@ public class RulesPortlet extends MVCPortlet{
                 case UPDATE_RULE:
                     String ruleBody = resourceRequest.getParameter("ruleBody");
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    String errors = ruleService.getRuleErrors(ruleBody);
+                    if(errors != null)
+                        throw new RuntimeException(errors);
                     ruleService.updateBody(ruleId, ruleBody);
                     writer.write(JsonMaker.getJson(true));
                     break;
@@ -173,15 +176,16 @@ public class RulesPortlet extends MVCPortlet{
                     init();
                     serveResource(resourceRequest, resourceResponse);
                 } catch (PortletException e1) {
-                    resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
+                    //resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
                     writer.write("{ \"success\": false, \"errorMessage\": \""+ e1.getMessage()
                             .replaceAll("\"","").replaceAll("\n","")+"\"}");
                 } finally {
                     retry = false;
+                    return;
                 }
             }
 
-            resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
+            //resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
             writer.write("{ \"success\": false, \"errorMessage\": \""+ e.getMessage().replaceAll("\"","").replaceAll("\n","")+"\"}");
         }
 
