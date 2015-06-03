@@ -949,15 +949,19 @@
 		</foreign-key>-->
 	</table>
 	<table name="sc_id_bag">
-			<column name="id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+			<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+			<column name="entity_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 			<column name="showcase_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+			<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
 			<index name="eav_ind_022_01">
-							<index-column name="id"/>
-							<index-column name="showcase_id"/>
-					</index>
+					<index-column name="entity_id"/>
+					<index-column name="showcase_id"/>
+          <index-column name="report_date"/>
+			</index>
 			<unique name="ind_uk_sc_003_00">
-				<unique-column name="id"/>
+				<unique-column name="entity_id"/>
 				<unique-column name="showcase_id"/>
+        <unique-column name="report_date"/>
 			</unique>
 	</table>
 

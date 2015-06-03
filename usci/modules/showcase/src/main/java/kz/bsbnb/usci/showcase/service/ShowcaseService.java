@@ -13,7 +13,7 @@ public interface ShowcaseService {
 
     ShowCase load(String name);
 
-    void startLoad(String name, Date reportDate);
+    void startLoad(String name, Date reportDate, boolean doPopulate);
 
     void startLoadHistory(boolean populate, Queue<Long> creditorIds);
 

@@ -396,6 +396,38 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     @Transactional
+    void compareColumnValues(IBaseEntity entity, ShowcaseHolder showCaseHolder) {
+        String tableName = getActualTableName(showCaseHolder.getShowCaseMeta());
+
+        Map<String, String> prefixToColumn = showCaseHolder.generatePaths();
+
+        HashMap<String, String> dbValues = new HashMap<>();
+
+        String sql;
+
+        sql = "SELECT * FROM %s WHERE open_date <= ? AND %s%s_id = ?";
+        sql = String.format(sql, tableName, COLUMN_PREFIX, showCaseHolder.getRootClassName());
+
+        Map m = jdbcTemplateSC.queryForMap(sql, entity.getReportDate(), entity.getId());
+
+        for(ShowCaseField sf : showCaseHolder.getShowCaseMeta().getFieldsList()) {
+            if( m.get(sf.getColumnName()) != null)
+                dbValues.put(sf.getColumnName(), m.get(sf.getColumnName()).toString());
+        }
+
+        for(ShowCaseField sf : showCaseHolder.getShowCaseMeta().getCustomFieldsList()) {
+            if( m.get(sf.getColumnName()) != null)
+                dbValues.put(sf.getColumnName(), m.get(sf.getColumnName()).toString());
+        }
+
+        for(String s : prefixToColumn.keySet()) {
+            dbValues.put(s, prefixToColumn.get(s));
+        }
+
+
+    }
+
+    @Transactional
     void updateLeftRange(HistoryState historyState, IBaseEntity entity, ShowcaseHolder showCaseHolder) {
         String tableName;
 
@@ -588,6 +620,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 logger.debug(sql, entity.getId(), openDate);
                 logger.debug("Rows deleted from " + getActualTableName(showcaseHolder.getShowCaseMeta()) + ": " + rows);
             } else if(openDate.compareTo(entity.getReportDate()) < 0) {
+                compareColumnValues(entity, showcaseHolder);
                 long t1 = System.currentTimeMillis();
                 updateLeftRange(HistoryState.ACTUAL, entity, showcaseHolder);
                 moveActualToHistory(entity, showcaseHolder);
