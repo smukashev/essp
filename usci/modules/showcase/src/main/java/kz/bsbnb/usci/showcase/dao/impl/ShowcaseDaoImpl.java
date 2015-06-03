@@ -396,38 +396,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     @Transactional
-    void compareColumnValues(IBaseEntity entity, ShowcaseHolder showCaseHolder) {
-        String tableName = getActualTableName(showCaseHolder.getShowCaseMeta());
-
-        Map<String, String> prefixToColumn = showCaseHolder.generatePaths();
-
-        HashMap<String, String> dbValues = new HashMap<>();
-
-        String sql;
-
-        sql = "SELECT * FROM %s WHERE open_date <= ? AND %s%s_id = ?";
-        sql = String.format(sql, tableName, COLUMN_PREFIX, showCaseHolder.getRootClassName());
-
-        Map m = jdbcTemplateSC.queryForMap(sql, entity.getReportDate(), entity.getId());
-
-        for(ShowCaseField sf : showCaseHolder.getShowCaseMeta().getFieldsList()) {
-            if( m.get(sf.getColumnName()) != null)
-                dbValues.put(sf.getColumnName(), m.get(sf.getColumnName()).toString());
-        }
-
-        for(ShowCaseField sf : showCaseHolder.getShowCaseMeta().getCustomFieldsList()) {
-            if( m.get(sf.getColumnName()) != null)
-                dbValues.put(sf.getColumnName(), m.get(sf.getColumnName()).toString());
-        }
-
-        for(String s : prefixToColumn.keySet()) {
-            dbValues.put(s, prefixToColumn.get(s));
-        }
-
-
-    }
-
-    @Transactional
     void updateLeftRange(HistoryState historyState, IBaseEntity entity, ShowcaseHolder showCaseHolder) {
         String tableName;
 
@@ -457,13 +425,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         jdbcTemplateSC.update(sql, entity.getReportDate(), entity.getId(), openDate);
         long t6 = System.currentTimeMillis() - t5;
         stats.put("UPDATE %s SET close_date = ? WHERE %sroot_id = ? AND open_date = ?", t6);
-
-        /*sql = "DELETE FROM %s WHERE %s%s_ID = ? AND OPEN_DATE = CLOSE_DATE";
-        sql = String.format(sql, tableName, COLUMN_PREFIX, showCaseHolder.getRootClassName());
-        long t3 = System.currentTimeMillis();
-        jdbcTemplateSC.update(sql, entity.getId());
-        long t4 = System.currentTimeMillis() - t3;
-        stats.put("DELETE FROM %s WHERE %sROOT_ID = ? AND OPEN_DATE = CLOSE_DATE", t4);*/
     }
 
     String getActualTableName(ShowCase showCaseMeta) {
@@ -620,7 +581,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 logger.debug(sql, entity.getId(), openDate);
                 logger.debug("Rows deleted from " + getActualTableName(showcaseHolder.getShowCaseMeta()) + ": " + rows);
             } else if(openDate.compareTo(entity.getReportDate()) < 0) {
-                compareColumnValues(entity, showcaseHolder);
                 long t1 = System.currentTimeMillis();
                 updateLeftRange(HistoryState.ACTUAL, entity, showcaseHolder);
                 moveActualToHistory(entity, showcaseHolder);
