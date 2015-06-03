@@ -1,7 +1,9 @@
 package kz.bsbnb.usci.sync.service;
 
 
+import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
+import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.tool.status.SyncStatus;
 
@@ -26,6 +28,8 @@ public interface IEntityService {
 
     List<RefListItem> getRefsByMetaclass(long metaClassId);
 
+    RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis);
+
     int getQueueSize();
 
     void setThreadsCount(int threadsCount, boolean allowAutoIncrement);
@@ -33,4 +37,6 @@ public interface IEntityService {
     SyncStatus getStatus();
 
     void remove(long id);
+
+    RefColumnsResponse getRefColumns(long metaClassId);
 }

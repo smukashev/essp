@@ -1,6 +1,8 @@
 package kz.bsbnb.usci.core.service;
 
+import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
+import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
@@ -25,6 +27,8 @@ public interface IEntityService {
 
     List<RefListItem> getRefsByMetaclass(long metaClassId);
 
+    RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis);
+
     HashMap<String, QueryEntry> getSQLStats();
 
     void clearSQLStats();
@@ -34,4 +38,6 @@ public interface IEntityService {
     void removeAllByMetaClass(IMetaClass metaClass);
 
     Set<Long> getChildBaseEntityIds(long parentBaseEntityIds);
+
+    RefColumnsResponse getRefColumns(long metaClassId);
 }

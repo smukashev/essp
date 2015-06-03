@@ -1,7 +1,9 @@
 package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
+import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
@@ -128,6 +130,11 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     @Override
+    public RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis) {
+        return baseEntityProcessorDao.getRefListResponse(metaClassId, date, withHis);
+    }
+
+    @Override
     public HashMap<String, QueryEntry> getSQLStats() {
         return stats.getStats();
     }
@@ -145,6 +152,11 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Override
     public Set<Long> getChildBaseEntityIds(long parentBaseEntityIds) {
         return baseEntityProcessorDao.getChildBaseEntityIds(parentBaseEntityIds);
+    }
+
+    @Override
+    public RefColumnsResponse getRefColumns(long metaClassId) {
+        return baseEntityProcessorDao.getRefColumns(metaClassId);
     }
 
     @Override

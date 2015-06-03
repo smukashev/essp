@@ -7,7 +7,7 @@ Ext.require([
 
 var currentClassId = null;
 
-function createXML(currentNode, rootFlag, offset, arrayEl, first) {
+function createXML(currentNode, rootFlag, offset, arrayEl, first, remove) {
     var xmlStr = "";
 
     var children = currentNode.childNodes;
@@ -17,7 +17,8 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first) {
     } else {
         if(first) {
             xmlStr += offset + "<entity " +
-            (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
+            (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") +
+            (remove ? " operation=\"DELETE\"" : "") + ">\n";
         } else {
             xmlStr += offset + "<" + currentNode.data.code +
             (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
@@ -54,84 +55,108 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first) {
 }
 
 var grid;
-var store;
+var refStore;
+var entityStore;
 var subEntityStore;
 
 function createItemsGrid(itemId) {
-    if(grid == null) {
-        Ext.define('myModel', {
-            extend: 'Ext.data.Model',
-            fields: ['id','code','title']
-        });
+    Ext.Ajax.request({
+        url: dataUrl,
+        params : {
+            op: 'LIST_REF_COLUMNS',
+            metaId: itemId
+        },
+        success: function (response) {
+            var json = JSON.parse(response.responseText);
+            var colsInfo = buildColumnsInfo(json);
 
-        store = Ext.create('Ext.data.Store', {
-            model: 'myModel',
-            remoteGroup: true,
-            //buffered: true,
-            leadingBufferZone: 300,
-            pageSize: 100,
-            proxy: {
-                type: 'ajax',
-                url: dataUrl,
-                extraParams: {op : 'LIST_BY_CLASS', metaId : itemId},
-                actionMethods: {
-                    read: 'POST'
-                },
-                reader: {
-                    type: 'json',
-                    root: 'data',
-                    totalProperty: 'total'
-                }
-            },
-            autoLoad: true,
-            remoteSort: true
-        });
+            var refModel = Ext.define('refModel', {
+                extend: 'Ext.data.Model',
+                fields: json.names
+            });
 
-        grid = Ext.create('Ext.grid.Panel', {
-            id: "itemsGrid",
-            height: "100%",
-            store: store,
+            refStore = Ext.create('Ext.data.Store', {
+                model: 'refModel',
+                proxy: {
+                    type: 'ajax',
+                    url: dataUrl,
+                    extraParams: {
+                        op : 'LIST_BY_CLASS',
+                        metaId : itemId,
+                        date: Ext.getCmp('edDate').value,
+                        withHis: Ext.getCmp('checkboxHistory').pressed
+                    },
+                    actionMethods: {
+                        read: 'POST'
+                    },
+                    reader: {
+                        type: 'json',
+                        root: 'data',
+                        totalProperty: 'total'
+                    }
+                },
+                autoLoad: true
+            });
 
-            columns: [
-                {
-                    text     : 'ID',
-                    dataIndex: 'id',
-                    flex:1
-                },
-                {
-                    text     : label_CODE,
-                    dataIndex: 'code',
-                    flex:1
-                },
-                {
-                    text     : label_TITLE,
-                    dataIndex: 'title',
-                    flex:3
+            grid = Ext.create('Ext.grid.Panel', {
+                id: "refsGrid",
+                height: "100%",
+                store: refStore,
+                columns: colsInfo,
+                title: label_ITEMS,
+                listeners : {
+                    itemclick: function(dv, record, item, index, e) {
+                        entityId = Ext.getCmp("entityId");
+                        entityId.setValue(record.get('ID'));
+                        loadEntity(record.get('ID'));
+                    }
                 }
-            ],
-            title: label_ITEMS,
-            listeners : {
-                itemclick: function(dv, record, item, index, e) {
-                    entityId = Ext.getCmp("entityId");
-                    entityId.setValue(record.get('id'));
-                }
+            });
+
+            var refsGridContainer = Ext.getCmp('refsGridContainer');
+            refsGridContainer.removeAll();
+            refsGridContainer.add(grid);
+        }
+    });
+}
+
+function loadEntity(entityId) {
+    entityStore.load({
+        params: {
+            op : 'LIST_ENTITY',
+            entityId: entityId,
+            date: Ext.getCmp('edDate').value,
+            asRoot: true
+        },
+        callback: function(records, operation, success) {
+            if (!success) {
+                Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
             }
-        });
+        }
+    });
+}
 
-        return grid;
-    } else {
-        store.load({
-            params: {
-                metaId: itemId,
-                op : 'LIST_BY_CLASS'
-            },
-            callback: function(records, operation, success) {
-                if (!success) {
-                    Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA);
-                }
-            }
+function buildColumnsInfo(json) {
+    json.names.splice(0, 0, "ID");
+    json.titles.splice(0, 0, "ID");
+
+    json.names.push("open_date");
+    json.names.push("close_date");
+
+    json.titles.push("Дата начала");
+    json.titles.push("Дата окончания");
+
+    var colsInfo = [];
+
+    for (i = 0; i < json.names.length; i++) {
+        colsInfo.push({
+            text: json.titles[i],
+            dataIndex: json.names[i],
+            flex: 1
         });
     }
+
+    return colsInfo;
 }
 
 function loadSubEntity(subNode, isEdit) {
@@ -383,7 +408,7 @@ Ext.onReady(function() {
             }
         },
         autoLoad: true,
-        remoteSort: true,
+        remoteSort: true
     });
 
     Ext.define('refStoreModel', {
@@ -408,26 +433,6 @@ Ext.onReady(function() {
         ]
     });
 
-    /*var refStore = Ext.create('Ext.data.Store', {
-     model: 'refStoreModel',
-     pageSize: 100,
-     proxy: {
-     type: 'ajax',
-     url: dataUrl,
-     extraParams: {op : 'LIST_BY_CLASS'},
-     actionMethods: {
-     read: 'POST'
-     },
-     reader: {
-     type: 'json',
-     root: 'data',
-     totalProperty: 'total'
-     }
-     },
-     autoLoad: false,
-     remoteSort: true
-     });*/
-
     Ext.define('entityModel', {
         extend: 'Ext.data.Model',
         fields: [
@@ -445,7 +450,7 @@ Ext.onReady(function() {
         ]
     });
 
-    var entityStore = Ext.create('Ext.data.TreeStore', {
+    entityStore = Ext.create('Ext.data.TreeStore', {
         model: 'entityModel',
         storeId: 'entityStore',
         proxy: {
@@ -467,31 +472,6 @@ Ext.onReady(function() {
         folderSort: true
     });
 
-    var buttonShow = Ext.create('Ext.button.Button', {
-        id: "entityEditorShowBtn",
-        text: label_VIEW,
-        handler : function (){
-            entityId = Ext.getCmp("entityId");
-
-            entityStore.load({
-                params: {
-                    op : 'LIST_ENTITY',
-                    entityId: entityId.getValue(),
-                    date: Ext.getCmp('edDate').value,
-                    asRoot: true
-                },
-                callback: function(records, operation, success) {
-                    if (!success) {
-                        Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
-                    }
-                    var tree = Ext.getCmp('entityTreeView');
-                    var rootNode = tree.getRootNode();
-                }
-            });
-        },
-        maxWidth: 200
-    });
-
     var buttonXML = Ext.create('Ext.button.Button', {
         id: "entityEditorXmlBtn",
         text: label_SAVE,
@@ -507,12 +487,6 @@ Ext.onReady(function() {
                 params: {
                     xml_data: xmlStr,
                     op: 'SAVE_XML'
-                },
-                success: function() {
-                    console.log('success');
-                },
-                failure: function() {
-                    console.log('woops');
                 }
             });
         },
@@ -569,6 +543,27 @@ Ext.onReady(function() {
             });
 
             xmlFromWin.show();
+        },
+        maxWidth: 200
+    });
+
+    var buttonDelete = Ext.create('Ext.button.Button', {
+        id: "buttonDelete",
+        text: label_DEL,
+        handler : function (){
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+
+            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true, true);
+
+            Ext.Ajax.request({
+                url: dataUrl,
+                method: 'POST',
+                params: {
+                    xml_data: xmlStr,
+                    op: 'SAVE_XML'
+                }
+            });
         },
         maxWidth: 200
     });
@@ -645,7 +640,7 @@ Ext.onReady(function() {
 
     var buttonAdd = Ext.create('Ext.button.Button', {
         id: "entityEditorAddBtn",
-        text: 'Добавить новую запись',
+        text: 'Добавить',
         handler : function (){
             newAddFormItems = [];
             nextArrayIndex = 0;
@@ -663,7 +658,6 @@ Ext.onReady(function() {
             modalWindow.show();
         }
     });
-
 
     var entityGrid = Ext.create('Ext.tree.Panel', {
         //collapsible: true,
@@ -718,8 +712,6 @@ Ext.onReady(function() {
                 var form = Ext.getCmp('EntityEditorFormPannel');
                 form.removeAll();
 
-                console.log("selectedNode = ", selectedNode);
-
                 if (!selectedNode.data.simple) {
                     if (!selectedNode.data.array) {
                         if (selectedNode.data.root || !selectedNode.data.ref) {
@@ -753,7 +745,7 @@ Ext.onReady(function() {
         mm='0'+mm
     }
 
-    today = mm+'/'+dd+'/'+yyyy;
+    today = dd+'/'+mm+'/'+yyyy;
     // ------------------------------------------------
 
     mainEntityEditorPanel = Ext.create('Ext.panel.Panel', {
@@ -791,7 +783,7 @@ Ext.onReady(function() {
                 bbar: [
                     Ext.create('Ext.button.Button', {
                         id: "btnFormSave",
-                        text: label_SAVE,
+                        text: label_CONFIRM_CHANGES,
                         handler : function () {
                             var tree = Ext.getCmp('entityTreeView');
                             var selectedNode = tree.getSelectionModel().getLastSelected();
@@ -845,12 +837,13 @@ Ext.onReady(function() {
                 ]
             },{
                 xtype : 'panel',
+                id: 'refsGridContainer',
                 region: 'north',
                 preventHeader: true,
                 width: "60%",
                 height: 250,
-                autoScroll:true,
-                items: [ createItemsGrid()]
+                layout: 'fit',
+                items: []
             }],
         dockedItems: [
             {
@@ -863,33 +856,11 @@ Ext.onReady(function() {
                 listeners: {
                     change: function (field, newValue, oldValue) {
                         currentClassId = newValue;
-
-                        /*
-                         refStore.proxy.extraParams = {metaId: currentClassId, op: 'LIST_BY_CLASS'};
-                         Ext.getCmp('entityEditorrefCombo').value = null;
-
-                         refStore.reload();
-                         */
                         createItemsGrid(currentClassId);
                     }
                 },
                 editable : false
             },
-            /*{
-             fieldLabel: label_ITEMS,
-             id: 'entityEditorrefCombo',
-             xtype: 'combobox',
-             maxWidth: 400,
-             store: refStore,
-             valueField:'id',
-             displayField:'title',
-             listeners: {
-             change: function (field, newValue, oldValue) {
-             entityId = Ext.getCmp("entityId");
-             entityId.setValue(newValue);
-             }
-             }
-             },*/
             {
                 fieldLabel: label_ENTITY_ID,
                 id: 'entityId',
@@ -898,12 +869,42 @@ Ext.onReady(function() {
                 disabled : true,
                 /*maxWidth: 400,*/
                 value: (givenEntityId == "null" ? "" : givenEntityId)
-            }, {
-                fieldLabel: label_Date,
-                id: 'edDate',
-                xtype: 'datefield',
-                maxWidth: 400,
-                value : today
+            },
+            {
+                xtype: 'container',
+                layout: 'hbox',
+                items: [
+                    {
+                        fieldLabel: label_Date,
+                        id: 'edDate',
+                        xtype: 'datefield',
+                        format: 'd/m/Y',
+                        maxWidth: 400,
+                        value : today
+                    },
+                    {
+                        xtype: 'container',
+                        layout: 'hbox',
+                        flex: 1
+                    },
+                    {
+                        xtype: 'button',
+                        id: "checkboxHistory",
+                        text: 'Отображать историю',
+                        pressed: false,
+                        enableToggle: true,
+                        listeners: {
+                            toggle: function (obj, pressed) {
+                                if (refStore) {
+                                    refStore.load({params: {
+                                        withHis: pressed,
+                                        date: Ext.getCmp('edDate').value
+                                    }});
+                                }
+                            }
+                        }
+                    },
+                ]
             },
             {
                 xtype: 'tbseparator',
@@ -911,7 +912,7 @@ Ext.onReady(function() {
             }
         ],
         tbar: [
-            buttonAdd, buttonShow, buttonXML, buttonShowXML
+            buttonAdd, buttonXML, buttonShowXML, buttonDelete
         ]
     });
 });

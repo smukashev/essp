@@ -1,7 +1,9 @@
 package kz.bsbnb.usci.eav.persistance.dao;
 
 import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
+import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
+import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
@@ -67,6 +69,8 @@ public interface IBaseEntityProcessorDao
 
     List<RefListItem> getRefsByMetaclassRaw(long metaClassId);
 
+    RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis);
+
     List<BaseEntity> getEntityByMetaclass(MetaClass meta);
 
     boolean isApproved(long id);
@@ -86,6 +90,8 @@ public interface IBaseEntityProcessorDao
     void setApplyListener(IDaoListener applyListener);
 
     List<Date> getEntityReportDates(Long entityId);
+
+    RefColumnsResponse getRefColumns(long metaClassId);
 
     enum MergeResultChoice
     {

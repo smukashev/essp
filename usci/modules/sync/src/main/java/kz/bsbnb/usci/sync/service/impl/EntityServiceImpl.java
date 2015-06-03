@@ -1,6 +1,8 @@
 package kz.bsbnb.usci.sync.service.impl;
 
+import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
+import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.sync.job.impl.DataJob;
 import kz.bsbnb.usci.sync.service.IEntityService;
@@ -75,6 +77,11 @@ public class EntityServiceImpl implements IEntityService {
     }
 
     @Override
+    public RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis) {
+        return remoteEntityService.getRefListResponse(metaClassId, date, withHis);
+    }
+
+    @Override
     public int getQueueSize() {
         return dataJob.getQueueSize();
     }
@@ -93,5 +100,10 @@ public class EntityServiceImpl implements IEntityService {
     @Override
     public void remove(long id) {
         remoteEntityService.remove(id);
+    }
+
+    @Override
+    public RefColumnsResponse getRefColumns(long metaClassId) {
+        return remoteEntityService.getRefColumns(metaClassId);
     }
 }

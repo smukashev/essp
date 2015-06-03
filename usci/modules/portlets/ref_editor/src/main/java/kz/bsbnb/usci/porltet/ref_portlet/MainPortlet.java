@@ -6,12 +6,12 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
 import kz.bsbnb.usci.eav.model.BatchEntry;
-import kz.bsbnb.usci.eav.model.RefListItem;
+import kz.bsbnb.usci.eav.model.RefColumnsResponse;
+import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.*;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
@@ -93,6 +93,7 @@ public class MainPortlet extends MVCPortlet {
         LIST_ENTITY,
         SAVE_XML,
         LIST_BY_CLASS,
+        LIST_REF_COLUMNS,
         LIST_ATTRIBUTES
     }
 
@@ -394,38 +395,19 @@ public class MainPortlet extends MVCPortlet {
                     break;
                 case LIST_BY_CLASS:
                     String metaId = getParam("metaId", resourceRequest);
-                    if (metaId != null && metaId.trim().length() > 0) {
-                        List<RefListItem> ids = entityService.getRefsByMetaclass(Long.parseLong(metaId));
-
-                        writer.write("{\"total\":" + ids.size());
-                        writer.write(",\"data\":[");
-
-                        boolean first = true;
-
-                        for (RefListItem id : ids) {
-                            if (first) {
-                                first = false;
-                            } else {
-                                writer.write(",");
-                            }
-
-                            writer.write("{");
-
-                            writer.write("\"id\":\"" + id.getId() + "\",");
-                            writer.write("\"code\":\"" + id.getCode() + "\",");
-
-                            for (String key : id.getKeys()) {
-                                writer.write("\"" + key + "\":\"" + id.getValue(key) + "\",");
-                            }
-
-                            String title = id.getTitle() != null ? id.getTitle() : (String)id.getValue("VALUE");
-
-                            writer.write("\"title\":\"" + title + "\"");
-                            writer.write("}");
-                        }
-
-                        writer.write("]}");
-                    }
+                    String sDate = resourceRequest.getParameter("date");
+                    Date date = (Date) DataTypes.fromString(DataTypes.DATE, sDate);
+                    String sWithHis = resourceRequest.getParameter("withHis");
+                    boolean withHis = Boolean.valueOf(sWithHis);
+                    RefListResponse refListResponse = entityService.getRefListResponse(Long.parseLong(metaId), date, withHis);
+                    String sJson = gson.toJson(refListResponse);
+                    writer.write(sJson);
+                    break;
+                case LIST_REF_COLUMNS:
+                    metaId = getParam("metaId", resourceRequest);
+                    RefColumnsResponse refColumns = entityService.getRefColumns(Long.parseLong(metaId));
+                    sJson = gson.toJson(refColumns);
+                    writer.write(sJson);
                     break;
                 case LIST_ATTRIBUTES:
                     metaId = getParam("metaId", resourceRequest);
@@ -443,7 +425,7 @@ public class MainPortlet extends MVCPortlet {
                     boolean asRoot = StringUtils.isNotEmpty(asRootStr) ? Boolean.valueOf(asRootStr) : false;
 
                     if (entityId != null && entityId.trim().length() > 0) {
-                        Date date = null;
+                        date = null;
 
                         if(StringUtils.isNotEmpty(resourceRequest.getParameter("date")))
                             date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));

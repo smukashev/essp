@@ -19,4 +19,5 @@ var label_REF = 'Анықтама';
 var label_ITEMS = 'Элементтер';
 var label_ENTITY_ID = 'Болмыс идентификаторы';
 var label_Date = 'Дата';
-var label_DEL = 'Удалить_en';
+var label_DEL = 'Удалить';
+var label_CONFIRM_CHANGES = "Подтвердить изменения";

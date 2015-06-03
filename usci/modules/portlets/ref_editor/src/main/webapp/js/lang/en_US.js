@@ -20,3 +20,4 @@ var label_ITEMS = 'Элементы';
 var label_ENTITY_ID = 'Идентификатор сущности';
 var label_Date = 'Дата';
 var label_DEL = 'Удалить';
+var label_CONFIRM_CHANGES = "Подтвердить изменения";

@@ -5,7 +5,9 @@ import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
+import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
+import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.*;
 import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.meta.*;
@@ -35,9 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
@@ -82,6 +84,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     public static final HashMap<Long, List<RefListItem>> refsCache = new HashMap<Long, List<RefListItem>>();
     public static final HashMap<Long, List<RefListItem>> refsCacheRaw = new HashMap<Long, List<RefListItem>>();
+
+//    public static final Map<Long, List<BaseEntity>>
 
     private final int SC_ID_BAG_LIMIT = 100;
 
@@ -3085,8 +3089,240 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return getRefsByMetaClass(metaClassId, true);
     }
 
-    public List<RefListItem> getRefsByMetaClass(long metaClassId, boolean raw) {
+    @Override
+    public RefColumnsResponse getRefColumns(long metaClassId) {
+        Select simpleAttrsSelect = context.select().from(EAV_M_SIMPLE_ATTRIBUTES).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
+        Select complexAttrsSelect = context.select().from(EAV_M_COMPLEX_ATTRIBUTES).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
+        Select simpleSetsSelect = context.select().from(EAV_M_SIMPLE_SET).where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(metaClassId));
+        Select complexSetsSelect = context.select().from(EAV_M_COMPLEX_SET).where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(metaClassId));
 
+        List<Map<String, Object>> simpleAttrs = queryForListWithStats(simpleAttrsSelect.getSQL(), simpleAttrsSelect.getBindValues().toArray());
+        List<Map<String, Object>> complexAttrs = queryForListWithStats(complexAttrsSelect.getSQL(), complexAttrsSelect.getBindValues().toArray());
+        List<Map<String, Object>> simpleSets = queryForListWithStats(simpleSetsSelect.getSQL(), simpleSetsSelect.getBindValues().toArray());
+        List<Map<String, Object>> complexSets = queryForListWithStats(complexSetsSelect.getSQL(), complexSetsSelect.getBindValues().toArray());
+
+        List<String> names = new ArrayList<String>();
+        List<String> titles = new ArrayList<String>();
+
+        for (Map<String, Object> attr : simpleAttrs) {
+            String attrName = (String) attr.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
+            String attrTitle = (String) attr.get(EAV_M_SIMPLE_ATTRIBUTES.TITLE.getName());
+            names.add(attrName);
+            titles.add(attrTitle);
+        }
+
+        for (Map<String, Object> attr : complexAttrs) {
+            String attrName = (String) attr.get(EAV_M_COMPLEX_ATTRIBUTES.NAME.getName());
+            String attrTitle = (String) attr.get(EAV_M_COMPLEX_ATTRIBUTES.TITLE.getName());
+            names.add(attrName);
+            titles.add(attrTitle);
+        }
+
+        for (Map<String, Object> attr : simpleSets) {
+            String attrName = (String) attr.get(EAV_M_SIMPLE_SET.NAME.getName());
+            String attrTitle = (String) attr.get(EAV_M_SIMPLE_SET.TITLE.getName());
+            names.add(attrName);
+            titles.add(attrTitle);
+        }
+
+        for (Map<String, Object> attr : complexSets) {
+            String attrName = (String) attr.get(EAV_M_COMPLEX_SET.NAME.getName());
+            String attrTitle = (String) attr.get(EAV_M_COMPLEX_SET.TITLE.getName());
+            names.add(attrName);
+            titles.add(attrTitle);
+        }
+
+        return new RefColumnsResponse(names, titles);
+    }
+
+    @Override
+    public RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis) {
+        List<Map<String, Object>> rows = getRefListResponseWithHis(metaClassId);
+
+        addOpenCloseDates(rows);
+        rows = filter(rows, date);
+
+        // check: rows must be sorted at this stage
+
+        if (!withHis) {
+            rows = removeHistory(rows);
+        }
+
+        return new RefListResponse(rows);
+    }
+
+    private List<Map<String, Object>> removeHistory(List<Map<String, Object>> rows) {
+        Map<Object, Map<String, Object>> groupedRows = new TreeMap<Object, Map<String, Object>>();
+
+        for (Map<String, Object> row : rows) {
+            String groupProperty = "ID";
+            Object groupPropertyValue = row.get(groupProperty);
+            groupedRows.put(groupPropertyValue, row);
+        }
+
+        return new ArrayList<Map<String, Object>>(groupedRows.values());
+    }
+
+    private List<Map<String, Object>> filter(List<Map<String, Object>> rows, Date date) {
+        List<Map<String, Object>> filtered = new ArrayList<Map<String, Object>>();
+
+        for (Map<String, Object> row : rows) {
+            Date repDate = (Date) row.get("report_date");
+
+            if (!repDate.after(date)) {
+                filtered.add(row);
+            }
+        }
+
+        return filtered;
+    }
+
+    private void addOpenCloseDates(List<Map<String, Object>> rows) {
+        Map<String, Object> prev = null;
+
+        for (Map<String, Object> row : rows) {
+            row.put("open_date", row.get("report_date"));
+
+            if (prev != null) {
+                Object id = row.get("id");
+                Object prevId = prev.get("id");
+                Object reportDate = row.get("report_date");
+
+                if (id.equals(prevId)) {
+                    prev.put("close_date", reportDate);
+                }
+            }
+            prev = row;
+        }
+    }
+
+    private List<Map<String, Object>> getRefListResponseWithHis(long metaClassId) {
+        Select simpleAttrsSelect = context.select().from(EAV_M_SIMPLE_ATTRIBUTES).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
+
+        List<Map<String, Object>> simpleAttrs = queryForListWithStats(simpleAttrsSelect.getSQL(), simpleAttrsSelect.getBindValues().toArray());
+
+        Collection<Field> fields = new ArrayList<Field>();
+        fields.add(DSL.field("id"));
+        fields.add(DSL.min(DSL.field("report_date")).as("report_date"));
+
+        Collection<Field> groupByFields = new ArrayList<Field>();
+        groupByFields.add(DSL.field("id"));
+
+        for (Map<String, Object> attr : simpleAttrs) {
+            String attrName = (String) attr.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
+            attrName = "\"" + attrName + "\"";
+            fields.add(DSL.field(attrName));
+            groupByFields.add(DSL.field(attrName));
+        }
+
+        Collection<Field> fieldsInner = new ArrayList<Field>();
+
+        fieldsInner.add(DSL.field("\"dat\".id"));
+        fieldsInner.add(DSL.field("\"dat\".report_date"));
+
+        for (Map<String, Object> attr : simpleAttrs) {
+            BigDecimal attrId = (BigDecimal) attr.get(EAV_M_SIMPLE_ATTRIBUTES.ID.getName());
+            String attrName = (String) attr.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
+            String attrType = (String) attr.get(EAV_M_SIMPLE_ATTRIBUTES.TYPE_CODE.getName());
+            Table valuesTable = getValuesTable(attrType);
+
+            Field fieldInner = context.select(DSL.field("value")).from(valuesTable)
+                    .where(DSL.field("attribute_id").eq(attrId)).and(DSL.field("report_date").eq(
+                            context.select(DSL.max(DSL.field("report_date"))).from(valuesTable)
+                                    .where(DSL.field("attribute_id").eq(attrId))
+                                    .and(DSL.field("entity_id").eq(DSL.field("\"dat\".id")))
+                                    .and(DSL.field("report_date").le(DSL.field("\"dat\".report_date")))
+                    ).and(DSL.field("entity_id").eq(DSL.field("\"dat\".id"))))
+                    .asField(attrName);
+
+            fieldsInner.add(fieldInner);
+        }
+
+        SelectLimitStep select = context.select(fields.toArray(new Field[]{})).from(
+                context.select(fieldsInner.toArray(new Field[]{})).from(
+                        context.select(EAV_BE_ENTITIES.ID, EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE)
+                                .from(EAV_BE_ENTITIES).join(EAV_BE_ENTITY_REPORT_DATES)
+                                .on(EAV_BE_ENTITIES.ID.eq(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID))
+                                .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId))
+                                .asTable("dat")
+                )
+        ).groupBy(groupByFields).orderBy(DSL.field("id"), DSL.min(DSL.field("report_date")));
+
+        return queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+    }
+
+    private List<Map<String, Object>> getRefListResponseWithoutHis(long metaClassId, Date date) {
+        java.sql.Date dt = new java.sql.Date(date.getTime());
+
+        Select simpleAttrsSelect = context.select().from(EAV_M_SIMPLE_ATTRIBUTES).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
+
+        List<Map<String, Object>> simpleAttrs = queryForListWithStats(simpleAttrsSelect.getSQL(), simpleAttrsSelect.getBindValues().toArray());
+
+        Collection<Field> fields = new ArrayList<Field>();
+
+        fields.add(DSL.field("\"enr\".id"));
+        fields.add(DSL.field("\"enr\".report_date"));
+
+        for (Map<String, Object> attr : simpleAttrs) {
+            String attrName = (String) attr.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
+            fields.add(DSL.field("\"s_" + attrName + "\".value").as(attrName));
+        }
+
+        SelectJoinStep select = context.select(fields.toArray(new Field[]{})).from(
+                context.select().from(
+                        context.select(
+                                EAV_BE_ENTITIES.ID,
+                                EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE,
+                                DSL.rowNumber().over().partitionBy(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID).orderBy(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.desc()).as("p")
+                        ).from(EAV_BE_ENTITIES).join(EAV_BE_ENTITY_REPORT_DATES).on(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
+                                .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId)).and(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.le(dt))
+                                .asTable("sub")
+                ).where(DSL.field("\"sub\".\"p\"").eq(1)).asTable("enr")
+        );
+
+        for (Map<String, Object> attr : simpleAttrs) {
+            String attrName = (String) attr.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
+            String attrType = (String) attr.get(EAV_M_SIMPLE_ATTRIBUTES.TYPE_CODE.getName());
+            String attrSubTable = "s_" + attrName;
+
+            Table valuesTable = getValuesTable(attrType);
+
+            select.leftOuterJoin(
+                    context.select().from(
+                            context.select(
+                                    valuesTable.field("ENTITY_ID"),
+                                    valuesTable.field("VALUE"),
+                                    valuesTable.field("REPORT_DATE"),
+                                    DSL.rowNumber().over().partitionBy(valuesTable.field("ENTITY_ID")).orderBy(valuesTable.field("REPORT_DATE").desc()).as("p")
+                            ).from(valuesTable)
+                            .where(valuesTable.field("ATTRIBUTE_ID").eq(attr.get("ID"))).and(valuesTable.field("REPORT_DATE").le(dt))
+                            .asTable("sub")
+                    ).where(DSL.field("\"sub\".\"p\"").eq(1))
+                    .asTable(attrSubTable)
+            ).on("\"" + attrSubTable + "\"" + "." + "ENTITY_ID = \"enr\".id");
+        }
+
+        return queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+    }
+
+    private Table getValuesTable(String attrType) {
+        switch (attrType) {
+            case "STRING":
+                return EAV_BE_STRING_VALUES;
+            case "DOUBLE":
+                return EAV_BE_DOUBLE_VALUES;
+            case "INTEGER":
+                return EAV_BE_INTEGER_VALUES;
+            case "DATE":
+                return EAV_BE_DATE_VALUES;
+            case "BOOLEAN":
+                return EAV_BE_BOOLEAN_VALUES;
+        }
+
+        return null;
+    }
+
+    public List<RefListItem> getRefsByMetaClass(long metaClassId, boolean raw) {
         if(refsCacheEnabled) {
             List<RefListItem> refsList;
             if(raw)
@@ -3164,6 +3400,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 orderBy(DSL.field("ID"));
 
         logger.debug("LIST_BY_CLASS SQL: " + select.toString());
+
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         Iterator<Map<String, Object>> i = rows.iterator();
