@@ -160,73 +160,73 @@ public class ZipFilesMonitor{
         ViewResponse response = null;
 
         while(true) {
-                if(rows == null) {
-                    View view = couchbaseClient.getView("batch", "batch_pending");
-                    Query query = new Query();
-                    query.setDebug(false);
-                    query.setStale(Stale.FALSE);
+            if(rows == null) {
+                View view = couchbaseClient.getView("batch", "batch_pending");
+                Query query = new Query();
+                query.setDebug(false);
+                query.setStale(Stale.FALSE);
 
-                    response = couchbaseClient.query(view, query);
+                response = couchbaseClient.query(view, query);
 
-                    rows = response.iterator();
-                }
+                rows = response.iterator();
+            }
 
-                if (response.size() > 0) {
-                    System.out.println("Found pending jobs: " + response.size());
-                    System.out.println("-------------------------------------------------------------------------");
+            if (response.size() > 0) {
+                System.out.println("Found pending jobs: " + response.size());
+                System.out.println("-------------------------------------------------------------------------");
 
-                    int jobsRestarted = 0;
+                int jobsRestarted = 0;
 
-                    while(rows.hasNext()) {
-                        try {
-                            ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) rows.next();
-                            long batchId = Long.parseLong(viewRowNoDocs.getKey());
+                while(rows.hasNext()) {
+                    try {
+                        ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) rows.next();
+                        long batchId = Long.parseLong(viewRowNoDocs.getKey());
 
-                            if (viewRowNoDocs.getValue().equals("ERROR"))
-                            {
-                                System.out.println("Skipped because of error!");
-                                continue;
-                            }
-
-                            System.out.println("batchId: " + batchId + ", status: " + viewRowNoDocs.getValue());
-
-                            Object batchObject = couchbaseClient.get("batch:" + batchId);
-                            Object manifestObject = couchbaseClient.get("manifest:" + batchId);
-
-                            if (batchObject == null || manifestObject == null) {
-                                System.out.println("Batch with id: " + batchId + " has no manifest or batch. Restart failed.");
-                                continue;
-                            }
-
-                            System.out.println(manifestObject.toString());
-                            System.out.println("-------------------------------------------------------------------------");
-
-                            BatchInfo batchInfo = gson.fromJson(manifestObject.toString(), BatchInfo.class);
-                            try {
-                                batchService.load(batchId);
-                            } catch(Exception e) {
-                                System.out.println("Can't get batch from eav DB. Skipped.");
-                            }
-
-
-
-    //                        if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), cal.getTime()) != 0)
-    //                        {
-    //                            System.out.println("Skipping wrone dates: " + batchInfo.getRepDate());
-    //                            System.out.println("Must be: " + cal.getTime());
-    //                            continue;
-    //                        }
-
-                            sender.addJob(batchId, batchInfo);
-                            receiverStatusSingleton.batchReceived();
-                            System.out.println("Restarted job #" + ++jobsRestarted);
-                        } catch (Exception e) {
-                            System.out.println("Error in pending batches view: " + e.getMessage());
-                            System.out.println("Retrying...");
+                        if (viewRowNoDocs.getValue().equals("ERROR"))
+                        {
+                            System.out.println("Skipped because of error!");
+                            continue;
                         }
+
+                        System.out.println("batchId: " + batchId + ", status: " + viewRowNoDocs.getValue());
+
+                        Object batchObject = couchbaseClient.get("batch:" + batchId);
+                        Object manifestObject = couchbaseClient.get("manifest:" + batchId);
+
+                        if (batchObject == null || manifestObject == null) {
+                            System.out.println("Batch with id: " + batchId + " has no manifest or batch. Restart failed.");
+                            continue;
+                        }
+
+                        System.out.println(manifestObject.toString());
+                        System.out.println("-------------------------------------------------------------------------");
+
+                        BatchInfo batchInfo = gson.fromJson(manifestObject.toString(), BatchInfo.class);
+                        try {
+                            batchService.load(batchId);
+                        } catch(Exception e) {
+                            System.out.println("Can't get batch from eav DB. Skipped.");
+                        }
+
+
+
+                        //                        if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), cal.getTime()) != 0)
+                        //                        {
+                        //                            System.out.println("Skipping wrone dates: " + batchInfo.getRepDate());
+                        //                            System.out.println("Must be: " + cal.getTime());
+                        //                            continue;
+                        //                        }
+
+                        sender.addJob(batchId, batchInfo);
+                        receiverStatusSingleton.batchReceived();
+                        System.out.println("Restarted job #" + ++jobsRestarted);
+                    } catch (Exception e) {
+                        System.out.println("Error in pending batches view: " + e.getMessage());
+                        System.out.println("Retrying...");
                     }
                 }
-                break;
+            }
+            break;
 
         }
 
@@ -568,26 +568,21 @@ public class ZipFilesMonitor{
 
                     statusSingleton.addBatchStatus(batchId,
                             new BatchStatusJModel(BatchStatuses.ERROR,
-                                    "Can't find creditor: " + docType + " or BIN: " +
-                                    ", " + docValue, new Date(), batchInfo.getUserId()));
+                                    "Кредитор не найден", new Date(), batchInfo.getUserId()));
 
                     haveError = true;
                 }
             }
         }
 
-        if(cId != null && cId > 0) {
-            checkAndFillEavReport(cId, batchInfo);
-        } else {
-            statusSingleton.addBatchStatus(batchId,
-                    new BatchStatusJModel(BatchStatuses.WAITING, null, new Date(), batchInfo.getUserId()));
-
+        if(!haveError && !checkAndFillEavReport(cId, batchInfo, batchId)) {
             haveError = true;
         }
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
                 batchInfo.getUserId(), cId);
         statusSingleton.startBatch(batchId, batchFullJModel, batchInfo);
+
         if (!haveError) {
             statusSingleton.addBatchStatus(batchId,
                     new BatchStatusJModel(BatchStatuses.WAITING, null, new Date(), batchInfo.getUserId()));
@@ -596,15 +591,23 @@ public class ZipFilesMonitor{
         }
     }
 
-    private void checkAndFillEavReport(long creditorId, BatchInfo batchInfo) {
+    private boolean checkAndFillEavReport(long creditorId, BatchInfo batchInfo, long batchId) {
         ReportBeanRemoteBusiness reportBeanRemoteBusiness = serviceFactory.getReportBeanRemoteBusinessService();
 
         Report existing = reportBeanRemoteBusiness.getReport(creditorId, batchInfo.getRepDate());
 
         if (existing != null) {
             if (ReportStatus.COMPLETED.getStatusId().equals(existing.getStatusId())) {
-                throw new RuntimeException("Report with status COMPLETED already exists for creditorId = "
-                        + creditorId +  ", reportDate = " + batchInfo.getRepDate());
+                String errMsg = "Отчет со статусом 'В ПРОЦЕССЕ' уже существует для кредитора = "
+                        + creditorId +  ", отчетная дата = " + batchInfo.getRepDate();
+                logger.error(errMsg);
+                statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
+                        BatchStatuses.ERROR,
+                        errMsg,
+                        new Date(),
+                        batchInfo.getUserId()
+                ));
+                return false;
             }
         } else {
             Date lastApprovedDate = reportBeanRemoteBusiness.getLastApprovedDate(creditorId);
@@ -615,11 +618,28 @@ public class ZipFilesMonitor{
                         : new SimpleDateFormat("dd/MM/yyyy").parse(Report.INITIAL_REPORT_DATE_STR);
 
                 if (!batchInfo.getRepDate().equals(expectedDate)) {
-                     throw new RuntimeException("Reports must be supplied in order month by month");
+                    String errMsg = "Отчеты должны отправляться последовательно по месяцам";
+                    logger.error(errMsg);
+
+                    statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
+                            BatchStatuses.ERROR,
+                            errMsg,
+                            new Date(),
+                            batchInfo.getUserId()
+                    ));
+                    return false;
                 }
 
             } catch (ParseException e) {
-                throw new RuntimeException(e);
+                String errMsg = "Ошибка при парсинге даты";
+                logger.error(errMsg, e);
+                statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
+                        BatchStatuses.ERROR,
+                        errMsg,
+                        new Date(),
+                        batchInfo.getUserId()
+                ));
+                return false;
             }
         }
 
@@ -652,6 +672,8 @@ public class ZipFilesMonitor{
             Long reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
             batchInfo.setReportId(reportId);
         }
+
+        return true;
     }
 
     public byte[] inputStreamToByte(InputStream in) throws IOException {

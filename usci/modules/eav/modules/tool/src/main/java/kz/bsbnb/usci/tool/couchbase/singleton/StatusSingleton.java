@@ -94,7 +94,14 @@ public class StatusSingleton {
 
         Object batchStatus = client.get("batch_status:" + batchId);
 
-        BatchStatusArrayJModel bStatuses = new BatchStatusArrayJModel();
+        BatchStatusArrayJModel bStatuses;
+
+        if (batchStatus == null) {
+            bStatuses = new BatchStatusArrayJModel();
+        } else {
+            bStatuses = gson.fromJson(batchStatus.toString(), BatchStatusArrayJModel.class);//(BatchStatusArrayJModel)batchStatus;
+        }
+
         bStatuses.setFileName(fileName);
 
         client.set("batch_status:" + batchId, 0, gson.toJson(bStatuses));
