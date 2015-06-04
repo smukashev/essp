@@ -17,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author abukabayev
@@ -125,12 +126,14 @@ public class RuleDao implements IRuleDao {
     @Override
     public long createEmptyRule(final String title){
         KeyHolder keyHolder = new GeneratedKeyHolder();
+        final String defaultRuleBody = "rule \" rule_" + (new Random().nextInt()) + "\"\nwhen\nthen\nend";
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO " + PREFIX_ + "rules (title) " +
-                        "VALUES(?)", new String[]{"id"});
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO " + PREFIX_ + "rules (title, rule) " +
+                        "VALUES(?, ?)", new String[]{"id"});
                 ps.setString(1,title);
+                ps.setString(2, defaultRuleBody);
                 return ps;
             }
         },keyHolder);

@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.brms.rulesingleton;
+package kz.bsbnb.usci.brms.rulesvr.rulesingleton;
 
 import org.drools.runtime.rule.Activation;
 import org.drools.runtime.rule.ConsequenceExceptionHandler;

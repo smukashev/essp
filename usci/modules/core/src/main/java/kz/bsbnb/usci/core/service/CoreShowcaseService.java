@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Queue;
 
 public interface CoreShowcaseService {
-    void start(String metaName, Long id, Date reportDate);
+    void start(String metaName, Long id, Date reportDate, boolean doPopulate);
 
     void pause(Long id);
 

@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.receiver.writer.impl;
 
-import kz.bsbnb.usci.brms.rulesingleton.RulesSingleton;
+import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
@@ -30,11 +30,13 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
     @Qualifier(value = "remoteEntityService")
     private RmiProxyFactoryBean rmiProxyFactoryBean;
 
+    @Autowired
+    @Qualifier(value="remoteRuleService")
+    private RmiProxyFactoryBean rmiProxyRuleService;
+
     private IEntityService entityService;
     private Logger logger = Logger.getLogger(RmiEventEntityWriter.class);
-
-    @Autowired
-    private RulesSingleton rulesSingleton;
+    private IRuleService ruleService;
 
     @Autowired
     protected StatusSingleton statusSingleton;
@@ -50,8 +52,8 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
     @PostConstruct
     public void init() {
         logger.info("Writer init");
-        rulesSingleton.reloadCache();
         entityService = (IEntityService) rmiProxyFactoryBean.getObject();
+        ruleService = (IRuleService) rmiProxyRuleService.getObject();
 
         metaRules.add("credit");
     }
@@ -94,12 +96,14 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
             statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
 
+            List<String> errors = null;
+
             if(global.isRulesEnabled() && entity.getMeta() != null &&
                     metaRules.contains(entity.getMeta().getClassName())) {
                 try {
                     long t1 = System.currentTimeMillis();
 
-                    rulesSingleton.runRules(entity, entity.getMeta().getClassName() + "_parser",
+                    errors = ruleService.runRules(entity, entity.getMeta().getClassName() + "_parser",
                             entity.getReportDate());
 
                     sqlStats.put(entity.getMeta().getClassName() + "_parser", System.currentTimeMillis() - t1);
@@ -108,8 +112,8 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                 }
             }
 
-            if (entity.getValidationErrors().size() > 0) {
-                for (String errorMsg : entity.getValidationErrors()) {
+            if (errors != null && errors.size() > 0) {
+                for (String errorMsg : errors) {
                     System.out.println(errorMsg);
                     //TODO: check for error with Index
                     entityStatusJModel = new EntityStatusJModel(

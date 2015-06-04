@@ -425,13 +425,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         jdbcTemplateSC.update(sql, entity.getReportDate(), entity.getId(), openDate);
         long t6 = System.currentTimeMillis() - t5;
         stats.put("UPDATE %s SET close_date = ? WHERE %sroot_id = ? AND open_date = ?", t6);
-
-        /*sql = "DELETE FROM %s WHERE %s%s_ID = ? AND OPEN_DATE = CLOSE_DATE";
-        sql = String.format(sql, tableName, COLUMN_PREFIX, showCaseHolder.getRootClassName());
-        long t3 = System.currentTimeMillis();
-        jdbcTemplateSC.update(sql, entity.getId());
-        long t4 = System.currentTimeMillis() - t3;
-        stats.put("DELETE FROM %s WHERE %sROOT_ID = ? AND OPEN_DATE = CLOSE_DATE", t4);*/
     }
 
     String getActualTableName(ShowCase showCaseMeta) {

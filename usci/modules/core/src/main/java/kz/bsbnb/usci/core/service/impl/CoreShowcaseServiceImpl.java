@@ -39,8 +39,13 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     private Thread historyParentThread;
 
     @Override
-    public void start(String metaName, Long id, Date reportDate) {
-        baseEntityProcessorDao.populate(metaName, id, reportDate);
+    public void start(String metaName, Long id, Date reportDate, boolean doPopulate) {
+        if(doPopulate) {
+            System.out.println("Populating SC_ID_BAG ....");
+            baseEntityProcessorDao.populate(metaName, id, reportDate);
+            System.out.println("Finished");
+        }
+
         Thread t = new Thread(new Sender(id, reportDate));
         SCThreads.put(id, t);
         t.start();
@@ -279,7 +284,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
             }
 
             while (true) {
-                if (queueMbean.getQueueSize() == 0 && queueMbean.getQueueSize() <= MIN_SIZE) {
+                if (queueMbean.getQueueSize() <= MIN_SIZE) {
                     List<Long> list = baseEntityProcessorDao.getSCEntityIds(scId);
 
                     if (list.size() == 0) {
@@ -288,7 +293,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
                         return;
                     }
                     for (Long id : list) {
-                        QueueEntry entry = new QueueEntry().setBaseEntityApplied(baseEntityProcessorDao.load(id))
+                        QueueEntry entry = new QueueEntry().setBaseEntityApplied(baseEntityProcessorDao.loadByReportDate(id, reportDate))
                                 .setScId(scId);
                         try {
                             producer.produce(entry);

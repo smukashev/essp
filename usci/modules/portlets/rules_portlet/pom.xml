@@ -134,11 +134,6 @@
             <artifactId>rulesvr</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>kz.bsbnb.usci.brms</groupId>
-            <artifactId>rulesingleton</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 
     <distributionManagement>

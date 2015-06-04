@@ -5,8 +5,9 @@ import kz.bsbnb.usci.brms.rulesvr.dao.IBatchVersionDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
+import kz.bsbnb.usci.brms.rulesvr.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,10 @@ public class RuleService implements IRuleService {
 
 //    @Autowired
 //    private ListenerSingleton listenerSingleton;
+
+
+    @Autowired
+    private RulesSingleton rulesSingleton;
 
     @Override
     public long save(Rule rule, BatchVersion batchVersion) {
@@ -80,7 +85,7 @@ public class RuleService implements IRuleService {
 
     @Override
     public boolean deleteRule(long ruleId, long batchVersionId) {
-        return ruleDao.deleteRule(ruleId,batchVersionId);
+        return ruleDao.deleteRule(ruleId, batchVersionId);
     }
 
     @Override
@@ -117,6 +122,30 @@ public class RuleService implements IRuleService {
     @Override
     public void renameRule(long ruleId, String title) {
         ruleDao.renameRule(ruleId,title);
+    }
+
+    @Override
+    public void reloadCache() {
+        rulesSingleton.reloadCache();
+    }
+
+    @Override
+    public List<String> runRules(BaseEntity entity, String pkgName, Date repDate) {
+        rulesSingleton.runRules(entity,pkgName,repDate);
+        List<String> list = new java.util.ArrayList<String>();
+        for(String s : entity.getValidationErrors())
+            list.add(s);
+        return list;
+    }
+
+    @Override
+    public String getRulePackageName(String pkgName, Date repDate) {
+        return rulesSingleton.getRulePackageName(pkgName, repDate);
+    }
+
+    @Override
+    public String getRuleErrors(String rule) {
+        return rulesSingleton.getRuleErrors(rule);
     }
 
     //    public ListenerSingleton getListenerSingleton() {
