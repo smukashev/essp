@@ -93,6 +93,7 @@ public class MainPortlet extends MVCPortlet {
         LIST_ENTITY,
         SAVE_XML,
         LIST_BY_CLASS,
+        LIST_BY_CLASS_SHORT,
         LIST_REF_COLUMNS,
         LIST_ATTRIBUTES
     }
@@ -396,11 +397,21 @@ public class MainPortlet extends MVCPortlet {
                 case LIST_BY_CLASS:
                     String metaId = getParam("metaId", resourceRequest);
                     String sDate = resourceRequest.getParameter("date");
-                    Date date = (Date) DataTypes.fromString(DataTypes.DATE, sDate);
+                    Date date = null;
+                    if (StringUtils.isNotEmpty(sDate)) {
+                        date = (Date) DataTypes.fromString(DataTypes.DATE, sDate);
+                    }
                     String sWithHis = resourceRequest.getParameter("withHis");
                     boolean withHis = Boolean.valueOf(sWithHis);
                     RefListResponse refListResponse = entityService.getRefListResponse(Long.parseLong(metaId), date, withHis);
                     String sJson = gson.toJson(refListResponse);
+                    writer.write(sJson);
+                    break;
+                case LIST_BY_CLASS_SHORT:
+                    metaId = getParam("metaId", resourceRequest);
+                    refListResponse = entityService.getRefListResponse(Long.parseLong(metaId), null, false);
+                    refListResponse = refListToShort(refListResponse);
+                    sJson = gson.toJson(refListResponse);
                     writer.write(sJson);
                     break;
                 case LIST_REF_COLUMNS:
@@ -448,6 +459,35 @@ public class MainPortlet extends MVCPortlet {
             e.printStackTrace();
             writer.write("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}");
         }
+    }
+
+    private RefListResponse refListToShort(RefListResponse refListResponse) {
+        List<Map<String, Object>> shortRows = new ArrayList<Map<String, Object>>();
+
+        String titleKey = null;
+
+        if (!refListResponse.getData().isEmpty()) {
+            Set<String> keys = refListResponse.getData().get(0).keySet();
+
+            for (String key : keys) {
+                if (key.startsWith("name")) {
+                    titleKey = key;
+                    break;
+                }
+            }
+        }
+
+        for (Map<String, Object> row : refListResponse.getData()) {
+            Object id = row.get("ID");
+            Object title = titleKey != null ? row.get(titleKey) : "------------------------";
+
+            Map<String, Object> shortRow = new HashMap<String, Object>();
+            shortRow.put("ID", id);
+            shortRow.put("title", title);
+            shortRows.add(shortRow);
+        }
+
+        return new RefListResponse(shortRows);
     }
 
     private String getAttributesJson(IMetaClass meta) {

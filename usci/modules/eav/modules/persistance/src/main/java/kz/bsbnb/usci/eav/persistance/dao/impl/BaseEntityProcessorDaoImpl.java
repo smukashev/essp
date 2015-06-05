@@ -3140,7 +3140,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         List<Map<String, Object>> rows = getRefListResponseWithHis(metaClassId);
 
         addOpenCloseDates(rows);
-        rows = filter(rows, date);
+
+        if (date != null) {
+            rows = filter(rows, date);
+        }
 
         // check: rows must be sorted at this stage
 
@@ -3184,8 +3187,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             row.put("open_date", row.get("report_date"));
 
             if (prev != null) {
-                Object id = row.get("id");
-                Object prevId = prev.get("id");
+                Object id = row.get("ID");
+                Object prevId = prev.get("ID");
                 Object reportDate = row.get("report_date");
 
                 if (id.equals(prevId)) {
@@ -3224,14 +3227,24 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             BigDecimal attrId = (BigDecimal) attr.get(EAV_M_SIMPLE_ATTRIBUTES.ID.getName());
             String attrName = (String) attr.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
             String attrType = (String) attr.get(EAV_M_SIMPLE_ATTRIBUTES.TYPE_CODE.getName());
+            BigDecimal attrFinal = (BigDecimal) attr.get(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL.getName());
+            boolean isFinal = attrFinal != null && attrFinal.byteValue() != 0;
             Table valuesTable = getValuesTable(attrType);
+
+            SelectConditionStep<Record1<Object>> selectMaxRepDate = context.select(DSL.max(DSL.field("report_date"))).from(valuesTable)
+                    .where(DSL.field("attribute_id").eq(attrId))
+                    .and(DSL.field("entity_id").eq(DSL.field("\"dat\".id")));
+
+            if (isFinal) {
+                selectMaxRepDate.and(DSL.field("report_date").eq(DSL.field("\"dat\".report_date")));
+            } else {
+                selectMaxRepDate.and(DSL.field("report_date").le(DSL.field("\"dat\".report_date")));
+            }
+
 
             Field fieldInner = context.select(DSL.field("value")).from(valuesTable)
                     .where(DSL.field("attribute_id").eq(attrId)).and(DSL.field("report_date").eq(
-                            context.select(DSL.max(DSL.field("report_date"))).from(valuesTable)
-                                    .where(DSL.field("attribute_id").eq(attrId))
-                                    .and(DSL.field("entity_id").eq(DSL.field("\"dat\".id")))
-                                    .and(DSL.field("report_date").le(DSL.field("\"dat\".report_date")))
+                            selectMaxRepDate
                     ).and(DSL.field("entity_id").eq(DSL.field("\"dat\".id"))))
                     .asField(attrName);
 
