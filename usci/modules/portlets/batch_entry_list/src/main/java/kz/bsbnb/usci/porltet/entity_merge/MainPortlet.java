@@ -1,6 +1,9 @@
 package kz.bsbnb.usci.porltet.entity_merge;
 
 import com.google.gson.Gson;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
@@ -64,6 +67,25 @@ public class MainPortlet extends MVCPortlet {
 
         HttpServletRequest httpReq = PortalUtil.getOriginalServletRequest(
                 PortalUtil.getHttpServletRequest(renderRequest));
+
+        boolean isAdmin = false;
+
+        try {
+            User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
+            if(user != null) {
+                for (Role role : user.getRoles()) {
+                    if (role.getDescriptiveName().equals("Administrator"))
+                        isAdmin = true;
+                }
+            }
+        } catch (PortalException e) {
+            e.printStackTrace();
+        } catch (SystemException e) {
+            e.printStackTrace();
+        }
+
+        if(!isAdmin)
+            return;
 
         super.doView(renderRequest, renderResponse);
     }

@@ -575,9 +575,9 @@ public class ZipFilesMonitor{
             }
         }
 
-        if(!haveError && !checkAndFillEavReport(cId, batchInfo, batchId)) {
+        /*if(!haveError && !checkAndFillEavReport(cId, batchInfo, batchId)) {
             haveError = true;
-        }
+        }*/
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
                 batchInfo.getUserId(), cId);
@@ -702,7 +702,7 @@ public class ZipFilesMonitor{
             ZipFile zipFile = new ZipFile(filename);
             ZipEntry manifestEntry = zipFile.getEntry("manifest.xml");
 
-            if(manifestEntry == null) {
+            if(manifestEntry == null) { // credit-registry
                 int fileCount = 0;
                 ZipEntry dataXmlFile = null;
                 Enumeration<? extends ZipEntry> entries = zipFile.entries();
