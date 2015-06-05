@@ -1661,4 +1661,43 @@ $$$
 
 rule save
 
+#portion cr hard coded rules
+
+rule read $$$
+title: rd_first_day
+rule "rd_first_day"
+//MES401
+when
+  $entity: BaseEntity(BRMSHelper.firstDay($entity.getReportDate()) !=1)
+then
+  $entity.addValidationError("Неверная отчетная дата");
+end
+$$$
+
+rule read $$$
+title: pastdue_vs_report_date
+rule " pastdue_vs_report_date"
+when
+  $entity: BaseEntity(getEl("change.remains.debt.pastdue.open_date") != null
+      && getEl("change.remains.debt.pastdue.open_date") >= reportDate)
+then
+  $entity.addValidationError("Дата вынесения просроченной задолжности должна быть позднее отчетной даты");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: pastdue_od_vs_cd
+rule " rule_opendate_closedate"
+when
+  $entity: BaseEntity(getEl("change.remains.debt.pastdue.open_date")!=null && getEl("change.remains.debt.pastdue.close_date")!=null
+    && getEl("change.remains.debt.pastdue.open_date") > getEl("change.remains.debt.pastdue.close_date") )
+then
+  $entity.addValidationError("Дата открытия просроченного долга позднее даты закрытия");
+end
+$$$
+
+rule save
+
 quit
