@@ -15,6 +15,8 @@ var newArrayElements = [];
 
 var nextArrayIndex = 0;
 
+var modalWindow;
+
 function createXML(currentNode, rootFlag, offset, arrayEl, first, remove) {
     var xmlStr = "";
 
@@ -368,7 +370,12 @@ function saveFormValues(isEdit) {
 
             var existingAttrNode = selectedNode.findChild('code', attr.code);
 
-            if (fieldValue) {
+            if (attr.array) {
+                if (!existingAttrNode) {
+                    selectedNode.appendChild(attr);
+                    subNode = selectedNode.getChildAt(selectedNode.childNodes.length - 1);
+                }
+            } else if (fieldValue) {
                 var subNode;
 
                 if (existingAttrNode) {
@@ -388,7 +395,7 @@ function saveFormValues(isEdit) {
                     subNode.data.iconCls = 'folder';
 
                     if (attr.ref && attr.type == "META_CLASS") {
-                        loadSubEntity(subNode, true);
+                        loadSubEntity(subNode, isEdit);
                     }
                 }
             } else {
@@ -400,6 +407,10 @@ function saveFormValues(isEdit) {
     }
 
     tree.getView().refresh();
+
+    if (!isEdit) {
+        modalWindow.hide();
+    }
 }
 
 Ext.onReady(function() {
@@ -595,7 +606,7 @@ Ext.onReady(function() {
         maxWidth: 200
     });
 
-    var modalWindow = Ext.create("Ext.Window",{
+    modalWindow = Ext.create("Ext.Window",{
         title : 'Добавление записи',
         width : 400,
         modal : true,
