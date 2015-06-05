@@ -28,7 +28,7 @@ Ext.onReady(function() {
 
     Ext.define('myModel', {
         extend: 'Ext.data.Model',
-        fields: ['id','u_date']
+        fields: ['id', 'rep_date', 'u_date']
     });
 
     var store = Ext.create('Ext.data.Store', {
@@ -156,6 +156,11 @@ Ext.onReady(function() {
             {
                 text     : label_CODE,
                 dataIndex: 'id',
+                flex:1
+            },
+            {
+                text     : label_REP_DATE,
+                dataIndex: 'rep_date',
                 flex:1
             },
             {

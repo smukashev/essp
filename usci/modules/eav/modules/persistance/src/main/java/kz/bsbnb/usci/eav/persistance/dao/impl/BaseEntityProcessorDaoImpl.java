@@ -38,6 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 
@@ -3181,18 +3183,22 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     private void addOpenCloseDates(List<Map<String, Object>> rows) {
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+
         Map<String, Object> prev = null;
 
         for (Map<String, Object> row : rows) {
-            row.put("open_date", row.get("report_date"));
+            Date repDate = (Date) row.get("report_date");
+            String sRepDate = df.format(repDate);
+
+            row.put("open_date", sRepDate);
 
             if (prev != null) {
                 Object id = row.get("ID");
                 Object prevId = prev.get("ID");
-                Object reportDate = row.get("report_date");
 
                 if (id.equals(prevId)) {
-                    prev.put("close_date", reportDate);
+                    prev.put("close_date", sRepDate);
                 }
             }
             prev = row;
@@ -3257,6 +3263,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 .from(EAV_BE_ENTITIES).join(EAV_BE_ENTITY_REPORT_DATES)
                                 .on(EAV_BE_ENTITIES.ID.eq(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID))
                                 .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId))
+                                .and(EAV_BE_ENTITIES.DELETED.ne(DataUtils.convert(true)))
                                 .asTable("dat")
                 )
         ).groupBy(groupByFields).orderBy(DSL.field("id"), DSL.min(DSL.field("report_date")));

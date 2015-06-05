@@ -128,6 +128,7 @@ public class MainPortlet extends MVCPortlet {
         str += "\"array\": false,";
         str += "\"ref\": " + entity.getMeta().isReference() + ",";
         str += "\"isKey\": " + (attr != null ? attr.isKey() : false) + ",";
+        str += "\"isRequired\": " + (attr != null ? attr.isRequired() : false) + ",";
         str += "\"root\": " + asRoot + ",";
         str += "\"type\": \"META_CLASS\",";
         str += "\"metaId\": \"" + entity.getMeta().getId() + "\",";
@@ -201,7 +202,8 @@ public class MainPortlet extends MVCPortlet {
                     "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
                     "\"leaf\":true,\n" +
                     "\"iconCls\":\"file\",\n" +
-                    "\"isKey\":\""+meta.getMetaAttribute(innerClassesNames).isKey()+"\"\n" +
+                    "\"isKey\":\""+meta.getMetaAttribute(innerClassesNames).isKey()+"\",\n" +
+                    "\"isRequired\":\""+meta.getMetaAttribute(innerClassesNames).isRequired()+"\"\n" +
                     "}";
                 } else {
                     Object dtVal = value.getValue();
@@ -219,7 +221,8 @@ public class MainPortlet extends MVCPortlet {
                             "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
                             "\"leaf\":true,\n" +
                             "\"iconCls\":\"file\",\n" +
-                            "\"isKey\":\""+meta.getMetaAttribute(innerClassesNames).isKey()+"\"\n" +
+                            "\"isKey\":\""+meta.getMetaAttribute(innerClassesNames).isKey()+"\",\n" +
+                            "\"isRequired\":\""+meta.getMetaAttribute(innerClassesNames).isRequired()+"\"\n" +
                             "}";
                 }
             }
@@ -354,10 +357,13 @@ public class MainPortlet extends MVCPortlet {
             switch (operationType) {
                 case SAVE_XML:
                     String xml = getParam("xml_data", resourceRequest);
+                    String sDate = getParam("date", resourceRequest);
+                    Date date = (Date) DataTypes.fromString(DataTypes.DATE, sDate);
 
                     BatchEntry batchEntry = new BatchEntry();
 
                     batchEntry.setValue(xml);
+                    batchEntry.setRepDate(date);
 
                     User currentUser = PortalUtil.getUser(resourceRequest);
 
@@ -396,8 +402,8 @@ public class MainPortlet extends MVCPortlet {
                     break;
                 case LIST_BY_CLASS:
                     String metaId = getParam("metaId", resourceRequest);
-                    String sDate = resourceRequest.getParameter("date");
-                    Date date = null;
+                    sDate = resourceRequest.getParameter("date");
+                    date = null;
                     if (StringUtils.isNotEmpty(sDate)) {
                         date = (Date) DataTypes.fromString(DataTypes.DATE, sDate);
                     }
@@ -425,7 +431,8 @@ public class MainPortlet extends MVCPortlet {
 
                     if (StringUtils.isNotEmpty(metaId)) {
                         MetaClass metaClass = metaFactoryService.getMetaClass(Long.valueOf(metaId));
-                        writer.write(getAttributesJson(metaClass));
+                        sJson = getAttributesJson(metaClass);
+                        writer.write(sJson);
                     }
 
                     break;
@@ -446,10 +453,12 @@ public class MainPortlet extends MVCPortlet {
 
                         BaseEntity entity = entityService.load(Integer.parseInt(entityId), date);
 
-                        writer.write("{\"text\":\".\",\"children\": [\n" +
+                        sJson = "{\"text\":\".\",\"children\": [\n" +
                                 entityToJson(entity, entity.getMeta().getClassTitle(),
                                         entity.getMeta().getClassName(), null, asRoot) +
-                                "]}");
+                                "]}";
+
+                        writer.write(sJson);
                     }
                     break;
                 default:
@@ -522,6 +531,11 @@ public class MainPortlet extends MVCPortlet {
             result.append(",\"isKey\":");
             result.append("\"");
             result.append(metaAttribute.isKey());
+            result.append("\"");
+
+            result.append(",\"isRequired\":");
+            result.append("\"");
+            result.append(metaAttribute.isRequired());
             result.append("\"");
 
             result.append(",\"array\":");

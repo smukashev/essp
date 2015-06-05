@@ -6,12 +6,15 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
 import kz.bsbnb.usci.eav.model.BatchEntry;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -108,7 +111,8 @@ public class MainPortlet extends MVCPortlet {
                         writer.write("{");
 
                         writer.write("\"id\":\"" + batchEntry.getId() + "\",");
-                        writer.write("\"u_date\":\"" + batchEntry.getUpdateDate() + "\"");
+                        writer.write("\"u_date\":\"" + batchEntry.getUpdateDate() + "\",");
+                        writer.write("\"rep_date\":\"" + batchEntry.getRepDate() + "\"");
                         writer.write("}");
                     }
 
@@ -118,52 +122,56 @@ public class MainPortlet extends MVCPortlet {
                 case SEND_XML:
                     entries = batchEntryService.getListByUser(currentUser.getUserId());
 
-                    String xml =
-                            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                                    "<batch>\n" +
-                                    "<entities>\n";
+                    DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
 
                     for (BatchEntry batchEntry : entries) {
+                        String sRepDate = df.format(batchEntry.getRepDate());
+
+                        String xml =
+                                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                                        "<batch>\n" +
+                                        "<entities>\n";
+
                         xml += batchEntry.getValue() + "\n";
+
+                        xml += "\n</entities>\n" +
+                                "</batch>";
+
+                        String manifest = "<manifest>\n" +
+                                "\t<type>1</type>\n" +
+                                "\t<name>data.xml</name>\n" +
+                                "\t<userid>" + currentUser.getUserId() + "</userid>\n" +
+                                "\t<userid>100500</userid>\n" +
+                                "\t<size>10</size>\n" +
+                                "\t<date>" +
+                                sRepDate +
+                                "</date>\n" +
+                                "</manifest>";
+
+                        File f = File.createTempFile("tmp", ".zip", new File(TMP_FILE_DIR));
+
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        ZipOutputStream zipfile = new ZipOutputStream(bos);
+
+                        ZipEntry zipentry = new ZipEntry("data.xml");
+                        zipfile.putNextEntry(zipentry);
+                        zipfile.write(xml.getBytes());
+
+                        zipentry = new ZipEntry("manifest.xml");
+                        zipfile.putNextEntry(zipentry);
+                        zipfile.write(manifest.getBytes());
+
+                        zipfile.close();
+                        byte[] zipBytes = bos.toByteArray();
+
+                        FileOutputStream fileOutputStream = new FileOutputStream(f);
+
+                        fileOutputStream.write(zipBytes);
+
+                        fileOutputStream.close();
+
+                        batchProcessService.processBatch(f.getPath(), currentUser.getUserId());
                     }
-
-                    xml += "\n</entities>\n" +
-                            "</batch>";
-
-                    File f = File.createTempFile("tmp", ".zip", new File(TMP_FILE_DIR));
-
-                    // TODO: fix report date
-
-                    String manifest = "<manifest>\n" +
-                            "\t<type>1</type>\n" +
-                            "\t<name>data.xml</name>\n" +
-                            // "\t<userid>" + currentUser.getUserId() + "</userid>\n" +
-                            "\t<userid>100500</userid>\n" +
-                            "\t<size>10</size>\n" +
-                            "\t<date>01.04.2015</date>\n" +
-                            "</manifest>";
-
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    ZipOutputStream zipfile = new ZipOutputStream(bos);
-
-                    ZipEntry zipentry = new ZipEntry("data.xml");
-                    zipfile.putNextEntry(zipentry);
-                    zipfile.write(xml.getBytes());
-
-                    zipentry = new ZipEntry("manifest.xml");
-                    zipfile.putNextEntry(zipentry);
-                    zipfile.write(manifest.getBytes());
-
-                    zipfile.close();
-                    byte[] zipBytes = bos.toByteArray();
-
-                    FileOutputStream fileOutputStream = new FileOutputStream(f);
-
-                    fileOutputStream.write(zipBytes);
-
-                    fileOutputStream.close();
-
-                    batchProcessService.processBatch(f.getPath(), currentUser.getUserId());
 
                     break;
                 case GET_ENTRY: {

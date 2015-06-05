@@ -124,7 +124,7 @@ function createItemsGrid(itemId) {
                     itemclick: function(dv, record, item, index, e) {
                         entityId = Ext.getCmp("entityId");
                         entityId.setValue(record.get('ID'));
-                        loadEntity(record.get('ID'));
+                        loadEntity(record.get('ID'), record.get('open_date'));
                     }
                 }
             });
@@ -136,12 +136,12 @@ function createItemsGrid(itemId) {
     });
 }
 
-function loadEntity(entityId) {
+function loadEntity(entityId, date) {
     entityStore.load({
         params: {
             op : 'LIST_ENTITY',
             entityId: entityId,
-            date: Ext.getCmp('edDate').value,
+            date: date,
             asRoot: true
         },
         callback: function(records, operation, success) {
@@ -220,20 +220,24 @@ function addField(form, attr, isEdit, node) {
         form.add(Ext.create("Ext.form.field.Date",
             {
                 id: attr.code + "FromItem" + idSuffix,
-                fieldLabel: attr.title,
+                fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
                 width: "100%",
                 format: 'd.m.Y',
                 value: new Date(
                     attr.value.
                         replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1')),
-                disabled: disabled
+                disabled: disabled,
+                allowBlank: !attr.isRequired,
+                blankText: label_REQUIRED_FIELD
             }));
     } else if (attr.ref) {
         form.add(Ext.create("Ext.form.field.ComboBox", {
             id: attr.code + "FromItem" + idSuffix,
-            fieldLabel: attr.title,
+            fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
             width: "100%",
             disabled: disabled,
+            allowBlank: !attr.isRequired,
+            blankText: label_REQUIRED_FIELD,
             store: Ext.create('Ext.data.Store', {
                 model: 'refStoreModel',
                 pageSize: 100,
@@ -254,17 +258,20 @@ function addField(form, attr, isEdit, node) {
                 remoteSort: true
             }),
             displayField: 'title',
-            valueField: 'id',
-            value: attr.value
+            valueField: 'ID',
+            value: attr.value,
+            editable : false
         }));
     } else {
         form.add(Ext.create("Ext.form.field.Text",
             {
                 id: attr.code + "FromItem" + idSuffix,
-                fieldLabel: attr.title,
+                fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
                 width: "100%",
                 value: attr.value,
-                disabled: disabled
+                disabled: disabled,
+                allowBlank: !attr.isRequired,
+                blankText: label_REQUIRED_FIELD
             }));
     }
 }
@@ -444,7 +451,7 @@ Ext.onReady(function() {
     Ext.define('refStoreModel', {
         extend: 'Ext.data.Model',
         fields: [
-            {name: 'id', type: 'string'},
+            {name: 'ID', type: 'string'},
             {name: 'title', type: 'string'}
         ]
     });
@@ -460,6 +467,7 @@ Ext.onReady(function() {
             {name: 'ref',     type: 'boolean'},
             {name: 'type',     type: 'string'},
             {name: 'isKey',     type: 'boolean'},
+            {name: 'isRequired',     type: 'boolean'},
             {name: 'metaId',     type: 'string'},
             {name: 'childMetaId',     type: 'string'},
             {name: 'childType',     type: 'string'},
@@ -482,6 +490,7 @@ Ext.onReady(function() {
             {name: 'ref',     type: 'boolean'},
             {name: 'type',     type: 'string'},
             {name: 'isKey',     type: 'boolean'},
+            {name: 'isRequired',     type: 'boolean'},
             {name: 'metaId',     type: 'string'},
             {name: 'childMetaId',     type: 'string'},
             {name: 'childType',     type: 'string'},
@@ -519,12 +528,18 @@ Ext.onReady(function() {
 
             var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
 
+
+
             Ext.Ajax.request({
                 url: dataUrl,
                 method: 'POST',
                 params: {
                     xml_data: xmlStr,
+                    date: Ext.getCmp('edDate').value,
                     op: 'SAVE_XML'
+                },
+                success: function(response) {
+                    alert("Сохранено успешно");
                 }
             });
         },
@@ -594,12 +609,18 @@ Ext.onReady(function() {
 
             var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true, true);
 
+            var selected = grid.getSelectionModel().getLastSelected();
+
             Ext.Ajax.request({
                 url: dataUrl,
                 method: 'POST',
                 params: {
                     xml_data: xmlStr,
+                    date: selected.data.open_date,
                     op: 'SAVE_XML'
+                },
+                success: function(response) {
+                    alert("Операция выполнена успешно");
                 }
             });
         },
@@ -615,6 +636,7 @@ Ext.onReady(function() {
         items  : [
             {
                 id: "ModalFormPannel",
+                xtype: 'form',
                 bodyPadding: '5 5 0',
                 width: "100%",
                 defaults: {
@@ -625,7 +647,10 @@ Ext.onReady(function() {
         tbar : [{
             text : 'Сохранить новую запись' ,
             handler :function(){
-                saveFormValues(false);
+                var form = Ext.getCmp('ModalFormPannel');
+                if (form.isValid()) {
+                    saveFormValues(false);
+                }
             }
         }]
     });
@@ -759,7 +784,7 @@ Ext.onReady(function() {
                 items: [entityGrid]
             },{
                 id: "EntityEditorFormPannel",
-                xtype : 'panel',
+                xtype : 'form',
                 region: 'east',
                 width: "40%",
                 collapsible: true,
@@ -776,7 +801,10 @@ Ext.onReady(function() {
                         id: "btnFormSave",
                         text: label_CONFIRM_CHANGES,
                         handler : function () {
-                            saveFormValues(true);
+                            var form = Ext.getCmp('EntityEditorFormPannel');
+                            if (form.isValid()) {
+                                saveFormValues(true);
+                            }
                         }
                     })
                 ]
