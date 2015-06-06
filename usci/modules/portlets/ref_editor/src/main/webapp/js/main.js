@@ -549,6 +549,7 @@ Ext.onReady(function() {
     var buttonShowXML = Ext.create('Ext.button.Button', {
         id: "entityEditorShowXmlBtn",
         text: 'XML',
+        maxWidth: 200,
         handler : function (){
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
@@ -596,13 +597,13 @@ Ext.onReady(function() {
             });
 
             xmlFromWin.show();
-        },
-        maxWidth: 200
+        }
     });
 
     var buttonDelete = Ext.create('Ext.button.Button', {
         id: "buttonDelete",
         text: label_DEL,
+        maxWidth: 200,
         handler : function (){
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
@@ -623,8 +624,33 @@ Ext.onReady(function() {
                     alert("Операция выполнена успешно");
                 }
             });
-        },
-        maxWidth: 200
+        }
+    });
+
+    var buttonExport = Ext.create('Ext.button.Button', {
+        id: 'buttonExport',
+        text: label_EXPORT,
+        maxWidth: 200,
+        handler: function () {
+
+            var hiddenForm = Ext.create('Ext.form.Panel', {
+                title:'hiddenForm',
+                standardSubmit: true,
+                url: dataUrl,
+                timeout: 120000,
+                height:0,
+                width: 0,
+                hidden:true,
+                items:[
+                    {xtype:'textfield', name:'op', value:'EXPORT_REF'},
+                    {xtype:'textfield', name:'metaId', value: currentClassId},
+                    {xtype:'textfield', name:'date', value: Ext.getCmp('edDate').getSubmitValue()},
+                    {xtype:'textfield', name:'withHis', value: Ext.getCmp('checkboxHistory').pressed}
+                ]
+            });
+
+            hiddenForm.getForm().submit();
+        }
     });
 
     modalWindow = Ext.create("Ext.Window",{
@@ -761,7 +787,7 @@ Ext.onReady(function() {
         mm='0'+mm
     }
 
-    today = dd+'/'+mm+'/'+yyyy;
+    today = dd+'.'+mm+'.'+yyyy;
     // ------------------------------------------------
 
     mainEntityEditorPanel = Ext.create('Ext.panel.Panel', {
@@ -851,7 +877,7 @@ Ext.onReady(function() {
                         fieldLabel: label_Date,
                         id: 'edDate',
                         xtype: 'datefield',
-                        format: 'd/m/Y',
+                        format: 'd.m.Y',
                         maxWidth: 400,
                         value : today
                     },
@@ -885,7 +911,7 @@ Ext.onReady(function() {
             }
         ],
         tbar: [
-            buttonAdd, buttonXML, buttonShowXML, buttonDelete
+            buttonAdd, buttonXML, buttonShowXML, buttonDelete, buttonExport
         ]
     });
 });

@@ -7,6 +7,11 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import jxl.CellView;
+import jxl.Workbook;
+import jxl.format.Border;
+import jxl.format.BorderLineStyle;
+import jxl.write.*;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
 import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
@@ -27,10 +32,17 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.lang.Boolean;
+import java.lang.Number;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
 
 public class MainPortlet extends MVCPortlet {
     private RmiProxyFactoryBean metaFactoryServiceFactoryBean;
@@ -118,7 +130,8 @@ public class MainPortlet extends MVCPortlet {
         LIST_BY_CLASS,
         LIST_BY_CLASS_SHORT,
         LIST_REF_COLUMNS,
-        LIST_ATTRIBUTES
+        LIST_ATTRIBUTES,
+        EXPORT_REF
     }
 
     private String testNull(String str) {
@@ -370,12 +383,15 @@ public class MainPortlet extends MVCPortlet {
             if (metaFactoryService == null)
                 return;
         }
-        PrintWriter writer = resourceResponse.getWriter();
+
+        OutputStream out = resourceResponse.getPortletOutputStream();
 
         try {
             OperationTypes operationType = OperationTypes.valueOf(getParam("op", resourceRequest));
 
             Gson gson = new Gson();
+
+            User currentUser = PortalUtil.getUser(resourceRequest);
 
             switch (operationType) {
                 case SAVE_XML:
@@ -388,13 +404,11 @@ public class MainPortlet extends MVCPortlet {
                     batchEntry.setValue(xml);
                     batchEntry.setRepDate(date);
 
-                    User currentUser = PortalUtil.getUser(resourceRequest);
-
                     batchEntry.setUserId(currentUser.getUserId());
 
                     batchEntryService.save(batchEntry);
 
-                    writer.write("{\"success\": true }");
+                    out.write("{\"success\": true }".getBytes());
 
                     break;
                 case LIST_CLASSES:
@@ -420,7 +434,7 @@ public class MainPortlet extends MVCPortlet {
                         classesListJson.getData().add(metaClassListEntry);
                     }
 
-                    writer.write(gson.toJson(classesListJson));
+                    out.write(gson.toJson(classesListJson).getBytes());
 
                     break;
                 case LIST_BY_CLASS:
@@ -434,20 +448,20 @@ public class MainPortlet extends MVCPortlet {
                     boolean withHis = Boolean.valueOf(sWithHis);
                     RefListResponse refListResponse = entityService.getRefListResponse(Long.parseLong(metaId), date, withHis);
                     String sJson = gson.toJson(refListResponse);
-                    writer.write(sJson);
+                    out.write(sJson.getBytes());
                     break;
                 case LIST_BY_CLASS_SHORT:
                     metaId = getParam("metaId", resourceRequest);
                     refListResponse = entityService.getRefListResponse(Long.parseLong(metaId), null, false);
                     refListResponse = refListToShort(refListResponse);
                     sJson = gson.toJson(refListResponse);
-                    writer.write(sJson);
+                    out.write(sJson.getBytes());
                     break;
                 case LIST_REF_COLUMNS:
                     metaId = getParam("metaId", resourceRequest);
                     RefColumnsResponse refColumns = entityService.getRefColumns(Long.parseLong(metaId));
                     sJson = gson.toJson(refColumns);
-                    writer.write(sJson);
+                    out.write(sJson.getBytes());
                     break;
                 case LIST_ATTRIBUTES:
                     metaId = getParam("metaId", resourceRequest);
@@ -455,7 +469,7 @@ public class MainPortlet extends MVCPortlet {
                     if (StringUtils.isNotEmpty(metaId)) {
                         MetaClass metaClass = metaFactoryService.getMetaClass(Long.valueOf(metaId));
                         sJson = getAttributesJson(metaClass);
-                        writer.write(sJson);
+                        out.write(sJson.getBytes());
                     }
 
                     break;
@@ -481,16 +495,154 @@ public class MainPortlet extends MVCPortlet {
                                         entity.getMeta().getClassName(), null, asRoot) +
                                 "]}";
 
-                        writer.write(sJson);
+                        out.write(sJson.getBytes());
                     }
+                    break;
+                case EXPORT_REF:
+                    DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+
+                    metaId = getParam("metaId", resourceRequest);
+                    sDate = resourceRequest.getParameter("date");
+                    date = null;
+                    if (StringUtils.isNotEmpty(sDate)) {
+                        date = (Date) DataTypes.fromString(DataTypes.DATE, sDate);
+                    }
+                    sWithHis = resourceRequest.getParameter("withHis");
+                    withHis = Boolean.valueOf(sWithHis);
+                    refColumns = entityService.getRefColumns(Long.parseLong(metaId));
+                    refListResponse = entityService.getRefListResponse(Long.parseLong(metaId), date, withHis);
+                    MetaClass metaClass = metaFactoryService.getMetaClass(Long.valueOf(metaId));
+
+                    String refName = metaClass.getClassTitle() != null ? metaClass.getClassTitle() : metaClass.getClassName();
+                    String fileName = refName + "_" + df.format(new Date()) + ".xlsx";
+
+                    resourceResponse.setProperty("Content-Disposition", "attachment;filename=" + fileName);
+                    resourceResponse.setContentType("application/vnd.ms-excel");
+                    byte[] excelBytes = constructExcel(
+                            refListResponse,
+                            refColumns,
+                            refName,
+                            currentUser.getFullName(),
+                            sDate,
+                            withHis
+                    );
+                    out.write(excelBytes);
                     break;
                 default:
                     break;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            writer.write("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}");
+            out.write(("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}").getBytes());
         }
+    }
+
+    private byte[] constructExcel(RefListResponse refListResponse, RefColumnsResponse refColumnsResponse, String refName, String userName, String sRepDate, boolean withHis) throws WriteException, IOException, ParseException {
+        WritableWorkbook workbook = null;
+        String formatString = "dd.MM.yyyy";
+        DateFormat dfShort = new SimpleDateFormat(formatString);
+        DateFormat dfFull = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
+        WritableFont times12font = new WritableFont(WritableFont.TIMES, 10);
+        WritableFont times12fontBold = new WritableFont(WritableFont.TIMES, 10, WritableFont.BOLD);
+
+        WritableCellFormat infoFormat = new WritableCellFormat(times12font);
+
+        WritableCellFormat headerFormat = new WritableCellFormat(times12fontBold);
+        headerFormat.setAlignment(jxl.format.Alignment.CENTRE);
+        headerFormat.setBorder(Border.ALL, BorderLineStyle.THIN);
+
+        WritableCellFormat dataFormat = new WritableCellFormat(times12font);
+        dataFormat.setBorder(Border.ALL, BorderLineStyle.THIN);
+        dataFormat.setWrap(true);
+
+        WritableCellFormat dateFormat = new WritableCellFormat(new jxl.write.DateFormat(formatString));
+        dateFormat.setBorder(Border.ALL, BorderLineStyle.THIN);
+
+        CellView cellView = new CellView();
+        cellView.setSize(5000);
+
+        ByteArrayOutputStream baos = null;
+        baos = new ByteArrayOutputStream();
+        workbook = Workbook.createWorkbook(baos);
+        WritableSheet sheet = workbook.createSheet("Sheet1", 0);
+
+        List<Map<String, Object>> rows = refListResponse.getData();
+        List<String> headers = refColumnsResponse.getTitles();
+        List<String> keys = refColumnsResponse.getNames();
+
+        keys.add("open_date");
+        keys.add("close_date");
+
+        headers.add("Дата начала");
+        headers.add("Дата окончания");
+
+        int initialColIndex = 1;
+
+        int rowCounter = 1;
+
+        {
+            String str = "Название справочника: " + refName;
+            sheet.addCell(new Label(initialColIndex, rowCounter, str, infoFormat));
+            rowCounter++;
+
+            str = "По состоянию на: " + sRepDate;
+            sheet.addCell(new Label(initialColIndex, rowCounter, str, infoFormat));
+            rowCounter++;
+
+            str = "С историей: " + (withHis ? "Да" : "Нет");
+            sheet.addCell(new Label(initialColIndex, rowCounter, str, infoFormat));
+            rowCounter++;
+
+            str = "Дата формирования: " + dfFull.format(new Date());
+            sheet.addCell(new Label(initialColIndex, rowCounter, str, infoFormat));
+            rowCounter++;
+
+            str = "Пользователь: " + userName   ;
+            sheet.addCell(new Label(initialColIndex, rowCounter, str, infoFormat));
+            rowCounter++;
+        }
+
+        rowCounter++;
+
+        for (int columnIndex = initialColIndex; columnIndex < headers.size(); columnIndex++) {
+            sheet.addCell(new Label(columnIndex, rowCounter, headers.get(columnIndex), headerFormat));
+        }
+
+        rowCounter++;
+
+        for (Map<String, Object> row : rows) {
+            for (int columnIndex = initialColIndex; columnIndex < keys.size(); columnIndex++) {
+                String key = keys.get(columnIndex);
+                Object value = row.get(key);
+
+                if (value != null) {
+                    if (value instanceof Number) {
+                        jxl.write.Number number = new jxl.write.Number(columnIndex, rowCounter, Integer.parseInt(value.toString()), dataFormat);
+                        sheet.addCell(number);
+                    } else if (value instanceof Date) {
+                        sheet.addCell(new jxl.write.DateTime(columnIndex, rowCounter, (Date) value, dateFormat));
+                    } else if (key.equals("open_date") || key.equals("close_date")) {
+                        value = dfShort.parse(value.toString());
+                        sheet.addCell(new jxl.write.DateTime(columnIndex, rowCounter, (Date) value, dateFormat));
+                    } else {
+                        sheet.addCell(new jxl.write.Label(columnIndex, rowCounter, value.toString(), dataFormat));
+                    }
+                } else {
+                    sheet.addCell(new Blank(columnIndex, rowCounter, dataFormat));
+                }
+                sheet.setColumnView(columnIndex, cellView);
+            }
+            sheet.setRowView(rowCounter, 1000);
+
+            rowCounter++;
+        }
+
+        workbook.write();
+
+        workbook.close();
+
+        return baos.toByteArray();
     }
 
     private RefListResponse refListToShort(RefListResponse refListResponse) {
