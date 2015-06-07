@@ -2017,4 +2017,51 @@ $$$
 
 rule save
 
+rule read $$$
+title: BANK_RELATION_DUPLICATE
+rule "BANK_RELATION_DUPLICATE"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+  && (
+        getEls("{hasDuplicates(subjects.person.bank_relations)}bank_relation.code") == true ||
+        getEls("{hasDuplicates(subjects.organization.bank_relations)}bank_relation.code") == true
+     ))
+then
+  $entity.addValidationError("Дупликаты при отношений с банком");
+end
+
+$$$
+
+rule save
+
+rule read $$$
+title: PLEDGE_DUPLICATE
+rule "PLEDGE_DUPLICATE"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+  && getEls("{hasDuplicates(pledges)}pledge_type.code,contract") == true)
+then
+  $entity.addValidationError("Дупликаты при залогах");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: SUBJECT_DUPLICATE_DOCS
+rule "SUBJECT_DUPLICATE_DOCS"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && ( getEls("{hasDuplicates(subjects.person.docs)}doc_type.code,no") == true ||
+             getEls("{hasDuplicates(subjects.organization.docs)}doc_type.code,no") == true
+        ))
+then
+  $entity.addValidationError("Дупликаты документов субъекта");
+end
+
+$$$
+
+rule save
+
 quit
+
