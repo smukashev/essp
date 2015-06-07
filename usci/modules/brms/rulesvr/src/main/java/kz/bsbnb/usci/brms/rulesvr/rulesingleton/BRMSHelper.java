@@ -1,6 +1,9 @@
 package kz.bsbnb.usci.brms.rulesvr.rulesingleton;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -51,6 +54,12 @@ public class BRMSHelper
         if(iin.length() != 12)
             return false;
 
+        if(!isDateValid(iin.substring(0,6),"yyMMdd"))
+            return false;
+
+        if(iin.charAt(6) < '1' || iin.charAt(6) > '6')
+            return false;
+
         for(int i=0;i<11;i++)
             sum += (iin.charAt(i) - '0' ) * weights[i];
         sum %= 11;
@@ -62,5 +71,22 @@ public class BRMSHelper
             sum %= 11;
         }
         return sum == last;
+    }
+
+    public static int firstDay(java.util.Date date){
+        java.util.Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        return c.get(Calendar.DAY_OF_MONTH);
+    }
+
+    public static boolean isDateValid(String date,String pattern) {
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        sdf.setLenient(false);
+        try {
+            sdf.parse(date);
+            return true;
+        } catch (ParseException pe) {
+            return false;
+        }
     }
 }

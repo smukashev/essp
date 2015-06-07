@@ -84,7 +84,7 @@ public class RuleDao implements IRuleDao {
                 "(SELECT id FROM " + PREFIX_ + "package_versions WHERE REPORT_DATE = \n" +
                 "    (SELECT MAX(REPORT_DATE) FROM " + PREFIX_ + "package_versions WHERE package_id = ? AND REPORT_DATE <= ? ) \n" +
                 " AND package_id = ? AND rownum = 1\n" +
-                " ))";
+                " )) order by id";
 
 
         List<SimpleTrack> ret = jdbcTemplate.query(SQL, new Object[]{packageId, repDate, packageId}, new BeanPropertyRowMapper(SimpleTrack.class));
