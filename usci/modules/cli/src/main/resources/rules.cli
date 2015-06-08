@@ -1685,7 +1685,7 @@ when
         && getEl("change.remains.debt.pastdue.open_date") != null
         && getEl("change.remains.debt.pastdue.open_date") >= reportDate)
 then
-  $entity.addValidationError("Дата вынесения остатка просроченной задолжности должна быть позднее отчетной даты");
+  $entity.addValidationError("Дата вынесения на счет просроченной задолженности по основному долгу не должна быть равна или позднее отчетной даты");
 end
 $$$
 
@@ -1701,7 +1701,7 @@ when
     && getEl("change.remains.debt.pastdue.close_date")!=null
     && getEl("change.remains.debt.pastdue.open_date") > getEl("change.remains.debt.pastdue.close_date") )
 then
-  $entity.addValidationError("Дата закрытия остатка просроченного долга меньше даты открытия");
+  $entity.addValidationError("Дата погашения просроченной задолженности по основному долгу не должна быть ранее даты вынесения на счет просроченной задолженности по основному долгу");
 end
 $$$
 
@@ -1716,7 +1716,7 @@ when
                 && getEl("change.remains.debt.pastdue.close_date") != null
                 && getEl("change.remains.debt.pastdue.close_date") > getReportDate())
 then
-   $entity.addValidationError("Дата закрытия остатка просроченного долга больше отчетной даты")
+   $entity.addValidationError("Дата погашения просроченной задолженности по основному долгу не должна быть позднее отчетной даты")
 end
 $$$
 
@@ -1733,7 +1733,7 @@ when
                         &&    getEl("change.remains.debt.pastdue.close_date") == null
                         &&    getEl("change.remains.debt.pastdue.open_date") != null)
 then
-   $entity.addValidationError("Значение остатка просроченного долга отсутствует при отсутствии даты закрытия")
+   $entity.addValidationError("При наличии даты вынесения на счет просроченной задолженности по основному долгу и отсутствии даты погашения просроченной задолженности по основному долгу» значение остатка не может быть пустым или равным нулю.")
 end
 $$$
 
@@ -1749,7 +1749,7 @@ when
                 && getEl("change.remains.debt.pastdue.value")!=null
                 && getEl("change.remains.debt.pastdue.value")!=0 )
 then
-   $entity.addValidationError("Значение остатка просроченного долга не ноль при отсутствии даты открытия")
+   $entity.addValidationError("При наличии непустого и неравного нулю значения остатка просроченной задолженности по основному долгу дата вынесения на счет просроченной задолженности по основному долгу не может быть пустой.")
 end
 $$$
 
@@ -1779,7 +1779,7 @@ when
         && getEl("change.remains.interest.pastdue.open_date") != null
         && getEl("change.remains.interest.pastdue.open_date") >= reportDate)
 then
-  $entity.addValidationError("Дата вынесения остатка просроченного вознаграждения больше или равно отчетной даты");
+  $entity.addValidationError("Дата вынесения на счет просроченной задолженности по вознаграждению не должна быть равна или позднее отчетной даты");
 end
 $$$
 
@@ -1795,7 +1795,7 @@ when
     && getEl("change.remains.interest.pastdue.close_date")!=null
     && getEl("change.remains.interest.pastdue.open_date") > getEl("change.remains.interest.pastdue.close_date") )
 then
-  $entity.addValidationError("Дата закрытия остатка просроченного вознаграждения меньше даты открытия");
+  $entity.addValidationError("Дата погашения просроченной задолженности по начисленному вознаграждению не может быть ранее даты вынесения на счет");
 end
 $$$
 
@@ -1810,7 +1810,7 @@ when
             && getEl("change.remains.interest.pastdue.close_date") != null
             && getEl("change.remains.interest.pastdue.close_date") > getReportDate())
 then
-   $entity.addValidationError("Дата закрытия остатка просроченного вознаграждения больше отчетной даты")
+   $entity.addValidationError("Дата погашения просроченной задолженности по начисленному вознаграждению не может быть позднее отчетной даты")
 end
 $$$
 
@@ -1827,7 +1827,7 @@ when
                         &&    getEl("change.remains.interest.pastdue.close_date") == null
                         &&    getEl("change.remains.interest.pastdue.open_date") != null)
 then
-   $entity.addValidationError("Значение остатка просроченного вознаграждения отсутствует при отсутствии даты закрытия")
+   $entity.addValidationError("При наличии даты вынесения на счет просроченной задолженности по начисленному вознаграждению и отсутствии даты погашения просроченной задолженности по начисленному вознаграждению значение остатка не может быть пустым или равным нулю.")
 end
 $$$
 
@@ -1843,7 +1843,7 @@ when
                 && getEl("change.remains.interest.pastdue.value")!=null
                 && getEl("change.remains.interest.pastdue.value")!=0 )
 then
-   $entity.addValidationError("Значение остатка просроченного вознаграждения не ноль при отсутствии даты открытия")
+   $entity.addValidationError("При наличии непустого и неравного нулю значения остатка просроченной задолженности по начисленному вознаграждению дата вынесения на счет просроченной задолженности по начисленному вознаграждению не может быть пустой.")
 end
 $$$
 
@@ -1852,6 +1852,7 @@ rule save
 rule read $$$
 title: ACTUAL_ISSUE_DATE_MISMATCH
 rule "ACTUAL_ISSUE_DATE_MISMATCH"
+//MES817
 when
     $entity: BaseEntity(getMeta().getClassName() == "credit"
         && getEl("actual_issue_date")!=null && getEl("primary_contract.date")!=null
@@ -1866,12 +1867,13 @@ rule save
 rule read $$$
 title: CONTRACT_MATURITY_DATE_MISMATCH
 rule "CONTRACT_MATURITY_DATE_MISMATCH"
+//MES818
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
         && getEl("contract_maturity_date") != null
         && getEl("contract_maturity_date") < getEl("primary_contract.date"))
 then
-  $entity.addValidationError("Дата завершения договора меншье даты основного договора")
+  $entity.addValidationError("Дата погашения по договору не сооответствует дате договора и/или фактической дате выдачи (дата погашения по договору должна быть позднее или равна дате договора и фактической дате выдачи)")
 end
 
 $$$
@@ -1881,6 +1883,7 @@ rule save
 rule read $$$
 title: MATURITY_DATE_MISMATCH
 rule "MATURITY_DATE_MISMATCH"
+//MES819
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
         && mDate : getEl("maturity_date")
@@ -1888,8 +1891,7 @@ when
         && mDate!=null && pDate !=null
         && mDate < pDate)
 then
-  $entity.addValidationError("дата завершения неверно, дата завершения : " + mDate + "\n" +
-        " дата основного договора: " + pDate);
+  $entity.addValidationError("Неверная  дата фактического погашения");
 end
 
 $$$
@@ -1899,14 +1901,14 @@ rule save
 rule read $$$
 title: PROLONGATION_DATE_MISMATCH
 rule "PROLONGATION_DATE_MISMATCH_820"
+//MES820
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
         && pDate: getEl("prolongation_date") !=null
             && mDate: getEl("contract_maturity_date")!=null
         && pDate < mDate)
 then
-  $entity.addValidationError("Неверная дата пролонгации, дата пролонгаций: " +pDate + "\n"
-            + " дата завершения договора:" + mDate)
+  $entity.addValidationError("Неверная дата окончания пролонгации");
 end
 
 $$$
@@ -1921,7 +1923,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
         && getEls("{count}pledges") == 0)
 then
-  $entity.addValidationError("Отсутсвуют залоги")
+  $entity.addValidationError("Отсутсвует залог");
 end
 
 $$$
@@ -1931,11 +1933,12 @@ rule save
 rule read $$$
 title: PLEDGE_NO_OR_VALUE_ABSENSE
 rule "PLEDGE_NO_OR_VALUE_ABSENSE"
+//MES814
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
         && getEls("{count}pledges[pledge_type.code!=47][contract=null][value=null]") > 0)
 then
-  $entity.addValidationError("Залог не имеет контракта или значения")
+  $entity.addValidationError("Отсутсвует номер договора залога или сумма залога");
 end
 
 $$$
@@ -1945,12 +1948,13 @@ rule save
 rule read $$$
 title: PLEDGE_BLANK_WITH_NON_BLANK
 rule "PLEDGE_BLANK_WITH_NON_BLANK"
+//MES837
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
     && getEls("{count}pledges") > 1
     && getEls("{count}pledges[pledge_type.code=47]") > 0)
 then
-  $entity.addValidationError("Присутствуют залог бланковый и залог не бланковый")
+  $entity.addValidationError("Значение «Без обеспечения (бланковый)» не может использоваться с иными видами обеспечения");
 end
 
 $$$
@@ -1969,7 +1973,7 @@ when
                 ||
             getEls("{count}subjects[organization!=null]organization[docs=null]") > 0))
 then
-  $entity.addValidationError("Отсутсвуют документы субъекта")
+  $entity.addValidationError("Отсутствует документ заемщика");
 end
 $$$
 
@@ -1987,7 +1991,7 @@ when
                 ||
             getEls("{count}subjects.organization.docs[no=null]") > 0))
 then
-  $entity.addValidationError("Отсутсвует номер документа субъекта")
+  $entity.addValidationError("Номер документа субъекта не может быть пустым");
 end
 $$$
 
@@ -2010,7 +2014,7 @@ when
             && getEls("{count}subjects.creditor.bank_relations[bank_relation.code=50]") > 0)
         ))
 then
-  $entity.addValidationError("Связанность с банком имеет неправильный формат");
+  $entity.addValidationError("Неправильно сформирован блок \"Признаки связанности с банком\"");
 end
 
 $$$
@@ -2020,6 +2024,7 @@ rule save
 rule read $$$
 title: BANK_RELATION_DUPLICATE
 rule "BANK_RELATION_DUPLICATE"
+//MES921
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
   && (
@@ -2027,7 +2032,7 @@ when
         getEls("{hasDuplicates(subjects.organization.bank_relations)}bank_relation.code") == true
      ))
 then
-  $entity.addValidationError("Дупликаты при отношений с банком");
+  $entity.addValidationError("Неправильно сформирован блок \"Признаки связанности с банком\"");
 end
 
 $$$
@@ -2037,11 +2042,12 @@ rule save
 rule read $$$
 title: PLEDGE_DUPLICATE
 rule "PLEDGE_DUPLICATE"
+//MES836
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
   && getEls("{hasDuplicates(pledges)}pledge_type.code,contract") == true)
 then
-  $entity.addValidationError("Дупликаты при залогах");
+  $entity.addValidationError("Обнаружены дублирующиеся записи в списке залогов");
 end
 $$$
 
@@ -2050,13 +2056,14 @@ rule save
 rule read $$$
 title: SUBJECT_DUPLICATE_DOCS
 rule "SUBJECT_DUPLICATE_DOCS"
+//MES922
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
         && ( getEls("{hasDuplicates(subjects.person.docs)}doc_type.code,no") == true ||
              getEls("{hasDuplicates(subjects.organization.docs)}doc_type.code,no") == true
         ))
 then
-  $entity.addValidationError("Дупликаты документов субъекта");
+  $entity.addValidationError("Дублирующие документы");
 end
 
 $$$
@@ -2073,7 +2080,7 @@ when
       && getEl("change.credit_flow.provision.provision_msfo.value") != null
       && getEl("change.credit_flow.provision.provision_msfo.value") > 0)
 then
-  $entity.addValidationError("Неккоректные провизий МСФО");
+  $entity.addValidationError("Неверно указанные провизии");
 end
 $$$
 
@@ -2089,7 +2096,7 @@ when
       && getEl("change.credit_flow.provision.provision_kfn.value") != null
       && getEl("change.credit_flow.provision.provision_kfn.value") > 0)
 then
-  $entity.addValidationError("Неккоректные провизий КФН");
+  $entity.addValidationError("Неверно указанные провизии");
 end
 $$$
 
