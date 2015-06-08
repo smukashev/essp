@@ -95,7 +95,7 @@ public class DatabaseConnect {
         try {
             Locale previousLocale = Locale.getDefault();
             log.log(Level.INFO, "Current locale: {0}-{1}", new Object[]{previousLocale.getLanguage(), previousLocale.getCountry()});
-            Locale.setDefault(new Locale("ru", "RU"));
+            //Locale.setDefault(new Locale("ru", "RU"));
             Context context = new InitialContext();
             DataSource d = (DataSource) context.lookup("jdbc/RepPool");
             return d.getConnection();
