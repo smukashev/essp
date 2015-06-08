@@ -2063,5 +2063,37 @@ $$$
 
 rule save
 
+rule read $$$
+title: INCORRECT_PROVISION_MSFO
+rule "INCORRECT_PROVISION_MSFO"
+//MES1600
+when
+  $entity: BaseEntity(getMeta().getClassName == "credit"
+      && getEl("portfolio.portfolio_msfo.code") != null
+      && getEl("change.credit_flow.provision.provision_msfo.value") != null
+      && getEl("change.credit_flow.provision.provision_msfo.value") > 0)
+then
+  $entity.addValidationError("Неккоректные провизий МСФО");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: INCORRECT_PROVISION_KFN
+rule "INCORRECT_PROVISION_KFN"
+//MES1600
+when
+  $entity: BaseEntity(getMeta().getClassName == "credit"
+      && getEl("portfolio.portfolio.code") != null
+      && getEl("change.credit_flow.provision.provision_kfn.value") != null
+      && getEl("change.credit_flow.provision.provision_kfn.value") > 0)
+then
+  $entity.addValidationError("Неккоректные провизий КФН");
+end
+$$$
+
+rule save
+
 quit
 
