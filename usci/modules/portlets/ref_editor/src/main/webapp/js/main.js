@@ -218,23 +218,63 @@ function addField(form, attr, isEdit, node) {
 
     if (attr.type == "DATE") {
         form.add(Ext.create("Ext.form.field.Date",
-            {
-                id: attr.code + "FromItem" + idSuffix,
-                fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
-                width: "100%",
-                format: 'd.m.Y',
-                value: new Date(
-                    attr.value.
-                        replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1')),
-                disabled: disabled,
-                allowBlank: !attr.isRequired,
-                blankText: label_REQUIRED_FIELD
-            }));
+                {
+                    id: attr.code + "FromItem" + idSuffix,
+                    fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    labelWidth: "60%",
+                    width: "40%",
+                    format: 'd.m.Y',
+                    value: new Date(
+                        attr.value.
+                            replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1')),
+                    disabled: disabled,
+                    allowBlank: !attr.isRequired,
+                    blankText: label_REQUIRED_FIELD
+                })
+        );
+    } else if (attr.type == "INTEGER" || attr.type == "DOUBLE") {
+        form.add(Ext.create("Ext.form.field.Number",
+                {
+                    id: attr.code + "FromItem" + idSuffix,
+                    fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    labelWidth: "60%",
+                    width: "40%",
+                    value: attr.value,
+                    allowDecimals: attr.type == "DOUBLE",
+                    disabled: disabled,
+                    allowBlank: !attr.isRequired,
+                    blankText: label_REQUIRED_FIELD
+                })
+        );
+    } else if (attr.type == "BOOLEAN") {
+        form.add(Ext.create("Ext.form.field.ComboBox",
+                {
+                    id: attr.code + "FromItem" + idSuffix,
+                    fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    labelWidth: "60%",
+                    width: "40%",
+                    disabled: disabled,
+                    allowBlank: !attr.isRequired,
+                    blankText: label_REQUIRED_FIELD,
+                    editable : false,
+                    store: Ext.create('Ext.data.Store', {
+                        fields: ['value', 'title'],
+                        data: [
+                            {value: 'true', title: 'Да'},
+                            {value: 'false', title: 'Нет'}
+                        ]
+                    }),
+                    displayField: 'title',
+                    valueField: 'value',
+                    value: attr.value
+                })
+        );
     } else if (attr.ref) {
         form.add(Ext.create("Ext.form.field.ComboBox", {
             id: attr.code + "FromItem" + idSuffix,
             fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
-            width: "100%",
+            labelWidth: "60%",
+            width: "40%",
             disabled: disabled,
             allowBlank: !attr.isRequired,
             blankText: label_REQUIRED_FIELD,
@@ -264,15 +304,17 @@ function addField(form, attr, isEdit, node) {
         }));
     } else {
         form.add(Ext.create("Ext.form.field.Text",
-            {
-                id: attr.code + "FromItem" + idSuffix,
-                fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
-                width: "100%",
-                value: attr.value,
-                disabled: disabled,
-                allowBlank: !attr.isRequired,
-                blankText: label_REQUIRED_FIELD
-            }));
+                {
+                    id: attr.code + "FromItem" + idSuffix,
+                    fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    labelWidth: "60%",
+                    width: "40%",
+                    value: attr.value,
+                    disabled: disabled,
+                    allowBlank: !attr.isRequired,
+                    blankText: label_REQUIRED_FIELD
+                })
+        );
     }
 }
 

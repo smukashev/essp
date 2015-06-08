@@ -513,7 +513,8 @@ public class MainPortlet extends MVCPortlet {
                     refListResponse = entityService.getRefListResponse(Long.parseLong(metaId), date, withHis);
                     MetaClass metaClass = metaFactoryService.getMetaClass(Long.valueOf(metaId));
 
-                    String refName = metaClass.getClassTitle() != null ? metaClass.getClassTitle() : metaClass.getClassName();
+                    String refName = metaClass.getClassName();
+                    String refTitle = metaClass.getClassTitle() != null ? metaClass.getClassTitle() : metaClass.getClassName();
                     String fileName = refName + "_" + df.format(new Date()) + ".xlsx";
 
                     resourceResponse.setProperty("Content-Disposition", "attachment;filename=" + fileName);
@@ -521,7 +522,7 @@ public class MainPortlet extends MVCPortlet {
                     byte[] excelBytes = constructExcel(
                             refListResponse,
                             refColumns,
-                            refName,
+                            refTitle,
                             currentUser.getFullName(),
                             sDate,
                             withHis
@@ -537,7 +538,7 @@ public class MainPortlet extends MVCPortlet {
         }
     }
 
-    private byte[] constructExcel(RefListResponse refListResponse, RefColumnsResponse refColumnsResponse, String refName, String userName, String sRepDate, boolean withHis) throws WriteException, IOException, ParseException {
+    private byte[] constructExcel(RefListResponse refListResponse, RefColumnsResponse refColumnsResponse, String refTitle, String userName, String sRepDate, boolean withHis) throws WriteException, IOException, ParseException {
         WritableWorkbook workbook = null;
         String formatString = "dd.MM.yyyy";
         DateFormat dfShort = new SimpleDateFormat(formatString);
@@ -582,7 +583,7 @@ public class MainPortlet extends MVCPortlet {
         int rowCounter = 1;
 
         {
-            String str = "Название справочника: " + refName;
+            String str = "Название справочника: " + refTitle;
             sheet.addCell(new Label(initialColIndex, rowCounter, str, infoFormat));
             rowCounter++;
 
