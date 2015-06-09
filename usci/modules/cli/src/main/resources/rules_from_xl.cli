@@ -1,0 +1,1342 @@
+#dogovor start
+
+rule read $$$
+title: pledgeType_hm
+rule "pledge type for homogenous zaem"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+            && getEls("{count}pledges[pledge_type=null]") > 0 )
+then
+  $entity.addValidationError("Вид обеспечения должен указываться для однородных кредитов" );
+end
+$$$
+
+rule save
+
+rule read $$$
+title: contract_no
+rule "contract number check"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit" && getEls("{count}[primary_contract.no=null]") > 0 )
+then
+ $entity.addValidationError("Отсутствует номер соглашения");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: pledge_contract_no
+rule "pledge contract number for invest zaem, overdraft i overnait"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0
+                                                           && getEls("{setString(01,02,03,09,10,11,12,13,14,15,25,26)}credit_type.code") > 0
+                                                           && (getEl("pledges")==null || getEls("{count}pledges[contract=null]") > 0) )
+then
+  $entity.addValidationError("Номер залога должен указываться для данного типа кредита при наличии обеспечения");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: pledge_value_hm
+rule "pledge value for homogenous zaem"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0
+                                                           && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                                                           && getEls("{count}pledges[value=null]") > 0)
+then
+  $entity.addValidationError("Сумма залога должна указываться для однородных кредитов при наличии обеспечения");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: actual_issue_date >= contract_date
+rule "credit.actual_issue_date must not be earlier than contrat_date"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                            && getEl("actual_issue_date")!=null
+                            && getEl("actual_issue_date") < getEl("primary_contract.date")
+                     )
+then
+ $entity.addValidationError("Дата фактической выдачи  не может быть ранее даты договора");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: actual_issue_date_hm
+rule "actual issue date must be present for homegenous credit"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                                && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                                && getEl("actual_issue_date") == null)
+then
+   $entity.addValidationError("Фактическая дата выдачи должна быть указана для однородного займа");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: contract_date
+rule "contract date check"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit" && getEls("{count}[primary_contract.date=null]") > 0 )
+then
+ $entity.addValidationError("Отсутствует дата соглашения");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: credit code 2 digits
+rule "credit type code must be xx format"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && (getEl("credit_type.code") not matches ("[\\d]{2}") ) )
+then
+  $entity.addValidationError("код кредита должен быть 2х значным числом ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: pledge_contract_no_hm
+rule "pledge contract number for homogenous zaem"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0
+                                                           && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                                                           && getEls("{count}pledges[contract=null]") > 0)
+then
+  $entity.addValidationError("Номер залога должен указываться для однородного кредита при наличии обеспечения");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: pledgeType
+rule "pledge type for zaem"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{setString(01,02,03,09,10,11,12,13,14,15,16,17,18,24,25,26)}credit_type.code") > 0
+                                                           && getEls("{count}pledges[pledge_type=null]") > 0 )
+then
+  $entity.addValidationError("Вид обеспечения должен указываться для данного типа кредита");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: credit_type
+rule "credit Type check"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit" && getEls("{count}[credit_type=null]") > 0 )
+then
+ $entity.addValidationError("Не указан справочник вид займа и условных обязательств ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: credit.contract_date >= contract_date
+rule "contract_date must not be earlier primary_contract.date"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                    && getEl("contract.date")!=null
+                    && getEl("contract.date") < getEl("primary_contract.date"))
+then
+   $entity.addValidationError("Дата дополнительного соглашения не может быть ранее даты договора");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: maturity_date_contract
+rule "maturity date contract"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{setString(01,02,03,09,11,12,13,14,16,17,18,24,26)}credit_type.code") > 0
+                                                           && getEl("contract_maturity_date") == null )
+then
+  $entity.addValidationError("Дата погашения по условиям договора должна указываться для данного типа займа");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: actual_issue_date
+rule "actual issue date must be present for some credits"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,24,26)}credit_type.code") > 0
+                                && getEl("actual_issue_date") == null)
+then
+   $entity.addValidationError("Фактическая дата выдачи должна быть указана для данного типа займа");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: maturity_date_contract_hm
+rule "maturity date contract homogenous credit"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                                                           && getEl("contract_maturity_date") == null )
+then
+  $entity.addValidationError("Дата погашения по условиям договора должна указываться для однородного займа");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: pledge_value_check
+rule "pledge value for invest zaem"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit" && getEls("{count}pledges") > 0
+                                                           && getEls("{setString(01,02,03,09,10,11,12,13,14,15,25,26)}credit_type.code") > 0
+                                                           && getEls("{count}pledges[value=null]") > 0)
+then
+  $entity.addValidationError("Сумма залога должна указываться для данного типа кредита при наличии обеспечения");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: currency
+rule "currency"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,24,26)}credit_type.code") > 0
+                && getEl("currency") == null)
+then
+  $entity.addValidationError("Валюта должна указываться для данного типа кредита");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: currency_hm
+rule "currency for homogenous credit"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                && getEl("currency") == null)
+then
+  $entity.addValidationError("Валюта должна указываться для однородного типа кредита");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: amount
+rule "amount"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                    && getEl("amount") == null)
+then
+  $entity.addValidationError("Не указана сумма займа/УО в валюте договора");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: amount > 0
+rule "amount > 0"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                                            && getEl("amount") < 0)
+then
+  $entity.addValidationError("Сумма займа/УО в валюте договора не может быть отрицательным числом");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: interest yearly
+rule "interest yearly"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                                            && getEls("{setString(01,02,03,09,10,11,16,17,18)}credit_type.code") > 0
+                                            && getEl("interest_rate_yearly") == null )
+then
+  $entity.addValidationError("не указана годовая ставка вознаграждения по договору");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: credit purpose
+rule "credit purpose"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                                            && getEls("{setString(01,09,11)}credit_type.code") > 0
+                                            && getEl("credit_purpose") == null )
+then
+  $entity.addValidationError("не указан цель кредитования");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: credit object
+rule "credit object"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                                            && getEls("{setString(01,09,11)}credit_type.code") > 0
+                                            && getEl("credit_object") == null )
+then
+  $entity.addValidationError("не указан объект кредитования");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: finance resource
+rule "finance_source"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                                            && getEls("{setString(01,09,11,16)}credit_type.code") > 0
+                                            && getEl("finance_source") == null )
+then
+  $entity.addValidationError("не указан источник финансирования банка");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: has currency earn
+rule "has currency earn"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                                            && getEls("{setString(01,09,11,16)}credit_type.code") > 0
+                                            && getEl("has_currency_earn") == null )
+then
+  $entity.addValidationError("не указано наличие валютной выручки у заемщика");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: creditor_branch code
+rule "creditor branch code"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                                            && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,26)}credit_type.code") > 0
+                                            && getEl("creditor_branch.code") == null )
+then
+  $entity.addValidationError("не указан код/БИК филиала банка");
+end
+$$$
+
+rule save
+
+
+#end of dogovor
+
+#change start
+rule read $$$
+title: turnover_issue_interest_amount
+rule "turnover issue interest"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,09,11,16)}credit_type.code") > 0
+                && getEl("change.turnover.issue.interest.amount") == null )
+then
+  $entity.addValidationError("Отсутствуют начисления за отчетный период");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: turnover_issue_debt_amount
+rule "turnover issue debt amount"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,11,16)}credit_type.code") > 0
+                && getEl("change.turnover.issue.debt.amount") == null )
+then
+  $entity.addValidationError("Отсутствует выдача за отчетный период");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: remains debt current value
+rule "remains debt current value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,12,13,14,15,16,17,18,25,26)}credit_type.code") > 0
+                && getEl("change.remains.debt.current.value") == null )
+then
+  $entity.addValidationError("Отсутствует остаток долга непросроченной задолженности ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: remains debt pastdue value
+rule "remains debt pastdue value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,26)}credit_type.code") > 0
+                && getEl("change.remains.debt.pastdue.value") == null )
+then
+  $entity.addValidationError("Отсутствует остаток долга просроченной задолженности ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: remains debt writeoff value
+rule "remains debt writeoff value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,24,26)}credit_type.code") > 0
+                && getEl("change.remains.debt.write_off.value") == null )
+then
+  $entity.addValidationError("Отсутствует остаток долга списанной задолженности ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: remains interest current value
+rule "remains interest current value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,26)}credit_type.code") > 0
+                && getEl("change.remains.interest.current.value") == null )
+then
+  $entity.addValidationError("Отсутствует остаток вознограждения непросроченной задолженности ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: remains interest pasdue value
+rule "remains interest pastdue value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,26)}credit_type.code") > 0
+                && getEl("change.remains.interest.pastdue.value") == null )
+then
+  $entity.addValidationError("Отсутствует остаток вознограждения просроченной задолженности ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: remains interest writeoff value
+rule "remains interest writeoff value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,24,26)}credit_type.code") > 0
+                && getEl("change.remains.interest.write_off.value") == null )
+then
+  $entity.addValidationError("Отсутствует остаток вознограждения списанной задолженности ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: limit remains overdraft/credit_line
+rule "limit remains overdraft/credit_line"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(03,10)}credit_type.code") > 0
+                && getEl("change.remains.limit.value") == null )
+then
+  $entity.addValidationError("Остаток лимита кредитной карты обязателен для офердрафт/кредитная линия");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: balance account overdraft/credit_line
+rule "balance account overdraft/credit_line"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(03,10)}credit_type.code") > 0
+                && getEl("change.remains.limit.balance_account.no_") == null )
+then
+  $entity.addValidationError("Номер балансового счета обязателен для офердрафт/кредитная линия");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: limit remains zaem
+rule "limit remains zeam"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01)}credit_type.code") > 0
+                && getEl("change.remains")!=null
+                && getEl("change.remains.limit.value") == null )
+then
+  $entity.addValidationError("Остаток лимита кредитной карты обязателен для заема при наличии остатка");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: balance account_no zaem
+rule "balance account zaem"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01)}credit_type.code") > 0
+                && getEl("change.remains")!=null
+                && getEl("change.remains.limit.balance_account.no_") == null )
+then
+  $entity.addValidationError("Номер балансового счета обязателен для заема при наличии остатков");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: balance_account_no: change.remains.debt.current
+rule "balance_account:  change.remains.debt.current"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,16,17,18)}credit_type.code") > 0
+                && getEl("change.remains.debt.current")!=null
+                && getEl("change.remains.debt.current.balance_account.no_") == null )
+then
+  $entity.addValidationError("Номер балансового счета основного долга обязателен при наличии непросроченной задолженности");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: balance_account_no: change.remains.debt.pasdue
+rule "balance_account:  change.remains.debt.pastdue"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,16,17,18)}credit_type.code") > 0
+                && getEl("change.remains.debt.pastdue")!=null
+                && getEl("change.remains.debt.pastdue.balance_account.no_") == null )
+then
+  $entity.addValidationError("Номер балансового счета просроченной задолженности основного долга обязателен при наличии просроченной задолженности");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: balance_account_no: change.remains.debt.write_off
+rule "balance_account:  change.remains.debt.write_off"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,16,17,18)}credit_type.code") > 0
+                && getEl("change.remains.debt.write_off")!=null
+                && getEl("change.remains.debt.write_off.balance_account.no_") == null )
+then
+  $entity.addValidationError("Номер балансового счета списанного баланса основного долга обязателен при наличии списанного баланса");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: debt balance_account_no: credit line/ credit in future
+rule "debt balance_account: credit line / credit in future"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(15,25)}credit_type.code") > 0
+                && getEl("change.remains.debt.current.balance_account.no_") == null )
+then
+  $entity.addValidationError("Номер балансового счета основного долга обязателен для кредитной линий / кредитов в будущем");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: debt balance_account_no: writeoff credit
+rule "debt balance_account_no: writeoff credit"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(24)}credit_type.code") > 0
+                && getEl("change.remains.debt.write_off.balance_account.no_") == null )
+then
+  $entity.addValidationError("Номер балансового счета списанного баланса основного долга обязателен для займа списанный за баланс");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: interest balance_account_no: change.remains.debt.interest.current
+rule "interest balance_account_no: change.remains.interest.current"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,26)}credit_type.code") > 0
+                && getEl("change.remains.interest.current")!=null
+                && getEl("change.remains.interest.current.balance_account.no_") == null )
+then
+  $entity.addValidationError("Номер балансового счета вознограждения обязателен при наличии непросроченной задолженности");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: interest balance_account_no: change.remains.debt.interest.pastdue
+rule "interest balance_account_no: change.remains.interest.pastdue"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,16,17,18)}credit_type.code") > 0
+                && getEl("change.remains.interest.pastdue")!=null
+                && getEl("change.remains.interest.pastdue.balance_account.no_") == null )
+then
+  $entity.addValidationError("Номер балансового счета вознограждения просроченного задолженности обязателен при наличии просроченной задолженности");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: msfo balance_account_no:
+rule "msfo balance_account_no "
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,12,13,14,15,16,17,18,24,25,26)}credit_type.code") > 0
+                && getEl("change.credit_flow.provision.provision_msfo")!=null
+                && getEl("change.credit_flow.provision.provision_msfo.balance_account.no_") == null )
+then
+  $entity.addValidationError("Номер балансового счета по провизиям МСФО обязателен при наличии МСФО ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: msfo balance_account_no:  overdraft
+rule "msfo balance_account_no overdraft"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,10)}credit_type.code") > 0
+                && getEl("change.credit_flow.provision.provision_msfo_over_balance")!=null
+                && getEl("change.credit_flow.provision.provision_msfo_over_balance.balance_account.no_") == null )
+then
+  $entity.addValidationError("Номер балансового счета по провизиям МСФО обязателен при наличии МСФО (по лимиту кредитной карты/овердрафта) ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: correction balance_account_no:
+rule "correction balance_account_no"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,26)}credit_type.code") > 0
+                && getEl("change.remains.correction")!=null
+                && getEl("change.remains.correction.balance_account.no_") == null )
+then
+  $entity.addValidationError("Номер балансового счета  по корректировке обязателен при наличии корректировки");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: discount balance_account_no
+rule "discount balance_account_no"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,16,17,18)}credit_type.code") > 0
+                && getEl("change.remains.discount")!=null
+                && getEl("change.remains.discount.balance_account.no_") == null )
+then
+  $entity.addValidationError("Номер балансового счета по дисконту/премии обязателен при наличии дисконта/премий");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: debt pastdue open_date
+rule "debt pastdue open_date"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,16,17,18)}credit_type.code") > 0
+                && getEl("change.remains.debt.pastdue")!=null
+                && getEl("change.remains.debt.pastdue.open_date") == null )
+then
+  $entity.addValidationError("Дата вынесения просроченной задолженности основного долга обязательна при наличии просроченной задолженности");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: debt pastdue open_date_hm
+rule "debt pastdue open_date homogenous"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                && getEl("change.remains.debt.pastdue")!=null
+                && getEl("change.remains.debt.pastdue.open_date") == null )
+then
+  $entity.addValidationError("Дата вынесения просроченной задолженности основного долга обязательна для однородных займов при наличии просроченной задолженности");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: interest pastdue open_date
+rule "interset pastdue open_date"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,16,17,18)}credit_type.code") > 0
+                && getEl("change.remains.interest.pastdue")!=null
+                && getEl("change.remains.interest.pastdue.open_date") == null )
+then
+  $entity.addValidationError("Дата вынесения  просроченной задолженности вознограждения обязательна при наличии просроченной задолженности");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: debt interest pastdue open_date_hm
+rule "interest pastdue open_date homogenous"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                && getEl("change.remains.interest.pastdue")!=null
+                && getEl("change.remains.interest.pastdue.open_date") == null )
+then
+  $entity.addValidationError("Дата вынесения просроченной задолженности вознограждения обязательна для однородных заемов при наличии просроченной задолженности");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: debt pastdue close_date
+rule "debt pastdue close_date"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,16,17,18)}credit_type.code") > 0
+                && getEl("change.remains.debt.pastdue")!=null
+                && getEl("change.remains.debt.pastdue.close_date") == null )
+then
+  $entity.addValidationError("Дата погашения просроченной задолженности основного долга обязательна при наличии просроченной задолженности");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: debt pastdue close_date_hm
+rule "debt pastdue close_date homogenous"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                && getEl("change.remains.debt.pastdue")!=null
+                && getEl("change.remains.debt.pastdue.close_date") == null )
+then
+  $entity.addValidationError("Дата погашения просроченной задолженности основного долга обязательна при наличии просроченной задолженности(Однородые кредиты)");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: interest pastdue close_date
+rule "intereset pastdue close_date"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,16,17,18)}credit_type.code") > 0
+                && getEl("change.remains.interest.pastdue")!=null
+                && getEl("change.remains.interest.pastdue.close_date") == null )
+then
+  $entity.addValidationError("Дата погашения просроченной задолженности вознограждения обязательна при наличии просроченной задолженности");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: interest pastdue close_date_hm
+rule "intereset pastdue close_date homogenous"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && (getEl("portfolio.portfolio")!=null || getEl("portfolio.portfolio_msfo")!=null )
+                && getEl("change.remains.interest.pastdue")!=null
+                && getEl("change.remains.interest.pastdue.close_date") == null )
+then
+  $entity.addValidationError("Дата погашения просроченной задолженности вознограждения обязательна при наличии просроченной задолженности(Однородные кредиты)");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: write_off date: change.remains.debt
+rule "write_off date: change.remains.debt"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,26)}credit_type.code") > 0
+                && getEl("change.remains.debt.write_off")!=null
+                && getEl("change.remains.debt.write_off.date") == null )
+then
+  $entity.addValidationError("Дата списания с баланса основного долга обязательна при наличии списанного баланса");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: write_off date: change.remains.interest
+rule "write_off date: change.remains.interest"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,12,13,14,16,17,18,26)}credit_type.code") > 0
+                && getEl("change.remains.interest.write_off")!=null
+                && getEl("change.remains.interest.write_off.date") == null )
+then
+  $entity.addValidationError("Дата списания с баланса вознограждения обязательна при наличии вознограждения");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: write_off date for credit_type = write_off
+rule "write_off date for credit_type = write_off"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(24)}credit_type.code") > 0
+                && (getEl("change.remains.interest.write_off.date")==null || getEl("change.remains.debt.write_off.date")==null )  )
+then
+  $entity.addValidationError("Дата списания с баланса обязательна для займа типа: Займы списанные за баланс");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: msfo value in change
+rule "msfo value in change"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,12,13,14,15,16,17,18,25,26)}credit_type.code") > 0
+                && getEl("change.credit_flow.provision.provision_msfo.value") == null )
+then
+  $entity.addValidationError("Фактически сформированная сумма  резервов (провизий) обязательна ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: msfo(overdraft) value in change
+rule "msfo(overdraft) value in change"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,10)}credit_type.code") > 0
+                && getEl("change.credit_flow.provision.provision_msfo_over_balance")!=null
+                && getEl("change.credit_flow.provision.provision_msfo_over_balance.value") == null )
+then
+  $entity.addValidationError("Фактически сформированная сумма  резервов (провизий) обязательна ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: discounted_value in change.remains
+rule "discount  value in change.remains"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,16,17,18)}credit_type.code") > 0
+                && getEl("change.remains.discounted_value.value")==null )
+then
+  $entity.addValidationError("Дисконтированная стоимость будущих денежных потоков обязательна ");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: discounted_value in msfo
+rule "discounted_value in msfo"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEl("portfolio.portfolio_msfo")!=null
+                && getEl("change.remains.discounted_value.value")!=null )
+then
+  $entity.addValidationError("Дисконтированная стоимость для МСФО не заполняется");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: correction in change.remains
+rule "correction in change.remains"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,16,17,18,24)}credit_type.code") > 0
+                && (getEl("change.remains.correction.value") ==null ) || getEl("change.remains.correction.value_currency")==null )
+then
+  $entity.addValidationError("Положительная/отрицательная корректировка обязательна для данного типа кредита");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: discount in change.remains
+rule "discount in change.remains"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEls("{setString(01,02,03,09,10,11,15,16,25)}credit_type.code") > 0
+                && (getEl("change.remains.discount.value") ==null ) || getEl("change.remains.discount.value_currency")==null )
+then
+  $entity.addValidationError("Положительная/отрицательная корректировка обязательна для данного типа кредита");
+end
+$$$
+
+rule save
+
+#end of change
+#jur start
+
+
+rule read $$$
+title: jur_name
+rule "jur jur_name"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEl("credit_type.code") != "18"
+            && (getEls("{count}subjects[organization!=null]organization[names=null]") > 0
+            || getEls("{count}subjects[organization!=null]organization.names[name=null]") > 0)  )
+then
+  $entity.addValidationError("Полное наименование юридического лица обязательно");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur legal_form
+rule "jur legal_form"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{count}subjects[organization!=null]organization[country.code_numeric=398][legal_form=null]") > 0
+            && getEls("{setString(17,18,19)}credit_type.code") == 0)
+then
+  $entity.addValidationError("Организационно-правовая форма обязательно для Казахстана");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_legal_form[SE]
+rule "jur legal_form[SE]"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{count}subjects[organization!=null]organization[is_se=true]legal_form") > 0 )
+then
+  $entity.addValidationError("Организационно-правовая не заполняется для ИП");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_doc_type
+rule "jur doc_type"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{setString(17,18,19)}credit_type.code") == 0
+            && getEls("{count}subjects[organization!=null]organization[docs!=null]docs[doc_type=null]") > 0
+            )
+then
+  $entity.addValidationError("Тип документа субъекта должен указываться");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_doc_no
+rule "jur doc_no"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{setString(17,18,19)}credit_type.code") == 0
+            && getEls("{count}subjects[organization!=null]organization[docs!=null]docs[no=null]") > 0
+            )
+then
+  $entity.addValidationError("Номер документа субъекта должен указываться");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_address doc type
+rule "jur address doc type"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{count}subjects[organization!=null]organization[addresses!=null]addresses[type=null]") > 0
+            && getEls("{setString(17,18,19)}credit_type.code") == 0)
+then
+  $entity.addValidationError("Тип адреса субъекта должен указываться");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_address region
+rule "jur address region"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{count}subjects[organization!=null]organization[country.code_numeric=398][addresses!=null]addresses[region.code=null]") > 0
+            && getEls("{setString(17,18,19)}credit_type.code") == 0)
+then
+  $entity.addValidationError("Область адресата субъекта должен указываться для Казахстана");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_address
+rule "jur address must be present"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{count}subjects[organization!=null]organization[addresses!=null]addresses[details=null]") > 0
+            && getEls("{setString(17,18,19)}credit_type.code") == 0)
+then
+  $entity.addValidationError("Адрес должен указываться для данного типа кредита");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_address country
+rule "jur address country"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{count}subjects[organization!=null]organization[country.code_numeric=null]") > 0 )
+then
+  $entity.addValidationError("Страна субъекта кредитной истории должна указываться для кредита");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_offshore
+rule "jur offshore zone code"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{setString(18,19)}credit_type.code") == 0
+            && getEls("{count}subjects[organization!=null]organization[offshore!=null][offshore.code=null]") > 0 )
+then
+  $entity.addValidationError("Код оффшора должнен указываться если входит в перечень оффшорных зон");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_econ_trade
+rule "jur econ_trade"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{setString(18,19)}credit_type.code") == 0
+            && getEls("{count}subjects[organization!=null]organization[econ_trade.code=null]") > 0 )
+then
+  $entity.addValidationError("Код экономической деятельности должен указываться для данного типа кредита");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_bank_relations
+rule "jur bank_relations"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{setString(18)}credit_type.code") == 0
+            && getEls("{count}subjects[organization!=null]organization[bank_relations=null]") > 0 )
+then
+  $entity.addValidationError("Признак связанности с банком обязателен для данного типа кредита");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_head name
+rule "jur head name"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{setString(17,18,19)}credit_type.code") == 0
+            && getEls("{count}subjects[organization!=null]organization[is_se=false][head!=null]head[names!=null]names[firstname=null]") > 0)
+then
+  $entity.addValidationError("Имя руководителя юридического лица дожен указываться для данного типа кредита");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_head lastname
+rule "jur head lastname"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{setString(17,18,19)}credit_type.code") == 0
+            && getEls("{count}subjects[organization!=null]organization[is_se=false][head!=null]head[names!=null]names[lastname=null]") > 0)
+then
+  $entity.addValidationError("Фамилия руководителя юридического лица дожен указываться для данного типа кредита");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_head[SE]
+rule "jur head[SE]"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{setString(17,18,19)}credit_type.code") == 0
+            && getEls("{count}subjects[organization!=null]organization[is_se=true]head") > 0)
+then
+  $entity.addValidationError("Для ИП данные руководителя не предоставляются");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_enterprise_type
+rule "jur enterprise_type"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{setString(17,18,19)}credit_type.code") == 0
+            && getEls("{count}subjects[organization!=null]organization[enterprise_type.code=null]") > 0)
+then
+  $entity.addValidationError("Код субъекта частного предпринимательства обязателен");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_cnt(doc) > 0
+rule "jur at least 1 doc"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{setString(17,18,19)}credit_type.code") == 0
+            && getEls("{count}subjects.organization") > 0
+            && (getEls("{count}subjects[organization!=null]organization[docs=null]") > 0
+                  || getEls("{count}subjects[organization!=null]organization[docs!=null]docs") == 0 )
+            )
+then
+  $entity.addValidationError("Хотя бы один документ для юр лица для данного типа кредита");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: jur_cnt(head) > 0
+rule "jur head cnt > 1"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{setString(17,18,19)}credit_type.code") == 0
+            && getEls("{count}subjects.organization[is_se=false][head=null]") > 0)
+then
+  $entity.addValidationError("Хотя бы один руководитель организации обязателен для данного типа кредита (не ИП)");
+end
+$$$
+
+rule save
+
+#end jur
+#start nat
+
+rule read $$$
+title: nat_doc_type
+rule "nat doc_type"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("credit_type.code") != "18"
+    && getEls("{count}subjects.person.docs[doc_type.code=null]") > 0 )
+then
+  $entity.addValidationError("Тип документа должен указваться для физ. лица");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_doc_no
+rule "nat doc_no"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("credit_type.code") != "19"
+    && getEls("{count}subjects.person.docs[no=null]") > 0 )
+then
+  $entity.addValidationError("Номер документа должен указваться для физ. лица");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_region
+rule "nat region"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("credit_type.code") != "19"
+    && getEls("{count}subjects.person[country.code_numeric=398]addresses[region.code=null]") > 0 )
+then
+  $entity.addValidationError("Регион должен указваться для Казахстана");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_address detail
+rule "nat address detail"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("credit_type.code") != "19"
+    && getEls("{count}subjects.person.addresses[details=null]") > 0 )
+then
+  $entity.addValidationError("Адрес должен указываться для физ. лица");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_address type
+rule "nat address_type"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("credit_type.code") != "19"
+    && getEls("{count}subjects.person.addresses[type=null]") > 0 )
+then
+  $entity.addValidationError("Тип адреса должен указываться для физ. лица");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_address
+rule "nat address"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("credit_type.code") != "19"
+    && getEls("{count}subjects.person[addresses=null]") > 0 )
+then
+  $entity.addValidationError("Адрес должен указываться для физ. лица");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_country
+rule "nat country"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEls("{count}subjects.person[country=null]") > 0 )
+then
+  $entity.addValidationError("Страна должна указываться для физ. лица");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_offshore
+rule "nat offshore"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEls("{count}subjects.person[offshore!=null][offshore.code=null]") > 0 )
+then
+  $entity.addValidationError("Код оффшора должнен указываться если входит в перечень оффшорных зон");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat_bank_relations
+rule "nat bank_relations"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEls("{count}subjects.person[bank_relations=null]") > 0 )
+then
+  $entity.addValidationError("Признак связанности с банком обязателен для физ. лиц");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: nat subject_person cnt(doc) > 0
+rule "nat subject_person cnt(doc) > 0"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("credit_type.code") != "18"
+    && ( getEls("{count}subjects.person[docs=null]") > 0)
+    )
+then
+  $entity.addValidationError("Хотя бы 1 документ указывается для физ. лица");
+end
+$$$
+
+rule save
+
+#nat end

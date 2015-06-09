@@ -129,10 +129,13 @@ public class ChangeRemainsDebtParser extends BatchParser {
                 //xmlReader.setContentHandler(contentHandler);
                 return true;
             } else if(localName.equals("current")) {
+                currentBaseEntity.put("current",new BaseEntityComplexValue(batch,index,fieldCurrent));
                 //debt.setCurrent(ctRemainsTypeCurrent);
             } else if(localName.equals("pastdue")) {
+                currentBaseEntity.put("pastdue",new BaseEntityComplexValue(batch,index,fieldPastDue));
                 //debt.setPastdue(ctRemainsTypePastdue);
             } else if(localName.equals("write_off")) {
+                currentBaseEntity.put("write_off",new BaseEntityComplexValue(batch,index,fieldWriteOf));
                 //debt.setWriteOff(ctRemainsTypeDebtWriteOff);
             } else if(localName.equals("value")) {
                 if(debtWay.equals("current")) {
@@ -145,18 +148,7 @@ public class ChangeRemainsDebtParser extends BatchParser {
                     //throw new UnknownValException(localName, contents.toString());
                 }
             } else if(localName.equals("value_currency")) {
-                if(debtWay.equals("current")) {
-                    //ctRemainsTypeCurrent.setValueCurrency(new BigDecimal(contents.toString()));
-                    currentBaseEntity.put("current",new BaseEntityComplexValue(batch,index,fieldCurrent));
-                } else if(debtWay.equals("pastdue")) {
-                    //ctRemainsTypePastdue.setValueCurrency(new BigDecimal(contents.toString()));
-                    currentBaseEntity.put("pastdue",new BaseEntityComplexValue(batch,index,fieldPastDue));
-                } else if(debtWay.equals("write_off")) {
-                    //ctRemainsTypeDebtWriteOff.setValueCurrency(new BigDecimal(contents.toString()));
-                    currentBaseEntity.put("write_off",new BaseEntityComplexValue(batch,index,fieldWriteOf));
-                } else {
-                    //throw new UnknownValException(localName, contents.toString());
-                }
+
             } else if(localName.equals("balance_account")) {
                 if(debtWay.equals("current")) {
                     //ctRemainsTypeCurrent.setBalanceAccount(contents.toString());
