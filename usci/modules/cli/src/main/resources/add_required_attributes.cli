@@ -1,0 +1,123 @@
+meta add --name=ref_debtor_type --attribute=code --type=string --required
+meta key --name=ref_debtor_type --attribute=code
+meta add --name=ref_debtor_type --attribute=name_kz --type=string --required
+meta add --name=ref_debtor_type --attribute=name_ru --type=string --required
+
+meta add --name=ref_doc_type --attribute=code --type=string --required
+meta key --name=ref_doc_type --attribute=code
+meta add --name=ref_doc_type --attribute=name_kz --type=string --required
+meta add --name=ref_doc_type --attribute=name_ru --type=string --required
+
+meta add --name=ref_subject_type --attribute=code --type=string --required
+meta key --name=ref_subject_type --attribute=code
+meta add --name=ref_subject_type --attribute=name_kz --type=string --required
+meta add --name=ref_subject_type --attribute=name_ru --type=string --required
+
+meta add --name=ref_balance_account --attribute=name_kz --type=string --required
+meta add --name=ref_balance_account --attribute=name_ru --type=string --required
+meta add --name=ref_balance_account --attribute=no_ --type=string --required
+meta key --name=ref_balance_account --attribute=no_
+
+meta add --name=ref_country --attribute=code --type=string --required
+meta add --name=ref_country --attribute=code_numeric --type=integer --required
+meta key --name=ref_country --attribute=code_numeric
+meta add --name=ref_country --attribute=name_kz --type=string --required
+meta add --name=ref_country --attribute=name_ru --type=string --required
+
+meta add --name=ref_creditor --attribute=name --type=string --required
+meta add --name=ref_creditor --attribute=short_name --type=string --required
+
+meta add --name=ref_region --attribute=code --type=string --required
+meta key --name=ref_region --attribute=code
+meta add --name=ref_region --attribute=name_kz --type=string --required
+meta add --name=ref_region --attribute=name_ru --type=string --required
+
+meta add --name=ref_contact_type --attribute=code --type=string --required
+meta key --name=ref_contact_type --attribute=code
+meta add --name=ref_contact_type --attribute=name_kz --type=string --required
+meta add --name=ref_contact_type --attribute=name_ru --type=string --required
+
+meta add --name=ref_bank_relation --attribute=code --type=string --required
+meta key --name=ref_bank_relation --attribute=code
+meta add --name=ref_bank_relation --attribute=name_kz --type=string --required
+meta add --name=ref_bank_relation --attribute=name_ru --type=string --required
+
+meta add --name=ref_classification --attribute=code --type=string --required
+meta key --name=ref_classification --attribute=code
+meta add --name=ref_classification --attribute=name_kz --type=string --required
+meta add --name=ref_classification --attribute=name_ru --type=string --required
+
+meta add --name=ref_econ_trade --attribute=code --type=string --required
+meta key --name=ref_econ_trade --attribute=code
+meta add --name=ref_econ_trade --attribute=name_kz --type=string --required
+meta add --name=ref_econ_trade --attribute=name_ru --type=string --required
+
+meta add --name=ref_enterprise_type --attribute=code --type=string --required
+meta key --name=ref_enterprise_type --attribute=code
+meta add --name=ref_enterprise_type --attribute=name_kz --type=string --required
+meta add --name=ref_enterprise_type --attribute=name_ru --type=string --required
+
+meta add --name=ref_legal_form --attribute=code --type=string --required
+meta key --name=ref_legal_form --attribute=code
+meta add --name=ref_legal_form --attribute=name_kz --type=string --required
+meta add --name=ref_legal_form --attribute=name_ru --type=string --required
+
+meta add --name=ref_offshore --attribute=code --type=string --required
+meta key --name=ref_offshore --attribute=code
+meta add --name=ref_offshore --attribute=name_kz --type=string --required
+meta add --name=ref_offshore --attribute=name_ru --type=string --required
+meta add --name=ref_offshore --attribute=country --type=meta_class --childname=ref_country --keytype=any --immutable --required
+
+meta add --name=ref_portfolio --attribute=code --type=string --required
+meta key --name=ref_portfolio --attribute=code
+meta add --name=ref_portfolio --attribute=name_kz --type=string --required
+meta add --name=ref_portfolio --attribute=name_ru --type=string --required
+
+meta add --name=ref_creditor_branch --attribute=name --type=string --required
+meta add --name=ref_creditor_branch --attribute=short_name --type=string --required
+meta add --name=ref_creditor_branch --attribute=main_office --type=meta_class --childname=ref_creditor --keytype=any --immutable --required
+
+meta add --name=ref_credit_object --attribute=code --type=string --required
+meta key --name=ref_credit_object --attribute=code
+meta add --name=ref_credit_object --attribute=name_kz --type=string --required
+meta add --name=ref_credit_object --attribute=name_ru --type=string --required
+
+meta add --name=ref_credit_purpose --attribute=code --type=string --required
+meta key --name=ref_credit_purpose --attribute=code
+meta add --name=ref_credit_purpose --attribute=name_kz --type=string --required
+meta add --name=ref_credit_purpose --attribute=name_ru --type=string --required
+
+meta add --name=ref_currency --attribute=code --type=string --required
+meta key --name=ref_currency --attribute=code
+meta add --name=ref_currency --attribute=name_kz --type=string --required
+meta add --name=ref_currency --attribute=name_ru --type=string --required
+meta add --name=ref_currency --attribute=short_name --type=string --type=string --required
+
+meta add --name=ref_finance_source --attribute=code --type=string --required
+meta key --name=ref_finance_source --attribute=code
+meta add --name=ref_finance_source --attribute=name_kz --type=string --required
+meta add --name=ref_finance_source --attribute=name_ru --type=string --required
+
+meta add --name=ref_pledge_type --attribute=code --type=string --required
+meta key --name=ref_pledge_type --attribute=code
+meta add --name=ref_pledge_type --attribute=name_kz --type=string --required
+meta add --name=ref_pledge_type --attribute=name_ru --type=string --required
+
+meta add --name=ref_credit_type --attribute=code --type=string --required
+meta key --name=ref_credit_type --attribute=code
+meta add --name=ref_credit_type --attribute=kind_id --type=integer --required
+meta add --name=ref_credit_type --attribute=name_kz --type=string --required
+meta add --name=ref_credit_type --attribute=name_ru --type=string --required
+
+meta add --name=ref_econ_sector --attribute=code --type=string --required
+meta key --name=ref_econ_sector --attribute=code
+meta add --name=ref_econ_sector --attribute=name_kz --type=string --required
+meta add --name=ref_econ_sector --attribute=name_ru --type=string --required
+
+
+#====================================
+# Clear metadata cache
+#====================================
+rc
+
+quit
