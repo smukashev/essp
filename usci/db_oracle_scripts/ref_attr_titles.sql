@@ -64,8 +64,8 @@ update eav_m_complex_attributes set title = 'Главный офис' where name
 --update eav_m_simple_attributes set title = '' where name = 'maturity_date';
 update eav_m_simple_attributes set title = 'Отчество' where name = 'middlename';
 update eav_m_simple_attributes set title = 'Наименование' where name = 'name';
-update eav_m_simple_attributes set title = 'Наименование на казахском' where name = 'name_kz';
-update eav_m_simple_attributes set title = 'Наименование на русском' where name = 'name_ru';
+update eav_m_simple_attributes set title = 'Наименование (каз.)' where name = 'name_kz';
+update eav_m_simple_attributes set title = 'Наименование (рус.)' where name = 'name_ru';
 --update eav_m_simple_attributes set title = '' where name = 'names';
 update eav_m_simple_attributes set title = 'Номер' where name = 'no';
 update eav_m_simple_attributes set title = 'Номер' where name = 'no_';

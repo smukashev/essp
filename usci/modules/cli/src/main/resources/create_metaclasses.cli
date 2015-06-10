@@ -36,7 +36,7 @@ meta add --name=ref_doc_type --attribute=weight --type=integer
 
 meta create --name=document
 meta add --name=document --attribute=name --type=string
-meta add --name=document --attribute=no --type=string --required
+meta add --name=document --attribute=no --type=string
 meta key --name=document --attribute=no
 meta add --name=document --attribute=doc_type --type=meta_class --childname=ref_doc_type --keytype=any --immutable
 meta key --name=document --attribute=doc_type
@@ -85,7 +85,7 @@ meta add --name=person_name --attribute=middlename --type=string
 #====================================
 
 meta create --name=ref_country --reference
-meta add --name=ref_country --attribute=code --type=string
+meta add --name=ref_country --attribute=code --type=string --required
 meta add --name=ref_country --attribute=code_numeric --type=integer --required
 meta key --name=ref_country --attribute=code_numeric
 meta add --name=ref_country --attribute=name_kz --type=string --required
@@ -98,10 +98,10 @@ meta add --name=ref_country --attribute=short_name_ru --type=string
 #====================================
 
 meta create --name=ref_creditor --reference
-meta add --name=ref_creditor --attribute=code --type=string --required
+meta add --name=ref_creditor --attribute=code --type=string
 meta add --name=ref_creditor --attribute=name --type=string --required
 meta add --name=ref_creditor --attribute=nokbdb_code --type=string
-meta add --name=ref_creditor --attribute=short_name --type=string
+meta add --name=ref_creditor --attribute=short_name --type=string --required
 meta add --name=ref_creditor --attribute=subject_type --type=meta_class --childname=ref_subject_type --keytype=any --immutable
 meta add --name=ref_creditor --attribute=docs --type=meta_class --childname=document --array --keytype=any
 meta key --name=ref_creditor --attribute=docs
@@ -365,7 +365,7 @@ meta add --name=ref_offshore --attribute=code --type=string --required
 meta key --name=ref_offshore --attribute=code
 meta add --name=ref_offshore --attribute=name_kz --type=string --required
 meta add --name=ref_offshore --attribute=name_ru --type=string --required
-meta add --name=ref_offshore --attribute=country --type=meta_class --childname=ref_country --keytype=any --immutable
+meta add --name=ref_offshore --attribute=country --type=meta_class --childname=ref_country --keytype=any --immutable --required
 
 #====================================
 #= REF_PORTFOLIO
@@ -492,10 +492,10 @@ meta add --name=portfolio --attribute=portfolio_msfo --type=meta_class --childna
 #====================================
 
 meta create --name=ref_creditor_branch --reference
-meta add --name=ref_creditor_branch --attribute=code --type=string --required
+meta add --name=ref_creditor_branch --attribute=code --type=string
 meta add --name=ref_creditor_branch --attribute=name --type=string --required
-meta add --name=ref_creditor_branch --attribute=short_name --type=string
-meta add --name=ref_creditor_branch --attribute=main_office --type=meta_class --childname=ref_creditor --keytype=any --immutable
+meta add --name=ref_creditor_branch --attribute=short_name --type=string --required
+meta add --name=ref_creditor_branch --attribute=main_office --type=meta_class --childname=ref_creditor --keytype=any --immutable --required
 meta add --name=ref_creditor_branch --attribute=region --type=meta_class --childname=ref_region --keytype=any --immutable
 meta add --name=ref_creditor_branch --attribute=docs --type=meta_class --childname=document --array
 meta key --name=ref_creditor_branch --attribute=docs
@@ -531,7 +531,7 @@ meta add --name=ref_currency --attribute=is_convertible --type=boolean
 meta add --name=ref_currency --attribute=name_kz --type=string --required
 meta add --name=ref_currency --attribute=name_ru --type=string --required
 meta add --name=ref_currency --attribute=rating --type=string
-meta add --name=ref_currency --attribute=short_name --type=string
+meta add --name=ref_currency --attribute=short_name --type=string --type=string --required
 
 #====================================
 #= REF_FINANCE_SOURCE
@@ -562,7 +562,7 @@ meta add --name=ref_pledge_type --attribute=name_ru --type=string --required
 meta create --name=ref_credit_type --reference
 meta add --name=ref_credit_type --attribute=code --type=string --required
 meta key --name=ref_credit_type --attribute=code
-meta add --name=ref_credit_type --attribute=kind_id --type=integer
+meta add --name=ref_credit_type --attribute=kind_id --type=integer --required
 meta add --name=ref_credit_type --attribute=name_kz --type=string --required
 meta add --name=ref_credit_type --attribute=name_ru --type=string --required
 
