@@ -515,7 +515,7 @@ public class MainPortlet extends MVCPortlet {
 
                     String refName = metaClass.getClassName();
                     String refTitle = metaClass.getClassTitle() != null ? metaClass.getClassTitle() : metaClass.getClassName();
-                    String fileName = refName + "_" + df.format(new Date()) + ".xlsx";
+                    String fileName = refName + "_" + df.format(new Date()) + ".xls";
 
                     resourceResponse.setProperty("Content-Disposition", "attachment;filename=" + fileName);
                     resourceResponse.setContentType("application/vnd.ms-excel");
