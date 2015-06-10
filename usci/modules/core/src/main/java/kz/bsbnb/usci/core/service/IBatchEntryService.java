@@ -10,4 +10,5 @@ public interface IBatchEntryService
     BatchEntry load(long batchEntryId);
     List<BatchEntry> getListByUser(long userId);
     void delete(long batchEntryId);
+    void delete(List<Long> batchEntryIds);
 }

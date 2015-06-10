@@ -5,6 +5,8 @@ Ext.require([
     'Ext.tip.*'
 ]);
 
+var store;
+
 Ext.onReady(function() {
     var buttonSend = Ext.create('Ext.button.Button', {
         id: "entityEditorShowBtn",
@@ -18,6 +20,7 @@ Ext.onReady(function() {
                 },
                 success: function() {
                     Ext.MessageBox.alert(LABEL_SUCCESS, LABEL_SEND_APPROVAL);
+                    store.load();
                 },
                 failure: function() {
                     console.log('woops');
@@ -31,7 +34,7 @@ Ext.onReady(function() {
         fields: ['id', 'rep_date', 'u_date']
     });
 
-    var store = Ext.create('Ext.data.Store', {
+    store = Ext.create('Ext.data.Store', {
         model: 'myModel',
         remoteGroup: true,
         buffered: true,
