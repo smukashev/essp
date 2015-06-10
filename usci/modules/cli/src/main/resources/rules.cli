@@ -1,28 +1,50 @@
-rule set date 01.04.2001
-rule create package credit_parser
-rule rc
-rule set package credit_parser
+rule clear
+#rule set date 01.04.2001
+#rule create package credit_parser
+#rule rc
+#rule set package credit_parser
 rule set version
-
-
-
 
 #portion added in 14.04.2015
 
 rule read $$$
-title: Проверка номера ИИН
-rule "iin algo check"
+title: Проверка номера ИИН физ лиц
+rule "iin algo check person"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
-            && ( BRMSHelper.getInvalidIINs(getEls("{get}subjects[person!=null]person.docs[doc_type.code=06]no")).size() > 0))
+            && ( $r : BRMSHelper.getInvalidIINs(getEls("{get}subjects.person.docs[doc_type.code=06]no")) && $r.size() > 0))
 then
-  $entity.addValidationError("обнаружен некорректный иин: " + BRMSHelper.getInvalidIINs($entity.getEls("{get}subjects[person!=null]person.docs[doc_type.code=06]no")) );
+  $entity.addValidationError("обнаружен некорректный иин: " + $r );
 end
 $$$
 
 rule save
 
+rule read $$$
+title: Проверка номера ИИН юр лиц
+rule "iin algo check organization"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && ( $r : BRMSHelper.getInvalidIINs(getEls("{get}subjects.organization.docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+  $entity.addValidationError("обнаружен некорректный иин: " + $r );
+end
+$$$
 
+rule save
+
+rule read $$$
+title: Проверка номера ИИН руководителя организаций
+rule "iin algo check head"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && ( $r : BRMSHelper.getInvalidIINs(getEls("{get}subjects.organization.head.docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+  $entity.addValidationError("обнаружен некорректный иин руководителя: " + $r );
+end
+$$$
+
+rule save
 
 #remains
 

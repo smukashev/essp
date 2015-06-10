@@ -96,4 +96,11 @@ public interface IRuleService {
 
     public String getRuleErrors(String rule);
 
+    /**
+     * =============================
+     *   Developer tools
+     * =============================
+     */
+    public void clearAllRules();
+
 }

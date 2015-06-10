@@ -148,6 +148,12 @@ public class RuleService implements IRuleService {
         return rulesSingleton.getRuleErrors(rule);
     }
 
+    @Override
+    public void clearAllRules() {
+        ruleDao.clearAllRules();
+    }
+
+
     //    public ListenerSingleton getListenerSingleton() {
 //        return listenerSingleton;
 //    }

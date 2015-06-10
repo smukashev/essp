@@ -2,6 +2,11 @@ package kz.bsbnb.usci.brms.rulesvr.dao.impl;
 
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
+import org.jooq.DSLContext;
+import org.jooq.Delete;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
@@ -19,6 +24,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import static kz.bsbnb.usci.brms.rulesvr.generated.Tables.*;
+
 /**
  * @author abukabayev
  */
@@ -26,6 +33,12 @@ public class RuleDao implements IRuleDao {
 
     private JdbcTemplate jdbcTemplate;
     private final String PREFIX_ = "LOGIC_";
+
+    private final Logger logger = LoggerFactory.getLogger(RuleDao.class);
+
+    @SuppressWarnings("SpringJavaAutowiringInspection")
+    @Autowired
+    private DSLContext context;
 
     public boolean testConnection()
     {
@@ -195,5 +208,14 @@ public class RuleDao implements IRuleDao {
     public void renameRule(long ruleId, String title) {
         String sql = "Update " + PREFIX_ + "rules set title = ? where id = ?";
         jdbcTemplate.update(sql, title, ruleId);
+    }
+
+    @Override
+    public void clearAllRules() {
+        Delete delete = context.delete(LOGIC_RULE_PACKAGE_VERSIONS);
+        jdbcTemplate.update(delete.getSQL());
+
+        delete = context.delete(LOGIC_RULES);
+        jdbcTemplate.update(delete.getSQL());
     }
 }
