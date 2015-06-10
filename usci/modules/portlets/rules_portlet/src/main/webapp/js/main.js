@@ -494,10 +494,21 @@ Ext.onReady(function(){
                                         root: 'data'
                                     },
                                     success: function(response, opts) {
-                                        console.log(response.responseText.success);
+                                        console.log(JSON.parse(response.responseText).success);
+                                        var r = JSON.parse(response.responseText);
                                         //var obj = Ext.decode(response.responseText).data;
                                         //ruleListGrid.fireEvent('itemclick',ruleListGrid, ruleListGrid.getSelectionModel().getLastSelected());
-                                        ruleListGrid.fireEvent('cellclick', ruleListGrid, null, 1, ruleListGrid.getSelectionModel().getLastSelected()); //cellclick: function(grid, td, cellIndex, newValue, tr, rowIndex, e, eOpts){
+                                        var c = Ext.getCmp('errorPanel');
+
+                                        if(!r.success) {
+                                            //console.log(r.errorMessage);
+                                            c.update(r.errorMessage);
+                                            c.expand();
+                                        } else {
+                                            c.update("");
+                                            c.collapse();
+                                            ruleListGrid.fireEvent('cellclick', ruleListGrid, null, 1, ruleListGrid.getSelectionModel().getLastSelected()); //cellclick: function(grid, td, cellIndex, newValue, tr, rowIndex, e, eOpts){
+                                        }
                                         //editor.backup = obj.rule;
                                         //editor.setValue(obj.rule, -1);
 
@@ -574,8 +585,14 @@ Ext.onReady(function(){
                         },
                         initGrid()
                     ]
+                },{
+                    region: 'south',
+                    html: 'here errors',
+                    id: 'errorPanel',
+                    collapsible: true,
+                    collapsed: true,
+                    height: '10%'
                 }
-
             ]
         }
     ); //end of panel
