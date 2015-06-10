@@ -2401,6 +2401,8 @@ public class CLI {
                 System.out.println(currentBaseEntity.getEls(args.get(1)));
             } else if (args.get(0).equals("eval2")) {
                 System.out.println(currentBaseEntity.getEl(args.get(1)));
+            } else if (args.get(0).equals("clear")) {
+                ruleService.clearAllRules();
             } else throw new IllegalArgumentException();
         } catch (IllegalArgumentException e) {
             if (e.getMessage() == null)
