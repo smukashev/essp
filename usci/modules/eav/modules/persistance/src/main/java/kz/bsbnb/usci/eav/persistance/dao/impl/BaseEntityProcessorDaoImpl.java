@@ -2950,6 +2950,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 case DELETE:
                     if (baseEntityPostPrepared.getId() <= 0)
                         throw new RuntimeException("deleting entity must be found");
+
+                    if (baseEntity.getMeta().isReference() && historyExists(
+                            baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId()))
+                        throw new RuntimeException("Reference with history cannot be deleted!");
+
                     baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
                     entityHolder.applied = baseEntityApplied;
@@ -2972,6 +2977,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     entityHolder.applied, baseEntityManager);
 
         return baseEntityApplied;
+    }
+
+    private boolean historyExists(long metaId, long entityId) {
+        List<Map<String, Object>> rows = getRefListResponseWithHis(metaId, entityId);
+        return rows.size() > 1;
     }
 
     private void reloadCacheIfRef(IBaseEntity baseEntity) {
@@ -3139,7 +3149,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     public RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis) {
-        List<Map<String, Object>> rows = getRefListResponseWithHis(metaClassId);
+        List<Map<String, Object>> rows = getRefListResponseWithHis(metaClassId, null);
 
         addOpenCloseDates(rows);
 
@@ -3205,7 +3215,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    private List<Map<String, Object>> getRefListResponseWithHis(long metaClassId) {
+    private List<Map<String, Object>> getRefListResponseWithHis(long metaClassId, Long entityId) {
         Select simpleAttrsSelect = context.select().from(EAV_M_SIMPLE_ATTRIBUTES).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
 
         List<Map<String, Object>> simpleAttrs = queryForListWithStats(simpleAttrsSelect.getSQL(), simpleAttrsSelect.getBindValues().toArray());
@@ -3263,6 +3273,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 .from(EAV_BE_ENTITIES).join(EAV_BE_ENTITY_REPORT_DATES)
                                 .on(EAV_BE_ENTITIES.ID.eq(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID))
                                 .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId))
+                                .and(entityId != null ? EAV_BE_ENTITIES.ID.eq(entityId) : DSL.trueCondition())
                                 .and(EAV_BE_ENTITIES.DELETED.ne(DataUtils.convert(true)))
                                 .asTable("dat")
                 )
