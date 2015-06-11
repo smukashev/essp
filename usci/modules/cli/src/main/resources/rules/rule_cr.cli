@@ -5,7 +5,7 @@ title: rd_first_day
 rule "rd_first_day"
 //MES401
 when
-  $entity: BaseEntity(BRMSHelper.firstDay($entity.getReportDate()) !=1)
+  $entity: BaseEntity(getFirstDay($entity.getReportDate()) !=1)
 then
   $entity.addValidationError("Неверная отчетная дата");
 end

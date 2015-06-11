@@ -50,6 +50,12 @@ function boolean isDateValid(String date,String pattern) {
             return false;
         }
 }
+
+function int getFirstDay(Date date){
+    java.util.Calendar c = Calendar.getInstance();
+    c.setTime(date);
+    return c.get(Calendar.DAY_OF_MONTH);
+}
 $$$
 
 rule save
