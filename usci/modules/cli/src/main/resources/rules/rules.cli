@@ -1,0 +1,17 @@
+rule clear
+#rule set date 01.04.2001
+#rule create package credit_parser
+#rule rc
+#rule set package credit_parser
+rule set version
+
+rule import modules/cli/src/main/resources/rules/rule_functions.cli
+rule import modules/cli/src/main/resources/rules/rule_docs.cli
+rule import modules/cli/src/main/resources/rules/rule_indicators.cli
+rule import modules/cli/src/main/resources/rules/rule_cr.cli
+
+rule rc
+
+quit
+
+

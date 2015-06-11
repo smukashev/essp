@@ -1,0 +1,131 @@
+rule read $$$
+title: subjects.person.docs
+rule "subjects.person.docs"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ( $r : getInvalidIINs((List)getEls("{get}subjects.person.docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("обнаружен некорректный иин: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: subjects.organization.docs
+rule "subjects.organization.docs"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ( $r : BRMSHelper.getInvalidIINs(getEls("{get}subjects.organization.docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("обнаружен некорректный иин: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: creditor_branch.docs
+rule "creditor_branch.docs"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ( $r : BRMSHelper.getInvalidIINs(getEls("{get}creditor_branch.docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("обнаружен некорректный иин: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: creditor_branch.main_office.docs
+rule "creditor_branch.main_office.docs"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ( $r : BRMSHelper.getInvalidIINs(getEls("{get}creditor_branch.main_office.docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("обнаружен некорректный иин: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: portfolio.portfolio.creditor.docs
+rule "portfolio.portfolio.creditor.docs"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ( $r : BRMSHelper.getInvalidIINs(getEls("{get}portfolio.portfolio.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("обнаружен некорректный иин: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: portfolio.portfolio_msfo.creditor.docs
+rule "portfolio.portfolio_msfo.creditor.docs"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ( $r : BRMSHelper.getInvalidIINs(getEls("{get}portfolio.portfolio_msfo.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("обнаружен некорректный иин: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: subjects.creditor.docs
+rule "subjects.creditor.docs"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ( $r : BRMSHelper.getInvalidIINs(getEls("{get}subjects.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("обнаружен некорректный иин: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: subjects.person.bank_relations.creditor.docs
+rule "subjects.person.bank_relations.creditor.docs"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ( $r : BRMSHelper.getInvalidIINs(getEls("{get}subjects.person.bank_relations.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("обнаружен некорректный иин: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: subjects.organization.bank_relations.creditor.docs
+rule "subjects.organization.bank_relations.creditor.docs"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ( $r : BRMSHelper.getInvalidIINs(getEls("{get}subjects.organization.bank_relations.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("обнаружен некорректный иин: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: subjects.organization.head.docs
+rule "subjects.organization.head.docs"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ( $r : BRMSHelper.getInvalidIINs(getEls("{get}subjects.organization.head.docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("обнаружен некорректный иин: " + $r);
+end
+$$$
+
+rule save
+
+quit
