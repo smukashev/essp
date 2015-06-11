@@ -2403,7 +2403,30 @@ public class CLI {
                 System.out.println(currentBaseEntity.getEl(args.get(1)));
             } else if (args.get(0).equals("clear")) {
                 ruleService.clearAllRules();
-            } else throw new IllegalArgumentException();
+            } else if(args.get(0).equals("import")) {
+                try {
+                    Scanner importedPath = new Scanner(new File(args.get(1)));
+
+                    while(importedPath.hasNext()) {
+                        String line1 = importedPath.nextLine();
+                        if(line1.equals("") || line1.startsWith("#"))
+                            continue;
+                        StringTokenizer st = new StringTokenizer(line1);
+                        command = st.nextToken().trim();
+                        if(command.equals("quit")) break;
+                        if (st.hasMoreTokens()) {
+                            args.clear();
+                            while (st.hasMoreTokens()) {
+                                args.add(st.nextToken().trim());
+                            }
+                        }
+                        commandRule(importedPath);
+                    }
+
+                } catch(Exception e){
+                    e.printStackTrace();
+                }
+            }else throw new IllegalArgumentException();
         } catch (IllegalArgumentException e) {
             if (e.getMessage() == null)
                 System.out.println("Argument needed: <read {label},current [<pckName,date>],save,run {id}," +
