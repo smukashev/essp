@@ -3526,6 +3526,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             for (String key : keys) {
                 if (key.startsWith("name")) {
                     titleKey = key;
+                    break;
                 }
             }
         }
