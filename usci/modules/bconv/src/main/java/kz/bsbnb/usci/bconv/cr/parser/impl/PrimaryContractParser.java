@@ -57,10 +57,9 @@ public class PrimaryContractParser extends BatchParser {
             String dateRaw = event.asCharacters().getData();
             try {
                 currentBaseEntity.put("date", new BaseEntityDateValue(batch, index,
-                        dateFormat.parse("Неправильная дата: " + dateRaw)
-                ));
+                        dateFormat.parse(dateRaw)));
             } catch(ParseException e) {
-                currentBaseEntity.addValidationError(dateRaw);
+                currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }
         } else {
             currentBaseEntity.addValidationError("Нет такого тега: " + localName);
