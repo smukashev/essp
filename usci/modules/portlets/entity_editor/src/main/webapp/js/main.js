@@ -442,7 +442,8 @@ Ext.onReady(function() {
                     labelWidth: 70,
                     valueField:'id',
                     displayField:'name',
-                    fieldLabel: label_CLASS
+                    fieldLabel: label_CLASS,
+                    editable: false
                 }, {
                     xtype: 'component',
                     html: "<a href='#' onclick='getForm();'>" +LABEL_UPDATE+ "</a>"

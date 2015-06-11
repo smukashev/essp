@@ -84,10 +84,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Value("${refs.cache.enabled}")
     private boolean refsCacheEnabled;
 
+    @Deprecated
     public static final HashMap<Long, List<RefListItem>> refsCache = new HashMap<Long, List<RefListItem>>();
-    public static final HashMap<Long, List<RefListItem>> refsCacheRaw = new HashMap<Long, List<RefListItem>>();
 
-//    public static final Map<Long, List<BaseEntity>>
+    @Deprecated
+    public static final HashMap<Long, List<RefListItem>> refsCacheRaw = new HashMap<Long, List<RefListItem>>();
 
     private final int SC_ID_BAG_LIMIT = 100;
 
@@ -2119,7 +2120,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 int compare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
                 if (compare == 0) {
-                    //TODO: Check previous value and if exist then remove current value
                     if (metaAttribute.isFinal()) {
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -2130,7 +2130,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 new Date(baseValueLoaded.getRepDate().getTime()),
                                 metaValue.getTypeCode() == DataTypes.DATE ?
                                         new Date(((Date) baseValueLoaded.getValue()).getTime()) :
-                                        baseValueLoaded.getValue(),
+                                baseValueLoaded.getValue(),
                                 baseValueLoaded.isClosed(),
                                 baseValueLoaded.isLast()
                         );
@@ -2152,10 +2152,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             }
                         }
                     } else {
-                        if (metaAttribute.isFinal())
-                            throw new RuntimeException("Instance of BaseValue with incorrect report date and final flag " +
-                                    "mistakenly loaded from the database.");
-
                         IBaseValue baseValueClosed = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
@@ -2165,7 +2161,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 new Date(baseValueLoaded.getRepDate().getTime()),
                                 metaValue.getTypeCode() == DataTypes.DATE ?
                                         new Date(((Date) baseValueLoaded.getValue()).getTime()) :
-                                        baseValueLoaded.getValue(),
+                                baseValueLoaded.getValue(),
                                 true,
                                 baseValueLoaded.isLast()
                         );
@@ -2273,7 +2269,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             new Date(baseValueLoaded.getRepDate().getTime()),
                             metaValue.getTypeCode() == DataTypes.DATE ?
                                     new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            baseValueSaving.getValue(),
                             baseValueLoaded.isClosed(),
                             baseValueLoaded.isLast());
 
@@ -2288,7 +2284,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             new Date(baseValueSaving.getRepDate().getTime()),
                             metaValue.getTypeCode() == DataTypes.DATE ?
                                     new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            baseValueSaving.getValue(),
                             false,
                             baseValueLoaded.isLast());
 
@@ -2323,7 +2319,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             new Date(baseValueSaving.getRepDate().getTime()),
                             metaValue.getTypeCode() == DataTypes.DATE ?
                                     new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            baseValueSaving.getValue(),
                             false,
                             baseValueLoaded.isLast()
                     );
@@ -2331,7 +2327,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
 
-                    IBaseValue baseValueAppliedClosed = BaseValueFactory.create(
+                    // TODO: bug
+                    /*IBaseValue baseValueAppliedClosed = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
                             metaType,
                             baseValueSaving.getBatch(),
@@ -2339,12 +2336,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             new Date(baseValueLoaded.getRepDate().getTime()),
                             metaValue.getTypeCode() == DataTypes.DATE ?
                                     new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            baseValueSaving.getValue(),
                             true,
                             false);
 
                     baseEntity.put(metaAttribute.getName(), baseValueAppliedClosed);
-                    baseEntityManager.registerAsInserted(baseValueAppliedClosed);
+                    baseEntityManager.registerAsInserted(baseValueAppliedClosed);*/
                 }
             }
         } else {
@@ -2970,7 +2967,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         applyToDb(baseEntityManager);
 
-        reloadCacheIfRef(baseEntityApplied);
+//        reloadCacheIfRef(baseEntityApplied);
 
         if (applyListener != null)
             applyListener.applyToDBEnded(entityHolder.saving, entityHolder.loaded,
@@ -3092,13 +3089,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
 
         return entityIds;
-    }
-
-    /**
-     * Analog of getRefsByMetaClass method, not escapes content with quotes
-     */
-    public List<RefListItem> getRefsByMetaclassRaw(long metaClassId) {
-        return getRefsByMetaClass(metaClassId, true);
     }
 
     @Override
@@ -3283,7 +3273,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     private List<Map<String, Object>> getRefListResponseWithoutHis(long metaClassId, Date date) {
-        java.sql.Date dt = new java.sql.Date(date.getTime());
+        java.sql.Date dt = null;
+
+        if (date != null) {
+            dt = new java.sql.Date(date.getTime());
+        }
 
         Select simpleAttrsSelect = context.select().from(EAV_M_SIMPLE_ATTRIBUTES).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
 
@@ -3306,7 +3300,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE,
                                 DSL.rowNumber().over().partitionBy(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID).orderBy(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.desc()).as("p")
                         ).from(EAV_BE_ENTITIES).join(EAV_BE_ENTITY_REPORT_DATES).on(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
-                                .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId)).and(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.le(dt))
+                                .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId))
+                                .and(dt != null ? EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.le(dt) : DSL.trueCondition())
+                                .and(EAV_BE_ENTITIES.DELETED.ne(DataUtils.convert(true)))
                                 .asTable("sub")
                 ).where(DSL.field("\"sub\".\"p\"").eq(1)).asTable("enr")
         );
@@ -3326,10 +3322,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                     valuesTable.field("REPORT_DATE"),
                                     DSL.rowNumber().over().partitionBy(valuesTable.field("ENTITY_ID")).orderBy(valuesTable.field("REPORT_DATE").desc()).as("p")
                             ).from(valuesTable)
-                            .where(valuesTable.field("ATTRIBUTE_ID").eq(attr.get("ID"))).and(valuesTable.field("REPORT_DATE").le(dt))
+                            .where(valuesTable.field("ATTRIBUTE_ID").eq(attr.get("ID")))
+                            .and(dt != null ? valuesTable.field("REPORT_DATE").le(dt) : DSL.trueCondition())
                             .asTable("sub")
                     ).where(DSL.field("\"sub\".\"p\"").eq(1))
-                    .asTable(attrSubTable)
+                            .asTable(attrSubTable)
             ).on("\"" + attrSubTable + "\"" + "." + "ENTITY_ID = \"enr\".id");
         }
 
@@ -3353,6 +3350,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return null;
     }
 
+    @Deprecated
     public List<RefListItem> getRefsByMetaClass(long metaClassId, boolean raw) {
         if(refsCacheEnabled) {
             List<RefListItem> refsList;
@@ -3503,7 +3501,46 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     public List<RefListItem> getRefsByMetaclass(long metaClassId) {
-        return getRefsByMetaClass(metaClassId, false);
+        List<RefListItem> items = getRefsByMetaclassInner(metaClassId, false);
+        return items;
+    }
+
+    /**
+     * Analog of getRefsByMetaClass method, not escapes content with quotes
+     */
+    public List<RefListItem> getRefsByMetaclassRaw(long metaClassId) {
+        List<RefListItem> items = getRefsByMetaclassInner(metaClassId, true);
+        return items;
+    }
+
+    private List<RefListItem> getRefsByMetaclassInner(long metaClassId, boolean raw) {
+        List<Map<String, Object>> rows = getRefListResponseWithoutHis(metaClassId, null);
+
+        List<RefListItem> items = new ArrayList<RefListItem>();
+
+        String titleKey = null;
+
+        if (!rows.isEmpty()) {
+            Set<String> keys = rows.get(0).keySet();
+
+            for (String key : keys) {
+                if (key.startsWith("name")) {
+                    titleKey = key;
+                }
+            }
+        }
+
+        for (Map<String, Object> row : rows) {
+            Object id = row.get("ID");
+            String title = titleKey != null ? (String) row.get(titleKey) : "------------------------";
+
+            RefListItem item = new RefListItem();
+            item.setId(((BigDecimal) id).longValue());
+            item.setTitle(raw ? title : Quote.addSlashes(title));
+            items.add(item);
+        }
+
+        return items;
     }
 
     public List<BaseEntity> getEntityByMetaclass(MetaClass meta) {

@@ -10,8 +10,11 @@ public class RefListItem implements Serializable
 
     private long id;
     private String title;
+
+    @Deprecated
     private String code;
 
+    @Deprecated
     private HashMap<String, Object> values = new HashMap<String, Object>();
 
     public long getId()
@@ -34,24 +37,29 @@ public class RefListItem implements Serializable
         this.title = title;
     }
 
+    @Deprecated
     public String getCode()
     {
         return code;
     }
 
+    @Deprecated
     public void setCode(String code)
     {
         this.code = code;
     }
 
+    @Deprecated
     public void addValue(String key, Object value) {
         values.put(key, value);
     }
 
+    @Deprecated
     public Object getValue(String key) {
         return values.get(key);
     }
 
+    @Deprecated
     public Set<String> getKeys() {
         return values.keySet();
     }

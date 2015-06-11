@@ -7,4 +7,6 @@ import java.util.List;
 public interface IBatchEntriesDao extends IDao<BatchEntry>
 {
     public List<BatchEntry> getBatchEntriesByUserId(long userId);
+
+    public void remove(List<Long> batchEntryIds);
 }

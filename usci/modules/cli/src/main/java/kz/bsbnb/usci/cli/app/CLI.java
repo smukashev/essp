@@ -2677,7 +2677,7 @@ public class CLI {
             Queue<Long> creditorIdsQueue = null;
 
             if (args.size() > 2) {
-                creditorIdsQueue = new LinkedList<Long>();
+                creditorIdsQueue = new LinkedList<>();
                 for (int i = 2; i < args.size(); i++) {
                     creditorIdsQueue.add(Long.valueOf(args.get(i)));
                 }

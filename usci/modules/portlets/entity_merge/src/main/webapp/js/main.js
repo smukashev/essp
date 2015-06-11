@@ -800,7 +800,8 @@ Ext.onReady(function() {
                                         store: classesStore,
                                         valueField:'id',
                                         displayField:'name',
-                                        fieldLabel: label_CLASS
+                                        fieldLabel: label_CLASS,
+                                        editable: false
                                     },
 
                                     {
@@ -842,7 +843,8 @@ Ext.onReady(function() {
                                         labelWidth: 350,
                                         valueField:'id',
                                         displayField:'name',
-                                        fieldLabel: label_CLASS
+                                        fieldLabel: label_CLASS,
+                                        editable: false
                                     },
                                     {
                                         xtype: 'component',

@@ -141,8 +141,7 @@ public class MainPortlet extends MVCPortlet {
     }
 
     private String clearSlashes(String str) {
-        //TODO: str.replaceAll("\"","\\\""); does not work! Fix needed.
-        String outStr = str.replaceAll("\""," ");
+        String outStr = str.replaceAll("\"", "\\\\\"");
         System.out.println(outStr);
         return outStr;
     }

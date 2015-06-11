@@ -146,6 +146,8 @@ public class MainPortlet extends MVCPortlet {
 
                     DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
 
+                    List<Long> batchEntryIds = new ArrayList<Long>();
+
                     for (BatchEntry batchEntry : entries) {
                         String sRepDate = df.format(batchEntry.getRepDate());
 
@@ -163,7 +165,6 @@ public class MainPortlet extends MVCPortlet {
                                 "\t<type>1</type>\n" +
                                 "\t<name>data.xml</name>\n" +
                                 "\t<userid>" + currentUser.getUserId() + "</userid>\n" +
-                                "\t<userid>100500</userid>\n" +
                                 "\t<size>10</size>\n" +
                                 "\t<date>" +
                                 sRepDate +
@@ -193,7 +194,11 @@ public class MainPortlet extends MVCPortlet {
                         fileOutputStream.close();
 
                         batchProcessService.processBatch(f.getPath(), currentUser.getUserId());
+
+                        batchEntryIds.add(batchEntry.getId());
                     }
+
+                    batchEntryService.delete(batchEntryIds);
 
                     break;
                 case GET_ENTRY: {

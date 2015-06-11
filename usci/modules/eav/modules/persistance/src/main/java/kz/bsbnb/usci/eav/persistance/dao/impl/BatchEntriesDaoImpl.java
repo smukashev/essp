@@ -140,4 +140,14 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
 
         return result;
     }
+
+    @Override
+    public void remove(List<Long> batchEntryIds) {
+        DeleteConditionStep delete = context
+                .delete(BATCH_ENTRIES)
+                .where(BATCH_ENTRIES.ID.in(batchEntryIds));
+
+        logger.debug(delete.toString());
+        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+    }
 }
