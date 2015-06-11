@@ -2120,7 +2120,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 int compare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
                 if (compare == 0) {
-                    //TODO: Check previous value and if exist then remove current value
                     if (metaAttribute.isFinal()) {
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -2131,7 +2130,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 new Date(baseValueLoaded.getRepDate().getTime()),
                                 metaValue.getTypeCode() == DataTypes.DATE ?
                                         new Date(((Date) baseValueLoaded.getValue()).getTime()) :
-                                        baseValueLoaded.getValue(),
+                                baseValueLoaded.getValue(),
                                 baseValueLoaded.isClosed(),
                                 baseValueLoaded.isLast()
                         );
@@ -2153,10 +2152,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             }
                         }
                     } else {
-                        if (metaAttribute.isFinal())
-                            throw new RuntimeException("Instance of BaseValue with incorrect report date and final flag " +
-                                    "mistakenly loaded from the database.");
-
                         IBaseValue baseValueClosed = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
@@ -2166,7 +2161,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 new Date(baseValueLoaded.getRepDate().getTime()),
                                 metaValue.getTypeCode() == DataTypes.DATE ?
                                         new Date(((Date) baseValueLoaded.getValue()).getTime()) :
-                                        baseValueLoaded.getValue(),
+                                baseValueLoaded.getValue(),
                                 true,
                                 baseValueLoaded.isLast()
                         );
@@ -2274,7 +2269,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             new Date(baseValueLoaded.getRepDate().getTime()),
                             metaValue.getTypeCode() == DataTypes.DATE ?
                                     new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            baseValueSaving.getValue(),
                             baseValueLoaded.isClosed(),
                             baseValueLoaded.isLast());
 
@@ -2289,7 +2284,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             new Date(baseValueSaving.getRepDate().getTime()),
                             metaValue.getTypeCode() == DataTypes.DATE ?
                                     new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            baseValueSaving.getValue(),
                             false,
                             baseValueLoaded.isLast());
 
@@ -2324,7 +2319,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             new Date(baseValueSaving.getRepDate().getTime()),
                             metaValue.getTypeCode() == DataTypes.DATE ?
                                     new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            baseValueSaving.getValue(),
                             false,
                             baseValueLoaded.isLast()
                     );
@@ -2332,7 +2327,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
 
-                    IBaseValue baseValueAppliedClosed = BaseValueFactory.create(
+                    // TODO: bug
+                    /*IBaseValue baseValueAppliedClosed = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
                             metaType,
                             baseValueSaving.getBatch(),
@@ -2340,12 +2336,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             new Date(baseValueLoaded.getRepDate().getTime()),
                             metaValue.getTypeCode() == DataTypes.DATE ?
                                     new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            baseValueSaving.getValue(),
                             true,
                             false);
 
                     baseEntity.put(metaAttribute.getName(), baseValueAppliedClosed);
-                    baseEntityManager.registerAsInserted(baseValueAppliedClosed);
+                    baseEntityManager.registerAsInserted(baseValueAppliedClosed);*/
                 }
             }
         } else {
