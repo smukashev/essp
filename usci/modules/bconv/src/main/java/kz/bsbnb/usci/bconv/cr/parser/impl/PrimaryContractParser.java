@@ -47,22 +47,25 @@ public class PrimaryContractParser extends BatchParser {
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        try {
-            if(localName.equals("primary_contract")) {
-            } else if(localName.equals("no")) {
-                event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("no", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
-            } else if(localName.equals("date")) {
-                event = (XMLEvent) xmlReader.next();
+
+        if(localName.equals("primary_contract")) {
+        } else if(localName.equals("no")) {
+            event = (XMLEvent) xmlReader.next();
+            currentBaseEntity.put("no", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
+        } else if(localName.equals("date")) {
+            event = (XMLEvent) xmlReader.next();
+            String dateRaw = event.asCharacters().getData();
+            try {
                 currentBaseEntity.put("date", new BaseEntityDateValue(batch, index,
-                        dateFormat.parse(event.asCharacters().getData())
-                    ));
-            } else {
-                throw new UnknownTagException(localName);
+                        dateFormat.parse("Неправильная дата: " + dateRaw)
+                ));
+            } catch(ParseException e) {
+                currentBaseEntity.addValidationError(dateRaw);
             }
-        } catch (ParseException parseException) {
-            throw new UnknownValException(localName, event.asCharacters().getData());
+        } else {
+            currentBaseEntity.addValidationError("Нет такого тега: " + localName);
         }
+
 
         return false;
     }

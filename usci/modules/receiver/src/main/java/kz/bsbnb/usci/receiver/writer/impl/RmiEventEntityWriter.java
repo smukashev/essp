@@ -96,7 +96,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
             statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
 
-            List<String> errors = null;
+            List<String> errors = new LinkedList<String>(entity.getValidationErrors());
 
             if(global.isRulesEnabled() && entity.getMeta() != null &&
                     metaRules.contains(entity.getMeta().getClassName())) {

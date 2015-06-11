@@ -43,6 +43,7 @@ public abstract class BatchParser {
 
     public BatchParser() {
         super();
+        dateFormat.setLenient(false);
     }
 
     public Calendar convertDateToCalendar(Date date) {
