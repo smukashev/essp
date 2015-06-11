@@ -15,6 +15,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,7 +23,6 @@ import java.util.concurrent.Future;
 
 @Component
 public class ShowcaseMessageConsumer implements MessageListener {
-
     final static Logger logger = Logger.getLogger(ShowcaseMessageConsumer.class);
     @Autowired
     SQLQueriesStats stats;
@@ -30,10 +30,49 @@ public class ShowcaseMessageConsumer implements MessageListener {
     ShowcaseDao showcaseDao;
     private ExecutorService exec = Executors.newCachedThreadPool();
 
+    private HashSet<SyncKey> syncSet = new HashSet<>();
+
+    private class SyncKey {
+        public Long entityId;
+        public Long scId;
+
+        public SyncKey(Long entityId, Long scId) {
+            this.entityId = entityId;
+            this.scId = scId;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            SyncKey syncKey = (SyncKey) o;
+
+            if (!entityId.equals(syncKey.entityId)) return false;
+            return scId.equals(syncKey.scId);
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = entityId.hashCode();
+            result = 31 * result + scId.hashCode();
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "SyncKey{" +
+                    "entityId=" + entityId +
+                    ", scId=" + scId +
+                    '}';
+        }
+    }
+
     @Override
     public void onMessage(Message message) {
         if (message instanceof ObjectMessage) {
-            long t3 = System.currentTimeMillis();
+
 
             ObjectMessage om = (ObjectMessage) message;
             QueueEntry queueEntry;
@@ -84,12 +123,9 @@ public class ShowcaseMessageConsumer implements MessageListener {
                         f.get();
 
                     futures.removeAll(futures);
-
-                    long t4 = System.currentTimeMillis() - t3;
-                    stats.put("message", t4);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
 
                 StringBuilder sb = new StringBuilder();
 
@@ -113,10 +149,19 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
         @Override
         public void run() {
-            long t1 = System.currentTimeMillis();
-            showcaseDao.generate(entity, holder);
-            long t2 = System.currentTimeMillis() - t1;
-            stats.put("showcase", t2);
+            SyncKey syncKey = new SyncKey(entity.getId(),
+                    holder.getShowCaseMeta().getId());
+
+            try {
+                while (syncSet.contains(syncKey)) Thread.sleep(50);
+
+                syncSet.add(syncKey);
+                showcaseDao.generate(entity, holder);
+            } catch(Exception e) {
+                e.printStackTrace();
+            } finally {
+                syncSet.remove(syncKey);
+            }
         }
     }
 }
