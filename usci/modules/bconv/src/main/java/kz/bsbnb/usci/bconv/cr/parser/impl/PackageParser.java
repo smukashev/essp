@@ -82,8 +82,11 @@ public class PackageParser extends BatchParser {
         } else if(localName.equals("primary_contract")) {
             primaryContractParser.parse(xmlReader, batch, index);
             BaseEntity primaryContract = primaryContractParser.getCurrentBaseEntity();
-
             currentBaseEntity.put("primary_contract", new BaseEntityComplexValue(batch, index, primaryContract));
+            for(String e: primaryContractParser.getCurrentBaseEntity().getValidationErrors()){
+                getCurrentBaseEntity().addValidationError(e);
+            }
+            primaryContractParser.getCurrentBaseEntity().clearValidationErrors();
         } else if(localName.equals("credit")) {
             //attributes.getValue("credit_type")
             creditParser.parse(xmlReader, batch, index);
@@ -130,6 +133,11 @@ public class PackageParser extends BatchParser {
         } else if(localName.equals("change")) {
             changeParser.parse(xmlReader, batch, index);
             currentBaseEntity.put("change",new BaseEntityComplexValue(batch,index,changeParser.getCurrentBaseEntity()));
+
+            for(String e: changeParser.getCurrentBaseEntity().getValidationErrors()){
+                getCurrentBaseEntity().addValidationError(e);
+            }
+            changeParser.getCurrentBaseEntity().clearValidationErrors();
 
             if (changeParser.getMaturityDate() != null) {
                 currentBaseEntity.put("maturity_date", changeParser.getMaturityDate());

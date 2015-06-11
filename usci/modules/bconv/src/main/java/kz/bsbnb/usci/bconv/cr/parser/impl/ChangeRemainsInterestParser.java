@@ -94,24 +94,27 @@ public class ChangeRemainsInterestParser extends BatchParser {
             }
         } else if(localName.equals("open_date")) {
             event = (XMLEvent) xmlReader.next();
+            String dateRaw = event.asCharacters().getData();
             try{
-                fieldPastDue.put("open_date",new BaseEntityDateValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
+                fieldPastDue.put("open_date",new BaseEntityDateValue(batch,index,dateFormat.parse(dateRaw)));
             }catch(ParseException e){
-                System.out.println(e.getMessage());
+                getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
             }
         } else if(localName.equals("close_date")) {
             event = (XMLEvent) xmlReader.next();
+            String dateRaw = event.asCharacters().getData();
             try {
-                fieldPastDue.put("close_date",new BaseEntityDateValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
+                fieldPastDue.put("close_date",new BaseEntityDateValue(batch,index,dateFormat.parse(dateRaw)));
             } catch (ParseException e) {
-                System.out.println(e.getMessage());
+                getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
             }
         } else if(localName.equals("date")) {
             event = (XMLEvent) xmlReader.next();
+            String dateRaw = event.asCharacters().getData();
             try {
-                fieldWriteOf.put("date",new BaseEntityDateValue(batch,index,dateFormat.parse(event.asCharacters().getData())));
+                fieldWriteOf.put("date",new BaseEntityDateValue(batch,index,dateFormat.parse(dateRaw)));
             } catch (ParseException e) {
-                System.out.println(e.getMessage());
+                getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
             }
         } else {
             throw new UnknownTagException(localName);
