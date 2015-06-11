@@ -150,6 +150,8 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                             ii.setCompletionDate(statusModel.getReceived());
                         } else if(statusModel.getProtocol().equals("WAITING")) {
                             ii.setReceiverDate(statusModel.getReceived());
+                        } else if (statusModel.getProtocol().equals("ERROR") && ii.getReceiverDate() == null) {
+                            ii.setReceiverDate(statusModel.getReceived());
                         }
                     }
 
