@@ -1,0 +1,7 @@
+rule read $$$
+title: Нужные импорты для работы функций
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.util.*;
+$$$
+rule save
