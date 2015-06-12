@@ -31,7 +31,7 @@ public class InputInfoDisplayBean implements Button.ClickListener {
     private InputInfo inputInfo;
     private DataProvider provider;
 
-    private final String path = "/home/sadmin/tmp_zips";
+    private final String path = "C:\\tmp_zips";
 
     private static CouchbaseProvider couchbaseProvider = CouchbaseProvider.getInstance();
 
