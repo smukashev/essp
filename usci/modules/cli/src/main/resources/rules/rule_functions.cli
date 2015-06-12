@@ -56,6 +56,24 @@ function int getFirstDay(Date date){
     c.setTime(date);
     return c.get(Calendar.DAY_OF_MONTH);
 }
+
+function List getNot12DigitStrings(List docs){
+    List ret = new ArrayList();
+        for(Object doc : docs) {
+            if(!((String) doc ).matches("\\d{12}"))
+                ret.add(doc);
+        }
+    return ret;
+}
+
+function List get12ZeroStrings(List docs){
+    List ret = new ArrayList();
+        for(Object doc: docs) {
+            if(((String) doc ).equals("000000000000"))
+                ret.add(doc);
+        }
+    return ret;
+}
 $$$
 
 rule save
