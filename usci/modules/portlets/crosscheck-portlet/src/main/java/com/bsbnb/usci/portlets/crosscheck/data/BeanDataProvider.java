@@ -1,5 +1,6 @@
 package com.bsbnb.usci.portlets.crosscheck.data;
 
+import com.bsbnb.usci.portlets.crosscheck.CrossCheckApplication;
 import com.bsbnb.usci.portlets.crosscheck.PortletEnvironmentFacade;
 import com.bsbnb.usci.portlets.crosscheck.dm.*;
 import com.bsbnb.usci.portlets.crosscheck.helper.DbHelper;
@@ -8,13 +9,6 @@ import com.bsbnb.usci.portlets.crosscheck.helper.ModelHelper;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -62,7 +56,8 @@ public class BeanDataProvider implements DataProvider {
         Statement stmt = null;
         String query = "SELECT t0.REF_CREDITOR_ID AS ID, t0.OPEN_DATE AS CHANGE_DATE, t0.CODE, t0.NAME, t0.SHORT_NAME, " +
                 "t0.CLOSE_DATE AS SHUTDOWN_DATE, 0 AS MAIN_OFFICE_ID, t0.SUBJECT_TYPE_ID " +
-                "FROM CORE.R_REF_CREDITOR t0, CORE.EAV_A_CREDITOR_USER t2, CORE.EAV_A_USER t1 " +
+                "FROM " + CrossCheckApplication.SHOWCASE_SCHEMA + ".R_REF_CREDITOR t0, " + CrossCheckApplication.CORE_SCHEMA +
+                ".EAV_A_CREDITOR_USER t2, " + CrossCheckApplication.CORE_SCHEMA + ".EAV_A_USER t1 " +
                 "WHERE ((t1.USER_ID = " + BigInteger.valueOf(facade.getUserID()) +") " +
                 "AND ((t2.CREDITOR_ID = t0.REF_CREDITOR_ID) AND (t1.USER_ID = t2.USER_ID))) " +
                 "ORDER BY t0.NAME ASC";
@@ -173,19 +168,7 @@ public class BeanDataProvider implements DataProvider {
             while (rs.next()) {
                 CrossCheck cc = DbHelper.getCrossCheck(conn, rs.getBigDecimal("CROSS_CHECK_ID").toBigInteger());
                 BigDecimal messageId = rs.getBigDecimal("MESSAGE_ID");
-		
-		Message m = null;
-		if(messageId != null) {
-			m = DbHelper.getMessage(conn, messageId.toBigInteger());
-		} else {
-			m = new Message();
-			m.setId(rs.getBigDecimal("DESCRIPTION"));
-			m.setCode(rs.getString("DESCRIPTION"));
-			m.setNameKz(rs.getString("DESCRIPTION"));
-			m.setNameRu(rs.getString("DESCRIPTION"));
-			m.setNote(rs.getString("DESCRIPTION"));
-		}
-
+                Message m = DbHelper.getMessage(conn, messageId != null ? messageId.toBigInteger() : BigInteger.valueOf(7)); // TODO fix
                 CrossCheckMessage cm = ModelHelper.convertToCrossCheckMessage(rs, cc, m);
                 cList.add(cm);
             }
@@ -222,7 +205,8 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM CORE.R_REF_CREDITOR";
+        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM " + CrossCheckApplication.SHOWCASE_SCHEMA +
+                ".R_REF_CREDITOR";
 
         log.log(Level.INFO, "getFirstNotApprovedDate: " + query);
 
@@ -256,7 +240,8 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM CORE.R_REF_CREDITOR";
+        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM " + CrossCheckApplication.SHOWCASE_SCHEMA +
+                ".R_REF_CREDITOR";
 
         log.log(Level.INFO, "getLastApprovedDate: " + query);
 

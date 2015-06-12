@@ -38,7 +38,9 @@ public class CrossCheckApplication extends Application {
     private static final long serialVersionUID = 2096197512742005243L;
     public static final String CONTEXT_NAME = "usci-crosscheck-portlet";
     public static final Logger log = Logger.getLogger(CrossCheckApplication.class.getName());
-    public static final String SCHEMA = "CORE";
+
+    public static final String CORE_SCHEMA = "CORE";
+    public static final String SHOWCASE_SCHEMA = "SHOWCASE";
 
     @Override
     public void init() {
