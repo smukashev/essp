@@ -173,7 +173,19 @@ public class BeanDataProvider implements DataProvider {
             while (rs.next()) {
                 CrossCheck cc = DbHelper.getCrossCheck(conn, rs.getBigDecimal("CROSS_CHECK_ID").toBigInteger());
                 BigDecimal messageId = rs.getBigDecimal("MESSAGE_ID");
-                Message m = DbHelper.getMessage(conn, messageId != null ? messageId.toBigInteger() : BigInteger.valueOf(7)); // TODO fix
+		
+		Message m = null;
+		if(messageId != null) {
+			m = DbHelper.getMessage(conn, messageId.toBigInteger());
+		} else {
+			m = new Message();
+			m.setId(rs.getBigDecimal("DESCRIPTION"));
+			m.setCode(rs.getString("DESCRIPTION"));
+			m.setNameKz(rs.getString("DESCRIPTION"));
+			m.setNameRu(rs.getString("DESCRIPTION"));
+			m.setNote(rs.getString("DESCRIPTION"));
+		}
+
                 CrossCheckMessage cm = ModelHelper.convertToCrossCheckMessage(rs, cc, m);
                 cList.add(cm);
             }
@@ -210,7 +222,7 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM R_REF_CREDITOR";
+        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM CORE.R_REF_CREDITOR";
 
         log.log(Level.INFO, "getFirstNotApprovedDate: " + query);
 
@@ -244,7 +256,7 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM R_REF_CREDITOR";
+        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM CORE.R_REF_CREDITOR";
 
         log.log(Level.INFO, "getLastApprovedDate: " + query);
 
