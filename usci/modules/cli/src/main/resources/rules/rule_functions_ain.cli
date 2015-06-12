@@ -1,0 +1,43 @@
+rule read $$$
+title: Функций провекри аин
+
+function boolean isDigit(char c){
+    return '1' <= c && c <= '9';
+}
+
+function boolean isAinCorrect(String ain, boolean isPerson){
+    if(ain.length() != 12)
+        return false;
+    if(!ain.substring(0,2).matches("[A-Z]{2}"))
+        return false;
+    if(!ain.substring(2,4).matches("[\\p{javaUpperCase}]{2}"))
+        return false;
+    if(isPerson) {
+        if(!isDateValid(ain.substring(4,10), "yyMMdd"))
+            return false;
+        if(!ain.substring(10,12).matches("\\d{2}"))
+            return false;
+    } else {
+        if(!isDigit(ain.charAt(4)))
+            return false;
+        if(!isDateValid(ain.substring(5,11), "yyMMdd"))
+            return false;
+        if(!isDigit(ain.charAt(11)))
+            return false;
+    }
+
+    return true;
+}
+
+function List getInvalidAINs(List ains, boolean isPerson) {
+    List ret = new ArrayList();
+        for(Object ain: ains) {
+            if(!isAinCorrect((String) ain , isPerson))
+                ret.add(ain);
+        }
+    return ret;
+}
+
+$$$
+
+rule save
