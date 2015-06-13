@@ -692,6 +692,16 @@ meta add --name=ref_ba_ct --attribute=credit_type --type=meta_class --childname=
 meta key --name=ref_ba_ct --attribute=balance_account
 meta key --name=ref_ba_ct --attribute=credit_type
 
+#==============================================================================================
+#  REF_DEBT_REMAINS_TYPE
+#==============================================================================================
+meta create --name=ref_debt_remains_type --reference
+
+meta add --name=ref_debt_remains_type --attribute=code --type=string --required
+meta key --name=ref_debt_remains_type --attribute=code
+meta add --name=ref_debt_remains_type --attribute=name_ru --type=string
+meta add --name=ref_debt_remains_type --attribute=name_kz --type=string
+
 #====================================
 # Clear metadata cache
 #====================================

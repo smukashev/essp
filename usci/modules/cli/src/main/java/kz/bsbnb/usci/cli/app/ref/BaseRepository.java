@@ -122,6 +122,7 @@ public class BaseRepository implements  Runnable
         (new NokbdbCrawler()).work();
         (new EconSectorCrawler()).work();
         (new BACTCrawler()).work();
+        new DRTCrawler().work();
     }
 
     public static void main( String[] args )

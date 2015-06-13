@@ -20,5 +20,6 @@ entity read  usci/modules/cli/src/main/resources/refs_02_2015/ref_offshore_01_02
 entity read  usci/modules/cli/src/main/resources/refs_02_2015/ref_pledge_type_01_02_2015.xml 01.04.2013
 entity read  usci/modules/cli/src/main/resources/refs_02_2015/ref_portfolio_01_02_2015.xml 01.04.2013
 entity read  usci/modules/cli/src/main/resources/refs_02_2015/ref_ba_ct_01_02_2015.xml 01.04.2013
+entity read  usci/modules/cli/src/main/resources/refs_02_2015/ref_debt_remains_type_01_02_2015.xml 01.04.2013
 
 quit
