@@ -774,8 +774,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
                         COLUMN_PREFIX, showcaseHolder.getRootClassName());
             } else {
+                sql += " AND open_date = ?";
                 sql = String.format(sql, getHistoryTableName(showcaseHolder.getShowCaseMeta()),
-                        COLUMN_PREFIX, showcaseHolder.getRootClassName());
+                        COLUMN_PREFIX, showcaseHolder.getRootClassName(), entity.getReportDate());
             }
 
             Map dbElement = jdbcTemplateSC.queryForMap(sql, recordId);

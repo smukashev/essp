@@ -1,44 +1,5 @@
 rule read $$$
-title: function
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
-import java.util.*;
-
-function List getInvalidIINs(List iins){
-    List ret = new ArrayList();
-    for(Object iin : iins) {
-        if(!iinCorrect((String) iin ))
-            ret.add(iin);
-    }
-    return ret;
-}
-
-function  boolean iinCorrect(String iin){
-
-    int[] weights = new int[]{1,2,3,4,5,6,7,8,9,10,11,1,2};
-
-    int sum = 0;
-    if(iin.length() != 12)
-        return false;
-
-    if(!isDateValid(iin.substring(0,6),"yyMMdd"))
-        return false;
-
-    if(iin.charAt(6) < '1' || iin.charAt(6) > '6')
-        return false;
-
-    for(int i=0;i<11;i++)
-        sum += (iin.charAt(i) - '0' ) * weights[i];
-    sum %= 11;
-    int last = iin.charAt(11) - '0';
-    if(sum ==  10) {
-        sum = 0;
-        for(int i=0;i<11;i++)
-            sum+=(iin.charAt(i) - '0') * weights[i+2];
-        sum %= 11;
-    }
-    return sum == last;
-}
+title: Общие функций
 
 function boolean isDateValid(String date,String pattern) {
     SimpleDateFormat sdf = new SimpleDateFormat(pattern);
@@ -51,11 +12,27 @@ function boolean isDateValid(String date,String pattern) {
         }
 }
 
+function boolean isDigit(char c){
+    return '1' <= c && c <= '9';
+}
+
 function int getFirstDay(Date date){
     java.util.Calendar c = Calendar.getInstance();
     c.setTime(date);
     return c.get(Calendar.DAY_OF_MONTH);
 }
+
+function List getNot12DigitStrings(List docs){
+    List ret = new ArrayList();
+        for(Object doc : docs) {
+            if(!((String) doc ).matches("\\d{12}"))
+                ret.add(doc);
+        }
+    return ret;
+}
+
 $$$
 
 rule save
+
+quit
