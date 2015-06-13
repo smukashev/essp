@@ -682,6 +682,16 @@ meta add --name=ref_econ_sector --attribute=name_kz --type=string --required
 meta add --name=ref_econ_sector --attribute=name_ru --type=string --required
 
 
+#==============================================================================================
+#  REF_BA_CT
+#==============================================================================================
+meta create --name=ref_ba_ct --reference
+
+meta add --name=ref_ba_ct --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+meta add --name=ref_ba_ct --attribute=credit_type --type=meta_class --childname=ref_credit_type --keytype=any --immutable
+meta key --name=ref_ba_ct --attribute=balance_account
+meta key --name=ref_ba_ct --attribute=credit_type
+
 #====================================
 # Clear metadata cache
 #====================================

@@ -2423,6 +2423,8 @@ public class CLI {
                         commandRule(importedPath);
                     }
 
+                    importedPath.close();
+
                 } catch(Exception e){
                     e.printStackTrace();
                 }
