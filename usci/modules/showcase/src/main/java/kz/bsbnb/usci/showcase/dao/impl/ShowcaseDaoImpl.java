@@ -563,7 +563,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         if(!showcaseHolder.getShowCaseMeta().isFinal()) {
             try {
-                sql = "SELECT OPEN_DATE AS OPEN_DATE FROM %s WHERE %s%s_ID = ?";
+                sql = "SELECT MAX(OPEN_DATE) AS OPEN_DATE FROM %s WHERE %s%s_ID = ?";
                 sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
                         COLUMN_PREFIX, showcaseHolder.getRootClassName());
 
