@@ -59,21 +59,11 @@ public class ShowcaseMessageConsumer implements MessageListener {
             result = 31 * result + scId.hashCode();
             return result;
         }
-
-        @Override
-        public String toString() {
-            return "SyncKey{" +
-                    "entityId=" + entityId +
-                    ", scId=" + scId +
-                    '}';
-        }
     }
 
     @Override
     public void onMessage(Message message) {
         if (message instanceof ObjectMessage) {
-
-
             ObjectMessage om = (ObjectMessage) message;
             QueueEntry queueEntry;
 
