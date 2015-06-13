@@ -123,6 +123,7 @@ public class BaseRepository implements  Runnable
         (new EconSectorCrawler()).work();
         (new BACTCrawler()).work();
         new DRTCrawler().work();
+        new BADRTCrawler().work();
     }
 
     public static void main( String[] args )

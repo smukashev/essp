@@ -702,6 +702,16 @@ meta key --name=ref_debt_remains_type --attribute=code
 meta add --name=ref_debt_remains_type --attribute=name_ru --type=string
 meta add --name=ref_debt_remains_type --attribute=name_kz --type=string
 
+#==============================================================================================
+#  REF_BA_DRT
+#==============================================================================================
+meta create --name=ref_ba_drt --reference
+
+meta add --name=ref_ba_drt --attribute=balance_account --type=meta_class --childname=ref_balance_account --keytype=any --immutable
+meta add --name=ref_ba_drt --attribute=debt_remains_type --type=meta_class --childname=ref_debt_remains_type --keytype=any --immutable
+meta key --name=ref_ba_drt --attribute=balance_account
+meta key --name=ref_ba_drt --attribute=debt_remains_type
+
 #====================================
 # Clear metadata cache
 #====================================
