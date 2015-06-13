@@ -90,6 +90,20 @@ public class BRMSHelper
 
 
     }
+
+    public static boolean isExclusiveIIN(String iin){
+
+        String select = "select count(1)\n" +
+                "  from eav_be_string_values sv\n" +
+                " where sv.attribute_id = (select id from vw_simple_attribute where attribute_name = 'code' and class_name = 'ref_exclusive_iin')\n" +
+                "   and sv.value = ?\n" +
+                "   and rownum = 1\n";
+
+        int ans = jdbcTemplate.queryForInt(select, new String[]{iin});
+
+        return ans > 0;
+    }
+
     public static boolean isValidRNN(String rnn)
     {
         String chr;

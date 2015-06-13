@@ -712,6 +712,17 @@ meta add --name=ref_ba_drt --attribute=debt_remains_type --type=meta_class --chi
 meta key --name=ref_ba_drt --attribute=balance_account
 meta key --name=ref_ba_drt --attribute=debt_remains_type
 
+#==============================================================================================
+#  REF_EXCLUSIVE_IIN
+#==============================================================================================
+meta create --name=ref_exclusive_iin --reference
+
+meta add --name=ref_exclusive_iin --attribute=code --type=string --required
+meta key --name=ref_exclusive_iin --attribute=code
+meta add --name=ref_exclusive_iin --attribute=name_ru --type=string
+meta add --name=ref_exclusive_iin --attribute=name_kz --type=string
+
+
 #====================================
 # Clear metadata cache
 #====================================
