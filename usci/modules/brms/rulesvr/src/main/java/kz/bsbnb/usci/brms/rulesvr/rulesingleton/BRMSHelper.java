@@ -52,6 +52,44 @@ public class BRMSHelper
 
         return ans > 0;
     }
+
+    public static boolean hasBADRT(String balanceAccountNo, String debtRemainTypeCode){
+
+        String select ="select count(1)\n" +
+                "  from eav_be_entities ent,\n" +
+                "       eav_be_complex_values cba,\n" +
+                "       eav_be_string_values sba,\n" +
+                "       eav_be_complex_values cdrt,\n" +
+                "       eav_be_string_values sdrt\n" +
+                "   where ent.id = cba.entity_id\n" +
+                "     and cba.attribute_id = (select ct.id from vw_complex_attribute ct \n" +
+                "                                    where ct.attribute_name = 'balance_account'\n" +
+                "                                       and ct.containing_name = 'ref_ba_drt'\n" +
+                "                                       and ct.class_name = 'ref_balance_account')\n" +
+                "     and cba.entity_value_id = sba.entity_id\n" +
+                "     and sba.attribute_id = (select st.id from vw_simple_attribute st\n" +
+                "                                    where st.class_name = 'ref_balance_account'\n" +
+                "                                      and st.attribute_name = 'no_')\n" +
+                "     and sba.value = ?\n" +
+                "     and ent.id = cdrt.entity_id\n" +
+                "     and cdrt.entity_value_id = sdrt.entity_id\n" +
+                "     and sdrt.value = ?\n" +
+                "     and cdrt.attribute_id = (select ct.id from vw_complex_attribute ct \n" +
+                "                                    where ct.attribute_name = 'debt_remains_type'\n" +
+                "                                       and ct.containing_name = 'ref_ba_drt'\n" +
+                "                                       and ct.class_name = 'ref_debt_remains_type')\n" +
+                "     and sdrt.attribute_id = (select st.id from vw_simple_attribute st\n" +
+                "                                    where st.class_name = 'ref_debt_remains_type'\n" +
+                "                                      and st.attribute_name = 'code')\n" +
+                "     and rownum = 1\n" +
+                "\n";
+
+        int ans = jdbcTemplate.queryForInt(select, new String[]{balanceAccountNo, debtRemainTypeCode});
+
+        return ans > 0;
+
+
+    }
     public static boolean isValidRNN(String rnn)
     {
         String chr;

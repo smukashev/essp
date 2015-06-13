@@ -1,0 +1,166 @@
+rule read $$$
+title: проверка соответсвия бс основного долга текущего остатка и типа остатка
+rule "проверка соответсвия бс основного долга текущего остатка и типа остатка"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& $r : getEl("change.remains.debt.current.balance_account.no_")
+			&& $r != null
+			&& !BRMSHelper.hasBADRT((String)$r, "1"))
+then
+	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка соответсвия бс основного долга просроченного остатка и типа остатка
+rule "проверка соответсвия бс основного долга просроченного остатка и типа остатка"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& $r : getEl("change.remains.debt.pastdue.balance_account.no_")
+			&& $r != null
+			&& !BRMSHelper.hasBADRT((String)$r, "2"))
+then
+	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка соответсвия бс основного долга списанного остатка и типа остатка
+rule "проверка соответсвия бс основного долга списанного остатка и типа остатка"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& $r : getEl("change.remains.debt.write_off.balance_account.no_")
+			&& $r != null
+			&& !BRMSHelper.hasBADRT((String)$r, "3"))
+then
+	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка соответсвия бс вознаграждения текущего остатка и типа остатка
+rule "проверка соответсвия бс вознаграждения текущего остатка и типа остатка"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& $r : getEl("change.remains.interest.current.balance_account.no_")
+			&& $r != null
+			&& !BRMSHelper.hasBADRT((String)$r, "4"))
+then
+	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка соответсвия бс вознаграждения просроченного остатка и типа остатка
+rule "проверка соответсвия бс вознаграждения просроченного остатка и типа остатка"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& $r : getEl("change.remains.interest.pastdue.balance_account.no_")
+			&& $r != null
+			&& !BRMSHelper.hasBADRT((String)$r, "5"))
+then
+	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка соответсвия бс провизий и типа остатка
+rule "проверка соответсвия бс провизий и типа остатка"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& $r : getEl("change.credit_flow.provision.provision_kfn.balance_account.no_")
+			&& $r != null
+			&& !BRMSHelper.hasBADRT((String)$r, "11"))
+then
+	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка соответсвия бс провизий МСФО и типа остатка
+rule "проверка соответсвия бс провизий МСФО и типа остатка"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& $r : getEl("change.credit_flow.provision.provision_msfo.balance_account.no_")
+			&& $r != null
+			&& !BRMSHelper.hasBADRT((String)$r, "12"))
+then
+	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка соответсвия бс провизий МСФО над балансом и типа остатка
+rule "проверка соответсвия бс провизий МСФО над балансом и типа остатка"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& $r : getEl("change.credit_flow.provision.provision_msfo_over_balance.balance_account.no_")
+			&& $r != null
+			&& !BRMSHelper.hasBADRT((String)$r, "13"))
+then
+	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка соответсвия бс корректировки остатка  и типа остатка
+rule "проверка соответсвия бс корректировки остатка  и типа остатка"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& $r : getEl("change.remains.correction.balance_account.no_")
+			&& $r != null
+			&& !BRMSHelper.hasBADRT((String)$r, "8"))
+then
+	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка соответсвия бс дисконта и типа остатка
+rule "проверка соответсвия бс дисконта и типа остатка"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& $r : getEl("change.remains.discount.balance_account.no_")
+			&& $r != null
+			&& !BRMSHelper.hasBADRT((String)$r, "7"))
+then
+	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка соответсвия бс лимита и типа остатка
+rule "проверка соответсвия бс лимита и типа остатка"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& $r : getEl("change.remains.limit.balance_account.no_")
+			&& $r != null
+			&& !BRMSHelper.hasBADRT((String)$r, "10"))
+then
+	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
+end
+$$$
+
+rule save
+
+quit
