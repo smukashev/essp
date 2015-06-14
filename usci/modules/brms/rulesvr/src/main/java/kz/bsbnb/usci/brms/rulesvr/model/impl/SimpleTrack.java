@@ -10,7 +10,11 @@ import kz.bsbnb.usci.brms.rulesvr.persistable.impl.Persistable;
  * Time: 12:42
  */
 public class SimpleTrack extends Persistable implements ISimpleTrack {
+
+    private static final long serialVersionUID = -2781296616323525651L;
+
      public String name;
+    private boolean isActive;
 
     public SimpleTrack() {
     }
@@ -26,5 +30,13 @@ public class SimpleTrack extends Persistable implements ISimpleTrack {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
 }

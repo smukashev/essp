@@ -149,6 +149,21 @@ public class RuleService implements IRuleService {
     }
 
     @Override
+    public String getPackageErrorsOnRuleUpdate(String ruleBody, Long ruleId, String pkgName, Date repDate) {
+        return rulesSingleton.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, repDate, false, false);
+    }
+
+    @Override
+    public String getPackageErrorsOnRuleActivate(String ruleBody, Long ruleId, String pkgName, Date repDate) {
+        return rulesSingleton.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, repDate, true, false);
+    }
+
+    @Override
+    public String getPackageErrorsOnRuleDisable(Long ruleId, String pkgName, Date repDate) {
+        return rulesSingleton.getPackageErrorsOnRuleUpdate("", ruleId, pkgName, repDate, false, true);
+    }
+
+    @Override
     public void clearAllRules() {
         ruleDao.clearAllRules();
     }

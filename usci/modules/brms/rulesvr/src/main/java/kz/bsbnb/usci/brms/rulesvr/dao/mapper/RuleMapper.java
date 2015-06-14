@@ -16,6 +16,7 @@ public class RuleMapper implements RowMapper<Rule> {
         rule.setId(resultSet.getLong("id"));
         rule.setRule(resultSet.getString("rule"));
         rule.setTitle(resultSet.getString("title"));
+        rule.setIsActive(resultSet.getString("is_active").equals("1"));
         return rule;
     }
 }
