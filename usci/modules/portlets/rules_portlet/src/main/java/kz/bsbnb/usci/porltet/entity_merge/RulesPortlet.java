@@ -145,7 +145,9 @@ public class RulesPortlet extends MVCPortlet{
                 case UPDATE_RULE:
                     String ruleBody = resourceRequest.getParameter("ruleBody");
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
-                    String errors = ruleService.getRuleErrors(ruleBody);
+                    String pkgName = resourceRequest.getParameter("pkgName");
+                    date =  df.parse(resourceRequest.getParameter("date"));
+                    String errors = ruleService.getRuleErrorsInPackage(ruleBody, ruleId, pkgName, date);
                     if(errors != null)
                         throw new RuntimeException(errors);
                     ruleService.updateBody(ruleId, ruleBody);

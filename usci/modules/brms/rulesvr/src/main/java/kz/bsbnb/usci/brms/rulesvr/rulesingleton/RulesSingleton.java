@@ -1,11 +1,11 @@
 package kz.bsbnb.usci.brms.rulesvr.rulesingleton;
 
+import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
-import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.util.*;
 
@@ -81,12 +82,12 @@ public class RulesSingleton
 
     private ArrayList<RulePackageError> rulePackageErrors = new ArrayList<RulePackageError>();
 
-    @Autowired(required = false)
-    private IBatchService remoteRuleBatchService;
-    @Autowired(required = false)
-    private IRuleService remoteRuleService;
-    @Autowired(required = false)
-    private IBatchVersionService remoteRuleBatchVersionService;
+    @Autowired
+    private IBatchService ruleBatchService;
+    @Autowired
+    private IRuleDao ruleDao;
+    @Autowired
+    private IBatchVersionService ruleBatchVersionService;
 
     public StatelessKnowledgeSession getSession()
     {
@@ -94,20 +95,16 @@ public class RulesSingleton
     }
 
     public RulesSingleton() {
-        reloadCache();
         kbase = KnowledgeBaseFactory.newKnowledgeBase();
     }
 
+    @PostConstruct
+    public void init(){
+        reloadCache();
+    }
+
     public void reloadCache() {
-        if (remoteRuleBatchService == null ||
-                remoteRuleService == null ||
-                remoteRuleBatchVersionService == null) {
-            logger.warn("RuleServer services are null, using local cache only");
-            //System.out.println("%%%%%%%%%%%%%%%%% no services wiered");
-        } else {
-            //System.out.println("%%%%%%%%%%%%%%%%% filling cache");
             fillPackagesCache();
-        }
     }
 
     public void setRules(String rules)
@@ -147,6 +144,41 @@ public class RulesSingleton
         return null;
     }
 
+    public String getRuleErrorsInPackage(String ruleBody, long ruleId, String pkgName, Date repDate)
+    {
+        BatchVersion batchVersion = ruleBatchVersionService.getBatchVersion(pkgName, repDate);
+        if(batchVersion == null)
+            return "Версия пакета правил остутвует на текущую дату";
+
+        List<Rule> rules = ruleDao.load(batchVersion);
+
+        String packages = "";
+
+        packages += "package test\n";
+        packages += "dialect \"mvel\"\n";
+        packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
+        packages += "import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n";
+
+        for (Rule r : rules)
+        {
+            if(r.getId() != ruleId)
+                packages += r.getRule() + "\n";
+            else
+                packages += ruleBody + "\n";
+        }
+
+        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+
+        kbuilder.add(ResourceFactory.newInputStreamResource(new ByteArrayInputStream(packages.getBytes())),
+                ResourceType.DRL);
+
+        if ( kbuilder.hasErrors() ) {
+            return kbuilder.getErrors().toString();
+        }
+
+        return null;
+    }
+
     private class PackageAgendaFilter implements AgendaFilter
     {
         private String pkgName = "";
@@ -169,7 +201,7 @@ public class RulesSingleton
 
     synchronized public void fillPackagesCache() {
         kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        List<Batch> allBatches = remoteRuleBatchService.getAllBatches();
+        List<Batch> allBatches = ruleBatchService.getAllBatches();
 
         rulePackageErrors.clear();
         ruleCache.clear();
@@ -179,12 +211,12 @@ public class RulesSingleton
                 throw new IllegalArgumentException("Null package recieved from service " + curBatch);
             }
 
-            List<BatchVersion> versions = remoteRuleBatchVersionService.getBatchVersions(curBatch);
+            List<BatchVersion> versions = ruleBatchVersionService.getBatchVersions(curBatch);
 
             ArrayList<RuleCasheEntry> ruleCasheEntries = new ArrayList<RuleCasheEntry>();
 
             for (BatchVersion curVersion : versions) {
-                List<Rule> rules = remoteRuleService.load(curVersion);
+                List<Rule> rules = ruleDao.load(curVersion);
 
                 String packages = "";
 
@@ -253,66 +285,5 @@ public class RulesSingleton
         StatelessKnowledgeSession ksession = getSession();
 
         ksession.execute(entity);
-    }
-
-    synchronized public void update(Long versionId, Date date, String packageName)
-    {
-        //System.out.println("%%%%%%%%%%%%%%%%% Update called!!!");
-        rulePackageErrors.clear();
-
-        BatchVersion curVersion = new BatchVersion();
-        curVersion.setId(versionId);
-        curVersion.setReport_date(date);
-
-        List<Rule> rules = remoteRuleService.load(curVersion);
-
-        String packages = "";
-
-        packages += "package " + packageName + "_" + curVersion.getId() + "\n";
-        packages += "dialect \"mvel\"\n";
-        packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
-        packages += "import kz.bsbnb.usci.brms.rulesingleton.BRMSHelper;\n";
-
-        for (Rule r : rules)
-        {
-            packages += r.getRule() + "\n";
-        }
-
-        logger.debug(packages);
-        //System.out.println("%%%%%%%%%%%%%%%%% packages:" + packages);
-        try {
-            setRules(packages);
-        } catch (Exception e) {
-            e.printStackTrace();
-            rulePackageErrors.add(new RulePackageError(packageName + "_" + curVersion.getId(),
-                    e.getMessage()));
-        }
-
-        ArrayList<RuleCasheEntry> ruleCasheEntries = ruleCache.get(packageName);
-
-        if (ruleCasheEntries != null)
-        {
-            boolean found = false;
-            for (RuleCasheEntry entry : ruleCasheEntries)
-            {
-                if (entry.getRules().equals(packageName + "_" + curVersion.getId())) {
-                    found = true;
-                    entry.setRepDate(curVersion.getReport_date());
-                    break;
-                }
-            }
-
-            if(!found) {
-                ruleCasheEntries.add(new RuleCasheEntry(curVersion.getReport_date(),
-                        packageName + "_" + curVersion.getId()));
-            }
-
-            Collections.sort(ruleCasheEntries);
-        }
-    }
-
-    public ArrayList<RulePackageError> getRulePackageErrors()
-    {
-        return rulePackageErrors;
     }
 }

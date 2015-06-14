@@ -484,7 +484,9 @@ Ext.onReady(function(){
                                     params : {
                                         op : 'UPDATE_RULE',
                                         ruleBody: editor.getSession().getValue(),
-                                        ruleId: editor.ruleId
+                                        ruleId: editor.ruleId,
+                                        date: Ext.Date.format(Ext.getCmp('elemDatePackage').value, 'd.m.Y'),
+                                        pkgName: Ext.getCmp('elemComboPackage').getRawValue()
                                     },
                                     reader: {
                                         type: 'json'
