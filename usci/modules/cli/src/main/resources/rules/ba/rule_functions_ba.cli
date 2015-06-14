@@ -21,6 +21,20 @@ function boolean isBA5thSymbolCorrect(String ba, List subjects){
     return false;
 }
 
+function boolean isBA7thSymbolCorrect(String ba,String currencyCode, Date reportDate){
+    if(ba.length() < 7) return false;
+    if(currencyCode.equals("398"))
+       return ba.charAt(6) == '1';
+
+    boolean isConvertible = BRMSHelper.isCurrencyConvertible(currencyCode, reportDate);
+
+    if(isConvertible)
+        return ba.charAt(6) == '2';
+
+    return ba.charAt(6) == '3';
+
+}
+
 $$$
 
 rule save

@@ -5,10 +5,7 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class BRMSHelper
@@ -100,6 +97,27 @@ public class BRMSHelper
                 "   and rownum = 1\n";
 
         int ans = jdbcTemplate.queryForInt(select, new String[]{iin});
+
+        return ans > 0;
+    }
+
+    public static boolean isCurrencyConvertible(String currencyCode, Date reportDate){
+
+        String select = "select value from (\n" +
+                "select sconv.value,\n" +
+                "       rank() over(order by sconv.report_date desc) as ra\n" +
+                "  from eav_be_boolean_values sconv\n" +
+                " where sconv.report_date <= ? \n" +
+                "   and sconv.is_closed = 0\n" +
+                "   and sconv.entity_id = (select scode.entity_id\n" +
+                "                            from eav_be_string_values scode\n" +
+                "                           where scode.attribute_id = (select atr.id from vw_simple_attribute atr \n" +
+                "                                                         where atr.class_name = 'ref_currency'\n" +
+                "                                                         and atr.attribute_name = 'code')\n" +
+                "                             and scode.value = ?)\n" +
+                ") where ra  = 1";
+
+        int ans = jdbcTemplate.queryForInt(select, new Object[]{reportDate, currencyCode});
 
         return ans > 0;
     }
