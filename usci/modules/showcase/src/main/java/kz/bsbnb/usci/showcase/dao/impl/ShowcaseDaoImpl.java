@@ -34,6 +34,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.activation.UnsupportedDataTypeException;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -120,12 +121,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
     private void createTable(HistoryState historyState, ShowcaseHolder showcaseHolder) {
         String tableName;
-        switch (historyState) {
-            case ACTUAL:
-                tableName = getActualTableName(showcaseHolder.getShowCaseMeta());
-                break;
-            default:
-                tableName = getHistoryTableName(showcaseHolder.getShowCaseMeta());
+
+        if(historyState == HistoryState.ACTUAL) {
+            tableName = getActualTableName(showcaseHolder.getShowCaseMeta());
+        } else {
+            tableName = getHistoryTableName(showcaseHolder.getShowCaseMeta());
         }
 
         Database model = new Database();
@@ -145,102 +145,41 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         table.addColumn(idColumn);
 
-        Map<String, String> prefixToColumn = showcaseHolder.generatePaths();
-
-        // path ids
-        for (String prefix : prefixToColumn.keySet()) {
-            boolean hasFilter = false;
-
-            // Filter check
-            if(!showcaseHolder.getShowCaseMeta().getFilterFieldsList().isEmpty()) {
-                for(ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFilterFieldsList()) {
-                    if(sf.getAttributePath().equals(prefix) ||
-                            ("root." + sf.getAttributePath()).equals(prefix)) {
-                        hasFilter = true;
-                        break;
-                    }
-                }
-            }
-
-            if(!hasFilter) {
-                Column column = new Column();
-                column.setName(COLUMN_PREFIX + prefixToColumn.get(prefix) + "_ID");
-                column.setPrimaryKey(false);
-                column.setRequired(false);
-                column.setType("NUMERIC");
-                column.setSize("14,0");
-                column.setAutoIncrement(false);
-
-                table.addColumn(column);
-            }
-        }
-
-        // Custom fields
-        if (showcaseHolder.getShowCaseMeta().getCustomFieldsList().size() > 0) {
-            for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
-                Column column = new Column();
-
-                if (sf.getAttributePath().equals("ROOT")) { // ROOT ID
-                    column.setName(COLUMN_PREFIX + sf.getColumnName());
-                    column.setPrimaryKey(false);
-                    column.setRequired(false);
-                    column.setType("NUMERIC");
-                    column.setSize("14,0");
-                    column.setAutoIncrement(false);
-                } else {
-                    MetaClass root = metaService.getMetaClass("credit"); // TODO: fix credit arg
-                    String path;
-
-                    if(sf.getAttributePath() == null || sf.getAttributePath().equals("")) {
-                        path = sf.getAttributeName();
-                    } else {
-                        path = sf.getAttributePath();
-                    }
-
-                    IMetaType metaType = root.getEl(path);
-
-                    if(metaType.isComplex()) {
-                        column.setType("NUMERIC");
-                        column.setSize("14,0");
-                    } else {
-                        column.setType(getDBType(metaType));
-                        column.setSize(getDBSize(metaType));
-                    }
-
-                    column.setName(COLUMN_PREFIX + sf.getColumnName());
-                    column.setPrimaryKey(false);
-                    column.setRequired(false);
-                    column.setAutoIncrement(false);
-                }
-
-                table.addColumn(column);
-            }
-        }
-
-        Index indexR = new NonUniqueIndex();
-        indexR.setName("ind_" + tableName + "_" + prefixToColumn.get("root") + "_id");
-        indexR.addColumn(new IndexColumn(COLUMN_PREFIX + prefixToColumn.get("root") + "_id"));
-        table.addIndex(indexR);
-
         for (ShowCaseField field : showcaseHolder.getShowCaseMeta().getFieldsList()) {
-            if (field.getAttributeName().equals(""))
-                continue;
-
             Column column = new Column();
-
             column.setName(COLUMN_PREFIX + field.getColumnName().toUpperCase());
             column.setPrimaryKey(false);
             column.setRequired(false);
 
-            IMetaType metaType = showcaseHolder.getShowCaseMeta().getActualMeta().getEl(field.getPath());
+            IMetaType metaType = showcaseHolder.getShowCaseMeta().getActualMeta().getEl(field.getAttributePath());
 
             column.setType(getDBType(metaType));
+            column.setSize(getDBSize(metaType));
 
-            String columnSize = getDBSize(metaType);
+            //column.setDefaultValue(xmlReader.getAttributeValue(idx));
+            column.setAutoIncrement(false);
+            //column.setDescription(xmlReader.getAttributeValue(idx));
+            //column.setJavaName(xmlReader.getAttributeValue(idx));
 
-            if (columnSize != null) {
-                column.setSize(columnSize);
+            table.addColumn(column);
+        }
+
+        for (ShowCaseField field : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
+            Column column = new Column();
+            column.setName(COLUMN_PREFIX + field.getColumnName().toUpperCase());
+            column.setPrimaryKey(false);
+            column.setRequired(false);
+
+            IMetaType metaType;
+
+            if(field.getAttributePath().equals("root")) {
+                metaType = metaService.getMetaClass(field.getMetaId());
+            } else {
+                metaType = metaService.getMetaClass(field.getMetaId()).getEl(field.getAttributePath());
             }
+
+            column.setType(getDBType(metaType));
+            column.setSize(getDBSize(metaType));
 
             //column.setDefaultValue(xmlReader.getAttributeValue(idx));
             column.setAutoIncrement(false);
@@ -255,11 +194,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         column.setPrimaryKey(false);
         column.setRequired(false);
         column.setType("DATE");
-        Index indexCDC = new NonUniqueIndex();
-        indexCDC.setName("ind_" + tableName + "_CDC");
-        indexCDC.addColumn(new IndexColumn("CDC"));
-        table.addIndex(indexCDC);
-        table.addColumn(column);
 
         if(!showcaseHolder.getShowCaseMeta().isFinal()) {
             column = new Column();
@@ -267,6 +201,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             column.setPrimaryKey(false);
             column.setRequired(false);
             column.setType("DATE");
+
             Index indexOD = new NonUniqueIndex();
             indexOD.setName("ind_" + tableName + "_OPEN_DATE");
             indexOD.addColumn(new IndexColumn("OPEN_DATE"));
@@ -278,6 +213,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             column.setPrimaryKey(false);
             column.setRequired(false);
             column.setType("DATE");
+
             Index indexCD = new NonUniqueIndex();
             indexCD.setName("ind_" + tableName + "_CLOSE_DATE");
             indexCD.addColumn(new IndexColumn("CLOSE_DATE"));
@@ -289,6 +225,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             column.setPrimaryKey(false);
             column.setRequired(false);
             column.setType("DATE");
+
             Index indexRD = new NonUniqueIndex();
             indexRD.setName("ind_" + tableName + "_REP_DATE");
             indexRD.addColumn(new IndexColumn("REP_DATE"));
@@ -334,21 +271,15 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         for(ShowCaseField sf : showCaseHolder.getShowCaseMeta().getCustomFieldsList()) {
             sql.append(sf.getColumnName()).append(", ");
             values.append("?, ");
-            Object o;
-
-            if(sf.getAttributePath().equals("")) {
-                o = entity.getEl(sf.getAttributeName());
-            } else {
-                o = entity.getEl(sf.getAttributePath());
-            }
+            Object element = entity.getEl(sf.getAttributePath());
 
             try {
-                if (o instanceof BaseEntity) {
-                    vals[i++] = ((BaseEntity) o).getId();
-                } else if(o instanceof Date) {
-                    vals[i++] = DataUtils.convert((Date) o);
+                if (element instanceof BaseEntity) {
+                    vals[i++] = ((BaseEntity) element).getId();
+                } else if(element instanceof Date) {
+                    vals[i++] = DataUtils.convert((Date) element);
                 } else {
-                    vals[i++] = o;
+                    vals[i++] = element;
                 }
             } catch(Exception e) {
                 e.printStackTrace();
@@ -449,27 +380,12 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         StringBuilder select = new StringBuilder();
         StringBuilder sql = new StringBuilder("insert into %s");
 
-        for (String s : showcaseHolder.generatePaths().values()) {
-            boolean hasFilter = false;
-
-            for(ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFilterFieldsList()) {
-                if(s.equals(sf.getAttributePath()))  {
-                    hasFilter = true;
-                    break;
-                }
-            }
-
-            if(!hasFilter)
-                select.append(COLUMN_PREFIX).append(s).append("_id").append(",");
-        }
+        for (String s : showcaseHolder.generatePaths().values())
+            select.append(COLUMN_PREFIX).append(s).append("_id").append(",");
 
         // default fields
-        for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFieldsList()) {
-            if (sf.getAttributeName().equals(""))
-                continue;
-
+        for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFieldsList())
             select.append(COLUMN_PREFIX).append(sf.getColumnName()).append(",");
-        }
 
         // custom fields
         for(ShowCaseField sf : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
@@ -642,65 +558,13 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             jdbcTemplateSC.update(sql, entity.getId(), openDate);
         }
 
-        int n = showcaseHolder.getShowCaseMeta().getFieldsList().size();
+        int fieldSize = showcaseHolder.getShowCaseMeta().getFieldsList().size();
 
-        ShowCaseEntries[] showCases = new ShowCaseEntries[n];
-        int i = 0;
-
-        for (ShowCaseField field : showcaseHolder.getShowCaseMeta().getFieldsList()) {
-            showCases[i] = new ShowCaseEntries(entity, field.getAttributeName().equals("") ?
-                    field.getAttributePath() : field.getAttributePath() + "." + field.getAttributeName(),
-                    field.getColumnName(), showcaseHolder.generatePaths());
-            i++;
-        }
-
-        int allRecordsSize = 0;
-        for (i = 0; i < n; i++)
-            allRecordsSize += showCases[i].getEntriesSize();
-
-        boolean[] was = new boolean[allRecordsSize];
-        boolean[] usedGroup = new boolean[n];
-        int[] id = new int[allRecordsSize];
-
-        List<HashMap> entries = new ArrayList<>(allRecordsSize);
-
-        int yk = 0;
-        for (i = 0; i < n; i++)
-            for (HashMap m : showCases[i].getEntries()) {
-                entries.add(yk, m);
-                id[yk] = i;
-                yk++;
-            }
-
-        boolean found = true;
-
-        while (found) {
-            found = false;
-
-            for (i = 0; i < allRecordsSize; i++)
-                if (!was[i]) {
-                    was[i] = true;
-                    HashMap map = (HashMap) entries.get(i).clone();
-                    found = true;
-
-                    Arrays.fill(usedGroup, false);
-                    usedGroup[id[i]] = true;
-
-                    for (int j = 0; j < allRecordsSize; j++)
-                        if (i != j && !was[j] && !usedGroup[id[j]])
-                            if (merge(map, entries.get(j))) {
-                                was[j] = true;
-                                usedGroup[id[j]] = true;
-                            }
-
-                    persistMap(map, openDate, closeDate, showcaseHolder, globalEntity);
-                }
-        }
     }
 
     public boolean compareValues(HistoryState state, IBaseEntity entity, ShowcaseHolder showcaseHolder, Long recordId) {
         boolean equalityFlag = true;
-        List<HashMap<String, String>> mapList = new ArrayList<>();
+        /* List<HashMap<String, String>> mapList = new ArrayList<>();
         int fieldSize = showcaseHolder.getShowCaseMeta().getFieldsList().size();
 
         ShowCaseEntries[] showCases = new ShowCaseEntries[fieldSize];
@@ -831,14 +695,13 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 }
             }
         }
-
+*/
         return equalityFlag;
     }
 
     private String getDBType(IMetaType type) {
         if (type.isComplex())
-            throw new IllegalArgumentException("ShowCase can't contain coplexType columns: "
-                    + type.toString());
+            return "NUMERIC";
 
         if (type instanceof MetaSet)
             type = ((MetaSet) type).getMemberType();
@@ -866,12 +729,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     private String getDBSize(IMetaType type) {
-        if (type.isComplex())
-            throw new IllegalArgumentException("ShowCase can't contain coplexType columns");
+        if(type.isComplex())
+            return "10, 0";
 
         if (type instanceof MetaSet)
             type = ((MetaSet) type).getMemberType();
-
 
         if (type.isSet())
             throw new IllegalArgumentException("ShowCase can't contain set columns");
@@ -879,7 +741,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         MetaValue metaValue = (MetaValue) type;
 
         switch (metaValue.getTypeCode()) {
-
             case INTEGER:
                 return "10,0";
             case DATE:
@@ -930,10 +791,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         showCase.setMeta(metaClass);
 
         select = context
-                .select(EAV_SC_SHOWCASE_FIELDS.ID, EAV_SC_SHOWCASE_FIELDS.TITLE, EAV_SC_SHOWCASE_FIELDS.NAME,
-                        EAV_SC_SHOWCASE_FIELDS.COLUMN_NAME, EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_ID,
-                        EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_NAME, EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH,
-                        EAV_SC_SHOWCASE_FIELDS.TYPE)
+                .select(EAV_SC_SHOWCASE_FIELDS.ID, EAV_SC_SHOWCASE_FIELDS.COLUMN_NAME, EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_ID,
+                        EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH, EAV_SC_SHOWCASE_FIELDS.TYPE)
                 .from(EAV_SC_SHOWCASE_FIELDS)
                 .where(EAV_SC_SHOWCASE_FIELDS.SHOWCASE_ID.equal(showCase.getId()));
 
@@ -944,18 +803,10 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         if (rows.size() > 0) {
             for (Map<String, Object> curRow : rows) {
                 ShowCaseField showCaseField = new ShowCaseField();
-                showCaseField.setName((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.NAME.getName()));
-                showCaseField.setTitle((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.TITLE.getName()));
                 showCaseField.setColumnName((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.COLUMN_NAME.getName()));
                 showCaseField.setType(((BigDecimal) curRow.get(EAV_SC_SHOWCASE_FIELDS.TYPE.getName())).intValue());
-                showCaseField.setAttributeName((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_NAME.getName()));
-
-                if (curRow.get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH.getName()) != null) {
-                    showCaseField.setAttributePath((String) curRow.
-                            get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH.getName()));
-                } else {
-                    showCaseField.setAttributePath("");
-                }
+                showCaseField.setAttributePath((String) curRow.
+                        get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH.getName()));
 
                 showCaseField.setAttributeId(((BigDecimal) curRow
                         .get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_ID.getName())).longValue());
@@ -965,8 +816,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
                 if (showCaseField.getType() == ShowCaseField.ShowCaseFieldTypes.CUSTOM) {
                     showCase.addCustomField(showCaseField);
-                } else if (showCaseField.getType() == ShowCaseField.ShowCaseFieldTypes.FILTER) {
-                    showCase.addFilterField(showCaseField);
                 } else {
                     showCase.addField(showCaseField);
                 }
@@ -1025,13 +874,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     private long insertField(ShowCaseField showCaseField, long showCaseId) {
         Insert insert = context
                 .insertInto(EAV_SC_SHOWCASE_FIELDS)
+                .set(EAV_SC_SHOWCASE_FIELDS.META_ID, showCaseField.getMetaId())
                 .set(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_ID, showCaseField.getAttributeId())
-                .set(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_NAME, showCaseField.getAttributeName())
                 .set(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH, showCaseField.getAttributePath())
                 .set(EAV_SC_SHOWCASE_FIELDS.COLUMN_NAME, showCaseField.getColumnName())
-                .set(EAV_SC_SHOWCASE_FIELDS.NAME, showCaseField.getName())
                 .set(EAV_SC_SHOWCASE_FIELDS.SHOWCASE_ID, showCaseId)
-                .set(EAV_SC_SHOWCASE_FIELDS.TITLE, showCaseField.getTitle())
                 .set(EAV_SC_SHOWCASE_FIELDS.TYPE, showCaseField.getType());
 
         logger.debug(insert.toString());
@@ -1065,9 +912,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             insertField(sf, showCase.getId());
 
         for (ShowCaseField sf : showCase.getCustomFieldsList())
-            insertField(sf, showCase.getId());
-
-        for (ShowCaseField sf : showCase.getFilterFieldsList())
             insertField(sf, showCase.getId());
 
         return showCaseId;
@@ -1109,10 +953,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         for(ShowCaseField sf : showCaseSaving.getCustomFieldsList())
             insertField(sf, showCaseSaving.getId());
-
-        for(ShowCaseField sf : showCaseSaving.getFilterFieldsList())
-            insertField(sf, showCaseSaving.getId());
-
     }
 
     long insertWithId(String query, Object[] values) {

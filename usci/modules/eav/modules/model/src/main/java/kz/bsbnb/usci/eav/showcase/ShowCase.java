@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.eav.showcase;
 
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
@@ -19,7 +18,6 @@ public class ShowCase extends Persistable {
 
     private ArrayList<ShowCaseField> fields = new ArrayList<ShowCaseField>();
     private ArrayList<ShowCaseField> customFields = new ArrayList<ShowCaseField>();
-    private ArrayList<ShowCaseField> filterFields = new ArrayList<ShowCaseField>();
 
     public ShowCase() {
         super();
@@ -62,10 +60,7 @@ public class ShowCase extends Persistable {
     }
 
     public void setDownPath(String downPath) {
-        if (downPath == null)
-            this.downPath = "";
-        else
-            this.downPath = downPath;
+        this.downPath = downPath;
     }
 
     public void addField(ShowCaseField field) {
@@ -74,10 +69,6 @@ public class ShowCase extends Persistable {
 
     public void addCustomField(ShowCaseField field) {
         customFields.add(field);
-    }
-
-    public void addFilterField(ShowCaseField field) {
-        filterFields.add(field);
     }
 
     public boolean isFinal() {
@@ -96,115 +87,52 @@ public class ShowCase extends Persistable {
         return (MetaClass) meta.getEl(downPath);
     }
 
-    public void addField(String path, String name) {
+    public void addField(String attributePath, String columnName) {
         if (meta == null)
-            throw new IllegalArgumentException("meta not set for showcase");
+            throw new IllegalArgumentException("customMeta not set for showcase");
 
-        addField(path, name, name);
-    }
-
-    public void addField(String path, String name, String columnName) {
-        if (meta == null)
-            throw new IllegalArgumentException("meta not set for showcase");
-
-        IMetaAttribute attr = getActualMeta().getElAttribute(path + "." + name);
+        IMetaAttribute attr = getActualMeta().getElAttribute(attributePath);
 
         if (attr == null)
-            throw new IllegalArgumentException(getName() + ": Can't get attribute: " + path + "." + name);
-
-        IMetaType metaType = attr.getMetaType();
+            throw new IllegalArgumentException(getName() + ": Can't get attribute: " + attributePath);
 
         ShowCaseField showCaseField = new ShowCaseField();
+        showCaseField.setMetaId(this.getActualMeta().getId());
         showCaseField.setAttributeId(attr.getId());
-        showCaseField.setName(columnName);
-        showCaseField.setAttributePath(path);
-        showCaseField.setAttributeName(name);
+        showCaseField.setAttributePath(attributePath);
         showCaseField.setColumnName(columnName);
-        showCaseField.setTitle(attr.getTitle());
-
-        if (metaType.isComplex()) {
-            showCaseField.setAttributePath(path.equals("") ? name : path + "." + name);
-            showCaseField.setAttributeName("");
-        }
 
         addField(showCaseField);
     }
 
-    public void addCustomField(String path, String name, String columnName, MetaClass meta) {
-        if (meta == null)
-            throw new IllegalArgumentException("meta can't be null");
+    public void addCustomField(String attributePath, String columnName, MetaClass customMeta) {
+        if (customMeta == null)
+            throw new IllegalArgumentException("customMeta can't be null");
 
-        if(!name.equals("root")) {
-            IMetaAttribute metaAttribute = meta.getElAttribute(path + "." + name);
+        IMetaAttribute attr = null;
+        if(!attributePath.equals("root"))
+            attr = customMeta.getElAttribute(attributePath);
 
-            if (metaAttribute == null)
-                throw new IllegalArgumentException("Can't get attribute: " + path + "." + name);
-
-            IMetaType metaType = metaAttribute.getMetaType();
-
-            ShowCaseField showCaseField = new ShowCaseField();
-            showCaseField.setAttributeId(metaAttribute.getId());
-            showCaseField.setName(columnName);
-            showCaseField.setAttributePath(path);
-            showCaseField.setAttributeName(name);
-            showCaseField.setColumnName(columnName);
-            showCaseField.setTitle(metaAttribute.getTitle());
-            showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.CUSTOM);
-
-            if (metaType.isComplex()) {
-                showCaseField.setAttributePath(path.equals("") ? name : path + "." + name);
-                showCaseField.setAttributeName("");
-            }
-
-            customFields.add(showCaseField);
-        } else {
-            ShowCaseField showCaseField = new ShowCaseField();
-            showCaseField.setAttributeId(meta.getId());
-            showCaseField.setName(columnName);
-            showCaseField.setAttributePath("ROOT");
-            showCaseField.setAttributeName(name);
-            showCaseField.setColumnName(columnName);
-            showCaseField.setTitle("ROOT_ID");
-            showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.CUSTOM);
-
-            customFields.add(showCaseField);
-        }
-    }
-
-    public void addFilterField(String path, String name) {
-        if (meta == null)
-            throw new IllegalArgumentException("meta not set for showcase");
-
-        IMetaAttribute attr = getActualMeta().getElAttribute(path + "." + name);
-
-        if (attr == null)
-            throw new IllegalArgumentException(getName() + ": Can't get attribute: " + path + "." + name);
-
-        IMetaType metaType = attr.getMetaType();
+        if (attr == null && !attributePath.equals("root"))
+            throw new IllegalArgumentException(getName() + ": Can't get attribute: " + attributePath);
 
         ShowCaseField showCaseField = new ShowCaseField();
-        showCaseField.setAttributeId(attr.getId());
-        showCaseField.setName(name);
-        showCaseField.setAttributePath(path);
-        showCaseField.setAttributeName(name);
-        showCaseField.setColumnName(name);
-        showCaseField.setTitle(attr.getTitle());
-        showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.FILTER);
 
-        if (metaType.isComplex()) {
-            showCaseField.setAttributePath(path.equals("") ? name : path + "." + name);
-            showCaseField.setAttributeName("");
-        }
+        if(attr != null)
+            showCaseField.setAttributeId(attr.getId());
+        else
+            showCaseField.setAttributeId(0L);
 
-        filterFields.add(showCaseField);
+        showCaseField.setMetaId(customMeta.getId());
+        showCaseField.setAttributePath(attributePath);
+        showCaseField.setColumnName(columnName);
+        showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.CUSTOM);
+
+        customFields.add(showCaseField);
     }
 
     public ArrayList<ShowCaseField> getCustomFieldsList() {
         return customFields;
-    }
-
-    public ArrayList<ShowCaseField> getFilterFieldsList() {
-        return filterFields;
     }
 
     public List<ShowCaseField> getFieldsList() {
@@ -219,7 +147,7 @@ public class ShowCase extends Persistable {
                 ", title='" + title + '\'' +
                 ", downPath='" + downPath + '\'' +
                 ", isFinal=" + isFinal +
-                ", meta=" + (meta != null ? meta.getClassName() : null) +
+                ", customMeta=" + (meta != null ? meta.getClassName() : null) +
                 '}';
     }
 }
