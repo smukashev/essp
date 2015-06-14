@@ -97,6 +97,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
             statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
 
             List<String> errors = new LinkedList<String>(entity.getValidationErrors());
+            String ruleRuntimeException = null;
 
             if(global.isRulesEnabled() && entity.getMeta() != null &&
                     metaRules.contains(entity.getMeta().getClassName())) {
@@ -109,10 +110,21 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                     sqlStats.put(entity.getMeta().getClassName() + "_parser", System.currentTimeMillis() - t1);
                 } catch (Exception e) {
                     logger.error("Can't run rules: " + e.getMessage());
+                    ruleRuntimeException = e.getMessage();
                 }
             }
 
-            if (errors != null && errors.size() > 0) {
+            if(ruleRuntimeException != null) {
+                ruleRuntimeException = "Ошибка при запуске правил: " + ruleRuntimeException;
+                entityStatusJModel = new EntityStatusJModel(
+                        entity.getBatchIndex() - 1,
+                        EntityStatuses.ERROR, ruleRuntimeException, new Date());
+
+                entityStatusJModel.addProperty(StatusProperties.CONTRACT_NO, contractNo);
+                entityStatusJModel.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
+
+                statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
+            } else if (errors != null && errors.size() > 0) {
                 for (String errorMsg : errors) {
                     System.out.println(errorMsg);
                     //TODO: check for error with Index
