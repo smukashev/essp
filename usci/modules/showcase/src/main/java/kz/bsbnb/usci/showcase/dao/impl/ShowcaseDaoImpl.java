@@ -779,7 +779,15 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         COLUMN_PREFIX, showcaseHolder.getRootClassName(), entity.getReportDate());
             }
 
-            Map dbElement = jdbcTemplateSC.queryForMap(sql, recordId);
+            Map dbElement = null;
+            try {
+                dbElement = jdbcTemplateSC.queryForMap(sql, recordId);
+            } catch(Exception e) {
+                System.err.println(sql);
+                System.out.println(recordId);
+                logger.error("Error: " + sql + " " + recordId);
+                return false;
+            }
 
             for(String colName : mapElement.keySet()) {
                 Object newValue = mapElement.get(colName);
