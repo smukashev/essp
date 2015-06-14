@@ -779,13 +779,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         COLUMN_PREFIX, showcaseHolder.getRootClassName(), entity.getReportDate());
             }
 
-            Map dbElement = null;
+            Map dbElement;
             try {
                 dbElement = jdbcTemplateSC.queryForMap(sql, recordId);
             } catch(Exception e) {
-                System.err.println(sql);
-                System.out.println(recordId);
-                logger.error("Error: " + sql + " " + recordId);
+                System.err.println(sql + " " + recordId);
                 return false;
             }
 
