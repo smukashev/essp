@@ -1,0 +1,16 @@
+rule read $$$
+title: проверка 7 символа  бс основного долга текущего остатка
+rule "проверка 7 символа  бс основного долга текущего остатка"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& $r : getEl("change.remains.debt.current.balance_account.no_")
+			&& $r != null
+			&& !isBA7thSymbolCorrect((String)$r, (String)getEl("currency.code"), getReportDate()))
+then
+	$entity.addValidationError("7й символ балансового счета  неккоректный: " + $r);
+end
+$$$
+
+rule save
+
+quit

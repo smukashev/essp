@@ -17,6 +17,7 @@ rule import modules/cli/src/main/resources/rules/docs/rule_functions_ain.cli
 rule import modules/cli/src/main/resources/rules/docs/rule_ain.cli
 rule import modules/cli/src/main/resources/rules/ba/rule_functions_ba.cli
 rule import modules/cli/src/main/resources/rules/ba/rule_ba_5.cli
+rule import modules/cli/src/main/resources/rules/ba/rule_ba_7.cli
 rule import modules/cli/src/main/resources/rules/ba/rule_bact.cli
 rule import modules/cli/src/main/resources/rules/ba/rule_badrt.cli
 
