@@ -80,7 +80,7 @@ public class ShowCase extends Persistable {
     }
 
     public MetaClass getActualMeta() {
-        if (downPath.equals(""))
+        if (downPath == null || downPath.equals(""))
             return meta;
         if (meta.getElAttribute(downPath).getMetaType().isSet())
             return (MetaClass) ((MetaSet) meta.getEl(downPath)).getMemberType();
