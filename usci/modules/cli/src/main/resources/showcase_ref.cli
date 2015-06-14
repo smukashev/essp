@@ -7,7 +7,8 @@ showcase set meta ref_creditor
 showcase set name REF_CREDITOR_DOC
 showcase set tableName REF_CREDITOR_DOC
 
-showcase list add docs docs_id
+showcase list add docs doc_id
+showcase list add docs.doc_type doc_type_id
 
 showcase list add docs.no no
 showcase list add docs.doc_type.code doc_type_code
