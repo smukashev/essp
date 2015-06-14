@@ -151,9 +151,12 @@ public class ShowcaseMessageConsumer implements MessageListener {
             try {
                 while(true) {
                     lock.readLock().lock();
-                    if(!syncSet.contains(syncKey)) break;
-                    lock.readLock().unlock();
+                    if(!syncSet.contains(syncKey)) {
+                        lock.readLock().unlock();
+                        break;
+                    }
 
+                    lock.readLock().unlock();
                     Thread.sleep(50);
                 }
 
