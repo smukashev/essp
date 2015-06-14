@@ -20,17 +20,24 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Component
 public class ShowcaseMessageConsumer implements MessageListener {
     final static Logger logger = Logger.getLogger(ShowcaseMessageConsumer.class);
+
     @Autowired
     SQLQueriesStats stats;
+
     @Autowired
     ShowcaseDao showcaseDao;
+
     private ExecutorService exec = Executors.newCachedThreadPool();
 
-    private HashSet<SyncKey> syncSet = new HashSet<>();
+    private static ReadWriteLock lock = new ReentrantReadWriteLock();
+
+    private static HashSet<SyncKey> syncSet = new HashSet<>();
 
     private class SyncKey {
         public Long entityId;
@@ -139,18 +146,28 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
         @Override
         public void run() {
-            SyncKey syncKey = new SyncKey(entity.getId(),
-                    holder.getShowCaseMeta().getId());
+            SyncKey syncKey = new SyncKey(entity.getId(), holder.getShowCaseMeta().getId());
 
             try {
-                while (syncSet.contains(syncKey)) Thread.sleep(50);
+                while(true) {
+                    lock.readLock().lock();
+                    if(!syncSet.contains(syncKey)) break;
+                    lock.readLock().unlock();
 
+                    Thread.sleep(50);
+                }
+
+                lock.writeLock().lock();
                 syncSet.add(syncKey);
+                lock.writeLock().unlock();
+
                 showcaseDao.generate(entity, holder);
             } catch(Exception e) {
                 e.printStackTrace();
             } finally {
+                lock.writeLock().lock();
                 syncSet.remove(syncKey);
+                lock.writeLock().unlock();
             }
         }
     }
