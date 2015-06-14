@@ -144,8 +144,13 @@ public class RulesSingleton
         return null;
     }
 
-    public String getRuleErrorsInPackage(String ruleBody, long ruleId, String pkgName, Date repDate)
+    public String getPackageErrorsOnRuleUpdate(String ruleBody, long ruleId,
+                                               String pkgName, Date repDate, boolean makeActive, boolean makeInActive)
     {
+
+        if(makeActive && makeInActive)
+            throw new IllegalArgumentException("non proper method call");
+
         BatchVersion batchVersion = ruleBatchVersionService.getBatchVersion(pkgName, repDate);
         if(batchVersion == null)
             return "Версия пакета правил остутвует на текущую дату";
@@ -161,6 +166,12 @@ public class RulesSingleton
 
         for (Rule r : rules)
         {
+            if(!r.isActive() && !(r.getId() == ruleId && makeActive))
+                continue;
+
+            if(r.getId() == ruleId && makeInActive)
+                continue;
+
             if(r.getId() != ruleId)
                 packages += r.getRule() + "\n";
             else

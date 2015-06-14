@@ -103,6 +103,7 @@ public class RulesPortlet extends MVCPortlet{
         RUN_RULE,
         FLUSH,
         RENAME_RULE,
+        RULE_SWITCH,
 
         LIST_ALL,
         LIST_CLASS,
@@ -147,7 +148,7 @@ public class RulesPortlet extends MVCPortlet{
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     String pkgName = resourceRequest.getParameter("pkgName");
                     date =  df.parse(resourceRequest.getParameter("date"));
-                    String errors = ruleService.getRuleErrorsInPackage(ruleBody, ruleId, pkgName, date);
+                    String errors = ruleService.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, date);
                     if(errors != null)
                         throw new RuntimeException(errors);
                     ruleService.updateBody(ruleId, ruleBody);
@@ -193,6 +194,25 @@ public class RulesPortlet extends MVCPortlet{
                     title = resourceRequest.getParameter("title");
                     ruleService.renameRule(ruleId, title);
                     break;
+                case RULE_SWITCH:
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    pkgName = resourceRequest.getParameter("pkgName");
+                    date = df.parse(resourceRequest.getParameter("date"));
+                    boolean makeActive = resourceRequest.getParameter("newValue").equals("true");
+                    String error = null;
+                    ruleBody = resourceRequest.getParameter("ruleBody");
+
+                    if(makeActive)
+                        error = ruleService.getPackageErrorsOnRuleActivate(ruleBody, ruleId, pkgName, date);
+                    else
+                        error = ruleService.getPackageErrorsOnRuleDisable(ruleId, pkgName, date);
+
+                    if(error != null) {
+                        //writer.write("{ \"success\": false, \"errorMessage\": \""+ error.replaceAll("\n", "")+"\"}");
+                        writer.write(JsonMaker.getNegativeJson(error));
+                    } else {
+                        writer.write(JsonMaker.getJson(true));
+                    }
             }
 
         } catch (Exception e) {
