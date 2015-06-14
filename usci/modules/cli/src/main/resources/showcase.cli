@@ -407,12 +407,14 @@ showcase save
 showcase set meta portfolio_data
 showcase set name CORE_PORTFOLIO_FLOW_KFN
 showcase set tableName CORE_PORTFOLIO_FLOW_KFN
+showcase set downPath portfolio_flows_kfn
 showcase set final true
 
-showcase list add creditor portfolio_data_creditor_id
-showcase list add portfolio_flows_kfn.details.balance_account
-showcase list add portfolio_flows_kfn.details.value
-showcase list add portfolio_flows_kfn.portfolio.creditor
+showcase list add details.balance_account
+showcase list add details.value
+showcase list add portfolio.creditor
+
+showcase list addCustom portfolio_data creditor portfolio_data_creditor_id
 
 showcase save
 
@@ -423,13 +425,15 @@ showcase save
 showcase set meta portfolio_data
 showcase set name CORE_PORTFOLIO_FLOW_MSFO
 showcase set tableName CORE_PORTFOLIO_FLOW_MSFO
+showcase set downPath portfolio_flows_msfo
 showcase set final true
 
-showcase list add creditor portfolio_data_creditor_id
-showcase list add portfolio_flows_msfo.details.balance_account
-showcase list add portfolio_flows_msfo.details.value
-showcase list add portfolio_flows_msfo.portfolio.creditor
-showcase list add portfolio_flows_msfo.discounted_value
+showcase list add details.balance_account
+showcase list add details.value
+showcase list add portfolio.creditor
+showcase list add discounted_value
+
+showcase list addCustom portfolio_data creditor portfolio_data_creditor_id
 
 showcase save
 
