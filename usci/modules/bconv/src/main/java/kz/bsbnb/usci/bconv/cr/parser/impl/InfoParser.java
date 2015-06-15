@@ -3,15 +3,21 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.TypeErrorException;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import kz.bsbnb.usci.eav.model.RefListResponse;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
@@ -55,7 +61,37 @@ public class InfoParser extends BatchParser {
             //currentBaseEntity.put("code",new BaseValue(batch,index,777));
         } else if(localName.equals("code")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("code", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
+            String crCode = event.asCharacters().getData();
+            IBaseEntityProcessorDao processorDao = baseEntityRepository.getBaseEntityProcessorDao();
+            RefListResponse refListResponse = processorDao.getRefListResponse(
+                    metaClassRepository.getMetaClass("ref_creditor").getId(), batch.getRepDate(), false);
+
+            boolean found = false;
+
+            for(Map<String,Object> m : refListResponse.getData())
+                if(m.get("CODE") != null && m.get("CODE").equals(crCode)){
+                    long creditorId = ((BigDecimal)m.get("ID")).longValue();
+                    IBaseEntity loadedCreditor = processorDao.load(creditorId);
+                    BaseSet creditorDocsLoaded = (BaseSet)loadedCreditor.getEl("docs");
+                    BaseSet creditorDocs = new BaseSet(metaClassRepository.getMetaClass("document"));
+                    for(IBaseValue bv:  creditorDocsLoaded.get()) {
+                        BaseEntity docLoaded = (BaseEntity) bv.getValue();
+                        BaseEntity doc = new BaseEntity(metaClassRepository.getMetaClass("document"),batch.getRepDate());
+                        doc.put("no", new BaseValue(batch,index, docLoaded.getEl("no")));
+
+                        BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),batch.getRepDate());
+                        docType.put("code",new BaseEntityStringValue(batch,index,
+                                (String)docLoaded.getEl("doc_type.code")));
+                        doc.put("doc_type", new BaseEntityComplexValue(batch, index, docType));
+                        creditorDocs.put(new BaseValue(batch,index, doc));
+                    }
+                    currentBaseEntity.put("docs",new BaseEntityComplexSet(batch,index,creditorDocs));
+                    found = true;
+                    break;
+                }
+
+            if(!found)
+                currentBaseEntity.addValidationError(String.format("Кредитор с кодом %s не найден", crCode));
         } else if(localName.equals("docs")) {
             docs = new BaseSet(metaClassRepository.getMetaClass("document"));
             //docs = new Docs();
@@ -76,17 +112,19 @@ public class InfoParser extends BatchParser {
             currentDoc.put("no",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
         } else if(localName.equals("account_date")) {
             event = (XMLEvent) xmlReader.next();
+            String dateRaw = event.asCharacters().getData();
             try {
-                accountDate = new BaseEntityDateValue(batch,index,dateFormat.parse(event.asCharacters().getData()));
+                accountDate = new BaseEntityDateValue(batch,index,dateFormat.parse(dateRaw));
             } catch (ParseException e) {
-                System.out.println(e.getMessage());
+                currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }
         } else if(localName.equals("report_date")) {
             event = (XMLEvent) xmlReader.next();
+            String dateRaw = event.asCharacters().getData();
             try {
-                reportDate = new BaseEntityDateValue(batch,index,dateFormat.parse(event.asCharacters().getData()));
+                reportDate = new BaseEntityDateValue(batch,index,dateFormat.parse(dateRaw));
             } catch (ParseException e) {
-                System.out.println(e.getMessage());
+                currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }
         } else if(localName.equals("actual_credit_count")) {
             event = (XMLEvent) xmlReader.next();
