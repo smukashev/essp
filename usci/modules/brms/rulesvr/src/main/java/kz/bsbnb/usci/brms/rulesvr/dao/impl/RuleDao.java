@@ -92,7 +92,7 @@ public class RuleDao implements IRuleDao {
 
     @Override
     public List<SimpleTrack> getRuleTitles(Long packageId, Date repDate) {
-        String SQL = "SELECT id, title AS NAME FROM " + PREFIX_ + "rules WHERE id IN (\n" +
+        String SQL = "SELECT id, title AS NAME, is_active as isActive FROM " + PREFIX_ + "rules WHERE id IN (\n" +
                 "SELECT rule_id FROM " + PREFIX_ + "rule_package_versions WHERE package_versions_id = \n" +
                 "(SELECT id FROM " + PREFIX_ + "package_versions WHERE REPORT_DATE = \n" +
                 "    (SELECT MAX(REPORT_DATE) FROM " + PREFIX_ + "package_versions WHERE package_id = ? AND REPORT_DATE <= ? ) \n" +

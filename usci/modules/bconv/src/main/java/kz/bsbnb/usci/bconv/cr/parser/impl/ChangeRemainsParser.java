@@ -92,7 +92,15 @@ public class ChangeRemainsParser extends BatchParser {
             //xmlReader.setContentHandler(contentHandler);
             return true;
         } else if(localName.equals("debt")) {
+            for(String e: changeRemainsDebtParser.getCurrentBaseEntity().getValidationErrors()){
+                getCurrentBaseEntity().addValidationError(e);
+            }
+            changeRemainsDebtParser.getCurrentBaseEntity().clearValidationErrors();
         } else if(localName.equals("interest")) {
+            for(String e: changeRemainsInterestParser.getCurrentBaseEntity().getValidationErrors()){
+                getCurrentBaseEntity().addValidationError(e);
+            }
+            changeRemainsInterestParser.getCurrentBaseEntity().clearValidationErrors();
         } else if(localName.equals("discount")) {
         } else if(localName.equals("correction")) {
         } else if(localName.equals("discounted_value")) {

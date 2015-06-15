@@ -23,6 +23,7 @@ import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherP
 import kz.bsbnb.usci.eav.repository.IBaseEntityRepository;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.tool.CommonConfig;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.tool.Quote;
 import org.jooq.*;
@@ -51,7 +52,6 @@ import static kz.bsbnb.eav.persistance.generated.Tables.*;
 @SuppressWarnings("unchecked")
 @Repository
 public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEntityProcessorDao {
-    private static final boolean exceptionOnImmutableWrite = false;
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
     @Autowired
     IBatchRepository batchRepository;
@@ -593,7 +593,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
                     if (childBaseEntity.getValueCount() != 0) {
                         if (childBaseEntity.getId() < 1) {
-                            if (exceptionOnImmutableWrite) {
+                            if (CommonConfig.exceptionOnImmutableWrite) {
                                 throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                         childBaseEntity.getMeta().getClassName() + "\n" + childBaseEntity.toString());
                             } else {
@@ -2585,7 +2585,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 IBaseEntity baseEntityApplied;
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1) {
-                        if (exceptionOnImmutableWrite) {
+                        if (CommonConfig.exceptionOnImmutableWrite) {
                             throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                     baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
                         } else {
@@ -2624,7 +2624,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 IBaseEntity baseEntityApplied;
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1) {
-                        if (exceptionOnImmutableWrite) {
+                        if (CommonConfig.exceptionOnImmutableWrite) {
                             throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                     baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
                         } else {
@@ -2756,7 +2756,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
                             if (baseEntitySaving.getId() < 1) {
-                                if (exceptionOnImmutableWrite) {
+                                if (CommonConfig.exceptionOnImmutableWrite) {
                                     throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                             baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
                                 } else {
@@ -2790,7 +2790,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
                             if (baseEntitySaving.getId() < 1) {
-                                if (exceptionOnImmutableWrite) {
+                                if (CommonConfig.exceptionOnImmutableWrite) {
                                     throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                             baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
                                 } else {
@@ -2824,7 +2824,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 IBaseEntity baseEntityApplied = null;
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1) {
-                        if (exceptionOnImmutableWrite) {
+                        if (CommonConfig.exceptionOnImmutableWrite) {
                             throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                     baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
                         } else {

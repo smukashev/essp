@@ -18,6 +18,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Stack;
 
@@ -54,7 +55,7 @@ public class CreditParser extends BatchParser {
     }
 
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        try {
+
             if(localName.equals("credit")) {
             } else if(localName.equals("contract")) {
                 creditContractParser.parse(xmlReader, batch, index);
@@ -101,14 +102,24 @@ public class CreditParser extends BatchParser {
                     ));
             } else if(localName.equals("contract_maturity_date")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("contract_maturity_date", new BaseEntityDateValue(batch, index,
-                        dateFormat.parse(event.asCharacters().getData())
+                String dateRaw = event.asCharacters().getData();
+                try {
+                    currentBaseEntity.put("contract_maturity_date", new BaseEntityDateValue(batch, index,
+                            dateFormat.parse(dateRaw)
                     ));
+                } catch (ParseException e) {
+                    getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
+                }
             } else if(localName.equals("actual_issue_date")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("actual_issue_date", new BaseEntityDateValue(batch, index,
-                        dateFormat.parse(event.asCharacters().getData())
+                String dateRaw = event.asCharacters().getData();
+                try{
+                    currentBaseEntity.put("actual_issue_date", new BaseEntityDateValue(batch, index,
+                            dateFormat.parse(event.asCharacters().getData())
                     ));
+                } catch (ParseException e) {
+                    getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
+                }
             } else if(localName.equals("credit_purpose")) {
                 event = (XMLEvent) xmlReader.next();
                 BaseEntity creditPurpose = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_purpose"), batch.getRepDate());
@@ -175,9 +186,6 @@ public class CreditParser extends BatchParser {
             }
         
             stack.push(localName);
-        } catch(ParseException parseException) {
-            throw new TypeErrorException(localName);
-        }
 
         return false;
     }

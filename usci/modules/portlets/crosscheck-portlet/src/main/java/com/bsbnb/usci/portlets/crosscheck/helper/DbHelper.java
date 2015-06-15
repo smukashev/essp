@@ -21,7 +21,7 @@ public class DbHelper {
     public static Creditor getCreditor(Connection conn, BigInteger id) {
         Statement stmt = null;
         String query = "SELECT REF_CREDITOR_ID AS ID, 0 AS MAIN_OFFICE_ID, SUBJECT_TYPE_ID, NAME, SHORT_NAME, CODE, " +
-                "CLOSE_DATE AS SHUTDOWN_DATE, OPEN_DATE AS CHANGE_DATE, NOKBDB_CODE FROM " + CrossCheckApplication.SCHEMA + ".R_REF_CREDITOR WHERE REF_CREDITOR_ID = " + id;
+                "CLOSE_DATE AS SHUTDOWN_DATE, OPEN_DATE AS CHANGE_DATE, NOKBDB_CODE FROM " + CrossCheckApplication.SHOWCASE_SCHEMA + ".R_REF_CREDITOR WHERE REF_CREDITOR_ID = " + id;
 
         // log.log(Level.INFO, "getCreditor: " + query);
 
