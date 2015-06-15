@@ -5,9 +5,6 @@
         <param-name>productionMode</param-name>
         <param-value>true</param-value>
     </context-param>
-    <listener>
-        <listener-class>com.bsbnb.creditregistry.portlets.queue.thread.ApplicationContextListener</listener-class>
-    </listener>
     <servlet>
         <servlet-name>credit-registry-queue-portlet</servlet-name>
         <servlet-class>com.liferay.portal.kernel.servlet.PortletServlet</servlet-class>

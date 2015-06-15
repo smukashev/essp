@@ -22,17 +22,15 @@ import java.net.URI;
 import java.util.*;
 
 @Service
-public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusiness
-{
+public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusiness {
     private CouchbaseClient couchbaseClient;
     private Logger logger = Logger.getLogger(InputInfoBeanRemoteBusinessImpl.class);
 
     @PostConstruct
     public void init() {
         System.setProperty("viewmode", "production");
-        //System.setProperty("viewmode", "development");
 
-        ArrayList<URI> nodes = new ArrayList<URI>();
+        ArrayList<URI> nodes = new ArrayList<>();
         nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
         try {
@@ -55,7 +53,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
         Iterator<ViewRow> rows = response.iterator();
 
-        if(rows.hasNext()) {
+        if (rows.hasNext()) {
             ViewRowReduced viewRowNoDocs = (ViewRowReduced) rows.next();
 
             System.out.println("==================");
@@ -68,7 +66,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
             return batchFullStatusJModel.getStatus().getBatchStatuses();
         }
 
-        return new ArrayList<BatchStatusJModel>();
+        return new ArrayList<>();
     }
 
     private BatchInfo getManifest(long id) {
@@ -94,8 +92,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     }
 
     @Override
-    public List<InputInfo> getAllInputInfos(List<Creditor> creditorsList, Date reportDate)
-    {
+    public List<InputInfo> getAllInputInfos(List<Creditor> creditorsList, Date reportDate) {
         ArrayList<InputInfo> list = new ArrayList<InputInfo>();
 
         View view = couchbaseClient.getView("batch", "batch");
@@ -110,28 +107,25 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
         HashMap<Long, Creditor> inputCreditors = new HashMap<Long, Creditor>();
 
-        for(Creditor cred : creditorsList) {
+        for (Creditor cred : creditorsList) {
             inputCreditors.put(cred.getId(), cred);
         }
 
         BatchFullStatusJModel batchFullStatusJModel = null;
 
-        if(viewResponse != null) {
-            for(ViewRow row : viewResponse) {
+        if (viewResponse != null) {
+            for (ViewRow row : viewResponse) {
                 ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) row;
 
                 if (batchFullStatusJModel == null) {
                     batchFullStatusJModel =
-                        gson.fromJson(viewRowNoDocs.getValue(), BatchFullStatusJModel.class);
+                            gson.fromJson(viewRowNoDocs.getValue(), BatchFullStatusJModel.class);
                 } else {
                     Long id = batchFullStatusJModel.getId();
 
                     Long creditorId = getCreditorId(id);
 
                     Creditor currentCreditor = inputCreditors.get(creditorId);
-
-                    //if (currentCreditor == null)
-                        //continue;
 
                     BatchStatusArrayJModel statusArrayJModel =
                             gson.fromJson(viewRowNoDocs.getValue(), BatchStatusArrayJModel.class);
@@ -146,11 +140,12 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                         lastStatus = statusModel.getProtocol();
                         if (statusModel.getProtocol().equals("PROCESSING")) {
                             ii.setStartedDate(statusModel.getReceived());
-                        } else if(statusModel.getProtocol().equals("COMPLETED")) {
+                        } else if (statusModel.getProtocol().equals("COMPLETED")) {
                             ii.setCompletionDate(statusModel.getReceived());
-                        } else if(statusModel.getProtocol().equals("WAITING")) {
+                        } else if (statusModel.getProtocol().equals("WAITING")) {
                             ii.setReceiverDate(statusModel.getReceived());
-                        } else if (statusModel.getProtocol().equals("ERROR") && ii.getReceiverDate() == null) {
+                        } else if (statusModel.getProtocol().equals("ERROR") &&
+                                ii.getReceiverDate() == null) {
                             ii.setReceiverDate(statusModel.getReceived());
                         }
                     }
@@ -176,12 +171,45 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                     ii.setReceiverType(s);
                     ii.setStatus(s);
 
-                    if (reportDate == null || DataTypeUtil.compareBeginningOfTheDay(ii.getReportDate(), reportDate) == 0) {
+                    if (reportDate == null ||
+                            DataTypeUtil.compareBeginningOfTheDay(ii.getReportDate(), reportDate) == 0)
                         list.add(ii);
-                    }
 
                     batchFullStatusJModel = null;
                 }
+            }
+        }
+
+        return list;
+    }
+
+    @Override
+    public List<InputInfo> getPendingBatches(List<Creditor> creditorsList) {
+        ArrayList<InputInfo> list = new ArrayList<>();
+
+        View view = couchbaseClient.getView("batch_pending", "batch_pending");
+        Query query = new Query();
+        //query.setLimit(20);
+        //query.setGroup(true);
+        //query.setGroupLevel(1);
+
+        ViewResponse viewResponse = couchbaseClient.query(view, query);
+
+        Gson gson = new Gson();
+
+        HashMap<Long, Creditor> inputCreditors = new HashMap<>();
+
+        for (Creditor cred : creditorsList) {
+            inputCreditors.put(cred.getId(), cred);
+        }
+
+        BatchFullStatusJModel batchFullStatusJModel = null;
+
+        if (viewResponse != null) {
+            for (ViewRow row : viewResponse) {
+                ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) row;
+
+                System.out.println(viewRowNoDocs);
             }
         }
 

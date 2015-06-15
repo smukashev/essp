@@ -1,11 +1,9 @@
 package com.bsbnb.creditregistry.portlets.queue.ui;
 
-import com.bsbnb.creditregistry.dm.ref.Creditor;
 import com.bsbnb.creditregistry.portlets.queue.PortalEnvironmentFacade;
 import static com.bsbnb.creditregistry.portlets.queue.QueueApplication.log;
 import com.bsbnb.creditregistry.portlets.queue.QueueApplicationResource;
 import com.bsbnb.creditregistry.portlets.queue.data.DataProvider;
-import com.bsbnb.creditregistry.portlets.queue.data.InputInfoNotInQueueException;
 import com.bsbnb.creditregistry.portlets.queue.data.QueueFileInfo;
 import com.bsbnb.vaadin.filterableselector.FilterableSelect;
 import com.bsbnb.vaadin.filterableselector.SelectionCallback;
@@ -25,6 +23,8 @@ import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.VerticalLayout;
+import kz.bsbnb.usci.cr.model.Creditor;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -60,7 +60,7 @@ public class QueueComponent extends VerticalLayout {
     public void attach() {
         setSpacing(false);
         List<Creditor> userCreditors = dataProvider.getCreditors(env.getUserId(), env.isUserAdmin());
-        creditorsSelect = new FilterableSelect<Creditor>(userCreditors, new Selector<Creditor>() {
+        creditorsSelect = new FilterableSelect<>(userCreditors, new Selector<Creditor>() {
             public String getCaption(Creditor item) {
                 return item.getName();
             }
@@ -70,7 +70,10 @@ public class QueueComponent extends VerticalLayout {
             }
 
             public String getType(Creditor item) {
-                return item.getSubjectType().getNameRu();
+                if(item.getSubjectType() != null)
+                    return item.getSubjectType().getNameRu();
+
+                return "null";
             }
         });
         toXLSButton = new Button(env.getString(Localization.EXPORT_TO_XLS_CAPTION), new Button.ClickListener() {
@@ -277,8 +280,8 @@ public class QueueComponent extends VerticalLayout {
                 new MessageBoxListener() {
                     @Override
                     public void messageResult(MessageResult result) {
-                        if (result == MessageResult.YES) {
-                            removeSelectedFilesFromQueue();
+                        if (result == MessageResult.Yes) {
+                            System.out.println("REMOVE FROM QUEUE");
                         }
                     }
                 },
@@ -286,23 +289,4 @@ public class QueueComponent extends VerticalLayout {
                 MessageBoxType.Question,
                 getApplication().getMainWindow());
     }
-
-    private void removeSelectedFilesFromQueue() {
-        List<QueueFileInfo> filesToRemove = table.getSelectedFiles();
-        StringBuilder messageBuilder = new StringBuilder();
-        String inputInfoNotInQueueMessageTemplate = env.getString(Localization.INPUT_INFO_SHOULD_BE_IN_QUEUE_TO_UPDATE_STATUS);
-        String inputInfoRemovedFromQueueuMessageTemplate = env.getString(Localization.INPUT_INFO_REMOVED_FROM_QUEUE);
-        for (QueueFileInfo fileToRemove : filesToRemove) {
-            try {
-                dataProvider.rejectInputInfo(fileToRemove.getInputInfoId());
-                messageBuilder.append(String.format(inputInfoRemovedFromQueueuMessageTemplate, fileToRemove.getFilename()));
-            } catch (InputInfoNotInQueueException iiniqe) {
-                messageBuilder.append(String.format(inputInfoNotInQueueMessageTemplate, fileToRemove.getFilename()));
-            }
-            messageBuilder.append("<br/>");
-        }
-        MessageBox.Show(messageBuilder.toString(), getApplication().getMainWindow());
-        loadTable();
-    }
-
 }

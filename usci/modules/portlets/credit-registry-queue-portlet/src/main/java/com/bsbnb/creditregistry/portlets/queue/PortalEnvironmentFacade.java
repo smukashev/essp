@@ -9,17 +9,17 @@ import java.util.Locale;
  */
 public interface PortalEnvironmentFacade {
 
-    public long getUserId();
+    long getUserId();
 
-    public String getString(String key);
+    String getString(String key);
 
-    public String getString(Localization key);
+    String getString(Localization key);
 
-    public Locale getLocale();
+    Locale getLocale();
 
-    public String getLocaleLanguage();
+    String getLocaleLanguage();
 
-    public boolean isUserAdmin();
+    boolean isUserAdmin();
 
-    public boolean isBankUser();
+    boolean isBankUser();
 }

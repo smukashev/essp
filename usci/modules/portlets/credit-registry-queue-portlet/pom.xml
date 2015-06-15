@@ -36,14 +36,6 @@
                     <autoDeployDir>${liferay.auto.deploy.dir}</autoDeployDir>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
         </plugins>
         <finalName>credit-registry-queue-portlet</finalName>
     </build>
