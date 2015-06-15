@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -93,10 +94,13 @@ public class MainParser extends BatchParser {
         } else if(localName.equals("info")) {
             infoParser.parse(xmlReader, batch, index);
         } else if(localName.equals("packages")) {
-            hasMore = true;
-            parseNextPackage();
-            return true;
+//            hasMore = true;
+//            parseNextPackage();
+//            return true;
         } else if(localName.equals("package")) {
+            BaseEntity pkg = new BaseEntity(metaClassRepository.getMetaClass("credit"), batch.getRepDate());
+            pkg.setIndex(Long.parseLong(event.asStartElement().getAttributeByName(new QName("no")).getValue()));
+            packageParser.setCurrentBaseEntity(pkg);
             hasMore = true;
             parseNextPackage();
             return true;
@@ -104,7 +108,7 @@ public class MainParser extends BatchParser {
             hasMore = true;
             portfolioDataParser.parse(xmlReader, batch, index);
             currentBaseEntity = portfolioDataParser.getCurrentBaseEntity();
-            currentBaseEntity.put("creditor", new BaseValue(batch, index, infoParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("creditor", new BaseEntityComplexValue(batch, index, infoParser.getCurrentBaseEntity()));
             return true;
         } else {
             throw new UnknownTagException(localName);

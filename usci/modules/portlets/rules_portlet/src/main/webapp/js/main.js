@@ -49,7 +49,7 @@ function deleteRule(rowIndex){
 
 function initGrid(){
     var store = Ext.create('Ext.data.ArrayStore', {
-        fields: ['id','name'],
+        fields: ['id','name','isActive'],
         proxy: {
             type: 'ajax',
             url : dataUrl,
@@ -93,6 +93,56 @@ function initGrid(){
                 flex: 1,
                 field: {
                     allowBlank: false
+                }
+            },{
+                xtype: 'checkcolumn',
+                id: 'my-check',
+                text: 'активность',
+                dataIndex: 'isActive',
+                listeners : {
+                    beforecheckchange: function( a, rowIndex, newValue, eOpts ) {
+                        var ruleId = ruleListGrid.store.getAt(rowIndex).raw.id;
+                        var t = false;
+
+                        Ext.Ajax.request({
+                            url: dataUrl,
+                            waitMsg: 'adding',
+                            async: false,
+                            params : {
+                                op : 'RULE_SWITCH',
+                                ruleId: ruleListGrid.store.getAt(rowIndex).raw.id,
+                                date: Ext.Date.format(Ext.getCmp('elemDatePackage').value, 'd.m.Y'),
+                                pkgName: Ext.getCmp('elemComboPackage').getRawValue(),
+                                newValue: newValue,
+                                ruleBody: editor.getSession().getValue()
+                            },
+                            reader: {
+                                type: 'json'
+                            },
+                            actionMethods: {
+                                read: 'POST',
+                                root: 'data'
+                            },
+                            success: function(response, opts) {
+                                var r = Ext.decode(response.responseText);
+                                console.log(r);
+                                if(r.success) {
+                                    t = true;
+                                } else {
+                                    var c = Ext.getCmp('errorPanel');
+                                    c.update(r.data);
+                                    c.expand();
+                                }
+                            },
+                            failure: function(response, opts) {
+                                Ext.Msg.alert("ошибка",Ext.decode(response.responseText).errorMessage);
+                                return false;
+                            }
+                        });
+
+                        console.log('333 ' + t);
+                        return t;
+                    }
                 }
             }/* ,
             {
@@ -484,7 +534,9 @@ Ext.onReady(function(){
                                     params : {
                                         op : 'UPDATE_RULE',
                                         ruleBody: editor.getSession().getValue(),
-                                        ruleId: editor.ruleId
+                                        ruleId: editor.ruleId,
+                                        date: Ext.Date.format(Ext.getCmp('elemDatePackage').value, 'd.m.Y'),
+                                        pkgName: Ext.getCmp('elemComboPackage').getRawValue()
                                     },
                                     reader: {
                                         type: 'json'

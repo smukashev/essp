@@ -1,14 +1,127 @@
 package kz.bsbnb.usci.brms.rulesvr.rulesingleton;
 
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+import javax.sql.DataSource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
+@Component
 public class BRMSHelper
 {
+    private static JdbcTemplate jdbcTemplate;
+
+    public void setDataSource(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
+    public static boolean hasBACT(String balanceAccountNo, String creditCode){
+        String select = "select count(1)\n" +
+                "  from eav_be_entities ent,\n" +
+                "       eav_be_complex_values cba,\n" +
+                "       eav_be_string_values sba,\n" +
+                "       eav_be_complex_values cct,\n" +
+                "       eav_be_string_values sct\n" +
+                "   where ent.id = cba.entity_id\n" +
+                "     and cba.attribute_id = (select ct.id from vw_complex_attribute ct \n" +
+                "                                    where ct.attribute_name = 'balance_account'\n" +
+                "                                       and ct.containing_name = 'ref_ba_ct'\n" +
+                "                                       and ct.class_name = 'ref_balance_account')\n" +
+                "     and cba.entity_value_id = sba.entity_id\n" +
+                "     and sba.attribute_id = (select st.id from vw_simple_attribute st\n" +
+                "                                    where st.class_name = 'ref_balance_account'\n" +
+                "                                      and st.attribute_name = 'no_')\n" +
+                "     and sba.value = ?\n" +
+                "     and ent.id = cct.entity_id\n" +
+                "     and cct.entity_value_id = sct.entity_id\n" +
+                "     and sct.value = ?\n" +
+                "     and cct.attribute_id = (select ct.id from vw_complex_attribute ct \n" +
+                "                                    where ct.attribute_name = 'credit_type'\n" +
+                "                                       and ct.containing_name = 'ref_ba_ct'\n" +
+                "                                       and ct.class_name = 'ref_credit_type')\n" +
+                "     and sct.attribute_id = (select st.id from vw_simple_attribute st\n" +
+                "                                    where st.class_name = 'ref_credit_type'\n" +
+                "                                      and st.attribute_name = 'code')\n" +
+                "     and rownum = 1\n";
+
+        int ans = jdbcTemplate.queryForInt(select, new String[]{balanceAccountNo, creditCode});
+
+        return ans > 0;
+    }
+
+    public static boolean hasBADRT(String balanceAccountNo, String debtRemainTypeCode){
+
+        String select ="select count(1)\n" +
+                "  from eav_be_entities ent,\n" +
+                "       eav_be_complex_values cba,\n" +
+                "       eav_be_string_values sba,\n" +
+                "       eav_be_complex_values cdrt,\n" +
+                "       eav_be_string_values sdrt\n" +
+                "   where ent.id = cba.entity_id\n" +
+                "     and cba.attribute_id = (select ct.id from vw_complex_attribute ct \n" +
+                "                                    where ct.attribute_name = 'balance_account'\n" +
+                "                                       and ct.containing_name = 'ref_ba_drt'\n" +
+                "                                       and ct.class_name = 'ref_balance_account')\n" +
+                "     and cba.entity_value_id = sba.entity_id\n" +
+                "     and sba.attribute_id = (select st.id from vw_simple_attribute st\n" +
+                "                                    where st.class_name = 'ref_balance_account'\n" +
+                "                                      and st.attribute_name = 'no_')\n" +
+                "     and sba.value = ?\n" +
+                "     and ent.id = cdrt.entity_id\n" +
+                "     and cdrt.entity_value_id = sdrt.entity_id\n" +
+                "     and sdrt.value = ?\n" +
+                "     and cdrt.attribute_id = (select ct.id from vw_complex_attribute ct \n" +
+                "                                    where ct.attribute_name = 'debt_remains_type'\n" +
+                "                                       and ct.containing_name = 'ref_ba_drt'\n" +
+                "                                       and ct.class_name = 'ref_debt_remains_type')\n" +
+                "     and sdrt.attribute_id = (select st.id from vw_simple_attribute st\n" +
+                "                                    where st.class_name = 'ref_debt_remains_type'\n" +
+                "                                      and st.attribute_name = 'code')\n" +
+                "     and rownum = 1\n" +
+                "\n";
+
+        int ans = jdbcTemplate.queryForInt(select, new String[]{balanceAccountNo, debtRemainTypeCode});
+
+        return ans > 0;
+
+
+    }
+
+    public static boolean isExclusiveIIN(String iin){
+
+        String select = "select count(1)\n" +
+                "  from eav_be_string_values sv\n" +
+                " where sv.attribute_id = (select id from vw_simple_attribute where attribute_name = 'code' and class_name = 'ref_exclusive_iin')\n" +
+                "   and sv.value = ?\n" +
+                "   and rownum = 1\n";
+
+        int ans = jdbcTemplate.queryForInt(select, new String[]{iin});
+
+        return ans > 0;
+    }
+
+    public static boolean isCurrencyConvertible(String currencyCode, Date reportDate){
+
+        String select = "select value from (\n" +
+                "select sconv.value,\n" +
+                "       rank() over(order by sconv.report_date desc) as ra\n" +
+                "  from eav_be_boolean_values sconv\n" +
+                " where sconv.report_date <= ? \n" +
+                "   and sconv.is_closed = 0\n" +
+                "   and sconv.entity_id = (select scode.entity_id\n" +
+                "                            from eav_be_string_values scode\n" +
+                "                           where scode.attribute_id = (select atr.id from vw_simple_attribute atr \n" +
+                "                                                         where atr.class_name = 'ref_currency'\n" +
+                "                                                         and atr.attribute_name = 'code')\n" +
+                "                             and scode.value = ?)\n" +
+                ") where ra  = 1";
+
+        int ans = jdbcTemplate.queryForInt(select, new Object[]{reportDate, currencyCode});
+
+        return ans > 0;
+    }
+
     public static boolean isValidRNN(String rnn)
     {
         String chr;

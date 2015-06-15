@@ -47,6 +47,10 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
+    <bean id="brmsHelper" class="kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
     <bean id="batchRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
         <property name="serviceName" value="batchService"/>
         <property name="service" ref="batchService"/>

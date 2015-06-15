@@ -9,6 +9,7 @@ import kz.bsbnb.usci.brms.rulesvr.model.IRule;
 public class Rule extends Persistable implements IRule {
     private String rule;
     private String title;
+    private boolean isActive;
 
     public Rule(){
 
@@ -32,5 +33,13 @@ public class Rule extends Persistable implements IRule {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
 }
