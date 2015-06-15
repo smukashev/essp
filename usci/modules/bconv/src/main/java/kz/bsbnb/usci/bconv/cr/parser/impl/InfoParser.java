@@ -54,6 +54,8 @@ public class InfoParser extends BatchParser {
             currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor"),batch.getRepDate());
             //currentBaseEntity.put("code",new BaseValue(batch,index,777));
         } else if(localName.equals("code")) {
+            event = (XMLEvent) xmlReader.next();
+            currentBaseEntity.put("code", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
         } else if(localName.equals("docs")) {
             docs = new BaseSet(metaClassRepository.getMetaClass("document"));
             //docs = new Docs();
