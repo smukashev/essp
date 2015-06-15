@@ -21,6 +21,7 @@
     <modules>
         <module>vaadin-messagebox</module>
         <module>vaadin-filterable-selector</module>
+        <module>vaadin-formatted-table</module>
         <module>static</module>
         <module>translit-util</module>
         <module>approval-portlet</module>
