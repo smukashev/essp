@@ -598,7 +598,7 @@ public class ZipFilesMonitor{
 
         if (existing != null) {
             if (ReportStatus.COMPLETED.getStatusId().equals(existing.getStatusId())) {
-                String errMsg = "Отчет со статусом 'В ПРОЦЕССЕ' уже существует для кредитора = "
+                String errMsg = "Отчет со статусом 'Завершен' уже существует для кредитора = "
                         + creditorId +  ", отчетная дата = " + batchInfo.getRepDate();
                 logger.error(errMsg);
                 statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
@@ -610,37 +610,37 @@ public class ZipFilesMonitor{
                 return false;
             }
         } else {
-            Date lastApprovedDate = reportBeanRemoteBusiness.getLastApprovedDate(creditorId);
-
-            try {
-                Date expectedDate = lastApprovedDate != null
-                        ? DataTypeUtil.plus(lastApprovedDate, Calendar.MONTH, 1)
-                        : new SimpleDateFormat("dd/MM/yyyy").parse(Report.INITIAL_REPORT_DATE_STR);
-
-                if (!batchInfo.getRepDate().equals(expectedDate)) {
-                    String errMsg = "Отчеты должны отправляться последовательно по месяцам";
-                    logger.error(errMsg);
-
-                    statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
-                            BatchStatuses.ERROR,
-                            errMsg,
-                            new Date(),
-                            batchInfo.getUserId()
-                    ));
-                    return false;
-                }
-
-            } catch (ParseException e) {
-                String errMsg = "Ошибка при парсинге даты";
-                logger.error(errMsg, e);
-                statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
-                        BatchStatuses.ERROR,
-                        errMsg,
-                        new Date(),
-                        batchInfo.getUserId()
-                ));
-                return false;
-            }
+//            Date lastApprovedDate = reportBeanRemoteBusiness.getLastApprovedDate(creditorId);
+//
+//            try {
+//                Date expectedDate = lastApprovedDate != null
+//                        ? DataTypeUtil.plus(lastApprovedDate, Calendar.MONTH, 1)
+//                        : new SimpleDateFormat("dd/MM/yyyy").parse(Report.INITIAL_REPORT_DATE_STR);
+//
+//                if (!batchInfo.getRepDate().equals(expectedDate)) {
+//                    String errMsg = "Отчеты должны отправляться последовательно по месяцам";
+//                    logger.error(errMsg);
+//
+//                    statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
+//                            BatchStatuses.ERROR,
+//                            errMsg,
+//                            new Date(),
+//                            batchInfo.getUserId()
+//                    ));
+//                    return false;
+//                }
+//
+//            } catch (ParseException e) {
+//                String errMsg = "Ошибка при парсинге даты";
+//                logger.error(errMsg, e);
+//                statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
+//                        BatchStatuses.ERROR,
+//                        errMsg,
+//                        new Date(),
+//                        batchInfo.getUserId()
+//                ));
+//                return false;
+//            }
         }
 
         if (existing != null) {
