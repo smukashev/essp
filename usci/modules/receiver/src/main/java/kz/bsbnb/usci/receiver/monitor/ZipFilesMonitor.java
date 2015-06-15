@@ -575,9 +575,9 @@ public class ZipFilesMonitor{
             }
         }
 
-        /*if(!haveError && !checkAndFillEavReport(cId, batchInfo, batchId)) {
+        if(!haveError && !checkAndFillEavReport(cId, batchInfo, batchId)) {
             haveError = true;
-        }*/
+        }
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
                 batchInfo.getUserId(), cId);
@@ -647,7 +647,7 @@ public class ZipFilesMonitor{
             existing.setStatusId(ReportStatus.IN_PROGRESS.getStatusId());
             existing.setTotalCount(batchInfo.getTotalCount());
             existing.setActualCount(batchInfo.getActualCount());
-            existing.setLastManualEditDate(new Date());
+            existing.setEndDate(new Date());
 
             PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
             PortalUser portalUser = userService.getUser(batchInfo.getUserId());
@@ -665,7 +665,7 @@ public class ZipFilesMonitor{
             report.setActualCount(batchInfo.getActualCount());
             report.setReportDate(batchInfo.getRepDate());
             report.setBeginningDate(new Date());
-            report.setLastManualEditDate(new Date());
+            existing.setEndDate(new Date());
 
             PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
             PortalUser portalUser = userService.getUser(batchInfo.getUserId());
