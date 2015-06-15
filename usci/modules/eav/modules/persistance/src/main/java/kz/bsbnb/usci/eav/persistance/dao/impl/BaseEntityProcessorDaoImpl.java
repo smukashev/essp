@@ -81,52 +81,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         this.applyListener = applyListener;
     }
 
-    @Value("${refs.cache.enabled}")
-    private boolean refsCacheEnabled;
-
-    @Deprecated
-    public static final HashMap<Long, List<RefListItem>> refsCache = new HashMap<Long, List<RefListItem>>();
-
-    @Deprecated
-    public static final HashMap<Long, List<RefListItem>> refsCacheRaw = new HashMap<Long, List<RefListItem>>();
-
     private final int SC_ID_BAG_LIMIT = 100;
-
-    @PostConstruct
-    public void init() {
-        if(refsCacheEnabled && refsCache.size() == 0 && refsCacheRaw.size() == 0) {
-            List<MetaClassName> metaClassNames = null;
-            try {
-                metaClassNames = metaClassRepository.getRefNames();
-            } catch (Exception e) {
-                System.out.println("Cache couldn't initialize");
-            }
-
-            if(metaClassNames != null) {
-                System.out.println(" -- Initializing cache for references at: " + new Date());
-
-                for (MetaClassName metaClassName : metaClassNames) {
-                    //refsCache.put(metaClassName.getId(), getRefsByMetaclass(metaClassName.getId()));
-                    List<RefListItem> rawList = getRefsByMetaClass(metaClassName.getId(), true);
-                    List<RefListItem> list = new ArrayList<RefListItem>();
-
-                    for(RefListItem rli : rawList) {
-                        RefListItem item = new RefListItem();
-                        item.setId(rli.getId());
-                        item.setCode(rli.getCode());
-                        item.setTitle(Quote.addSlashes(rli.getTitle()));
-                        list.add(item);
-                    }
-
-                    refsCache.put(metaClassName.getId(), list);
-                    refsCacheRaw.put(metaClassName.getId(), rawList);
-
-                }
-
-                System.out.println(" -- Cache is ready to use -- ");
-            }
-        }
-    }
 
     public IBaseEntity loadByMaxReportDate(long id, Date actualReportDate, boolean caching) {
         IBaseEntityReportDateDao baseEntityReportDateDao =
@@ -2967,8 +2922,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         applyToDb(baseEntityManager);
 
-//        reloadCacheIfRef(baseEntityApplied);
-
         if (applyListener != null)
             applyListener.applyToDBEnded(entityHolder.saving, entityHolder.loaded,
                     entityHolder.applied, baseEntityManager);
@@ -2979,59 +2932,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private boolean historyExists(long metaId, long entityId) {
         List<Map<String, Object>> rows = getRefListResponseWithHis(metaId, entityId);
         return rows.size() > 1;
-    }
-
-    private void reloadCacheIfRef(IBaseEntity baseEntity) {
-        if (baseEntity.getMeta().isReference() && refsCacheEnabled) {
-            RefListItem refListItem = findRefListItemById(baseEntity.getMeta().getId(), baseEntity.getId(), false);
-            RefListItem refListItemRaw = findRefListItemById(baseEntity.getMeta().getId(), baseEntity.getId(), true);
-
-            if (OperationType.DELETE.equals(baseEntity.getOperation())) { // delete
-                refsCache.get(baseEntity.getMeta().getId()).remove(refListItem);
-                refsCacheRaw.get(baseEntity.getMeta().getId()).remove(refListItemRaw);
-            } else {
-                IBaseEntity baseEntityPrepared = prepare(((BaseEntity) baseEntity).clone());
-                IBaseEntity baseEntityPostPrepared = postPrepare(((BaseEntity) baseEntityPrepared).clone(), null);
-                baseEntity = baseEntityPostPrepared;
-
-                if (refListItem == null) {
-                    refListItem = new RefListItem();
-                    refListItemRaw = new RefListItem();
-                    refListItem.setId(baseEntityPostPrepared.getId());
-                    refListItemRaw.setId(baseEntityPostPrepared.getId());
-
-                    refsCache.get(baseEntity.getMeta().getId()).add(refListItem);
-                    refsCacheRaw.get(baseEntity.getMeta().getId()).add(refListItemRaw);
-                }
-
-                for (IBaseValue value : baseEntity.get()) {
-                    if (!value.getMetaAttribute().getMetaType().isComplex()
-                            && !value.getMetaAttribute().getMetaType().isSet()) {
-                        if (value.getMetaAttribute().getName().startsWith("name")) {
-                            refListItem.setTitle((String) value.getValue());
-                            refListItemRaw.setTitle(Quote.addSlashes((String) value.getValue()));
-                        } else if (value.getMetaAttribute().getName().equals("code")) {
-                            refListItem.setCode(String.valueOf(value.getValue()));
-                            refListItemRaw.setCode(String.valueOf(value.getValue()));
-                        }
-                        refListItem.addValue(value.getMetaAttribute().getName(), value.getValue());
-                        refListItemRaw.addValue(value.getMetaAttribute().getName(), value.getValue());
-                    }
-                }
-            }
-        }
-    }
-
-    private RefListItem findRefListItemById(long metaId, long id, boolean raw) {
-        List<RefListItem> refListItems = raw ? refsCacheRaw.get(metaId) : refsCache.get(metaId);
-
-        for (RefListItem refListItem : refListItems) {
-            if (refListItem.getId() == id) {
-                return refListItem;
-            }
-        }
-
-        return null;
     }
 
     public boolean checkReportDateExists(long baseEntityId, Date reportDate) {
@@ -3103,8 +3003,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         List<Map<String, Object>> simpleSets = queryForListWithStats(simpleSetsSelect.getSQL(), simpleSetsSelect.getBindValues().toArray());
         List<Map<String, Object>> complexSets = queryForListWithStats(complexSetsSelect.getSQL(), complexSetsSelect.getBindValues().toArray());
 
-        List<String> names = new ArrayList<String>();
-        List<String> titles = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
+        List<String> titles = new ArrayList<>();
 
         for (Map<String, Object> attr : simpleAttrs) {
             String attrName = (String) attr.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
@@ -3348,156 +3248,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
 
         return null;
-    }
-
-    @Deprecated
-    public List<RefListItem> getRefsByMetaClass(long metaClassId, boolean raw) {
-        if(refsCacheEnabled) {
-            List<RefListItem> refsList;
-            if(raw)
-                refsList = refsCacheRaw.get(metaClassId);
-            else
-                refsList = refsCache.get(metaClassId);
-
-            if(refsList != null)
-                return refsList;
-        }
-
-        ArrayList<RefListItem> entityIds = new ArrayList<RefListItem>();
-
-        // TODO: fix
-
-        Select select = context.select().from(
-                context.select(
-                        EAV_BE_ENTITIES.ID,
-                        EAV_M_CLASSES.NAME.as("classes_name"),
-                        EAV_M_SIMPLE_ATTRIBUTES.NAME,
-                        EAV_BE_STRING_VALUES.VALUE,
-                        DSL.val("string", String.class).as("type"))
-                        .from(EAV_BE_ENTITIES, EAV_M_CLASSES, EAV_M_SIMPLE_ATTRIBUTES, EAV_BE_STRING_VALUES)
-                        .where(EAV_M_CLASSES.ID.eq(metaClassId))
-                        .and(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
-                        .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(EAV_M_CLASSES.ID))
-                        .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(1))
-                        .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
-                        .and(EAV_BE_STRING_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
-                        .union(context
-                                .select(
-                                        EAV_BE_ENTITIES.ID,
-                                        EAV_M_CLASSES.NAME.as("classes_name"),
-                                        EAV_M_SIMPLE_ATTRIBUTES.NAME,
-                                        DSL.field(
-                                                "TO_CHAR({0})", String.class, EAV_BE_INTEGER_VALUES.VALUE),
-                                        DSL.val("integer", String.class).as("type"))
-                                .from(EAV_BE_ENTITIES, EAV_M_CLASSES, EAV_M_SIMPLE_ATTRIBUTES, EAV_BE_INTEGER_VALUES)
-                                .where(EAV_M_CLASSES.ID.eq(metaClassId))
-                                .and(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
-                                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(EAV_M_CLASSES.ID))
-                                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(1))
-                                .and(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
-                                .and(EAV_BE_INTEGER_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
-                                .union(context
-                                        .select(
-                                                EAV_BE_ENTITIES.ID,
-                                                EAV_M_CLASSES.NAME.as("classes_name"),
-                                                EAV_M_SIMPLE_ATTRIBUTES.NAME,
-                                                DSL.field(
-                                                        "TO_CHAR({0})", String.class, EAV_BE_DATE_VALUES.VALUE),
-                                                DSL.val("date", String.class).as("type"))
-                                        .from(EAV_BE_ENTITIES, EAV_M_CLASSES, EAV_M_SIMPLE_ATTRIBUTES, EAV_BE_DATE_VALUES)
-                                        .where(EAV_M_CLASSES.ID.eq(metaClassId))
-                                        .and(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
-                                        .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(EAV_M_CLASSES.ID))
-                                        .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(1))
-                                        .and(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
-                                        .and(EAV_BE_DATE_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
-                                        .union(context
-                                                .select(
-                                                        EAV_BE_ENTITIES.ID,
-                                                        EAV_M_CLASSES.NAME.as("classes_name"),
-                                                        EAV_M_SIMPLE_ATTRIBUTES.NAME,
-                                                        DSL.field(
-                                                                "TO_CHAR({0})", String.class, EAV_BE_BOOLEAN_VALUES.VALUE),
-                                                        DSL.val("boolean", String.class).as("type"))
-                                                .from(EAV_BE_ENTITIES, EAV_M_CLASSES, EAV_M_SIMPLE_ATTRIBUTES, EAV_BE_BOOLEAN_VALUES)
-                                                .where(EAV_M_CLASSES.ID.eq(metaClassId))
-                                                .and(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
-                                                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(EAV_M_CLASSES.ID))
-                                                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(1))
-                                                .and(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
-                                                .and(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID)))))).
-                orderBy(DSL.field("ID"));
-
-        logger.debug("LIST_BY_CLASS SQL: " + select.toString());
-
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        Iterator<Map<String, Object>> i = rows.iterator();
-        RefListItem rli = null;
-        long prevId = -1;
-
-        while (i.hasNext()) {
-            Map<String, Object> row = i.next();
-            long id = ((BigDecimal) row.get("ID")).longValue();
-
-            if(prevId != id) {
-                if(rli != null)
-                    entityIds.add(rli);
-                rli = new RefListItem();
-            }
-            prevId = id;
-
-            logger.debug("#####################");
-
-            rli.setId(id);
-
-            if (((String) row.get("NAME")).equals("code")) {
-                String code = (String) row.get("VALUE");
-                if(!raw)
-                    code = Quote.addSlashes(code);
-                rli.setCode(code);
-            } else if (((String) row.get("NAME")).startsWith("name_")) {
-                String value = (String) row.get("VALUE");
-                if(!raw)
-                    value = Quote.addSlashes(value);
-                rli.setTitle(value);
-            } else if (((String) row.get("NAME")).startsWith("name")) {
-                String value = (String) row.get("VALUE");
-                if(!raw)
-                    value = Quote.addSlashes(value);
-                rli.setTitle(value);
-            }
-
-            for (String key : row.keySet()) {
-                if (key.equals("NAME") || key.startsWith("name_")) {
-                    continue;
-                }
-
-                String value = row.get(key).toString();
-
-                if(!raw)
-                    value = Quote.addSlashes(value);
-
-                //System.out.println("###% " + value);
-
-                rli.addValue(key, value);
-            }
-
-            //if (!i.hasNext())
-            //    break;
-
-            //row = i.next();
-            //old_id = id;
-            //id = ((BigDecimal) row.get("ID")).longValue();
-        }
-
-        if(rli!=null)
-            entityIds.add(rli);
-
-        if(refsCacheEnabled)
-            refsCache.put(metaClassId, entityIds);
-
-        return entityIds;
     }
 
     public List<RefListItem> getRefsByMetaclass(long metaClassId) {
