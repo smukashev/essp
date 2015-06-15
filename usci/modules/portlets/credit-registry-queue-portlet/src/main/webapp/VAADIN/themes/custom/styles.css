@@ -1,0 +1,41 @@
+@import "../reindeer/styles.css";
+
+.queue-table .v-table-header-wrap {
+    white-space:normal;
+    height: 40px;
+    background: transparent repeat-x;
+    background-image: url(common/img/table-column-header-background.png);
+    -background-image: url(common/img/table-column-header-background.png.png);
+}
+
+.queue-table .v-table-header {
+    height: 40px;
+    background: none;
+}
+
+.queue-table .v-table-header-cell{
+    height: 40px;
+    background: none;
+}
+
+.queue-table .v-table-caption-container {
+    white-space: normal;
+    height: 40px;
+    background: none;
+}
+
+.queue-table .v-table-resizer {
+    height:40px;
+}
+
+.queue-table .v-table-cell-content {
+    white-space: normal;
+    overflow: hidden;
+    padding: 0 6px;
+    border-right: 1px solid #aaa;
+}
+
+.queue-table .v-table-cell-wrapper {
+    white-space: normal;
+    overflow: hidden;
+}

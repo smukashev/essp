@@ -665,7 +665,7 @@ public class ZipFilesMonitor{
             report.setActualCount(batchInfo.getActualCount());
             report.setReportDate(batchInfo.getRepDate());
             report.setBeginningDate(new Date());
-            existing.setEndDate(new Date());
+            report.setEndDate(new Date());
 
             PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
             PortalUser portalUser = userService.getUser(batchInfo.getUserId());
