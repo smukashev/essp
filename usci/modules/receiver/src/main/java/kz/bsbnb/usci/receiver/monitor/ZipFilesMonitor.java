@@ -651,7 +651,11 @@ public class ZipFilesMonitor{
 
             PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
             PortalUser portalUser = userService.getUser(batchInfo.getUserId());
-            reportBeanRemoteBusiness.updateReport(existing, portalUser.getScreenName());
+            if(portalUser != null)
+                reportBeanRemoteBusiness.updateReport(existing, portalUser.getScreenName());
+            else
+                reportBeanRemoteBusiness.updateReport(existing, "Unknown");
+
             batchInfo.setReportId(existing.getId());
         } else {
             Report report = new Report();
@@ -669,7 +673,11 @@ public class ZipFilesMonitor{
 
             PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
             PortalUser portalUser = userService.getUser(batchInfo.getUserId());
-            Long reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
+            Long reportId;
+            if(portalUser != null)
+                reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
+            else
+                reportId = reportBeanRemoteBusiness.insert(report, "Unknown");
             batchInfo.setReportId(reportId);
         }
 

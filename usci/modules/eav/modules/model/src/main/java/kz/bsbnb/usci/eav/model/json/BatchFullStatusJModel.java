@@ -13,6 +13,8 @@ public class BatchFullStatusJModel
     private String fileName;
     private Date received;
     private BatchStatusArrayJModel status;
+    private Long userId;
+    private Long creditorId;
 
     public BatchFullStatusJModel(Long id, String fileName, Date received) {
         this.id = id;
@@ -52,5 +54,21 @@ public class BatchFullStatusJModel
     public void setStatus(BatchStatusArrayJModel status)
     {
         this.status = status;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Long getCreditorId() {
+        return creditorId;
+    }
+
+    public void setCreditorId(Long creditorId) {
+        this.creditorId = creditorId;
     }
 }
