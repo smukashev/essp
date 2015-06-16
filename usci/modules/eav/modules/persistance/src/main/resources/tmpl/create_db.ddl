@@ -1041,7 +1041,7 @@
 	<!-- MAINTENANCE -->
 	<table name="mnt_operations">
 			<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-			<column name="name" type="VARCHAR" size="100" />
+			<column name="name" type="VARCHAR" size="250" />
 	</table>
 
 	<table name="mnt_logs" >

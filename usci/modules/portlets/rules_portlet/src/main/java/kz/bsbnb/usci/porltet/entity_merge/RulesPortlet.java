@@ -199,19 +199,34 @@ public class RulesPortlet extends MVCPortlet{
                     pkgName = resourceRequest.getParameter("pkgName");
                     date = df.parse(resourceRequest.getParameter("date"));
                     boolean makeActive = resourceRequest.getParameter("newValue").equals("true");
+                    boolean ruleEdited = resourceRequest.getParameter("ruleEdited").equals("true");
                     String error = null;
                     ruleBody = resourceRequest.getParameter("ruleBody");
 
-                    if(makeActive)
-                        error = ruleService.getPackageErrorsOnRuleActivate(ruleBody, ruleId, pkgName, date);
-                    else
+                    boolean success = false;
+
+                    if(makeActive) {
+                        error = ruleService.getPackageErrorsOnRuleActivate(ruleBody, ruleId, pkgName, date, ruleEdited);
+                        if(error == null) {
+                            if(ruleEdited)
+                                success |= ruleService.activateRule(ruleBody, ruleId);
+                            else
+                                success |= ruleService.activateRule(ruleId);
+                        }
+                    } else {
                         error = ruleService.getPackageErrorsOnRuleDisable(ruleId, pkgName, date);
+                        if(error == null)
+                            success |= ruleService.disableRule(ruleId);
+                    }
 
                     if(error != null) {
                         //writer.write("{ \"success\": false, \"errorMessage\": \""+ error.replaceAll("\n", "")+"\"}");
                         writer.write(JsonMaker.getNegativeJson(error));
                     } else {
-                        writer.write(JsonMaker.getJson(true));
+                        if(!success)
+                            writer.write(JsonMaker.getNegativeJson("Ошибка при обновлении в базе"));
+                        else
+                            writer.write(JsonMaker.getJson(true));
                     }
             }
 
