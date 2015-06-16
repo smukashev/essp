@@ -25,5 +25,8 @@ public interface IRuleDao extends IDao{
     public long createCopy(long ruleId, String title);
     public long createRule(Rule rule);
     public void renameRule(long ruleId, String title);
+    public boolean activateRule(String ruleBody, long ruleId);
+    public boolean activateRule(long ruleId);
+    public boolean disableRule(long ruleId);
     public void clearAllRules();
 }

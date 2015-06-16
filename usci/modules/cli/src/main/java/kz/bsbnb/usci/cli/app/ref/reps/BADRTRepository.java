@@ -22,9 +22,11 @@ public class BADRTRepository extends BaseRepository {
             "       ref.balance_account ba,\n" +
             "       ref.shared sh\n" +
             "       where ba_drt.balance_account_id = ba.id\n" +
+            "         and ba.open_date <= to_date('"+repDate+"','dd.MM.yyyy')\n" +
+            "         and (ba.close_date > to_date('"+repDate+"','dd.MM.yyyy') or ba.close_date is null)\n" +
             "         and ba_drt.debt_remains_type_id = sh.id\n" +
             "         and ba_drt.open_date <= to_date('"+repDate+"','dd.MM.yyyy')\n" +
-            "         and (ba_drt.close_date >= to_date('"+repDate+"','dd.MM.yyyy') or ba_drt.close_date is null)";
+            "         and (ba_drt.close_date > to_date('"+repDate+"','dd.MM.yyyy') or ba_drt.close_date is null)";
 
 
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='BA_CT'";

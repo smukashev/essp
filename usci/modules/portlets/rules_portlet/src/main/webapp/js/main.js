@@ -102,7 +102,13 @@ function initGrid(){
                 listeners : {
                     beforecheckchange: function( a, rowIndex, newValue, eOpts ) {
                         var ruleId = ruleListGrid.store.getAt(rowIndex).raw.id;
+                        var ruleBody = editor.getSession().getValue();
+                        var ruleEdited = false;
                         var t = false;
+
+                        if(ruleId == ruleListGrid.getSelectionModel().getLastSelected().data.id) {
+                            ruleEdited = true;
+                        }
 
                         Ext.Ajax.request({
                             url: dataUrl,
@@ -110,11 +116,12 @@ function initGrid(){
                             async: false,
                             params : {
                                 op : 'RULE_SWITCH',
-                                ruleId: ruleListGrid.store.getAt(rowIndex).raw.id,
+                                ruleId: ruleId,
                                 date: Ext.Date.format(Ext.getCmp('elemDatePackage').value, 'd.m.Y'),
                                 pkgName: Ext.getCmp('elemComboPackage').getRawValue(),
                                 newValue: newValue,
-                                ruleBody: editor.getSession().getValue()
+                                ruleBody: ruleBody,
+                                ruleEdited: ruleEdited
                             },
                             reader: {
                                 type: 'json'
