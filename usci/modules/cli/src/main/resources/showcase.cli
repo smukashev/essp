@@ -166,10 +166,10 @@ showcase set name CORE_PERSON_CONTACTS
 showcase set tableName CORE_PERSON_CONTACTS
 showcase set downPath subjects.person
 
-showcase list add contacts contract_id
+showcase list add contacts contact_id
 showcase list add contacts.contact_type contact_type_id
-showcase list add contacts.details details
 
+showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
 
 showcase list addCustom credit creditor creditor_id
@@ -189,8 +189,8 @@ showcase set downPath subjects.organization
 
 showcase list add contacts contact_id
 showcase list add contacts.contact_type contact_type_id
-showcase list add contacts.details details
 
+showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
 
 showcase list addCustom credit creditor creditor_id
