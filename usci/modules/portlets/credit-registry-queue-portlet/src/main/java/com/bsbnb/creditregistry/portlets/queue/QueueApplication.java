@@ -9,6 +9,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import java.util.logging.Level;
@@ -53,14 +54,18 @@ public class QueueApplication extends Application {
                 setTheme("custom");
                 Window mainWindow = new Window();
                 User user = PortalUtil.getUser(request);
-                QueuePortalEnvironmentFacade queuePortalEnvironmentFacade = new QueuePortalEnvironmentFacade(user);
-                BeanDataProvider dataProvider = new BeanDataProvider();
-                mainWindow.addComponent(new MainLayout(queuePortalEnvironmentFacade, dataProvider));
-                setMainWindow(mainWindow);
-            } catch (PortalException pe) {
+
+                if(user == null) {
+                    Label errorMessageLabel = new Label("Нет прав для просмотра");
+                    mainWindow.addComponent(errorMessageLabel);
+                } else {
+                    QueuePortalEnvironmentFacade queuePortalEnvironmentFacade = new QueuePortalEnvironmentFacade(user);
+                    BeanDataProvider dataProvider = new BeanDataProvider();
+                    mainWindow.addComponent(new MainLayout(queuePortalEnvironmentFacade, dataProvider));
+                    setMainWindow(mainWindow);
+                }
+            } catch (PortalException | SystemException pe) {
                 log.log(Level.SEVERE, "", pe);
-            } catch (SystemException se) {
-                log.log(Level.SEVERE, "", se);
             }
         }
 
