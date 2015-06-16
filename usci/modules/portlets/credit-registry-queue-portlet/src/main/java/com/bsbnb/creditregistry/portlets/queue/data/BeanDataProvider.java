@@ -81,25 +81,23 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public List<QueueFileInfo> getQueue(List<Creditor> creditors) {
-        List queueList = inputInfoBusiness.getPendingBatches(creditors);
+        List<InputInfo> queueList = inputInfoBusiness.getPendingBatches(creditors);
 
         List<QueueFileInfo> queue = new ArrayList<>();
 
-        for (Object queueObject : queueList) {
-            Object[] values = (Object[]) queueObject;
+        for (InputInfo ii : queueList) {
             QueueFileInfo file = new QueueFileInfo();
-            int counter = 0;
-            file.setRownum(((BigDecimal) values[counter++]).intValue());
-            file.setInputInfoId(((BigDecimal) values[counter++]).intValue());
-            file.setUserId(((BigDecimal) values[counter++]).intValue());
-            file.setProtocolCount(((BigDecimal) values[counter++]).intValue());
-            file.setCreditorId(((BigDecimal) values[counter++]).intValue());
-            file.setCreditorName((String) values[counter++]);
-            file.setStatusCode((String) values[counter++]);
-            file.setStatus((String) values[counter++]);
-            file.setFilePath((String) values[counter++]);
-            file.setReceiverDate((Date) values[counter++]);
-            file.setFilename((String) values[counter++]);
+            file.setRownum(0);
+            file.setInputInfoId(ii.getId().intValue());
+            file.setUserId(ii.getUserId().intValue());
+            file.setProtocolCount(0);
+            file.setCreditorId(ii.getCreditor().getId().intValue());
+            file.setCreditorName(ii.getCreditor().getName());
+            // file.setStatusCode("AAAAA");
+            file.setStatus(ii.getStatus().getNameRu());
+            file.setFilePath(ii.getFileName());
+            file.setReceiverDate(ii.getReceiverDate());
+            file.setFilename(ii.getFileName());
             queue.add(file);
         }
 

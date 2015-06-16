@@ -187,9 +187,11 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     public List<InputInfo> getPendingBatches(List<Creditor> creditorsList) {
         ArrayList<InputInfo> list = new ArrayList<>();
 
-        View view = couchbaseClient.getView("batch_pending", "batch_pending");
+        View view = couchbaseClient.getView("batch", "batch_pending");
         Query query = new Query();
-        //query.setLimit(20);
+        query.setStale(Stale.FALSE);
+        query.setDescending(true);
+        query.setLimit(10000);
         //query.setGroup(true);
         //query.setGroupLevel(1);
 
@@ -209,7 +211,35 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
             for (ViewRow row : viewResponse) {
                 ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) row;
 
-                System.out.println(viewRowNoDocs);
+                batchFullStatusJModel = gson.fromJson(couchbaseClient.get("batch:" +
+                        viewRowNoDocs.getKey()).toString(), BatchFullStatusJModel.class);
+
+                Long key = Long.parseLong(viewRowNoDocs.getKey());
+
+                Long creditorId;
+                if(batchFullStatusJModel.getCreditorId() != null)
+                    creditorId = batchFullStatusJModel.getCreditorId();
+                else
+                    creditorId = getCreditorId(key.longValue());
+
+                if(inputCreditors.get(creditorId) != null) {
+                    InputInfo inputInfo = new InputInfo();
+                    inputInfo.setFileName(batchFullStatusJModel.getFileName());
+                    inputInfo.setId(BigInteger.valueOf(key));
+                    inputInfo.setCreditor(inputCreditors.get(creditorId));
+
+                    Shared s = new Shared();
+                    s.setCode("S");
+                    s.setNameRu("В обработке");
+                    s.setNameKz("В обработке");
+                    inputInfo.setStatus(s);
+
+                    inputInfo.setUserId(batchFullStatusJModel.getUserId());
+                    inputInfo.setReceiverDate(batchFullStatusJModel.getReceived());
+
+                    list.add(inputInfo);
+                }
+
             }
         }
 
