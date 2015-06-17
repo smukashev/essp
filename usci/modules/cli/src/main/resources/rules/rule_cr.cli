@@ -531,4 +531,19 @@ $$$
 
 rule save
 
+rule read $$$
+title: признак ИП - тип юр лица
+rule "признак ИП - тип юр лица"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                && (getEls("{setString(01,04,07)}subjects.organization[is_se=true]enterprise_type.code") > 0
+                   ||
+                    getEls("{setString(02,05,06)}subjects.organization[is_se=false]enterprise_type.code") > 0))
+then
+ $entity.addValidationError("Тип юр лица должен быть ИП");
+end
+$$$
+
+rule save
+
 quit
