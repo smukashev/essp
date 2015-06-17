@@ -451,5 +451,58 @@ $$$
 
 rule save
 
+rule read $$$
+title: документ иной физ лица
+rule "документ иной физ лица"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                && getEls("{count}subjects.person.docs[doc_type.code=16][name=null]") > 0 )
+then
+ $entity.addValidationError("При указании иного документа наименование документа не должен быть пустым");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: документ иной юр лица
+rule "документ иной юр лица"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                && getEls("{count}subjects.organization.docs[doc_type.code=16][name=null]") > 0 )
+then
+ $entity.addValidationError("При указании иного документа наименование документа не должен быть пустым");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: название документа физ лица
+rule "название документа физ лица"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                && getEls("{count}subjects.person.docs[doc_type.code!=16][name!=null]") > 0 )
+then
+ $entity.addValidationError("При указании не иного документа наименование документа должен быть пустым");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: название документа иной юр лица
+rule "название документа иной юр лица"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                && getEls("{count}subjects.organization.docs[doc_type.code!=16][name!=null]") > 0 )
+then
+ $entity.addValidationError("При указании не иного документа наименование документа должен быть пустым");
+end
+$$$
+
+rule save
+
+
 
 quit
