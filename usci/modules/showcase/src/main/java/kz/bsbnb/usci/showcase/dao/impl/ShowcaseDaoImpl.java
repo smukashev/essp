@@ -566,7 +566,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 } else if(openDate.compareTo(entity.getReportDate()) < 0) {
                     compResult = compareValues(HistoryState.ACTUAL, entryMap, entity, showcaseHolder, keyData);
 
-                    if(compResult) return;
+                    if(compResult) continue;
 
                     updateMapLeftRange(HistoryState.ACTUAL, keyData, entity, showcaseHolder);
                     moveActualMapToHistory(keyData, entity, showcaseHolder);
@@ -626,7 +626,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             }
 
             persistMap(entryMap, openDate, closeDate, showcaseHolder);
-
         }
     }
 
