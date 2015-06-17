@@ -278,7 +278,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         if(!showCaseHolder.getShowCaseMeta().isFinal()) {
             sql.append("cdc, open_date, close_date");
-            values.append("sysdate, ?, ? )");
+            values.append("sysdate, ?, ?)");
             vals[i++] = openDate;
             vals[i] = closeDate;
         } else {
@@ -386,7 +386,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 .append(select).append("FROM %s WHERE %s%s_id = ? )");
 
         String sqlResult = String.format(sql.toString(), getHistoryTableName(showcaseHolder.getShowCaseMeta()),
-                getActualTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX, 
+                getActualTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX,
                 showcaseHolder.getRootClassName());
 
         jdbcTemplateSC.update(sqlResult, entity.getId());
@@ -394,7 +394,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         sqlResult = String.format("DELETE FROM %s WHERE %s%s_ID = ? AND CLOSE_DATE IS NOT NULL",
                 getActualTableName(showcaseHolder.getShowCaseMeta()),
                 COLUMN_PREFIX, showcaseHolder.getRootClassName());
-        
+
         jdbcTemplateSC.update(sqlResult, entity.getId());
     }
 
@@ -868,7 +868,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
     private String getDBSize(IMetaType type) {
         if(type.isComplex())
-            return "10, 0";
+            return "14, 0";
 
         if (type instanceof MetaSet)
             type = ((MetaSet) type).getMemberType();
@@ -880,7 +880,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         switch (metaValue.getTypeCode()) {
             case INTEGER:
-                return "10,0";
+                return "14,0";
             case DATE:
                 return null;
             case STRING:
