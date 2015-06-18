@@ -20,6 +20,8 @@ public class MetaAttribute extends Persistable implements IMetaAttribute
 
     private boolean isFinal = false;
 
+    private boolean isRequired = false;
+
     private boolean immutable = false;
 
     private String name = "";
@@ -158,6 +160,14 @@ public class MetaAttribute extends Persistable implements IMetaAttribute
     public void setFinal(boolean aFinal)
     {
         isFinal = aFinal;
+    }
+
+    public boolean isRequired() {
+        return isRequired;
+    }
+
+    public void setRequired(boolean isRequired) {
+        this.isRequired = isRequired;
     }
 
     public boolean isImmutable()

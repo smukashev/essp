@@ -30,6 +30,9 @@ public interface IMetaAttribute extends IPersistable
     public boolean isFinal();
     public void setFinal(boolean isFinal);
 
+    public boolean isRequired();
+    public void setRequired(boolean isRequired);
+
     public boolean isImmutable();
 
     public void setImmutable(boolean immutable);

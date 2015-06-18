@@ -36,6 +36,7 @@
     <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
     <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
     <column name="value" primaryKey="false" required="true" type="CLOB" size="14,0" autoIncrement="false"/>
+    <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
     <column name="updated_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
     <unique>
     <unique-column name="id"/>
@@ -120,6 +121,7 @@
 		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
 		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
 		<column name="is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+		<column name="is_required" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_final" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
@@ -219,6 +221,7 @@
 		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
 		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
 		<column name="is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+		<column name="is_required" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_final" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>

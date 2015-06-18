@@ -39,6 +39,8 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static kz.bsbnb.usci.showcase.generated.Tables.EAV_SC_BAD_ENTITIES;
@@ -581,6 +583,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 logger.debug(sql, entity.getId(), openDate);
                 logger.debug("Rows deleted from " + getActualTableName(showcaseHolder.getShowCaseMeta()) + ": " + rows);
             } else if(openDate.compareTo(entity.getReportDate()) < 0) {
+                generateMap(entity, showcaseHolder, 1L);
+
                 long t1 = System.currentTimeMillis();
                 updateLeftRange(HistoryState.ACTUAL, entity, showcaseHolder);
                 moveActualToHistory(entity, showcaseHolder);
@@ -682,6 +686,133 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         long t2 = System.currentTimeMillis() - t1;
         stats.put("persistMapLoop", t2);
+    }
+
+    public List<HashMap<String, String>> generateMap(IBaseEntity entity, ShowcaseHolder showcaseHolder, Long recordId) {
+        List<HashMap<String, String>> mapList = new ArrayList<>();
+        int fieldSize = showcaseHolder.getShowCaseMeta().getFieldsList().size();
+
+        ShowCaseEntries[] showCases = new ShowCaseEntries[fieldSize];
+        int i = 0;
+
+        for (ShowCaseField field : showcaseHolder.getShowCaseMeta().getFieldsList()) {
+            showCases[i] = new ShowCaseEntries(entity, field.getAttributeName().equals("") ?
+                    field.getAttributePath() : field.getAttributePath() + "." + field.getAttributeName(),
+                    field.getColumnName(), showcaseHolder.generatePaths());
+            i++;
+        }
+
+        int allRecordsSize = 0;
+        for (i = 0; i < fieldSize; i++)
+            allRecordsSize += showCases[i].getEntriesSize();
+
+        boolean[] was = new boolean[allRecordsSize];
+        boolean[] usedGroup = new boolean[fieldSize];
+        int[] id = new int[allRecordsSize];
+
+        List<HashMap> entries = new ArrayList<>(allRecordsSize);
+
+        int yk = 0;
+        for (i = 0; i < fieldSize; i++)
+            for (HashMap m : showCases[i].getEntries()) {
+                entries.add(yk, m);
+                id[yk] = i;
+                yk++;
+            }
+
+        boolean found = true;
+
+        while (found) {
+            found = false;
+
+            for (i = 0; i < allRecordsSize; i++)
+                if (!was[i]) {
+                    was[i] = true;
+                    HashMap map = (HashMap) entries.get(i).clone();
+                    found = true;
+
+                    Arrays.fill(usedGroup, false);
+                    usedGroup[id[i]] = true;
+
+                    for (int j = 0; j < allRecordsSize; j++) {
+                        if (i != j && !was[j] && !usedGroup[id[j]])
+                            if (merge(map, entries.get(j))) {
+                                was[j] = true;
+                                usedGroup[id[j]] = true;
+                            }
+                    }
+
+                    mapList.add(map);
+                }
+        }
+
+        for(HashMap<String, String> mapElement : mapList) {
+            boolean equalityFlag = true;
+            StringBuilder st = new StringBuilder();
+
+            int colCounter = 0;
+            for(String colName : mapElement.keySet()) {
+                st.append(colName);
+
+                if(++colCounter < mapElement.size())
+                    st.append(", ");
+            }
+
+            String sql = "SELECT " + st.toString() + " FROM %s WHERE ID = ?";
+            sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                    COLUMN_PREFIX);
+
+            Map dbElement = jdbcTemplateSC.queryForMap(sql, recordId);
+
+            for(String colName : mapElement.keySet()) {
+                Object newValue = mapElement.get(colName);
+                Object dbValue = dbElement.get(colName);
+
+                if(newValue == null && dbValue == null)
+                    continue;
+
+                if(newValue == null || dbValue == null) {
+                    equalityFlag = false;
+                    break;
+                }
+
+                if(newValue instanceof Double) {
+                    if(!Double.valueOf((Double) newValue).equals(Double.valueOf(dbValue.toString()))) {
+                        equalityFlag = false;
+                        break;
+                    }
+                } else if(newValue instanceof Integer) {
+                    if(!Integer.valueOf((Integer) newValue).equals(Integer.valueOf(dbValue.toString()))) {
+                        equalityFlag = false;
+                        break;
+                    }
+                } else if(newValue instanceof Boolean) {
+                    if(!Boolean.valueOf((Boolean) newValue).equals(Boolean.valueOf(dbValue.toString()))) {
+                        equalityFlag = false;
+                        break;
+                    }
+                } else if(newValue instanceof Long) {
+                    if(!Long.valueOf((Long) newValue).equals(Long.valueOf(dbValue.toString()))) {
+                        equalityFlag = false;
+                        break;
+                    }
+                } else if(newValue instanceof String) {
+                    if(!newValue.toString().equals(dbValue.toString())) {
+                        equalityFlag = false;
+                        break;
+                    }
+                } else {
+                    if(!newValue.equals(dbValue)) {
+                        equalityFlag = false;
+                        break;
+                    }
+                }
+            }
+
+            System.out.println(id + " ===> " + equalityFlag);
+        }
+
+        return mapList;
     }
 
     private String getDBType(IMetaType type) {

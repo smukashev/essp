@@ -107,7 +107,7 @@ public class BeanDataProvider implements DataProvider {
         Connection conn = getConnection();
         Statement stmt = null;
         String query = "SELECT ID, DATE_BEGIN, DATE_END, REPORT_DATE, STATUS_ID, 0 AS STATUS_NAME, USER_NAME, CREDITOR_ID " +
-                "FROM CROSS_CHECK " +
+                "FROM reporter.CROSS_CHECK " +
                 "WHERE ((CREDITOR_ID IN (";
 
         for (int i = 0; i < creditors.length; i++) {
@@ -160,7 +160,7 @@ public class BeanDataProvider implements DataProvider {
         Connection conn = getConnection();
         Statement stmt = null;
         String query =  "SELECT ID, DESCRIPTION, DIFF, INNER_VALUE, IS_ERROR, OUTER_VALUE, CROSS_CHECK_ID, MESSAGE_ID " +
-                        "FROM CROSS_CHECK_MESSAGE " +
+                        "FROM reporter.CROSS_CHECK_MESSAGE " +
                         "WHERE (CROSS_CHECK_ID = " + crossCheck.getId() + ") " +
                         "ORDER BY ID ASC";
 
@@ -173,7 +173,20 @@ public class BeanDataProvider implements DataProvider {
             while (rs.next()) {
                 CrossCheck cc = DbHelper.getCrossCheck(conn, rs.getBigDecimal("CROSS_CHECK_ID").toBigInteger());
                 BigDecimal messageId = rs.getBigDecimal("MESSAGE_ID");
-                Message m = DbHelper.getMessage(conn, messageId != null ? messageId.toBigInteger() : BigInteger.valueOf(7)); // TODO fix
+                Message m = null;
+                if(messageId!=null) {
+                    m = DbHelper.getMessage(conn, messageId.toBigInteger()); // TODO fix
+                }
+                else
+                {
+                    m = new Message();
+                    m.setId(rs.getBigDecimal("DESCRIPTION"));
+                    m.setCode(rs.getString("DESCRIPTION"));
+                    m.setNameKz(rs.getString("DESCRIPTION"));
+                    m.setNameRu(rs.getString("DESCRIPTION"));
+                    m.setNote(rs.getString("DESCRIPTION"));
+
+                }
                 CrossCheckMessage cm = ModelHelper.convertToCrossCheckMessage(rs, cc, m);
                 cList.add(cm);
             }

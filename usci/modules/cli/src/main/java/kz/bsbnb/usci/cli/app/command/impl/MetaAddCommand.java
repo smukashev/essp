@@ -82,6 +82,9 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
     public static final String OPTION_FINAL = "f";
     public static final String LONG_OPTION_FINAL = "final";
 
+    public static final String OPTION_REQUIRED = "r";
+    public static final String LONG_OPTION_REQUIRED = "required";
+
     public static final String DEFAULT_NAME = null;
     public static final String DEFAULT_ATTRIBUTE = null;
     public static final AttributeType DEFAULT_TYPE = null;
@@ -90,6 +93,7 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
     public static final boolean DEFAULT_ARRAY = false;
     public static final boolean DEFAULT_IMMUTABLE = false;
     public static final boolean DEFAULT_FINAL = false;
+    public static final boolean DEFAULT_REQUIRED = false;
 
     private IMetaClassRepository metaClassRepository;
     private Options options = new Options();
@@ -158,6 +162,12 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
         finalOption.setArgs(0);
         finalOption.setRequired(false);
         options.addOption(finalOption);
+
+        Option requiredOption = new Option(OPTION_REQUIRED, LONG_OPTION_REQUIRED, false,
+                "Required flag for new instance of MetaAttribute.");
+        requiredOption.setArgs(0);
+        requiredOption.setRequired(false);
+        options.addOption(requiredOption);
     }
 
     @Override
@@ -172,6 +182,7 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
         boolean isArray = DEFAULT_ARRAY;
         boolean isImmutable = DEFAULT_IMMUTABLE;
         boolean isFinal = DEFAULT_FINAL;
+        boolean isRequired = DEFAULT_REQUIRED;
 
         try {
             CommandLine commandLine = commandLineParser.parse(options, args);
@@ -222,6 +233,10 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
             if(commandLine.hasOption(OPTION_FINAL)) {
                 isFinal = true;
             }
+
+            if (commandLine.hasOption(OPTION_REQUIRED)) {
+                isRequired = true;
+            }
         }
         catch(ParseException e) {
             System.err.println(e.getMessage());
@@ -257,11 +272,13 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
                 MetaAttribute metaAttribute = new MetaAttribute(false, false, setToAdd);
                 metaAttribute.setImmutable(isImmutable);
                 metaAttribute.setFinal(isFinal);
+                metaAttribute.setRequired(isRequired);
                 metaClass.setMetaAttribute(attribute, metaAttribute);
             } else {
                 MetaAttribute metaAttribute = new MetaAttribute(false, false, childMetaClass);
                 metaAttribute.setImmutable(isImmutable);
                 metaAttribute.setFinal(isFinal);
+                metaAttribute.setRequired(isRequired);
                 metaClass.setMetaAttribute(attribute, metaAttribute);
             }
         } else {
@@ -275,11 +292,13 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
                 MetaAttribute metaAttribute = new MetaAttribute(false, false, setToAdd);
                 metaAttribute.setImmutable(isImmutable);
                 metaAttribute.setFinal(isFinal);
+                metaAttribute.setRequired(isRequired);
                 metaClass.setMetaAttribute(attribute, metaAttribute);
             } else {
                 MetaAttribute metaAttribute = new MetaAttribute(false, false, metaValue);
                 metaAttribute.setImmutable(isImmutable);
                 metaAttribute.setFinal(isFinal);
+                metaAttribute.setRequired(isRequired);
 
                 metaClass.setMetaAttribute(attribute, metaAttribute);
             }

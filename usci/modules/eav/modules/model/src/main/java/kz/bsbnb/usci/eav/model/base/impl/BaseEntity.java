@@ -19,6 +19,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Implements EAV entity object. 
@@ -629,6 +631,13 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     }
 
     private Queue queue;
+    public List lastRuleErrors;
+
+    public List getLastRuleErrors(){
+        if(lastRuleErrors == null)
+            lastRuleErrors = new LinkedList();
+        return lastRuleErrors;
+    }
 
     public synchronized Object getEls(String path){
       queue = new LinkedList();
@@ -666,6 +675,52 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                 for(String e: elems)
                     allowedSet.add(e.trim());
             }
+        }
+
+        if(function.startsWith("hasDuplicates")) {
+            String pattern = "hasDuplicates\\((\\S+)\\)";
+            Matcher m = Pattern.compile(pattern).matcher(function);
+            String downPath;
+            boolean ret = false;
+            lastRuleErrors = new LinkedList();
+
+            if(m.find()) {
+                downPath = m.group(1);
+            } else {
+                throw new RuntimeException("function duplicates not correct: " +
+                        "example {hasDuplicates(subjects)}doc_type.code,date");
+            }
+
+            LinkedList list = (LinkedList) getEls("{get}" + downPath);
+
+            String[] fields = path.split(",");
+
+            Set controlSet;
+
+            if(fields.length == 1)
+                controlSet = new HashSet<String>();
+            else if(fields.length == 2)
+                controlSet = new HashSet<Map.Entry>();
+            else throw new RuntimeException("rule not yet implemented");
+
+            for(Object o : list) {
+                BaseEntity entity = (BaseEntity) o;
+                Object entry = null;
+
+                if(fields.length == 1)
+                    entry = entity.getEl(fields[0]);
+                else if(fields.length == 2) {
+                    entry = new AbstractMap.SimpleEntry(entity.getEl(fields[0]), entity.getEl(fields[1]));
+                }
+
+                if(controlSet.contains(entry)) {
+                    ret = true;
+                    lastRuleErrors.add(entry);
+                } else {
+                    controlSet.add(entry);
+                }
+            }
+            return ret;
         }
 
 

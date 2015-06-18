@@ -8,6 +8,7 @@ import java.util.Date;
 public class BatchEntry extends Persistable
 {
     private String value;
+    private Date repDate;
     private Date updateDate;
     private long userId;
 
@@ -19,6 +20,14 @@ public class BatchEntry extends Persistable
     public void setValue(String value)
     {
         this.value = value;
+    }
+
+    public Date getRepDate() {
+        return repDate;
+    }
+
+    public void setRepDate(Date repDate) {
+        this.repDate = repDate;
     }
 
     public Date getUpdateDate()

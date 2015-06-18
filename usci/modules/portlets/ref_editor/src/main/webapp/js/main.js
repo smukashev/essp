@@ -6,6 +6,16 @@ Ext.require([
 ]);
 
 var currentClassId = null;
+var grid;
+var refStore;
+var entityStore;
+var subEntityStore;
+var attrStore;
+var newArrayElements = [];
+
+var nextArrayIndex = 0;
+
+var modalWindow;
 
 function createXML(currentNode, rootFlag, offset, arrayEl, first, remove) {
     var xmlStr = "";
@@ -54,10 +64,16 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, remove) {
     return xmlStr;
 }
 
-var grid;
-var refStore;
-var entityStore;
-var subEntityStore;
+function fillAttrValuesFromTree(attributes, existingVals) {
+    for (i = 0; i < attributes.length; i++) {
+        for (j = 0; j < existingVals.length; j++) {
+            if (attributes[i].data.code == existingVals[j].data.code) {
+                attributes[i].data.value = existingVals[j].data.value;
+                break;
+            }
+        }
+    }
+}
 
 function createItemsGrid(itemId) {
     Ext.Ajax.request({
@@ -108,7 +124,7 @@ function createItemsGrid(itemId) {
                     itemclick: function(dv, record, item, index, e) {
                         entityId = Ext.getCmp("entityId");
                         entityId.setValue(record.get('ID'));
-                        loadEntity(record.get('ID'));
+                        loadEntity(record.get('ID'), record.get('open_date'));
                     }
                 }
             });
@@ -120,12 +136,12 @@ function createItemsGrid(itemId) {
     });
 }
 
-function loadEntity(entityId) {
+function loadEntity(entityId, date) {
     entityStore.load({
         params: {
             op : 'LIST_ENTITY',
             entityId: entityId,
-            date: Ext.getCmp('edDate').value,
+            date: date,
             asRoot: true
         },
         callback: function(records, operation, success) {
@@ -189,18 +205,8 @@ function loadSubEntity(subNode, isEdit) {
     });
 }
 
-function addField(form, attr, isEdit, isNew, node) {
-    if (isEdit) {
-        idSuffix = "_edit";
-        newItems = newEditFormItems;
-    } else {
-        idSuffix = "_add";
-        newItems = newAddFormItems;
-    }
-
-    if (isNew) {
-        newItems.push(attr);
-    }
+function addField(form, attr, isEdit, node) {
+    idSuffix = isEdit ? "_edit" : "_add";
 
     if (node && node.array) {
         nextArrayIndex++;
@@ -212,29 +218,73 @@ function addField(form, attr, isEdit, isNew, node) {
 
     if (attr.type == "DATE") {
         form.add(Ext.create("Ext.form.field.Date",
-            {
-                id: attr.code + "FromItem" + idSuffix,
-                fieldLabel: attr.title,
-                width: "100%",
-                format: 'd.m.Y',
-                value: new Date(
-                    attr.value.
-                        replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1')),
-                disabled: disabled
-            }));
+                {
+                    id: attr.code + "FromItem" + idSuffix,
+                    fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    labelWidth: "60%",
+                    width: "40%",
+                    format: 'd.m.Y',
+                    value: new Date(
+                        attr.value.
+                            replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1')),
+                    disabled: disabled,
+                    allowBlank: !attr.isRequired,
+                    blankText: label_REQUIRED_FIELD
+                })
+        );
+    } else if (attr.type == "INTEGER" || attr.type == "DOUBLE") {
+        form.add(Ext.create("Ext.form.field.Number",
+                {
+                    id: attr.code + "FromItem" + idSuffix,
+                    fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    labelWidth: "60%",
+                    width: "40%",
+                    value: attr.value,
+                    allowDecimals: attr.type == "DOUBLE",
+                    disabled: disabled,
+                    allowBlank: !attr.isRequired,
+                    blankText: label_REQUIRED_FIELD
+                })
+        );
+    } else if (attr.type == "BOOLEAN") {
+        form.add(Ext.create("Ext.form.field.ComboBox",
+                {
+                    id: attr.code + "FromItem" + idSuffix,
+                    fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    labelWidth: "60%",
+                    width: "40%",
+                    disabled: disabled,
+                    allowBlank: !attr.isRequired,
+                    blankText: label_REQUIRED_FIELD,
+                    editable : false,
+                    store: Ext.create('Ext.data.Store', {
+                        fields: ['value', 'title'],
+                        data: [
+                            {value: 'true', title: 'Да'},
+                            {value: 'false', title: 'Нет'}
+                        ]
+                    }),
+                    displayField: 'title',
+                    valueField: 'value',
+                    value: attr.value
+                })
+        );
     } else if (attr.ref) {
         form.add(Ext.create("Ext.form.field.ComboBox", {
             id: attr.code + "FromItem" + idSuffix,
-            fieldLabel: attr.title,
-            width: "100%",
+            fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+            labelWidth: "60%",
+            width: "40%",
             disabled: disabled,
+            allowBlank: !attr.isRequired,
+            blankText: label_REQUIRED_FIELD,
             store: Ext.create('Ext.data.Store', {
                 model: 'refStoreModel',
                 pageSize: 100,
                 proxy: {
                     type: 'ajax',
                     url: dataUrl,
-                    extraParams: {op : 'LIST_BY_CLASS', metaId: attr.metaId},
+                    extraParams: {op : 'LIST_BY_CLASS_SHORT', metaId: attr.metaId},
                     actionMethods: {
                         read: 'POST'
                     },
@@ -246,123 +296,27 @@ function addField(form, attr, isEdit, isNew, node) {
                 },
                 autoLoad: true,
                 remoteSort: true
-
             }),
             displayField: 'title',
-            valueField: 'id',
-            value: attr.value
+            valueField: 'ID',
+            value: attr.value,
+            editable : false
         }));
     } else {
         form.add(Ext.create("Ext.form.field.Text",
-            {
-                id: attr.code + "FromItem" + idSuffix,
-                fieldLabel: attr.title,
-                width: "100%",
-                value: attr.value,
-                disabled: disabled
-            }));
+                {
+                    id: attr.code + "FromItem" + idSuffix,
+                    fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    labelWidth: "60%",
+                    width: "40%",
+                    value: attr.value,
+                    disabled: disabled,
+                    allowBlank: !attr.isRequired,
+                    blankText: label_REQUIRED_FIELD
+                })
+        );
     }
 }
-
-function addAttributesCombo(form, metaId, isEdit) {
-    idSuffix = isEdit ? "_edit" : "_add";
-
-    var store = Ext.create('Ext.data.Store', {
-        storeId: 'attrsStore' + idSuffix,
-        model: 'attrsStoreModel',
-        pageSize: 100,
-        proxy: {
-            type: 'ajax',
-            url: dataUrl,
-            extraParams: {
-                op : 'LIST_ATTRIBUTES',
-                metaId: metaId
-            },
-            actionMethods: {
-                read: 'POST'
-            },
-            reader: {
-                type: 'json',
-                root: 'data',
-                totalProperty: 'total'
-            }
-        },
-        autoLoad: true,
-        remoteSort: true,
-        listeners : {
-            load : function (obj, records) {
-                var tree = Ext.getCmp('entityTreeView');
-                var selectedNode = tree.getSelectionModel().getLastSelected();
-                var localStore = Ext.StoreMgr.lookup('attrsStore' + idSuffix);
-
-                if (isEdit) {
-                    var count = 0;
-
-                    for (i = 0; i < records.length; i++) {
-                        var rec = records[i].data;
-
-                        for (j = 0; j < selectedNode.childNodes.length; j++) {
-                            if (rec.code == selectedNode.childNodes[j].data.code) {
-                                localStore.removeAt(i - count);
-                                count++;
-                            }
-                        }
-                    }
-
-                    if (count == records.length) {
-                        var combo = Ext.getCmp("attributesCombo" + idSuffix);
-                        var btn = Ext.getCmp("btnFormAdd");
-                        form.remove(combo);
-                        form.remove(btn);
-                    }
-                }
-            }
-        }
-    });
-
-    form.add(Ext.create("Ext.form.field.ComboBox", {
-        id: "attributesCombo" + idSuffix,
-        fieldLabel: "Атрибут:",
-        width: "100%",
-        store: store,
-        editable: false,
-        displayField: 'title',
-        valueField: 'code'
-        //hidden: !isEdit
-    }));
-
-    var combo = Ext.getCmp("attributesCombo" + idSuffix);
-    combo.on('click', function () {
-        combo.expand();
-    });
-
-    combo.on('select', function () {
-        combo.expand();
-    });
-
-    form.add(Ext.create('Ext.button.Button', {
-        id: "btnFormAdd",
-        text: "Добавить",
-        //hidden: !isEdit,
-        handler : function () {
-            var combo = Ext.getCmp('attributesCombo' + idSuffix);
-            var selectedAttrName = combo.getValue();
-            if (!selectedAttrName) return;
-
-            var store = Ext.StoreMgr.lookup("attrsStore" + idSuffix);
-            var index = store.findExact('code', selectedAttrName);
-            var rec = store.getAt(index);
-            store.removeAt(index);
-            combo.setValue(null);
-
-            if (!Ext.getCmp(rec.data.code + "FromItem" + idSuffix)) {
-                addField(form, rec.data, isEdit, true);
-            }
-        }
-    }));
-}
-
-var nextArrayIndex = 0;
 
 function addArrayElementButton(form, selectedNode, isEdit) {
     form.add(Ext.create('Ext.button.Button', {
@@ -375,13 +329,138 @@ function addArrayElementButton(form, selectedNode, isEdit) {
                 metaId: selectedNode.childMetaId,
                 type: selectedNode.childType
             };
-            addField(form, element, isEdit, true, selectedNode);
+            newArrayElements.push(element);
+            addField(form, element, isEdit, selectedNode);
         }
     }));
 }
 
-var newEditFormItems = [];
-var newAddFormItems = [];
+function loadAttributes(form, selectedNode) {
+    var children;
+    var metaId;
+    var selectedNodeData;
+    var isEdit;
+
+    if (selectedNode) {
+        children = selectedNode.childNodes;
+        metaId = selectedNode.data.metaId;
+        selectedNodeData = selectedNode.data;
+        isEdit = true;
+    } else {
+        children = [];
+        metaId = currentClassId;
+        selectedNodeData = null;
+        isEdit = false;
+    }
+
+    Ext.Ajax.request({
+        url: dataUrl,
+        params: {
+            op: 'LIST_ATTRIBUTES',
+            metaId: metaId
+        },
+        success: function (result) {
+            var json = JSON.parse(result.responseText);
+            attrStore.removeAll();
+            attrStore.add(json.data);
+            var attributes = attrStore.getRange();
+
+            fillAttrValuesFromTree(attributes, children);
+
+            for(var i = 0; i < attributes.length; i++) {
+                addField(form, attributes[i].data, isEdit, selectedNodeData);
+            }
+        }
+    });
+}
+
+function saveFormValues(isEdit) {
+    var idSuffix = isEdit ? "_edit" : "_add";
+    var tree = Ext.getCmp('entityTreeView');
+    var selectedNode = tree.getSelectionModel().getLastSelected();
+
+    if (!isEdit) {
+        rootNode = tree.getRootNode();
+
+        var classesCombo = Ext.getCmp('entityEditorComplexTypeCombo');
+        var value = classesCombo.getValue();
+        var rec = classesCombo.findRecordByValue(value);
+
+        rootNode.removeAll();
+        rootNode.appendChild({
+            leaf: false,
+            title: rec.data.className,
+            code: rec.data.className,
+            type: "META_CLASS",
+            metaId: rec.data.classId
+        });
+        selectedNode = rootNode.getChildAt(0);
+    }
+    if (selectedNode.data.array) {
+        for (var i = 0; i < newArrayElements.length; i++) {
+            selectedNode.appendChild(newArrayElements[i]);
+        }
+        selectedNode.data.value = selectedNode.childNodes.length;
+    } else {
+        var attributes = attrStore.getRange();
+
+        for (var i = 0; i < attributes.length; i++) {
+            var attr = attributes[i].data;
+
+            var field = Ext.getCmp(attr.code + "FromItem" + idSuffix);
+
+            var fieldValue;
+
+            if (attr.type == "DATE") {
+                fieldValue = field.getSubmitValue();
+            } else {
+                fieldValue = field.getValue();
+            }
+
+            var existingAttrNode = selectedNode.findChild('code', attr.code);
+
+            if (attr.array) {
+                if (!existingAttrNode) {
+                    selectedNode.appendChild(attr);
+                    subNode = selectedNode.getChildAt(selectedNode.childNodes.length - 1);
+                }
+            } else if (fieldValue) {
+                var subNode;
+
+                if (existingAttrNode) {
+                    subNode = existingAttrNode;
+                } else {
+                    selectedNode.appendChild(attr);
+                    subNode = selectedNode.getChildAt(selectedNode.childNodes.length - 1);
+                }
+
+                subNode.data.value = fieldValue;
+
+                if (attr.simple) {
+                    subNode.data.leaf = true;
+                    subNode.data.iconCls = 'file';
+                } else {
+                    subNode.data.leaf = false;
+                    subNode.data.iconCls = 'folder';
+
+                    if (attr.ref && attr.type == "META_CLASS") {
+                        loadSubEntity(subNode, isEdit);
+                    }
+                }
+            } else {
+                if (existingAttrNode) {
+                    selectedNode.removeChild(existingAttrNode);
+                }
+            }
+        }
+    }
+
+    tree.getView().refresh();
+
+    if (!isEdit) {
+        modalWindow.hide();
+    }
+}
 
 Ext.onReady(function() {
     grid = null;
@@ -413,7 +492,10 @@ Ext.onReady(function() {
 
     Ext.define('refStoreModel', {
         extend: 'Ext.data.Model',
-        fields: ['id','title']
+        fields: [
+            {name: 'ID', type: 'string'},
+            {name: 'title', type: 'string'}
+        ]
     });
 
     Ext.define('attrsStoreModel', {
@@ -427,10 +509,16 @@ Ext.onReady(function() {
             {name: 'ref',     type: 'boolean'},
             {name: 'type',     type: 'string'},
             {name: 'isKey',     type: 'boolean'},
+            {name: 'isRequired',     type: 'boolean'},
             {name: 'metaId',     type: 'string'},
             {name: 'childMetaId',     type: 'string'},
             {name: 'childType',     type: 'string'},
         ]
+    });
+
+    attrStore = Ext.create('Ext.data.Store', {
+        storeId: 'attrsStore',
+        model: 'attrsStoreModel'
     });
 
     Ext.define('entityModel', {
@@ -444,6 +532,7 @@ Ext.onReady(function() {
             {name: 'ref',     type: 'boolean'},
             {name: 'type',     type: 'string'},
             {name: 'isKey',     type: 'boolean'},
+            {name: 'isRequired',     type: 'boolean'},
             {name: 'metaId',     type: 'string'},
             {name: 'childMetaId',     type: 'string'},
             {name: 'childType',     type: 'string'},
@@ -481,12 +570,18 @@ Ext.onReady(function() {
 
             var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
 
+
+
             Ext.Ajax.request({
                 url: dataUrl,
                 method: 'POST',
                 params: {
                     xml_data: xmlStr,
+                    date: Ext.getCmp('edDate').value,
                     op: 'SAVE_XML'
+                },
+                success: function(response) {
+                    alert("Сохранено успешно");
                 }
             });
         },
@@ -496,6 +591,7 @@ Ext.onReady(function() {
     var buttonShowXML = Ext.create('Ext.button.Button', {
         id: "entityEditorShowXmlBtn",
         text: 'XML',
+        maxWidth: 200,
         handler : function (){
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
@@ -543,32 +639,63 @@ Ext.onReady(function() {
             });
 
             xmlFromWin.show();
-        },
-        maxWidth: 200
+        }
     });
 
     var buttonDelete = Ext.create('Ext.button.Button', {
         id: "buttonDelete",
         text: label_DEL,
+        maxWidth: 200,
         handler : function (){
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
 
             var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true, true);
 
+            var selected = grid.getSelectionModel().getLastSelected();
+
             Ext.Ajax.request({
                 url: dataUrl,
                 method: 'POST',
                 params: {
                     xml_data: xmlStr,
+                    date: selected.data.open_date,
                     op: 'SAVE_XML'
+                },
+                success: function(response) {
+                    alert("Операция выполнена успешно");
                 }
             });
-        },
-        maxWidth: 200
+        }
     });
 
-    var modalWindow = Ext.create("Ext.Window",{
+    var buttonExport = Ext.create('Ext.button.Button', {
+        id: 'buttonExport',
+        text: label_EXPORT,
+        maxWidth: 200,
+        handler: function () {
+
+            var hiddenForm = Ext.create('Ext.form.Panel', {
+                title:'hiddenForm',
+                standardSubmit: true,
+                url: dataUrl,
+                timeout: 120000,
+                height:0,
+                width: 0,
+                hidden:true,
+                items:[
+                    {xtype:'textfield', name:'op', value:'EXPORT_REF'},
+                    {xtype:'textfield', name:'metaId', value: currentClassId},
+                    {xtype:'textfield', name:'date', value: Ext.getCmp('edDate').getSubmitValue()},
+                    {xtype:'textfield', name:'withHis', value: Ext.getCmp('checkboxHistory').pressed}
+                ]
+            });
+
+            hiddenForm.getForm().submit();
+        }
+    });
+
+    modalWindow = Ext.create("Ext.Window",{
         title : 'Добавление записи',
         width : 400,
         modal : true,
@@ -577,6 +704,8 @@ Ext.onReady(function() {
         items  : [
             {
                 id: "ModalFormPannel",
+                xtype: 'form',
+                bodyPadding: '5 5 0',
                 width: "100%",
                 defaults: {
                     anchor: '100%'
@@ -586,54 +715,10 @@ Ext.onReady(function() {
         tbar : [{
             text : 'Сохранить новую запись' ,
             handler :function(){
-                var tree = Ext.getCmp('entityTreeView');
-                rootNode = tree.getRootNode();
-
-                var classesCombo = Ext.getCmp('entityEditorComplexTypeCombo');
-                var value = classesCombo.getValue();
-                var rec = classesCombo.findRecordByValue(value);
-
-                rootNode.removeAll();
-
-                rootNode.appendChild({
-                    leaf: false,
-                    title: rec.data.className,
-                    code: rec.data.className,
-                    type: "META_CLASS",
-                    metaId: rec.data.classId
-                });
-
-                var mainNode = rootNode.getChildAt(0);
-
-                for (i = 0; i < newAddFormItems.length; i++) {
-                    mainNode.appendChild(newAddFormItems[i]);
-                    var currentNode = mainNode.getChildAt(i);
-
-                    if(newAddFormItems[i].simple) {
-                        currentNode.data.leaf = true;
-                        currentNode.data.iconCls = "file";
-
-                        if(newAddFormItems[i].type == "DATE") {
-                            currentNode.data.value = Ext.getCmp(newAddFormItems[i].code + "FromItem_add")
-                                .getSubmitValue();
-                        } else {
-                            currentNode.data.value = Ext.getCmp(newAddFormItems[i].code + "FromItem_add")
-                                .getValue();
-                        }
-
-                    } else {
-                        if(newAddFormItems[i].ref && newAddFormItems[i].type == "META_CLASS") {
-                            currentNode.data.leaf = false;
-                            currentNode.data.iconCls = "folder";
-
-                            loadSubEntity(currentNode, false);
-                        }
-                    }
+                var form = Ext.getCmp('ModalFormPannel');
+                if (form.isValid()) {
+                    saveFormValues(false);
                 }
-
-                tree.getView().refresh();
-
-                this.up('.window').hide();
             }
         }]
     });
@@ -654,7 +739,8 @@ Ext.onReady(function() {
                 return;
             }
 
-            addAttributesCombo(form, metaId, false);
+            loadAttributes(form)
+
             modalWindow.show();
         }
     });
@@ -704,7 +790,7 @@ Ext.onReady(function() {
         listeners : {
             itemclick: function(view, record, item, index, e, eOpts) {
                 nextArrayIndex = 0;
-                newEditFormItems = [];
+                newArrayElements = [];
                 var tree = Ext.getCmp('entityTreeView');
                 var selectedNode = tree.getSelectionModel().getLastSelected();
                 var children = selectedNode.childNodes;
@@ -714,16 +800,14 @@ Ext.onReady(function() {
 
                 if (!selectedNode.data.simple) {
                     if (!selectedNode.data.array) {
-                        if (selectedNode.data.root || !selectedNode.data.ref) {
-                            addAttributesCombo(form, selectedNode.data.metaId, true);
-                        }
+                        loadAttributes(form, selectedNode);
                     } else {
                         addArrayElementButton(form, selectedNode.data, true);
-                    }
-                }
 
-                for(var i = 0; i < children.length; i++){
-                    addField(form, children[i].data, true, false, selectedNode.data);
+                        for(var i = 0; i < children.length; i++){
+                            addField(form, children[i].data, true, selectedNode.data);
+                        }
+                    }
                 }
 
                 form.doLayout();
@@ -745,7 +829,7 @@ Ext.onReady(function() {
         mm='0'+mm
     }
 
-    today = dd+'/'+mm+'/'+yyyy;
+    today = dd+'.'+mm+'.'+yyyy;
     // ------------------------------------------------
 
     mainEntityEditorPanel = Ext.create('Ext.panel.Panel', {
@@ -768,7 +852,7 @@ Ext.onReady(function() {
                 items: [entityGrid]
             },{
                 id: "EntityEditorFormPannel",
-                xtype : 'panel',
+                xtype : 'form',
                 region: 'east',
                 width: "40%",
                 collapsible: true,
@@ -785,53 +869,10 @@ Ext.onReady(function() {
                         id: "btnFormSave",
                         text: label_CONFIRM_CHANGES,
                         handler : function () {
-                            var tree = Ext.getCmp('entityTreeView');
-                            var selectedNode = tree.getSelectionModel().getLastSelected();
-
-                            var children = selectedNode.childNodes;
-
-                            for(var i = 0; i < children.length; i++){
-                                if(children[i].data.simple) {
-                                    if(children[i].data.type == "DATE") {
-                                        children[i].data.value = Ext.getCmp(children[i].data.code + "FromItem_edit")
-                                            .getSubmitValue();
-                                    } else {
-                                        children[i].data.value = Ext.getCmp(children[i].data.code + "FromItem_edit")
-                                            .getValue();
-                                    }
-                                } else {
-                                    if(children[i].data.ref && children[i].data.type == "META_CLASS") {
-                                        loadSubEntity(children[i], true);
-                                    }
-                                }
+                            var form = Ext.getCmp('EntityEditorFormPannel');
+                            if (form.isValid()) {
+                                saveFormValues(true);
                             }
-
-                            for (i = 0; i < newEditFormItems.length; i++) {
-                                if(newEditFormItems[i].simple) {
-                                    newEditFormItems[i].leaf = true;
-
-                                    if(newEditFormItems[i].type == "DATE") {
-                                        newEditFormItems[i].value = Ext.getCmp(newEditFormItems[i].code + "FromItem_edit")
-                                            .getSubmitValue();
-                                    } else {
-                                        newEditFormItems[i].value = Ext.getCmp(newEditFormItems[i].code + "FromItem_edit")
-                                            .getValue();
-                                    }
-                                    selectedNode.appendChild(newEditFormItems[i]);
-
-                                } else {
-                                    selectedNode.appendChild(newEditFormItems[i]);
-
-                                    var subNode = selectedNode.getChildAt(children.length - 1);
-
-                                    if(newEditFormItems[i].ref && newEditFormItems[i].type == "META_CLASS") {
-                                        loadSubEntity(subNode, true);
-                                    }
-                                }
-                            }
-
-                            Ext.getCmp("entityTreeView").getView().refresh();
-                            newEditFormItems = [];
                         }
                     })
                 ]
@@ -878,7 +919,7 @@ Ext.onReady(function() {
                         fieldLabel: label_Date,
                         id: 'edDate',
                         xtype: 'datefield',
-                        format: 'd/m/Y',
+                        format: 'd.m.Y',
                         maxWidth: 400,
                         value : today
                     },
@@ -912,7 +953,7 @@ Ext.onReady(function() {
             }
         ],
         tbar: [
-            buttonAdd, buttonXML, buttonShowXML, buttonDelete
+            buttonAdd, buttonXML, buttonShowXML, buttonDelete, buttonExport
         ]
     });
 });

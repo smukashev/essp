@@ -11,6 +11,8 @@ import java.util.Map;
  */
 public class RefListResponse implements Serializable {
 
+    private static final long serialVersionUID = 0L;
+
     public RefListResponse(List<Map<String, Object>> data) {
         this.data = data;
     }

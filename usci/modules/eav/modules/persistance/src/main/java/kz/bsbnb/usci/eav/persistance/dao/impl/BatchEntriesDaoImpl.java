@@ -38,6 +38,7 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
                 .select(BATCH_ENTRIES.ID,
                         BATCH_ENTRIES.USER_ID,
                         BATCH_ENTRIES.UPDATED_DATE,
+                        BATCH_ENTRIES.REPORT_DATE,
                         BATCH_ENTRIES.VALUE)
                 .from(BATCH_ENTRIES)
                 .where(BATCH_ENTRIES.ID.equal(id));
@@ -62,6 +63,8 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
             batchEntry.setUserId(((BigDecimal) row.get(BATCH_ENTRIES.USER_ID.getName())).longValue());
             batchEntry.setUpdateDate(DataUtils.convert((Timestamp)
                     row.get(BATCH_ENTRIES.UPDATED_DATE.getName())));
+            batchEntry.setRepDate(DataUtils.convert((Timestamp)
+                    row.get(BATCH_ENTRIES.REPORT_DATE.getName())));
             batchEntry.setValue((String) row.get(BATCH_ENTRIES.VALUE.getName()));
         }
         else
@@ -81,6 +84,7 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
                 .insertInto(BATCH_ENTRIES)
                 .set(BATCH_ENTRIES.USER_ID, batch.getUserId())
                 .set(BATCH_ENTRIES.VALUE, batch.getValue())
+                .set(BATCH_ENTRIES.REPORT_DATE, new Date(batch.getRepDate().getTime()))
                 .set(BATCH_ENTRIES.UPDATED_DATE,
                         new Date(Calendar.getInstance().getTimeInMillis()));
 
@@ -113,6 +117,7 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
         Select select = context
                 .select(BATCH_ENTRIES.ID,
                         BATCH_ENTRIES.UPDATED_DATE,
+                        BATCH_ENTRIES.REPORT_DATE,
                         BATCH_ENTRIES.VALUE)
                 .from(BATCH_ENTRIES)
                 .where(BATCH_ENTRIES.USER_ID.equal(userId));
@@ -127,6 +132,8 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
             batchEntry.setValue((String)row.get(BATCH_ENTRIES.VALUE.getName()));
             batchEntry.setUpdateDate(DataUtils.convert((Timestamp)
                     row.get(BATCH_ENTRIES.UPDATED_DATE.getName())));
+            batchEntry.setRepDate(DataUtils.convert((Timestamp)
+                    row.get(BATCH_ENTRIES.REPORT_DATE.getName())));
 
             result.add(batchEntry);
         }
