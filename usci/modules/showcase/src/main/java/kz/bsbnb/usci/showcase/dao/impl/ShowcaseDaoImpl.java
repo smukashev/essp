@@ -7,8 +7,10 @@ import kz.bsbnb.ddlutils.model.Table;
 import kz.bsbnb.usci.core.service.IMetaFactoryService;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.BaseContainer;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -629,128 +631,137 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         }
     }
 
-    public HashMap<Object, HashMap<String, Object>> generateMap(IBaseEntity globalEntity, IBaseEntity entity,
-                                               ShowcaseHolder showcaseHolder) {
-        HashMap<String, Object> map = new HashMap<>();
-        HashMap<String, Object> keyMap = new HashMap<>();
+    public HashMap<String, HashSet<String>> generatePaths(IBaseEntity entity, ShowcaseHolder showcaseHolder) {
+        HashMap<String, HashSet<String>> paths = new HashMap<>();
 
-        map.put(showcaseHolder.getRootClassName() + "_id", entity.getId());
-        keyMap.put(showcaseHolder.getRootClassName() + "_id", "GLOBAL");
+        HashSet<String> tmpSet = null;
 
-        for(ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFieldsList()) {
-            Object value = entity.getEl(sf.getAttributePath());
+        for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFieldsList()) {
+            IMetaType attributeMetaType = entity.getMeta().getEl(sf.getAttributePath());
 
-            if(value == null)
-                continue;
-
-            if(value instanceof BaseSet) {
-                BaseSet bSet = (BaseSet) value;
-                IMetaType metaType = bSet.getMemberType();
-
-                if(metaType.isComplex()) {
-                    Object object = map.get(sf.getColumnName());
-
-                    HashMap innerMap;
-                    if(object == null) {
-                        innerMap = new HashMap();
+            if (sf.getAttributePath().contains(".")) {
+                if(attributeMetaType.isComplex()) {
+                    if(paths.get("root." + sf.getAttributePath()) != null) {
+                        tmpSet = paths.get("root." + sf.getAttributePath());
                     } else {
-                        innerMap = (HashMap) object;
+                        tmpSet = new HashSet<>();
                     }
 
-                    for(IBaseValue baseValue : bSet.get()) {
-                        BaseEntity baseEntity = (BaseEntity) baseValue.getValue();
+                    tmpSet.add("root");
+                    paths.put("root." + sf.getAttributePath(), tmpSet);
 
-                        if(!sf.getAttributePath().contains(".")) {
-                            innerMap.put(baseEntity.getId(), baseEntity.getId());
-                            keyMap.put(sf.getColumnName(), "LOCAL");
-                        } else {
-                            Object tmpObject = baseEntity.getEl(sf.getAttributePath().
-                                    substring(sf.getAttributePath().indexOf(".")));
+                    String path = sf.getAttributePath().substring(0, sf.getAttributePath().lastIndexOf("."));
+                    String name = sf.getAttributePath().substring(sf.getAttributePath().lastIndexOf(".") + 1);
 
-                            if(tmpObject instanceof BaseEntity) {
-                                innerMap.put(baseEntity.getId(), ((BaseEntity) tmpObject).getId());
+                    if(paths.get("root." + path) != null) {
+                        tmpSet = paths.get("root." + path);
+                    } else {
+                        tmpSet = new HashSet<>();
+                    }
+
+                    tmpSet.add(name);
+                    paths.put("root." + path, tmpSet);
+                } else {
+                    String path = sf.getAttributePath().substring(0, sf.getAttributePath().lastIndexOf("."));
+                    String name = sf.getAttributePath().substring(sf.getAttributePath().lastIndexOf(".") + 1);
+
+                    if(paths.get("root." + path) != null) {
+                        tmpSet = paths.get("root." + path);
+                    } else {
+                        tmpSet = new HashSet<>();
+                    }
+
+                    tmpSet.add(name);
+                    paths.put("root." + path, tmpSet);
+                }
+            } else {
+                if(paths.get("root") != null) {
+                    tmpSet = paths.get("root");
+                } else {
+                    tmpSet = new HashSet<>();
+                }
+
+                if(attributeMetaType.isComplex() || attributeMetaType.isSet()) {
+                    tmpSet.add("root." + sf.getAttributePath());
+                    paths.put("root", tmpSet);
+
+                    tmpSet = new HashSet<>();
+                    tmpSet.add("root");
+                    paths.put("root." + sf.getAttributePath(), tmpSet);
+                } else {
+                    tmpSet.add(sf.getAttributePath());
+                    paths.put("root", tmpSet);
+                }
+            }
+        }
+
+        return paths;
+    }
+
+    HashMap<String, Object> readMap(String curPath, IBaseEntity entity, HashMap<String, HashSet<String>> paths) {
+        HashSet<String> attributes = paths.get(curPath);
+
+        HashMap<String, Object> map = new HashMap<>();
+
+        if(attributes != null) {
+            for(String attribute : attributes) {
+                if(attribute.equals("root") && entity != null) {
+                    map.put(entity.getMeta().getClassName()+"_id", entity.getId());
+                } else {
+                    if(attribute.contains("root.")) {
+                        Object container = entity.getEl(attribute.substring(attribute.indexOf(".")));
+
+                        if (container instanceof BaseEntity) {
+                            BaseEntity innerEntity = (BaseEntity) container;
+
+                            if(innerEntity != null)
+                                map.put(attribute, readMap(attribute, innerEntity, paths));
+                        } else if (container instanceof BaseSet) {
+                            BaseSet innerSet = (BaseSet) container;
+
+                            if(innerSet.getMemberType().isComplex()) {
+                                for(IBaseValue bValue : innerSet.get()) {
+                                    BaseEntity bValueEntity = (BaseEntity) bValue.getValue();
+                                    map.put(attribute + "_" + bValueEntity.getId(), readMap(attribute, bValueEntity, paths));
+                                }
                             } else {
-                                innerMap.put(baseEntity.getId(), tmpObject);
+                                for(IBaseValue bValue : innerSet.get())
+                                    map.put(attribute, bValue.getValue());
                             }
+                        } else {
+                            System.err.println("Operation is not supported!");
+                            return null;
+                        }
+
+                    } else {
+                        IBaseValue iBaseValue = entity.getBaseValue(attribute);
+
+                        if(iBaseValue != null && iBaseValue.getMetaAttribute().getMetaType().isComplex()) {
+                            map.put(curPath + "." + attribute, readMap(curPath + "." + attribute,
+                                        (BaseEntity) iBaseValue.getValue(), paths));
+                        } else if(iBaseValue != null) {
+                            map.put(attribute, iBaseValue.getValue());
                         }
                     }
-
-                    map.put(sf.getColumnName(), innerMap);
-                } else {
-                    Object object = map.get(sf.getColumnName());
-
-                    HashMap innerMap;
-                    if(object == null) {
-                        innerMap = new HashMap();
-                    } else {
-                        innerMap = (HashMap) object;
-                    }
-
-                    for(IBaseValue baseValue : bSet.get()) {
-                        Object simpleValue = baseValue.getValue();
-
-                        /*innerMap.put(simpleValue.getId(),
-                                baseEntity.getEl(sf.getAttributePath().
-                                        substring(sf.getAttributePath().indexOf("."))));*/
-                    }
-
-                    map.put(sf.getColumnName(), innerMap);
-                }
-
-            } else if(value instanceof BaseEntity) {
-                map.put(sf.getColumnName(), ((BaseEntity) value).getId());
-            } else {
-                map.put(sf.getColumnName(), value);
-            }
-        }
-
-        for(ShowCaseField sf : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
-            Object value = globalEntity.getEl(sf.getAttributePath());
-
-            if(value instanceof BaseEntity) {
-                map.put(sf.getColumnName(), ((BaseEntity) value).getId());
-            } else if(value instanceof BaseSet) {
-                throw new UnsupportedOperationException("Adding custom set in not supported!");
-            } else {
-                map.put(sf.getColumnName(), value);
-            }
-        }
-
-        HashMap<Object, HashMap<String, Object>> returnMap = new HashMap<>();
-
-        for(Map.Entry entry : map.entrySet()) {
-            if(entry.getValue() instanceof Map) {
-                for(Map.Entry innerEntry : ((HashMap<String, Object>) entry.getValue()).entrySet()) {
-                    HashMap<String, Object> returnInnerMap;
-
-                    if(returnMap.get(innerEntry.getKey()) != null) {
-                        returnInnerMap = returnMap.get(innerEntry.getKey());
-                    } else {
-                        returnInnerMap = new HashMap<>();
-                    }
-
-                    returnInnerMap.put((String) entry.getKey(), innerEntry.getValue());
-                    returnMap.put(innerEntry.getKey(), returnInnerMap);
                 }
             }
         }
 
-        for(Map.Entry entry : map.entrySet()) {
-            if(!(entry.getValue() instanceof Map)) {
-                if (returnMap.size() > 0) {
-                    for (Map.Entry returnEntry : returnMap.entrySet()) {
-                        ((HashMap<String, Object>) returnEntry.getValue()).put((String)
-                                entry.getKey(), entry.getValue());
-                    }
-                } else {
-                    returnMap.put(entity.getId(), map);
-                }
-            }
-        }
+        return map;
+    }
 
-        returnMap.put("_KEYMAP", keyMap);
+    public HashMap<Object, HashMap<String, Object>> generateMap(IBaseEntity globalEntity, IBaseEntity entity,
+                                               ShowcaseHolder showcaseHolder){
+        HashMap<String, HashSet<String>> paths = generatePaths(entity, showcaseHolder);
 
-        return returnMap;
+        HashSet<String> rootAttributes = paths.get("root");
+        rootAttributes.add("root");
+
+        HashMap<String, Object> map1 = readMap("root", entity, paths);
+
+        System.out.println(showcaseHolder.getRootClassName());
+
+        return null;
     }
 
     public boolean compareValues(HistoryState state, HashMap<String, Object> savingMap,
@@ -1005,11 +1016,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     @Override
-    public void remove(ShowCase showCase) {
+    public void remove (ShowCase showCase) {
         throw new RuntimeException("Unimplemented");
     }
 
-    private long insertField(ShowCaseField showCaseField, long showCaseId) {
+        private long insertField(ShowCaseField showCaseField, long showCaseId) {
         Insert insert = context
                 .insertInto(EAV_SC_SHOWCASE_FIELDS)
                 .set(EAV_SC_SHOWCASE_FIELDS.META_ID, showCaseField.getMetaId())

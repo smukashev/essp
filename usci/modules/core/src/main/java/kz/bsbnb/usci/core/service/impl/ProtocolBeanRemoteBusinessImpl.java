@@ -36,7 +36,6 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
     @PostConstruct
     public void init() {
         System.setProperty("viewmode", "production");
-        //System.setProperty("viewmode", "development");
 
         ArrayList<URI> nodes = new ArrayList<URI>();
         nodes.add(URI.create("http://127.0.0.1:8091/pools"));
