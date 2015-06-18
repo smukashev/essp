@@ -44,7 +44,7 @@ public class RuleService implements IRuleService {
     @Override
     public long save(Rule rule, BatchVersion batchVersion) {
 
-//        Batch batch = batchDao.loadBatch(batchVersion.getPackage_id());
+//        Batch batch = batchDao.loadBatch(batchVersion.getPackageId());
 //
 //        listenerSingleton.callListeners(batchVersion.getId(),batchVersion.getReport_date(), batch.getName());
         long id = ruleDao.save(rule,batchVersion);
@@ -150,17 +150,32 @@ public class RuleService implements IRuleService {
 
     @Override
     public String getPackageErrorsOnRuleUpdate(String ruleBody, Long ruleId, String pkgName, Date repDate) {
-        return rulesSingleton.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, repDate, false, false);
+        return rulesSingleton.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, repDate, false, false, false);
     }
 
     @Override
-    public String getPackageErrorsOnRuleActivate(String ruleBody, Long ruleId, String pkgName, Date repDate) {
-        return rulesSingleton.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, repDate, true, false);
+    public String getPackageErrorsOnRuleActivate(String ruleBody, Long ruleId, String pkgName, Date repDate, boolean ruleEdited) {
+        return rulesSingleton.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, repDate, true, false, ruleEdited);
     }
 
     @Override
     public String getPackageErrorsOnRuleDisable(Long ruleId, String pkgName, Date repDate) {
-        return rulesSingleton.getPackageErrorsOnRuleUpdate("", ruleId, pkgName, repDate, false, true);
+        return rulesSingleton.getPackageErrorsOnRuleUpdate("", ruleId, pkgName, repDate, false, true, false);
+    }
+
+    @Override
+    public boolean activateRule(String ruleBody, Long ruleId) {
+        return ruleDao.activateRule(ruleBody, ruleId);
+    }
+
+    @Override
+    public boolean activateRule(Long ruleId) {
+        return ruleDao.activateRule(ruleId);
+    }
+
+    @Override
+    public boolean disableRule(Long ruleId) {
+        return ruleDao.disableRule(ruleId);
     }
 
     @Override

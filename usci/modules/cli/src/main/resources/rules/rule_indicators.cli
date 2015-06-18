@@ -5,7 +5,9 @@ title: Остаток - Основной долг - Непросроченная
 rule "gen_remains_debt_current"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
-                && getEls("{setString(035)}currency.code") == 0
+                && getEls("{setString(035,398)}currency.code") == 0
+                && getEl("change.remains.debt.current.value") != null
+                && getEl("change.remains.debt.current.value") > 0
                 && getEl("change.remains.debt.current.value_currency") == null )
 then
   $entity.addValidationError("Остаток\\Основной долг\\Непросроченная  задолженность\\Значение остатка в валюте договора должен указываться");
@@ -20,6 +22,8 @@ rule "gen_remains_debt_pastdue"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && getEls("{setString(035,398)}currency.code") == 0
+                && getEl("change.remains.debt.pastdue.value") != null
+                && getEl("change.remains.debt.pastdue.value") > 0
                 && getEl("change.remains.debt.pastdue.value_currency") == null )
 then
   $entity.addValidationError("Остаток\\Основной долг\\Просроченная задолженность\\Значение остатка в валюте договора должен указываться для данного типа кредита");
@@ -34,6 +38,8 @@ rule "credit_gen_remains_debt_writeoff"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && getEls("{setString(035,398)}currency.code") == 0
+                && getEl("change.remains.debt.write_off.value") != null
+                && getEl("change.remains.debt.write_off.value") > 0
                 && getEl("change.remains.debt.write_off.value_currency") == null )
 then
   $entity.addValidationError("Остаток\\Основной долг\\Списанная с баланса задолженность должен указываться для данного типа кредита");
@@ -48,6 +54,8 @@ rule "gen_remains_interest_current"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && getEls("{setString(035,398)}currency.code") == 0
+                && getEl("change.remains.interest.current.value") != null
+                && getEl("change.remains.interest.current.value") > 0
                 && getEl("change.remains.interest.current.value_currency") == null )
 then
   $entity.addValidationError("Остаток\\Вознаграждение\\Непросроченная  задолженность\\Значение остатка в валюте договора");
@@ -62,6 +70,8 @@ rule "gen_remains_interest_pastdue"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && getEls("{setString(035,398)}currency.code") == 0
+                && getEl("change.remains.interest.pastdue.value") != null
+                && getEl("change.remains.interest.pastdue.value") > 0
                 && getEl("change.remains.interest.pastdue.value_currency") == null )
 then
   $entity.addValidationError("Остаток\\Вознаграждение\\Просроченная задолженность\\Значение остатка в валюте договора должен указываться для данного кредита");
@@ -76,6 +86,8 @@ rule "gen_remains_interest_writeoff"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && getEls("{setString(035,398)}currency.code") == 0
+                && getEl("change.remains.interest.write_off.value") != null
+                && getEl("change.remains.interest.write_off.value") > 0
                 && getEl("change.remains.interest.write_off.value_currency") == null )
 then
   $entity.addValidationError("Остаток\\Вознаграждение\\Списанная с баланса задолженность\\Значение остатка в валюте договора должен указываться");
@@ -90,6 +102,8 @@ rule "gen_remains_correction"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && getEls("{setString(035,398)}currency.code") == 0
+                && getEl("change.remains.correction.value") != null
+                && getEl("change.remains.correction.value") > 0
                 && getEl("change.remains.correction.value_currency") == null )
 then
   $entity.addValidationError("Остаток\\Положительная/отрицательная корректировка\\Значение остатка в валюте договора должен указываться");
@@ -104,6 +118,8 @@ rule "gen_remains_discount"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && getEls("{setString(035,398)}currency.code") == 0
+                && getEl("change.remains.discount.value") != null
+                && getEl("change.remains.discount.value") > 0
                 && getEl("change.remains.discount.value_currency") == null )
 then
   $entity.addValidationError("Остаток\\Дисконт/премия\\Значение остатка в валюте договора должен указываться");

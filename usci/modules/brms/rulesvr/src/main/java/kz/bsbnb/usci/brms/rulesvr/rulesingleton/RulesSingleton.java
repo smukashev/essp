@@ -145,10 +145,16 @@ public class RulesSingleton
     }
 
     public String getPackageErrorsOnRuleUpdate(String ruleBody, long ruleId,
-                                               String pkgName, Date repDate, boolean makeActive, boolean makeInActive)
+                                               String pkgName, Date repDate,
+                                               boolean makeActive,
+                                               boolean makeInActive,
+                                               boolean ruleEdited)
     {
 
         if(makeActive && makeInActive)
+            throw new IllegalArgumentException("non proper method call");
+
+        if(!makeActive && ruleEdited)
             throw new IllegalArgumentException("non proper method call");
 
         BatchVersion batchVersion = ruleBatchVersionService.getBatchVersion(pkgName, repDate);
@@ -174,8 +180,9 @@ public class RulesSingleton
 
             if(r.getId() != ruleId)
                 packages += r.getRule() + "\n";
-            else
-                packages += ruleBody + "\n";
+            else {
+                packages += ruleEdited ? ruleBody : r.getRule()+ "\n";
+            }
         }
 
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
@@ -238,7 +245,8 @@ public class RulesSingleton
 
                 for (Rule r : rules)
                 {
-                    packages += r.getRule() + "\n";
+                    if(r.isActive())
+                        packages += r.getRule() + "\n";
                 }
 
                 logger.debug(packages);
@@ -250,7 +258,7 @@ public class RulesSingleton
                             e.getMessage()));
                 }
 
-                ruleCasheEntries.add(new RuleCasheEntry(curVersion.getReport_date(),
+                ruleCasheEntries.add(new RuleCasheEntry(curVersion.getOpenDate(),
                         curBatch.getName() + "_" + curVersion.getId()));
             }
 

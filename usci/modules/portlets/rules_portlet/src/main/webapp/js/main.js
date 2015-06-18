@@ -65,7 +65,7 @@ function initGrid(){
     ruleListGrid = Ext.create('Ext.grid.Panel', {
         store: store,
         columns: [
-            {
+            /*{
                 header: '',
                 xtype: 'actioncolumn',
                 width: 30,
@@ -85,7 +85,7 @@ function initGrid(){
                         });
                     }
                 }]
-            },
+            },*/
             {
                 text     : 'Название',
                 dataIndex: 'name',
@@ -102,7 +102,13 @@ function initGrid(){
                 listeners : {
                     beforecheckchange: function( a, rowIndex, newValue, eOpts ) {
                         var ruleId = ruleListGrid.store.getAt(rowIndex).raw.id;
+                        var ruleBody = editor.getSession().getValue();
+                        var ruleEdited = false;
                         var t = false;
+
+                        if(ruleId == ruleListGrid.getSelectionModel().getLastSelected().data.id) {
+                            ruleEdited = true;
+                        }
 
                         Ext.Ajax.request({
                             url: dataUrl,
@@ -110,11 +116,12 @@ function initGrid(){
                             async: false,
                             params : {
                                 op : 'RULE_SWITCH',
-                                ruleId: ruleListGrid.store.getAt(rowIndex).raw.id,
+                                ruleId: ruleId,
                                 date: Ext.Date.format(Ext.getCmp('elemDatePackage').value, 'd.m.Y'),
                                 pkgName: Ext.getCmp('elemComboPackage').getRawValue(),
                                 newValue: newValue,
-                                ruleBody: editor.getSession().getValue()
+                                ruleBody: ruleBody,
+                                ruleEdited: ruleEdited
                             },
                             reader: {
                                 type: 'json'
@@ -250,7 +257,7 @@ function initGrid(){
 
                     Ext.EventObject.stopPropagation();
                 }
-            },{
+            }/*,{
                 text: 'запуск',
                 id:    'btnRun',
                 icon: contextPathUrl + '/pics/run.png',
@@ -289,7 +296,7 @@ function initGrid(){
                         }
                     }, this, false, this.lastValue);
                 }
-            },{
+            }*/,{
                 text: 'сброс',
                 icon: contextPathUrl + '/pics/bin.png',
                 id: 'btnFlush',
@@ -322,6 +329,13 @@ function initGrid(){
                 //disabled: true,
                 handler: function(){
                     createRuleForm().show();
+                }
+            },{
+                text: 'обновить',
+                id: 'btnRefresh',
+                icon: contextPathUrl + '/pics/refresh.png',
+                handler: function(){
+                    updateRules();
                 }
             }]
         }],
@@ -375,7 +389,7 @@ function reset(){
 
 function updateRules(){
 
-    if(Ext.getCmp('elemComboPackage').value == null || Ext.getCmp('elemDatePackage').value == null)
+    if(Ext.getCmp('elemComboPackage').value == null || Ext.getCmp('elemPackageVersionCombo').value == null)
         return;
     reset();
     ruleListGrid.store.load(
@@ -383,7 +397,7 @@ function updateRules(){
             params: {
                 op: 'GET_RULE_TITLES',
                 packageId:Ext.getCmp('elemComboPackage').value,
-                date: Ext.Date.format(Ext.getCmp('elemDatePackage').value, 'd.m.Y')
+                date: Ext.getCmp('elemPackageVersionCombo').value
             },
             callback: function(a,b,success){
                 if(success == false){
@@ -471,14 +485,6 @@ Ext.onReady(function(){
         }
     );
 
-
-
-
-
-
-
-
-
     packageStore = Ext.create('Ext.data.Store',{
         id: 'packageStore',
         model: 'packageListModel',
@@ -495,6 +501,22 @@ Ext.onReady(function(){
             }
         },
         autoLoad: true
+    });
+
+    packageVersionStore = Ext.create('Ext.data.Store',{
+        id: 'packageVersionStore',
+        model: 'packageListModel',
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {
+                op: 'PACKAGE_VERSIONS'
+            },
+            reader: {
+                type: 'json',
+                root: 'data'
+            }
+        }
     });
 
 
@@ -619,10 +641,14 @@ Ext.onReady(function(){
                                     fieldLabel: 'Выберите пакет',
                                     listeners: {
                                         change: function(){
-                                            updateRules();
+                                            //updateRules();
+                                            packageVersionStore.load({
+                                                params: {
+                                                    packageId: Ext.getCmp('elemComboPackage').value
+                                                }});
                                         }
                                     }
-                                }, {
+                                }/*, {
                                     xtype: 'datefield',
                                     id: 'elemDatePackage',
                                     fieldLabel: 'дата',
@@ -632,6 +658,18 @@ Ext.onReady(function(){
                                         }
                                     },
                                     format: 'd.m.Y'
+                                }*/, {
+                                    xtype: 'combobox',
+                                    id: 'elemPackageVersionCombo',
+                                    store: packageVersionStore,
+                                    displayField: 'name',
+                                    valueField: 'name',
+                                    fieldLabel: 'дата',
+                                    listeners: {
+                                        change: function(){
+                                            updateRules();
+                                        }
+                                    }
                                 }
                             ]
                         },

@@ -2,8 +2,10 @@ package kz.bsbnb.usci.brms.rulesvr.dao.impl;
 
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Delete;
+import org.jooq.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -208,6 +210,57 @@ public class RuleDao implements IRuleDao {
     public void renameRule(long ruleId, String title) {
         String sql = "Update " + PREFIX_ + "rules set title = ? where id = ?";
         jdbcTemplate.update(sql, title, ruleId);
+    }
+
+    @Override
+    public boolean activateRule(String ruleBody, long ruleId) {
+        Update update = context.update(LOGIC_RULES)
+                .set(LOGIC_RULES.RULE, ruleBody)
+                .set(LOGIC_RULES.IS_ACTIVE, DataUtils.convert(true))
+                .where(LOGIC_RULES.ID.eq(ruleId));
+
+
+        try{
+            jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean activateRule(long ruleId) {
+        Update update = context.update(LOGIC_RULES)
+                .set(LOGIC_RULES.IS_ACTIVE, DataUtils.convert(true))
+                .where(LOGIC_RULES.ID.eq(ruleId));
+
+
+        try{
+            jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean disableRule(long ruleId) {
+        Update update = context.update(LOGIC_RULES)
+                .set(LOGIC_RULES.IS_ACTIVE, DataUtils.convert(false))
+                .where(LOGIC_RULES.ID.eq(ruleId));
+
+        try{
+            jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+
+        return true;
     }
 
     @Override

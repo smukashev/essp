@@ -174,7 +174,7 @@ public class CLI {
         //System.setProperty("viewmode", "development");
 
         ArrayList<URI> nodes = new ArrayList<URI>();
-        nodes.add(URI.create("http://127.0.0.1:8091/pools"));
+        nodes.add(URI.create("http://172.17.110.114:8091/pools"));
 
         try {
             couchbaseClient = new CouchbaseClient(nodes, "test", "");
@@ -396,7 +396,7 @@ public class CLI {
         if (args.size() < 5) {
             System.out.println("Usage: <report_date> <output_file>");
             System.out.println("Example: batchstat 01.05.2013 " +
-                    "D:\\usci\\out.txt jdbc:oracle:thin:@170.7.15.15:1521:ESSP core CORE_2013");
+                    "D:\\usci\\out.txt jdbc:oracle:thin:@172.17.110.92:1521:XE core CORE_2013");
             return;
         }
 
@@ -599,7 +599,7 @@ public class CLI {
         if (args.size() < 6) {
             System.out.println("Usage: <report_date> <output_file>");
             System.out.println("Example: batchrestart 01.05.2013 D:\\usci\\out.txt " +
-                    "jdbc:oracle:thin:@170.7.15.15:1521:ESSP core CORE_2013 rmi://127.0.0.1:1097/batchProcessService");
+                    "jdbc:oracle:thin:@172.17.110.92:1521:XE core CORE_2013 rmi://127.0.0.1:1097/batchProcessService");
             return;
         }
 
@@ -826,7 +826,7 @@ public class CLI {
         if (args.size() < 6) {
             System.out.println("Usage: <report_date> <output_file>");
             System.out.println("Example: batchrestartall 01.05.2013 D:\\usci\\out.txt " +
-                    "jdbc:oracle:thin:@170.7.15.15:1521:ESSP " +
+                    "jdbc:oracle:thin:@172.17.110.92:1521:XE " +
                     "core CORE_2013 rmi://127.0.0.1:1097/batchProcessService");
             return;
         }
@@ -2345,12 +2345,6 @@ public class CLI {
             } else if (args.get(0).equals("save")) {
                 long ruleId = ruleService.createNewRuleInBatch(currentRule, currentBatchVersion);
                 System.out.println("ok saved: ruleId = " + ruleId);
-                /* Remove overhead from TNS Listener */
-                try {
-                    Thread.sleep(300);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             } else if (args.get(0).equals("run")) {
 
                 DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");

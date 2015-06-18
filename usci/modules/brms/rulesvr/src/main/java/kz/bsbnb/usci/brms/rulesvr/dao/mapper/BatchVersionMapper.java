@@ -14,7 +14,7 @@ public class BatchVersionMapper implements RowMapper<BatchVersion> {
     public BatchVersion mapRow(ResultSet resultSet, int i) throws SQLException {
         BatchVersion batchVersion = new BatchVersion();
         batchVersion.setId(resultSet.getLong("id"));
-        batchVersion.setReport_date(resultSet.getTimestamp("report_date"));
+        batchVersion.setOpenDate(resultSet.getTimestamp("report_date"));
         return batchVersion;
     }
 }

@@ -37,10 +37,7 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 
 public class FormattedTable extends Table {
-
-    private final Logger logger = Logger.getLogger(FormattedTable.class);
-
-    private final HashMap<Object, String> formatData = new HashMap<Object, String>();
+    private final HashMap<Object, String> formatData = new HashMap<>();
 
     private WritableCellFormat mainFormat;
     private WritableFont mainFont;
@@ -252,7 +249,7 @@ public class FormattedTable extends Table {
             final String date = DATE_FORMATTER_FROM_CURRENT.format(base);
             return DATE_FORMATTER_TO_GMT.parse(date);
         } catch (ParseException e) {
-            logger.error("Date parsing failed. Conversion to GMT wasn't performed.", e);
+            e.printStackTrace();
             return base;
         }
     }
@@ -297,9 +294,9 @@ public class FormattedTable extends Table {
             };
             getWindow().open(resource, "_blank");
         } catch (IOException ioe) {
-            logger.error("Download failed", ioe);
+            ioe.printStackTrace();
         } catch (WriteException we) {
-            logger.error("Download failed", we);
+            we.printStackTrace();
         }
     }
 

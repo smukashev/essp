@@ -56,7 +56,12 @@ public class MainParser extends BatchParser {
 
         if (packageParser.hasMore()) {
             currentBaseEntity = packageParser.getCurrentBaseEntity();
-            currentBaseEntity.put("creditor", new BaseEntityComplexValue(batch, currentIndex, infoParser.getCurrentBaseEntity()));
+            BaseEntity creditor = infoParser.getCurrentBaseEntity();
+            currentBaseEntity.put("creditor", new BaseEntityComplexValue(batch, currentIndex, creditor));
+
+            for(String s : creditor.getValidationErrors()) {
+                currentBaseEntity.addValidationError(s);
+            }
 
             // TODO possibly should be removed, we don't have such fields
 //                currentBaseEntity.put("account_date", infoParser.getAccountDate());

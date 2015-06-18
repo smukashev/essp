@@ -30,14 +30,14 @@
         <module>report-portlet</module>
         <module>crosscheck-portlet</module>
         <module>audit_portlet</module>
-        <!-- <module>signing-portlet</module> -->
+        <module>signing-portlet</module>
         <module>meta_editor</module>
         <module>entity_editor</module>
         <module>ref_editor</module>
         <module>entity_merge</module>
         <module>rules_portlet</module>
         <module>batch_entry_list</module>
-        <!-- <module>showcase-portlet</module> -->
+        <module>showcase-portlet</module>
     </modules>
 
     <distributionManagement>

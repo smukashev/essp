@@ -130,8 +130,8 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
                     Creditor currentCreditor = inputCreditors.get(creditorId);
 
-                    //if (currentCreditor == null)
-                        //continue;
+                    if (currentCreditor == null)
+                        continue;
 
                     BatchStatusArrayJModel statusArrayJModel =
                             gson.fromJson(viewRowNoDocs.getValue(), BatchStatusArrayJModel.class);
@@ -150,7 +150,8 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                             ii.setCompletionDate(statusModel.getReceived());
                         } else if(statusModel.getProtocol().equals("WAITING")) {
                             ii.setReceiverDate(statusModel.getReceived());
-                        } else if (statusModel.getProtocol().equals("ERROR") && ii.getReceiverDate() == null) {
+                        } else if (statusModel.getProtocol().equals("ERROR") &&
+                                ii.getReceiverDate() == null) {
                             ii.setReceiverDate(statusModel.getReceived());
                         }
                     }
@@ -182,6 +183,69 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
                     batchFullStatusJModel = null;
                 }
+            }
+        }
+
+        return list;
+    }
+
+    @Override
+    public List<InputInfo> getPendingBatches(List<Creditor> creditorsList) {
+        ArrayList<InputInfo> list = new ArrayList<>();
+
+        View view = couchbaseClient.getView("batch", "batch_pending");
+        Query query = new Query();
+        query.setStale(Stale.FALSE);
+        query.setDescending(true);
+        query.setLimit(10000);
+        //query.setGroup(true);
+        //query.setGroupLevel(1);
+
+        ViewResponse viewResponse = couchbaseClient.query(view, query);
+
+        Gson gson = new Gson();
+
+        HashMap<Long, Creditor> inputCreditors = new HashMap<>();
+
+        for (Creditor cred : creditorsList) {
+            inputCreditors.put(cred.getId(), cred);
+        }
+
+        BatchFullStatusJModel batchFullStatusJModel = null;
+
+        if (viewResponse != null) {
+            for (ViewRow row : viewResponse) {
+                ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) row;
+
+                batchFullStatusJModel = gson.fromJson(couchbaseClient.get("batch:" +
+                        viewRowNoDocs.getKey()).toString(), BatchFullStatusJModel.class);
+
+                Long key = Long.parseLong(viewRowNoDocs.getKey());
+
+                Long creditorId;
+                if(batchFullStatusJModel.getCreditorId() != null)
+                    creditorId = batchFullStatusJModel.getCreditorId();
+                else
+                    creditorId = getCreditorId(key.longValue());
+
+                if(inputCreditors.get(creditorId) != null) {
+                    InputInfo inputInfo = new InputInfo();
+                    inputInfo.setFileName(batchFullStatusJModel.getFileName());
+                    inputInfo.setId(BigInteger.valueOf(key));
+                    inputInfo.setCreditor(inputCreditors.get(creditorId));
+
+                    Shared s = new Shared();
+                    s.setCode("S");
+                    s.setNameRu("В обработке");
+                    s.setNameKz("В обработке");
+                    inputInfo.setStatus(s);
+
+                    inputInfo.setUserId(batchFullStatusJModel.getUserId());
+                    inputInfo.setReceiverDate(batchFullStatusJModel.getReceived());
+
+                    list.add(inputInfo);
+                }
+
             }
         }
 
