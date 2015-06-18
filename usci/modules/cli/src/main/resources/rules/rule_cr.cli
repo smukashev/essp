@@ -546,4 +546,20 @@ $$$
 
 rule save
 
+rule read $$$
+title: идентификацонный документ для КЗ
+rule "идентификацонный документ для КЗ"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                 && (!identificationDocCheckSuccess((List)getEls("{get}subjects.person[country.code_numeric=398]"))
+                  || !identificationDocCheckSuccess((List)getEls("{get}subjects.organization[country.code_numeric=398]")))
+                 )
+then
+ $entity.addValidationError("Как минимум один идентификационный документ для кз обязателен");
+end
+$$$
+
+rule save
+
+
 quit
