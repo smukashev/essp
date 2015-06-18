@@ -2,6 +2,7 @@ package kz.bsbnb.usci.portlet.report.dm;
 
 import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
 
+import kz.bsbnb.usci.portlet.report.export.ProtocolsForRepDateTableReportExporter;
 import kz.bsbnb.usci.portlet.report.ui.CustomDataSource;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -167,6 +168,26 @@ public class DatabaseConnect {
             closeResources(cursor, ocs, statement, connection);
         }
         return null;
+    }
+
+    public CustomDataSource getDataFromCouchBase(List<Object> parameterList)
+    {
+        int parametersCount = parameterList.size();
+        Date dateParameter=null;
+        Long parameterValue=null;
+        for (int parameterIndex = 0; parameterIndex < parametersCount; parameterIndex++)
+        {
+            Object parameter = parameterList.get(parameterIndex);
+            if (parameter instanceof Date) {
+                dateParameter = (Date) parameter;
+            }
+            else
+            {
+                parameterValue = Long.parseLong(parameter.toString());
+            }
+        }
+
+        return new CustomDataSource(new ProtocolsForRepDateTableReportExporter(parameterValue, dateParameter).getData());
     }
 
     public CustomDataSource getDataSourceFromStoredProcedure(String procedureName, List<Object> parameterList) throws SQLException {
