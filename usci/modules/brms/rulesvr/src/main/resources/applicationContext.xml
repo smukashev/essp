@@ -28,11 +28,13 @@
         </property>
     </bean>
 
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="${ds.driver}"/>
         <property name="url" value="${ds.url}"/>
         <property name="username" value="${ds.user}"/>
         <property name="password" value="${ds.password}"/>
+        <property name="initialSize" value="${ds.initialSize}"/>
+        <property name="maxActive" value="${ds.maxActive}"/>
     </bean>
 
     <bean id="BatchDao" class="kz.bsbnb.usci.brms.rulesvr.dao.impl.BatchDao">
@@ -44,6 +46,10 @@
     </bean>
 
     <bean id="RuleDao" class="kz.bsbnb.usci.brms.rulesvr.dao.impl.RuleDao">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="brmsHelper" class="kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper">
         <property name="dataSource" ref="dataSource"/>
     </bean>
 

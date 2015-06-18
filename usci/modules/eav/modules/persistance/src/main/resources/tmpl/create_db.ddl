@@ -996,8 +996,9 @@
 	</table>
 	<table name="logic_rules">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="rule" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<column name="rule" primaryKey="false" required="false" type="VARCHAR" size="2024" autoIncrement="false"/>
 		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<column name="is_active" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="1"/>
 		<unique>
 			<unique-column name="id"/>
 		</unique>
@@ -1040,7 +1041,7 @@
 	<!-- MAINTENANCE -->
 	<table name="mnt_operations">
 			<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-			<column name="name" type="VARCHAR" size="100" />
+			<column name="name" type="VARCHAR" size="250" />
 	</table>
 
 	<table name="mnt_logs" >

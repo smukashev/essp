@@ -5,15 +5,9 @@ import kz.bsbnb.usci.brms.rulesvr.persistable.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import kz.bsbnb.usci.brms.rulesvr.dao.IBatchVersionDao;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 
-import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -49,7 +43,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
        BatchVersion batchVersion = batchVersionList.get(0);
 
         for (BatchVersion b: batchVersionList){
-            if (b.getReport_date().getTime()>batchVersion.getReport_date().getTime()){
+            if (b.getOpenDate().getTime()>batchVersion.getOpenDate().getTime()){
                 batchVersion = b;
             }
         }
@@ -64,7 +58,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
 
         boolean nn=false;
         for (BatchVersion b: batchVersionList){
-            if (b.getReport_date().before(date) || DateUtils.isSameDay(b.getReport_date(),date)){
+            if (b.getOpenDate().before(date) || DateUtils.isSameDay(b.getOpenDate(),date)){
                 batchVersion = b;
                 nn=true;
                 break;
@@ -72,7 +66,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
         }
 
         for (BatchVersion b: batchVersionList){
-            if (b.getReport_date().before(date) && b.getReport_date().after(batchVersion.getReport_date())){
+            if (b.getOpenDate().before(date) && b.getOpenDate().after(batchVersion.getOpenDate())){
                 batchVersion = b;
                 nn=true;
             }
@@ -101,7 +95,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
         boolean nn=false;
         Long batchVersionId=0L;
         for (BatchVersion b: batchVersionList){
-            if (DateUtils.isSameDay(b.getReport_date(),versionDate)){
+            if (DateUtils.isSameDay(b.getOpenDate(),versionDate)){
                 batchVersionId = b.getId();
                 nn=true;
                 break;

@@ -1,0 +1,43 @@
+rule read $$$
+title: функций проверки балансовых счетов
+
+function boolean isBA5thSymbolCorrect(String ba, List subjects){
+    if(ba.length() < 5) return false;
+
+    if(subjects.size() > 0) {
+        BaseEntity subject = (BaseEntity) subjects.get(0);
+        boolean isResident = false;
+        isResident = isResident || (Integer)subject.getEls("{count}person.country[code_numeric=398]") > 0;
+        isResident = isResident || (Integer)subject.getEls("{count}organization.country[code_numeric=398]") > 0;
+
+        if(isResident && ba.charAt(4) == '1')
+            return true;
+        if(!isResident && ba.charAt(4) == '2')
+            return true;
+
+        return false;
+    }
+
+    return false;
+}
+
+function boolean isBA7thSymbolCorrect(String ba,String currencyCode, Date reportDate){
+    if(ba.length() < 7) return false;
+    if(currencyCode.equals("398"))
+       return ba.charAt(6) == '1';
+
+    boolean isConvertible = BRMSHelper.isCurrencyConvertible(currencyCode, reportDate);
+
+    if(isConvertible)
+        return ba.charAt(6) == '2';
+
+    return ba.charAt(6) == '3';
+
+}
+
+$$$
+
+rule save
+
+
+quit

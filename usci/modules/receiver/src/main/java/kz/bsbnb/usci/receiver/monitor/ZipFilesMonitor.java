@@ -575,9 +575,9 @@ public class ZipFilesMonitor{
             }
         }
 
-        /*if(!haveError && !checkAndFillEavReport(cId, batchInfo, batchId)) {
+        if(!haveError && !checkAndFillEavReport(cId, batchInfo, batchId)) {
             haveError = true;
-        }*/
+        }
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
                 batchInfo.getUserId(), cId);
@@ -598,7 +598,7 @@ public class ZipFilesMonitor{
 
         if (existing != null) {
             if (ReportStatus.COMPLETED.getStatusId().equals(existing.getStatusId())) {
-                String errMsg = "Отчет со статусом 'В ПРОЦЕССЕ' уже существует для кредитора = "
+                String errMsg = "Отчет со статусом 'Завершен' уже существует для кредитора = "
                         + creditorId +  ", отчетная дата = " + batchInfo.getRepDate();
                 logger.error(errMsg);
                 statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
@@ -610,48 +610,52 @@ public class ZipFilesMonitor{
                 return false;
             }
         } else {
-            Date lastApprovedDate = reportBeanRemoteBusiness.getLastApprovedDate(creditorId);
-
-            try {
-                Date expectedDate = lastApprovedDate != null
-                        ? DataTypeUtil.plus(lastApprovedDate, Calendar.MONTH, 1)
-                        : new SimpleDateFormat("dd/MM/yyyy").parse(Report.INITIAL_REPORT_DATE_STR);
-
-                if (!batchInfo.getRepDate().equals(expectedDate)) {
-                    String errMsg = "Отчеты должны отправляться последовательно по месяцам";
-                    logger.error(errMsg);
-
-                    statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
-                            BatchStatuses.ERROR,
-                            errMsg,
-                            new Date(),
-                            batchInfo.getUserId()
-                    ));
-                    return false;
-                }
-
-            } catch (ParseException e) {
-                String errMsg = "Ошибка при парсинге даты";
-                logger.error(errMsg, e);
-                statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
-                        BatchStatuses.ERROR,
-                        errMsg,
-                        new Date(),
-                        batchInfo.getUserId()
-                ));
-                return false;
-            }
+//            Date lastApprovedDate = reportBeanRemoteBusiness.getLastApprovedDate(creditorId);
+//
+//            try {
+//                Date expectedDate = lastApprovedDate != null
+//                        ? DataTypeUtil.plus(lastApprovedDate, Calendar.MONTH, 1)
+//                        : new SimpleDateFormat("dd/MM/yyyy").parse(Report.INITIAL_REPORT_DATE_STR);
+//
+//                if (!batchInfo.getRepDate().equals(expectedDate)) {
+//                    String errMsg = "Отчеты должны отправляться последовательно по месяцам";
+//                    logger.error(errMsg);
+//
+//                    statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
+//                            BatchStatuses.ERROR,
+//                            errMsg,
+//                            new Date(),
+//                            batchInfo.getUserId()
+//                    ));
+//                    return false;
+//                }
+//
+//            } catch (ParseException e) {
+//                String errMsg = "Ошибка при парсинге даты";
+//                logger.error(errMsg, e);
+//                statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
+//                        BatchStatuses.ERROR,
+//                        errMsg,
+//                        new Date(),
+//                        batchInfo.getUserId()
+//                ));
+//                return false;
+//            }
         }
 
         if (existing != null) {
             existing.setStatusId(ReportStatus.IN_PROGRESS.getStatusId());
             existing.setTotalCount(batchInfo.getTotalCount());
             existing.setActualCount(batchInfo.getActualCount());
-            existing.setLastManualEditDate(new Date());
+            existing.setEndDate(new Date());
 
             PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
             PortalUser portalUser = userService.getUser(batchInfo.getUserId());
-            reportBeanRemoteBusiness.updateReport(existing, portalUser.getScreenName());
+            if(portalUser != null)
+                reportBeanRemoteBusiness.updateReport(existing, portalUser.getScreenName());
+            else
+                reportBeanRemoteBusiness.updateReport(existing, "Unknown");
+
             batchInfo.setReportId(existing.getId());
         } else {
             Report report = new Report();
@@ -665,11 +669,15 @@ public class ZipFilesMonitor{
             report.setActualCount(batchInfo.getActualCount());
             report.setReportDate(batchInfo.getRepDate());
             report.setBeginningDate(new Date());
-            report.setLastManualEditDate(new Date());
+            report.setEndDate(new Date());
 
             PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
             PortalUser portalUser = userService.getUser(batchInfo.getUserId());
-            Long reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
+            Long reportId;
+            if(portalUser != null)
+                reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
+            else
+                reportId = reportBeanRemoteBusiness.insert(report, "Unknown");
             batchInfo.setReportId(reportId);
         }
 

@@ -1,0 +1,28 @@
+rule read $$$
+title: аин физ лицо
+rule "аин физ лицо"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ( $r : getInvalidAINs((List)getEls("{get}subjects.person.docs[doc_type.code=17]no"), true) && $r.size() > 0))
+then
+	$entity.addValidationError("Некорректный аин: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: аин юр. лицо
+rule "аин юр. лицо"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ( $r : getInvalidAINs((List)getEls("{get}subjects.organization.docs[doc_type.code=17]no"), false) && $r.size() > 0))
+then
+	$entity.addValidationError("Некорректный аин: " + $r);
+end
+$$$
+
+rule save
+
+
+quit

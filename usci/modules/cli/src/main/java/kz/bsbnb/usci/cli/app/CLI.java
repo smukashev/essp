@@ -2345,12 +2345,6 @@ public class CLI {
             } else if (args.get(0).equals("save")) {
                 long ruleId = ruleService.createNewRuleInBatch(currentRule, currentBatchVersion);
                 System.out.println("ok saved: ruleId = " + ruleId);
-                /* Remove overhead from TNS Listener */
-                try {
-                    Thread.sleep(300);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             } else if (args.get(0).equals("run")) {
 
                 DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
@@ -2401,7 +2395,34 @@ public class CLI {
                 System.out.println(currentBaseEntity.getEls(args.get(1)));
             } else if (args.get(0).equals("eval2")) {
                 System.out.println(currentBaseEntity.getEl(args.get(1)));
-            } else throw new IllegalArgumentException();
+            } else if (args.get(0).equals("clear")) {
+                ruleService.clearAllRules();
+            } else if(args.get(0).equals("import")) {
+                try {
+                    Scanner importedPath = new Scanner(new File(args.get(1)));
+
+                    while(importedPath.hasNext()) {
+                        String line1 = importedPath.nextLine();
+                        if(line1.equals("") || line1.startsWith("#"))
+                            continue;
+                        StringTokenizer st = new StringTokenizer(line1);
+                        command = st.nextToken().trim();
+                        if(command.equals("quit")) break;
+                        if (st.hasMoreTokens()) {
+                            args.clear();
+                            while (st.hasMoreTokens()) {
+                                args.add(st.nextToken().trim());
+                            }
+                        }
+                        commandRule(importedPath);
+                    }
+
+                    importedPath.close();
+
+                } catch(Exception e){
+                    e.printStackTrace();
+                }
+            }else throw new IllegalArgumentException();
         } catch (IllegalArgumentException e) {
             if (e.getMessage() == null)
                 System.out.println("Argument needed: <read {label},current [<pckName,date>],save,run {id}," +
@@ -2652,7 +2673,7 @@ public class CLI {
             Queue<Long> creditorIdsQueue = null;
 
             if (args.size() > 2) {
-                creditorIdsQueue = new LinkedList<Long>();
+                creditorIdsQueue = new LinkedList<>();
                 for (int i = 2; i < args.size(); i++) {
                     creditorIdsQueue.add(Long.valueOf(args.get(i)));
                 }

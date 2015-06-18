@@ -2,14 +2,24 @@ package kz.bsbnb.usci.brms.rulesvr.dao.impl;
 
 import kz.bsbnb.usci.brms.rulesvr.dao.IBatchDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.mapper.BatchMapper;
+import kz.bsbnb.usci.brms.rulesvr.model.IBatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
+import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
+import org.jooq.DSLContext;
+import org.jooq.Select;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import static kz.bsbnb.usci.brms.rulesvr.generated.Tables.*;
 
 /**
  * @author abukabayev
@@ -22,6 +32,10 @@ public class BatchDao implements IBatchDao
     private JdbcTemplate jdbcTemplate;
 
     private final String PREFIX_ = "LOGIC_";
+
+    @SuppressWarnings("SpringJavaAutowiringInspection")
+    @Autowired
+    private DSLContext context;
 
     public BatchDao() {
     }
@@ -105,5 +119,25 @@ public class BatchDao implements IBatchDao
                 "AND package_id = ? AND rownum = 1";
 
         return jdbcTemplate.queryForLong(SQL, batchId, repDate, batchId);
+    }
+
+    @Override
+    public List<IBatchVersion> getBatchVersions(long batchId) {
+        Select select = context.select(LOGIC_PACKAGE_VERSIONS.ID, LOGIC_PACKAGE_VERSIONS.REPORT_DATE)
+                .from(LOGIC_PACKAGE_VERSIONS)
+                .where(LOGIC_PACKAGE_VERSIONS.PACKAGE_ID.eq(batchId));
+
+        List<Map<String,Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
+        List<IBatchVersion> ret = new LinkedList<>();
+
+        for(Map<String,Object> row: rows) {
+            IBatchVersion batchVersion = new BatchVersion();
+            batchVersion.setId(((BigDecimal)row.get(LOGIC_PACKAGE_VERSIONS.ID.getName())).longValue());
+            batchVersion.setPackageId(batchId);
+            batchVersion.setOpenDate((Date)row.get(LOGIC_PACKAGE_VERSIONS.REPORT_DATE.getName()));
+            ret.add(batchVersion);
+        }
+
+        return ret;
     }
 }

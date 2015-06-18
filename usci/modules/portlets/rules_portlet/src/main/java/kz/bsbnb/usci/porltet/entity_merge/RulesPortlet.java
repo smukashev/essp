@@ -93,6 +93,7 @@ public class RulesPortlet extends MVCPortlet{
 
     enum OperationTypes {
         PACKAGE_ALL,
+        PACKAGE_VERSIONS,
         GET_RULE_TITLES,
         GET_RULE,
         UPDATE_RULE,
@@ -103,6 +104,7 @@ public class RulesPortlet extends MVCPortlet{
         RUN_RULE,
         FLUSH,
         RENAME_RULE,
+        RULE_SWITCH,
 
         LIST_ALL,
         LIST_CLASS,
@@ -121,7 +123,7 @@ public class RulesPortlet extends MVCPortlet{
 
         try {
             OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
-            long ruleId, batchVersionId;
+            long ruleId, batchVersionId, batchId;
             String title;
             DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             long baseEntityId;
@@ -132,6 +134,10 @@ public class RulesPortlet extends MVCPortlet{
             switch(operationType){
                 case PACKAGE_ALL:
                        writer.write(JsonMaker.getJson(batchService.getAllBatches()));
+                    break;
+                case PACKAGE_VERSIONS:
+                    batchId = Long.parseLong(resourceRequest.getParameter("packageId"));
+                    writer.write(JsonMaker.getJson(batchService.getBatchVersions(batchId)));
                     break;
                 case GET_RULE_TITLES:
                     long packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
@@ -145,7 +151,9 @@ public class RulesPortlet extends MVCPortlet{
                 case UPDATE_RULE:
                     String ruleBody = resourceRequest.getParameter("ruleBody");
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
-                    String errors = ruleService.getRuleErrors(ruleBody);
+                    String pkgName = resourceRequest.getParameter("pkgName");
+                    date =  df.parse(resourceRequest.getParameter("date"));
+                    String errors = ruleService.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, date);
                     if(errors != null)
                         throw new RuntimeException(errors);
                     ruleService.updateBody(ruleId, ruleBody);
@@ -191,6 +199,40 @@ public class RulesPortlet extends MVCPortlet{
                     title = resourceRequest.getParameter("title");
                     ruleService.renameRule(ruleId, title);
                     break;
+                case RULE_SWITCH:
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    pkgName = resourceRequest.getParameter("pkgName");
+                    date = df.parse(resourceRequest.getParameter("date"));
+                    boolean makeActive = resourceRequest.getParameter("newValue").equals("true");
+                    boolean ruleEdited = resourceRequest.getParameter("ruleEdited").equals("true");
+                    String error = null;
+                    ruleBody = resourceRequest.getParameter("ruleBody");
+
+                    boolean success = false;
+
+                    if(makeActive) {
+                        error = ruleService.getPackageErrorsOnRuleActivate(ruleBody, ruleId, pkgName, date, ruleEdited);
+                        if(error == null) {
+                            if(ruleEdited)
+                                success |= ruleService.activateRule(ruleBody, ruleId);
+                            else
+                                success |= ruleService.activateRule(ruleId);
+                        }
+                    } else {
+                        error = ruleService.getPackageErrorsOnRuleDisable(ruleId, pkgName, date);
+                        if(error == null)
+                            success |= ruleService.disableRule(ruleId);
+                    }
+
+                    if(error != null) {
+                        //writer.write("{ \"success\": false, \"errorMessage\": \""+ error.replaceAll("\n", "")+"\"}");
+                        writer.write(JsonMaker.getNegativeJson(error));
+                    } else {
+                        if(!success)
+                            writer.write(JsonMaker.getNegativeJson("Ошибка при обновлении в базе"));
+                        else
+                            writer.write(JsonMaker.getJson(true));
+                    }
             }
 
         } catch (Exception e) {

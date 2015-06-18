@@ -96,4 +96,23 @@ public interface IRuleService {
 
     public String getRuleErrors(String rule);
 
+    public String getPackageErrorsOnRuleUpdate(String ruleBody, Long ruleId, String pkgName, Date repDate);
+
+    public String getPackageErrorsOnRuleActivate(String ruleBody, Long ruleId, String pkgName, Date repDate, boolean ruleEdited);
+
+    public String getPackageErrorsOnRuleDisable(Long ruleId, String pkgName, Date repDate);
+
+    public boolean activateRule(String ruleBody, Long ruleId);
+
+    public boolean activateRule(Long ruleId);
+
+    public boolean disableRule(Long ruleId);
+
+    /**
+     * =============================
+     *   Developer tools
+     * =============================
+     */
+    public void clearAllRules();
+
 }

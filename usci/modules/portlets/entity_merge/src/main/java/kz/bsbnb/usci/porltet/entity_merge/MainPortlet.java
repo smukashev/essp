@@ -644,40 +644,6 @@ public class MainPortlet extends MVCPortlet {
 
                     writer.write("{\"success\":\"true\", \"data\": " + gson.toJson(classes) + "}");
                     break;
-                case LIST_BY_CLASS:
-                    metaId = Long.valueOf(resourceRequest.getParameter("metaId"));
-                    if (metaId != null) {
-                        List<RefListItem> ids = entityService.getRefsByMetaclass(metaId);
-
-                        writer.write("{\"total\":" + ids.size());
-                        writer.write(",\"data\":[");
-
-                        boolean first = true;
-
-                        for (RefListItem id : ids) {
-                            if (first) {
-                                first = false;
-                            } else {
-                                writer.write(",");
-                            }
-
-                            writer.write("{");
-
-                            writer.write("\"id\":\"" + id.getId() + "\",");
-                            writer.write("\"code\":\"" + id.getCode() + "\",");
-
-                            for (String key : id.getKeys()) {
-                                writer.write("\"" + key + "\":\"" + id.getValue(key) + "\",");
-                            }
-
-                            writer.write("\"title\":\"" + id.getTitle() + "\"");
-                            writer.write("}");
-                        }
-
-                        writer.write("]}");
-                    }
-
-                    break;
                 case LIST_ENTITY: {
                     String leftEntityId = resourceRequest.getParameter("leftEntityId");
                     String leftReportDate = resourceRequest.getParameter("leftReportDate");
@@ -707,11 +673,6 @@ public class MainPortlet extends MVCPortlet {
                     }
                     break;
                 }
-                case GET_CANDIDATES:
-                    // DUMMY DATA
-                    writer.write("[{'type': 'credit', 'name_1':'0128', 'name_2': '02121', 'id_1':'5214', 'id_2':'36598'}, " +
-                            "{'type': 'person', 'name_1':'Захар Петрович Басов', 'name_2': 'Петр Васильевич Франкенштейн', 'id_1':'333', 'id_2':'222'}," +
-                            "{'type': 'doc', 'name_1':'важный документ', 'name_2': 'неважный документ', 'id_1':'123', 'id_2':'321'}]");
                 default:
                     break;
             }

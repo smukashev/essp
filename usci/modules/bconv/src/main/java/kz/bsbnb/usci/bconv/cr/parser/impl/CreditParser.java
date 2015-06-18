@@ -3,9 +3,11 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.TypeErrorException;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
+import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.apache.log4j.Logger;
@@ -17,9 +19,7 @@ import org.xml.sax.SAXException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  *
@@ -40,10 +40,6 @@ public class CreditParser extends BatchParser {
     @Autowired
     private CreditorBranchParser creditorBranchParser;
 
-    private MetaClass currencyMetaClass;
-
-    private List<IBaseEntity> refCurrencyList = new ArrayList<>();
-
     public CreditParser() {
         super();
     }
@@ -54,46 +50,34 @@ public class CreditParser extends BatchParser {
     }
 
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        try {
+
             if(localName.equals("credit")) {
             } else if(localName.equals("contract")) {
                 creditContractParser.parse(xmlReader, batch, index);
                 BaseEntity creditContract = creditContractParser.getCurrentBaseEntity();
                 currentBaseEntity.put("contract", new BaseEntityComplexValue(batch, index, creditContract));
             } else if(localName.equals("currency")) {
-                if(currencyMetaClass == null) {
-                    try {
-                        currencyMetaClass = metaClassRepository.getMetaClass("ref_currency");
-                    } catch (Exception e) {
-                        // do nothing
-                    }
-                }
 
-                if(currencyMetaClass != null && refCurrencyList.size() == 0) {
-                    List<Long> refCurrencyIds = baseEntityRepository.getBaseEntityProcessorDao().
-                            getEntityIDsByMetaclass(currencyMetaClass.getId());
+                RefListResponse refListResponse =  baseEntityRepository.getBaseEntityProcessorDao()
+                        .getRefListResponse(metaClassRepository.getMetaClass("ref_currency").getId(),
+                                batch.getRepDate(), false);
 
-                    for (Long refCurrencyId : refCurrencyIds) {
-                        refCurrencyList.add(baseEntityRepository.getBaseEntityProcessorDao().load(refCurrencyId));
-                    }
-                }
-
+                boolean found = false;
                 event = (XMLEvent) xmlReader.next();
-                BaseEntity currency = new BaseEntity(currencyMetaClass, batch.getRepDate());
+                String crCode = event.asCharacters().getData();
 
-                String currencyCode = null;
-
-                for(IBaseEntity entity : refCurrencyList) {
-                    IBaseValue shortName = entity.getBaseValue("short_name");
-                    if(shortName.getValue().toString().equals(event.asCharacters().getData())) {
-                        currencyCode = entity.getBaseValue("code").getValue().toString();
+                for(Map<String,Object> o : refListResponse.getData())
+                    if(o.get("SHORT_NAME")!=null && o.get("SHORT_NAME").equals(crCode)){
+                        BaseEntity currency = new BaseEntity(metaClassRepository.getMetaClass("ref_currency"),batch.getRepDate());
+                        currency.put("code", new BaseValue(batch, index, o.get("CODE")));
+                        currentBaseEntity.put("currency", new BaseEntityComplexValue(batch, index, currency));
+                        found = true;
                         break;
                     }
-                }
 
-                currency.put("code", new BaseEntityStringValue(batch, index, currencyCode));
+                if(!found)
+                    currentBaseEntity.addValidationError(String.format("Валюта с кодом %s не найдена", crCode));
 
-                currentBaseEntity.put("currency", new BaseEntityComplexValue(batch, index, currency));
             } else if(localName.equals("interest_rate_yearly")) {
                 event = (XMLEvent) xmlReader.next();
                 currentBaseEntity.put("interest_rate_yearly", new BaseEntityDoubleValue(batch, index,
@@ -101,14 +85,24 @@ public class CreditParser extends BatchParser {
                     ));
             } else if(localName.equals("contract_maturity_date")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("contract_maturity_date", new BaseEntityDateValue(batch, index,
-                        dateFormat.parse(event.asCharacters().getData())
+                String dateRaw = event.asCharacters().getData();
+                try {
+                    currentBaseEntity.put("contract_maturity_date", new BaseEntityDateValue(batch, index,
+                            dateFormat.parse(dateRaw)
                     ));
+                } catch (ParseException e) {
+                    getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
+                }
             } else if(localName.equals("actual_issue_date")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("actual_issue_date", new BaseEntityDateValue(batch, index,
-                        dateFormat.parse(event.asCharacters().getData())
+                String dateRaw = event.asCharacters().getData();
+                try{
+                    currentBaseEntity.put("actual_issue_date", new BaseEntityDateValue(batch, index,
+                            dateFormat.parse(event.asCharacters().getData())
                     ));
+                } catch (ParseException e) {
+                    getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
+                }
             } else if(localName.equals("credit_purpose")) {
                 event = (XMLEvent) xmlReader.next();
                 BaseEntity creditPurpose = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_purpose"), batch.getRepDate());
@@ -175,9 +169,6 @@ public class CreditParser extends BatchParser {
             }
         
             stack.push(localName);
-        } catch(ParseException parseException) {
-            throw new TypeErrorException(localName);
-        }
 
         return false;
     }

@@ -41,6 +41,13 @@ public class JsonMaker {
         return gson.toJson(m);
     }
 
+    public static String getNegativeJson(Object data){
+        Map m = new HashMap();
+        m.put("data", data);
+        m.put("success",false);
+        return gson.toJson(m);
+    }
+
     public static String getJson(Map m){
        m.put("success", true);
        return gson.toJson(m);

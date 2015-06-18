@@ -32,7 +32,7 @@ public class BaseRepository implements  Runnable
 
       private static Connection connection;
       private static Statement statement;
-      protected static String repDate = "01.03.2014";
+      protected static String repDate = "01.02.2015";
 
      public void saveXml(String[] lookup, ResultSet rows, String path){
          try {
@@ -121,6 +121,9 @@ public class BaseRepository implements  Runnable
         (new CreditorBranchCrawler()).work();
         (new NokbdbCrawler()).work();
         (new EconSectorCrawler()).work();
+        (new BACTCrawler()).work();
+        new DRTCrawler().work();
+        new BADRTCrawler().work();
     }
 
     public static void main( String[] args )

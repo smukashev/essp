@@ -4,6 +4,7 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
+import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
@@ -60,30 +61,28 @@ public class PackageParser extends BatchParser {
         return totalCount;
     }
 
+    public void setCurrentBaseEntity(BaseEntity currentBaseEntity) {
+        this.currentBaseEntity = currentBaseEntity;
+        creditParser.setCurrentBaseEntity(currentBaseEntity);
+    }
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName)
             throws SAXException {
 
         if(localName.equals("packages")) {
         } else if(localName.equals("package")) {
-            /*currentPackage = new Package();
-            currentPackage.setNo(new BigInteger(attributes.getValue("no")));
-            
-            if(attributes.getValue("operation_type").equals("insert")) {
-                currentPackage.setOperationType(StOperationType.INSERT);
-            } else if(attributes.getValue("operation_type").equals("update")) {
-                currentPackage.setOperationType(StOperationType.UPDATE);
-            } else {
-                throw new UnknownValException(localName, attributes.getValue("operation_type"));
-            } */
             currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit"), batch.getRepDate());
             currentBaseEntity.setIndex(Long.parseLong(event.asStartElement().getAttributeByName(new QName("no")).getValue()));
             creditParser.setCurrentBaseEntity(currentBaseEntity);
         } else if(localName.equals("primary_contract")) {
             primaryContractParser.parse(xmlReader, batch, index);
             BaseEntity primaryContract = primaryContractParser.getCurrentBaseEntity();
-
             currentBaseEntity.put("primary_contract", new BaseEntityComplexValue(batch, index, primaryContract));
+            for(String e: primaryContractParser.getCurrentBaseEntity().getValidationErrors()){
+                getCurrentBaseEntity().addValidationError(e);
+            }
+            primaryContractParser.getCurrentBaseEntity().clearValidationErrors();
         } else if(localName.equals("credit")) {
             //attributes.getValue("credit_type")
             creditParser.parse(xmlReader, batch, index);
@@ -130,6 +129,11 @@ public class PackageParser extends BatchParser {
         } else if(localName.equals("change")) {
             changeParser.parse(xmlReader, batch, index);
             currentBaseEntity.put("change",new BaseEntityComplexValue(batch,index,changeParser.getCurrentBaseEntity()));
+
+            for(String e: changeParser.getCurrentBaseEntity().getValidationErrors()){
+                getCurrentBaseEntity().addValidationError(e);
+            }
+            changeParser.getCurrentBaseEntity().clearValidationErrors();
 
             if (changeParser.getMaturityDate() != null) {
                 currentBaseEntity.put("maturity_date", changeParser.getMaturityDate());

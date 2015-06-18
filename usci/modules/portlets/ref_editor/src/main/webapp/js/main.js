@@ -216,6 +216,8 @@ function addField(form, attr, isEdit, node) {
         || (node && !node.root && node.ref)
         || (node && node.array && !attr.simple && !attr.ref);
 
+    var allowBlank = !(attr.isRequired || attr.isKey);
+
     if (attr.type == "DATE") {
         form.add(Ext.create("Ext.form.field.Date",
                 {
@@ -228,7 +230,7 @@ function addField(form, attr, isEdit, node) {
                         attr.value.
                             replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1')),
                     disabled: disabled,
-                    allowBlank: !attr.isRequired,
+                    allowBlank: allowBlank,
                     blankText: label_REQUIRED_FIELD
                 })
         );
@@ -242,7 +244,7 @@ function addField(form, attr, isEdit, node) {
                     value: attr.value,
                     allowDecimals: attr.type == "DOUBLE",
                     disabled: disabled,
-                    allowBlank: !attr.isRequired,
+                    allowBlank: allowBlank,
                     blankText: label_REQUIRED_FIELD
                 })
         );
@@ -254,7 +256,7 @@ function addField(form, attr, isEdit, node) {
                     labelWidth: "60%",
                     width: "40%",
                     disabled: disabled,
-                    allowBlank: !attr.isRequired,
+                    allowBlank: allowBlank,
                     blankText: label_REQUIRED_FIELD,
                     editable : false,
                     store: Ext.create('Ext.data.Store', {
@@ -276,7 +278,7 @@ function addField(form, attr, isEdit, node) {
             labelWidth: "60%",
             width: "40%",
             disabled: disabled,
-            allowBlank: !attr.isRequired,
+            allowBlank: allowBlank,
             blankText: label_REQUIRED_FIELD,
             store: Ext.create('Ext.data.Store', {
                 model: 'refStoreModel',
@@ -311,7 +313,7 @@ function addField(form, attr, isEdit, node) {
                     width: "40%",
                     value: attr.value,
                     disabled: disabled,
-                    allowBlank: !attr.isRequired,
+                    allowBlank: allowBlank,
                     blankText: label_REQUIRED_FIELD
                 })
         );

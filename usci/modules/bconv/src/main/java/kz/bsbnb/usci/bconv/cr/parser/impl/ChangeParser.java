@@ -64,18 +64,20 @@ public class ChangeParser extends BatchParser {
                     changeCreditFlowParser.getCurrentBaseEntity()));
         } else if(localName.equals("maturity_date")) {
             event = (XMLEvent) xmlReader.next();
+            String dateRaw = event.asCharacters().getData();
             try{
-              maturityDate = new BaseEntityDateValue(batch,index, dateFormat.parse(event.asCharacters().getData()));
+              maturityDate = new BaseEntityDateValue(batch,index, dateFormat.parse(dateRaw));
             } catch (ParseException e){
-                System.out.println(e.getMessage());
+                currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }
         } else if(localName.equals("prolongation_date")) {
             event = (XMLEvent) xmlReader.next();
+            String dateRaw = event.asCharacters().getData();
             try{
                 prolongationDate = new BaseEntityDateValue(batch,index,
-                        dateFormat.parse(event.asCharacters().getData()));
+                        dateFormat.parse(dateRaw));
             } catch (ParseException e){
-                System.out.println(e.getMessage());
+                currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }
         } else {
             throw new UnknownTagException(localName);
@@ -93,6 +95,10 @@ public class ChangeParser extends BatchParser {
                 return true;
             } else if(localName.equals("turnover")) {
             } else if(localName.equals("remains")) {
+                for(String e: changeRemainsParser.getCurrentBaseEntity().getValidationErrors()){
+                    getCurrentBaseEntity().addValidationError(e);
+                }
+                changeRemainsParser.getCurrentBaseEntity().clearValidationErrors();
             } else if(localName.equals("credit_flow")) {
             } else if(localName.equals("maturity_date")) {
                 //ctChange.setMaturityDate(convertDateToCalendar(dateFormat.parse(contents.toString())));

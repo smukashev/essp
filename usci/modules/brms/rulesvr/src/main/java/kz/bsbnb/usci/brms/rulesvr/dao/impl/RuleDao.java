@@ -2,6 +2,13 @@ package kz.bsbnb.usci.brms.rulesvr.dao.impl;
 
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
+import kz.bsbnb.usci.eav.util.DataUtils;
+import org.jooq.DSLContext;
+import org.jooq.Delete;
+import org.jooq.Update;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
@@ -19,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import static kz.bsbnb.usci.brms.rulesvr.generated.Tables.*;
+
 /**
  * @author abukabayev
  */
@@ -26,6 +35,12 @@ public class RuleDao implements IRuleDao {
 
     private JdbcTemplate jdbcTemplate;
     private final String PREFIX_ = "LOGIC_";
+
+    private final Logger logger = LoggerFactory.getLogger(RuleDao.class);
+
+    @SuppressWarnings("SpringJavaAutowiringInspection")
+    @Autowired
+    private DSLContext context;
 
     public boolean testConnection()
     {
@@ -79,7 +94,7 @@ public class RuleDao implements IRuleDao {
 
     @Override
     public List<SimpleTrack> getRuleTitles(Long packageId, Date repDate) {
-        String SQL = "SELECT id, title AS NAME FROM " + PREFIX_ + "rules WHERE id IN (\n" +
+        String SQL = "SELECT id, title AS NAME, is_active as isActive FROM " + PREFIX_ + "rules WHERE id IN (\n" +
                 "SELECT rule_id FROM " + PREFIX_ + "rule_package_versions WHERE package_versions_id = \n" +
                 "(SELECT id FROM " + PREFIX_ + "package_versions WHERE REPORT_DATE = \n" +
                 "    (SELECT MAX(REPORT_DATE) FROM " + PREFIX_ + "package_versions WHERE package_id = ? AND REPORT_DATE <= ? ) \n" +
@@ -195,5 +210,65 @@ public class RuleDao implements IRuleDao {
     public void renameRule(long ruleId, String title) {
         String sql = "Update " + PREFIX_ + "rules set title = ? where id = ?";
         jdbcTemplate.update(sql, title, ruleId);
+    }
+
+    @Override
+    public boolean activateRule(String ruleBody, long ruleId) {
+        Update update = context.update(LOGIC_RULES)
+                .set(LOGIC_RULES.RULE, ruleBody)
+                .set(LOGIC_RULES.IS_ACTIVE, DataUtils.convert(true))
+                .where(LOGIC_RULES.ID.eq(ruleId));
+
+
+        try{
+            jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean activateRule(long ruleId) {
+        Update update = context.update(LOGIC_RULES)
+                .set(LOGIC_RULES.IS_ACTIVE, DataUtils.convert(true))
+                .where(LOGIC_RULES.ID.eq(ruleId));
+
+
+        try{
+            jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean disableRule(long ruleId) {
+        Update update = context.update(LOGIC_RULES)
+                .set(LOGIC_RULES.IS_ACTIVE, DataUtils.convert(false))
+                .where(LOGIC_RULES.ID.eq(ruleId));
+
+        try{
+            jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void clearAllRules() {
+        Delete delete = context.delete(LOGIC_RULE_PACKAGE_VERSIONS);
+        jdbcTemplate.update(delete.getSQL());
+
+        delete = context.delete(LOGIC_RULES);
+        jdbcTemplate.update(delete.getSQL());
     }
 }

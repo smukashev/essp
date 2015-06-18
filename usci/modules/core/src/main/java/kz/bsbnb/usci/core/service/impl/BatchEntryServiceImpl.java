@@ -35,4 +35,9 @@ public class BatchEntryServiceImpl implements IBatchEntryService {
         batchEntry.setId(batchEntryId);
         batchEntriesDao.remove(batchEntry);
     }
+
+    @Override
+    public void delete(List<Long> batchEntryIds) {
+        batchEntriesDao.remove(batchEntryIds);
+    }
 }

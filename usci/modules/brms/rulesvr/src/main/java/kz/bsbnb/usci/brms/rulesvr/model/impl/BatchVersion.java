@@ -8,8 +8,8 @@ import java.util.Date;
  * @author abukabayev
  */
 public class BatchVersion extends Persistable implements IBatchVersion {
-    private Date report_date;
-    private long package_id;
+    private Date openDate;
+    private long packageId;
     private String name;
 
     public BatchVersion(){
@@ -17,24 +17,24 @@ public class BatchVersion extends Persistable implements IBatchVersion {
     }
 
     public BatchVersion(Date repDate,long package_id){
-       this.report_date = repDate;
-       this.package_id = package_id;
+       this.openDate = repDate;
+       this.packageId = package_id;
     }
 
-    public Date getReport_date() {
-        return report_date;
+    public Date getOpenDate() {
+        return openDate;
     }
 
-    public void setReport_date(Date report_date) {
-        this.report_date = report_date;
+    public void setOpenDate(Date openDate) {
+        this.openDate = openDate;
     }
 
-    public long getPackage_id() {
-        return package_id;
+    public long getPackageId() {
+        return packageId;
     }
 
-    public void setPackage_id(long package_id) {
-        this.package_id = package_id;
+    public void setPackageId(long packageId) {
+        this.packageId = packageId;
     }
 
     public String getName() {
@@ -47,6 +47,6 @@ public class BatchVersion extends Persistable implements IBatchVersion {
 
     @Override
     public String toString() {
-        return "id: " + id + ", name: " + name + ", package_id: " + package_id;
+        return "id: " + id + ", name: " + name + ", package_id: " + packageId;
     }
 }

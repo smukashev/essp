@@ -23,6 +23,7 @@ import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherP
 import kz.bsbnb.usci.eav.repository.IBaseEntityRepository;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.tool.CommonConfig;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.tool.Quote;
 import org.jooq.*;
@@ -51,7 +52,6 @@ import static kz.bsbnb.eav.persistance.generated.Tables.*;
 @SuppressWarnings("unchecked")
 @Repository
 public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEntityProcessorDao {
-    private static final boolean exceptionOnImmutableWrite = false;
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
     @Autowired
     IBatchRepository batchRepository;
@@ -81,51 +81,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         this.applyListener = applyListener;
     }
 
-    @Value("${refs.cache.enabled}")
-    private boolean refsCacheEnabled;
-
-    public static final HashMap<Long, List<RefListItem>> refsCache = new HashMap<Long, List<RefListItem>>();
-    public static final HashMap<Long, List<RefListItem>> refsCacheRaw = new HashMap<Long, List<RefListItem>>();
-
-//    public static final Map<Long, List<BaseEntity>>
-
     private final int SC_ID_BAG_LIMIT = 100;
-
-    @PostConstruct
-    public void init() {
-        if(refsCacheEnabled && refsCache.size() == 0 && refsCacheRaw.size() == 0) {
-            List<MetaClassName> metaClassNames = null;
-            try {
-                metaClassNames = metaClassRepository.getRefNames();
-            } catch (Exception e) {
-                System.out.println("Cache couldn't initialize");
-            }
-
-            if(metaClassNames != null) {
-                System.out.println(" -- Initializing cache for references at: " + new Date());
-
-                for (MetaClassName metaClassName : metaClassNames) {
-                    //refsCache.put(metaClassName.getId(), getRefsByMetaclass(metaClassName.getId()));
-                    List<RefListItem> rawList = getRefsByMetaClass(metaClassName.getId(), true);
-                    List<RefListItem> list = new ArrayList<RefListItem>();
-
-                    for(RefListItem rli : rawList) {
-                        RefListItem item = new RefListItem();
-                        item.setId(rli.getId());
-                        item.setCode(rli.getCode());
-                        item.setTitle(Quote.addSlashes(rli.getTitle()));
-                        list.add(item);
-                    }
-
-                    refsCache.put(metaClassName.getId(), list);
-                    refsCacheRaw.put(metaClassName.getId(), rawList);
-
-                }
-
-                System.out.println(" -- Cache is ready to use -- ");
-            }
-        }
-    }
 
     public IBaseEntity loadByMaxReportDate(long id, Date actualReportDate, boolean caching) {
         IBaseEntityReportDateDao baseEntityReportDateDao =
@@ -592,7 +548,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
                     if (childBaseEntity.getValueCount() != 0) {
                         if (childBaseEntity.getId() < 1) {
-                            if (exceptionOnImmutableWrite) {
+                            if (CommonConfig.exceptionOnImmutableWrite) {
                                 throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                         childBaseEntity.getMeta().getClassName() + "\n" + childBaseEntity.toString());
                             } else {
@@ -2119,7 +2075,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 int compare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
                 if (compare == 0) {
-                    //TODO: Check previous value and if exist then remove current value
                     if (metaAttribute.isFinal()) {
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -2130,7 +2085,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 new Date(baseValueLoaded.getRepDate().getTime()),
                                 metaValue.getTypeCode() == DataTypes.DATE ?
                                         new Date(((Date) baseValueLoaded.getValue()).getTime()) :
-                                        baseValueLoaded.getValue(),
+                                baseValueLoaded.getValue(),
                                 baseValueLoaded.isClosed(),
                                 baseValueLoaded.isLast()
                         );
@@ -2152,10 +2107,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             }
                         }
                     } else {
-                        if (metaAttribute.isFinal())
-                            throw new RuntimeException("Instance of BaseValue with incorrect report date and final flag " +
-                                    "mistakenly loaded from the database.");
-
                         IBaseValue baseValueClosed = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
@@ -2165,7 +2116,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 new Date(baseValueLoaded.getRepDate().getTime()),
                                 metaValue.getTypeCode() == DataTypes.DATE ?
                                         new Date(((Date) baseValueLoaded.getValue()).getTime()) :
-                                        baseValueLoaded.getValue(),
+                                baseValueLoaded.getValue(),
                                 true,
                                 baseValueLoaded.isLast()
                         );
@@ -2273,7 +2224,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             new Date(baseValueLoaded.getRepDate().getTime()),
                             metaValue.getTypeCode() == DataTypes.DATE ?
                                     new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            baseValueSaving.getValue(),
                             baseValueLoaded.isClosed(),
                             baseValueLoaded.isLast());
 
@@ -2288,7 +2239,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             new Date(baseValueSaving.getRepDate().getTime()),
                             metaValue.getTypeCode() == DataTypes.DATE ?
                                     new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            baseValueSaving.getValue(),
                             false,
                             baseValueLoaded.isLast());
 
@@ -2323,7 +2274,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             new Date(baseValueSaving.getRepDate().getTime()),
                             metaValue.getTypeCode() == DataTypes.DATE ?
                                     new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            baseValueSaving.getValue(),
                             false,
                             baseValueLoaded.isLast()
                     );
@@ -2331,7 +2282,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
 
-                    IBaseValue baseValueAppliedClosed = BaseValueFactory.create(
+                    // TODO: bug
+                    /*IBaseValue baseValueAppliedClosed = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
                             metaType,
                             baseValueSaving.getBatch(),
@@ -2339,12 +2291,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             new Date(baseValueLoaded.getRepDate().getTime()),
                             metaValue.getTypeCode() == DataTypes.DATE ?
                                     new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            baseValueSaving.getValue(),
                             true,
                             false);
 
                     baseEntity.put(metaAttribute.getName(), baseValueAppliedClosed);
-                    baseEntityManager.registerAsInserted(baseValueAppliedClosed);
+                    baseEntityManager.registerAsInserted(baseValueAppliedClosed);*/
                 }
             }
         } else {
@@ -2588,7 +2540,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 IBaseEntity baseEntityApplied;
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1) {
-                        if (exceptionOnImmutableWrite) {
+                        if (CommonConfig.exceptionOnImmutableWrite) {
                             throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                     baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
                         } else {
@@ -2627,7 +2579,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 IBaseEntity baseEntityApplied;
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1) {
-                        if (exceptionOnImmutableWrite) {
+                        if (CommonConfig.exceptionOnImmutableWrite) {
                             throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                     baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
                         } else {
@@ -2759,7 +2711,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
                             if (baseEntitySaving.getId() < 1) {
-                                if (exceptionOnImmutableWrite) {
+                                if (CommonConfig.exceptionOnImmutableWrite) {
                                     throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                             baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
                                 } else {
@@ -2793,7 +2745,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
                             if (baseEntitySaving.getId() < 1) {
-                                if (exceptionOnImmutableWrite) {
+                                if (CommonConfig.exceptionOnImmutableWrite) {
                                     throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                             baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
                                 } else {
@@ -2827,7 +2779,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 IBaseEntity baseEntityApplied = null;
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1) {
-                        if (exceptionOnImmutableWrite) {
+                        if (CommonConfig.exceptionOnImmutableWrite) {
                             throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                     baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
                         } else {
@@ -2950,6 +2902,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 case DELETE:
                     if (baseEntityPostPrepared.getId() <= 0)
                         throw new RuntimeException("deleting entity must be found");
+
+                    if (baseEntity.getMeta().isReference() && historyExists(
+                            baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId()))
+                        throw new RuntimeException("Reference with history cannot be deleted!");
+
                     baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
                     entityHolder.applied = baseEntityApplied;
@@ -2965,8 +2922,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         applyToDb(baseEntityManager);
 
-        reloadCacheIfRef(baseEntityApplied);
-
         if (applyListener != null)
             applyListener.applyToDBEnded(entityHolder.saving, entityHolder.loaded,
                     entityHolder.applied, baseEntityManager);
@@ -2974,57 +2929,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return baseEntityApplied;
     }
 
-    private void reloadCacheIfRef(IBaseEntity baseEntity) {
-        if (baseEntity.getMeta().isReference() && refsCacheEnabled) {
-            RefListItem refListItem = findRefListItemById(baseEntity.getMeta().getId(), baseEntity.getId(), false);
-            RefListItem refListItemRaw = findRefListItemById(baseEntity.getMeta().getId(), baseEntity.getId(), true);
-
-            if (OperationType.DELETE.equals(baseEntity.getOperation())) { // delete
-                refsCache.get(baseEntity.getMeta().getId()).remove(refListItem);
-                refsCacheRaw.get(baseEntity.getMeta().getId()).remove(refListItemRaw);
-            } else {
-                IBaseEntity baseEntityPrepared = prepare(((BaseEntity) baseEntity).clone());
-                IBaseEntity baseEntityPostPrepared = postPrepare(((BaseEntity) baseEntityPrepared).clone(), null);
-                baseEntity = baseEntityPostPrepared;
-
-                if (refListItem == null) {
-                    refListItem = new RefListItem();
-                    refListItemRaw = new RefListItem();
-                    refListItem.setId(baseEntityPostPrepared.getId());
-                    refListItemRaw.setId(baseEntityPostPrepared.getId());
-
-                    refsCache.get(baseEntity.getMeta().getId()).add(refListItem);
-                    refsCacheRaw.get(baseEntity.getMeta().getId()).add(refListItemRaw);
-                }
-
-                for (IBaseValue value : baseEntity.get()) {
-                    if (!value.getMetaAttribute().getMetaType().isComplex()
-                            && !value.getMetaAttribute().getMetaType().isSet()) {
-                        if (value.getMetaAttribute().getName().startsWith("name")) {
-                            refListItem.setTitle((String) value.getValue());
-                            refListItemRaw.setTitle(Quote.addSlashes((String) value.getValue()));
-                        } else if (value.getMetaAttribute().getName().equals("code")) {
-                            refListItem.setCode(String.valueOf(value.getValue()));
-                            refListItemRaw.setCode(String.valueOf(value.getValue()));
-                        }
-                        refListItem.addValue(value.getMetaAttribute().getName(), value.getValue());
-                        refListItemRaw.addValue(value.getMetaAttribute().getName(), value.getValue());
-                    }
-                }
-            }
-        }
-    }
-
-    private RefListItem findRefListItemById(long metaId, long id, boolean raw) {
-        List<RefListItem> refListItems = raw ? refsCacheRaw.get(metaId) : refsCache.get(metaId);
-
-        for (RefListItem refListItem : refListItems) {
-            if (refListItem.getId() == id) {
-                return refListItem;
-            }
-        }
-
-        return null;
+    private boolean historyExists(long metaId, long entityId) {
+        List<Map<String, Object>> rows = getRefListResponseWithHis(metaId, entityId);
+        return rows.size() > 1;
     }
 
     public boolean checkReportDateExists(long baseEntityId, Date reportDate) {
@@ -3084,13 +2991,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return entityIds;
     }
 
-    /**
-     * Analog of getRefsByMetaClass method, not escapes content with quotes
-     */
-    public List<RefListItem> getRefsByMetaclassRaw(long metaClassId) {
-        return getRefsByMetaClass(metaClassId, true);
-    }
-
     @Override
     public RefColumnsResponse getRefColumns(long metaClassId) {
         Select simpleAttrsSelect = context.select().from(EAV_M_SIMPLE_ATTRIBUTES).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
@@ -3103,8 +3003,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         List<Map<String, Object>> simpleSets = queryForListWithStats(simpleSetsSelect.getSQL(), simpleSetsSelect.getBindValues().toArray());
         List<Map<String, Object>> complexSets = queryForListWithStats(complexSetsSelect.getSQL(), complexSetsSelect.getBindValues().toArray());
 
-        List<String> names = new ArrayList<String>();
-        List<String> titles = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
+        List<String> titles = new ArrayList<>();
 
         for (Map<String, Object> attr : simpleAttrs) {
             String attrName = (String) attr.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
@@ -3139,7 +3039,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     public RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis) {
-        List<Map<String, Object>> rows = getRefListResponseWithHis(metaClassId);
+        List<Map<String, Object>> rows = getRefListResponseWithHis(metaClassId, null);
 
         addOpenCloseDates(rows);
 
@@ -3205,7 +3105,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    private List<Map<String, Object>> getRefListResponseWithHis(long metaClassId) {
+    private List<Map<String, Object>> getRefListResponseWithHis(long metaClassId, Long entityId) {
         Select simpleAttrsSelect = context.select().from(EAV_M_SIMPLE_ATTRIBUTES).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
 
         List<Map<String, Object>> simpleAttrs = queryForListWithStats(simpleAttrsSelect.getSQL(), simpleAttrsSelect.getBindValues().toArray());
@@ -3263,6 +3163,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 .from(EAV_BE_ENTITIES).join(EAV_BE_ENTITY_REPORT_DATES)
                                 .on(EAV_BE_ENTITIES.ID.eq(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID))
                                 .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId))
+                                .and(entityId != null ? EAV_BE_ENTITIES.ID.eq(entityId) : DSL.trueCondition())
                                 .and(EAV_BE_ENTITIES.DELETED.ne(DataUtils.convert(true)))
                                 .asTable("dat")
                 )
@@ -3272,7 +3173,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     private List<Map<String, Object>> getRefListResponseWithoutHis(long metaClassId, Date date) {
-        java.sql.Date dt = new java.sql.Date(date.getTime());
+        java.sql.Date dt = null;
+
+        if (date != null) {
+            dt = new java.sql.Date(date.getTime());
+        }
 
         Select simpleAttrsSelect = context.select().from(EAV_M_SIMPLE_ATTRIBUTES).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
 
@@ -3295,7 +3200,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                 EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE,
                                 DSL.rowNumber().over().partitionBy(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID).orderBy(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.desc()).as("p")
                         ).from(EAV_BE_ENTITIES).join(EAV_BE_ENTITY_REPORT_DATES).on(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
-                                .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId)).and(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.le(dt))
+                                .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId))
+                                .and(dt != null ? EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.le(dt) : DSL.trueCondition())
+                                .and(EAV_BE_ENTITIES.DELETED.ne(DataUtils.convert(true)))
                                 .asTable("sub")
                 ).where(DSL.field("\"sub\".\"p\"").eq(1)).asTable("enr")
         );
@@ -3315,10 +3222,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                                     valuesTable.field("REPORT_DATE"),
                                     DSL.rowNumber().over().partitionBy(valuesTable.field("ENTITY_ID")).orderBy(valuesTable.field("REPORT_DATE").desc()).as("p")
                             ).from(valuesTable)
-                            .where(valuesTable.field("ATTRIBUTE_ID").eq(attr.get("ID"))).and(valuesTable.field("REPORT_DATE").le(dt))
+                            .where(valuesTable.field("ATTRIBUTE_ID").eq(attr.get("ID")))
+                            .and(dt != null ? valuesTable.field("REPORT_DATE").le(dt) : DSL.trueCondition())
                             .asTable("sub")
                     ).where(DSL.field("\"sub\".\"p\"").eq(1))
-                    .asTable(attrSubTable)
+                            .asTable(attrSubTable)
             ).on("\"" + attrSubTable + "\"" + "." + "ENTITY_ID = \"enr\".id");
         }
 
@@ -3342,157 +3250,48 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return null;
     }
 
-    public List<RefListItem> getRefsByMetaClass(long metaClassId, boolean raw) {
-        if(refsCacheEnabled) {
-            List<RefListItem> refsList;
-            if(raw)
-                refsList = refsCacheRaw.get(metaClassId);
-            else
-                refsList = refsCache.get(metaClassId);
-
-            if(refsList != null)
-                return refsList;
-        }
-
-        ArrayList<RefListItem> entityIds = new ArrayList<RefListItem>();
-
-        // TODO: fix
-
-        Select select = context.select().from(
-                context.select(
-                        EAV_BE_ENTITIES.ID,
-                        EAV_M_CLASSES.NAME.as("classes_name"),
-                        EAV_M_SIMPLE_ATTRIBUTES.NAME,
-                        EAV_BE_STRING_VALUES.VALUE,
-                        DSL.val("string", String.class).as("type"))
-                        .from(EAV_BE_ENTITIES, EAV_M_CLASSES, EAV_M_SIMPLE_ATTRIBUTES, EAV_BE_STRING_VALUES)
-                        .where(EAV_M_CLASSES.ID.eq(metaClassId))
-                        .and(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
-                        .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(EAV_M_CLASSES.ID))
-                        .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(1))
-                        .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
-                        .and(EAV_BE_STRING_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
-                        .union(context
-                                .select(
-                                        EAV_BE_ENTITIES.ID,
-                                        EAV_M_CLASSES.NAME.as("classes_name"),
-                                        EAV_M_SIMPLE_ATTRIBUTES.NAME,
-                                        DSL.field(
-                                                "TO_CHAR({0})", String.class, EAV_BE_INTEGER_VALUES.VALUE),
-                                        DSL.val("integer", String.class).as("type"))
-                                .from(EAV_BE_ENTITIES, EAV_M_CLASSES, EAV_M_SIMPLE_ATTRIBUTES, EAV_BE_INTEGER_VALUES)
-                                .where(EAV_M_CLASSES.ID.eq(metaClassId))
-                                .and(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
-                                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(EAV_M_CLASSES.ID))
-                                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(1))
-                                .and(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
-                                .and(EAV_BE_INTEGER_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
-                                .union(context
-                                        .select(
-                                                EAV_BE_ENTITIES.ID,
-                                                EAV_M_CLASSES.NAME.as("classes_name"),
-                                                EAV_M_SIMPLE_ATTRIBUTES.NAME,
-                                                DSL.field(
-                                                        "TO_CHAR({0})", String.class, EAV_BE_DATE_VALUES.VALUE),
-                                                DSL.val("date", String.class).as("type"))
-                                        .from(EAV_BE_ENTITIES, EAV_M_CLASSES, EAV_M_SIMPLE_ATTRIBUTES, EAV_BE_DATE_VALUES)
-                                        .where(EAV_M_CLASSES.ID.eq(metaClassId))
-                                        .and(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
-                                        .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(EAV_M_CLASSES.ID))
-                                        .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(1))
-                                        .and(EAV_BE_DATE_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
-                                        .and(EAV_BE_DATE_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
-                                        .union(context
-                                                .select(
-                                                        EAV_BE_ENTITIES.ID,
-                                                        EAV_M_CLASSES.NAME.as("classes_name"),
-                                                        EAV_M_SIMPLE_ATTRIBUTES.NAME,
-                                                        DSL.field(
-                                                                "TO_CHAR({0})", String.class, EAV_BE_BOOLEAN_VALUES.VALUE),
-                                                        DSL.val("boolean", String.class).as("type"))
-                                                .from(EAV_BE_ENTITIES, EAV_M_CLASSES, EAV_M_SIMPLE_ATTRIBUTES, EAV_BE_BOOLEAN_VALUES)
-                                                .where(EAV_M_CLASSES.ID.eq(metaClassId))
-                                                .and(EAV_BE_ENTITIES.CLASS_ID.eq(EAV_M_CLASSES.ID))
-                                                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(EAV_M_CLASSES.ID))
-                                                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(1))
-                                                .and(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.ID))
-                                                .and(EAV_BE_BOOLEAN_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID)))))).
-                orderBy(DSL.field("ID"));
-
-        logger.debug("LIST_BY_CLASS SQL: " + select.toString());
-
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        Iterator<Map<String, Object>> i = rows.iterator();
-        RefListItem rli = null;
-        long prevId = -1;
-
-        while (i.hasNext()) {
-            Map<String, Object> row = i.next();
-            long id = ((BigDecimal) row.get("ID")).longValue();
-
-            if(prevId != id) {
-                if(rli != null)
-                    entityIds.add(rli);
-                rli = new RefListItem();
-            }
-            prevId = id;
-
-            logger.debug("#####################");
-
-            rli.setId(id);
-
-            if (((String) row.get("NAME")).equals("code")) {
-                String code = (String) row.get("VALUE");
-                if(!raw)
-                    code = Quote.addSlashes(code);
-                rli.setCode(code);
-            } else if (((String) row.get("NAME")).startsWith("name_")) {
-                String value = (String) row.get("VALUE");
-                if(!raw)
-                    value = Quote.addSlashes(value);
-                rli.setTitle(value);
-            } else if (((String) row.get("NAME")).startsWith("name")) {
-                String value = (String) row.get("VALUE");
-                if(!raw)
-                    value = Quote.addSlashes(value);
-                rli.setTitle(value);
-            }
-
-            for (String key : row.keySet()) {
-                if (key.equals("NAME") || key.startsWith("name_")) {
-                    continue;
-                }
-
-                String value = row.get(key).toString();
-
-                if(!raw)
-                    value = Quote.addSlashes(value);
-
-                //System.out.println("###% " + value);
-
-                rli.addValue(key, value);
-            }
-
-            //if (!i.hasNext())
-            //    break;
-
-            //row = i.next();
-            //old_id = id;
-            //id = ((BigDecimal) row.get("ID")).longValue();
-        }
-
-        if(rli!=null)
-            entityIds.add(rli);
-
-        if(refsCacheEnabled)
-            refsCache.put(metaClassId, entityIds);
-
-        return entityIds;
+    public List<RefListItem> getRefsByMetaclass(long metaClassId) {
+        List<RefListItem> items = getRefsByMetaclassInner(metaClassId, false);
+        return items;
     }
 
-    public List<RefListItem> getRefsByMetaclass(long metaClassId) {
-        return getRefsByMetaClass(metaClassId, false);
+    /**
+     * Analog of getRefsByMetaClass method, not escapes content with quotes
+     */
+    public List<RefListItem> getRefsByMetaclassRaw(long metaClassId) {
+        List<RefListItem> items = getRefsByMetaclassInner(metaClassId, true);
+        return items;
+    }
+
+    private List<RefListItem> getRefsByMetaclassInner(long metaClassId, boolean raw) {
+        List<Map<String, Object>> rows = getRefListResponseWithoutHis(metaClassId, null);
+
+        List<RefListItem> items = new ArrayList<RefListItem>();
+
+        String titleKey = null;
+
+        if (!rows.isEmpty()) {
+            Set<String> keys = rows.get(0).keySet();
+
+            for (String key : keys) {
+                if (key.startsWith("name")) {
+                    titleKey = key;
+                    break;
+                }
+            }
+        }
+
+        for (Map<String, Object> row : rows) {
+            Object id = row.get("ID");
+            String title = titleKey != null ? (String) row.get(titleKey) : "------------------------";
+
+            RefListItem item = new RefListItem();
+            item.setId(((BigDecimal) id).longValue());
+            item.setTitle(raw ? title : Quote.addSlashes(title));
+            items.add(item);
+        }
+
+        return items;
     }
 
     public List<BaseEntity> getEntityByMetaclass(MetaClass meta) {

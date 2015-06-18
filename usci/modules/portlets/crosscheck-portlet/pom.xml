@@ -80,6 +80,7 @@
             <name>Repository for library EclipseLink (JPA 2.1)</name>
         </repository>
      </repositories>
+
     <dependencies>
         <dependency>
             <groupId>com.liferay.portal</groupId>
