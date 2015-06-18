@@ -58,7 +58,12 @@ public class CLIXMLReader
             case STRING:
                 return value;
             case BOOLEAN:
-                return Boolean.parseBoolean(value);
+                try {
+                    int i = Integer.parseInt(value);
+                    return i == 1;
+                } catch (Exception e) {
+                    return Boolean.parseBoolean(value);
+                }
             case DOUBLE:
                 return Double.parseDouble(value);
             default:
