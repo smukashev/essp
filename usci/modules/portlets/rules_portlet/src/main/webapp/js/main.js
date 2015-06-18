@@ -65,7 +65,7 @@ function initGrid(){
     ruleListGrid = Ext.create('Ext.grid.Panel', {
         store: store,
         columns: [
-            {
+            /*{
                 header: '',
                 xtype: 'actioncolumn',
                 width: 30,
@@ -85,7 +85,7 @@ function initGrid(){
                         });
                     }
                 }]
-            },
+            },*/
             {
                 text     : 'Название',
                 dataIndex: 'name',
