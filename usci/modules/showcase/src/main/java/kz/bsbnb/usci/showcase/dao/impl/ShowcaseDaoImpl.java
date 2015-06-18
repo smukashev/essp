@@ -756,7 +756,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 } else {
                     if (attribute.elementPath.contains("root.")) {
                         Object container = entity.getEl(attribute.elementPath.substring(
-                                attribute.elementPath.indexOf(".")));
+                                attribute.elementPath.indexOf(".") + 1));
+
+                        if(container == null) continue;
 
                         if (container instanceof BaseEntity) {
                             BaseEntity innerEntity = (BaseEntity) container;
@@ -780,7 +782,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                             }
                         } else {
                             System.err.println("Operation is not supported!");
-                            return null;
                         }
 
                     } else {
@@ -835,7 +836,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         }
     }
 
-    public HashMap<Object, HashMap<String, Object>> generateMap(IBaseEntity globalEntity, IBaseEntity entity,
+    public synchronized HashMap<Object, HashMap<String, Object>> generateMap(IBaseEntity globalEntity, IBaseEntity entity,
                                                ShowcaseHolder showcaseHolder){
         HashMap<String, HashSet<PathElement>> paths = generatePaths(entity, showcaseHolder);
 
@@ -843,6 +844,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         rootAttributes.add(new PathElement("root", "root", entity.getMeta().getClassName()+"_id", true));
 
         HashMap<ValueElement, Object> dirtyMap = readMap("root", entity, paths, false);
+
+        if(dirtyMap == null)
+            System.err.println("Map is null!");
 
         clearDirtyMap(dirtyMap);
 
