@@ -44,7 +44,7 @@ public class RuleService implements IRuleService {
     @Override
     public long save(Rule rule, BatchVersion batchVersion) {
 
-//        Batch batch = batchDao.loadBatch(batchVersion.getPackage_id());
+//        Batch batch = batchDao.loadBatch(batchVersion.getPackageId());
 //
 //        listenerSingleton.callListeners(batchVersion.getId(),batchVersion.getReport_date(), batch.getName());
         long id = ruleDao.save(rule,batchVersion);

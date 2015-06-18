@@ -258,7 +258,7 @@ public class RulesSingleton
                             e.getMessage()));
                 }
 
-                ruleCasheEntries.add(new RuleCasheEntry(curVersion.getReport_date(),
+                ruleCasheEntries.add(new RuleCasheEntry(curVersion.getOpenDate(),
                         curBatch.getName() + "_" + curVersion.getId()));
             }
 

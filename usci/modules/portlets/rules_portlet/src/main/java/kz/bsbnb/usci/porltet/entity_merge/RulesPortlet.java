@@ -93,6 +93,7 @@ public class RulesPortlet extends MVCPortlet{
 
     enum OperationTypes {
         PACKAGE_ALL,
+        PACKAGE_VERSIONS,
         GET_RULE_TITLES,
         GET_RULE,
         UPDATE_RULE,
@@ -122,7 +123,7 @@ public class RulesPortlet extends MVCPortlet{
 
         try {
             OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
-            long ruleId, batchVersionId;
+            long ruleId, batchVersionId, batchId;
             String title;
             DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             long baseEntityId;
@@ -133,6 +134,10 @@ public class RulesPortlet extends MVCPortlet{
             switch(operationType){
                 case PACKAGE_ALL:
                        writer.write(JsonMaker.getJson(batchService.getAllBatches()));
+                    break;
+                case PACKAGE_VERSIONS:
+                    batchId = Long.parseLong(resourceRequest.getParameter("packageId"));
+                    writer.write(JsonMaker.getJson(batchService.getBatchVersions(batchId)));
                     break;
                 case GET_RULE_TITLES:
                     long packageId = Long.parseLong(resourceRequest.getParameter("packageId"));

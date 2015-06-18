@@ -41,7 +41,7 @@ public class Main {
 //            List<BatchVersion> batchVersionList = batchVersionDao.getBatchVersions(batch);
 //
 //            for (BatchVersion b : batchVersionList)
-//            System.out.println(b.getId()+" "+b.getPackage_id()+" "+b.getRepDate());
+//            System.out.println(b.getId()+" "+b.getPackageId()+" "+b.getRepDate());
 //
 //            BatchVersion bb = batchVersionDao.getBatchVersion(batch);
 //            System.out.println(bb.getId());
