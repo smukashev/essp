@@ -631,10 +631,55 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         }
     }
 
-    public HashMap<String, HashSet<String>> generatePaths(IBaseEntity entity, ShowcaseHolder showcaseHolder) {
-        HashMap<String, HashSet<String>> paths = new HashMap<>();
+    class PathElement {
+        public String elementPath;
+        public String attributePath;
+        public String columnName;
+        public boolean isKey = false;
 
-        HashSet<String> tmpSet = null;
+        public PathElement(String elementPath, String attributePath, String columnName, boolean isKey) {
+            this.elementPath = elementPath;
+            this.attributePath = attributePath;
+            this.columnName = columnName;
+            this.isKey = isKey;
+        }
+
+        @Override
+        public String toString() {
+            return elementPath + ", " + columnName;
+        }
+    }
+
+    class ValueElement {
+        public String columnName;
+        public Long elementId;
+        public boolean isKey;
+        public boolean isArray;
+
+        public ValueElement(String columnName, Long elementId, boolean isKey) {
+            this.columnName = columnName;
+            this.elementId = elementId;
+            this.isKey = isKey;
+            this.isArray = false;
+        }
+
+        public ValueElement(String columnName, Long elementId, boolean isKey, boolean isArray) {
+            this.columnName = columnName;
+            this.elementId = elementId;
+            this.isKey = isKey;
+            this.isArray = isArray;
+        }
+
+        @Override
+        public String toString() {
+            return columnName + ", " + elementId + ", " + isKey + ", " + isArray;
+        }
+    }
+
+    public HashMap<String, HashSet<PathElement>> generatePaths(IBaseEntity entity, ShowcaseHolder showcaseHolder) {
+        HashMap<String, HashSet<PathElement>> paths = new HashMap<>();
+
+        HashSet<PathElement> tmpSet;
 
         for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFieldsList()) {
             IMetaType attributeMetaType = entity.getMeta().getEl(sf.getAttributePath());
@@ -647,7 +692,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         tmpSet = new HashSet<>();
                     }
 
-                    tmpSet.add("root");
+                    tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName(), false));
                     paths.put("root." + sf.getAttributePath(), tmpSet);
 
                     String path = sf.getAttributePath().substring(0, sf.getAttributePath().lastIndexOf("."));
@@ -659,7 +704,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         tmpSet = new HashSet<>();
                     }
 
-                    tmpSet.add(name);
+                    tmpSet.add(new PathElement(name, sf.getAttributePath(), sf.getColumnName(), false));
                     paths.put("root." + path, tmpSet);
                 } else {
                     String path = sf.getAttributePath().substring(0, sf.getAttributePath().lastIndexOf("."));
@@ -671,7 +716,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         tmpSet = new HashSet<>();
                     }
 
-                    tmpSet.add(name);
+                    tmpSet.add(new PathElement(name, sf.getAttributePath(), sf.getColumnName(), false));
                     paths.put("root." + path, tmpSet);
                 }
             } else {
@@ -682,14 +727,15 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 }
 
                 if(attributeMetaType.isComplex() || attributeMetaType.isSet()) {
-                    tmpSet.add("root." + sf.getAttributePath());
+                    tmpSet.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
+                            sf.getColumnName(), false));
                     paths.put("root", tmpSet);
 
                     tmpSet = new HashSet<>();
-                    tmpSet.add("root");
+                    tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName(), true));
                     paths.put("root." + sf.getAttributePath(), tmpSet);
                 } else {
-                    tmpSet.add(sf.getAttributePath());
+                    tmpSet.add(new PathElement(sf.getAttributePath(), sf.getAttributePath(), sf.getColumnName(), false));
                     paths.put("root", tmpSet);
                 }
             }
@@ -698,35 +744,39 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         return paths;
     }
 
-    HashMap<String, Object> readMap(String curPath, IBaseEntity entity, HashMap<String, HashSet<String>> paths) {
-        HashSet<String> attributes = paths.get(curPath);
+    HashMap<ValueElement, Object> readMap(String curPath, IBaseEntity entity, HashMap<String, HashSet<PathElement>> paths, boolean parentIsArray) {
+        HashSet<PathElement> attributes = paths.get(curPath);
 
-        HashMap<String, Object> map = new HashMap<>();
+        HashMap<ValueElement, Object> map = new HashMap<>();
 
         if(attributes != null) {
-            for(String attribute : attributes) {
-                if(attribute.equals("root") && entity != null) {
-                    map.put(entity.getMeta().getClassName()+"_id", entity.getId());
+            for(PathElement attribute : attributes) {
+                if (attribute.elementPath.equals("root") && entity != null) {
+                    map.put(new ValueElement(attribute.columnName, entity.getId(), !curPath.contains(".") || parentIsArray), entity.getId());
                 } else {
-                    if(attribute.contains("root.")) {
-                        Object container = entity.getEl(attribute.substring(attribute.indexOf(".")));
+                    if (attribute.elementPath.contains("root.")) {
+                        Object container = entity.getEl(attribute.elementPath.substring(
+                                attribute.elementPath.indexOf(".")));
 
                         if (container instanceof BaseEntity) {
                             BaseEntity innerEntity = (BaseEntity) container;
 
                             if(innerEntity != null)
-                                map.put(attribute, readMap(attribute, innerEntity, paths));
+                                map.put(new ValueElement(attribute.elementPath, innerEntity.getId(), false),
+                                        readMap(attribute.elementPath, innerEntity, paths, false));
                         } else if (container instanceof BaseSet) {
                             BaseSet innerSet = (BaseSet) container;
 
                             if(innerSet.getMemberType().isComplex()) {
                                 for(IBaseValue bValue : innerSet.get()) {
                                     BaseEntity bValueEntity = (BaseEntity) bValue.getValue();
-                                    map.put(attribute + "_" + bValueEntity.getId(), readMap(attribute, bValueEntity, paths));
+                                    map.put(new ValueElement(attribute.elementPath, bValueEntity.getId(), true, true),
+                                            readMap(attribute.elementPath, bValueEntity, paths, true));
                                 }
                             } else {
                                 for(IBaseValue bValue : innerSet.get())
-                                    map.put(attribute, bValue.getValue());
+                                    map.put(new ValueElement(attribute.elementPath, bValue.getId(), false, true),
+                                            bValue.getValue());
                             }
                         } else {
                             System.err.println("Operation is not supported!");
@@ -734,13 +784,15 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         }
 
                     } else {
-                        IBaseValue iBaseValue = entity.getBaseValue(attribute);
+                        IBaseValue iBaseValue = entity.getBaseValue(attribute.elementPath);
 
                         if(iBaseValue != null && iBaseValue.getMetaAttribute().getMetaType().isComplex()) {
-                            map.put(curPath + "." + attribute, readMap(curPath + "." + attribute,
-                                        (BaseEntity) iBaseValue.getValue(), paths));
+                            map.put(new ValueElement(curPath + "." + attribute.elementPath, iBaseValue.getId(), false)
+                                    , readMap(curPath + "." + attribute.elementPath,
+                                    (BaseEntity) iBaseValue.getValue(), paths, false));
                         } else if(iBaseValue != null) {
-                            map.put(attribute, iBaseValue.getValue());
+                            map.put(new ValueElement(attribute.columnName, iBaseValue.getId(), false),
+                                    iBaseValue.getValue());
                         }
                     }
                 }
@@ -750,18 +802,90 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         return map;
     }
 
+    public void clearDirtyMap(HashMap<ValueElement, Object> dirtyMap) {
+        HashMap<ValueElement, Object> tmpMap = new HashMap<>();
+
+        Iterator mainIterator = dirtyMap.entrySet().iterator();
+        while(mainIterator.hasNext()) {
+            Map.Entry<ValueElement, Object> entry = (Map.Entry) mainIterator.next();
+            if(entry.getValue() instanceof HashMap) {
+                if(entry.getKey().isArray) {
+                    clearDirtyMap((HashMap)entry.getValue());
+                    continue;
+                }
+
+                Iterator innerIterator = ((HashMap) entry.getValue()).entrySet().iterator();
+                while(innerIterator.hasNext()) {
+                Map.Entry<ValueElement, Object> innerEntry = (Map.Entry) innerIterator.next();
+                    if(innerEntry.getValue() instanceof HashMap) {
+                        clearDirtyMap((HashMap<ValueElement, Object>)innerEntry.getValue());
+                    } else {
+                        tmpMap.put(innerEntry.getKey(), innerEntry.getValue());
+                    }
+                }
+
+                mainIterator.remove();
+            }
+        }
+
+        Iterator tmpIterator = tmpMap.entrySet().iterator();
+        while(tmpIterator.hasNext()) {
+            Map.Entry<ValueElement, Object> tmpEntry = (Map.Entry) tmpIterator.next();
+            dirtyMap.put(tmpEntry.getKey(), tmpEntry.getValue());
+        }
+    }
+
     public HashMap<Object, HashMap<String, Object>> generateMap(IBaseEntity globalEntity, IBaseEntity entity,
                                                ShowcaseHolder showcaseHolder){
-        HashMap<String, HashSet<String>> paths = generatePaths(entity, showcaseHolder);
+        HashMap<String, HashSet<PathElement>> paths = generatePaths(entity, showcaseHolder);
 
-        HashSet<String> rootAttributes = paths.get("root");
-        rootAttributes.add("root");
+        HashSet<PathElement> rootAttributes = paths.get("root");
+        rootAttributes.add(new PathElement("root", "root", entity.getMeta().getClassName()+"_id", true));
 
-        HashMap<String, Object> map1 = readMap("root", entity, paths);
+        HashMap<ValueElement, Object> dirtyMap = readMap("root", entity, paths, false);
 
-        System.out.println(showcaseHolder.getRootClassName());
+        clearDirtyMap(dirtyMap);
 
-        return null;
+        HashMap<Object, HashMap<ValueElement, Object>> returnMap = new HashMap<>();
+
+        boolean containsArray = false;
+        for(Map.Entry<ValueElement, Object> dirtyMapEntry : dirtyMap.entrySet()) {
+            if(dirtyMapEntry.getKey().isArray) {
+                returnMap.put(dirtyMapEntry.getKey().elementId, (HashMap) dirtyMapEntry.getValue());
+                containsArray = true;
+            }
+        }
+
+        if(containsArray) {
+            for (Map.Entry<ValueElement, Object> dirtyMapEntry : dirtyMap.entrySet()) {
+                if (!dirtyMapEntry.getKey().isArray) {
+                    for (Map.Entry<Object, HashMap<ValueElement, Object>> returnMapEntry : returnMap.entrySet()) {
+                        returnMapEntry.getValue().put(dirtyMapEntry.getKey(), dirtyMapEntry.getValue());
+                    }
+                }
+            }
+        } else {
+            returnMap.put(entity.getId(), dirtyMap);
+        }
+
+        HashMap<Object, HashMap<String, Object>> globalMap = new HashMap<>();
+        HashMap<String, Object> globalKey = new HashMap<>();
+        for (Map.Entry<Object, HashMap<ValueElement, Object>> returnMapEntry : returnMap.entrySet()) {
+            HashMap<String, Object> tmpMap = new HashMap<>();
+
+            for(Map.Entry<ValueElement, Object> innerEntry : returnMapEntry.getValue().entrySet()) {
+                tmpMap.put(innerEntry.getKey().columnName, innerEntry.getValue());
+
+                if(innerEntry.getKey().isKey)
+                    globalKey.put(innerEntry.getKey().columnName, innerEntry.getValue());
+            }
+
+            globalMap.put(returnMapEntry.getKey(), tmpMap);
+        }
+
+        globalMap.put("_KEYMAP", globalKey);
+
+        return globalMap;
     }
 
     public boolean compareValues(HistoryState state, HashMap<String, Object> savingMap,
