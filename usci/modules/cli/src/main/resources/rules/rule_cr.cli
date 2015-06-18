@@ -562,4 +562,19 @@ $$$
 rule save
 
 
+rule read $$$
+title: проверка документов по признаку IS_PERSON_DOC/IS_ORG_DOC
+rule "проверка документов по признаку IS_PERSON_DOC/IS_ORG_DOC"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                 && (getEls("{setString(07,10,15,16)}subjects.person.docs.doc_type.code") > 0
+                  || getEls("{setString(01,02,03,04,05,06,08,09,12,13)}subjects.organization.docs.doc_type.code") > 0
+                  ))
+then
+ $entity.addValidationError("Документ субъекта сформирован неправильно");
+end
+$$$
+
+rule save
+
 quit
