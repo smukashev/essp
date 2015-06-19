@@ -23,11 +23,11 @@ import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
 /**
  * Created by Bauyrzhan.Ibraimov on 18.06.2015.
  */
-public class ProtocolsForRepDateTableReportExporter {
+public class ProtocolsTableReportExporter {
     Date repDate;
     Long creditorId;
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-    public  ProtocolsForRepDateTableReportExporter(Long creditorId, Date repDate)
+    public ProtocolsTableReportExporter(Long creditorId, Date repDate)
     {
         this.repDate=repDate;
         this.creditorId=creditorId;

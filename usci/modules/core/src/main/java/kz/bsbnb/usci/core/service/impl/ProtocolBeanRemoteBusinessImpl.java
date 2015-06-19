@@ -19,10 +19,7 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusiness
@@ -31,7 +28,19 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
     private Logger logger = Logger.getLogger(ProtocolBeanRemoteBusinessImpl.class);
     private Gson gson = new Gson();
 
-    private DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss a");
+    private final DateFormat gsonDateFormat
+            = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.US);
+
+    private Date parseDateFromGson(String sDate) {
+        synchronized (gsonDateFormat) {
+            try {
+                return gsonDateFormat.parse(sDate);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
 
     @PostConstruct
     public void init() {
@@ -95,14 +104,12 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
 
                     prot.setNote("присвоено " + csajm.getReceived());
                     prot.setPackNo(csajm.getIndex());
-                    try {
-                        prot.setPrimaryContractDate(dateFormat.parse(
-                                (String) csajm.getProperty(StatusProperties.CONTRACT_DATE)));
-                    } catch (Exception e) {
-                        prot.setPrimaryContractDate(null);
-                    }
-                    prot.setProtocolType(s);
 
+                    prot.setPrimaryContractDate(
+                        parseDateFromGson((String) csajm.getProperty(StatusProperties.CONTRACT_DATE))
+                    );
+
+                    prot.setProtocolType(s);
 
                     prot.setTypeDescription((String)csajm.getProperty(StatusProperties.CONTRACT_NO));
                     prot.setInputInfo(inputInfoId);
