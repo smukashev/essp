@@ -6,6 +6,8 @@ import kz.bsbnb.usci.portlet.report.dm.Report;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
+import kz.bsbnb.usci.portlet.report.export.ProtocolsTableReportExporter;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -59,11 +61,12 @@ public class ReportComponent extends VerticalLayout {
         if(parameterValues==null) {
             return null;
         }
-        if(!report.getProcedureName().equals("REPorter.REPORT_PROTOCOLS_FOR_REP_DATE"))
+        if(!report.getName().equals("ProtocolsByRepDate") && !report.getName().equals("ProtocolsByTime"))
         return getConnect().getDataSourceFromStoredProcedure(report.getProcedureName(), parameterValues);
         else
         {
-            return getConnect().getDataFromCouchBase(parameterValues);
+            //return getConnect().getDataFromCouchBase(parameterValues);
+            return new CustomDataSource(new ProtocolsTableReportExporter(parameterValues,report.getName()).getData());
         }
     }
 

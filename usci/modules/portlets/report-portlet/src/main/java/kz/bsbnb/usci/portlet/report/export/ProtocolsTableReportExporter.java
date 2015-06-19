@@ -11,11 +11,9 @@ import kz.bsbnb.usci.portlet.report.data.ProtocolDisplayBean;
 import javax.xml.crypto.Data;
 import java.sql.ResultSet;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 
 import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
@@ -25,12 +23,50 @@ import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
  */
 public class ProtocolsTableReportExporter {
     Date repDate;
+    Date beginDate;
+    Date endDate;
     Long creditorId;
+    String RepName;
+
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-    public ProtocolsTableReportExporter(Long creditorId, Date repDate)
+    public ProtocolsTableReportExporter(List<Object> parameterList, String RepName)
     {
-        this.repDate=repDate;
-        this.creditorId=creditorId;
+        this.RepName=RepName;
+        Date[] dates = new Date[2];
+        int i=0;
+        for(int parameterIndex=0; parameterIndex < parameterList.size(); parameterIndex++)
+        {
+
+            Object parameter = parameterList.get(parameterIndex);
+            if (parameter instanceof Date) {
+                dates[i] = (Date) parameter;
+                i++;
+            }
+            else
+            {
+                this.creditorId = Long.parseLong(parameter.toString());
+            }
+
+        }
+        i=0;
+        if(RepName.equals("ProtocolsByRepDate"))
+        {
+            this.repDate=dates[0];
+        }
+        else
+        {
+            if(dates[0].compareTo(dates[1])<0)
+            {
+                this.beginDate=dates[0];
+                this.endDate=dates[1];
+            }
+            else
+            {
+                this.beginDate=dates[1];
+                this.endDate=dates[0];
+            }
+        }
+
     }
 
     public ResultSet getData()  {
@@ -49,12 +85,21 @@ public class ProtocolsTableReportExporter {
         creditors.clear();
         creditors.add(currentCreditor);
 
-        List<InputInfoDisplayBean> list  =provider.getInputInfosByCreditors(creditors, repDate);
-        List<ProtocolDisplayBean> ProtocolList;
+        List<InputInfoDisplayBean>   list  = provider.getInputInfosByCreditors(creditors, repDate);
+
+        List<ProtocolDisplayBean> ProtocolList=null;
         for(InputInfoDisplayBean info : list)
         {
-            ProtocolList = provider.getProtocolsByInputInfo(info);
-
+            if(RepName.equals("ProtocolsByRepDate")) {
+                ProtocolList = provider.getProtocolsByInputInfo(info);
+            }
+            else
+            {
+                if(info.getReceiverDate().compareTo(beginDate)>=0 && info.getReceiverDate().compareTo(endDate)<=0)
+                {
+                    ProtocolList = provider.getProtocolsByInputInfo(info);
+                }
+            }
             for(ProtocolDisplayBean protocolBean: ProtocolList)
             {
 
