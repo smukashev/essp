@@ -14,6 +14,10 @@ public class ReportPortletResource extends ExternalResource {
     public static final ReportPortletResource ARROW_LEFT_ICON = new ReportPortletResource("arrow_left.png");
     public static final ReportPortletResource DOWNLOAD_ICON = new ReportPortletResource("download.png");
     public static final ReportPortletResource REFRESH_ICON = new ReportPortletResource("refresh.png");
+
+    public static final ReportPortletResource WARNING_ICON = new ReportPortletResource("error.png");
+    public static final ReportPortletResource CRITICAL_ERROR_ICON = new ReportPortletResource("cancel.png");
+    public static final ReportPortletResource INFO_ICON = new ReportPortletResource("exclamation.png");
     
     private ReportPortletResource(String sourceURL) {
         super("/" + ReportApplication.CONTEXT_NAME + "/" + sourceURL);
