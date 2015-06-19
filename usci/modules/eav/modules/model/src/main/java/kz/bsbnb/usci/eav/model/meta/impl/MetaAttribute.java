@@ -9,6 +9,9 @@ import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
  */
 public class MetaAttribute extends Persistable implements IMetaAttribute
 {
+
+    private static final long serialVersionUID = 1L;
+
     IMetaType metaType;
 
     /**
