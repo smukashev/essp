@@ -154,7 +154,7 @@ Ext.onReady(function() {
 
     Ext.define('classesStoreModel', {
         extend: 'Ext.data.Model',
-        fields: ['id','name']
+        fields: ['id','name', 'title']
     });
 
     Ext.define('entityModel', {
@@ -441,7 +441,7 @@ Ext.onReady(function() {
                     store: classesStore,
                     labelWidth: 70,
                     valueField:'id',
-                    displayField:'name',
+                    displayField:'title',
                     fieldLabel: label_CLASS,
                     editable: false
                 }, {

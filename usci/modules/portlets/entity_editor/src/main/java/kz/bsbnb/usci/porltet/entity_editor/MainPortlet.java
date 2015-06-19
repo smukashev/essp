@@ -7,6 +7,7 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.liferay.util.portlet.PortletProps;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
 import kz.bsbnb.usci.core.service.ISearcherFormService;
 import kz.bsbnb.usci.eav.model.Batch;
@@ -81,9 +82,17 @@ public class MainPortlet extends MVCPortlet {
         }
     }
 
+    private List<String> classesFilter;
+
     @Override
     public void init() throws PortletException {
         connectToServices();
+
+        classesFilter = new LinkedList<>();
+
+        for(String s : PortletProps.get("classes.filter").split(",")) {
+            classesFilter.add(s);
+        }
 
         super.init();
     }
@@ -364,7 +373,12 @@ public class MainPortlet extends MVCPortlet {
                     List<Pair> classes = searcherFormService.getMetaClasses(currentUser.getUserId());
                     if(classes.size() < 1)
                         throw new RuntimeException("no.any.rights");
-                    writer.write("{\"success\":\"true\", \"data\": " + gson.toJson(classes) + "}");
+                    List<Pair> afterFilter = new LinkedList<>();
+                    for(Pair c : classes)
+                        if(classesFilter.contains(c.getName()))
+                            afterFilter.add(c);
+
+                    writer.write(JsonMaker.getJson(afterFilter));
                     break;
                 case GET_FORM:
                     Long metaId = Long.valueOf(resourceRequest.getParameter("metaId"));
