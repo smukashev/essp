@@ -170,5 +170,10 @@
             <scope>provided</scope>
            <version>6.0</version>
         </dependency>
+	<dependency>
+		<groupId>com.mockrunner</groupId>
+		<artifactId>mockrunner</artifactId>
+		<version>0.3.1</version>
+	</dependency>
     </dependencies>
 </project>
