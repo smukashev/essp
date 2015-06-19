@@ -36,37 +36,25 @@ public class ProtocolDisplayBean {
         this.text = text;
     }
 
-    public static Resource getIconByMessageTypeCode(String code) {
-        if (code == null)
-            code = "";
-
-        ProtocolPortletResource resource = null;
-        if (code.equals(MessageType.CRITICAL_ERROR.getCode())) {
-            resource = ProtocolPortletResource.CRITICAL_ERROR_ICON;
-        } else if (code.equals(MessageType.NON_CRITICAL_ERROR.getCode())) {
-            resource = ProtocolPortletResource.WARNING_ICON;
-        } else if (code.equals(MessageType.INFO.getCode())) {
-            resource = ProtocolPortletResource.INFO_ICON;
+    public static Resource getIconByMessageTypeName(String name) {
+        if ("ERROR".equals(name)) {
+            return ProtocolPortletResource.CRITICAL_ERROR_ICON;
         } else {
-            resource = ProtocolPortletResource.OK_ICON;
+            return ProtocolPortletResource.OK_ICON;
         }
-        return resource;
-
     }
 
-    public static Resource getIconByMessageTypeName(String name) {
-        if (name == null)
-            name = "";
+    /**
+     * ERROR or INFO
+     */
+    public String getMessageType() {
+        String typeName = getTypeName();
 
-        ProtocolPortletResource resource = null;
-
-        if (name.equals("ERROR")) {
-            resource = ProtocolPortletResource.CRITICAL_ERROR_ICON;
+        if ("ERROR".equals(typeName)) {
+            return "ERROR";
         } else {
-            resource = ProtocolPortletResource.OK_ICON;
+            return "INFO";
         }
-
-        return resource;
     }
 
     public String getMessage() {
@@ -83,7 +71,6 @@ public class ProtocolDisplayBean {
 
     public Embedded getStatusIcon() {
         if (statusIcon == null) {
-//            Resource resource = getIconByMessageTypeCode(getMessageTypeCode());
             Resource resource = getIconByMessageTypeName(getMessageTypeName());
             statusIcon = new Embedded("", resource);
             statusIcon.setDescription(getMessageTypeName());
