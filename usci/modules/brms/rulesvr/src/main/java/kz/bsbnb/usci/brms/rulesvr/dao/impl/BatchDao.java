@@ -123,7 +123,7 @@ public class BatchDao implements IBatchDao
 
     @Override
     public List<IBatchVersion> getBatchVersions(long batchId) {
-        Select select = context.select(LOGIC_PACKAGE_VERSIONS.ID, LOGIC_PACKAGE_VERSIONS.REPORT_DATE)
+        Select select = context.select(LOGIC_PACKAGE_VERSIONS.ID, LOGIC_PACKAGE_VERSIONS.OPEN_DATE)
                 .from(LOGIC_PACKAGE_VERSIONS)
                 .where(LOGIC_PACKAGE_VERSIONS.PACKAGE_ID.eq(batchId));
 
@@ -134,7 +134,7 @@ public class BatchDao implements IBatchDao
             IBatchVersion batchVersion = new BatchVersion();
             batchVersion.setId(((BigDecimal)row.get(LOGIC_PACKAGE_VERSIONS.ID.getName())).longValue());
             batchVersion.setPackageId(batchId);
-            batchVersion.setOpenDate((Date)row.get(LOGIC_PACKAGE_VERSIONS.REPORT_DATE.getName()));
+            batchVersion.setOpenDate((Date)row.get(LOGIC_PACKAGE_VERSIONS.OPEN_DATE.getName()));
             ret.add(batchVersion);
         }
 

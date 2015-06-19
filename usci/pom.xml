@@ -28,7 +28,7 @@
         <module>modules/cli</module>
         <module>modules/cr</module>
         <module>modules/parent</module>
-        <module>modules/showcase</module>
+       <!-- <module>modules/showcase</module>-->
     </modules>
 
     <build>
