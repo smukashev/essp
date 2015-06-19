@@ -31,7 +31,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
     private Logger logger = Logger.getLogger(ProtocolBeanRemoteBusinessImpl.class);
     private Gson gson = new Gson();
 
-    private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+    private DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss a");
 
     @PostConstruct
     public void init() {
@@ -39,7 +39,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         //System.setProperty("viewmode", "development");
 
         ArrayList<URI> nodes = new ArrayList<URI>();
-        nodes.add(URI.create("http://172.17.110.114:8091/pools"));
+        nodes.add(URI.create("http://172.17.110.92:8091/pools"));
 
         try {
             couchbaseClient = new CouchbaseClient(nodes, "test", "");
