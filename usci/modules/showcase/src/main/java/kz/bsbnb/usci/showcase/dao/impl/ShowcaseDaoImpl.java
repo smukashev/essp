@@ -250,7 +250,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         platform.createModel(model, false, true);
     }
 
-    void persistMap(HashMap<String, Object> map, Date openDate, Date closeDate, ShowcaseHolder showCaseHolder) {
+    void persistMap(HashMap<String, Object> map, Date openDate, Date closeDate, ShowcaseHolder showCaseHolder,
+                    IBaseEntity entity) {
         StringBuilder sql;
         StringBuilder values = new StringBuilder("(");
         String tableName;
@@ -276,6 +277,31 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             sql.append(COLUMN_PREFIX).append(entry.getKey()).append(", ");
             values.append("?, ");
             vals[i++] = entry.getValue();
+        }
+
+        for(ShowCaseField sf : showCaseHolder.getShowCaseMeta().getCustomFieldsList()) {
+            if(sf.getAttributePath().equals("root")) {
+                sql.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
+                vals[i++] = entity.getId();
+                values.append("?, ");
+                continue;
+            }
+
+            Object o = entity.getEl(sf.getAttributePath());
+
+            try {
+                if (o instanceof BaseEntity) {
+                    sql.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
+                    values.append("?, ");
+                    vals[i++] = ((BaseEntity) o).getId();
+             } else {
+                    sql.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
+                    values.append("?, ");
+                    vals[i++] = o;
+                }
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
 
         if(!showCaseHolder.getShowCaseMeta().isFinal()) {
@@ -525,11 +551,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     @Transactional
-    void dbCarteageGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
+    synchronized void dbCarteageGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
         Date openDate = null, closeDate = null;
         String sql;
 
-        HashMap<Object, HashMap<String, Object>> savingMap = generateMap(globalEntity, entity, showcaseHolder);
+        HashMap<Object, HashMap<String, Object>> savingMap = generateMap(entity, showcaseHolder);
 
         if(savingMap == null || savingMap.size() == 0)
             throw new UnsupportedOperationException("Map is empty!");
@@ -627,7 +653,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 jdbcTemplateSC.update(sql, getObjectArray(false, keyData.vals, openDate));
             }
 
-            persistMap(entryMap, openDate, closeDate, showcaseHolder);
+            persistMap(entryMap, openDate, closeDate, showcaseHolder, globalEntity);
         }
     }
 
@@ -791,6 +817,18 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                             map.put(new ValueElement(curPath + "." + attribute.elementPath, iBaseValue.getId(), false)
                                     , readMap(curPath + "." + attribute.elementPath,
                                     (BaseEntity) iBaseValue.getValue(), paths, false));
+                        } else if(iBaseValue != null && iBaseValue.getValue() instanceof BaseSet) {
+                            BaseSet bSet = (BaseSet) iBaseValue.getValue();
+
+                            for(IBaseValue innerValue : bSet.get()) {
+                                HashMap simpleArrayMap = new HashMap();
+
+                                simpleArrayMap.put(new ValueElement(attribute.elementPath, innerValue.getId(),
+                                        false, true), innerValue.getValue());
+
+                                map.put(new ValueElement(attribute.elementPath, innerValue.getId(), false, true),
+                                        simpleArrayMap);
+                            }
                         } else if(iBaseValue != null) {
                             map.put(new ValueElement(attribute.columnName, iBaseValue.getId(), false),
                                     iBaseValue.getValue());
@@ -836,7 +874,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         }
     }
 
-    public synchronized HashMap<Object, HashMap<String, Object>> generateMap(IBaseEntity globalEntity, IBaseEntity entity,
+    public synchronized HashMap<Object, HashMap<String, Object>> generateMap(IBaseEntity entity,
                                                ShowcaseHolder showcaseHolder){
         HashMap<String, HashSet<PathElement>> paths = generatePaths(entity, showcaseHolder);
 
