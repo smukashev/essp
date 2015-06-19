@@ -18,7 +18,6 @@ import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -48,7 +47,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         //System.setProperty("viewmode", "development");
 
         ArrayList<URI> nodes = new ArrayList<URI>();
-        nodes.add(URI.create("http://172.17.110.92:8091/pools"));
+        nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
         try {
             couchbaseClient = new CouchbaseClient(nodes, "test", "");

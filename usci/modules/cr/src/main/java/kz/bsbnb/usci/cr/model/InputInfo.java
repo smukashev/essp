@@ -5,6 +5,7 @@ package kz.bsbnb.usci.cr.model;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 /**
  * TODO javadoc 
@@ -45,7 +46,9 @@ public class InputInfo implements Serializable {
     private long totalInsertLost;
 
     private long totalUpdateLost;
-        
+
+	private List<Protocol> batchStatuses;
+
 	public BigInteger getId() {
 		return id;
 	}
@@ -223,4 +226,12 @@ public class InputInfo implements Serializable {
     public void setTotalUpdateLost(long totalUpdateLost) {
         this.totalUpdateLost = totalUpdateLost;
     }
+
+	public List<Protocol> getBatchStatuses() {
+		return batchStatuses;
+	}
+
+	public void setBatchStatuses(List<Protocol> batchStatuses) {
+		this.batchStatuses = batchStatuses;
+	}
 }

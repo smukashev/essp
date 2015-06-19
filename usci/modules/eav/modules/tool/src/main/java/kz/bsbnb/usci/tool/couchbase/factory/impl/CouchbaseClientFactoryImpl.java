@@ -37,7 +37,7 @@ public class CouchbaseClientFactoryImpl implements ICouchbaseClientFactory {
     @Override
     public CouchbaseClient getCouchbaseClient() {
         ArrayList<URI> nodes = new ArrayList<URI>();
-        nodes.add(URI.create("http://172.17.110.92:8091/pools"));
+        nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
         try {
             return new CouchbaseClient(nodes, "test", "");

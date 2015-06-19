@@ -1009,7 +1009,7 @@
 	<table name="logic_package_versions">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="package_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="open_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
 		<unique>
 			<unique-column name="id"/>
 		</unique>

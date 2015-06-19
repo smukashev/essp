@@ -6,6 +6,9 @@ import java.io.Serializable;
  * Use for anything that will contain combination [id,name] or [id, title]
  */
 public class Pair implements Serializable{
+
+    private static final long serialVersionUID = 1L;
+
     private Long id;
     private String name;
     private String title;
@@ -13,6 +16,12 @@ public class Pair implements Serializable{
     public Pair(long id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public Pair(long id, String name, String title) {
+        this.id = id;
+        this.name = name;
+        this.title = title;
     }
 
     public Pair(long id,String title, boolean another) {

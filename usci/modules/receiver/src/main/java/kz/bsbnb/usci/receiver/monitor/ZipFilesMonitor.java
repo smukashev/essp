@@ -93,7 +93,7 @@ public class ZipFilesMonitor{
         //System.setProperty("viewmode", "development");
 
         ArrayList<URI> nodes = new ArrayList<URI>();
-        nodes.add(URI.create("http://172.17.110.114:8091/pools"));
+        nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
         try {
             couchbaseClient = new CouchbaseClient(nodes, "test", "");
@@ -146,7 +146,7 @@ public class ZipFilesMonitor{
         //System.setProperty("viewmode", "development");
 
         ArrayList<URI> nodes = new ArrayList<URI>();
-        nodes.add(URI.create("http://172.17.110.114:8091/pools"));
+        nodes.add(URI.create("http://127.0.0.1:8091/pools"));
 
         try {
             couchbaseClient = new CouchbaseClient(nodes, "test", "");

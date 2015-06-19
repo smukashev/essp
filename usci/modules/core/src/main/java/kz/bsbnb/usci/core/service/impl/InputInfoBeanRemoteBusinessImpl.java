@@ -4,14 +4,12 @@ import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.core.service.InputInfoBeanRemoteBusiness;
-import kz.bsbnb.usci.cr.model.Creditor;
-import kz.bsbnb.usci.cr.model.DataTypeUtil;
-import kz.bsbnb.usci.cr.model.InputInfo;
-import kz.bsbnb.usci.cr.model.Shared;
+import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.model.json.BatchFullStatusJModel;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.eav.model.json.BatchStatusArrayJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
+import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -130,8 +128,10 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
                     Creditor currentCreditor = inputCreditors.get(creditorId);
 
-                    if (currentCreditor == null)
+                    if (currentCreditor == null) {
+                        batchFullStatusJModel = null;
                         continue;
+                    }
 
                     BatchStatusArrayJModel statusArrayJModel =
                             gson.fromJson(viewRowNoDocs.getValue(), BatchStatusArrayJModel.class);
@@ -142,7 +142,33 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
                     String lastStatus = "";
 
+                    ii.setBatchStatuses(new ArrayList<Protocol>());
+
                     for (BatchStatusJModel statusModel : statusesList) {
+                        {
+                            Protocol protocol = new Protocol();
+                            protocol.setId(0L);
+                            {
+                                Message m = new Message();
+                                m.setCode("A");
+                                m.setNameKz(statusModel.getDescription());
+                                m.setNameRu(statusModel.getDescription());
+                                protocol.setMessage(m);
+                            }
+                            {
+                                Shared s = new Shared();
+                                s.setCode("S");
+                                s.setNameRu(statusModel.getProtocol());
+                                s.setNameKz(statusModel.getProtocol());
+                                protocol.setMessageType(s);
+                                protocol.setProtocolType(s);
+                            }
+
+                            protocol.setNote("присвоено " + statusModel.getReceived());
+
+                            ii.getBatchStatuses().add(protocol);
+                        }
+
                         lastStatus = statusModel.getProtocol();
                         if (statusModel.getProtocol().equals("PROCESSING")) {
                             ii.setStartedDate(statusModel.getReceived());

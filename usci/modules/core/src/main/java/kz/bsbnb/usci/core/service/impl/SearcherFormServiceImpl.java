@@ -53,7 +53,7 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
 
         for(MetaClassName metaClass : metas) {
             // if(allowedMetas == null || allowedMetasSet.contains(metaClass.getClassName())) TODO: uncomment
-                ret.add(new Pair(metaClass.getId(), metaClass.getClassTitle()));
+                ret.add(new Pair(metaClass.getId(), metaClass.getClassName(), metaClass.getClassTitle()));
         }
 
         return ret;
