@@ -143,11 +143,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         Column entityIdColumn = new Column();
         entityIdColumn.setName(showcaseHolder.getRootClassName().toUpperCase() + "_ID");
-        entityIdColumn.setPrimaryKey(true);
+        entityIdColumn.setPrimaryKey(false);
         entityIdColumn.setRequired(true);
         entityIdColumn.setType("NUMERIC");
         entityIdColumn.setSize("14,0");
-        entityIdColumn.setAutoIncrement(true);
+        entityIdColumn.setAutoIncrement(false);
 
         table.addColumn(entityIdColumn);
 
@@ -329,16 +329,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         sql.append(") VALUES ").append(values);
 
         jdbcTemplateSC.update(sql.toString(), vals);
-    }
-
-    private boolean compatible(HashMap a, HashMap b) {
-        for (Object o : a.keySet()) {
-            String key = (String) o;
-            if (key.endsWith("_id"))
-                if (b.containsKey(key) && !a.get(key).equals(b.get(key)))
-                    return false;
-        }
-        return true;
     }
 
     @Transactional
