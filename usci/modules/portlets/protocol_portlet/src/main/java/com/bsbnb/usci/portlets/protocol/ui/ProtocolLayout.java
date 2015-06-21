@@ -47,6 +47,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
 import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.SubjectType;
 
 /**
@@ -59,7 +60,7 @@ public class ProtocolLayout extends VerticalLayout {
     private boolean isProtocolGrouped = false;
     private Map<Object, List<ProtocolDisplayBean>> groupsMapProtocol;
     private List<ProtocolDisplayBean> listOfProtocols;
-    private Set<String> prohibitedMessageTypeCodes = new HashSet<String>();
+    private Set<String> prohibitedMessageTypes = new HashSet<String>();
     private DataProvider provider;
     private FilterableSelect<Creditor> creditorSelector;
     private DateField reportDateField;
@@ -408,42 +409,53 @@ public class ProtocolLayout extends VerticalLayout {
         typesOfProtocolLayout.setVisible(true);
         groupsTreePanel.setVisible(false);
 
-        prohibitedMessageTypeCodes.clear();
+        prohibitedMessageTypes.clear();
         listOfProtocols = provider.getProtocolsByInputInfo(ii);
         Set<String> messageTypeCodes = new HashSet<>();
+
+        if (listOfProtocols.isEmpty()) {
+            for (Protocol batchStatus : ii.getInputInfo().getBatchStatuses()) {
+                listOfProtocols.add(new ProtocolDisplayBean(batchStatus));
+            }
+        }
+
         if (listOfProtocols.isEmpty()) {
             noProtocolsLabel.setVisible(true);
             protocolLayout.setVisible(false);
         } else {
-            for (final ProtocolDisplayBean protocol : listOfProtocols) {
-                tableProtocol.addItem(protocol);
-                if (!messageTypeCodes.contains(protocol.getMessageTypeCode())) {
-                    messageTypeCodes.add(protocol.getMessageTypeCode());
-                    Button filterButton = new Button("Фильтр", new Button.ClickListener() {
-
-                        public void buttonClick(ClickEvent event) {
-                            Button button = event.getButton();
-                            String styleName = button.getStyleName();
-                            if ("v-button v-pressed".equals(styleName)) {
-                                button.setStyleName("v-button");
-                                prohibitedMessageTypeCodes.add(protocol.getMessageTypeCode());
-                            } else {
-                                button.setStyleName("v-button v-pressed");
-                                prohibitedMessageTypeCodes.remove(protocol.getMessageTypeCode());
-                            }
-                            updateProtocolTable();
-                        }
-                    });
-                    filterButton.setStyleName("v-button v-pressed");
-                    filterButton.setIcon(protocol.getStatusIcon().getSource());
-                    filterButton.setDescription(protocol.getMessageTypeName());
-                    filterButton.setImmediate(true);
-                    typesOfProtocolLayout.addComponent(filterButton);
-                }
+            for (ProtocolDisplayBean protocolDisplayBean : listOfProtocols) {
+                addProtocol(protocolDisplayBean, messageTypeCodes);
             }
             setProtocolColumns(EXTENDED_PROTOCOL_TABLE_COLUMNS);
             noProtocolsLabel.setVisible(false);
             protocolLayout.setVisible(true);
+        }
+    }
+
+    private void addProtocol(final ProtocolDisplayBean protocol, Set<String> messageTypes) {
+        tableProtocol.addItem(protocol);
+        if (!messageTypes.contains(protocol.getMessageType())) {
+            messageTypes.add(protocol.getMessageType());
+            Button filterButton = new Button(null, new Button.ClickListener() {
+
+                public void buttonClick(ClickEvent event) {
+                    Button button = event.getButton();
+                    String styleName = button.getStyleName();
+                    if ("v-button v-pressed".equals(styleName)) {
+                        button.setStyleName("v-button");
+                        prohibitedMessageTypes.add(protocol.getMessageType());
+                    } else {
+                        button.setStyleName("v-button v-pressed");
+                        prohibitedMessageTypes.remove(protocol.getMessageType());
+                    }
+                    updateProtocolTable();
+                }
+            });
+            filterButton.setStyleName("v-button v-pressed");
+            filterButton.setIcon(protocol.getStatusIcon().getSource());
+            filterButton.setDescription(protocol.getMessageType());
+            filterButton.setImmediate(true);
+            typesOfProtocolLayout.addComponent(filterButton);
         }
     }
 
@@ -488,6 +500,8 @@ public class ProtocolLayout extends VerticalLayout {
             protocolLayout.setVisible(false);
             groupsTreePanel.setVisible(false);
         } else {
+            // TODO check batchStatuses
+
             noProtocolsLabel.setVisible(false);
             protocolLayout.setVisible(true);
             groupsTreePanel.setVisible(true);
@@ -500,7 +514,7 @@ public class ProtocolLayout extends VerticalLayout {
         protocolsContainer.removeAllItems();
         List<ProtocolDisplayBean> filteredProtocols = new ArrayList<>();
         for (ProtocolDisplayBean protocol : listOfProtocols) {
-            if (!prohibitedMessageTypeCodes.contains(protocol.getMessageTypeCode())) {
+            if (!prohibitedMessageTypes.contains(protocol.getMessageType())) {
                 filteredProtocols.add(protocol);
             }
         }
