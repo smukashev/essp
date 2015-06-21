@@ -429,13 +429,13 @@ showcase set downPath subjects
 
 showcase list add organization org_id
 showcase list add organization.bank_relations org_brs_id
-showcase list add organization.bank_relations.bank_relation org_brs_bank_relation_id
-showcase list add organization.bank_relations.creditor org_brs_creditor_id
+showcase list add organization.bank_relations.bank_relation org_br_id
+showcase list add organization.bank_relations.creditor org_br_creditor_id
 
 showcase list add person person_id
 showcase list add person.bank_relations person_brs_id
-showcase list add person.bank_relations.bank_relation person_brs_bank_relation_id
-showcase list add person.bank_relations.creditor person_brs_creditor_id
+showcase list add person.bank_relations.bank_relation person_br_id
+showcase list add person.bank_relations.creditor person_br_creditor_id
 
 showcase save
 
