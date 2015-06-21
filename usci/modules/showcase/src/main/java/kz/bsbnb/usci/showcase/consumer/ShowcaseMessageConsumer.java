@@ -162,11 +162,13 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
                 lock.writeLock().lock();
                 syncSet.add(syncKey);
-                lock.writeLock().unlock();
-
                 showcaseDao.generate(entity, holder);
+                lock.writeLock().unlock();
             } catch(Exception e) {
+                System.err.println(holder.getShowCaseMeta().getTableName());
+                System.err.println("--------------------------------------");
                 e.printStackTrace();
+                System.err.println("--------------------------------------");
             } finally {
                 lock.writeLock().lock();
                 syncSet.remove(syncKey);
