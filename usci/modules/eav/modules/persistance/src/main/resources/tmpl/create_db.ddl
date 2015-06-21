@@ -1126,4 +1126,46 @@
     <column name="content" required="false" type="BLOB"/>
   </table>
   <!-- END: tables for approval portlet-->
+
+  <!--BEGIN: tables for notifications portlet -->
+	<table name="mail_template">
+	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
+	  <column name="subject" type="VARCHAR" size="1000" />
+	  <column name="text" type="VARCHAR" size="3000" />
+	  <column name="code" type="VARCHAR" size="30" />
+	  <column name="name_ru" type="VARCHAR" size="300" />
+	  <column name="name_kz" type="VARCHAR" size="300" />
+	  <column name="configuration_type_id" type="NUMERIC" size="14,0" />
+	</table>
+
+	<table name="mail_template_parameter">
+	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
+	  <column name="mail_template_id" required="true" type="NUMERIC" size="14,0" />
+	  <column name="code" required="true" type="VARCHAR" size="20" />
+	  <column name="order_number"  type="NUMERIC" size="14,0" />
+	</table>
+
+	<table name="mail_message">
+	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
+	  <column name="recipient_user_id" required="true" type="NUMERIC" size="14,0" />
+	  <column name="status_id" required="true" type="NUMERIC" size="14,0" />
+	  <column name="mail_template_id" required="true" type="NUMERIC" size="14,0" />
+	  <column name="creation_date"  type="DATE" />
+	  <column name="sending_date"  type="DATE" />
+	</table>
+
+	<table name="mail_message_parameter">
+	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
+	  <column name="mail_message_id" required="true" type="NUMERIC" size="14,0" />
+	  <column name="mail_template_parameter_id" required="true" type="NUMERIC" size="14,0" />
+	  <column name="value"  type="VARCHAR" size="1000" />
+	</table>
+
+	<table name="mail_user_mail_template">
+	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
+	  <column name="portal_user_id" required="true" type="NUMERIC" size="14,0" />
+	  <column name="mail_template_id" required="true" type="NUMERIC" size="14,0" />
+	  <column name="enabled" required="true" type="NUMERIC" size="1" default="0"/>
+	</table>
+  <!--END: tables for notifications portlet -->
 </database>
