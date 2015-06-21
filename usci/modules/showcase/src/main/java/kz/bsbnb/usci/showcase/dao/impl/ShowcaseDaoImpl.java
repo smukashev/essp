@@ -787,44 +787,25 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         return arrayEl;
     }
 
-    public void clearDirtyMap(HashMap<ValueElement, Object> dirtyMap) {
-        Iterator mainArrayIterator = dirtyMap.entrySet().iterator();
-        while (mainArrayIterator.hasNext()) {
-            Map.Entry<ValueElement, Object> entry = (Map.Entry) mainArrayIterator.next();
+    public HashMap<ValueElement, Object> clearDirtyMap(HashMap<ValueElement, Object> dirtyMap) {
+        HashMap<ValueElement, Object> returnMap = new HashMap<>();
 
-            if (entry.getKey().isArray) {
-                clearDirtyMap((HashMap) entry.getValue());
+        Iterator iter = dirtyMap.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<ValueElement, Object> entry = (Map.Entry) iter.next();
+
+            if (entry.getValue() instanceof HashMap) {
+                HashMap<ValueElement, Object> tmpMap = clearDirtyMap((HashMap) entry.getValue());
+
+                for(Map.Entry<ValueElement, Object> tmpMapEntry : tmpMap.entrySet())
+                    returnMap.put(tmpMapEntry.getKey(), tmpMapEntry.getValue());
+
+            } else {
+                returnMap.put(entry.getKey(), entry.getValue());
             }
         }
 
-        HashMap<ValueElement, Object> tmpMap = new HashMap<>();
-
-        Iterator mainArrayIterator2 = dirtyMap.entrySet().iterator();
-        while (mainArrayIterator2.hasNext()) {
-            Map.Entry<ValueElement, Object> entry = (Map.Entry) mainArrayIterator2.next();
-
-            if (!entry.getKey().isArray && entry.getValue() instanceof HashMap) {
-                HashMap<ValueElement, Object> innerMap = (HashMap) entry.getValue();
-
-                for (Map.Entry<ValueElement, Object> innerEntry : innerMap.entrySet()) {
-                    if(innerEntry.getValue() instanceof HashMap) {
-                        HashMap<ValueElement, Object> doubleMap = (HashMap) innerEntry.getValue();
-                        for(Map.Entry<ValueElement, Object> doubleEntry : doubleMap.entrySet())
-                            tmpMap.put(doubleEntry.getKey(), doubleEntry.getValue());
-                    } else {
-                        tmpMap.put(innerEntry.getKey(), innerEntry.getValue());
-                    }
-                }
-
-                mainArrayIterator2.remove();
-            }
-        }
-
-        Iterator tmpMapIterator = tmpMap.entrySet().iterator();
-        while (tmpMapIterator.hasNext()) {
-            Map.Entry<ValueElement, Object> entry = (Map.Entry) tmpMapIterator.next();
-            dirtyMap.put(entry.getKey(), entry.getValue());
-        }
+        return returnMap;
     }
 
     public HashMap<ArrayElement, HashMap<ValueElement, Object>> generateMap(IBaseEntity entity,
@@ -840,11 +821,12 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             return null;
 
         HashMap<ArrayElement, HashMap<ValueElement, Object>> globalMap = gen(dirtyMap);
+        HashMap<ArrayElement, HashMap<ValueElement, Object>> clearedGlobalMap = new HashMap<>();
 
         for (Map.Entry<ArrayElement, HashMap<ValueElement, Object>> globalEntry : globalMap.entrySet())
-            clearDirtyMap(globalEntry.getValue());
+            clearedGlobalMap.put(globalEntry.getKey(), clearDirtyMap(globalEntry.getValue()));
 
-        return globalMap;
+        return clearedGlobalMap;
     }
 
     public boolean compareValues(HistoryState state, HashMap<ValueElement, Object> savingMap,
