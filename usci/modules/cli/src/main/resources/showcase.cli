@@ -109,9 +109,6 @@ showcase list add names.lastname lastname
 showcase list add names.middlename middlename
 showcase list add names.lang lang
 
-showcase list addCustom credit creditor creditor_id
-showcase list addCustom credit root credit_id
-
 showcase save
 
 #=================================================================================
@@ -129,9 +126,6 @@ showcase list add docs doc_id
 showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type_id
 showcase list add docs.name doc_name
-
-showcase list addCustom credit creditor creditor_id
-showcase list addCustom credit root credit_id
 
 showcase save
 
@@ -171,8 +165,6 @@ showcase list add addresses.details details
 showcase list add addresses.region.code region_code
 showcase list add addresses.type address_type
 
-showcase list addCustom credit creditor creditor_id
-
 showcase save
 
 #=================================================================================
@@ -193,8 +185,6 @@ showcase list add addresses.details details
 showcase list add addresses.region.code region_code
 showcase list add addresses.type address_type
 
-showcase list addCustom credit creditor creditor_id
-
 showcase save
 
 #=================================================================================
@@ -212,8 +202,6 @@ showcase list add contacts.contact_type contact_type_id
 
 showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
-
-showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -233,8 +221,6 @@ showcase list add contacts.contact_type contact_type_id
 
 showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
-
-showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -479,7 +465,7 @@ showcase save
 #=================================================================================
 
 #=================================================================================
-#  Debtor_info
+#  Debtor_info_organization
 #=================================================================================
 
 showcase set name CORE_ORG_DEBTOR_INFO
@@ -489,8 +475,6 @@ showcase set downPath subjects.organization
 showcase list add bank_relations org_bank_relation_id
 showcase list add bank_relations.bank_relation ref_bank_relation_id
 showcase list add bank_relations.creditor creditor_id
-
-showcase list addCustom credit root credit_id
 
 showcase save
 

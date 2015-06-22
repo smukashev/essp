@@ -520,7 +520,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                             jdbcTemplateSC.update(sql, getObjectArray(false, getObjectArray(true, keyData.vals,
                                     entity.getReportDate()), openDate));
 
-                            return;
+                            continue;
                         } else {
                             closeDate = openDate;
                         }
@@ -535,7 +535,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                             jdbcTemplateSC.update(sql, getObjectArray(false, getObjectArray(true, keyData.vals,
                                     entity.getReportDate()), closeDate));
 
-                            return;
+                            continue;
                         } else {
                             closeDate = openDate;
                         }
@@ -824,82 +824,96 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         StringBuilder st = new StringBuilder();
         boolean equalityFlag = true;
 
-        int colCounter = 0;
-        for (ValueElement valueElement : savingMap.keySet()) {
-            st.append(valueElement.columnName);
+        try {
+            int colCounter = 0;
+            for (ValueElement valueElement : savingMap.keySet()) {
+                st.append(valueElement.columnName);
 
-            if (++colCounter < savingMap.size())
-                st.append(", ");
-        }
-
-        String sql = "SELECT " + st.toString() + " FROM %s WHERE " + keyData.queryKeys;
-
-        Map dbElement = null;
-
-        if (state == HistoryState.ACTUAL) {
-            sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
-                    COLUMN_PREFIX, showcaseHolder.getRootClassName());
-
-            dbElement = jdbcTemplateSC.queryForMap(sql, keyData.vals);
-        } else {
-            sql += " AND open_date = ?";
-            sql = String.format(sql, getHistoryTableName(showcaseHolder.getShowCaseMeta()),
-                    COLUMN_PREFIX, showcaseHolder.getRootClassName(), entity.getReportDate());
-
-            dbElement = jdbcTemplateSC.queryForMap(sql, getObjectArray(false, keyData.vals, entity.getReportDate()));
-        }
-
-        for (ValueElement valueElement : savingMap.keySet()) {
-            Object newValue = savingMap.get(valueElement);
-            Object dbValue = dbElement.get(valueElement.columnName);
-
-            if (newValue == null && dbValue == null)
-                continue;
-
-            if (newValue == null || dbValue == null) {
-                equalityFlag = false;
-                break;
+                if (++colCounter < savingMap.size())
+                    st.append(", ");
             }
 
-            if (newValue instanceof Double) {
-                if (!Double.valueOf((Double) newValue).equals(Double.valueOf(dbValue.toString()))) {
-                    equalityFlag = false;
-                    break;
-                }
-            } else if (newValue instanceof Integer) {
-                if (!Integer.valueOf((Integer) newValue).equals(Integer.valueOf(dbValue.toString()))) {
-                    equalityFlag = false;
-                    break;
-                }
-            } else if (newValue instanceof Boolean) {
-                if (!Boolean.valueOf((Boolean) newValue).equals(Boolean.valueOf(dbValue.toString()))) {
-                    equalityFlag = false;
-                    break;
-                }
-            } else if (newValue instanceof Long) {
-                if (!Long.valueOf((Long) newValue).equals(Long.valueOf(dbValue.toString()))) {
-                    equalityFlag = false;
-                    break;
-                }
-            } else if (newValue instanceof String) {
-                if (!newValue.toString().equals(dbValue.toString())) {
-                    equalityFlag = false;
-                    break;
-                }
-            } else if (newValue instanceof Date) {
-                if (!newValue.equals(new Date(((Timestamp) dbValue).getTime()))) {
-                    equalityFlag = false;
-                    break;
-                }
+            String sql = "SELECT " + st.toString() + " FROM %s WHERE " + keyData.queryKeys;
+
+            Map dbElement = null;
+
+            if (state == HistoryState.ACTUAL) {
+                sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                        COLUMN_PREFIX, showcaseHolder.getRootClassName());
+
+                dbElement = jdbcTemplateSC.queryForMap(sql, keyData.vals);
             } else {
-                if (!newValue.equals(dbValue)) {
+                sql += " AND open_date = ?";
+                sql = String.format(sql, getHistoryTableName(showcaseHolder.getShowCaseMeta()),
+                        COLUMN_PREFIX, showcaseHolder.getRootClassName(), entity.getReportDate());
+
+                dbElement = jdbcTemplateSC.queryForMap(sql, getObjectArray(false, keyData.vals, entity.getReportDate()));
+            }
+
+            for (ValueElement valueElement : savingMap.keySet()) {
+                Object newValue = savingMap.get(valueElement);
+                Object dbValue = dbElement.get(valueElement.columnName);
+
+                if (newValue == null && dbValue == null)
+                    continue;
+
+                if (newValue == null || dbValue == null) {
                     equalityFlag = false;
                     break;
                 }
-            }
-        }
 
-        return equalityFlag;
+                if (newValue instanceof Double) {
+                    if (!Double.valueOf((Double) newValue).equals(Double.valueOf(dbValue.toString()))) {
+                        equalityFlag = false;
+                        break;
+                    }
+                } else if (newValue instanceof Integer) {
+                    if (!Integer.valueOf((Integer) newValue).equals(Integer.valueOf(dbValue.toString()))) {
+                        equalityFlag = false;
+                        break;
+                    }
+                } else if (newValue instanceof Boolean) {
+                    if (!Boolean.valueOf((Boolean) newValue).equals(Boolean.valueOf(dbValue.toString()))) {
+                        equalityFlag = false;
+                        break;
+                    }
+                } else if (newValue instanceof Long) {
+                    if (!Long.valueOf((Long) newValue).equals(Long.valueOf(dbValue.toString()))) {
+                        equalityFlag = false;
+                        break;
+                    }
+                } else if (newValue instanceof String) {
+                    if (!newValue.toString().equals(dbValue.toString())) {
+                        equalityFlag = false;
+                        break;
+                    }
+                } else if (newValue instanceof Date) {
+                    if (!newValue.equals(new Date(((Timestamp) dbValue).getTime()))) {
+                        equalityFlag = false;
+                        break;
+                    }
+                } else {
+                    if (!newValue.equals(dbValue)) {
+                        equalityFlag = false;
+                        break;
+                    }
+                }
+            }
+
+            return equalityFlag;
+        } catch (Exception e) {
+            System.err.println("ERROR ENTITY ID: " + entity.getId() +", " + showcaseHolder.getShowCaseMeta().getTableName());
+            System.err.println(keyData.queryKeys);
+
+            for(Object o : keyData.vals)
+                System.err.print(o + ", ");
+
+            System.out.println("-------------------------");
+            e.printStackTrace();
+            System.out.println("-------------------------");
+
+            return false;
+        }
     }
 
     private String getDBType(IMetaType type) {

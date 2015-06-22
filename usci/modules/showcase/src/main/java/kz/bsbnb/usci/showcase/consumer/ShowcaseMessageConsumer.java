@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -38,6 +39,8 @@ public class ShowcaseMessageConsumer implements MessageListener {
     private static ReadWriteLock lock = new ReentrantReadWriteLock();
 
     private static HashSet<SyncKey> syncSet = new HashSet<>();
+
+    private static Semaphore mutex = new Semaphore(1);
 
     private class SyncKey {
         public Long entityId;
@@ -65,6 +68,11 @@ public class ShowcaseMessageConsumer implements MessageListener {
             int result = entityId.hashCode();
             result = 31 * result + scId.hashCode();
             return result;
+        }
+
+        @Override
+        public String toString() {
+            return entityId + ", " + scId;
         }
     }
 
@@ -162,13 +170,22 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
                 lock.writeLock().lock();
                 syncSet.add(syncKey);
-                showcaseDao.generate(entity, holder);
                 lock.writeLock().unlock();
+
+                showcaseDao.generate(entity, holder);
             } catch(Exception e) {
-                System.err.println(holder.getShowCaseMeta().getTableName());
-                System.err.println("--------------------------------------");
-                e.printStackTrace();
-                System.err.println("--------------------------------------");
+                try {
+                    mutex.acquire();
+                    System.err.println(holder.getShowCaseMeta().getTableName());
+                    System.err.println("--------------------------------------");
+                    e.printStackTrace();
+                    System.err.println("--------------------------------------");
+                } catch(InterruptedException ie) {
+                    ie.printStackTrace();
+                } finally {
+                    mutex.release();
+                }
+
             } finally {
                 lock.writeLock().lock();
                 syncSet.remove(syncKey);
