@@ -5,12 +5,11 @@ import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.core.service.InputInfoBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
-import kz.bsbnb.usci.eav.model.json.BatchFullStatusJModel;
-import kz.bsbnb.usci.eav.model.json.BatchInfo;
-import kz.bsbnb.usci.eav.model.json.BatchStatusArrayJModel;
-import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
+import kz.bsbnb.usci.eav.model.json.*;
+import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -22,22 +21,17 @@ import java.util.*;
 @Service
 public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusiness
 {
+    @Autowired
+    private CouchbaseClientManager couchbaseClientManager;
+
     private CouchbaseClient couchbaseClient;
     private Logger logger = Logger.getLogger(InputInfoBeanRemoteBusinessImpl.class);
 
+    private Gson gson = new Gson();
+
     @PostConstruct
     public void init() {
-        System.setProperty("viewmode", "production");
-        //System.setProperty("viewmode", "development");
-
-        ArrayList<URI> nodes = new ArrayList<URI>();
-        nodes.add(URI.create("http://localhost:8091/pools"));
-
-        try {
-            couchbaseClient = new CouchbaseClient(nodes, "test", "");
-        } catch (Exception e) {
-            logger.error("Error connecting to Couchbase: " + e.getMessage());
-        }
+        couchbaseClient = couchbaseClientManager.get();
     }
 
     private List<BatchStatusJModel> getBatchStatuses(long batchId) {
@@ -277,4 +271,11 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
         return list;
     }
+
+    @Override
+    public BatchFullJModel getBatchFullModel(BigInteger batchId) {
+        Object obj = couchbaseClient.get("batch:" + batchId);
+        return gson.fromJson(obj.toString(), BatchFullJModel.class);
+    }
+
 }

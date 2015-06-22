@@ -28,8 +28,6 @@ public class InputInfoDisplayBean implements Button.ClickListener {
 
     private final String path = "C:\\tmp_zips";
 
-    private static CouchbaseProvider couchbaseProvider = CouchbaseProvider.getInstance();
-
     public InputInfoDisplayBean(InputInfo inputInfo, DataProvider provider) {
         this.inputInfo = inputInfo;
         this.provider = provider;
@@ -120,7 +118,7 @@ public class InputInfoDisplayBean implements Button.ClickListener {
 
         final BigInteger batchId = inputInfo.getId();
 
-        final BatchFullJModel batchFullJModel = couchbaseProvider.getBatchFullModel(batchId);
+        final BatchFullJModel batchFullJModel = provider.getBatchFullModel(batchId);
 
 
         final File batchFile = new File(path + "batch_" + batchId + ".zip");

@@ -4,21 +4,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.Date;
 
-//import com.bsbnb.creditregistry.dm.maintenance.InputFile;
-//import com.bsbnb.creditregistry.dm.maintenance.InputInfo;
 import com.bsbnb.usci.portlets.protocol.PortletEnvironmentFacade;
-import com.bsbnb.usci.portlets.protocol.couchbase.CouchbaseProvider;
-import com.couchbase.client.CouchbaseClient;
-import com.google.gson.Gson;
 import com.vaadin.terminal.FileResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.BaseTheme;
-import kz.bsbnb.usci.cr.model.InputFile;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 
@@ -32,8 +24,6 @@ public class InputInfoDisplayBean implements Button.ClickListener {
     private DataProvider provider;
 
     private final String path = "C:\\tmp_zips";
-
-    private static CouchbaseProvider couchbaseProvider = CouchbaseProvider.getInstance();
 
     public InputInfoDisplayBean(InputInfo inputInfo, DataProvider provider) {
         this.inputInfo = inputInfo;
@@ -125,7 +115,7 @@ public class InputInfoDisplayBean implements Button.ClickListener {
 
         final BigInteger batchId = inputInfo.getId();
 
-        final BatchFullJModel batchFullJModel = couchbaseProvider.getBatchFullModel(batchId);
+        final BatchFullJModel batchFullJModel =  provider.getBatchFullModel(batchId);
 
         final File batchFile = new File(path + "batch_" + batchId + ".zip");
 

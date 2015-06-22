@@ -17,6 +17,7 @@ import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
+import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
 import net.spy.memcached.OperationTimeoutException;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
@@ -56,6 +57,10 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     private Long index = 1L, level = 0L;
     private IBatchService batchService;
     private IMetaFactoryService metaFactoryService;
+
+    @Autowired
+    private CouchbaseClientManager couchbaseClientManager;
+
     private CouchbaseClient couchbaseClient;
     private Gson gson = new Gson();
     private BatchFullJModel batchFullJModel;
@@ -68,81 +73,75 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     public void init() {
         batchService = serviceRepository.getBatchService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
-        couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
+        couchbaseClient = couchbaseClientManager.get();
+
+        Object batchStr = null;
+        int counter = 0;
+
+        while (counter < 100 && batchStr == null) {
+            counter++;
+            try {
+                batchStr = couchbaseClient.get("batch:" + batchId);
+            } catch (OperationTimeoutException e) {
+                batchStr = null;
+            }
+        }
+
+        if (batchStr == null) {
+            logger.error("Can't get batch with id: " + batchId);
+            throw new RuntimeException("Can't get batch with id: " + batchId);
+        }
+
+        batchFullJModel = gson.fromJson(batchStr.toString(), BatchFullJModel.class);
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(batchFullJModel.getContent());
+        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
+
+        ZipInputStream zis = new ZipInputStream(inputStream);
+        ZipEntry entry;
+        byte[] buffer = new byte[4096];
+        ByteArrayOutputStream out = null;
+        try {
+            while ((entry = zis.getNextEntry()) != null) {
+                if (entry.getName().equals("manifest.xml"))
+                    continue;
+
+                int len;
+                /*
+                out = new ByteArrayOutputStream((int)entry.getSize());
+                int size = (int)entry.getSize();
+                while ((len = zis.read(buffer, 0, Math.min(buffer.length, size))) > 0) {
+                    size -= len;
+                    out.write(buffer, 0, len);
+                    if (size <= 0)
+                        break;
+                }
+                */
+                // modified for generated batch files
+                out = new ByteArrayOutputStream(4096);
+                while ((len = zis.read(buffer, 0, 4096)) > 0) {
+                    out.write(buffer, 0, len);
+                }
+                break;
+            }
+        } catch (IOException e) {
+            logger.error("Batch: " + batchId + " error in entity reader.");
+            statusSingleton.addBatchStatus(batchId,
+                    new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
+            throw new RuntimeException(e);
+        }
 
         try {
-
-            Object batchStr = null;
-            int counter = 0;
-
-            while (counter < 100 && batchStr == null) {
-                counter++;
-                try {
-                    batchStr = couchbaseClient.get("batch:" + batchId);
-                } catch (OperationTimeoutException e) {
-                    batchStr = null;
-                }
-            }
-
-            if (batchStr == null) {
-                logger.error("Can't get batch with id: " + batchId);
-                throw new RuntimeException("Can't get batch with id: " + batchId);
-            }
-
-            batchFullJModel = gson.fromJson(batchStr.toString(), BatchFullJModel.class);
-
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(batchFullJModel.getContent());
-            XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-            inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
-
-            ZipInputStream zis = new ZipInputStream(inputStream);
-            ZipEntry entry;
-            byte[] buffer = new byte[4096];
-            ByteArrayOutputStream out = null;
-            try {
-                while ((entry = zis.getNextEntry()) != null) {
-                    if (entry.getName().equals("manifest.xml"))
-                        continue;
-
-                    int len;
-                    /*
-                    out = new ByteArrayOutputStream((int)entry.getSize());
-                    int size = (int)entry.getSize();
-                    while ((len = zis.read(buffer, 0, Math.min(buffer.length, size))) > 0) {
-                        size -= len;
-                        out.write(buffer, 0, len);
-                        if (size <= 0)
-                            break;
-                    }
-                    */
-                    // modified for generated batch files
-                    out = new ByteArrayOutputStream(4096);
-                    while ((len = zis.read(buffer, 0, 4096)) > 0) {
-                        out.write(buffer, 0, len);
-                    }
-                    break;
-                }
-            } catch (IOException e) {
-                logger.error("Batch: " + batchId + " error in entity reader.");
-                statusSingleton.addBatchStatus(batchId,
-                        new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
-                throw new RuntimeException(e);
-            }
-
-            try {
-                if (out != null)
-                    xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
-            } catch (XMLStreamException e) {
-                statusSingleton.addBatchStatus(batchId,
-                        new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
-                throw new RuntimeException(e);
-            }
-
-            batch = batchService.load(batchId);
-        } finally {
-            if (couchbaseClient != null)
-                couchbaseClient.shutdown();
+            if (out != null)
+                xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
+        } catch (XMLStreamException e) {
+            statusSingleton.addBatchStatus(batchId,
+                    new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
+            throw new RuntimeException(e);
         }
+
+        batch = batchService.load(batchId);
     }
 
     private boolean hasOperationDelete(StartElement startElement) {

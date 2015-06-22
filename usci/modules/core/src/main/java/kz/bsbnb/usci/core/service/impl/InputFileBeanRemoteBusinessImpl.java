@@ -9,8 +9,10 @@ import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchFullStatusJModel;
 import kz.bsbnb.usci.eav.model.json.BatchSign;
+import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
 import net.spy.memcached.internal.OperationFuture;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -22,27 +24,22 @@ import java.util.List;
 @Service
 public class InputFileBeanRemoteBusinessImpl implements InputFileBeanRemoteBusiness
 {
+    @Autowired
+    private CouchbaseClientManager couchbaseClientManager;
+
     private CouchbaseClient couchbaseClient;
     private Logger logger = Logger.getLogger(InputFileBeanRemoteBusinessImpl.class);
 
     @PostConstruct
     public void init() {
-        System.setProperty("viewmode", "production");
-        //System.setProperty("viewmode", "development");
-
-        ArrayList<URI> nodes = new ArrayList<URI>();
-        nodes.add(URI.create("http://127.0.0.1:8091/pools"));
-
-        try {
-            couchbaseClient = new CouchbaseClient(nodes, "test", "");
-        } catch (Exception e) {
-            logger.error("Error connecting to Couchbase: " + e.getMessage());
-        }
+        couchbaseClient = couchbaseClientManager.get();
     }
 
     @Override
     public InputFile getInputFileByInputInfo(InputInfo inputInfo)
     {
+        // TODO method possibly should be removed
+
         InputFile inputFile = new InputFile();
 
         inputFile.setFilePath(inputInfo.getFileName());

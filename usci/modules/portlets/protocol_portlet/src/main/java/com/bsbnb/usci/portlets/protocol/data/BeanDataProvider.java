@@ -1,5 +1,6 @@
 package com.bsbnb.usci.portlets.protocol.data;
 
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,6 +14,7 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputFile;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.cr.model.Protocol;
+import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.util.List;
@@ -139,5 +141,9 @@ public class BeanDataProvider implements DataProvider {
 
     public InputFile getFileByInputInfo(InputInfoDisplayBean inputInfo) {
         return inputFileBusiness.getInputFileByInputInfo(inputInfo.getInputInfo());
+    }
+
+    public BatchFullJModel getBatchFullModel(BigInteger batchId) {
+        return inputInfoBusiness.getBatchFullModel(batchId);
     }
 }
