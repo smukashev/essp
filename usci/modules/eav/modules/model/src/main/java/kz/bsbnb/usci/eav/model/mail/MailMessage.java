@@ -28,7 +28,8 @@ public class MailMessage implements Serializable {
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     */
     //private Shared status;
-    private MailMessageStatus status;
+    //private MailMessageStatus status;
+    private Integer statusId;
     /*
     @Basic(optional = false)
     @Column(name = "RECIPIENT_USER_ID")
@@ -62,6 +63,15 @@ public class MailMessage implements Serializable {
         this.id = id;
     }
 
+    public Integer getStatusId() {
+        return statusId;
+    }
+
+    public void setStatusId(Integer statusId) {
+        this.statusId = statusId;
+    }
+
+    /*
     public MailMessageStatus getStatus() {
         return status;
     }
@@ -69,6 +79,7 @@ public class MailMessage implements Serializable {
     public void setStatus(MailMessageStatus status) {
         this.status = status;
     }
+    */
 
     /*
     public Shared getStatus() {

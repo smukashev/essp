@@ -390,6 +390,7 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao
         portalUser.setLastName((String) row.get(EAV_A_USER.LAST_NAME.getName()));
         portalUser.setMiddleName((String) row.get(EAV_A_USER.MIDDLE_NAME.getName()));
         portalUser.setModifiedDate(DataUtils.convert((Timestamp) row.get(EAV_A_USER.MODIFIED_DATE.getName())));
+        portalUser.setActive(((BigDecimal) row.get(EAV_A_USER.IS_ACTIVE.getName())).longValue() == 1L);
 
         portalUser.setCreditorList(getPortalUserCreditorList(portalUser.getUserId()));
 

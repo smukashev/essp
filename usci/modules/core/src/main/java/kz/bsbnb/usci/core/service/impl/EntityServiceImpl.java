@@ -5,9 +5,11 @@ import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
+import kz.bsbnb.usci.eav.persistance.dao.IMailDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.IBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
@@ -41,6 +43,8 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     IMetaClassDao metaClassDao;
     @Autowired
     SQLQueriesStats stats;
+    @Autowired
+    IMailDao mailDao;
 
     public EntityServiceImpl() throws RemoteException {
         super();
@@ -69,6 +73,11 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
             entityStatus.addProperty(StatusProperties.CONTRACT_NO, contractNo);
             entityStatus.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
+
+            Properties properties = new Properties();
+            BatchFullJModel batch = statusSingleton.getBatch(baseEntity.getBatchId());
+            properties.put("FILENAME", batch.getFileName());
+            mailDao.sendMailMessage("FILE_PROCESSING_COMPLETED", batch.getUserId(), properties);
 
             statusSingleton.addContractStatus(baseEntity.getBatchId(), entityStatus);
         } catch (Exception e) {

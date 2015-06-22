@@ -21,13 +21,8 @@ import static com.bsbnb.creditregistry.portlets.notifications.NotificationsAppli
 import com.bsbnb.creditregistry.portlets.notifications.thread.ConfigurationException;
 import kz.bsbnb.usci.core.service.*;
 import kz.bsbnb.usci.cr.model.PortalUser;
-import kz.bsbnb.usci.cr.model.Shared;
-import kz.bsbnb.usci.eav.model.mail.MailMessage;
-import kz.bsbnb.usci.eav.model.mail.MailMessageParameter;
-import kz.bsbnb.usci.eav.model.mail.MailTemplate;
-import kz.bsbnb.usci.eav.model.mail.UserMailTemplate;
+import kz.bsbnb.usci.eav.model.mail.*;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -170,13 +165,12 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public List<MailMessage> getMessagesToSend() {
-        //return mailMessageBusiness.getPendingMessages();
-        return null;
+        return mailMessageBusiness.getPendingMessages();
     }
 
     @Override
     public void updateMailMessage(MailMessage message) {
-        //mailMessageBusiness.updateMailMessage(message);
+        mailMessageBusiness.updateMailMessage(message);
     }
 
     /*
@@ -212,12 +206,14 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public boolean isTemplateSendingEnabled(MailTemplate template, long recipientUserId) {
-        /*if (!"USER_SET".equals(template.getConfigurationType().getCode())) {
+        //if(1==1)
+        //    return true;
+
+        if (template.getConfigurationTypeId() == MailConfigurationTypes.OBLIGATORY) {
             //Данный шаблон не настраивается пользователем, а высылается в обязательном порядке
             return true;
         }
         //если шаблон настраивается пользователем, проверяются настройки
-        return mailMessageBusiness.isTemplateEnabledForUser(template.getCode(), recipientUserId);*/
-        return false;
+        return mailMessageBusiness.isTemplateEnabledForUser(template.getId(), recipientUserId);
     }
 }

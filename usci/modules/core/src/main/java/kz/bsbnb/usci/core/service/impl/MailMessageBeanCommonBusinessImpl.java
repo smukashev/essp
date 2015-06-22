@@ -24,12 +24,12 @@ public class MailMessageBeanCommonBusinessImpl implements MailMessageBeanCommonB
 
     @Override
     public List<MailMessage> getPendingMessages() {
-        return null;
+        return mailDao.getPendingMessages();
     }
 
     @Override
     public void updateMailMessage(MailMessage message) {
-
+        mailDao.updateMailMessage(message);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class MailMessageBeanCommonBusinessImpl implements MailMessageBeanCommonB
     }
 
     @Override
-    public boolean isTemplateEnabledForUser(String templateCode, long userId) {
-        return false;
+    public boolean isTemplateEnabledForUser(Long templateId, long userId) {
+        return mailDao.isTemplateEnabledForUser(templateId, userId);
     }
 }

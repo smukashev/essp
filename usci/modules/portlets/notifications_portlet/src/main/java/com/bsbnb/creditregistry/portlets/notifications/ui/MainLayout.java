@@ -33,7 +33,6 @@ public class MainLayout extends VerticalLayout {
         Tab settingsTab = mainTabSheet.addTab(settingsComponent);
         settingsTab.setCaption(environment.getResourceString(Localization.SETTINGS_TAB_NAME));
 
-        /*
         if (environment.isUserAdmin()) {
             final AdministratorComponent administratorComponent = new AdministratorComponent(environment, dataProvider);
             final Tab adminTab = mainTabSheet.addTab(administratorComponent);
@@ -48,7 +47,7 @@ public class MainLayout extends VerticalLayout {
                     }
                 }
             });
-        }*/
+        }
 
         mainTabSheet.setSelectedTab(settingsTab);
         addComponent(mainTabSheet);
