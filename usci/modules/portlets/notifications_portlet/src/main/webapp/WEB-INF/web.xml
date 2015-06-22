@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    <context-param>
+        <description>Vaadin production mode</description>
+        <param-name>productionMode</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <listener>
+        <listener-class>com.bsbnb.creditregistry.portlets.notifications.thread.ApplicationContextListener</listener-class>
+    </listener>
+    <!--
+    <servlet>
+        <servlet-name>notifications_portlet</servlet-name>
+        <servlet-class>com.liferay.portal.kernel.servlet.PortletServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>notifications_portlet</servlet-name>
+        <url-pattern>/notifications_portlet/*</url-pattern>
+    </servlet-mapping>
+    -->
+</web-app>

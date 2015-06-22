@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class ApprovalBusiness {
 
-    private static final String BONITA_URI = "http://localhost:8080/bonita";
+    private static final String BONITA_URI = "http://localhost:8082/bonita";
 
     /**
      * Human user username
