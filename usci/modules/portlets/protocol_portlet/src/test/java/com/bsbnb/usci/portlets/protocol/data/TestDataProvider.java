@@ -15,7 +15,9 @@ import com.bsbnb.usci.portlets.protocol.data.InputInfoDisplayBean;
 import com.bsbnb.usci.portlets.protocol.data.ProtocolDisplayBean;
 import com.bsbnb.usci.portlets.protocol.data.SharedDisplayBean;
 import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -63,5 +65,10 @@ public class TestDataProvider implements DataProvider {
     public InputFile getFileByInputInfo(InputInfoDisplayBean inputInfo) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
+    @Override
+    public BatchFullJModel getBatchFullModel(BigInteger batchId) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

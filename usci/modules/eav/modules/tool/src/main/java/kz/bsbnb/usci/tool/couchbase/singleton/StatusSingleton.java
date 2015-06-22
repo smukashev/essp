@@ -22,6 +22,9 @@ public class StatusSingleton {
     @Autowired(required = true)
     private ICouchbaseClientFactory clientFactory;
 
+    @Autowired
+    private CouchbaseClientManager couchbaseClientManager;
+
     CouchbaseClient client;
 
     private static final boolean readOnly = false;
@@ -31,7 +34,7 @@ public class StatusSingleton {
     @PostConstruct
     public void init()
     {
-        client = clientFactory.getCouchbaseClient();
+        client = couchbaseClientManager.get();
     }
 
     public boolean isEntityCompleted(long batchId, long index) {

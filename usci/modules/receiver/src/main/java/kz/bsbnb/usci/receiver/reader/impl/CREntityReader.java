@@ -13,6 +13,7 @@ import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
+import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -50,7 +51,11 @@ public class CREntityReader<T> extends CommonReader<T> {
     private IMetaFactoryService metaFactoryService;
     private ReportBeanRemoteBusiness reportService;
 
+    @Autowired
+    private CouchbaseClientManager couchbaseClientManager;
+
     private CouchbaseClient couchbaseClient;
+
     private Gson gson = new Gson();
 
     private BatchFullJModel batchFullJModel;
@@ -66,7 +71,7 @@ public class CREntityReader<T> extends CommonReader<T> {
         logger.info("Reader init.");
         batchService = serviceRepository.getBatchService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
-        couchbaseClient = couchbaseClientFactory.getCouchbaseClient();
+        couchbaseClient = couchbaseClientManager.get();
         reportService = serviceRepository.getReportBeanRemoteBusinessService();
 
         int counter = 100;

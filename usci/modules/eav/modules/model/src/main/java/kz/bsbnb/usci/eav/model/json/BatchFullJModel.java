@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.model.json;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Date;
  *
  * @author k.tulbassiyev
  */
-public class BatchFullJModel {
+public class BatchFullJModel implements Serializable {
     private Long id;
     private String type = "batch";
     private String fileName;

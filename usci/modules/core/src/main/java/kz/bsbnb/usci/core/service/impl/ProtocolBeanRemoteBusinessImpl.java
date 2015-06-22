@@ -10,8 +10,10 @@ import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.Shared;
 import kz.bsbnb.usci.eav.model.json.EntityStatusArrayJModel;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
+import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -23,6 +25,9 @@ import java.util.*;
 @Service
 public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusiness
 {
+    @Autowired
+    private CouchbaseClientManager couchbaseClientManager;
+
     private CouchbaseClient couchbaseClient;
     private Logger logger = Logger.getLogger(ProtocolBeanRemoteBusinessImpl.class);
     private Gson gson = new Gson();
@@ -43,17 +48,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
 
     @PostConstruct
     public void init() {
-        System.setProperty("viewmode", "production");
-        //System.setProperty("viewmode", "development");
-
-        ArrayList<URI> nodes = new ArrayList<URI>();
-        nodes.add(URI.create("http://127.0.0.1:8091/pools"));
-
-        try {
-            couchbaseClient = new CouchbaseClient(nodes, "test", "");
-        } catch (Exception e) {
-            logger.error("Error connecting to Couchbase: " + e.getMessage());
-        }
+        couchbaseClient = couchbaseClientManager.get();
     }
 
     @Override
