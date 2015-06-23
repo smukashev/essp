@@ -452,15 +452,66 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         return newObjectArray;
     }
 
+    class CarteageElement {
+        public Long globalId;
+        public Long entityId;
+        public Long showcaseId;
+
+        public CarteageElement(Long globalId, Long entityId, Long showcaseId) {
+            this.globalId = globalId;
+            this.entityId = entityId;
+            this.showcaseId = showcaseId;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            CarteageElement that = (CarteageElement) o;
+
+            if (!globalId.equals(that.globalId)) return false;
+            if (!entityId.equals(that.entityId)) return false;
+            return showcaseId.equals(that.showcaseId);
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = globalId.hashCode();
+            result = 31 * result + entityId.hashCode();
+            result = 31 * result + showcaseId.hashCode();
+            return result;
+        }
+    }
+
+    private static volatile HashSet<CarteageElement> carteageElements = new HashSet<>();
+
     @Transactional
     void dbCarteageGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
         Date openDate = null, closeDate = null;
         String sql;
 
+        if(globalEntity == null || entity == null || showcaseHolder == null) return;
+
         HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = generateMap(entity, showcaseHolder);
 
         if (savingMap == null || savingMap.size() == 0)
             return;
+
+        CarteageElement cElement = new CarteageElement(globalEntity.getId(), entity.getId(),
+                showcaseHolder.getShowCaseMeta().getId());
+
+        while (true) {
+            synchronized (carteageElements) {
+                if(!carteageElements.contains(cElement))  {
+                    carteageElements.add(cElement);
+                    break;
+                }
+            }
+
+            try { Thread.sleep(50); } catch (InterruptedException ie) { ie.printStackTrace(); }
+        }
 
         for (Map.Entry entry : savingMap.entrySet()) {
             HashMap<ValueElement, Object> entryMap = (HashMap) entry.getValue();
@@ -555,6 +606,10 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             }
 
             persistMap(entryMap, openDate, closeDate, showcaseHolder, globalEntity);
+        }
+
+        synchronized (carteageElements) {
+            carteageElements.remove(cElement);
         }
     }
 

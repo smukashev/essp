@@ -38,44 +38,6 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
     private static ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    private static volatile HashSet<SyncKey> syncSet = new HashSet<>();
-
-    private static Semaphore mutex = new Semaphore(1);
-
-    private class SyncKey {
-        public Long entityId;
-        public Long scId;
-
-        public SyncKey(Long entityId, Long scId) {
-            this.entityId = entityId;
-            this.scId = scId;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            SyncKey syncKey = (SyncKey) o;
-
-            if (!entityId.equals(syncKey.entityId)) return false;
-            return scId.equals(syncKey.scId);
-
-        }
-
-        @Override
-        public int hashCode() {
-            int result = entityId.hashCode();
-            result = 31 * result + scId.hashCode();
-            return result;
-        }
-
-        @Override
-        public String toString() {
-            return entityId + ", " + scId;
-        }
-    }
-
     @Override
     public void onMessage(Message message) {
         if (message instanceof ObjectMessage) {
@@ -154,43 +116,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
         @Override
         public void run() {
-            SyncKey syncKey = new SyncKey(entity.getId(), holder.getShowCaseMeta().getId());
-
-            try {
-                while(true) {
-                    lock.readLock().lock();
-                    if(!syncSet.contains(syncKey)) {
-                        lock.readLock().unlock();
-                        break;
-                    }
-
-                    lock.readLock().unlock();
-                    Thread.sleep(50);
-                }
-
-                lock.writeLock().lock();
-                syncSet.add(syncKey);
-                lock.writeLock().unlock();
-
-                showcaseDao.generate(entity, holder);
-            } catch(Exception e) {
-                try {
-                    mutex.acquire();
-                    System.err.println(holder.getShowCaseMeta().getTableName());
-                    System.err.println("--------------------------------------");
-                    e.printStackTrace();
-                    System.err.println("--------------------------------------");
-                } catch(InterruptedException ie) {
-                    ie.printStackTrace();
-                } finally {
-                    mutex.release();
-                }
-
-            } finally {
-                lock.writeLock().lock();
-                syncSet.remove(syncKey);
-                lock.writeLock().unlock();
-            }
+            showcaseDao.generate(entity, holder);
         }
     }
 }
