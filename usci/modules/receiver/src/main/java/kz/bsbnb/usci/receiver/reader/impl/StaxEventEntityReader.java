@@ -8,6 +8,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
+import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -16,7 +17,9 @@ import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
+import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
 import net.spy.memcached.OperationTimeoutException;
 import org.apache.log4j.Logger;
@@ -24,6 +27,7 @@ import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -57,6 +61,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     private Long index = 1L, level = 0L;
     private IBatchService batchService;
     private IMetaFactoryService metaFactoryService;
+    private ReportBeanRemoteBusiness reportService;
 
     @Autowired
     private CouchbaseClientManager couchbaseClientManager;
@@ -69,9 +74,18 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     private boolean hasMembers = false;
 
+    @Value("#{jobParameters['reportId']}")
+    private Long reportId;
+
+    @Value("#{jobParameters['actualCount']}")
+    private Long actualCount;
+
+    private int totalCount = 0;
+
     @PostConstruct
     public void init() {
         batchService = serviceRepository.getBatchService();
+        reportService = serviceFactory.getReportBeanRemoteBusinessService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
         couchbaseClient = couchbaseClientManager.get();
 
@@ -260,7 +274,14 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 EndElement endElement = event.asEndElement();
                 String localName = endElement.getName().getLocalPart();
 
-                if (endElement(localName)) return (T) currentContainer;
+                if (endElement(localName)) {
+                    if (currentContainer == null) {
+                        break;
+                    } else {
+                        totalCount++;
+                        return (T) currentContainer;
+                    }
+                }
             } else if (event.isEndDocument()) {
                 logger.debug("end document");
                 //couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
@@ -269,7 +290,23 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             }
         }
 
+        saveTotalCounts();
+
         return null;
+    }
+
+    private void saveTotalCounts() {
+        reportService.setTotalCount(reportId, totalCount);
+        {
+            EntityStatusJModel entityStatus = new EntityStatusJModel(
+                    0L, EntityStatuses.ACTUAL_COUNT, String.valueOf(actualCount), new Date());
+            statusSingleton.addContractStatus(batchId, entityStatus);
+        }
+        {
+            EntityStatusJModel entityStatus = new EntityStatusJModel(
+                    0L, EntityStatuses.TOTAL_COUNT, String.valueOf(totalCount), new Date());
+            statusSingleton.addContractStatus(batchId, entityStatus);
+        }
     }
 
     public boolean endElement(String localName) {

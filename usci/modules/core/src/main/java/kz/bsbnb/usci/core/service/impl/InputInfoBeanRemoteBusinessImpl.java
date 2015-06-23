@@ -201,11 +201,11 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
         Protocol protocol = new Protocol();
         protocol.setId(0L);
         {
-            Message m = new Message();
-            m.setCode("A");
-            m.setNameKz(statusModel.getDescription());
-            m.setNameRu(statusModel.getDescription());
-            protocol.setMessage(m);
+            Message message = new Message();
+            message.setCode("A");
+            message.setNameKz(statusModel.getDescription());
+            message.setNameRu(statusModel.getDescription());
+            protocol.setMessage(message);
         }
         {
             Shared s = new Shared();
@@ -215,8 +215,6 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
             protocol.setMessageType(s);
             protocol.setProtocolType(s);
         }
-
-        protocol.setNote("присвоено " + statusModel.getReceived());
 
         inputInfo.getBatchStatuses().add(protocol);
     }

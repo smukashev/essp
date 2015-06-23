@@ -18,13 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.*;
 
-import static kz.bsbnb.usci.tool.couchbase.EntityStatuses.COMPLETED;
-import static kz.bsbnb.usci.tool.couchbase.EntityStatuses.ERROR;
+import static kz.bsbnb.usci.tool.couchbase.EntityStatuses.*;
 
 @Service
 public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusiness
@@ -39,7 +37,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
     private final DateFormat gsonDateFormat
             = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.US);
 
-    private final List<String> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED);
+    private final List<String> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, TOTAL_COUNT, ACTUAL_COUNT);
 
     private Date parseDateFromGson(String sDate) {
         synchronized (gsonDateFormat) {
@@ -94,34 +92,46 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
     }
 
     private void fillProtocol(EntityStatusJModel entityStatus, InputInfo inputInfoId, ArrayList<Protocol> list) {
-        Protocol prot = new Protocol();
-        prot.setId(1L);
-        Message m = new Message();
+        Protocol protocol = new Protocol();
+        protocol.setId(1L);
+        protocol.setPackNo(entityStatus.getIndex());
+        protocol.setInputInfo(inputInfoId);
 
-        m.setCode("A");
-        m.setNameKz(entityStatus.getDescription());
-        m.setNameRu(entityStatus.getDescription());
-        prot.setMessage(m);
+        Message message = new Message();
+        message.setCode("A");
+        message.setNameKz(entityStatus.getDescription());
+        message.setNameRu(entityStatus.getDescription());
 
-        Shared s = new Shared();
-        s.setCode("S");
-        s.setNameRu(entityStatus.getProtocol());
-        s.setNameKz(entityStatus.getProtocol());
-        prot.setMessageType(s);
+        Shared type = new Shared();
+        type.setCode("S");
+        type.setNameRu(entityStatus.getProtocol());
+        type.setNameKz(entityStatus.getProtocol());
 
+        protocol.setMessage(message);
+        protocol.setMessageType(type);
+        protocol.setProtocolType(type);
 
-        prot.setNote("присвоено " + entityStatus.getReceived());
-        prot.setPackNo(entityStatus.getIndex());
+        if (EntityStatuses.TOTAL_COUNT.equals(entityStatus.getProtocol())) {
+            message.setNameRu("Общее количество:");
+            message.setNameKz("Общее количество:");
+            protocol.setNote(entityStatus.getDescription());
+        } else if (EntityStatuses.ACTUAL_COUNT.equals(entityStatus.getProtocol())) {
+            message.setNameRu("Заявленное количество:");
+            message.setNameKz("Заявленное количество:");
+            protocol.setNote(entityStatus.getDescription());
+        } else {
+            if (EntityStatuses.COMPLETED.equals(entityStatus.getProtocol())) {
+                message.setNameRu("Идентификатор сущности:");
+                message.setNameKz("Идентификатор сущности:");
+                protocol.setNote(entityStatus.getDescription());
+            }
+            protocol.setPrimaryContractDate(
+                    parseDateFromGson((String) entityStatus.getProperty(StatusProperties.CONTRACT_DATE))
+            );
+            protocol.setTypeDescription((String) entityStatus.getProperty(StatusProperties.CONTRACT_NO));
+        }
 
-        prot.setPrimaryContractDate(
-            parseDateFromGson((String) entityStatus.getProperty(StatusProperties.CONTRACT_DATE))
-        );
-
-        prot.setProtocolType(s);
-
-        prot.setTypeDescription((String)entityStatus.getProperty(StatusProperties.CONTRACT_NO));
-        prot.setInputInfo(inputInfoId);
-        list.add(prot);
+        list.add(protocol);
     }
 }
 

@@ -402,6 +402,7 @@ public class ZipFilesMonitor{
                         jobParametersBuilder.addParameter("batchId", new JobParameter(nextJob.getBatchId()));
                         jobParametersBuilder.addParameter("userId", new JobParameter(nextJob.getBatchInfo().getUserId()));
                         jobParametersBuilder.addParameter("reportId", new JobParameter(nextJob.getBatchInfo().getReportId()));
+                        jobParametersBuilder.addParameter("actualCount", new JobParameter(nextJob.getBatchInfo().getActualCount()));
 
                         Job job = jobs.get(nextJob.getBatchInfo().getBatchType());
 
@@ -741,6 +742,7 @@ public class ZipFilesMonitor{
                 batchInfo.setRepDate(date);
 
                 String actualCreditCount = document.getElementsByTagName("actual_credit_count").item(0).getTextContent();
+                batchInfo.setSize(Long.parseLong(actualCreditCount));
                 batchInfo.setActualCount(Integer.parseInt(actualCreditCount));
                 batchInfo.setTotalCount(0);
 
@@ -783,11 +785,15 @@ public class ZipFilesMonitor{
 
                 batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent());
                 batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent());
-
                 batchInfo.setUserId(userId == null ?
                         Long.parseLong(document.getElementsByTagName("userid").item(0).getTextContent()) : userId);
 
-                batchInfo.setSize(Long.parseLong(document.getElementsByTagName("size").item(0).getTextContent()));
+                int actualCreditCount = Integer.parseInt(document.getElementsByTagName("size").item(0).getTextContent());
+
+                batchInfo.setSize((long) actualCreditCount);
+                batchInfo.setActualCount(actualCreditCount);
+                batchInfo.setTotalCount(0);
+
                 Date date = null;
 
                 try {
