@@ -10,6 +10,7 @@ import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.Shared;
 import kz.bsbnb.usci.eav.model.json.EntityStatusArrayJModel;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
+import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
 import org.apache.log4j.Logger;
@@ -21,6 +22,9 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.*;
+
+import static kz.bsbnb.usci.tool.couchbase.EntityStatuses.COMPLETED;
+import static kz.bsbnb.usci.tool.couchbase.EntityStatuses.ERROR;
 
 @Service
 public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusiness
@@ -34,6 +38,8 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
 
     private final DateFormat gsonDateFormat
             = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.US);
+
+    private final List<String> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED);
 
     private Date parseDateFromGson(String sDate) {
         synchronized (gsonDateFormat) {
@@ -70,49 +76,52 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
 
             Iterator<ViewRow> rows = response.iterator();
 
-            ArrayList<EntityStatusArrayJModel> csList = new ArrayList<EntityStatusArrayJModel>();
             while(rows.hasNext()) {
                 ViewRow viewRowNoDocs = rows.next();
 
                 EntityStatusArrayJModel batchFullStatusJModel =
                         gson.fromJson(viewRowNoDocs.getValue(), EntityStatusArrayJModel.class);
 
-                //csList.add(batchFullStatusJModel);
-
-                for (EntityStatusJModel csajm : batchFullStatusJModel.getEntityStatuses()) {
-                    Protocol prot = new Protocol();
-                    prot.setId(1L);
-                    Message m = new Message();
-
-                    m.setCode("A");
-                    m.setNameKz(csajm.getDescription());
-                    m.setNameRu(csajm.getDescription());
-                    prot.setMessage(m);
-
-                    Shared s = new Shared();
-                    s.setCode("S");
-                    s.setNameRu(csajm.getProtocol());
-                    s.setNameKz(csajm.getProtocol());
-                    prot.setMessageType(s);
-
-
-                    prot.setNote("присвоено " + csajm.getReceived());
-                    prot.setPackNo(csajm.getIndex());
-
-                    prot.setPrimaryContractDate(
-                        parseDateFromGson((String) csajm.getProperty(StatusProperties.CONTRACT_DATE))
-                    );
-
-                    prot.setProtocolType(s);
-
-                    prot.setTypeDescription((String)csajm.getProperty(StatusProperties.CONTRACT_NO));
-                    prot.setInputInfo(inputInfoId);
-                    list.add(prot);
+                for (EntityStatusJModel entityStatus : batchFullStatusJModel.getEntityStatuses()) {
+                    if (protocolsToDisplay.contains(entityStatus.getProtocol())) {
+                        fillProtocol(entityStatus, inputInfoId, list);
+                    }
                 }
             }
         }
 
         return list;
+    }
+
+    private void fillProtocol(EntityStatusJModel entityStatus, InputInfo inputInfoId, ArrayList<Protocol> list) {
+        Protocol prot = new Protocol();
+        prot.setId(1L);
+        Message m = new Message();
+
+        m.setCode("A");
+        m.setNameKz(entityStatus.getDescription());
+        m.setNameRu(entityStatus.getDescription());
+        prot.setMessage(m);
+
+        Shared s = new Shared();
+        s.setCode("S");
+        s.setNameRu(entityStatus.getProtocol());
+        s.setNameKz(entityStatus.getProtocol());
+        prot.setMessageType(s);
+
+
+        prot.setNote("присвоено " + entityStatus.getReceived());
+        prot.setPackNo(entityStatus.getIndex());
+
+        prot.setPrimaryContractDate(
+            parseDateFromGson((String) entityStatus.getProperty(StatusProperties.CONTRACT_DATE))
+        );
+
+        prot.setProtocolType(s);
+
+        prot.setTypeDescription((String)entityStatus.getProperty(StatusProperties.CONTRACT_NO));
+        prot.setInputInfo(inputInfoId);
+        list.add(prot);
     }
 }
 
