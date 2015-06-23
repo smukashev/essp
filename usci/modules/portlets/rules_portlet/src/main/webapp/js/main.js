@@ -557,7 +557,7 @@ Ext.onReady(function(){
                                         op : 'UPDATE_RULE',
                                         ruleBody: editor.getSession().getValue(),
                                         ruleId: editor.ruleId,
-                                        date: Ext.Date.format(Ext.getCmp('elemDatePackage').value, 'd.m.Y'),
+                                        date: Ext.getCmp('elemPackageVersionCombo').value,
                                         pkgName: Ext.getCmp('elemComboPackage').getRawValue()
                                     },
                                     reader: {

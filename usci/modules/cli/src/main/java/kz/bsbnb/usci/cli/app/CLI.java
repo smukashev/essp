@@ -146,7 +146,7 @@ public class CLI {
     private Date currentDate = new Date();
     private boolean started = false;
     private BatchVersion currentBatchVersion;
-    private String defaultDumpFile = "c:/rules/pledge2.cli";
+    private String defaultDumpFile = "c:/rule_dumps/23_06_2015.cli";
     private BaseEntity currentBaseEntity;
     private Mnt mnt;
 
@@ -174,10 +174,10 @@ public class CLI {
         //System.setProperty("viewmode", "development");
 
         ArrayList<URI> nodes = new ArrayList<URI>();
-        nodes.add(URI.create("http://172.17.110.114:8091/pools"));
+        nodes.add(URI.create("http://localhost:8091/pools"));
 
         try {
-            couchbaseClient = new CouchbaseClient(nodes, "test", "");
+            couchbaseClient = new CouchbaseClient(nodes, "test2", "");
         } catch (Exception e) {
             System.out.println("Error connecting to Couchbase: " + e.getMessage());
         }

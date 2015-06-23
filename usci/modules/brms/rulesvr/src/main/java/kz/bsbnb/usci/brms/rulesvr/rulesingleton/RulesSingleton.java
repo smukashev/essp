@@ -154,8 +154,8 @@ public class RulesSingleton
         if(makeActive && makeInActive)
             throw new IllegalArgumentException("non proper method call");
 
-        if(!makeActive && ruleEdited)
-            throw new IllegalArgumentException("non proper method call");
+        //if(!makeActive && ruleEdited)
+        //    throw new IllegalArgumentException("non proper method call");
 
         BatchVersion batchVersion = ruleBatchVersionService.getBatchVersion(pkgName, repDate);
         if(batchVersion == null)

@@ -115,12 +115,12 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
 
     @Override
     public BatchVersion getBatchVersion(String name, Date repdate) {
-        String Sql = "SELECT t1.name, t2.id, t2.package_id, t2.REPORT_DATE" +
+        String Sql = "SELECT t1.name, t2.id, t2.package_id, t2.OPEN_DATE" +
                 " from " + PREFIX_ + "packages t1," + PREFIX_ + "package_versions t2" +
                 " where t1.id = t2.package_id" +
                 " and   t1.name = ?" +
-                " AND   t2.REPORT_DATE <= ? AND ROWNUM = 1" +
-                " ORDER BY t2.REPORT_DATE desc";
+                " AND   t2.OPEN_DATE <= ? AND ROWNUM = 1" +
+                " ORDER BY t2.OPEN_DATE desc";
 
         return (BatchVersion) jdbcTemplate.queryForObject(Sql, new BeanPropertyRowMapper(BatchVersion.class),
                 new Object[]{name, repdate});
