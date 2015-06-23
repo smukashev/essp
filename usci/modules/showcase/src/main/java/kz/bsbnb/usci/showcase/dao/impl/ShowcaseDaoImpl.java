@@ -460,7 +460,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = generateMap(entity, showcaseHolder);
 
         if (savingMap == null || savingMap.size() == 0)
-            throw new UnsupportedOperationException("Map is empty!");
+            return;
 
         for (Map.Entry entry : savingMap.entrySet()) {
             HashMap<ValueElement, Object> entryMap = (HashMap) entry.getValue();
@@ -558,7 +558,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         }
     }
 
-    public HashMap<String, HashSet<PathElement>> generatePaths(IBaseEntity entity, ShowcaseHolder showcaseHolder) {
+    public HashMap<String, HashSet<PathElement>> generatePaths(IBaseEntity entity, ShowcaseHolder showcaseHolder,  HashSet<PathElement> keyPaths) {
         HashMap<String, HashSet<PathElement>> paths = new HashMap<>();
 
         HashSet<PathElement> tmpSet;
@@ -608,7 +608,18 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                     tmpSet = new HashSet<>();
                 }
 
-                if (attributeMetaType.isComplex() || attributeMetaType.isSet()) {
+                if(attributeMetaType.isSet()) {
+                    keyPaths.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
+                            sf.getColumnName(), true));
+
+                    tmpSet.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
+                            sf.getColumnName(), false));
+                    paths.put("root", tmpSet);
+
+                    tmpSet = new HashSet<>();
+                    tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName(), true));
+                    paths.put("root." + sf.getAttributePath(), tmpSet);
+                } else if (attributeMetaType.isComplex()) {
                     tmpSet.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
                             sf.getColumnName(), false));
                     paths.put("root", tmpSet);
@@ -800,10 +811,13 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
     public HashMap<ArrayElement, HashMap<ValueElement, Object>> generateMap(IBaseEntity entity,
                                                                             ShowcaseHolder showcaseHolder) {
-        HashMap<String, HashSet<PathElement>> paths = generatePaths(entity, showcaseHolder);
+        HashSet<PathElement> keyPaths = new HashSet<>();
+        HashMap<String, HashSet<PathElement>> paths = generatePaths(entity, showcaseHolder, keyPaths);
 
         HashSet<PathElement> rootAttributes = paths.get("root");
         rootAttributes.add(new PathElement("root", "root", entity.getMeta().getClassName() + "_id", true));
+
+        keyPaths.add(new PathElement("root", "root", entity.getMeta().getClassName() + "_id", true));
 
         HashMap<ValueElement, Object> dirtyMap = readMap("root", entity, paths, false);
 
@@ -813,8 +827,28 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         HashMap<ArrayElement, HashMap<ValueElement, Object>> globalMap = gen(dirtyMap);
         HashMap<ArrayElement, HashMap<ValueElement, Object>> clearedGlobalMap = new HashMap<>();
 
-        for (Map.Entry<ArrayElement, HashMap<ValueElement, Object>> globalEntry : globalMap.entrySet())
-            clearedGlobalMap.put(globalEntry.getKey(), clearDirtyMap(globalEntry.getValue()));
+        for (Map.Entry<ArrayElement, HashMap<ValueElement, Object>> globalEntry : globalMap.entrySet()) {
+            HashMap<ValueElement, Object> tmpMap = clearDirtyMap(globalEntry.getValue());
+            boolean hasMandatoryKeys = true;
+
+            for(PathElement pElement : keyPaths) {
+                boolean eFound = false;
+                for(ValueElement vElement : tmpMap.keySet()) {
+                    if(vElement.columnName.equals(pElement.columnName)) {
+                        eFound = true;
+                        break;
+                    }
+                }
+
+                if(!eFound) {
+                    hasMandatoryKeys = false;
+                    break;
+                }
+            }
+
+            if(hasMandatoryKeys)
+                clearedGlobalMap.put(globalEntry.getKey(), tmpMap);
+        }
 
         return clearedGlobalMap;
     }
@@ -1256,7 +1290,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         @Override
         public String toString() {
-            return elementPath + ", " + columnName;
+            return elementPath + ", " + columnName + ", " + isKey;
         }
     }
 

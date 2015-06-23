@@ -38,7 +38,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
     private static ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    private static HashSet<SyncKey> syncSet = new HashSet<>();
+    private static volatile HashSet<SyncKey> syncSet = new HashSet<>();
 
     private static Semaphore mutex = new Semaphore(1);
 
