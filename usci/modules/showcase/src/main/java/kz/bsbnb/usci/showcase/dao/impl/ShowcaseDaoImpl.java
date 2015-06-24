@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -51,6 +52,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     private final Logger logger = LoggerFactory.getLogger(ShowcaseDaoImpl.class);
     private JdbcTemplate jdbcTemplateSC;
     private ArrayList<ShowcaseHolder> holders;
+
+    private static volatile Set<Long> carteageElements = Collections.synchronizedSet(new HashSet<Long>());
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -485,27 +488,24 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         }
     }
 
-    private static volatile HashSet<CarteageElement> carteageElements = new HashSet<>();
+
 
     @Transactional
     void dbCarteageGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
         Date openDate = null, closeDate = null;
         String sql;
 
-        if(globalEntity == null || entity == null || showcaseHolder == null) return;
+        if (globalEntity == null || entity == null || showcaseHolder == null) return;
 
         HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = generateMap(entity, showcaseHolder);
 
         if (savingMap == null || savingMap.size() == 0)
             return;
 
-        CarteageElement cElement = new CarteageElement(globalEntity.getId(), entity.getId(),
-                showcaseHolder.getShowCaseMeta().getId());
-
         while (true) {
             synchronized (carteageElements) {
-                if(!carteageElements.contains(cElement))  {
-                    carteageElements.add(cElement);
+                if(!carteageElements.contains(showcaseHolder.getShowCaseMeta().getId()))  {
+                    carteageElements.add(showcaseHolder.getShowCaseMeta().getId());
                     break;
                 }
             }
@@ -609,7 +609,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         }
 
         synchronized (carteageElements) {
-            carteageElements.remove(cElement);
+            carteageElements.remove(showcaseHolder.getShowCaseMeta().getId());
         }
     }
 
@@ -990,11 +990,23 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             }
 
             return equalityFlag;
-        } catch (Exception e) {
-            System.err.println("ERROR ENTITY ID: " + entity.getId() +", " + showcaseHolder.getShowCaseMeta().getTableName());
+        } catch (IncorrectResultSizeDataAccessException ir) {
+            System.out.println("!INCORRECT RESULT SET!");
+            System.err.println(showcaseHolder.getShowCaseMeta().getTableName());
             System.err.println(keyData.queryKeys);
 
-            for(Object o : keyData.vals)
+            for (Object o : keyData.vals)
+                System.err.print(o + ", ");
+
+            System.out.println("-------------------------");
+            ir.printStackTrace();
+            System.out.println("-------------------------");
+            return true;
+        } catch (Exception e) {
+            System.err.println("ERROR ENTITY ID: " + entity.getId() + ", " + showcaseHolder.getShowCaseMeta().getTableName());
+            System.err.println(keyData.queryKeys);
+
+            for (Object o : keyData.vals)
                 System.err.print(o + ", ");
 
             System.out.println("-------------------------");
