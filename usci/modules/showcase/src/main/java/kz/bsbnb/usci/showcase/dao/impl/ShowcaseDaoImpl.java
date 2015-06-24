@@ -49,12 +49,10 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     private final static String TABLES_PREFIX = "R_";
     private final static String COLUMN_PREFIX = "";
     private final static String HISTORY_POSTFIX = "_HIS";
+    private static final Set<Long> carteageElements = Collections.synchronizedSet(new HashSet<Long>());
     private final Logger logger = LoggerFactory.getLogger(ShowcaseDaoImpl.class);
     private JdbcTemplate jdbcTemplateSC;
     private ArrayList<ShowcaseHolder> holders;
-
-    private static volatile Set<Long> carteageElements = Collections.synchronizedSet(new HashSet<Long>());
-
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
@@ -67,11 +65,13 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
     @Autowired
     public void setDataSourceSC(DataSource dataSourceSC) {
+        System.out.println("ASDSAD");
         this.jdbcTemplateSC = new JdbcTemplate(dataSourceSC);
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        System.out.println("afterPropertiesSet");
         holders = populateHolders();
     }
 
@@ -262,8 +262,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         platform.createModel(model, false, true);
     }
 
-    void persistMap(HashMap<ValueElement, Object> map, Date openDate, Date closeDate, ShowcaseHolder showCaseHolder,
-                    IBaseEntity entity) {
+    private void persistMap(HashMap<ValueElement, Object> map, Date openDate, Date closeDate, ShowcaseHolder showCaseHolder,
+                            IBaseEntity entity) {
         StringBuilder sql;
         StringBuilder values = new StringBuilder("(");
         String tableName;
@@ -335,7 +335,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     @Transactional
-    void updateMapLeftRange(HistoryState historyState, KeyData keyData, IBaseEntity entity, ShowcaseHolder showCaseHolder) {
+    private void updateMapLeftRange(HistoryState historyState, KeyData keyData, IBaseEntity entity, ShowcaseHolder showCaseHolder) {
         String sql = "UPDATE %s SET close_date = ? WHERE " + keyData.queryKeys;
 
         if (historyState == HistoryState.ACTUAL) {
@@ -349,16 +349,16 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         jdbcTemplateSC.update(sql, getObjectArray(true, keyData.vals, entity.getReportDate()));
     }
 
-    String getActualTableName(ShowCase showCaseMeta) {
+    private String getActualTableName(ShowCase showCaseMeta) {
         return TABLES_PREFIX + showCaseMeta.getTableName();
     }
 
-    String getHistoryTableName(ShowCase showCaseMeta) {
+    private String getHistoryTableName(ShowCase showCaseMeta) {
         return TABLES_PREFIX + showCaseMeta.getTableName() + HISTORY_POSTFIX;
     }
 
     @Transactional
-    void moveActualMapToHistory(KeyData keyData, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
+    private void moveActualMapToHistory(KeyData keyData, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
         StringBuilder select = new StringBuilder();
         StringBuilder sql = new StringBuilder("INSERT INTO %s");
 
@@ -440,7 +440,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         }
     }
 
-    public Object[] getObjectArray(boolean reverse, Object[] elementArray, Object... elements) {
+    private Object[] getObjectArray(boolean reverse, Object[] elementArray, Object... elements) {
         Object[] newObjectArray = new Object[elementArray.length + elements.length];
 
         int index = 0;
@@ -455,43 +455,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         return newObjectArray;
     }
 
-    class CarteageElement {
-        public Long globalId;
-        public Long entityId;
-        public Long showcaseId;
-
-        public CarteageElement(Long globalId, Long entityId, Long showcaseId) {
-            this.globalId = globalId;
-            this.entityId = entityId;
-            this.showcaseId = showcaseId;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            CarteageElement that = (CarteageElement) o;
-
-            if (!globalId.equals(that.globalId)) return false;
-            if (!entityId.equals(that.entityId)) return false;
-            return showcaseId.equals(that.showcaseId);
-
-        }
-
-        @Override
-        public int hashCode() {
-            int result = globalId.hashCode();
-            result = 31 * result + entityId.hashCode();
-            result = 31 * result + showcaseId.hashCode();
-            return result;
-        }
-    }
-
-
-
     @Transactional
-    void dbCarteageGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
+    private void dbCarteageGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
         Date openDate = null, closeDate = null;
         String sql;
 
@@ -504,13 +469,17 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         while (true) {
             synchronized (carteageElements) {
-                if(!carteageElements.contains(showcaseHolder.getShowCaseMeta().getId()))  {
+                if (!carteageElements.contains(showcaseHolder.getShowCaseMeta().getId())) {
                     carteageElements.add(showcaseHolder.getShowCaseMeta().getId());
                     break;
                 }
             }
 
-            try { Thread.sleep(50); } catch (InterruptedException ie) { ie.printStackTrace(); }
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }
         }
 
         for (Map.Entry entry : savingMap.entrySet()) {
@@ -613,7 +582,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         }
     }
 
-    public HashMap<String, HashSet<PathElement>> generatePaths(IBaseEntity entity, ShowcaseHolder showcaseHolder,  HashSet<PathElement> keyPaths) {
+    private HashMap<String, HashSet<PathElement>> generatePaths(IBaseEntity entity, ShowcaseHolder showcaseHolder, HashSet<PathElement> keyPaths) {
         HashMap<String, HashSet<PathElement>> paths = new HashMap<>();
 
         HashSet<PathElement> tmpSet;
@@ -663,7 +632,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                     tmpSet = new HashSet<>();
                 }
 
-                if(attributeMetaType.isSet()) {
+                if (attributeMetaType.isSet()) {
                     keyPaths.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
                             sf.getColumnName(), true));
 
@@ -694,7 +663,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         return paths;
     }
 
-    HashMap<ValueElement, Object> readMap(String curPath, IBaseEntity entity, HashMap<String,
+    private HashMap<ValueElement, Object> readMap(String curPath, IBaseEntity entity, HashMap<String,
             HashSet<PathElement>> paths, boolean parentIsArray) {
         HashSet<PathElement> attributes = paths.get(curPath);
 
@@ -776,7 +745,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         return map;
     }
 
-    public HashMap<ArrayElement, HashMap<ValueElement, Object>> gen(HashMap<ValueElement, Object> dirtyMap) {
+    private HashMap<ArrayElement, HashMap<ValueElement, Object>> gen(HashMap<ValueElement, Object> dirtyMap) {
         HashMap<ArrayElement, HashMap<ValueElement, Object>> arrayEl = new HashMap<>();
 
         int index = 0;
@@ -843,7 +812,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         return arrayEl;
     }
 
-    public HashMap<ValueElement, Object> clearDirtyMap(HashMap<ValueElement, Object> dirtyMap) {
+    private HashMap<ValueElement, Object> clearDirtyMap(HashMap<ValueElement, Object> dirtyMap) {
         HashMap<ValueElement, Object> returnMap = new HashMap<>();
 
         Iterator iter = dirtyMap.entrySet().iterator();
@@ -853,7 +822,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             if (entry.getValue() instanceof HashMap) {
                 HashMap<ValueElement, Object> tmpMap = clearDirtyMap((HashMap) entry.getValue());
 
-                for(Map.Entry<ValueElement, Object> tmpMapEntry : tmpMap.entrySet())
+                for (Map.Entry<ValueElement, Object> tmpMapEntry : tmpMap.entrySet())
                     returnMap.put(tmpMapEntry.getKey(), tmpMapEntry.getValue());
 
             } else {
@@ -864,8 +833,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         return returnMap;
     }
 
-    public HashMap<ArrayElement, HashMap<ValueElement, Object>> generateMap(IBaseEntity entity,
-                                                                            ShowcaseHolder showcaseHolder) {
+    private HashMap<ArrayElement, HashMap<ValueElement, Object>> generateMap(IBaseEntity entity,
+                                                                             ShowcaseHolder showcaseHolder) {
         HashSet<PathElement> keyPaths = new HashSet<>();
         HashMap<String, HashSet<PathElement>> paths = generatePaths(entity, showcaseHolder, keyPaths);
 
@@ -886,30 +855,30 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             HashMap<ValueElement, Object> tmpMap = clearDirtyMap(globalEntry.getValue());
             boolean hasMandatoryKeys = true;
 
-            for(PathElement pElement : keyPaths) {
+            for (PathElement pElement : keyPaths) {
                 boolean eFound = false;
-                for(ValueElement vElement : tmpMap.keySet()) {
-                    if(vElement.columnName.equals(pElement.columnName)) {
+                for (ValueElement vElement : tmpMap.keySet()) {
+                    if (vElement.columnName.equals(pElement.columnName)) {
                         eFound = true;
                         break;
                     }
                 }
 
-                if(!eFound) {
+                if (!eFound) {
                     hasMandatoryKeys = false;
                     break;
                 }
             }
 
-            if(hasMandatoryKeys)
+            if (hasMandatoryKeys)
                 clearedGlobalMap.put(globalEntry.getKey(), tmpMap);
         }
 
         return clearedGlobalMap;
     }
 
-    public boolean compareValues(HistoryState state, HashMap<ValueElement, Object> savingMap,
-                                 IBaseEntity entity, ShowcaseHolder showcaseHolder, KeyData keyData) {
+    private boolean compareValues(HistoryState state, HashMap<ValueElement, Object> savingMap,
+                                  IBaseEntity entity, ShowcaseHolder showcaseHolder, KeyData keyData) {
         StringBuilder st = new StringBuilder();
         boolean equalityFlag = true;
 
@@ -1149,7 +1118,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         return load(id);
     }
 
-    long getIdByName(String name) {
+    private long getIdByName(String name) {
         Select select = context.select(EAV_SC_SHOWCASES.ID).from(EAV_SC_SHOWCASES)
                 .where(EAV_SC_SHOWCASES.NAME.equal(name));
 
@@ -1273,7 +1242,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             insertField(sf, showCaseSaving.getId());
     }
 
-    long insertWithId(String query, Object[] values) {
+    private long insertWithId(String query, Object[] values) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplateSC.update(new GenericInsertPreparedStatementCreator(query, values), keyHolder);
         return keyHolder.getKey().longValue();
@@ -1316,8 +1285,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     class KeyData {
-        Object[] keys;
-        Object[] vals;
+        final Object[] keys;
+        final Object[] vals;
         String queryKeys = "";
 
         public KeyData(HashMap<ValueElement, Object> map) {
@@ -1343,9 +1312,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     class PathElement {
-        public String elementPath;
-        public String attributePath;
-        public String columnName;
+        public final String elementPath;
+        public final String attributePath;
+        public final String columnName;
         public boolean isKey = false;
 
         public PathElement(String elementPath, String attributePath, String columnName, boolean isKey) {
@@ -1362,11 +1331,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     class ValueElement {
-        public String columnName;
-        public Long elementId;
-        public boolean isKey;
-        public boolean isArray;
-        public boolean isSimple;
+        public final String columnName;
+        public final Long elementId;
+        public final boolean isKey;
+        public final boolean isArray;
+        public final boolean isSimple;
 
         public ValueElement(String columnName, Long elementId, boolean isKey) {
             this.columnName = columnName;
@@ -1399,8 +1368,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     class ArrayElement {
-        public int index;
-        public ValueElement valueElement;
+        public final int index;
+        public final ValueElement valueElement;
 
         public ArrayElement(int index, ValueElement valueElement) {
             this.index = index;
@@ -1419,8 +1388,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
             ArrayElement that = (ArrayElement) o;
 
-            if (index != that.index) return false;
-            return valueElement.equals(that.valueElement);
+            return index == that.index && valueElement.equals(that.valueElement);
 
         }
 
@@ -1435,7 +1403,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     class GenericInsertPreparedStatementCreator implements PreparedStatementCreator {
         final String query;
         final Object[] values;
-        String keyName = "id";
+        final String keyName = "id";
 
         public GenericInsertPreparedStatementCreator(String query, Object[] values) {
             this.query = query;
