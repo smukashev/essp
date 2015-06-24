@@ -117,7 +117,7 @@ function initGrid(){
                             params : {
                                 op : 'RULE_SWITCH',
                                 ruleId: ruleId,
-                                date: Ext.Date.format(Ext.getCmp('elemDatePackage').value, 'd.m.Y'),
+                                date: Ext.getCmp('elemPackageVersionCombo').value,
                                 pkgName: Ext.getCmp('elemComboPackage').getRawValue(),
                                 newValue: newValue,
                                 ruleBody: ruleBody,
