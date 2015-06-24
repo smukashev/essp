@@ -80,10 +80,8 @@ showcase set tableName CORE_ORG
 showcase set downPath subjects.organization
 
 showcase list add head head_id
-showcase list add head.names name_id
 
 showcase list add is_se is_se
-showcase list add head.names.firstname firstname
 showcase list add econ_trade econ_trade
 showcase list add legal_form legal_form
 showcase list add offshore offshore
@@ -91,6 +89,43 @@ showcase list add enterprise_type enterprise_type
 showcase list add country country
 
 showcase list addCustom credit creditor creditor_id
+
+showcase save
+
+#=================================================================================
+
+#==================================================================================
+# Head names
+#==================================================================================
+
+showcase set name CORE_ORG_HEAD_NAMES
+showcase set tableName CORE_ORG_HEAD_NAMES
+showcase set downPath subjects.organization.head
+
+showcase list add names name_id
+
+showcase list add names.firstname firstname
+showcase list add names.lastname lastname
+showcase list add names.middlename middlename
+showcase list add names.lang lang
+
+showcase save
+
+#=================================================================================
+
+#==================================================================================
+# Head docs
+#==================================================================================
+
+showcase set name CORE_ORG_HEAD_DOCS
+showcase set tableName CORE_ORG_HEAD_DOCS
+showcase set downPath subjects.organization.head
+
+showcase list add docs doc_id
+
+showcase list add docs.no doc_no
+showcase list add docs.doc_type doc_type_id
+showcase list add docs.name doc_name
 
 showcase save
 
@@ -130,8 +165,6 @@ showcase list add addresses.details details
 showcase list add addresses.region.code region_code
 showcase list add addresses.type address_type
 
-showcase list addCustom credit creditor creditor_id
-
 showcase save
 
 #=================================================================================
@@ -152,8 +185,6 @@ showcase list add addresses.details details
 showcase list add addresses.region.code region_code
 showcase list add addresses.type address_type
 
-showcase list addCustom credit creditor creditor_id
-
 showcase save
 
 #=================================================================================
@@ -171,8 +202,6 @@ showcase list add contacts.contact_type contact_type_id
 
 showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
-
-showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -192,8 +221,6 @@ showcase list add contacts.contact_type contact_type_id
 
 showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
-
-showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -420,29 +447,39 @@ showcase save
 #=================================================================================
 
 #=================================================================================
-#  17. CORE_DEBTOR_INFO
+#  Debtor_info_person
 #=================================================================================
 
-showcase set name CORE_DEBTOR_INFO
-showcase set tableName CORE_DEBTOR_INFO
-showcase set downPath subjects
+showcase set name CORE_PERSON_DEBTOR_INFO
+showcase set tableName CORE_PERSON_DEBTOR_INFO
+showcase set downPath subjects.person
 
-showcase list add organization org_id
-showcase list add organization.bank_relations org_brs_id
-showcase list add organization.bank_relations.bank_relation org_brs_bank_relation_id
-showcase list add organization.bank_relations.creditor org_brs_creditor_id
-
-showcase list add person person_id
-showcase list add person.bank_relations person_brs_id
-showcase list add person.bank_relations.bank_relation person_brs_bank_relation_id
-showcase list add person.bank_relations.creditor person_brs_creditor_id
+showcase list add bank_relations person_bank_relation_id
+showcase list add bank_relations.bank_relation ref_bank_relation_id
+showcase list add bank_relations.creditor creditor_id
 
 showcase save
 
 #=================================================================================
 
 #=================================================================================
-#  18. PORTFOLIO_FLOW_KFN
+
+#=================================================================================
+#  Debtor_info_organization
+#=================================================================================
+
+showcase set name CORE_ORG_DEBTOR_INFO
+showcase set tableName CORE_ORG_DEBTOR_INFO
+showcase set downPath subjects.organization
+
+showcase list add bank_relations org_bank_relation_id
+showcase list add bank_relations.bank_relation ref_bank_relation_id
+showcase list add bank_relations.creditor creditor_id
+
+showcase save
+
+#=================================================================================
+# Portfolio_flow_kfn
 #=================================================================================
 
 showcase set meta portfolio_data
@@ -464,7 +501,7 @@ showcase list addCustom portfolio_data creditor portfolio_data_creditor_id
 showcase save
 
 #=================================================================================
-#  19. PORTFOLIO_FLOW_MSFO
+# Portfolio_flow_msfo
 #=================================================================================
 
 showcase set meta portfolio_data

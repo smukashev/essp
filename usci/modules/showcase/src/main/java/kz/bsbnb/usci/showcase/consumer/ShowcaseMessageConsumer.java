@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -36,37 +37,6 @@ public class ShowcaseMessageConsumer implements MessageListener {
     private ExecutorService exec = Executors.newCachedThreadPool();
 
     private static ReadWriteLock lock = new ReentrantReadWriteLock();
-
-    private static HashSet<SyncKey> syncSet = new HashSet<>();
-
-    private class SyncKey {
-        public Long entityId;
-        public Long scId;
-
-        public SyncKey(Long entityId, Long scId) {
-            this.entityId = entityId;
-            this.scId = scId;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            SyncKey syncKey = (SyncKey) o;
-
-            if (!entityId.equals(syncKey.entityId)) return false;
-            return scId.equals(syncKey.scId);
-
-        }
-
-        @Override
-        public int hashCode() {
-            int result = entityId.hashCode();
-            result = 31 * result + scId.hashCode();
-            return result;
-        }
-    }
 
     @Override
     public void onMessage(Message message) {
@@ -146,32 +116,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
         @Override
         public void run() {
-            SyncKey syncKey = new SyncKey(entity.getId(), holder.getShowCaseMeta().getId());
-
-            try {
-                while(true) {
-                    lock.readLock().lock();
-                    if(!syncSet.contains(syncKey)) {
-                        lock.readLock().unlock();
-                        break;
-                    }
-
-                    lock.readLock().unlock();
-                    Thread.sleep(50);
-                }
-
-                lock.writeLock().lock();
-                syncSet.add(syncKey);
-                lock.writeLock().unlock();
-
-                showcaseDao.generate(entity, holder);
-            } catch(Exception e) {
-                e.printStackTrace();
-            } finally {
-                lock.writeLock().lock();
-                syncSet.remove(syncKey);
-                lock.writeLock().unlock();
-            }
+            showcaseDao.generate(entity, holder);
         }
     }
 }
