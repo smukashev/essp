@@ -177,7 +177,7 @@ public class CLI {
         nodes.add(URI.create("http://localhost:8091/pools"));
 
         try {
-            couchbaseClient = new CouchbaseClient(nodes, "test2", "");
+            couchbaseClient = new CouchbaseClient(nodes, "test", "");
         } catch (Exception e) {
             System.out.println("Error connecting to Couchbase: " + e.getMessage());
         }
