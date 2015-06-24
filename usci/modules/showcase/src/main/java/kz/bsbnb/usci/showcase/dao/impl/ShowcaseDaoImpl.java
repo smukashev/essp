@@ -6,10 +6,9 @@ import kz.bsbnb.ddlutils.model.*;
 import kz.bsbnb.ddlutils.model.Table;
 import kz.bsbnb.usci.core.service.IMetaFactoryService;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
-import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -120,12 +119,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
     private void createTable(HistoryState historyState, ShowcaseHolder showcaseHolder) {
         String tableName;
-        switch (historyState) {
-            case ACTUAL:
-                tableName = getActualTableName(showcaseHolder.getShowCaseMeta());
-                break;
-            default:
-                tableName = getHistoryTableName(showcaseHolder.getShowCaseMeta());
+
+        if(historyState == HistoryState.ACTUAL) {
+            tableName = getActualTableName(showcaseHolder.getShowCaseMeta());
+        } else {
+            tableName = getHistoryTableName(showcaseHolder.getShowCaseMeta());
         }
 
         Database model = new Database();
@@ -145,102 +143,51 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         table.addColumn(idColumn);
 
-        Map<String, String> prefixToColumn = showcaseHolder.generatePaths();
+        Column entityIdColumn = new Column();
+        entityIdColumn.setName(showcaseHolder.getRootClassName().toUpperCase() + "_ID");
+        entityIdColumn.setPrimaryKey(true);
+        entityIdColumn.setRequired(true);
+        entityIdColumn.setType("NUMERIC");
+        entityIdColumn.setSize("14,0");
+        entityIdColumn.setAutoIncrement(true);
 
-        // path ids
-        for (String prefix : prefixToColumn.keySet()) {
-            boolean hasFilter = false;
-
-            // Filter check
-            if(!showcaseHolder.getShowCaseMeta().getFilterFieldsList().isEmpty()) {
-                for(ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFilterFieldsList()) {
-                    if(sf.getAttributePath().equals(prefix) ||
-                            ("root." + sf.getAttributePath()).equals(prefix)) {
-                        hasFilter = true;
-                        break;
-                    }
-                }
-            }
-
-            if(!hasFilter) {
-                Column column = new Column();
-                column.setName(COLUMN_PREFIX + prefixToColumn.get(prefix) + "_ID");
-                column.setPrimaryKey(false);
-                column.setRequired(false);
-                column.setType("NUMERIC");
-                column.setSize("14,0");
-                column.setAutoIncrement(false);
-
-                table.addColumn(column);
-            }
-        }
-
-        // Custom fields
-        if (showcaseHolder.getShowCaseMeta().getCustomFieldsList().size() > 0) {
-            for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
-                Column column = new Column();
-
-                if (sf.getAttributePath().equals("ROOT")) { // ROOT ID
-                    column.setName(COLUMN_PREFIX + sf.getColumnName());
-                    column.setPrimaryKey(false);
-                    column.setRequired(false);
-                    column.setType("NUMERIC");
-                    column.setSize("14,0");
-                    column.setAutoIncrement(false);
-                } else {
-                    MetaClass root = metaService.getMetaClass("credit"); // TODO: fix credit arg
-                    String path;
-
-                    if(sf.getAttributePath() == null || sf.getAttributePath().equals("")) {
-                        path = sf.getAttributeName();
-                    } else {
-                        path = sf.getAttributePath();
-                    }
-
-                    IMetaType metaType = root.getEl(path);
-
-                    if(metaType.isComplex()) {
-                        column.setType("NUMERIC");
-                        column.setSize("14,0");
-                    } else {
-                        column.setType(getDBType(metaType));
-                        column.setSize(getDBSize(metaType));
-                    }
-
-                    column.setName(COLUMN_PREFIX + sf.getColumnName());
-                    column.setPrimaryKey(false);
-                    column.setRequired(false);
-                    column.setAutoIncrement(false);
-                }
-
-                table.addColumn(column);
-            }
-        }
-
-        Index indexR = new NonUniqueIndex();
-        indexR.setName("ind_" + tableName + "_" + prefixToColumn.get("root") + "_id");
-        indexR.addColumn(new IndexColumn(COLUMN_PREFIX + prefixToColumn.get("root") + "_id"));
-        table.addIndex(indexR);
+        table.addColumn(entityIdColumn);
 
         for (ShowCaseField field : showcaseHolder.getShowCaseMeta().getFieldsList()) {
-            if (field.getAttributeName().equals(""))
-                continue;
-
             Column column = new Column();
-
             column.setName(COLUMN_PREFIX + field.getColumnName().toUpperCase());
             column.setPrimaryKey(false);
             column.setRequired(false);
 
-            IMetaType metaType = showcaseHolder.getShowCaseMeta().getActualMeta().getEl(field.getPath());
+            IMetaType metaType = showcaseHolder.getShowCaseMeta().getActualMeta().getEl(field.getAttributePath());
 
             column.setType(getDBType(metaType));
+            column.setSize(getDBSize(metaType));
 
-            String columnSize = getDBSize(metaType);
+            //column.setDefaultValue(xmlReader.getAttributeValue(idx));
+            column.setAutoIncrement(false);
+            //column.setDescription(xmlReader.getAttributeValue(idx));
+            //column.setJavaName(xmlReader.getAttributeValue(idx));
 
-            if (columnSize != null) {
-                column.setSize(columnSize);
+            table.addColumn(column);
+        }
+
+        for (ShowCaseField field : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
+            Column column = new Column();
+            column.setName(COLUMN_PREFIX + field.getColumnName().toUpperCase());
+            column.setPrimaryKey(false);
+            column.setRequired(false);
+
+            IMetaType metaType;
+
+            if(field.getAttributePath().equals("root")) {
+                metaType = metaService.getMetaClass(field.getMetaId());
+            } else {
+                metaType = metaService.getMetaClass(field.getMetaId()).getEl(field.getAttributePath());
             }
+
+            column.setType(getDBType(metaType));
+            column.setSize(getDBSize(metaType));
 
             //column.setDefaultValue(xmlReader.getAttributeValue(idx));
             column.setAutoIncrement(false);
@@ -255,10 +202,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         column.setPrimaryKey(false);
         column.setRequired(false);
         column.setType("DATE");
-        Index indexCDC = new NonUniqueIndex();
-        indexCDC.setName("ind_" + tableName + "_CDC");
-        indexCDC.addColumn(new IndexColumn("CDC"));
-        table.addIndex(indexCDC);
         table.addColumn(column);
 
         if(!showcaseHolder.getShowCaseMeta().isFinal()) {
@@ -267,33 +210,36 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             column.setPrimaryKey(false);
             column.setRequired(false);
             column.setType("DATE");
+            table.addColumn(column);
+
             Index indexOD = new NonUniqueIndex();
             indexOD.setName("ind_" + tableName + "_OPEN_DATE");
             indexOD.addColumn(new IndexColumn("OPEN_DATE"));
             table.addIndex(indexOD);
-            table.addColumn(column);
 
             column = new Column();
             column.setName("CLOSE_DATE");
             column.setPrimaryKey(false);
             column.setRequired(false);
             column.setType("DATE");
+            table.addColumn(column);
+
             Index indexCD = new NonUniqueIndex();
             indexCD.setName("ind_" + tableName + "_CLOSE_DATE");
             indexCD.addColumn(new IndexColumn("CLOSE_DATE"));
             table.addIndex(indexCD);
-            table.addColumn(column);
         } else {
             column = new Column();
             column.setName("REP_DATE");
             column.setPrimaryKey(false);
             column.setRequired(false);
             column.setType("DATE");
+            table.addColumn(column);
+
             Index indexRD = new NonUniqueIndex();
             indexRD.setName("ind_" + tableName + "_REP_DATE");
             indexRD.addColumn(new IndexColumn("REP_DATE"));
             table.addIndex(indexRD);
-            table.addColumn(column);
         }
 
         model.addTable(table);
@@ -313,7 +259,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         else
             tableName = getHistoryTableName(showCaseHolder.getShowCaseMeta());
 
-        sql = new StringBuilder("insert into ").append(tableName).append("(");
+        sql = new StringBuilder("INSERT INTO ").append(tableName).append("(");
 
         Object[] vals;
 
@@ -332,22 +278,23 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         }
 
         for(ShowCaseField sf : showCaseHolder.getShowCaseMeta().getCustomFieldsList()) {
-            sql.append(sf.getColumnName()).append(", ");
-            values.append("?, ");
-            Object o;
-
-            if(sf.getAttributePath().equals("")) {
-                o = entity.getEl(sf.getAttributeName());
-            } else {
-                o = entity.getEl(sf.getAttributePath());
+            if(sf.getAttributePath().equals("root")) {
+                sql.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
+                vals[i++] = entity.getId();
+                values.append("?, ");
+                continue;
             }
+
+            Object o = entity.getEl(sf.getAttributePath());
 
             try {
                 if (o instanceof BaseEntity) {
+                    sql.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
+                    values.append("?, ");
                     vals[i++] = ((BaseEntity) o).getId();
-                } else if(o instanceof Date) {
-                    vals[i++] = DataUtils.convert((Date) o);
-                } else {
+             } else {
+                    sql.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
+                    values.append("?, ");
                     vals[i++] = o;
                 }
             } catch(Exception e) {
@@ -356,22 +303,19 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         }
 
         if(!showCaseHolder.getShowCaseMeta().isFinal()) {
-            sql.append("CDC, OPEN_DATE, CLOSE_DATE");
-            values.append("SYSDATE, ?, ? )");
+            sql.append("cdc, open_date, close_date");
+            values.append("sysdate, ?, ?)");
             vals[i++] = openDate;
             vals[i] = closeDate;
         } else {
-            sql.append("CDC, REP_DATE");
+            sql.append("cdc, rep_date");
             values.append("SYSDATE, ?)");
             vals[i] = openDate;
         }
 
-        sql.append(") values ").append(values);
+        sql.append(") VALUES ").append(values);
 
-        long t1 = System.currentTimeMillis();
         jdbcTemplateSC.update(sql.toString(), vals);
-        long t2 = System.currentTimeMillis() - t1;
-        stats.put("insert into (persistMap)", t2);
     }
 
     private boolean compatible(HashMap a, HashMap b) {
@@ -384,16 +328,19 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         return true;
     }
 
-    private boolean merge(HashMap a, HashMap b) {
-        if (compatible(a, b)) {
-            for (Object o : b.keySet()) {
-                String key = (String) o;
-                if (!a.containsKey(key))
-                    a.put(key, b.get(key));
-            }
-            return true;
+    @Transactional
+    void updateMapLeftRange(HistoryState historyState, KeyData keyData, IBaseEntity entity, ShowcaseHolder showCaseHolder) {
+        String sql = "UPDATE %s SET close_date = ? WHERE " + keyData.queryKeys;
+
+        if(historyState == HistoryState.ACTUAL) {
+            sql = String.format(sql, getActualTableName(showCaseHolder.getShowCaseMeta()), COLUMN_PREFIX,
+                    showCaseHolder.getRootClassName());
+        } else {
+            sql = String.format(sql, getHistoryTableName(showCaseHolder.getShowCaseMeta()), COLUMN_PREFIX,
+                    showCaseHolder.getRootClassName());
         }
-        return false;
+
+        jdbcTemplateSC.update(sql, getObjectArray(true, keyData.vals, entity.getReportDate()));
     }
 
     @Transactional
@@ -447,56 +394,67 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     @Transactional
     void moveActualToHistory(IBaseEntity entity, ShowcaseHolder showcaseHolder) {
         StringBuilder select = new StringBuilder();
-        StringBuilder sql = new StringBuilder("insert into %s");
+        StringBuilder sql = new StringBuilder("INSERT INTO %s");
 
-        for (String s : showcaseHolder.generatePaths().values()) {
-            boolean hasFilter = false;
-
-            for(ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFilterFieldsList()) {
-                if(s.equals(sf.getAttributePath()))  {
-                    hasFilter = true;
-                    break;
-                }
-            }
-
-            if(!hasFilter)
-                select.append(COLUMN_PREFIX).append(s).append("_id").append(",");
-        }
+        select.append(COLUMN_PREFIX).append(showcaseHolder.getRootClassName()).append("_id, ");
 
         // default fields
-        for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFieldsList()) {
-            if (sf.getAttributeName().equals(""))
-                continue;
-
-            select.append(COLUMN_PREFIX).append(sf.getColumnName()).append(",");
-        }
+        for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFieldsList())
+            select.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
 
         // custom fields
         for(ShowCaseField sf : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
-            select.append(COLUMN_PREFIX).append(sf.getColumnName()).append(",");
+            select.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
         }
 
         select.append("CDC, OPEN_DATE, CLOSE_DATE ");
         sql.append("(").append(select).append(")( select ")
-                .append(select).append("from %s where %s%s_id = ? )");
+                .append(select).append("FROM %s WHERE %s%s_id = ? )");
 
         String sqlResult = String.format(sql.toString(), getHistoryTableName(showcaseHolder.getShowCaseMeta()),
-                getActualTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX, 
+                getActualTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX,
                 showcaseHolder.getRootClassName());
 
-        long t1 = System.currentTimeMillis();
         jdbcTemplateSC.update(sqlResult, entity.getId());
-        long t2 = System.currentTimeMillis() - t1;
-        stats.put("insert into %s ( select from %s where %sROOT_ID = ? )", t2);
 
         sqlResult = String.format("DELETE FROM %s WHERE %s%s_ID = ? AND CLOSE_DATE IS NOT NULL",
                 getActualTableName(showcaseHolder.getShowCaseMeta()),
                 COLUMN_PREFIX, showcaseHolder.getRootClassName());
-        
-        long t3 = System.currentTimeMillis();
+
         jdbcTemplateSC.update(sqlResult, entity.getId());
-        long t4 = System.currentTimeMillis() - t3;
-        stats.put("DELETE FROM %s WHERE %sROOT_ID = ? AND CLOSE_DATE IS NOT NULL", t4);
+    }
+
+    @Transactional
+    void moveActualMapToHistory(KeyData keyData, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
+        StringBuilder select = new StringBuilder();
+        StringBuilder sql = new StringBuilder("INSERT INTO %s");
+
+        select.append(COLUMN_PREFIX).append(showcaseHolder.getRootClassName()).append("_id, ");
+
+        // default fields
+        for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFieldsList())
+            select.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
+
+        // custom fields
+        for(ShowCaseField sf : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
+            select.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
+        }
+
+        select.append("CDC, OPEN_DATE, CLOSE_DATE ");
+        sql.append("(").append(select).append(")( SELECT ")
+                .append(select).append("FROM %s WHERE " + keyData.queryKeys + ")");
+
+        String sqlResult = String.format(sql.toString(), getHistoryTableName(showcaseHolder.getShowCaseMeta()),
+                getActualTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX,
+                showcaseHolder.getRootClassName());
+
+        jdbcTemplateSC.update(sqlResult, keyData.vals);
+
+        sqlResult = String.format("DELETE FROM %s WHERE " + keyData.queryKeys + " AND CLOSE_DATE IS NOT NULL",
+                getActualTableName(showcaseHolder.getShowCaseMeta()),
+                COLUMN_PREFIX, showcaseHolder.getRootClassName());
+
+        jdbcTemplateSC.update(sqlResult, keyData.vals);
     }
 
     public int deleteById(ShowcaseHolder holder, IBaseEntity e) {
@@ -510,19 +468,13 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 sql = String.format(sql, getHistoryTableName(sh.getShowCaseMeta()),
                         COLUMN_PREFIX, holder.getRootClassName());
 
-                rows = jdbcTemplateSC.update(sql, e.getId());
-
-                logger.debug(sql, e.getId());
-                logger.debug("Rows deleted from " + getHistoryTableName(sh.getShowCaseMeta()) + ": " + rows);
+                rows += jdbcTemplateSC.update(sql, e.getId());
 
                 sql = "DELETE FROM %s WHERE %s%s_ID = ?";
                 sql = String.format(sql, getActualTableName(sh.getShowCaseMeta()),
                         COLUMN_PREFIX, holder.getRootClassName());
 
-                rows = jdbcTemplateSC.update(sql, e.getId());
-
-                logger.debug(sql, e.getId());
-                logger.debug("Rows deleted from " + getActualTableName(sh.getShowCaseMeta()) + ": " + rows);
+                rows += jdbcTemplateSC.update(sql, e.getId());
             }
         }
 
@@ -530,321 +482,533 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         sql = String.format(sql, getHistoryTableName(holder.getShowCaseMeta()),
                 COLUMN_PREFIX, holder.getRootClassName());
 
-        rows = jdbcTemplateSC.update(sql, e.getId());
-
-        logger.debug(sql, e.getId());
-        logger.debug("Rows deleted from " + getHistoryTableName(holder.getShowCaseMeta()) + ": " + rows);
+        rows += jdbcTemplateSC.update(sql, e.getId());
 
         sql = "DELETE FROM %s WHERE %s%s_ID = ?";
         sql = String.format(sql, getActualTableName(holder.getShowCaseMeta()),
                 COLUMN_PREFIX, holder.getRootClassName());
 
-        rows = jdbcTemplateSC.update(sql, e.getId());
-
-        logger.debug(sql, e.getId());
-        logger.debug("Rows deleted from " + getActualTableName(holder.getShowCaseMeta()) + ": " + rows);
+        rows += jdbcTemplateSC.update(sql, e.getId());
 
         return rows;
     }
 
     @Transactional
     public void generate(IBaseEntity entity, ShowcaseHolder showcaseHolder) {
-        List<BaseEntity> all = (List<BaseEntity>) entity.getEls("{get}" +
-                showcaseHolder.getShowCaseMeta().getDownPath());
+        List<BaseEntity> all;
 
-        for (BaseEntity baseEntity : all)
-            dbCarteageGenerate(entity, baseEntity, showcaseHolder);
+        if(showcaseHolder.getShowCaseMeta().getDownPath() != null) {
+            all = (List<BaseEntity>) entity.getEls("{get}" +
+                    showcaseHolder.getShowCaseMeta().getDownPath());
+
+            for (BaseEntity baseEntity : all)
+                dbCarteageGenerate(entity, baseEntity, showcaseHolder);
+        } else {
+            dbCarteageGenerate(entity, entity, showcaseHolder);
+        }
+    }
+
+    class KeyData {
+        Object[] keys;
+        Object[] vals;
+        String queryKeys = "";
+
+        public KeyData(HashMap<String, Object> keyMap, HashMap<String, Object> map) {
+            keys = new Object[keyMap.size()];
+            vals = new Object[keyMap.size()];
+
+            int keyCounter = 0;
+            for(Map.Entry entry : keyMap.entrySet()) {
+                if(map.get(entry.getKey()) != null) {
+                    keys[keyCounter] = entry.getKey();
+                    vals[keyCounter] = map.get(entry.getKey());
+
+                    queryKeys += entry.getKey() + " = ? ";
+                    if(++keyCounter < keyMap.size()) queryKeys += " AND ";
+
+                } else {
+                    System.err.println("KEY VALUE IS NULL!!!!");
+                }
+            }
+        }
+    }
+
+    public Object[] getObjectArray(boolean reverse, Object[] elementArray, Object... elements) {
+        Object[] newObjectArray = new Object[elementArray.length + elements.length];
+
+        int index = 0;
+        if(!reverse) {
+            for (Object object : elementArray) newObjectArray[index++] = object;
+            for (Object object : elements) newObjectArray[index++] = object;
+        } else {
+            for (Object object : elements) newObjectArray[index++] = object;
+            for (Object object : elementArray) newObjectArray[index++] = object;
+        }
+
+        return newObjectArray;
     }
 
     @Transactional
-    void dbCarteageGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
-        Date openDate, closeDate = null;
+    synchronized void dbCarteageGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
+        Date openDate = null, closeDate = null;
         String sql;
 
-        if(!showcaseHolder.getShowCaseMeta().isFinal()) {
-            try {
-                sql = "SELECT MAX(OPEN_DATE) AS OPEN_DATE FROM %s WHERE %s%s_ID = ?";
-                sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
-                        COLUMN_PREFIX, showcaseHolder.getRootClassName());
+        HashMap<Object, HashMap<String, Object>> savingMap = generateMap(entity, showcaseHolder);
 
-                openDate = (Date) jdbcTemplateSC.queryForMap(sql, entity.getId()).get("OPEN_DATE");
-            } catch (EmptyResultDataAccessException e) {
-                openDate = null;
-            }
+        if(savingMap == null || savingMap.size() == 0)
+            throw new UnsupportedOperationException("Map is empty!");
 
-            if (openDate == null) {
-                openDate = entity.getReportDate();
-            } else if(openDate.compareTo(entity.getReportDate()) == 0) {
-                openDate = entity.getReportDate();
+        HashMap<String, Object> keyMap = savingMap.get("_KEYMAP");
+        savingMap.remove("_KEYMAP");
 
-                sql = "DELETE FROM %s WHERE %s%s_ID = ? and OPEN_DATE = ?";
-                sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
-                        COLUMN_PREFIX, showcaseHolder.getRootClassName());
+        for(Map.Entry entry : savingMap.entrySet()) {
+            HashMap<String, Object> entryMap = (HashMap<String, Object>) entry.getValue();
 
-                jdbcTemplateSC.update(sql, entity.getId(), openDate);
-            } else if(openDate.compareTo(entity.getReportDate()) < 0) {
-                boolean compResult = compareValues(HistoryState.ACTUAL, entity, showcaseHolder, entity.getId());
+            KeyData keyData = new KeyData(keyMap, entryMap);
 
-                if(compResult) return;
+            if(!showcaseHolder.getShowCaseMeta().isFinal()) {
+                try {
+                    sql = "SELECT MAX(OPEN_DATE) AS OPEN_DATE FROM %s WHERE " + keyData.queryKeys;
+                    sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                            COLUMN_PREFIX, showcaseHolder.getRootClassName().toUpperCase());
 
-                updateActualLeftRange(entity, showcaseHolder);
-                moveActualToHistory(entity, showcaseHolder);
+                    openDate = (Date) jdbcTemplateSC.queryForMap(sql, keyData.vals).get("OPEN_DATE");
+                } catch (EmptyResultDataAccessException e) {
+                    openDate = null;
+                }
 
-                openDate = entity.getReportDate();
-            } else {
-                sql = "SELECT MIN(OPEN_DATE) as OPEN_DATE FROM %s WHERE %s%s_ID = ? AND OPEN_DATE > ? ";
-                sql = String.format(sql, getHistoryTableName(showcaseHolder.getShowCaseMeta()),
-                        COLUMN_PREFIX, showcaseHolder.getRootClassName());
+                boolean compResult;
 
-                closeDate = (Date) jdbcTemplateSC.queryForMap(sql, entity.getId(),
-                        entity.getReportDate()).get("OPEN_DATE");
+                if (openDate == null) {
+                    openDate = entity.getReportDate();
+                } else if(openDate.compareTo(entity.getReportDate()) == 0) {
+                    openDate = entity.getReportDate();
 
-                if (closeDate == null) {
-                    boolean compResult = compareValues(HistoryState.ACTUAL, entity, showcaseHolder, entity.getId());
+                    sql = "DELETE FROM %s WHERE " + keyData.queryKeys + " and OPEN_DATE = ?";
+                    sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                            COLUMN_PREFIX, showcaseHolder.getRootClassName());
 
-                    if(compResult) {
-                        sql = "UPDATE %s SET open_date = ? WHERE %s%s_id = ? AND open_date = ?";
-                        sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX,
-                                showcaseHolder.getRootClassName());
+                    jdbcTemplateSC.update(sql, getObjectArray(false, keyData.vals, openDate));
+                } else if(openDate.compareTo(entity.getReportDate()) < 0) {
+                    compResult = compareValues(HistoryState.ACTUAL, entryMap, entity, showcaseHolder, keyData);
 
-                        jdbcTemplateSC.update(sql, entity.getReportDate(), entity.getId(), openDate);
+                    if(compResult) continue;
 
-                        return;
-                    } else {
-                        closeDate = openDate;
-                    }
+                    updateMapLeftRange(HistoryState.ACTUAL, keyData, entity, showcaseHolder);
+                    moveActualMapToHistory(keyData, entity, showcaseHolder);
+
+                    openDate = entity.getReportDate();
                 } else {
-                    boolean compResult = compareValues(HistoryState.HISTORY, entity, showcaseHolder, entity.getId());
+                    sql = "SELECT MIN(OPEN_DATE) as OPEN_DATE FROM %s WHERE " + keyData.queryKeys + " AND OPEN_DATE > ? ";
+                    sql = String.format(sql, getHistoryTableName(showcaseHolder.getShowCaseMeta()),
+                            COLUMN_PREFIX, showcaseHolder.getRootClassName());
 
-                    if(compResult) {
-                        sql = "UPDATE %s SET open_date = ? WHERE %s%s_id = ? AND open_date = ?";
-                        sql = String.format(sql, getHistoryTableName(showcaseHolder.getShowCaseMeta()), COLUMN_PREFIX,
-                                showcaseHolder.getRootClassName());
+                    closeDate = (Date) jdbcTemplateSC.queryForMap(sql,
+                            getObjectArray(false, keyData.vals, entity.getReportDate())).get("OPEN_DATE");
 
-                        jdbcTemplateSC.update(sql, entity.getReportDate(), entity.getId(), closeDate);
+                    if (closeDate == null) {
+                        compResult = compareValues(HistoryState.ACTUAL, entryMap, entity, showcaseHolder, keyData);
 
-                        return;
+                        if(compResult) {
+                            sql = "UPDATE %s SET open_date = ? WHERE " + keyData.queryKeys + " AND open_date = ?";
+                            sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                                    COLUMN_PREFIX, showcaseHolder.getRootClassName());
+
+                            jdbcTemplateSC.update(sql, getObjectArray(false, getObjectArray(true, keyData.vals,
+                                    entity.getReportDate()), openDate));
+
+                            return;
+                        } else {
+                            closeDate = openDate;
+                        }
                     } else {
-                        closeDate = openDate;
+                        compResult = compareValues(HistoryState.HISTORY, entryMap, entity, showcaseHolder, keyData);
+
+                        if(compResult) {
+                            sql = "UPDATE %s SET open_date = ? WHERE " + keyData.queryKeys + " AND open_date = ?";
+                            sql = String.format(sql, getHistoryTableName(showcaseHolder.getShowCaseMeta()),
+                                    COLUMN_PREFIX, showcaseHolder.getRootClassName());
+
+                            jdbcTemplateSC.update(sql, getObjectArray(false, getObjectArray(true, keyData.vals,
+                                    entity.getReportDate()), closeDate));
+
+                            return;
+                        } else {
+                            closeDate = openDate;
+                        }
                     }
-                }
 
+                    openDate = entity.getReportDate();
+                    updateMapLeftRange(HistoryState.HISTORY, keyData, entity, showcaseHolder);
+                }
+            } else {
                 openDate = entity.getReportDate();
-                updateHistoryLeftRange(entity, showcaseHolder);
-            }
-        } else {
-            openDate = entity.getReportDate();
 
-            sql = "DELETE FROM %s WHERE %s%s_ID = ? and REP_DATE = ?";
-            sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
-                    COLUMN_PREFIX, showcaseHolder.getRootClassName());
+                sql = "DELETE FROM %s WHERE " + keyData.queryKeys + " and REP_DATE = ?";
+                sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                        COLUMN_PREFIX, showcaseHolder.getRootClassName());
 
-            jdbcTemplateSC.update(sql, entity.getId(), openDate);
-        }
-
-        int n = showcaseHolder.getShowCaseMeta().getFieldsList().size();
-
-        ShowCaseEntries[] showCases = new ShowCaseEntries[n];
-        int i = 0;
-
-        for (ShowCaseField field : showcaseHolder.getShowCaseMeta().getFieldsList()) {
-            showCases[i] = new ShowCaseEntries(entity, field.getAttributeName().equals("") ?
-                    field.getAttributePath() : field.getAttributePath() + "." + field.getAttributeName(),
-                    field.getColumnName(), showcaseHolder.generatePaths());
-            i++;
-        }
-
-        int allRecordsSize = 0;
-        for (i = 0; i < n; i++)
-            allRecordsSize += showCases[i].getEntriesSize();
-
-        boolean[] was = new boolean[allRecordsSize];
-        boolean[] usedGroup = new boolean[n];
-        int[] id = new int[allRecordsSize];
-
-        List<HashMap> entries = new ArrayList<>(allRecordsSize);
-
-        int yk = 0;
-        for (i = 0; i < n; i++)
-            for (HashMap m : showCases[i].getEntries()) {
-                entries.add(yk, m);
-                id[yk] = i;
-                yk++;
+                jdbcTemplateSC.update(sql, getObjectArray(false, keyData.vals, openDate));
             }
 
-        boolean found = true;
-
-        while (found) {
-            found = false;
-
-            for (i = 0; i < allRecordsSize; i++)
-                if (!was[i]) {
-                    was[i] = true;
-                    HashMap map = (HashMap) entries.get(i).clone();
-                    found = true;
-
-                    Arrays.fill(usedGroup, false);
-                    usedGroup[id[i]] = true;
-
-                    for (int j = 0; j < allRecordsSize; j++)
-                        if (i != j && !was[j] && !usedGroup[id[j]])
-                            if (merge(map, entries.get(j))) {
-                                was[j] = true;
-                                usedGroup[id[j]] = true;
-                            }
-
-                    persistMap(map, openDate, closeDate, showcaseHolder, globalEntity);
-                }
+            persistMap(entryMap, openDate, closeDate, showcaseHolder, globalEntity);
         }
     }
 
-    public boolean compareValues(HistoryState state, IBaseEntity entity, ShowcaseHolder showcaseHolder, Long recordId) {
-        boolean equalityFlag = true;
-        List<HashMap<String, String>> mapList = new ArrayList<>();
-        int fieldSize = showcaseHolder.getShowCaseMeta().getFieldsList().size();
+    class PathElement {
+        public String elementPath;
+        public String attributePath;
+        public String columnName;
+        public boolean isKey = false;
 
-        ShowCaseEntries[] showCases = new ShowCaseEntries[fieldSize];
-        int i = 0;
-
-        for (ShowCaseField field : showcaseHolder.getShowCaseMeta().getFieldsList()) {
-            showCases[i] = new ShowCaseEntries(entity, field.getAttributeName().equals("") ?
-                    field.getAttributePath() : field.getAttributePath() + "." + field.getAttributeName(),
-                    field.getColumnName(), showcaseHolder.generatePaths());
-            i++;
+        public PathElement(String elementPath, String attributePath, String columnName, boolean isKey) {
+            this.elementPath = elementPath;
+            this.attributePath = attributePath;
+            this.columnName = columnName;
+            this.isKey = isKey;
         }
 
-        int allRecordsSize = 0;
-        for (i = 0; i < fieldSize; i++)
-            allRecordsSize += showCases[i].getEntriesSize();
+        @Override
+        public String toString() {
+            return elementPath + ", " + columnName;
+        }
+    }
 
-        boolean[] was = new boolean[allRecordsSize];
-        boolean[] usedGroup = new boolean[fieldSize];
-        int[] id = new int[allRecordsSize];
+    class ValueElement {
+        public String columnName;
+        public Long elementId;
+        public boolean isKey;
+        public boolean isArray;
+        public boolean isSimple;
 
-        List<HashMap> entries = new ArrayList<>(allRecordsSize);
+        public ValueElement(String columnName, Long elementId, boolean isKey) {
+            this.columnName = columnName;
+            this.elementId = elementId;
+            this.isKey = isKey;
+            this.isArray = false;
+            this.isSimple = false;
+        }
 
-        int yk = 0;
-        for (i = 0; i < fieldSize; i++)
-            for (HashMap m : showCases[i].getEntries()) {
-                entries.add(yk, m);
-                id[yk] = i;
-                yk++;
-            }
+        public ValueElement(String columnName, Long elementId, boolean isKey, boolean isArray) {
+            this.columnName = columnName;
+            this.elementId = elementId;
+            this.isKey = isKey;
+            this.isArray = isArray;
+            this.isSimple = false;
+        }
 
-        boolean found = true;
+        public ValueElement(String columnName, Long elementId, boolean isKey, boolean isArray, boolean isSimple) {
+            this.columnName = columnName;
+            this.elementId = elementId;
+            this.isKey = isKey;
+            this.isArray = isArray;
+            this.isSimple = isSimple;
+        }
 
-        while (found) {
-            found = false;
+        @Override
+        public String toString() {
+            return columnName + ", " + elementId + ", " + isKey + ", " + isArray;
+        }
+    }
 
-            for (i = 0; i < allRecordsSize; i++)
-                if (!was[i]) {
-                    was[i] = true;
-                    HashMap map = (HashMap) entries.get(i).clone();
-                    found = true;
+    public HashMap<String, HashSet<PathElement>> generatePaths(IBaseEntity entity, ShowcaseHolder showcaseHolder) {
+        HashMap<String, HashSet<PathElement>> paths = new HashMap<>();
 
-                    Arrays.fill(usedGroup, false);
-                    usedGroup[id[i]] = true;
+        HashSet<PathElement> tmpSet;
 
-                    for (int j = 0; j < allRecordsSize; j++) {
-                        if (i != j && !was[j] && !usedGroup[id[j]])
-                            if (merge(map, entries.get(j))) {
-                                was[j] = true;
-                                usedGroup[id[j]] = true;
-                            }
+        for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getFieldsList()) {
+            IMetaType attributeMetaType = entity.getMeta().getEl(sf.getAttributePath());
+
+            if (sf.getAttributePath().contains(".")) {
+                if(attributeMetaType.isComplex()) {
+                    if(paths.get("root." + sf.getAttributePath()) != null) {
+                        tmpSet = paths.get("root." + sf.getAttributePath());
+                    } else {
+                        tmpSet = new HashSet<>();
                     }
 
-                    mapList.add(map);
+                    tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName(), false));
+                    paths.put("root." + sf.getAttributePath(), tmpSet);
+
+                    String path = sf.getAttributePath().substring(0, sf.getAttributePath().lastIndexOf("."));
+                    String name = sf.getAttributePath().substring(sf.getAttributePath().lastIndexOf(".") + 1);
+
+                    if(paths.get("root." + path) != null) {
+                        tmpSet = paths.get("root." + path);
+                    } else {
+                        tmpSet = new HashSet<>();
+                    }
+
+                    tmpSet.add(new PathElement(name, sf.getAttributePath(), sf.getColumnName(), false));
+                    paths.put("root." + path, tmpSet);
+                } else {
+                    String path = sf.getAttributePath().substring(0, sf.getAttributePath().lastIndexOf("."));
+                    String name = sf.getAttributePath().substring(sf.getAttributePath().lastIndexOf(".") + 1);
+
+                    if(paths.get("root." + path) != null) {
+                        tmpSet = paths.get("root." + path);
+                    } else {
+                        tmpSet = new HashSet<>();
+                    }
+
+                    tmpSet.add(new PathElement(name, sf.getAttributePath(), sf.getColumnName(), false));
+                    paths.put("root." + path, tmpSet);
                 }
+            } else {
+                if(paths.get("root") != null) {
+                    tmpSet = paths.get("root");
+                } else {
+                    tmpSet = new HashSet<>();
+                }
+
+                if(attributeMetaType.isComplex() || attributeMetaType.isSet()) {
+                    tmpSet.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
+                            sf.getColumnName(), false));
+                    paths.put("root", tmpSet);
+
+                    tmpSet = new HashSet<>();
+                    tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName(), true));
+                    paths.put("root." + sf.getAttributePath(), tmpSet);
+                } else {
+                    tmpSet.add(new PathElement(sf.getAttributePath(), sf.getAttributePath(), sf.getColumnName(), false));
+                    paths.put("root", tmpSet);
+                }
+            }
         }
 
-        for(HashMap<String, String> mapElement : mapList) {
-            StringBuilder st = new StringBuilder();
+        return paths;
+    }
 
-            int colCounter = 0;
-            for(String colName : mapElement.keySet()) {
-                st.append(colName);
+    HashMap<ValueElement, Object> readMap(String curPath, IBaseEntity entity, HashMap<String,
+            HashSet<PathElement>> paths, boolean parentIsArray) {
+        HashSet<PathElement> attributes = paths.get(curPath);
 
-                if(++colCounter < mapElement.size())
-                    st.append(", ");
+        HashMap<ValueElement, Object> map = new HashMap<>();
+
+        if(attributes != null) {
+            for(PathElement attribute : attributes) {
+                if (attribute.elementPath.equals("root") && entity != null) {
+                    map.put(new ValueElement(attribute.columnName, entity.getId(), !curPath.contains(".")
+                            || parentIsArray), entity.getId());
+                } else {
+                    if (attribute.elementPath.contains("root.")) {
+                        Object container = entity.getEl(attribute.elementPath.substring(
+                                attribute.elementPath.indexOf(".") + 1));
+
+                        if(container == null) continue;
+
+                        if (container instanceof BaseEntity) {
+                            BaseEntity innerEntity = (BaseEntity) container;
+
+                            if(innerEntity != null)
+                                map.put(new ValueElement(attribute.elementPath, innerEntity.getId(), false),
+                                        readMap(attribute.elementPath, innerEntity, paths, false));
+                        } else if (container instanceof BaseSet) {
+                            BaseSet innerSet = (BaseSet) container;
+
+                            HashMap<ValueElement, Object> arrayMap = new HashMap<>();
+
+                            if(innerSet.getMemberType().isComplex()) {
+                                for(IBaseValue bValue : innerSet.get()) {
+                                    BaseEntity bValueEntity = (BaseEntity) bValue.getValue();
+                                    arrayMap.put(new ValueElement(attribute.elementPath, bValueEntity.getId(), true, false),
+                                            readMap(attribute.elementPath, bValueEntity, paths, true));
+                                }
+
+                                map.put(new ValueElement(attribute.elementPath, ((BaseSet) container).getId(), false, true, false), arrayMap);
+                            } else {
+                                for(IBaseValue bValue : innerSet.get())
+                                    arrayMap.put(new ValueElement(attribute.elementPath, bValue.getId(), false, false),
+                                            bValue.getValue());
+
+                                map.put(new ValueElement(attribute.elementPath, ((BaseSet) container).getId(), false, true, true), arrayMap);
+                            }
+                        } else {
+                            System.err.println("Operation is not supported!");
+                        }
+
+                    } else {
+                        IBaseValue iBaseValue = entity.getBaseValue(attribute.elementPath);
+
+                        if(iBaseValue != null && iBaseValue.getMetaAttribute().getMetaType().isComplex()) {
+                            map.put(new ValueElement(curPath + "." + attribute.elementPath, iBaseValue.getId(), false)
+                                    , readMap(curPath + "." + attribute.elementPath,
+                                    (BaseEntity) iBaseValue.getValue(), paths, false));
+                        } else if(iBaseValue != null && iBaseValue.getValue() instanceof BaseSet) {
+                            BaseSet bSet = (BaseSet) iBaseValue.getValue();
+
+                            HashMap<ValueElement, Object> arrayMap = new HashMap<>();
+
+                            for(IBaseValue innerValue : bSet.get())
+                                arrayMap.put(new ValueElement(attribute.elementPath, innerValue.getId(),
+                                        false, false), innerValue.getValue());
+
+                            map.put(new ValueElement(attribute.elementPath, iBaseValue.getId(), false, true, true),
+                                    arrayMap);
+                        } else if(iBaseValue != null) {
+                            map.put(new ValueElement(attribute.columnName, iBaseValue.getId(), false),
+                                    iBaseValue.getValue());
+                        }
+                    }
+                }
+            }
+        }
+
+        return map;
+    }
+
+    public HashMap<ValueElement, Object> clearDirtyMap(HashMap<ValueElement, Object> dirtyMap) {
+        HashMap<ValueElement, Object> tmpMap = new HashMap<>();
+
+        Iterator mainArrayIterator = dirtyMap.entrySet().iterator();
+        while(mainArrayIterator.hasNext()) {
+            Map.Entry<ValueElement, Object> entry = (Map.Entry) mainArrayIterator.next();
+
+            if(entry.getKey().isArray) {
+                if(entry.getKey().isSimple) {
+                    Iterator arrayIterator = ((HashMap) entry.getValue()).entrySet().iterator();
+
+                    while(arrayIterator.hasNext()) {
+                        Map.Entry<ValueElement, Object> arrayEntry = (Map.Entry) arrayIterator.next();
+
+                        HashMap<ValueElement, Object> rMap = new HashMap<>();
+                        rMap.put(arrayEntry.getKey(), arrayEntry.getValue());
+                        tmpMap.put(arrayEntry.getKey(), rMap);
+                    }
+                } else {
+                    Iterator arrayIterator = ((HashMap) entry.getValue()).entrySet().iterator();
+
+                    while(arrayIterator.hasNext()) {
+                        Map.Entry<ValueElement, Object> arrayEntry = (Map.Entry) arrayIterator.next();
+
+                        HashMap<ValueElement, Object> rMap = clearDirtyMap((HashMap) arrayEntry.getValue());
+                        tmpMap.put(arrayEntry.getKey(), rMap);
+                    }
+                }
+
+            }
+        }
+
+        Iterator mainIterator = dirtyMap.entrySet().iterator();
+        while(mainIterator.hasNext()) {
+            Map.Entry<ValueElement, Object> entry = (Map.Entry) mainIterator.next();
+
+            if(!entry.getKey().isArray) {
+                for(ValueElement tmpKey : tmpMap.keySet()) {
+                    HashMap<ValueElement, Object> innerTmpMap = (HashMap) tmpMap.get(tmpKey);
+
+                    innerTmpMap.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+
+        return tmpMap;
+    }
+
+    public synchronized HashMap<Object, HashMap<String, Object>> generateMap(IBaseEntity entity,
+                                               ShowcaseHolder showcaseHolder){
+        HashMap<String, HashSet<PathElement>> paths = generatePaths(entity, showcaseHolder);
+
+        HashSet<PathElement> rootAttributes = paths.get("root");
+        rootAttributes.add(new PathElement("root", "root", entity.getMeta().getClassName()+"_id", true));
+
+        HashMap<ValueElement, Object> dirtyMap = readMap("root", entity, paths, false);
+
+        if(dirtyMap == null)
+            System.err.println("Map is null!");
+
+        HashMap<ValueElement, Object> returnMap = clearDirtyMap(dirtyMap);
+
+        return null;
+    }
+
+    public boolean compareValues(HistoryState state, HashMap<String, Object> savingMap,
+                                 IBaseEntity entity, ShowcaseHolder showcaseHolder, KeyData keyData) {
+        StringBuilder st = new StringBuilder();
+        boolean equalityFlag = true;
+
+        int colCounter = 0;
+        for(String colName : savingMap.keySet()) {
+            st.append(colName);
+
+            if(++colCounter < savingMap.size())
+                st.append(", ");
+        }
+
+        String sql = "SELECT " + st.toString() + " FROM %s WHERE " + keyData.queryKeys;
+
+        Map dbElement = null;
+
+        if(state == HistoryState.ACTUAL) {
+            sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                    COLUMN_PREFIX, showcaseHolder.getRootClassName());
+
+            dbElement = jdbcTemplateSC.queryForMap(sql, keyData.vals);
+        } else {
+            sql += " AND open_date = ?";
+            sql = String.format(sql, getHistoryTableName(showcaseHolder.getShowCaseMeta()),
+                    COLUMN_PREFIX, showcaseHolder.getRootClassName(), entity.getReportDate());
+
+            dbElement = jdbcTemplateSC.queryForMap(sql, getObjectArray(false, keyData.vals, entity.getReportDate()));
+        }
+
+        for(String colName : savingMap.keySet()) {
+            Object newValue = savingMap.get(colName);
+            Object dbValue = dbElement.get(colName);
+
+            if(newValue == null && dbValue == null)
+                continue;
+
+            if(newValue == null || dbValue == null) {
+                equalityFlag = false;
+                break;
             }
 
-            String sql = "SELECT " + st.toString() + " FROM %s WHERE %s%s_id = ?";
-
-            if(state == HistoryState.ACTUAL) {
-                sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
-                        COLUMN_PREFIX, showcaseHolder.getRootClassName());
-            } else {
-                sql += " AND open_date = ?";
-                sql = String.format(sql, getHistoryTableName(showcaseHolder.getShowCaseMeta()),
-                        COLUMN_PREFIX, showcaseHolder.getRootClassName(), entity.getReportDate());
-            }
-
-            Map dbElement;
-            try {
-                dbElement = jdbcTemplateSC.queryForMap(sql, recordId);
-            } catch(Exception e) {
-                System.err.println(sql + " " + recordId);
-                return false;
-            }
-
-            for(String colName : mapElement.keySet()) {
-                Object newValue = mapElement.get(colName);
-                Object dbValue = dbElement.get(colName);
-
-                if(newValue == null && dbValue == null)
-                    continue;
-
-                if(newValue == null || dbValue == null) {
+            if(newValue instanceof Double) {
+                if(!Double.valueOf((Double) newValue).equals(Double.valueOf(dbValue.toString()))) {
                     equalityFlag = false;
                     break;
                 }
-
-                if(newValue instanceof Double) {
-                    if(!Double.valueOf((Double) newValue).equals(Double.valueOf(dbValue.toString()))) {
-                        equalityFlag = false;
-                        break;
-                    }
-                } else if(newValue instanceof Integer) {
-                    if(!Integer.valueOf((Integer) newValue).equals(Integer.valueOf(dbValue.toString()))) {
-                        equalityFlag = false;
-                        break;
-                    }
-                } else if(newValue instanceof Boolean) {
-                    if(!Boolean.valueOf((Boolean) newValue).equals(Boolean.valueOf(dbValue.toString()))) {
-                        equalityFlag = false;
-                        break;
-                    }
-                } else if(newValue instanceof Long) {
-                    if(!Long.valueOf((Long) newValue).equals(Long.valueOf(dbValue.toString()))) {
-                        equalityFlag = false;
-                        break;
-                    }
-                } else if(newValue instanceof String) {
-                    if(!newValue.toString().equals(dbValue.toString())) {
-                        equalityFlag = false;
-                        break;
-                    }
-                } else if(newValue instanceof Date) {
-                    if(!newValue.equals(new Date(((Timestamp)dbValue).getTime()))) {
-                        equalityFlag = false;
-                        break;
-                    }
-                } else {
-                    if(!newValue.equals(dbValue)) {
-                        equalityFlag = false;
-                        break;
-                    }
+            } else if(newValue instanceof Integer) {
+                if(!Integer.valueOf((Integer) newValue).equals(Integer.valueOf(dbValue.toString()))) {
+                    equalityFlag = false;
+                    break;
+                }
+            } else if(newValue instanceof Boolean) {
+                if(!Boolean.valueOf((Boolean) newValue).equals(Boolean.valueOf(dbValue.toString()))) {
+                    equalityFlag = false;
+                    break;
+                }
+            } else if(newValue instanceof Long) {
+                if(!Long.valueOf((Long) newValue).equals(Long.valueOf(dbValue.toString()))) {
+                    equalityFlag = false;
+                    break;
+                }
+            } else if(newValue instanceof String) {
+                if(!newValue.toString().equals(dbValue.toString())) {
+                    equalityFlag = false;
+                    break;
+                }
+            } else if(newValue instanceof Date) {
+                if(!newValue.equals(new Date(((Timestamp)dbValue).getTime()))) {
+                    equalityFlag = false;
+                    break;
+                }
+            } else {
+                if(!newValue.equals(dbValue)) {
+                    equalityFlag = false;
+                    break;
                 }
             }
         }
+
 
         return equalityFlag;
     }
 
     private String getDBType(IMetaType type) {
         if (type.isComplex())
-            throw new IllegalArgumentException("ShowCase can't contain coplexType columns: "
-                    + type.toString());
+            return "NUMERIC";
 
         if (type instanceof MetaSet)
             type = ((MetaSet) type).getMemberType();
@@ -872,12 +1036,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     private String getDBSize(IMetaType type) {
-        if (type.isComplex())
-            throw new IllegalArgumentException("ShowCase can't contain coplexType columns");
+        if(type.isComplex())
+            return "14, 0";
 
         if (type instanceof MetaSet)
             type = ((MetaSet) type).getMemberType();
-
 
         if (type.isSet())
             throw new IllegalArgumentException("ShowCase can't contain set columns");
@@ -885,9 +1048,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         MetaValue metaValue = (MetaValue) type;
 
         switch (metaValue.getTypeCode()) {
-
             case INTEGER:
-                return "10,0";
+                return "14,0";
             case DATE:
                 return null;
             case STRING:
@@ -936,10 +1098,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         showCase.setMeta(metaClass);
 
         select = context
-                .select(EAV_SC_SHOWCASE_FIELDS.ID, EAV_SC_SHOWCASE_FIELDS.TITLE, EAV_SC_SHOWCASE_FIELDS.NAME,
-                        EAV_SC_SHOWCASE_FIELDS.COLUMN_NAME, EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_ID,
-                        EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_NAME, EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH,
-                        EAV_SC_SHOWCASE_FIELDS.TYPE)
+                .select(EAV_SC_SHOWCASE_FIELDS.ID, EAV_SC_SHOWCASE_FIELDS.COLUMN_NAME, EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_ID,
+                        EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH, EAV_SC_SHOWCASE_FIELDS.TYPE)
                 .from(EAV_SC_SHOWCASE_FIELDS)
                 .where(EAV_SC_SHOWCASE_FIELDS.SHOWCASE_ID.equal(showCase.getId()));
 
@@ -950,18 +1110,10 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         if (rows.size() > 0) {
             for (Map<String, Object> curRow : rows) {
                 ShowCaseField showCaseField = new ShowCaseField();
-                showCaseField.setName((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.NAME.getName()));
-                showCaseField.setTitle((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.TITLE.getName()));
                 showCaseField.setColumnName((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.COLUMN_NAME.getName()));
                 showCaseField.setType(((BigDecimal) curRow.get(EAV_SC_SHOWCASE_FIELDS.TYPE.getName())).intValue());
-                showCaseField.setAttributeName((String) curRow.get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_NAME.getName()));
-
-                if (curRow.get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH.getName()) != null) {
-                    showCaseField.setAttributePath((String) curRow.
-                            get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH.getName()));
-                } else {
-                    showCaseField.setAttributePath("");
-                }
+                showCaseField.setAttributePath((String) curRow.
+                        get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH.getName()));
 
                 showCaseField.setAttributeId(((BigDecimal) curRow
                         .get(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_ID.getName())).longValue());
@@ -971,8 +1123,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
                 if (showCaseField.getType() == ShowCaseField.ShowCaseFieldTypes.CUSTOM) {
                     showCase.addCustomField(showCaseField);
-                } else if (showCaseField.getType() == ShowCaseField.ShowCaseFieldTypes.FILTER) {
-                    showCase.addFilterField(showCaseField);
                 } else {
                     showCase.addField(showCaseField);
                 }
@@ -1024,20 +1174,18 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     @Override
-    public void remove(ShowCase showCase) {
+    public void remove (ShowCase showCase) {
         throw new RuntimeException("Unimplemented");
     }
 
-    private long insertField(ShowCaseField showCaseField, long showCaseId) {
+        private long insertField(ShowCaseField showCaseField, long showCaseId) {
         Insert insert = context
                 .insertInto(EAV_SC_SHOWCASE_FIELDS)
+                .set(EAV_SC_SHOWCASE_FIELDS.META_ID, showCaseField.getMetaId())
                 .set(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_ID, showCaseField.getAttributeId())
-                .set(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_NAME, showCaseField.getAttributeName())
                 .set(EAV_SC_SHOWCASE_FIELDS.ATTRIBUTE_PATH, showCaseField.getAttributePath())
                 .set(EAV_SC_SHOWCASE_FIELDS.COLUMN_NAME, showCaseField.getColumnName())
-                .set(EAV_SC_SHOWCASE_FIELDS.NAME, showCaseField.getName())
                 .set(EAV_SC_SHOWCASE_FIELDS.SHOWCASE_ID, showCaseId)
-                .set(EAV_SC_SHOWCASE_FIELDS.TITLE, showCaseField.getTitle())
                 .set(EAV_SC_SHOWCASE_FIELDS.TYPE, showCaseField.getType());
 
         logger.debug(insert.toString());
@@ -1071,9 +1219,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             insertField(sf, showCase.getId());
 
         for (ShowCaseField sf : showCase.getCustomFieldsList())
-            insertField(sf, showCase.getId());
-
-        for (ShowCaseField sf : showCase.getFilterFieldsList())
             insertField(sf, showCase.getId());
 
         return showCaseId;
@@ -1115,10 +1260,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         for(ShowCaseField sf : showCaseSaving.getCustomFieldsList())
             insertField(sf, showCaseSaving.getId());
-
-        for(ShowCaseField sf : showCaseSaving.getFilterFieldsList())
-            insertField(sf, showCaseSaving.getId());
-
     }
 
     long insertWithId(String query, Object[] values) {
@@ -1171,75 +1312,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             }
 
             return ps;
-        }
-    }
-
-    class ShowCaseEntries {
-        public final String columnName;
-        final List<HashMap> entries = new ArrayList<>();
-        final Map<String, String> prefixToColumn;
-
-        ShowCaseEntries(IBaseEntity entity, String path, String columnName, Map<String, String> prefixToColumn) {
-            this.columnName = columnName;
-            if (path.startsWith("."))
-                path = path.substring(1);
-            this.prefixToColumn = prefixToColumn;
-            gen(entity, path, new HashMap(), "root");
-        }
-
-        public List<HashMap> getEntries() {
-            return entries;
-        }
-
-        public int getEntriesSize() {
-            return entries.size();
-        }
-
-        public void gen(IBaseEntity entity, String curPath, HashMap map, String prefix) {
-            if (curPath == null || curPath.equals("") || entity == null) {
-                if (entity != null)
-                    map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
-                entries.add(map);
-                return;
-            }
-
-            MetaClass curMeta = entity.getMeta();
-            String path = (curPath.indexOf('.') == -1) ? curPath : curPath.substring(0, curPath.indexOf('.'));
-            String nextPath = curPath.indexOf('.') == -1 ? null : curPath.substring(curPath.indexOf('.') + 1);
-            IMetaAttribute attribute = curMeta.getMetaAttribute(path);
-
-            if(prefixToColumn.get(prefix) != null)
-                map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
-
-            if (!attribute.getMetaType().isComplex()) {
-                map.put(prefixToColumn.get(prefix) + "_id", entity.getId());
-                if (!attribute.getMetaType().isSet()) {
-                    map.put(columnName, entity.getEl(path));
-                    entries.add(map);
-                } else {
-                    IBaseSet set = (IBaseSet) entity.getEl(path);
-
-                    if (set != null) {
-                        for (IBaseValue o : set.get()) {
-                            HashMap nmap = (HashMap) map.clone();
-                            nmap.put(columnName, o.getValue());
-                            entries.add(nmap);
-                        }
-                    }
-                }
-            } else if (attribute.getMetaType().isSet()) {
-                IBaseSet next = (IBaseSet) entity.getEl(path);
-
-                if (next != null) {
-                    for (Object o : next.get()) {
-                        gen((IBaseEntity) ((IBaseValue) o).getValue(), nextPath, (HashMap) map.clone(),
-                                prefix + "." + path);
-                    }
-                }
-            } else {
-                IBaseEntity next = (IBaseEntity) entity.getEl(path);
-                gen(next, nextPath, (HashMap) map.clone(), prefix + "." + path);
-            }
         }
     }
 

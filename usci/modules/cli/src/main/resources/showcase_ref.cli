@@ -7,9 +7,12 @@ showcase set meta ref_creditor
 showcase set name REF_CREDITOR_DOC
 showcase set tableName REF_CREDITOR_DOC
 
-showcase list add docs.no
+showcase list add docs doc_id
+showcase list add docs.doc_type doc_type_id
+
+showcase list add docs.no no
 showcase list add docs.doc_type.code doc_type_code
-showcase list add docs.name
+showcase list add docs.name name
 
 showcase save
 #---------------------------------------------------------------------------------
@@ -23,16 +26,16 @@ showcase set meta ref_balance_account
 showcase set name REF_BALANCE_ACCOUNT
 showcase set tableName REF_BALANCE_ACCOUNT
  
-showcase list add display_no
-showcase list add fifth_sign
-showcase list add first_fourth_signs
-showcase list add is_in_balance
-showcase list add name_kz
-showcase list add name_ru
-showcase list add no_
-showcase list add seventh_sign
-showcase list add sixth_sign
- 
+showcase list add display_no display_no
+showcase list add fifth_sign fifth_sign
+showcase list add first_fourth_signs first_fourth_signs
+showcase list add is_in_balance is_in_balance
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
+showcase list add no_ no_
+showcase list add seventh_sign seventh_sign
+showcase list add sixth_sign sixth_sign
+
 showcase save
 #---------------------------------------------------------------------------------
 
@@ -46,9 +49,9 @@ showcase set meta ref_bank_relation
 showcase set name REF_BANK_RELATION
 showcase set tableName REF_BANK_RELATION
  
-showcase list add code
-showcase list add name_kz
-showcase list add name_ru
+showcase list add code code
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
  
 showcase save
 #---------------------------------------------------------------------------------
@@ -63,16 +66,16 @@ showcase set meta ref_classification
 showcase set name REF_CLASSIFICATION
 showcase set tableName REF_CLASSIFICATION
  
-showcase list add code
-showcase list add comment_kz
-showcase list add comment_ru
-showcase list add is_input_value
-showcase list add name_kz
-showcase list add name_ru
-showcase list add provision_debt
-showcase list add provision_portfolio_max
-showcase list add provision_portfolio_min
-showcase list add value_
+showcase list add code code
+showcase list add comment_kz comment_kz
+showcase list add comment_ru comment_ru
+showcase list add is_input_value is_input_value
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
+showcase list add provision_debt provision_debt
+showcase list add provision_portfolio_max provision_portfolio_max
+showcase list add provision_portfolio_min provision_portfolio_min
+showcase list add value_ value_
  
 showcase save
 #---------------------------------------------------------------------------------
@@ -87,10 +90,10 @@ showcase set meta ref_contact_type
 showcase set name REF_CONTACT_TYPE
 showcase set tableName REF_CONTACT_TYPE
  
-showcase list add code
-showcase list add name_kz
-showcase list add name_ru
- 
+showcase list add code code
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -104,12 +107,12 @@ showcase set meta ref_country
 showcase set name REF_COUNTRY
 showcase set tableName REF_COUNTRY
  
-showcase list add code
-showcase list add code_numeric
-showcase list add name_kz
-showcase list add name_ru
-showcase list add short_name_kz
-showcase list add short_name_ru
+showcase list add code code
+showcase list add code_numeric code_numeric
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
+showcase list add short_name_kz short_name_kz
+showcase list add short_name_ru short_name_ru
  
 showcase save
 #---------------------------------------------------------------------------------
@@ -124,27 +127,29 @@ showcase set meta ref_credit_object
 showcase set name REF_CREDIT_OBJECT
 showcase set tableName REF_CREDIT_OBJECT
  
-showcase list add code
-showcase list add name_kz
-showcase list add name_ru
+showcase list add code code
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
  
 showcase save
 #---------------------------------------------------------------------------------
  
  
 #=================================================================================
-#  7.REF_CREDITOR*
+#  7.REF_CREDITOR
 #=================================================================================
  
 showcase set meta ref_creditor
  
 showcase set name REF_CREDITOR
 showcase set tableName REF_CREDITOR
- 
-showcase list add code
-showcase list add name
-showcase list add nokbdb_code
-showcase list add short_name
+
+ showcase list add subject_type subject_type_id
+
+showcase list add code code
+showcase list add name name
+showcase list add nokbdb_code nokbdb_code
+showcase list add short_name short_name
 showcase list add subject_type.code subject_type_code
  
 showcase save
@@ -160,10 +165,13 @@ showcase set meta ref_creditor_branch
 showcase set name REF_CREDITOR_BRANCH
 showcase set tableName REF_CREDITOR_BRANCH
 
-showcase list add code
-showcase list add name
-showcase list add short_name
-showcase list add main_office.code code_main_office
+showcase list add main_office main_office_id
+showcase list add region region_id
+
+showcase list add code code
+showcase list add name name
+showcase list add short_name short_name
+showcase list add main_office.code main_office_code
 showcase list add region.code region_code
 
 showcase save
@@ -179,9 +187,9 @@ showcase set meta ref_credit_purpose
 showcase set name REF_CREDIT_PURPOSE
 showcase set tableName REF_CREDIT_PURPOSE
  
-showcase list add code
-showcase list add name_kz
-showcase list add name_ru
+showcase list add code code
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
  
 showcase save
 #---------------------------------------------------------------------------------
@@ -196,10 +204,10 @@ showcase set meta ref_credit_type
 showcase set name REF_CREDIT_TYPE
 showcase set tableName REF_CREDIT_TYPE
  
-showcase list add code
-showcase list add kind_id
-showcase list add name_kz
-showcase list add name_ru
+showcase list add code code
+showcase list add kind_id kind_id
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
  
 showcase save
 #---------------------------------------------------------------------------------
@@ -214,12 +222,12 @@ showcase set meta ref_currency
 showcase set name REF_CURRENCY
 showcase set tableName REF_CURRENCY
  
-showcase list add code
-showcase list add is_convertible
-showcase list add name_kz
-showcase list add name_ru
-showcase list add rating
-showcase list add short_name
+showcase list add code code
+showcase list add is_convertible is_convertible
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
+showcase list add rating rating
+showcase list add short_name short_name
  
 showcase save
 #---------------------------------------------------------------------------------
@@ -234,9 +242,9 @@ showcase set meta ref_debtor_type
 showcase set name REF_DEBTOR_TYPE
 showcase set tableName REF_DEBTOR_TYPE
  
-showcase list add code
-showcase list add name_kz
-showcase list add name_ru
+showcase list add code code
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
  
 showcase save
 #---------------------------------------------------------------------------------
@@ -251,16 +259,16 @@ showcase set meta ref_doc_type
 showcase set name REF_DOC_TYPE
 showcase set tableName REF_DOC_TYPE
  
-showcase list add code
-showcase list add is_identification
-showcase list add is_organization_doc
-showcase list add is_person_doc
-showcase list add name_kz
-showcase list add name_ru
-showcase list add short_name_kz
-showcase list add short_name_ru
-showcase list add sign_count
-showcase list add weight
+showcase list add code code
+showcase list add is_identification is_identification
+showcase list add is_organization_doc is_organization_doc
+showcase list add is_person_doc is_person_doc
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
+showcase list add short_name_kz short_name_kz
+showcase list add short_name_ru short_name_ru
+showcase list add sign_count sign_count
+showcase list add weight weight
  
 showcase save
 #---------------------------------------------------------------------------------
@@ -275,9 +283,9 @@ showcase set meta ref_econ_trade
 showcase set name REF_ECON_TRADE
 showcase set tableName REF_ECON_TRADE
  
-showcase list add code
-showcase list add name_kz
-showcase list add name_ru
+showcase list add code code
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
  
 showcase save
 #---------------------------------------------------------------------------------
@@ -292,11 +300,11 @@ showcase set meta ref_enterprise_type
 showcase set name REF_ENTERPRISE_TYPE
 showcase set tableName REF_ENTERPRISE_TYPE
  
-showcase list add code
-showcase list add is_organization
-showcase list add is_se
-showcase list add name_kz
-showcase list add name_ru
+showcase list add code code
+showcase list add is_organization is_organization
+showcase list add is_se is_se
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
  
 showcase save
 #---------------------------------------------------------------------------------
@@ -311,9 +319,9 @@ showcase set meta ref_finance_source
 showcase set name REF_FINANCE_SOURCE
 showcase set tableName REF_FINANCE_SOURCE
  
-showcase list add code
-showcase list add name_kz
-showcase list add name_ru
+showcase list add code code
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
  
 showcase save
 #---------------------------------------------------------------------------------
@@ -328,11 +336,11 @@ showcase set meta ref_legal_form
 showcase set name REF_LEGAL_FORM
 showcase set tableName REF_LEGAL_FORM
  
-showcase list add code
-showcase list add name_kz
-showcase list add name_ru
-showcase list add short_name_kz
-showcase list add short_name_ru
+showcase list add code code
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
+showcase list add short_name_kz short_name_kz
+showcase list add short_name_ru short_name_ru
  
 showcase save
 #---------------------------------------------------------------------------------
@@ -346,10 +354,12 @@ showcase set meta ref_offshore
  
 showcase set name REF_OFFSHORE
 showcase set tableName REF_OFFSHORE
- 
-showcase list add code
-showcase list add name_kz
-showcase list add name_ru
+
+showcase list add country country_id
+
+showcase list add code code
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
 showcase list add country.code country_code
 
 showcase save
@@ -365,11 +375,11 @@ showcase set meta ref_pledge_type
 showcase set name REF_PLEDGE_TYPE
 showcase set tableName REF_PLEDGE_TYPE
  
-showcase list add code
-showcase list add is_liquid_all
-showcase list add is_liquid_invest
-showcase list add name_kz
-showcase list add name_ru
+showcase list add code code
+showcase list add is_liquid_all is_liquid_all
+showcase list add is_liquid_invest is_liquid_invest
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
  
 showcase save
 #---------------------------------------------------------------------------------
@@ -383,10 +393,12 @@ showcase set meta ref_portfolio
  
 showcase set name REF_PORTFOLIO
 showcase set tableName REF_PORTFOLIO
- 
-showcase list add code
-showcase list add name_kz
-showcase list add name_ru
+
+showcase list add creditor creditor_id
+
+showcase list add code code
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
 showcase list add creditor.code creditor_code
 
 showcase save
@@ -402,9 +414,9 @@ showcase set meta ref_region
 showcase set name REF_REGION
 showcase set tableName REF_REGION
  
-showcase list add code
-showcase list add name_kz
-showcase list add name_ru
+showcase list add code code
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
  
 showcase save
 #---------------------------------------------------------------------------------
@@ -419,11 +431,11 @@ showcase set meta ref_subject_type
 showcase set name REF_SUBJECT_TYPE
 showcase set tableName REF_SUBJECT_TYPE
  
-showcase list add code
-showcase list add kind_id
-showcase list add name_kz
-showcase list add name_ru
-showcase list add report_period_duration_months
+showcase list add code code
+showcase list add kind_id kind_id
+showcase list add name_kz name_kz
+showcase list add name_ru name_ru
+showcase list add report_period_duration_months report_period_duration_months
  
 showcase save
 #---------------------------------------------------------------------------------
