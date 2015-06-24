@@ -1,5 +1,10 @@
 package kz.bsbnb.usci.portlets.showcase;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.Role;
+import com.liferay.portal.model.User;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
@@ -63,6 +68,26 @@ public class ShowcasePortlet extends MVCPortlet{
     }
 
     public void serveResource(ResourceRequest request, ResourceResponse response) throws IOException {
+
+        boolean hasRights = false;
+        try {
+            User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
+            if(user != null) {
+                for (Role role : user.getRoles()) {
+                    if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
+                            || role.getName().equals("NationalBankEmployee"))
+                        hasRights = true;
+                }
+            }
+        } catch (PortalException e) {
+            e.printStackTrace();
+        } catch (SystemException e) {
+            e.printStackTrace();
+        }
+
+        if(!hasRights)
+            return;
+
         Long id = new Long(request.getParameter("showcaseId"));
         int count = Integer.parseInt(request.getParameter("count"));
         int page = Integer.parseInt(request.getParameter("page"));

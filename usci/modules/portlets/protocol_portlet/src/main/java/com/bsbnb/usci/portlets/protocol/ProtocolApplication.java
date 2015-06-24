@@ -21,6 +21,7 @@ import com.bsbnb.usci.portlets.protocol.data.DataProvider;
 import com.bsbnb.usci.portlets.protocol.ui.ProtocolLayout;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.vaadin.Application;
@@ -52,24 +53,34 @@ public class ProtocolApplication extends Application {
 
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
+            boolean hasRights = false;
+            User user = null;
+
             try {
-                User user = PortalUtil.getUser(request);
-
-                if (user == null)
-                    return;
-
-                setTheme("custom");
-                log.log(Level.INFO, "User ID: {0}", user.getUserId());
-                Window mainWindow = new Window();
-                PortletEnvironmentFacade.set(new ProtocolPortletEnvironmentFacade(user));
-                DataProvider provider = new BeanDataProvider();
-                mainWindow.addComponent(new ProtocolLayout(provider));
-                setMainWindow(mainWindow);
-            } catch (PortalException pe) {
-                log.log(Level.WARNING, null, pe);
-            } catch (SystemException se) {
-                log.log(Level.WARNING, null, se);
+                user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
+                if(user != null) {
+                    for (Role role : user.getRoles()) {
+                        if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
+                                || role.getName().equals("NationalBankEmployee"))
+                            hasRights = true;
+                    }
+                }
+            } catch (PortalException e) {
+                e.printStackTrace();
+            } catch (SystemException e) {
+                e.printStackTrace();
             }
+
+            if(!hasRights)
+                return;
+
+            setTheme("custom");
+            log.log(Level.INFO, "User ID: {0}", user.getUserId());
+            Window mainWindow = new Window();
+            PortletEnvironmentFacade.set(new ProtocolPortletEnvironmentFacade(user));
+            DataProvider provider = new BeanDataProvider();
+            mainWindow.addComponent(new ProtocolLayout(provider));
+            setMainWindow(mainWindow);
         }
 
         @Override

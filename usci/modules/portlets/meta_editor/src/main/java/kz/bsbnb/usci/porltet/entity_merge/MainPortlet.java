@@ -55,14 +55,14 @@ public class MainPortlet extends MVCPortlet {
                        RenderResponse renderResponse) throws IOException, PortletException {
        //renderRequest.setAttribute("entityList", baseEntityList);
 
-        boolean isAdmin = false;
+        boolean hasRights = false;
 
         try {
             User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
             if(user != null) {
                 for (Role role : user.getRoles()) {
-                    if (role.getDescriptiveName().equals("Administrator"))
-                        isAdmin = true;
+                    if (role.getName().equals("Administrator") || role.getName().equals("NationalBankEmployee"))
+                        hasRights = true;
                 }
             }
         } catch (PortalException e) {
@@ -71,7 +71,7 @@ public class MainPortlet extends MVCPortlet {
             e.printStackTrace();
         }
 
-        if(!isAdmin)
+        if(!hasRights)
             return;
 
         super.doView(renderRequest, renderResponse);

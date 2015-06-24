@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.portlets.signing;
 
+import com.liferay.portal.model.Role;
 import kz.bsbnb.usci.portlets.signing.data.BeanDataProvider;
 import kz.bsbnb.usci.portlets.signing.data.DataProvider;
 import kz.bsbnb.usci.portlets.signing.data.FileSignatureRecord;
@@ -73,24 +74,39 @@ public class SigningPortlet extends GenericPortlet {
     public void doView(
             RenderRequest renderRequest, RenderResponse renderResponse)
             throws IOException, PortletException {
+        log.log(Level.INFO, "View");
+        User user = null;
+        boolean hasRights = false;
         try {
-            log.log(Level.INFO, "View");
-            User user = PortalUtil.getUser(renderRequest);
-            renderRequest.setAttribute("UserId", user.getUserId());
-            DataProvider provider = new BeanDataProvider();
-            renderRequest.setAttribute("PortalUrl", provider.getBaseUrl());
-            renderRequest.setAttribute("ContextPath", renderRequest.getContextPath());
-            List<Creditor> userCreditors = provider.getCreditorsList(user.getUserId());
-            renderRequest.setAttribute("hasAccess", userCreditors.size() == 1);
-            List<FileSignatureRecord> filesToSign = provider.getFilesToSign(user.getUserId());
-            renderRequest.setAttribute("noFilesToSign", filesToSign.isEmpty());
-            renderRequest.setAttribute("inputFiles", filesToSign);
-            renderRequest.setAttribute("actionUrl", renderResponse.createActionURL());
-        } catch (PortalException ex) {
-            log.log(Level.SEVERE, null, ex);
-        } catch (SystemException ex) {
-            log.log(Level.SEVERE, null, ex);
+            user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
+            if(user != null) {
+                for (Role role : user.getRoles()) {
+                    if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
+                            || role.getName().equals("NationalBankEmployee"))
+                        hasRights = true;
+                }
+            }
+        } catch (PortalException e) {
+            e.printStackTrace();
+        } catch (SystemException e) {
+            e.printStackTrace();
         }
+
+        if(!hasRights)
+            return;
+
+
+        renderRequest.setAttribute("UserId", user.getUserId());
+        DataProvider provider = new BeanDataProvider();
+        renderRequest.setAttribute("PortalUrl", provider.getBaseUrl());
+        renderRequest.setAttribute("ContextPath", renderRequest.getContextPath());
+        List<Creditor> userCreditors = provider.getCreditorsList(user.getUserId());
+        renderRequest.setAttribute("hasAccess", userCreditors.size() == 1);
+        List<FileSignatureRecord> filesToSign = provider.getFilesToSign(user.getUserId());
+        renderRequest.setAttribute("noFilesToSign", filesToSign.isEmpty());
+        renderRequest.setAttribute("inputFiles", filesToSign);
+        renderRequest.setAttribute("actionUrl", renderResponse.createActionURL());
+
         include(viewJSP, renderRequest, renderResponse);
     }
 

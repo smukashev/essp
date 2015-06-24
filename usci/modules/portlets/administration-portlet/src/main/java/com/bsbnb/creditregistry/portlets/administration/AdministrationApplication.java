@@ -64,13 +64,13 @@ public class AdministrationApplication extends Application implements PortletReq
                 if(user == null) {
                     mainWindow.addComponent(errorMessageLabel);
                 } else {
-                    boolean isAdmin = false;
+                    boolean hasRights = false;
                     for(Role role : user.getRoles()) {
-                        if(role.getDescriptiveName().equals("Administrator"))
-                            isAdmin = true;
+                        if(role.getDescriptiveName().equals("Administrator") || role.getName().equals("NationalBankEmployee"))
+                            hasRights = true;
                     }
 
-                    if(!isAdmin) {
+                    if(!hasRights) {
                         mainWindow.addComponent(errorMessageLabel);
                     } else {
                         BeanDataProvider provider = new BeanDataProvider();

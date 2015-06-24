@@ -4,6 +4,7 @@ import com.bsbnb.creditregistry.portlets.queue.data.BeanDataProvider;
 import com.bsbnb.creditregistry.portlets.queue.ui.MainLayout;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.vaadin.Application;
@@ -50,22 +51,37 @@ public class QueueApplication extends Application {
 
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
-            try {
-                setTheme("custom");
-                Window mainWindow = new Window();
-                User user = PortalUtil.getUser(request);
+            setTheme("custom");
+            Window mainWindow = new Window();
+            User user = null;
 
-                if(user == null) {
-                    Label errorMessageLabel = new Label("Нет прав для просмотра");
-                    mainWindow.addComponent(errorMessageLabel);
-                } else {
-                    QueuePortalEnvironmentFacade queuePortalEnvironmentFacade = new QueuePortalEnvironmentFacade(user);
-                    BeanDataProvider dataProvider = new BeanDataProvider();
-                    mainWindow.addComponent(new MainLayout(queuePortalEnvironmentFacade, dataProvider));
-                    setMainWindow(mainWindow);
+            boolean hasRights = false;
+
+            try {
+                user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
+                if(user != null) {
+                    for (Role role : user.getRoles()) {
+                        if (role.getName().equals("Administrator") || role.getName().equals("NationalBankEmployee"))
+                            hasRights = true;
+                    }
                 }
-            } catch (PortalException | SystemException pe) {
-                log.log(Level.SEVERE, "", pe);
+            } catch (PortalException e) {
+                e.printStackTrace();
+            } catch (SystemException e) {
+                e.printStackTrace();
+            }
+
+            if(!hasRights)
+                return;
+
+            if(user == null) {
+                Label errorMessageLabel = new Label("Нет прав для просмотра");
+                mainWindow.addComponent(errorMessageLabel);
+            } else {
+                QueuePortalEnvironmentFacade queuePortalEnvironmentFacade = new QueuePortalEnvironmentFacade(user);
+                BeanDataProvider dataProvider = new BeanDataProvider();
+                mainWindow.addComponent(new MainLayout(queuePortalEnvironmentFacade, dataProvider));
+                setMainWindow(mainWindow);
             }
         }
 

@@ -9,6 +9,11 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.Role;
+import com.liferay.portal.model.User;
+import com.liferay.portal.util.PortalUtil;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
@@ -41,6 +46,26 @@ public class AuditApplication extends Application {
 
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
+
+            boolean hasRights = false;
+            try {
+                User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
+                if(user != null) {
+                    for (Role role : user.getRoles()) {
+                        if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
+                                || role.getName().equals("NationalBankEmployee"))
+                            hasRights = true;
+                    }
+                }
+            } catch (PortalException e) {
+                e.printStackTrace();
+            } catch (SystemException e) {
+                e.printStackTrace();
+            }
+
+            if(!hasRights)
+                return;
+
             Window mainWindow = new Window();
             mainWindow.setTheme("custom");
             mainWindow.addComponent(new AuditLayout(request.getLocale()));
