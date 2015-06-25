@@ -8,6 +8,11 @@ import com.bsbnb.creditregistry.dm.ref.shared.MailMessageStatus;
 import static com.bsbnb.creditregistry.portlets.notifications.NotificationsApplication.log;
 import com.bsbnb.creditregistry.portlets.notifications.data.BeanDataProvider;
 import com.bsbnb.creditregistry.portlets.notifications.data.DataProvider;
+import com.liferay.util.portlet.PortletProps;
+import kz.bsbnb.usci.cr.model.PortalUser;
+import kz.bsbnb.usci.eav.model.mail.MailMessage;
+import kz.bsbnb.usci.eav.model.mail.MailMessageStatuses;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
@@ -33,7 +38,7 @@ public class MailHandler implements Runnable {
     private final DataProvider provider;
 
     public MailHandler() {
-        provider = null; //new BeanDataProvider();
+        provider = new BeanDataProvider();
         configuration = new DatabaseMailHandlerConfiguration(provider);
     }
 
@@ -56,7 +61,7 @@ public class MailHandler implements Runnable {
             log.log(Level.INFO, "Configuration exception", ce);
         }
 
-        /*
+
         try {
             List<MailMessage> mailMessages = provider.getMessagesToSend();
             if (mailMessages.isEmpty()) {
@@ -73,10 +78,9 @@ public class MailHandler implements Runnable {
         } catch (UnsupportedEncodingException t) {
             log.log(Level.SEVERE, "Unexpected exception. ", t);
         }
-        */
     }
 
-    /*
+
     private void handleMailMessage(MailMessage mailMessage) throws UnsupportedEncodingException, ConfigurationException, MessagingException {
         long recipientUserId = mailMessage.getRecipientUserId().longValue();
         boolean isSending = provider.isTemplateSendingEnabled(mailMessage.getMailTemplate(), recipientUserId);;
@@ -87,18 +91,17 @@ public class MailHandler implements Runnable {
 
         if (isSending) {
             sendMailMessage(mailMessage, recipient.getEmailAddress());
-            mailMessage.setStatus(provider.getMailMessageStatus(MailMessageStatus.SENT));
+            mailMessage.setStatusId(MailMessageStatuses.SENT);
         } else {
-            mailMessage.setStatus(provider.getMailMessageStatus(MailMessageStatus.REJECTED_BY_USER_SETTINGS));
+            mailMessage.setStatusId(MailMessageStatuses.REJECTED_BY_USER_SETTINGS);
         }
         mailMessage.setSendingDate(new Date());
         provider.updateMailMessage(mailMessage);
-    }*/
+    }
 
-    /*
     private void sendMailMessage(MailMessage mailMessage, String email) throws ConfigurationException, AddressException, MessagingException, UnsupportedEncodingException {
-        String host = configuration.getSmtpHost();
-        String sender = configuration.getMailSender();
+        String host = PortletProps.get("smtp.host");
+        String sender = PortletProps.get("mail.sender");
 
         Properties properties = System.getProperties();
         properties.setProperty("mail.smtp.host", host);
@@ -110,8 +113,9 @@ public class MailHandler implements Runnable {
         message.setSubject(provider.getMessageSubject(mailMessage));
         message.setText(provider.getMessageText(mailMessage), "utf-8", "html");
 
-        Transport.send(message);
-    }*/
+        System.out.println("sent to: " + host + ", sender: " + sender);
+        //Transport.send(message);
+    }
 
     @Override
     public void run() {
@@ -129,9 +133,9 @@ public class MailHandler implements Runnable {
             while (true) {
                 Thread.sleep(SLEEPING_INTERVAL);
                 try {
-                    Long databaseLaunchTimeMillis = null;
+                    Long lastLaunchTimeMillis = null;
                     try {
-                        databaseLaunchTimeMillis = configuration.getLastLaunchMillis();
+                        lastLaunchTimeMillis = configuration.getLastLaunchMillis();
                     } catch (ConfigurationException ce) {
                         log.log(Level.WARNING, "", ce);
                     }
@@ -139,8 +143,8 @@ public class MailHandler implements Runnable {
                     if (isSmtpHostConfigEmpty()) {
                         break;
                     }
-                    if (databaseLaunchTimeMillis != null) {
-                        if (databaseLaunchTimeMillis != threadStartTimeMillis) {
+                    if (lastLaunchTimeMillis != null) {
+                        if (lastLaunchTimeMillis != threadStartTimeMillis) {
                             log.log(Level.WARNING, "Last launch time doesn't match");
                             break;
                         }
@@ -151,6 +155,7 @@ public class MailHandler implements Runnable {
                     }
                 } catch (Exception ex) {
                     log.log(Level.WARNING, "Unexpected exception", ex);
+                    break;
                 }
             }
 
@@ -169,15 +174,16 @@ public class MailHandler implements Runnable {
     }
 
     private boolean isSmtpHostConfigEmpty() {
-        try {
-            String smtpHost = configuration.getSmtpHost();
+        //try {
+            //String smtpHost = configuration.getSmtpHost();
+            String smtpHost = PortletProps.get("smtp.host");
             if (smtpHost == null || smtpHost.isEmpty() || smtpHost.trim().isEmpty()) {
                 log.log(Level.INFO, "Mail smtp host is empty");
                 return true;
             }
-        } catch (ConfigurationException ce) {
+        /*} catch (ConfigurationException ce) {
             return true;
-        }
+        }*/
         return false;
     }
 }

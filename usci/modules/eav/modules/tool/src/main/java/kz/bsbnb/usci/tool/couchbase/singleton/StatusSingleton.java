@@ -2,6 +2,7 @@ package kz.bsbnb.usci.tool.couchbase.singleton;
 
 import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
+import kz.bsbnb.usci.eav.model.exceptions.BatchNotFoundException;
 import kz.bsbnb.usci.eav.model.json.*;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
@@ -186,5 +187,12 @@ public class StatusSingleton {
 
         addBatchStatus(batchId, new BatchStatusJModel(
                 BatchStatuses.COMPLETED, null, new Date(), userId));
+    }
+     public BatchFullJModel getBatch(long batchId) throws BatchNotFoundException {
+        Object batch = client.get("batch:" + batchId);
+        if(batch == null)
+            throw new BatchNotFoundException("batchId:" + batchId);
+        BatchFullJModel ret = gson.fromJson(batch.toString(), BatchFullJModel.class);
+        return ret;
     }
 }

@@ -100,14 +100,15 @@ public class MainPortlet extends MVCPortlet {
         String entityId = httpReq.getParameter("entityId");
         renderRequest.setAttribute("entityId", entityId);
 
-        boolean isAdmin = false;
+        boolean hasRights = false;
 
         try {
             User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
             if(user != null) {
                 for (Role role : user.getRoles()) {
-                    if (role.getDescriptiveName().equals("Administrator"))
-                        isAdmin = true;
+                    if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
+                            || role.getName().equals("NationalBankEmployee"))
+                        hasRights = true;
                 }
             }
         } catch (PortalException e) {
@@ -116,7 +117,7 @@ public class MainPortlet extends MVCPortlet {
             e.printStackTrace();
         }
 
-        if(!isAdmin)
+        if(!hasRights)
             return;
 
 

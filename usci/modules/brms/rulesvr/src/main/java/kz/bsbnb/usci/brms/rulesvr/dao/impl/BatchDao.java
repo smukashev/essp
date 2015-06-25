@@ -114,8 +114,8 @@ public class BatchDao implements IBatchDao
 
     @Override
     public long getBatchVersionId(long batchId, Date repDate) {
-        String SQL = "SELECT id FROM " + PREFIX_ + "package_versions WHERE REPORT_DATE = \n" +
-                "     (SELECT MAX(REPORT_DATE) FROM " + PREFIX_ + "package_versions WHERE package_id = ? AND REPORT_DATE <= ? ) \n" +
+        String SQL = "SELECT id FROM " + PREFIX_ + "package_versions WHERE OPEN_DATE = \n" +
+                "     (SELECT MAX(OPEN_DATE) FROM " + PREFIX_ + "package_versions WHERE package_id = ? AND OPEN_DATE <= ? ) \n" +
                 "AND package_id = ? AND rownum = 1";
 
         return jdbcTemplate.queryForLong(SQL, batchId, repDate, batchId);

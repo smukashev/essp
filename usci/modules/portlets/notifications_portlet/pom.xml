@@ -137,12 +137,12 @@
             <artifactId>credit-registry-ejb-ref-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        -->
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>mailapi</artifactId>
             <version>1.4.7</version>
         </dependency>
-        -->
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
@@ -162,6 +162,11 @@
             <groupId>kz.bsbnb.usci.eav</groupId>
             <artifactId>model</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.liferay.portal</groupId>
+            <artifactId>util-java</artifactId>
+            <version>6.2.1</version>
         </dependency>
     </dependencies>
 </project>

@@ -150,7 +150,7 @@ public class RuleService implements IRuleService {
 
     @Override
     public String getPackageErrorsOnRuleUpdate(String ruleBody, Long ruleId, String pkgName, Date repDate) {
-        return rulesSingleton.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, repDate, false, false, false);
+        return rulesSingleton.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, repDate, false, false, true);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.bsbnb.creditregistry.portlets.approval.data.BeanDataProvider;
 import com.bsbnb.creditregistry.portlets.approval.ui.MainLayout;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.vaadin.Application;
@@ -48,25 +49,35 @@ public class ApprovalApplication extends Application {
 
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
+            User user = null;
+            boolean hasRights = false;
             try {
-                User user = PortalUtil.getUser(request);
-
-                if (user == null)
-                    return;
-
-                setTheme("custom");
-
-                Window mainWindow = new Window();
-
-                mainWindow.addComponent(new MainLayout(new BeanDataProvider(),
-                        new ApprovalPortletEnvironmentFacade(user)));
-
-                setMainWindow(mainWindow);
-            } catch (PortalException pe) {
-                log.log(Level.WARNING, null, pe);
-            } catch (SystemException se) {
-                log.log(Level.WARNING, null, se);
+                user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
+                if(user != null) {
+                    for (Role role : user.getRoles()) {
+                        if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
+                                || role.getName().equals("NationalBankEmployee"))
+                            hasRights = true;
+                    }
+                }
+            } catch (PortalException e) {
+                e.printStackTrace();
+            } catch (SystemException e) {
+                e.printStackTrace();
             }
+
+            if(!hasRights)
+                return;
+
+            setTheme("custom");
+
+            Window mainWindow = new Window();
+
+            mainWindow.addComponent(new MainLayout(new BeanDataProvider(),
+                    new ApprovalPortletEnvironmentFacade(user)));
+
+            setMainWindow(mainWindow);
+
         }
 
         @Override

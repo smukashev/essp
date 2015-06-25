@@ -14,6 +14,7 @@ public class PortalUser implements Serializable {
     private String lastName;
     private String middleName;
     private Date modifiedDate;
+    private Boolean isActive;
 
     private List<Creditor> creditorList;
 
@@ -165,6 +166,14 @@ public class PortalUser implements Serializable {
      */
     public void setCreditorList(List<Creditor> creditorList) {
         this.creditorList = creditorList;
+    }
+
+    public Boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 }
 

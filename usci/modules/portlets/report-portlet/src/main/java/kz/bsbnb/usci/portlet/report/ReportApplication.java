@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.portlet.report;
 
+import com.liferay.portal.model.Role;
 import kz.bsbnb.usci.portlet.report.dm.DatabaseConnect;
 import kz.bsbnb.usci.portlet.report.ui.MainLayout;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -96,7 +97,27 @@ public class ReportApplication extends Application {
             setTheme("custom");
             Window mainWindow = new Window();
             try {
-                User user = PortalUtil.getUser(request);
+                User user = null;
+                boolean hasRights = false;
+
+                try {
+                    user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
+                    if(user != null) {
+                        for (Role role : user.getRoles()) {
+                            if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
+                                    || role.getName().equals("NationalBankEmployee"))
+                                hasRights = true;
+                        }
+                    }
+                } catch (PortalException e) {
+                    e.printStackTrace();
+                } catch (SystemException e) {
+                    e.printStackTrace();
+                }
+
+                if(!hasRights)
+                    return;
+
                 if (user != null) {
                     try {
                         String portletInstanceId = (String) request.getAttribute(WebKeys.PORTLET_ID);
@@ -124,8 +145,6 @@ public class ReportApplication extends Application {
                 }
             } catch (PortalException pe) {
                 log.log(Level.SEVERE, "Failed to access user", pe);
-            } catch (SystemException se) {
-                log.log(Level.SEVERE, "Failed to access user", se);
             }
         }
 

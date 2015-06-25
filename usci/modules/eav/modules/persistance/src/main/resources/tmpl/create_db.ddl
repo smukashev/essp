@@ -1150,8 +1150,8 @@
 	  <column name="recipient_user_id" required="true" type="NUMERIC" size="14,0" />
 	  <column name="status_id" required="true" type="NUMERIC" size="14,0" />
 	  <column name="mail_template_id" required="true" type="NUMERIC" size="14,0" />
-	  <column name="creation_date"  type="DATE" />
-	  <column name="sending_date"  type="DATE" />
+	  <column name="creation_date"  type="TIMESTAMP" />
+	  <column name="sending_date"  type="TIMESTAMP" />
 	</table>
 
 	<table name="mail_message_parameter">

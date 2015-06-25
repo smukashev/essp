@@ -23,6 +23,7 @@ import com.bsbnb.usci.portlets.crosscheck.ui.CrossCheckLayout;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
@@ -64,6 +65,27 @@ public class CrossCheckApplication extends Application {
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
             try {
+
+                boolean hasRights = false;
+
+                try {
+                    User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
+                    if(user != null) {
+                        for (Role role : user.getRoles()) {
+                            if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
+                                    || role.getName().equals("NationalBankEmployee"))
+                                hasRights = true;
+                        }
+                    }
+                } catch (PortalException e) {
+                    e.printStackTrace();
+                } catch (SystemException e) {
+                    e.printStackTrace();
+                }
+
+                if(!hasRights)
+                    return;
+
                 String portletInstanceId = (String) request.getAttribute(WebKeys.PORTLET_ID);
                 PortletPreferences prefs = PortletPreferencesFactoryUtil.getPortletSetup(request, portletInstanceId);
                 String viewType = prefs.getValue("type", "WORK");

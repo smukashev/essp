@@ -40,7 +40,6 @@ public class NotificationsApplication extends Application {
         } else {
             getMainWindow().showNotification("Not inited via Portal!", Notification.TYPE_ERROR_MESSAGE);
         }
-
     }
 
     private class SamplePortletListener implements PortletListener {

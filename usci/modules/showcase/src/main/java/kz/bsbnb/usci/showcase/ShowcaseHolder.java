@@ -70,16 +70,7 @@ public class ShowcaseHolder implements Serializable {
                     temp[i] = ((MetaClass) metaSet.getMemberType()).getClassName();
                 }
 
-                // Filter prefixes
-                boolean hasFilter = false;
-                for(ShowCaseField sf : showCaseMeta.getFilterFieldsList()) {
-                    if(path.equals(sf.getAttributePath())) {
-                        hasFilter = true;
-                        break;
-                    }
-                }
-
-                if (!hasFilter && !prefixToColumn.containsKey(prefix)) {
+                if (!prefixToColumn.containsKey(prefix)) {
                     if (!nextNumber.containsKey(temp[i]))
                         nextNumber.put(temp[i], 1);
 

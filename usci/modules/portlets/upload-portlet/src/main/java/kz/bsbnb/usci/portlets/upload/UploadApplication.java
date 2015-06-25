@@ -12,6 +12,8 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
+import com.liferay.portal.model.Role;
+import com.liferay.portal.model.User;
 import kz.bsbnb.usci.portlets.upload.ui.MainLayout;
 import kz.bsbnb.usci.portlets.upload.ui.SingleUploadComponent;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -49,7 +51,25 @@ public class UploadApplication extends Application {
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
             try {
-                if(PortalUtil.getUser(request) == null)
+
+                boolean hasRights = false;
+
+                try {
+                    User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
+                    if(user != null) {
+                        for (Role role : user.getRoles()) {
+                            if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
+                                    || role.getName().equals("NationalBankEmployee"))
+                                hasRights = true;
+                        }
+                    }
+                } catch (PortalException e) {
+                    e.printStackTrace();
+                } catch (SystemException e) {
+                    e.printStackTrace();
+                }
+
+                if(!hasRights)
                     return;
 
                 Window mainWindow = new Window();

@@ -33,6 +33,7 @@ public class MailTemplate implements Serializable {
     /*@JoinColumn(name = "CONFIGURATION_TYPE_ID", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)*/
     //private Shared configurationType;
+    private Long configurationTypeId;
 
     public MailTemplate() {
     }
@@ -95,6 +96,14 @@ public class MailTemplate implements Serializable {
      */
     public void setNameKz(String nameKz) {
         this.nameKz = nameKz;
+    }
+
+    public Long getConfigurationTypeId() {
+        return configurationTypeId;
+    }
+
+    public void setConfigurationTypeId(Long configurationTypeId) {
+        this.configurationTypeId = configurationTypeId;
     }
 
     /**

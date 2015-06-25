@@ -44,5 +44,5 @@ public interface MailMessageBeanCommonBusiness {
 
     public void saveUserMailTemplates(List<UserMailTemplate> userTemplates);
 
-    public boolean isTemplateEnabledForUser(String templateCode, long userId);
+    public boolean isTemplateEnabledForUser(Long templateId, long userId);
 }

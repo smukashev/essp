@@ -1,5 +1,8 @@
 package com.bsbnb.creditregistry.portlets.notifications.thread;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
 import static com.bsbnb.creditregistry.portlets.notifications.NotificationsApplication.log;
 import java.util.logging.Level;
 //import javax.servlet.ServletContextEvent;
@@ -9,8 +12,8 @@ import java.util.logging.Level;
  *
  * @author Aidar.Myrzahanov
  */
-public class ApplicationContextListener /*implements ServletContextListener */{
-/*
+public class ApplicationContextListener implements ServletContextListener {
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         log.log(Level.INFO, "Context initialized");
@@ -30,5 +33,4 @@ public class ApplicationContextListener /*implements ServletContextListener */{
     public void contextDestroyed(ServletContextEvent sce) {
         log.log(Level.INFO, "Context destroyed");
     }
-    */
 }

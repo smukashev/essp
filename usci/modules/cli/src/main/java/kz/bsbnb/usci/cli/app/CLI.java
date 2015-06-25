@@ -146,7 +146,7 @@ public class CLI {
     private Date currentDate = new Date();
     private boolean started = false;
     private BatchVersion currentBatchVersion;
-    private String defaultDumpFile = "c:/rules/pledge2.cli";
+    private String defaultDumpFile = "c:/rule_dumps/23_06_2015.cli";
     private BaseEntity currentBaseEntity;
     private Mnt mnt;
 
@@ -174,7 +174,7 @@ public class CLI {
         //System.setProperty("viewmode", "development");
 
         ArrayList<URI> nodes = new ArrayList<URI>();
-        nodes.add(URI.create("http://172.17.110.114:8091/pools"));
+        nodes.add(URI.create("http://localhost:8091/pools"));
 
         try {
             couchbaseClient = new CouchbaseClient(nodes, "test", "");
@@ -2178,54 +2178,7 @@ public class CLI {
         } else throw new IllegalArgumentException("allowed operations refs [import] [filename]");
     }
 
-    public void commandSC() {
-        if (args.get(0).equals("list")) {
-
-        } else if (args.get(0).equals("add")) {
-            showcaseServiceFactoryBean = new RmiProxyFactoryBean();
-            showcaseServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1095/showcaseService");
-            showcaseServiceFactoryBean.setServiceInterface(ShowcaseService.class);
-
-            showcaseServiceFactoryBean.afterPropertiesSet();
-            showcaseService = (ShowcaseService) showcaseServiceFactoryBean.getObject();
-
-            String name = args.get(1);
-            String metaName = args.get(2);
-            System.out.println("argument: " + args.get(1) + "   " + args.get(2));
-            MetaClass metaClass = metaClassRepository.getMetaClass(metaName);
-            ShowCase showCase = new ShowCase();
-            showCase.setName(name);
-            showCase.setTableName(name);
-            showCase.setMeta(metaClass);
-            for (int i = 3; i < args.size(); i++) {
-                String field = args.get(i);
-                String columnName;
-                String fieldName;
-                String path;
-                if (field.contains(":")) {
-                    columnName = field.split(":")[1];
-                    field = field.split(":")[0];
-                }
-                if (field.contains(".")) {
-                    fieldName = field.substring(field.lastIndexOf(".") + 1);
-                    path = field.substring(0, field.lastIndexOf("."));
-                } else {
-                    path = "";
-                    fieldName = field;
-                }
-                columnName = fieldName;
-                showCase.addField(path, fieldName, columnName);
-            }
-            showcaseService.add(showCase);
-            System.out.println("Showcase successfully added!");
-        } else if (args.get(0).equals("delete")) {
-
-        }
-    }
-
     public void init() {
-
-
         try {
             entityServiceFactoryBean = new RmiProxyFactoryBean();
             entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
@@ -2534,9 +2487,6 @@ public class CLI {
 
             for (ShowCaseField sf : showCase.getCustomFieldsList())
                 System.out.println("* " + sf.getAttributePath() + ", " + sf.getColumnName());
-
-            for (ShowCaseField sf : showCase.getFilterFieldsList())
-                System.out.println("% " + sf.getAttributePath() + ", " + sf.getColumnName());
         } else if (args.get(0).equals("set")) {
             if (args.size() != 3)
                 throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
@@ -2561,53 +2511,29 @@ public class CLI {
                 throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
 
         } else if (args.get(0).equals("list")) {
-            if (args.get(1).equals("reset"))
+            if (args.get(1).equals("reset")) {
                 showCase.getFieldsList().clear();
-            else if (args.get(1).equals("add")) {
-                String path = "";
-                String colName = args.get(2);
-                int id = args.get(2).lastIndexOf('.');
+            } else if (args.get(1).equals("add")) {
+                if(args.get(2) == null || args.get(3) == null)
+                    throw new UnsupportedOperationException("AttributePath and columnName cannot be empty");
 
-                if (id != -1) {
-                    path = args.get(2).substring(0, id);
-                    colName = args.get(2).substring(id + 1);
-                }
-
-                if (args.size() == 3)
-                    showCase.addField(path, colName);
-                else if (args.size() == 4)
-                    showCase.addField(path, colName, args.get(3));
-                else
-                    throw new IllegalArgumentException("Example: showcase list add [path] [columnName] {columnAlias}");
+                showCase.addField(args.get(2), args.get(3));
             } else if (args.get(1).equals("addCustom")) {
-                MetaClass customMeta = metaClassRepository.getMetaClass(args.get(2));
+                if(args.get(2) == null || args.get(3) == null || args.get(4) == null)
+                    throw new UnsupportedOperationException("MetaClass, attributePath and columnName cannot be empty");
 
-                if(customMeta == null)
-                    throw new UnsupportedOperationException("MetaClass can't be null");
+                MetaClass customMeta;
 
-                String path = "";
-                String name = args.get(3);
-
-                if (args.get(3).lastIndexOf('.') != -1) {
-                    path = args.get(3).substring(0, args.get(3).lastIndexOf('.'));
-                    name = args.get(3).substring(args.get(3).lastIndexOf('.') + 1);
+                if(args.get(2).equals("root")) {
+                    customMeta = metaClassRepository.getMetaClass(args.get(2));
+                } else {
+                    customMeta = metaClassRepository.getMetaClass(args.get(2));
                 }
 
-                showCase.addCustomField(path, name, args.get(4), customMeta);
-            } else if (args.get(1).equals("addFilter")) {
-                String path = null;
-                String name = null;
-
-                if (args.get(2).lastIndexOf('.') != -1) {
-                    path = args.get(2).substring(0, args.get(2).lastIndexOf('.'));
-                    name = args.get(2).substring(args.get(2).lastIndexOf('.') + 1);
-                }
-
-                showCase.addFilterField(path, name);
+                showCase.addCustomField(args.get(3), args.get(4), metaClassRepository.getMetaClass(args.get(2)));
             } else {
-                System.err.println("Example: showcase list add [path] [columnName] {columnAlias}");
-                System.err.println("Example: showcase list addCustom metaClass [path] [columnName] {columnAlias}");
-                System.err.println("Example: showcase list addFilter [path]");
+                System.err.println("Example: showcase list add [path] [columnName]");
+                System.err.println("Example: showcase list addCustom metaClass [path] [columnName]");
                 throw new IllegalArgumentException();
             }
         } else if (args.get(0).equals("save")) {
@@ -2622,33 +2548,23 @@ public class CLI {
             for (ShowcaseHolder holder : list) {
                 System.out.println(holder.getShowCaseMeta().getName());
 
-                for (ShowCaseField field : holder.getShowCaseMeta().getFieldsList()) {
-                    System.out.println("\t" + field.getName());
-                }
+                for (ShowCaseField field : holder.getShowCaseMeta().getFieldsList())
+                    System.out.println("\t" + field.getColumnName());
 
-                for(ShowCaseField field : holder.getShowCaseMeta().getCustomFieldsList()) {
-                    System.out.println("\t* " + field.getName());
-                }
-
-                for(ShowCaseField field : holder.getShowCaseMeta().getFilterFieldsList()) {
-                    System.out.println("\t% " + field.getName());
-                }
+                for(ShowCaseField field : holder.getShowCaseMeta().getCustomFieldsList())
+                    System.out.println("\t* " + field.getColumnName());
             }
         } else if (args.get(0).equals("loadSC")) {
             if (args.size() > 1) {
                 ShowCase sc = showcaseService.load(args.get(1));
                 System.out.println(sc.getName());
-                for (ShowCaseField field : sc.getFieldsList()) {
-                    System.out.println("\t" + field.getName());
-                }
 
-                for (ShowCaseField field : sc.getCustomFieldsList()) {
-                    System.out.println("\t* " + field.getName());
-                }
+                for (ShowCaseField field : sc.getFieldsList())
+                    System.out.println("\t" + field.getColumnName());
 
-                for (ShowCaseField field : sc.getFilterFieldsList()) {
-                    System.out.println("\t% " + field.getName());
-                }
+                for (ShowCaseField field : sc.getCustomFieldsList())
+                    System.out.println("\t* " + field.getColumnName());
+
             } else {
                 System.out.println("Usage: loadSC <showcase name>");
             }

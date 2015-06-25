@@ -2,7 +2,7 @@ package com.bsbnb.creditregistry.portlets.notifications.data;
 
 //import com.bsbnb.creditregistry.dm.maintenance.mail.MailMessage;
 import kz.bsbnb.usci.eav.model.mail.MailMessage;
-import kz.bsbnb.usci.eav.model.mail.MailMessageStatus;
+import kz.bsbnb.usci.eav.model.mail.MailMessageStatuses;
 
 import java.util.Date;
 
@@ -37,14 +37,14 @@ public class NotificationDisplayBean {
     
     public String getStatus() {
 
-        switch (message.getStatus()) {
-            case BATCH_STOPPED:
+        switch (message.getStatusId()) {
+            case MailMessageStatuses.BATCH_STOPPED:
                 return "Обработка прервана";
-            case PROCESSING:
+            case MailMessageStatuses.PROCESSING:
                 return "Сообщение ожидает обработки";
-            case REJECTED_BY_USER_SETTINGS:
+            case MailMessageStatuses.REJECTED_BY_USER_SETTINGS:
                 return "Настройки пользователя не позволили отправить сообщение";
-            case SENT:
+            case MailMessageStatuses.SENT:
                 return "Сообщение отправлено";
         }
 
