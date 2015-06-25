@@ -71,15 +71,6 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
             BaseEntity entity = (BaseEntity)iter.next();
             //System.out.println(entity.toString());
 
-            //TODO: Remove hardcode (credit specific attributes)
-            Date contractDate = null;
-            String contractNo = null;
-            if (entity.getMeta().getClassName().equals("credit"))
-            {
-                contractDate = (Date)entity.getEl("primary_contract.date");
-                contractNo = (String)entity.getEl("primary_contract.no");
-            }
-
             //TODO: UNCOMMENT
             /*if (statusSingleton.isEntityCompleted(entity.getBatchId(), entity.getBatchIndex() - 1)) {
                 //System.out.println("Contract no " + contractNo + " with date " + contractDate + " skipped because it " +
@@ -91,8 +82,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                     entity.getBatchIndex() - 1,
                     EntityStatuses.CHECK_IN_PARSER, null, new Date());
 
-            entityStatusJModel.addProperty(StatusProperties.CONTRACT_NO, contractNo);
-            entityStatusJModel.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
+            StatusProperties.fillSpecificProperties(entityStatusJModel, entity);
 
             statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
 
@@ -120,8 +110,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                         entity.getBatchIndex() - 1,
                         EntityStatuses.ERROR, ruleRuntimeException, new Date());
 
-                entityStatusJModel.addProperty(StatusProperties.CONTRACT_NO, contractNo);
-                entityStatusJModel.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
+                StatusProperties.fillSpecificProperties(entityStatusJModel, entity);
 
                 statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
             } else if (errors != null && errors.size() > 0) {
@@ -132,8 +121,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                             entity.getBatchIndex() - 1,
                             EntityStatuses.ERROR, errorMsg, new Date());
 
-                    entityStatusJModel.addProperty(StatusProperties.CONTRACT_NO, contractNo);
-                    entityStatusJModel.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
+                    StatusProperties.fillSpecificProperties(entityStatusJModel, entity);
 
                     statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
                 }
@@ -142,8 +130,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                         entity.getBatchIndex() - 1,
                         EntityStatuses.WAITING, null, new Date());
 
-                entityStatusJModel.addProperty(StatusProperties.CONTRACT_NO, contractNo);
-                entityStatusJModel.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
+                StatusProperties.fillSpecificProperties(entityStatusJModel, entity);
 
                 statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
 

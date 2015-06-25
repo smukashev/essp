@@ -43,8 +43,8 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         synchronized (gsonDateFormat) {
             try {
                 return gsonDateFormat.parse(sDate);
-            } catch (ParseException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+//                e.printStackTrace();
                 return null;
             }
         }
@@ -125,13 +125,23 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
                 message.setNameKz("Идентификатор сущности:");
                 protocol.setNote(entityStatus.getDescription());
             }
+
+            fillTypeDescription(entityStatus, protocol);
+
             protocol.setPrimaryContractDate(
                     parseDateFromGson((String) entityStatus.getProperty(StatusProperties.CONTRACT_DATE))
             );
-            protocol.setTypeDescription((String) entityStatus.getProperty(StatusProperties.CONTRACT_NO));
         }
 
         list.add(protocol);
+    }
+
+    private void fillTypeDescription(EntityStatusJModel entityStatus, Protocol protocol) {
+        if (entityStatus.getProperty(StatusProperties.CONTRACT_NO) != null) {
+            protocol.setTypeDescription((String) entityStatus.getProperty(StatusProperties.CONTRACT_NO));
+        } else if (entityStatus.getProperty(StatusProperties.REF_NAME) != null) {
+            protocol.setTypeDescription("Наименование: " + entityStatus.getProperty(StatusProperties.REF_NAME));
+        }
     }
 }
 

@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav.model.json;
 
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+
 import java.util.Date;
 import java.util.HashMap;
 

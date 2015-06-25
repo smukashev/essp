@@ -68,9 +68,6 @@ public class CREntityReader<T> extends CommonReader<T> {
     @Value("#{jobParameters['actualCount']}")
     private Long actualCount;
 
-    @Value("#{jobParameters}")
-    private JobParameters jobParameters;
-
     @PostConstruct
     public void init() {
         logger.info("Reader init.");
