@@ -2,6 +2,7 @@ package com.bsbnb.usci.portlets.protocol.ui;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.Number;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,13 +12,7 @@ import jxl.CellView;
 import jxl.Workbook;
 import jxl.format.Border;
 import jxl.format.BorderLineStyle;
-import jxl.write.DateFormat;
-import jxl.write.Label;
-import jxl.write.WritableCellFormat;
-import jxl.write.WritableFont;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
+import jxl.write.*;
 
 import com.vaadin.data.Property;
 import com.vaadin.terminal.DownloadStream;
@@ -125,6 +120,8 @@ public class FormattedTable extends Table {
                     } else {
                         ProtocolApplication.log.log(Level.WARNING, "Unpredicted column type. Couldn export class: {0}", value.getClass().getCanonicalName());
                     }
+                }  else {
+                    sheet.addCell(new Blank(columnIndex, rowCounter, times12format));
                 }
                 sheet.setColumnView(columnIndex, cellView);
             }

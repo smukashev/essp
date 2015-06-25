@@ -6,6 +6,7 @@ import com.vaadin.ui.Component;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.Number;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -14,13 +15,7 @@ import jxl.Workbook;
 import jxl.WorkbookSettings;
 import jxl.format.Border;
 import jxl.format.BorderLineStyle;
-import jxl.write.DateFormat;
-import jxl.write.Label;
-import jxl.write.WritableCellFormat;
-import jxl.write.WritableFont;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
+import jxl.write.*;
 
 /**
  *
@@ -58,17 +53,19 @@ public class XlsProtocolExporter extends ProtocolExporter {
             WritableCellFormat times12format = new WritableCellFormat(times12font);
             WritableCellFormat times12formatBold = new WritableCellFormat(times12fontBold);
             CellView cellView = new CellView();
+            cellView.setSize(10000);
             // cellView.setAutosize(true); NEW
 
             times12formatBold.setAlignment(jxl.format.Alignment.CENTRE);
             times12formatBold.setBorder(Border.ALL, BorderLineStyle.THIN);
             times12format.setBorder(Border.ALL, BorderLineStyle.THIN);
+            times12format.setWrap(true);
             ByteArrayOutputStream baos = null;
             baos = new ByteArrayOutputStream();
-            PrintStream ps = new PrintStream(baos, true, "UTF-8");
-            WorkbookSettings settings = new WorkbookSettings();
+//            PrintStream ps = new PrintStream(baos, true, "UTF-8");
+//            WorkbookSettings settings = new WorkbookSettings();
             // settings.setUseTemporaryFileDuringWrite(true); NEW
-            workbook = Workbook.createWorkbook(ps, settings);
+            workbook = Workbook.createWorkbook(baos);
             WritableSheet sheet = workbook.createSheet("Sheet1", 0);
 
             int rowCounter = 0;
@@ -100,8 +97,10 @@ public class XlsProtocolExporter extends ProtocolExporter {
                         } else if (value instanceof Component) {
                             sheet.addCell(new Label(accessorIndex, rowCounter, ((Component) value).getCaption(), times12format));
                         }
-                        sheet.setColumnView(accessorIndex, cellView);
+                    } else {
+                        sheet.addCell(new Blank(accessorIndex, rowCounter, times12format));
                     }
+                    sheet.setColumnView(accessorIndex, cellView);
                 }
                 rowCounter++;
             }
