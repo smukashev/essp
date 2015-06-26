@@ -15,6 +15,7 @@ import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
 import org.apache.log4j.Logger;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
@@ -30,10 +31,8 @@ import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Stack;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
@@ -65,6 +64,9 @@ public class CREntityReader<T> extends CommonReader<T> {
 
     @Value("#{jobParameters['reportId']}")
     private Long reportId;
+
+    @Value("#{jobParameters['actualCount']}")
+    private Long actualCount;
 
     @PostConstruct
     public void init() {
@@ -189,9 +191,23 @@ public class CREntityReader<T> extends CommonReader<T> {
 
         //couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
 
-        reportService.setTotalCount(reportId, crParser.getPackageCount());
+        saveTotalCounts();
 
         return null;
+    }
+
+    private void saveTotalCounts() {
+        reportService.setTotalCount(reportId, crParser.getPackageCount());
+        {
+            EntityStatusJModel entityStatus = new EntityStatusJModel(
+                    0L, EntityStatuses.ACTUAL_COUNT, String.valueOf(actualCount), new Date());
+            statusSingleton.addContractStatus(batchId, entityStatus);
+        }
+        {
+            EntityStatusJModel entityStatus = new EntityStatusJModel(
+                    0L, EntityStatuses.TOTAL_COUNT, String.valueOf(crParser.getPackageCount()), new Date());
+            statusSingleton.addContractStatus(batchId, entityStatus);
+        }
     }
 
 }

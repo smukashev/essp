@@ -57,33 +57,16 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             BaseEntity entity = (BaseEntity) baseEntityProcessorDao.process(baseEntity);
             long t2 = System.currentTimeMillis() - t1;
 
-            //TODO: Remove hardcode (credit specific attributes)
-            Date contractDate = null;
-            String contractNo = null;
-            if (baseEntity.getMeta().getClassName().equals("credit")) {
-                contractDate = (Date) baseEntity.getEl("primary_contract.date");
-                contractNo = (String) baseEntity.getEl("primary_contract.no");
-            }
-
             stats.put("coreService", t2);
 
             EntityStatusJModel entityStatus = new EntityStatusJModel(
                     entity.getBatchIndex() - 1,
                     EntityStatuses.COMPLETED, "" + entity.getId(), new Date());
 
-            entityStatus.addProperty(StatusProperties.CONTRACT_NO, contractNo);
-            entityStatus.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
+            StatusProperties.fillSpecificProperties(entityStatus, baseEntity);
 
             statusSingleton.addContractStatus(baseEntity.getBatchId(), entityStatus);
         } catch (Exception e) {
-            //TODO: Remove hardcode (credit specific attributes)
-            Date contractDate = null;
-            String contractNo = null;
-            if (baseEntity.getMeta().getClassName().equals("credit")) {
-                contractDate = (Date) baseEntity.getEl("primary_contract.date");
-                contractNo = (String) baseEntity.getEl("primary_contract.no");
-            }
-
             logger.error("Batch id: " + baseEntity.getBatchId() + ", index: " + (baseEntity.getBatchIndex() - 1) +
                     ExceptionUtils.getStackTrace(e));
 
@@ -91,8 +74,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
                     baseEntity.getBatchIndex() - 1,
                     EntityStatuses.ERROR, e.getMessage(), new Date());
 
-            entityStatus.addProperty(StatusProperties.CONTRACT_NO, contractNo);
-            entityStatus.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
+            StatusProperties.fillSpecificProperties(entityStatus, baseEntity);
 
             statusSingleton.addContractStatus(baseEntity.getBatchId(), entityStatus);
         }

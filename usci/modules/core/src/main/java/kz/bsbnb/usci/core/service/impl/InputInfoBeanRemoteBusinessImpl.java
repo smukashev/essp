@@ -6,17 +6,18 @@ import com.google.gson.Gson;
 import kz.bsbnb.usci.core.service.InputInfoBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.model.json.*;
+import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
-import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.math.BigInteger;
-import java.net.URI;
 import java.util.*;
+
+import static kz.bsbnb.usci.tool.couchbase.BatchStatuses.COMPLETED;
+import static kz.bsbnb.usci.tool.couchbase.BatchStatuses.ERROR;
 
 @Service
 public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusiness
@@ -28,6 +29,8 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     private Logger logger = Logger.getLogger(InputInfoBeanRemoteBusinessImpl.class);
 
     private Gson gson = new Gson();
+
+    private final List<String> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED);
 
     @PostConstruct
     public void init() {
@@ -139,41 +142,10 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                     ii.setBatchStatuses(new ArrayList<Protocol>());
 
                     for (BatchStatusJModel statusModel : statusesList) {
-                        {
-                            Protocol protocol = new Protocol();
-                            protocol.setId(0L);
-                            {
-                                Message m = new Message();
-                                m.setCode("A");
-                                m.setNameKz(statusModel.getDescription());
-                                m.setNameRu(statusModel.getDescription());
-                                protocol.setMessage(m);
-                            }
-                            {
-                                Shared s = new Shared();
-                                s.setCode("S");
-                                s.setNameRu(statusModel.getProtocol());
-                                s.setNameKz(statusModel.getProtocol());
-                                protocol.setMessageType(s);
-                                protocol.setProtocolType(s);
-                            }
-
-                            protocol.setNote("присвоено " + statusModel.getReceived());
-
-                            ii.getBatchStatuses().add(protocol);
+                        if (protocolsToDisplay.contains(statusModel.getProtocol())) {
+                            fillProtocol(statusModel, ii);
                         }
-
-                        lastStatus = statusModel.getProtocol();
-                        if (statusModel.getProtocol().equals("PROCESSING")) {
-                            ii.setStartedDate(statusModel.getReceived());
-                        } else if(statusModel.getProtocol().equals("COMPLETED")) {
-                            ii.setCompletionDate(statusModel.getReceived());
-                        } else if(statusModel.getProtocol().equals("WAITING")) {
-                            ii.setReceiverDate(statusModel.getReceived());
-                        } else if (statusModel.getProtocol().equals("ERROR") &&
-                                ii.getReceiverDate() == null) {
-                            ii.setReceiverDate(statusModel.getReceived());
-                        }
+                        lastStatus = fillDates(statusModel, ii);
                     }
 
                     BatchInfo manifest = getManifest(id);
@@ -207,6 +179,44 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
         }
 
         return list;
+    }
+
+    private String fillDates(BatchStatusJModel statusModel, InputInfo inputInfo) {
+        String lastStatus = statusModel.getProtocol();
+
+        if (lastStatus.equals("PROCESSING")) {
+            inputInfo.setStartedDate(statusModel.getReceived());
+        } else if(lastStatus.equals("COMPLETED")) {
+            inputInfo.setCompletionDate(statusModel.getReceived());
+        } else if(lastStatus.equals("WAITING")) {
+            inputInfo.setReceiverDate(statusModel.getReceived());
+        } else if (lastStatus.equals("ERROR") &&
+                inputInfo.getReceiverDate() == null) {
+            inputInfo.setReceiverDate(statusModel.getReceived());
+        }
+        return lastStatus;
+    }
+
+    private void fillProtocol(BatchStatusJModel statusModel, InputInfo inputInfo) {
+        Protocol protocol = new Protocol();
+        protocol.setId(0L);
+        {
+            Message message = new Message();
+            message.setCode("A");
+            message.setNameKz(statusModel.getDescription());
+            message.setNameRu(statusModel.getDescription());
+            protocol.setMessage(message);
+        }
+        {
+            Shared s = new Shared();
+            s.setCode("S");
+            s.setNameRu(statusModel.getProtocol());
+            s.setNameKz(statusModel.getProtocol());
+            protocol.setMessageType(s);
+            protocol.setProtocolType(s);
+        }
+
+        inputInfo.getBatchStatuses().add(protocol);
     }
 
     @Override

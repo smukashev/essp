@@ -98,7 +98,7 @@ public class BeanDataProvider implements DataProvider {
             if (protocol.getMessageType().getNameRu().equals("COMPLETED"))
                 pr.setLink(new Link("Просмотр",
                         new ExternalResource(ENTITY_EDITOR_PAGE + "?entityId=" +
-                        protocol.getMessage().getNameRu() + "&repDate=" + sRepDate)));
+                        protocol.getNote() + "&repDate=" + sRepDate)));
 
             result.add(pr);
         }
