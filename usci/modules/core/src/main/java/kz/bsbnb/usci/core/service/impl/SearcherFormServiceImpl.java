@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.core.service.impl;
 
+import kz.bsbnb.usci.core.listener.IRefLoadedListener;
 import kz.bsbnb.usci.core.service.ISearcherFormService;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
@@ -37,6 +38,9 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
 
     @Autowired
     private IUserDao userDao;
+
+    @Autowired(required = false)
+    private IRefLoadedListener refLoadedListener;
 
     @Override
     public List<Pair> getMetaClasses(long userId) {
@@ -76,8 +80,10 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
         ret = String.format(ret, ((MetaClass)metaClass).getClassTitle(), nextId(), metaClass.getClassName(), attr);
 
         List<RefListItem> list = baseEntityProcessorDao.getRefsByMetaclassRaw(metaClass.getId());
-        List<Long> allowedRefs = userDao.getAllowedRefs(userId, metaClass.getClassName());
-        Set<Long> refSet = new HashSet<>(allowedRefs);
+        if(refLoadedListener !=null)
+            refLoadedListener.process(userId, metaClass, attr, list);
+        //List<Long> allowedRefs = userDao.getAllowedRefs(userId, metaClass.getClassName());
+        //Set<Long> refSet = new HashSet<>(allowedRefs);
         String option;
 
         // TODO: incorrect mechanism
