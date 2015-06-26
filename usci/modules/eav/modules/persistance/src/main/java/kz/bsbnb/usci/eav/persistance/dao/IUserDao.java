@@ -15,4 +15,5 @@ public interface IUserDao
     public List<String> getAllowedClasses(long portalUserId);
     public List<Long> getAllowedRefs(long portalUserId, String meta);
     public PortalUser getUser(long userId);
+    List<PortalUser> getPortalUsersHavingAccessToCreditor(Creditor creditor);
 }

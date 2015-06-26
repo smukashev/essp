@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -395,5 +396,32 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao
         portalUser.setCreditorList(getPortalUserCreditorList(portalUser.getUserId()));
 
         return portalUser;
+    }
+
+    @Override
+    public List<PortalUser> getPortalUsersHavingAccessToCreditor(Creditor creditor) {
+        Table root = EAV_A_USER.as("root");
+        Table creditors = EAV_A_CREDITOR_USER.as("creditors");
+
+
+        Select select = context.select(root.field(EAV_A_USER.ID),
+                root.field(EAV_A_USER.USER_ID),
+                root.field(EAV_A_USER.SCREEN_NAME),
+                root.field(EAV_A_USER.EMAIL),
+                root.field(EAV_A_USER.FIRST_NAME),
+                root.field(EAV_A_USER.LAST_NAME),
+                root.field(EAV_A_USER.MIDDLE_NAME),
+                root.field(EAV_A_USER.MODIFIED_DATE),
+                root.field(EAV_A_USER.IS_ACTIVE)
+        ).from(root).join(creditors)
+                .on(root.field(EAV_A_USER.USER_ID).eq(creditors.field(EAV_A_CREDITOR_USER.USER_ID)))
+                .where(root.field(EAV_A_USER.IS_ACTIVE).eq(DataUtils.convert(true))
+                        .and(creditors.field(EAV_A_CREDITOR_USER.CREDITOR_ID).eq(creditor.getId())));
+
+
+        List<PortalUser> ret = jdbcTemplate.query(select.getSQL(),
+                select.getBindValues().toArray(), new BeanPropertyRowMapper(PortalUser.class));
+
+        return ret;
     }
 }

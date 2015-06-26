@@ -1,5 +1,6 @@
 package com.bsbnb.creditregistry.portlets.approval.data;
 
+import kz.bsbnb.usci.core.service.MailMessageBeanCommonBusiness;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
@@ -10,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 /**
  *
@@ -18,12 +20,14 @@ import java.util.List;
 public class BeanDataProvider implements DataProvider {
     private RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean;
     private RmiProxyFactoryBean reportBusinessFactoryBean;
+    private RmiProxyFactoryBean mailBusinessFactoryBean;
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private ReportBeanRemoteBusiness reportBusiness;
+    private MailMessageBeanCommonBusiness mailMessageBusiness;
 
     public BeanDataProvider() {
         // portalUserBeanRemoteBusiness
@@ -39,6 +43,13 @@ public class BeanDataProvider implements DataProvider {
         reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
         reportBusinessFactoryBean.afterPropertiesSet();
         reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
+
+        mailBusinessFactoryBean = new RmiProxyFactoryBean();
+        mailBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/mailRemoteBusiness");
+        mailBusinessFactoryBean.setServiceInterface(MailMessageBeanCommonBusiness.class);
+        mailBusinessFactoryBean.afterPropertiesSet();
+        mailMessageBusiness = (MailMessageBeanCommonBusiness) mailBusinessFactoryBean.getObject();
+
     }
 
     @Override
@@ -117,18 +128,17 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public void sendApprovalNotifications(Creditor creditor, Report report, String username, Date sendDate, String text) {
-        /* todo: implement */
-//        List<PortalUser> notificationRecipients = portalUserBusiness.getPortalUsersHavingAccessToCreditor(creditor);
-//        Properties mailMessageParameters = new Properties();
-//        mailMessageParameters.setProperty("CREDITOR", creditor.getName());
-//        mailMessageParameters.setProperty("STATUS", report.getStatus().getNameRu());
-//        mailMessageParameters.setProperty("USERNAME", username);
-//        mailMessageParameters.setProperty("REPORT_DATE", DATE_FORMAT.format(report.getReportDate()));
-//        mailMessageParameters.setProperty("UPDATE_TIME", TIME_FORMAT.format(sendDate));
-//        mailMessageParameters.setProperty("TEXT", text);
-//        for (PortalUser portalUser : notificationRecipients) {
-//            mailMessageBusiness.sendMailMessage("APPROVAL_UPDATE", portalUser.getUserId(), mailMessageParameters);
-//        }
+        List<PortalUser> notificationRecipients = portalUserBusiness.getPortalUsersHavingAccessToCreditor(creditor);
+        Properties mailMessageParameters = new Properties();
+        mailMessageParameters.setProperty("CREDITOR", creditor.getName());
+        mailMessageParameters.setProperty("STATUS", report.getStatus().getNameRu());
+        mailMessageParameters.setProperty("USERNAME", username);
+        mailMessageParameters.setProperty("REPORT_DATE", DATE_FORMAT.format(report.getReportDate()));
+        mailMessageParameters.setProperty("UPDATE_TIME", TIME_FORMAT.format(sendDate));
+        mailMessageParameters.setProperty("TEXT", text);
+        for (PortalUser portalUser : notificationRecipients) {
+            mailMessageBusiness.sendMailMessage("APPROVAL_UPDATE", portalUser.getUserId(), mailMessageParameters);
+        }
     }
 
 //    private MailMessageParameter getMailMessageParameter(MailMessage mailMessage, MailTemplateParameter templateParameter, String value) {

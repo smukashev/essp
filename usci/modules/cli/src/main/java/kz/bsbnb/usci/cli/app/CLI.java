@@ -2155,15 +2155,11 @@ public class CLI {
     }
 
     public void commandSql() {
-
-        System.out.println("ok sql mode...");
         StringBuilder str = new StringBuilder();
         for (Object o : args)
             str.append(o + " ");
-        System.out.println(str.toString());
         boolean res = storage.simpleSql(str.toString());
-        System.out.println(res ? "success" : "fail");
-
+        System.out.println(res ? "sql execution success" : "sql execution fail");
     }
 
     public void commandRefs() {

@@ -21,4 +21,5 @@ public interface IMailDao {
     public void updateMailMessage(MailMessage message);
     boolean isTemplateEnabledForUser(Long templateId, long userId);
     List<MailMessage> getPendingMessages();
+    boolean isMailHandlingOn();
 }

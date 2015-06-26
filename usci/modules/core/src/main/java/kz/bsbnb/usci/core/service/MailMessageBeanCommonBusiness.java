@@ -45,4 +45,6 @@ public interface MailMessageBeanCommonBusiness {
     public void saveUserMailTemplates(List<UserMailTemplate> userTemplates);
 
     public boolean isTemplateEnabledForUser(Long templateId, long userId);
+
+    boolean isMailHandlingOn();
 }
