@@ -74,11 +74,6 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             entityStatus.addProperty(StatusProperties.CONTRACT_NO, contractNo);
             entityStatus.addProperty(StatusProperties.CONTRACT_DATE, contractDate);
 
-            /*Properties properties = new Properties();
-            BatchFullJModel batch = statusSingleton.getBatch(baseEntity.getBatchId());
-            properties.put("FILENAME", batch.getFileName());
-            mailDao.sendMailMessage("FILE_PROCESSING_COMPLETED", batch.getUserId(), properties);*/
-
             statusSingleton.addContractStatus(baseEntity.getBatchId(), entityStatus);
         } catch (Exception e) {
             //TODO: Remove hardcode (credit specific attributes)
