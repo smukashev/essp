@@ -21,8 +21,8 @@
         <property name="url" value="jdbc:oracle:thin:@170.7.15.85:1521:SHOWCASE"/>
         <property name="username" value="SHOWCASE"/>
         <property name="password" value="SHOW_2015"/>
-        <property name="initialSize" value="32"/>
-        <property name="maxActive" value="256"/>
+        <property name="initialSize" value="16"/>
+        <property name="maxActive" value="64"/>
     </bean>
 
 </beans>
