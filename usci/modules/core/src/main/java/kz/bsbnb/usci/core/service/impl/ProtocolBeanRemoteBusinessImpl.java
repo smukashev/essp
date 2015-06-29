@@ -103,7 +103,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         message.setNameRu(entityStatus.getDescription());
 
         Shared type = new Shared();
-        type.setCode("S");
+        type.setCode(entityStatus.getProtocol());
         type.setNameRu(entityStatus.getProtocol());
         type.setNameKz(entityStatus.getProtocol());
 
