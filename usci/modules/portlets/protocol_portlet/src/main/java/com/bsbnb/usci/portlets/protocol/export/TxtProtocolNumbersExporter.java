@@ -24,7 +24,7 @@ public class TxtProtocolNumbersExporter extends ProtocolExporter {
         List<ProtocolDisplayBean> protocols = getProtocols();
         Set<String> uniqueNumbers = new HashSet<String>();
         for (ProtocolDisplayBean protocol : protocols) {
-            if (protocol.isError()&&protocol.getDescription()!=null&&protocol.getDescription().length()>0) {
+            if (protocol.isError() && protocol.getDescription() != null && protocol.getDescription().length() > 0) {
                 uniqueNumbers.add(protocol.getDescription());
             }
         }

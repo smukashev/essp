@@ -9,6 +9,7 @@ import kz.bsbnb.usci.cr.model.Message;
 import kz.bsbnb.usci.cr.model.MessageType;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.Shared;
+import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -116,7 +117,7 @@ public class ProtocolDisplayBean {
     }
 
     public boolean isError() {
-        return MessageType.CRITICAL_ERROR.getCode().equals(protocol.getMessageType().getCode());
+        return "ERROR".equals(getMessageType());
     }
 
     public String getMessageTypeCode() {
