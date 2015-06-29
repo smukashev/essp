@@ -34,7 +34,7 @@ public class MailMessageBeanCommonBusinessImpl implements MailMessageBeanCommonB
 
     @Override
     public void sendMailMessage(String templateCode, Long recipientUserId, Properties parametersByCode) {
-
+        mailDao.sendMailMessage(templateCode, recipientUserId, parametersByCode);
     }
 
     @Override
@@ -55,5 +55,10 @@ public class MailMessageBeanCommonBusinessImpl implements MailMessageBeanCommonB
     @Override
     public boolean isTemplateEnabledForUser(Long templateId, long userId) {
         return mailDao.isTemplateEnabledForUser(templateId, userId);
+    }
+
+    @Override
+    public boolean isMailHandlingOn() {
+        return mailDao.isMailHandlingOn();
     }
 }

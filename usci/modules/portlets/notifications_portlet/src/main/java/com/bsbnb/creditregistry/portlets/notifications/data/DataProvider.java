@@ -47,4 +47,6 @@ public interface DataProvider {
     public PortalUser getPortalUserByUserId(long userId);
 
     public boolean isTemplateSendingEnabled(MailTemplate mailTemplate, long recipientUserId);
+
+    boolean isMailHandlingOn();
 }

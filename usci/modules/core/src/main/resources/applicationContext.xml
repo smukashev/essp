@@ -10,6 +10,7 @@
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
     <context:component-scan base-package="kz.bsbnb.usci.core.service.impl" />
     <context:component-scan base-package="kz.bsbnb.usci.tool" />
+    <context:component-scan base-package="kz.bsbnb.usci.core.listener.cr" />
 
     <context:annotation-config/>
 

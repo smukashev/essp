@@ -65,11 +65,6 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
             StatusProperties.fillSpecificProperties(entityStatus, baseEntity);
 
-            /*Properties properties = new Properties();
-            BatchFullJModel batch = statusSingleton.getBatch(baseEntity.getBatchId());
-            properties.put("FILENAME", batch.getFileName());
-            mailDao.sendMailMessage("FILE_PROCESSING_COMPLETED", batch.getUserId(), properties);*/
-
             statusSingleton.addContractStatus(baseEntity.getBatchId(), entityStatus);
         } catch (Exception e) {
             logger.error("Batch id: " + baseEntity.getBatchId() + ", index: " + (baseEntity.getBatchIndex() - 1) +

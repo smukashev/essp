@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver.repository;
 
+import kz.bsbnb.usci.core.service.MailMessageBeanCommonBusiness;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.RemoteCreditorBusiness;
 import kz.bsbnb.usci.cr.model.PortalUser;
@@ -18,4 +19,5 @@ public interface IServiceRepository {
     PortalUserBeanRemoteBusiness getUserService();
     RemoteCreditorBusiness getRemoteCreditorBusiness();
     ReportBeanRemoteBusiness getReportBeanRemoteBusinessService();
+    MailMessageBeanCommonBusiness getMailMessageBeanCommonBusiness();
 }

@@ -19,4 +19,6 @@ public interface PortalUserBeanRemoteBusiness {
     List<Creditor> getMainCreditorsInAlphabeticalOrder(long userId);
 
     PortalUser getUser(long userId);
+
+    List<PortalUser> getPortalUsersHavingAccessToCreditor(Creditor creditor);
 }

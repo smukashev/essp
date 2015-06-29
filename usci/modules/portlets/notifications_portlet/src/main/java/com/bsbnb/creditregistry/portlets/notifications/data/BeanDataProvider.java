@@ -206,14 +206,16 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public boolean isTemplateSendingEnabled(MailTemplate template, long recipientUserId) {
-        //if(1==1)
-        //    return true;
-
         if (template.getConfigurationTypeId() == MailConfigurationTypes.OBLIGATORY) {
             //Данный шаблон не настраивается пользователем, а высылается в обязательном порядке
             return true;
         }
         //если шаблон настраивается пользователем, проверяются настройки
         return mailMessageBusiness.isTemplateEnabledForUser(template.getId(), recipientUserId);
+    }
+
+    @Override
+    public boolean isMailHandlingOn() {
+        return mailMessageBusiness.isMailHandlingOn();
     }
 }

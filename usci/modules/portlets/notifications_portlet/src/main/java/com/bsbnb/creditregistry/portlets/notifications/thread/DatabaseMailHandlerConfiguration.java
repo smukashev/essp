@@ -42,8 +42,7 @@ public class DatabaseMailHandlerConfiguration implements MailHandlerConfiguratio
     }
 
     public boolean isMailHandlingOn() throws ConfigurationException {
-        //return "1".equals(dataProvider.getConfig(IS_MAIL_HANDLING_ON_CODE).getValue());
-        return true;
+        return dataProvider.isMailHandlingOn();
     }
 
     public String getSmtpHost() throws ConfigurationException {

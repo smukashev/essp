@@ -278,11 +278,11 @@ public class MailDaoImpl extends JDBCSupport implements IMailDao {
                 .from(MAIL_USER_MAIL_TEMPLATE)
                 .where(MAIL_USER_MAIL_TEMPLATE.PORTAL_USER_ID.eq(userId))
                 .and(MAIL_USER_MAIL_TEMPLATE.MAIL_TEMPLATE_ID.eq(templateId))
-                .and(MAIL_USER_MAIL_TEMPLATE.ENABLED.eq(DataUtils.convert(true)));
+                .and(MAIL_USER_MAIL_TEMPLATE.ENABLED.eq(DataUtils.convert(false)));
 
         int ans = jdbcTemplate.queryForInt(select.getSQL(),select.getBindValues().toArray());
 
-        return ans > 0;
+        return ans == 0;
     }
 
     @Override
@@ -323,5 +323,18 @@ public class MailDaoImpl extends JDBCSupport implements IMailDao {
         }
 
         return ret;
+    }
+
+    @Override
+    public boolean isMailHandlingOn() {
+        Select select = context.select(DSL.count())
+                .from(EAV_A_SYSCONFIG)
+                .where(EAV_A_SYSCONFIG.KEY_.eq("IS_MAIL_HANDLING_ON"))
+                .and(EAV_A_SYSCONFIG.VALUE_.eq("1"))
+                .limit(1);
+
+        int ans = jdbcTemplate.queryForInt(select.getSQL(),select.getBindValues().toArray());
+
+        return ans > 0;
     }
 }

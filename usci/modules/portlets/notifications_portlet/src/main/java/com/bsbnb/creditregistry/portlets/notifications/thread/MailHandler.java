@@ -155,7 +155,6 @@ public class MailHandler implements Runnable {
                     }
                 } catch (Exception ex) {
                     log.log(Level.WARNING, "Unexpected exception", ex);
-                    break;
                 }
             }
 
