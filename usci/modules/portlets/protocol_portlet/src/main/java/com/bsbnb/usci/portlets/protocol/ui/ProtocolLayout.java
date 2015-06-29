@@ -92,7 +92,7 @@ public class ProtocolLayout extends VerticalLayout {
         "statusIcon", "typeName", "description", "primaryContractDate", "message", "note", "link" };
 
     private static final String[] EXPORT_PROTOCOL_TABLE_COLUMNS = new String[] {
-        "description", "primaryContractDate", "typeName", "messageTypeName", "message", "note", "link" };
+        "description", "primaryContractDate", "typeName", "messageType", "message", "note"};
 
     public ProtocolLayout(DataProvider provider) {
         this.provider = provider;
