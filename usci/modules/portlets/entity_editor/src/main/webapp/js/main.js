@@ -20,6 +20,17 @@ function getForm(){
         },
         success: function(data){
             document.getElementById('entity-editor-form').innerHTML = data.responseText;
+            var all = document.getElementsByClassName("usci-date");
+            for(var i = 0; i < all.length;i++) {
+                var info =  all[i].id.match(regex);
+                Ext.create('Ext.form.DateField', {
+                    renderTo: all[i].id,
+                    fieldLabel: 'дата',
+                    labelWidth: 27,
+                    id: 'inp-' + info[1],
+                    format: 'd.m.Y',
+                });
+            }
         }
     });
 }
@@ -38,6 +49,12 @@ function filterLeaf(control, queryObject){
             }
 
             queryObject[info[3]] = childControl.value;
+        } else if(childControl.tagName == 'DIV') {
+            var info = childControl.id.match(regex);
+            if(info == null)
+                continue;
+            var id = info[1];
+            queryObject[info[3]] = Ext.getCmp('inp-' + id).value;
         }
     }
 }
