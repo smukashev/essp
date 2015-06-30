@@ -61,9 +61,11 @@ public class JasperReportExporter extends AbstractReportExporter{
 
     protected void exportToXls() {
         try {
+            loadStarted();
             CustomDataSource dataSource = getTargetReportComponent().loadData();
             Report report = getTargetReportComponent().getReport();
             final String reportName = report.getName();
+
             final String reportPath = ConstantValues.REPORT_FILES_CATALOG+reportName+"\\";
             final String jasperFilePath = reportPath+reportName+".jasper";
             final String resourceFilePath = reportPath+reportName+"_"+ ReportApplication.getApplicationLocale().getLanguage()+".properties";
@@ -142,6 +144,7 @@ public class JasperReportExporter extends AbstractReportExporter{
                 }
             };
             (getWindow()).open(resource);
+            loadFinished();
         } catch(JRException jre) {
             ReportApplication.log.log(Level.INFO, "Report exception", jre);
         } catch(IOException ioe) {
