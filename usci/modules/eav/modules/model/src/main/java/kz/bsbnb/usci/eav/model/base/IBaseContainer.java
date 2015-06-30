@@ -13,68 +13,57 @@ import java.util.Set;
 /**
  * @author k.tulbassiyev
  */
-public interface IBaseContainer extends IBaseObject
-{
+public interface IBaseContainer extends IBaseObject {
 
-    public class ValueChangeEvent extends IBaseObject.Event
-    {
+    class ValueChangeEvent extends IBaseObject.Event {
         private String identifier;
 
-        public ValueChangeEvent(IBaseContainer source, String identifier)
-        {
+        public ValueChangeEvent(IBaseContainer source, String identifier) {
             super(source);
             this.identifier = identifier;
         }
 
-        public IBaseContainer getSource()
-        {
-            return (IBaseContainer)super.getSource();
+        public IBaseContainer getSource() {
+            return (IBaseContainer) super.getSource();
         }
 
-        public String getIdentifier()
-        {
+        public String getIdentifier() {
             return identifier;
         }
     }
 
-    public interface IValueChangeListener
-    {
-
-        public void valueChange(ValueChangeEvent event);
-
+    interface IValueChangeListener {
+        void valueChange(ValueChangeEvent event);
     }
 
-    public void addListener(IValueChangeListener listener);
+    void addListener(IValueChangeListener listener);
 
-    public void removeListener(IValueChangeListener listener);
+    void removeListener(IValueChangeListener listener);
 
-    public void setListening(boolean listening);
+    void setListening(boolean listening);
 
-    public boolean isListening();
+    boolean isListening();
 
-    public Set<String> getAttributes();
+    Set<String> getAttributes();
 
-    public void put(String identifier, IBaseValue value);
+    void put(String identifier, IBaseValue value);
 
-    public Collection<IBaseValue> get();
+    Collection<IBaseValue> get();
 
-    public IBaseValue getBaseValue(String identifier);
+    IBaseValue getBaseValue(String identifier);
 
-    public IMetaType getMemberType(String identifier);
+    IMetaType getMemberType(String identifier);
 
-    public void clearModifiedIdentifiers();
+    void clearModifiedIdentifiers();
 
-    public Set<String> getModifiedIdentifiers();
+    Set<String> getModifiedIdentifiers();
 
-    public boolean isSet();
+    boolean isSet();
 
-    public int getValueCount();
+    int getValueCount();
 
-    public BaseContainerType getBaseContainerType();
+    BaseContainerType getBaseContainerType();
 
-    public void setBaseContainerType(BaseContainerType baseContainerType);
-
-    //public IMetaContainer getMetaContainer();
-
+    void setBaseContainerType(BaseContainerType baseContainerType);
 
 }

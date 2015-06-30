@@ -11,24 +11,24 @@ import java.util.Set;
  */
 public interface IBaseEntityManager {
 
-    public void registerAsInserted(IPersistable persistableObject);
+    void registerAsInserted(IPersistable persistableObject);
 
-    public void registerAsUpdated(IPersistable persistableObject);
+    void registerAsUpdated(IPersistable persistableObject);
 
-    public void registerAsDeleted(IPersistable persistableObject);
+    void registerAsDeleted(IPersistable persistableObject);
 
-    public void registerUnusedBaseEntity(IBaseEntity unusedBaseEntity);
+    void registerUnusedBaseEntity(IBaseEntity unusedBaseEntity);
 
-    public void registerProcessedBaseEntity(IBaseEntity processedBaseEntity);
+    void registerProcessedBaseEntity(IBaseEntity processedBaseEntity);
 
-    public List<IPersistable> getInsertedObjects(Class objectClass);
+    List<IPersistable> getInsertedObjects(Class objectClass);
 
-    public List<IPersistable> getUpdatedObjects(Class objectClass);
+    List<IPersistable> getUpdatedObjects(Class objectClass);
 
-    public List<IPersistable> getDeletedObjects(Class objectClass);
+    List<IPersistable> getDeletedObjects(Class objectClass);
 
-    public Set<IBaseEntity> getUnusedBaseEntities();
+    Set<IBaseEntity> getUnusedBaseEntities();
 
-    public IBaseEntity getProcessed(IBaseEntity baseEntity);
+    IBaseEntity getProcessed(IBaseEntity baseEntity);
 
 }

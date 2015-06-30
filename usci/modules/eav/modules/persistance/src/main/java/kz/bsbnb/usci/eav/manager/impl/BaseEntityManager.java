@@ -16,9 +16,9 @@ import java.util.*;
  */
 public class BaseEntityManager implements IBaseEntityManager {
 
-    public static List<Class> CLASS_PRIORITY = new ArrayList<Class>();
-    static
-    {
+    public static List<Class> CLASS_PRIORITY = new ArrayList<>();
+
+    static {
         CLASS_PRIORITY.add(BaseEntity.class);
         CLASS_PRIORITY.add(BaseEntityReportDate.class);
 
@@ -42,70 +42,52 @@ public class BaseEntityManager implements IBaseEntityManager {
         CLASS_PRIORITY.add(BaseSetComplexValue.class);
     }
 
-    private Map<Class, List<IPersistable>> insertedObjects = new HashMap<Class, List<IPersistable>>();
-    private Map<Class, List<IPersistable>> updatedObjects = new HashMap<Class, List<IPersistable>>();
-    private Map<Class, List<IPersistable>> deletedObjects = new HashMap<Class, List<IPersistable>>();
+    private Map<Class, List<IPersistable>> insertedObjects = new HashMap<>();
+    private Map<Class, List<IPersistable>> updatedObjects = new HashMap<>();
+    private Map<Class, List<IPersistable>> deletedObjects = new HashMap<>();
 
-    private Set<IBaseEntity> unusedBaseEntities = new HashSet<IBaseEntity>();
-    private HashMap<String, List<IBaseEntity>> processedEntities = new HashMap<String, List<IBaseEntity>>();
+    private Set<IBaseEntity> unusedBaseEntities = new HashSet<>();
+    private HashMap<String, List<IBaseEntity>> processedEntities = new HashMap<>();
 
-    public void registerAsInserted(IPersistable insertedObject)
-    {
+    public void registerAsInserted(IPersistable insertedObject) {
         if (insertedObject == null)
-        {
             throw new RuntimeException("Inserted object can not be null;");
-        }
 
         Class objectClass = insertedObject.getClass();
-        if (insertedObjects.containsKey(objectClass))
-        {
+        if (insertedObjects.containsKey(objectClass)) {
             insertedObjects.get(objectClass).add(insertedObject);
-        }
-        else
-        {
-            List<IPersistable> objects = new ArrayList<IPersistable>();
+        } else {
+            List<IPersistable> objects = new ArrayList<>();
             objects.add(insertedObject);
 
             insertedObjects.put(objectClass, objects);
         }
     }
 
-    public void registerAsUpdated(IPersistable updatedObject)
-    {
+    public void registerAsUpdated(IPersistable updatedObject) {
         if (updatedObject == null)
-        {
             throw new RuntimeException("Updated object can not be null;");
-        }
 
         Class objectClass = updatedObject.getClass();
-        if (updatedObjects.containsKey(objectClass))
-        {
+        if (updatedObjects.containsKey(objectClass)) {
             updatedObjects.get(objectClass).add(updatedObject);
-        }
-        else
-        {
-            List<IPersistable> objects = new ArrayList<IPersistable>();
+        } else {
+            List<IPersistable> objects = new ArrayList<>();
             objects.add(updatedObject);
 
             updatedObjects.put(objectClass, objects);
         }
     }
 
-    public void registerAsDeleted(IPersistable deletedObject)
-    {
+    public void registerAsDeleted(IPersistable deletedObject) {
         if (deletedObject == null)
-        {
             throw new RuntimeException("Deleted object can not be null;");
-        }
 
         Class objectClass = deletedObject.getClass();
-        if (deletedObjects.containsKey(objectClass))
-        {
+        if (deletedObjects.containsKey(objectClass)) {
             deletedObjects.get(objectClass).add(deletedObject);
-        }
-        else
-        {
-            List<IPersistable> objects = new ArrayList<IPersistable>();
+        } else {
+            List<IPersistable> objects = new ArrayList<>();
             objects.add(deletedObject);
 
             deletedObjects.put(objectClass, objects);
@@ -113,12 +95,9 @@ public class BaseEntityManager implements IBaseEntityManager {
     }
 
     @Override
-    public void registerUnusedBaseEntity(IBaseEntity unusedBaseEntity)
-    {
+    public void registerUnusedBaseEntity(IBaseEntity unusedBaseEntity) {
         if (unusedBaseEntity == null)
-        {
             throw new RuntimeException("Unused instance of BaseEntity can not be null;");
-        }
 
         unusedBaseEntities.add(unusedBaseEntity);
     }
@@ -127,9 +106,8 @@ public class BaseEntityManager implements IBaseEntityManager {
     public void registerProcessedBaseEntity(IBaseEntity processedBaseEntity) {
         List<IBaseEntity> entityList = processedEntities.get(processedBaseEntity.getMeta().getClassName());
 
-        if (entityList == null) {
-            entityList = new ArrayList<IBaseEntity>();
-        }
+        if (entityList == null)
+            entityList = new ArrayList<>();
 
         entityList.add(processedBaseEntity);
         processedEntities.put(processedBaseEntity.getMeta().getClassName(), entityList);
@@ -159,17 +137,14 @@ public class BaseEntityManager implements IBaseEntityManager {
     public IBaseEntity getProcessed(IBaseEntity baseEntity) {
         List<IBaseEntity> entityList = processedEntities.get(baseEntity.getMeta().getClassName());
 
-        if (entityList == null) {
+        if (entityList == null)
             return null;
-        }
 
         BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
 
-        for (IBaseEntity currentBaseEntity : entityList) {
-            if (comparator.compare((BaseEntity)baseEntity, (BaseEntity)currentBaseEntity)) {
+        for (IBaseEntity currentBaseEntity : entityList)
+            if (comparator.compare((BaseEntity) baseEntity, (BaseEntity) currentBaseEntity))
                 return currentBaseEntity;
-            }
-        }
 
         return null;
     }
