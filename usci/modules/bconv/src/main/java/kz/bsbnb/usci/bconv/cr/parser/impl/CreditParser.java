@@ -150,7 +150,13 @@ public class CreditParser extends BatchParser {
                 if(portfolioCount == 2){
                     event = (XMLEvent) xmlReader.next();
                     BaseEntity portfolio = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),batch.getRepDate());
-                    portfolio.put("code",new BaseEntityStringValue(batch,index,event.asCharacters().getData()));
+                    String value = null;
+                    try {
+                        value = event.asCharacters().getData();
+                    } catch (ClassCastException e) {
+                        logger.debug("Empty tag: " + localName);
+                    }
+                    portfolio.put("code",new BaseEntityStringValue(batch,index, value));
                     currentPortfolio.put("portfolio",new BaseEntityComplexValue(batch,index,portfolio));
                     //if(!stack.pop().equals("portfolio")) {}
                     //portfolio = new Portfolio();
