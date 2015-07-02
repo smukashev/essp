@@ -330,8 +330,7 @@ public class MailDaoImpl extends JDBCSupport implements IMailDao {
         Select select = context.select(DSL.count())
                 .from(EAV_A_SYSCONFIG)
                 .where(EAV_A_SYSCONFIG.KEY_.eq("IS_MAIL_HANDLING_ON"))
-                .and(EAV_A_SYSCONFIG.VALUE_.eq("1"))
-                .limit(1);
+                .and(EAV_A_SYSCONFIG.VALUE_.eq("1"));
 
         int ans = jdbcTemplate.queryForInt(select.getSQL(),select.getBindValues().toArray());
 

@@ -2,6 +2,7 @@ package kz.bsbnb.usci.portlet.report.export;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -123,6 +124,7 @@ public class TableReportExporter extends AbstractReportExporter {
     }
 
     protected void loadTable() {
+        loadStarted();
         getTargetReportComponent().clearOutputComponents();
         try {
             CustomDataSource customDataSource = getTargetReportComponent().loadData();
@@ -132,6 +134,10 @@ public class TableReportExporter extends AbstractReportExporter {
             Table table = getTable(customDataSource);
 
             getTargetReportComponent().addOutputComponent(table);
+            //getTargetReportComponent().getConnect().getUserId()
+            //getTargetReportComponent().getReport().getNameRu()
+           // ResultSet rs =  getTargetReportComponent().getConnect().runQuery("select report_mail(2319, 'test', sysdate, 'Тест', sysdate) from dual");
+        loadFinished();
         } catch (SQLException sqle) {
             log.log(Level.SEVERE, "Sql exception", sqle);
             getTargetReportComponent().addOutputComponent(new Label("Sql exception: " + sqle.getMessage()));

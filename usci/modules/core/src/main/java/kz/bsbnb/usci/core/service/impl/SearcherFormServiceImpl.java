@@ -134,14 +134,18 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
                     }
                 } else {
                     String divSimple;
-                    if( ((MetaValue)metaType).getTypeCode().equals(DataTypes.DATE))
-                        divSimple = "<div class='leaf'> %s: <input type = 'date' id='inp-%d-%s-%s' />" +
+                    long nextId = nextId();
+
+                    if( ((MetaValue)metaType).getTypeCode().equals(DataTypes.DATE)) {
+                        divSimple = "<div class='leaf'> <div id='inp-%d-%s-%s' class='usci-date' ></div>" +
                                 "<div class='not-filled' id='err-%d'>not.filled</div></div>";
-                    else
+                        divSimple = String.format(divSimple, nextId, "simple", attr, nextId);
+                    }
+                    else {
                         divSimple = "<div class='leaf'> %s: <input type = 'text' id='inp-%d-%s-%s' />" +
                                 "<div class='not-filled' id='err-%d'>не заполнено</div></div>";
-                    long nextId = nextId();
-                    divSimple = String.format(divSimple, metaAttribute.getTitle(), nextId, "simple", attr , nextId);
+                        divSimple = String.format(divSimple, metaAttribute.getTitle(), nextId, "simple", attr, nextId);
+                    }
                     ret += divSimple;
                 }
             }
