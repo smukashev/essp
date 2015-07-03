@@ -216,7 +216,8 @@ function addField(form, attr, idSuffix, node) {
     var readOnly = (node && node.value && attr.isKey)
         || (attr.array && attr.isKey)
         || (node && !node.root && node.ref)
-        || (node && node.array && !attr.simple && !attr.ref);
+        || (node && node.array && !attr.simple && !attr.ref)
+        || (!attr.simple && !attr.array && !attr.ref);
 
     var allowBlank = !(attr.isRequired || attr.isKey);
 
@@ -339,6 +340,8 @@ function addArrayElementButton(form) {
     form.add(Ext.create('Ext.button.Button', {
         id: "btnFormAddArrayElement",
         text: "Добавить элемент",
+        margin: '0 0 5 0',
+
         handler : function () {
             var tree = Ext.getCmp('entityTreeView');
             var selectedNode = tree.getSelectionModel().getLastSelected();
@@ -428,22 +431,31 @@ function saveFormValues(formKind) {
         });
         selectedNode = rootNode.getChildAt(0);
     } else if (formKind == FORM_ADD_ARRAY_EL) {
-        selectedNode.appendChild({
+        var form = Ext.getCmp('EntityEditorFormPannel');
+        var arrayIndex = selectedNode.childNodes.length;
+        var element = {
             leaf: false,
-            title: "[" + nextArrayIndex + "]",
-            code: "[" + nextArrayIndex + "]",
-            type: selectedNode.childType,
-            metaId: selectedNode.childMetaId
-        });
-        selectedNode = selectedNode.getChildAt(nextArrayIndex);
+            title: "[" + arrayIndex + "]",
+            code: "[" + arrayIndex + "]",
+            type: selectedNode.data.childType,
+            metaId: selectedNode.data.childMetaId
+        };
+        selectedNode.appendChild(element);
+        selectedNode.data.value = selectedNode.childNodes.length;
+        selectedNode = selectedNode.getChildAt(arrayIndex);
+        addField(form, element, "_edit", selectedNode);
     }
 
-    if (selectedNode.data.array) {
-        alert("ERROR. This case must never happen!!!");
-        //for (var i = 0; i < newArrayElements.length; i++) {
-        //    selectedNode.appendChild(newArrayElements[i]);
-        //}
-        //selectedNode.data.value = selectedNode.childNodes.length;
+    if (selectedNode.data.array && selectedNode.data.simple) {
+        selectedNode.removeAll();
+
+        for (var i = 0; i < newArrayElements.length; i++) {
+            var el = newArrayElements[i];
+            var field = Ext.getCmp(el.code + "FromItem" + idSuffix);
+            el.value = el.type == "DATE" ? field.getSubmitValue() : field.getValue();
+            selectedNode.appendChild(el);
+        }
+        selectedNode.data.value = selectedNode.childNodes.length;
     } else {
         var attributes = attrStore.getRange();
 
@@ -892,6 +904,7 @@ Ext.onReady(function() {
             itemclick: function(view, record, item, index, e, eOpts) {
                 nextArrayIndex = 0;
                 newArrayElements = [];
+                Ext.getCmp('btnConfirmChanges').show();
                 var tree = Ext.getCmp('entityTreeView');
                 var selectedNode = tree.getSelectionModel().getLastSelected();
                 var children = selectedNode.childNodes;
@@ -903,6 +916,8 @@ Ext.onReady(function() {
                     if (!selectedNode.data.array) {
                         loadAttributes(form, selectedNode);
                     } else {
+                        Ext.getCmp('btnConfirmChanges').hide();
+
                         addArrayElementButton(form);
 
                         for(var i = 0; i < children.length; i++){
@@ -967,7 +982,7 @@ Ext.onReady(function() {
                 autoScroll:true,
                 bbar: [
                     Ext.create('Ext.button.Button', {
-                        id: "btnFormSave",
+                        id: "btnConfirmChanges",
                         text: label_CONFIRM_CHANGES,
                         handler : function () {
                             var form = Ext.getCmp('EntityEditorFormPannel');
