@@ -4,10 +4,12 @@ import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchEntriesDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.jooq.DSLContext;
 import org.jooq.DeleteConditionStep;
 import org.jooq.Insert;
 import org.jooq.Select;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,8 +87,7 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
                 .set(BATCH_ENTRIES.USER_ID, batch.getUserId())
                 .set(BATCH_ENTRIES.VALUE, batch.getValue())
                 .set(BATCH_ENTRIES.REPORT_DATE, new Date(batch.getRepDate().getTime()))
-                .set(BATCH_ENTRIES.UPDATED_DATE,
-                        new Date(Calendar.getInstance().getTimeInMillis()));
+                .set(BATCH_ENTRIES.UPDATED_DATE, DataUtils.convertToTimestamp(new java.util.Date()));
 
 
         baseEntityId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());

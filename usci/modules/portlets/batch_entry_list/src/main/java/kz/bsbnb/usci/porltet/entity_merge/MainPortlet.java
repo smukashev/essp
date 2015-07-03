@@ -117,6 +117,9 @@ public class MainPortlet extends MVCPortlet {
 
             switch (operationType) {
                 case LIST_ENTRIES:
+                    DateFormat dfRep = new SimpleDateFormat("dd.MM.yyyy");
+                    DateFormat dfUpd = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
                     List<BatchEntry> entries = batchEntryService.getListByUser(currentUser.getUserId());
 
                     writer.write("{\"total\":" + entries.size());
@@ -134,8 +137,8 @@ public class MainPortlet extends MVCPortlet {
                         writer.write("{");
 
                         writer.write("\"id\":\"" + batchEntry.getId() + "\",");
-                        writer.write("\"u_date\":\"" + batchEntry.getUpdateDate() + "\",");
-                        writer.write("\"rep_date\":\"" + batchEntry.getRepDate() + "\"");
+                        writer.write("\"u_date\":\"" + dfUpd.format(batchEntry.getUpdateDate()) + "\",");
+                        writer.write("\"rep_date\":\"" + dfRep.format(batchEntry.getRepDate()) + "\"");
                         writer.write("}");
                     }
 
