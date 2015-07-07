@@ -79,10 +79,11 @@
                 var sign = document.getElementById("sign" + id);
                 sign.value = pkcs7;
 
-                var acceptImage = document.createElement('img');
-                acceptImage.src = '/signing-portlet/accept.png';
+                var image = document.createElement('img');
+                image.src = pkcs7 != null && pkcs7.length > 0 ?
+                        '/signing-portlet/accept.png' : '/signing-portlet/error.png';
                 var signSymbolCell = document.getElementById("signSymbol" + id);
-                signSymbolCell.appendChild(acceptImage);
+                signSymbolCell.appendChild(image);
             }
         }
     }
