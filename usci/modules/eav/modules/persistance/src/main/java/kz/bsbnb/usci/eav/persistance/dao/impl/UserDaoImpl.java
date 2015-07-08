@@ -334,41 +334,6 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao
     }
 
     @Override
-    public List<String> getAllowedClasses(long portalUserId) {
-        Select select = context.select(EAV_A_USER_CLASS.META_NAME)
-                .from(EAV_A_USER_CLASS)
-                .where(EAV_A_USER_CLASS.USER_ID.eq(portalUserId));
-
-        List<String> list = new ArrayList<String>();
-
-        List<Map<String,Object> > ret = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        for(Map<String,Object> m : ret) {
-            list.add((String)m.get(EAV_A_USER_CLASS.META_NAME.getName()));
-        }
-
-        return list;
-    }
-
-    @Override
-    public List<Long> getAllowedRefs(long portalUserId, String meta){
-        Select select = context.select(EAV_A_USER_REF.ENTITY_ID)
-                .from(EAV_A_USER_REF)
-                .where(EAV_A_USER_REF.USER_ID.eq(portalUserId))
-                .and(EAV_A_USER_REF.META_NAME.eq(meta));
-
-        List<Long> list = new ArrayList<Long>();
-
-        List<Map<String,Object> > ret = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        for(Map<String,Object> m : ret) {
-            list.add( ((BigDecimal)m.get(EAV_A_USER_REF.ENTITY_ID.getName())).longValue());
-        }
-
-        return list;
-    }
-
-    @Override
     public PortalUser getUser(long userId) {
         Select select = context.select()
                 .from(EAV_A_USER)

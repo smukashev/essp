@@ -47,7 +47,7 @@
     <bean id="remoteSearcherFormService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="refreshStubOnConnectFailure" value="true"/>
         <property name="serviceUrl" value="rmi://127.0.0.1:1099/searcherFormService"/>
-        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.ISearcherFormService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.form.ISearcherFormService"/>
     </bean>
 
     <bean id="reportBeanRemoteBusiness" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">

@@ -1,0 +1,172 @@
+rule read $$$
+title: Функция для работы c типом субъекта
+function String getSubjectTypeCodeOfCredit(IEntityService entityService, BaseEntity credit){
+  try{
+        BaseEntity creditor = (BaseEntity)credit.getEl("creditor");
+        creditor = entityService.prepare(creditor);
+        creditor = entityService.getActualBaseEntity(creditor);
+        return (String) creditor.getEl("subject_type.code");
+    } catch (Exception e) {
+        credit.addValidationError(e.getMessage());
+    }
+    return null;
+}
+$$$
+
+rule save
+
+rule read $$$
+title: проверка на отсутсвие бс основного долга текущего остатка для прочих организаций
+rule "проверка на отсутсвие бс основного долга текущего остатка для прочих организаций"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& getSubjectTypeCodeOfCredit(entityService, $entity) == "0003"
+			&& getEl("change.remains.debt.current.balance_account.no_") != null)
+then
+	$entity.addValidationError("Прочие организации, осуществляющие отдельные виды банковских операций не должны указывать банковские счета")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка на отсутсвие бс основного долга просроченного остатка для прочих организаций
+rule "проверка на отсутсвие бс основного долга просроченного остатка для прочих организаций"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& getSubjectTypeCodeOfCredit(entityService, $entity) == "0003"
+			&& getEl("change.remains.debt.pastdue.balance_account.no_") != null)
+then
+	$entity.addValidationError("Прочие организации, осуществляющие отдельные виды банковских операций не должны указывать банковские счета")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка на отсутсвие бс основного долга списанного остатка для прочих организаций
+rule "проверка на отсутсвие бс основного долга списанного остатка для прочих организаций"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& getSubjectTypeCodeOfCredit(entityService, $entity) == "0003"
+			&& getEl("change.remains.debt.write_off.balance_account.no_") != null)
+then
+	$entity.addValidationError("Прочие организации, осуществляющие отдельные виды банковских операций не должны указывать банковские счета")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка на отсутсвие бс вознаграждения текущего остатка для прочих организаций
+rule "проверка на отсутсвие бс вознаграждения текущего остатка для прочих организаций"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& getSubjectTypeCodeOfCredit(entityService, $entity) == "0003"
+			&& getEl("change.remains.interest.current.balance_account.no_") != null)
+then
+	$entity.addValidationError("Прочие организации, осуществляющие отдельные виды банковских операций не должны указывать банковские счета")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка на отсутсвие бс вознаграждения просроченного остатка для прочих организаций
+rule "проверка на отсутсвие бс вознаграждения просроченного остатка для прочих организаций"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& getSubjectTypeCodeOfCredit(entityService, $entity) == "0003"
+			&& getEl("change.remains.interest.pastdue.balance_account.no_") != null)
+then
+	$entity.addValidationError("Прочие организации, осуществляющие отдельные виды банковских операций не должны указывать банковские счета")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка на отсутсвие бс провизий для прочих организаций
+rule "проверка на отсутсвие бс провизий для прочих организаций"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& getSubjectTypeCodeOfCredit(entityService, $entity) == "0003"
+			&& getEl("change.credit_flow.provision.provision_kfn.balance_account.no_") != null)
+then
+	$entity.addValidationError("Прочие организации, осуществляющие отдельные виды банковских операций не должны указывать банковские счета")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка на отсутсвие бс провизий МСФО для прочих организаций
+rule "проверка на отсутсвие бс провизий МСФО для прочих организаций"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& getSubjectTypeCodeOfCredit(entityService, $entity) == "0003"
+			&& getEl("change.credit_flow.provision.provision_msfo.balance_account.no_") != null)
+then
+	$entity.addValidationError("Прочие организации, осуществляющие отдельные виды банковских операций не должны указывать банковские счета")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка на отсутсвие бс провизий МСФО над балансом для прочих организаций
+rule "проверка на отсутсвие бс провизий МСФО над балансом для прочих организаций"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& getSubjectTypeCodeOfCredit(entityService, $entity) == "0003"
+			&& getEl("change.credit_flow.provision.provision_msfo_over_balance.balance_account.no_") != null)
+then
+	$entity.addValidationError("Прочие организации, осуществляющие отдельные виды банковских операций не должны указывать банковские счета")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка на отсутсвие бс корректировки остатка  для прочих организаций
+rule "проверка на отсутсвие бс корректировки остатка  для прочих организаций"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& getSubjectTypeCodeOfCredit(entityService, $entity) == "0003"
+			&& getEl("change.remains.correction.balance_account.no_") != null)
+then
+	$entity.addValidationError("Прочие организации, осуществляющие отдельные виды банковских операций не должны указывать банковские счета")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка на отсутсвие бс дисконта для прочих организаций
+rule "проверка на отсутсвие бс дисконта для прочих организаций"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& getSubjectTypeCodeOfCredit(entityService, $entity) == "0003"
+			&& getEl("change.remains.discount.balance_account.no_") != null)
+then
+	$entity.addValidationError("Прочие организации, осуществляющие отдельные виды банковских операций не должны указывать банковские счета")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка на отсутсвие бс лимита для прочих организаций
+rule "проверка на отсутсвие бс лимита для прочих организаций"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& getSubjectTypeCodeOfCredit(entityService, $entity) == "0003"
+			&& getEl("change.remains.limit.balance_account.no_") != null)
+then
+	$entity.addValidationError("Прочие организации, осуществляющие отдельные виды банковских операций не должны указывать банковские счета")
+end
+$$$
+
+rule save
+
+quit

@@ -1,16 +1,15 @@
-package kz.bsbnb.usci.porltet.entity_editor;
+package kz.bsbnb.usci.porltet.entity_merge;
 
 import com.google.gson.Gson;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import com.google.gson.Gson;
 import java.util.*;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Bauyrzhan.Makhambeto
- * Date: 20.01.14
- * Time: 9:51
- * To change this template use File | Settings | File Templates.
- */
 public class JsonMaker {
 
     private static Gson gson = new Gson();
