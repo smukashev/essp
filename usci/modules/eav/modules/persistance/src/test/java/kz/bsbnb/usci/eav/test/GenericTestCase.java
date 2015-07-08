@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.test;
 
-import kz.bsbnb.usci.eav.factory.IMetaFactory;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
@@ -17,8 +16,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class GenericTestCase
-{
+public class GenericTestCase {
     @Autowired
     protected IStorage postgreSQLStorageImpl;
 
@@ -27,13 +25,11 @@ public class GenericTestCase
 
     @Before
     public void setUp() throws Exception {
-        if(postgreSQLStorageImpl != null)
-        {
+        if (postgreSQLStorageImpl != null) {
             postgreSQLStorageImpl.clear();
             postgreSQLStorageImpl.initialize();
         }
-        if(batchRepository != null)
-        {
+        if (batchRepository != null) {
             batchRepository.clearCache();
         }
     }
@@ -42,8 +38,7 @@ public class GenericTestCase
     public void tearDown() throws Exception {
     }
 
-    protected MetaClass generateMetaClass()
-    {
+    protected MetaClass generateMetaClass() {
         MetaClass metaStreetHolder = new MetaClass("street");
         metaStreetHolder.setMetaAttribute("lang",
                 new MetaAttribute(false, false, new MetaValue(DataTypes.STRING)));
@@ -97,19 +92,13 @@ public class GenericTestCase
         return metaContractHolder;
     }
 
-    protected BaseEntity generateBaseEntity(Batch batch, IMetaFactory metaFactory)
-    {
-        throw new RuntimeException("TODO: Fix me!");
-    }
-
-    protected BaseEntity generateBaseEntity(Batch batch, IMetaClassRepository metaFactory)
-    {
+    protected BaseEntity generateBaseEntity(Batch batch, IMetaClassRepository metaFactory) {
         BaseEntity streetEntity = new BaseEntity(metaFactory.getMetaClass("street"), batch.getRepDate());
         streetEntity.put("lang", new BaseValue(batch, 1, "KAZ"));
         streetEntity.put("value", new BaseValue(batch, 1, "ABAY"));
 
         BaseEntity houseEntity = new BaseEntity(metaFactory.getMetaClass("house"), batch.getRepDate());
-        BaseSet houseSet = new BaseSet(((MetaSet)(houseEntity.getMemberType("value"))).getMemberType());
+        BaseSet houseSet = new BaseSet(((MetaSet) (houseEntity.getMemberType("value"))).getMemberType());
         houseSet.put(new BaseValue(batch, 2, 111));
         houseSet.put(new BaseValue(batch, 2, 222));
         houseSet.put(new BaseValue(batch, 2, 333));
@@ -130,7 +119,7 @@ public class GenericTestCase
         documentEntity2.put("no", new BaseValue(batch, 4, "0987654321"));
 
         BaseEntity documentsEntity = new BaseEntity(metaFactory.getMetaClass("documents"), batch.getRepDate());
-        BaseSet documentsSet = new BaseSet(((MetaSet)(documentsEntity.getMemberType("document"))).getMemberType());
+        BaseSet documentsSet = new BaseSet(((MetaSet) (documentsEntity.getMemberType("document"))).getMemberType());
         documentsSet.put(new BaseValue(batch, 5, documentEntity1));
         documentsSet.put(new BaseValue(batch, 5, documentEntity2));
         documentsEntity.put("document", new BaseValue(batch, 5, documentsSet));
