@@ -8,8 +8,9 @@ Ext.require([
 
 var tabs;
 var grid;
-var currentClass;
-var currentClass2;
+var currentSearch;
+var currentMeta;
+
 var regex = /^\S+-(\d+)-(\S+)-(\S+)$/;
 var errors = [];
 
@@ -308,13 +309,15 @@ function markEntityKeepBoth(){
 }
 
 function getForm(){
-    currentClass = Ext.getCmp('edClass').value;
+    currentSearch = Ext.getCmp('edSearch').value;
+    currentMeta = Ext.getCmp('edSearch').displayTplData[0].metaName;
     Ext.Ajax.request({
         url: dataUrl,
         method: 'POST',
         params: {
             op: 'GET_FORM',
-            meta: currentClass
+            search: currentSearch,
+            metaName: currentMeta
         },
         success: function(data){
             document.getElementById('entity-editor-form').innerHTML = data.responseText;
@@ -323,13 +326,15 @@ function getForm(){
 }
 
 function getForm2(){
-    currentClass2 = Ext.getCmp('edClass2').value;
+    currentSearch2 = Ext.getCmp('edSearch2').value;
+    currentMeta2 = Ext.getCmp('edSearch2').displayTplData[0].metaName;
     Ext.Ajax.request({
         url: dataUrl,
         method: 'POST',
         params: {
             op: 'GET_FORM',
-            meta: currentClass2
+            search: currentSearch2,
+            metaName: currentMeta2
         },
         success: function(data){
             document.getElementById('entity-editor-form2').innerHTML = data.responseText;
@@ -464,7 +469,7 @@ Ext.onReady(function() {
 
     Ext.define('classesStoreModel', {
         extend: 'Ext.data.Model',
-        fields: ['id','name']
+        fields: ['searchName','metaName','title']
     });
 
     var classesStore = Ext.create('Ext.data.Store', {
@@ -794,12 +799,12 @@ Ext.onReady(function() {
                                 border: 0,
                                 items: [
                                     {
-                                        id: 'edClass',
+                                        id: 'edSearch',
                                         xtype: 'combobox',
                                         labelWidth: 350,
                                         store: classesStore,
-                                        valueField:'id',
-                                        displayField:'name',
+                                        valueField:'searchName',
+                                        displayField:'title',
                                         fieldLabel: label_CLASS,
                                         editable: false
                                     },
@@ -837,12 +842,12 @@ Ext.onReady(function() {
                                 border: 0,
                                 items: [
                                     {
-                                        id: 'edClass2',
+                                        id: 'edSearch2',
                                         xtype: 'combobox',
                                         store: classesStore,
                                         labelWidth: 350,
-                                        valueField:'id',
-                                        displayField:'name',
+                                        valueField:'searchName',
+                                        displayField:'title',
                                         fieldLabel: label_CLASS,
                                         editable: false
                                     },

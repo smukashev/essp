@@ -209,7 +209,7 @@ public class MainPortlet extends MVCPortlet {
                     first = false;
                 }
 
-                str +=  setToJson((BaseSet) (value.getValue()), attrTitle, innerClassesNames);
+                str +=  setToJson((BaseSet) (value.getValue()), attrTitle, innerClassesNames, value.getMetaAttribute());
             }
         }
 
@@ -269,7 +269,7 @@ public class MainPortlet extends MVCPortlet {
         return str;
     }
 
-    private String setToJson(BaseSet set, String title, String code) {
+    private String setToJson(BaseSet set, String title, String code, IMetaAttribute attr) {
         IMetaType type = set.getMemberType();
 
         if (title == null) {
@@ -281,8 +281,9 @@ public class MainPortlet extends MVCPortlet {
         str += "\"title\": \"" + title + "\",";
         str += "\"code\": \"" + code + "\",";
         str += "\"value\": \"" + set.get().size() + "\",";
-        str += "\"simple\": false,";
+        str += "\"simple\": " + !attr.getMetaType().isComplex() + ",";
         str += "\"array\": true,";
+        str += "\"isKey\": " + attr.isKey() + ",";
         str += "\"type\": \"META_SET\",";
         str += "\"iconCls\":\"folder\",";
 

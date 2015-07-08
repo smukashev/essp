@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.core.listener;
+package kz.bsbnb.usci.core.service.form.listener;
 
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;

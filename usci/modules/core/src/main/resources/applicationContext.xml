@@ -8,9 +8,8 @@
     <import resource="applicationContextEAVPersistanse.xml"></import>
 
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
-    <context:component-scan base-package="kz.bsbnb.usci.core.service.impl" />
+    <context:component-scan base-package="kz.bsbnb.usci.core.service" />
     <context:component-scan base-package="kz.bsbnb.usci.tool" />
-    <context:component-scan base-package="kz.bsbnb.usci.core.listener.cr" />
 
     <context:annotation-config/>
 
@@ -118,7 +117,7 @@
     <bean id="searcherFormServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
         <property name="serviceName" value="searcherFormService"/>
         <property name="service" ref="searcherFormServiceImpl"/>
-        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.ISearcherFormService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.form.ISearcherFormService"/>
         <property name="registryPort" value="1099"/>
     </bean>
 

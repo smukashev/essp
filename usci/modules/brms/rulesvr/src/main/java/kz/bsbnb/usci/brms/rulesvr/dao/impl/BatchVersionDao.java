@@ -23,7 +23,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
             throw new IllegalArgumentException("Batch does not have id. Can't create batch version.");
         }
 
-        String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, REPORT_DATE) VALUES(?, ?)";
+        String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, OPEN_DATE) VALUES(?, ?)";
         return insertWithId(SQL, new Object[]{batch.getId(), DataUtils.convert(batch.getRepDate())});
     }
 
