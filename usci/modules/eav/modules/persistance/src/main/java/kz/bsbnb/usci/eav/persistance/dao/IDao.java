@@ -2,14 +2,10 @@ package kz.bsbnb.usci.eav.persistance.dao;
 
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 
-/**
- * Common DAO interface.
- *
- * @param <T>
- */
-public interface IDao<T extends Persistable>
-{
-	public T load(long id);
-	public long save(T persistable);
-	public void remove(T persistable);
+public interface IDao<T extends Persistable> {
+    T load(long id);
+
+    long save(T persistable);
+
+    void remove(T persistable);
 }

@@ -4,9 +4,10 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 
 import java.util.ArrayList;
 
-public interface IBaseEntitySearcher
-{
-    public String getClassName();
-    public Long findSingle(BaseEntity entity);
-    public ArrayList<Long> findAll(BaseEntity entity);
+public interface IBaseEntitySearcher {
+    String getClassName();
+
+    Long findSingle(BaseEntity entity);
+
+    ArrayList<Long> findAll(BaseEntity entity);
 }

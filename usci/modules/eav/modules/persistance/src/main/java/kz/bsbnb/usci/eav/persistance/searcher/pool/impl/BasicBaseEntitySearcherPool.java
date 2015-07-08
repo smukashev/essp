@@ -14,7 +14,7 @@ import java.util.HashMap;
 
 @Repository
 public class BasicBaseEntitySearcherPool implements IBaseEntitySearcherPool {
-    private HashMap<String, IBaseEntitySearcher> searchersByName = new HashMap<String, IBaseEntitySearcher>();
+    private HashMap<String, IBaseEntitySearcher> searchersByName = new HashMap<>();
 
     @Autowired
     private ImprovedBaseEntitySearcher baseEntitySearcher;

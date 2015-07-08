@@ -4,19 +4,14 @@ import kz.bsbnb.usci.eav.model.base.IBaseValue;
 
 import java.util.Set;
 
-/**
- *
- */
 public interface IBaseSetComplexValueDao extends IBaseSetValueDao {
+    Set<Long> getChildBaseEntityIds(long baseSetId);
 
-    public Set<Long> getChildBaseEntityIds(long baseSetId);
+    IBaseValue getNextBaseValue(IBaseValue baseValue, boolean currentReportDate);
 
-    public IBaseValue getNextBaseValue(IBaseValue baseValue, boolean currentReportDate);
+    IBaseValue getPreviousBaseValue(IBaseValue baseValue, boolean currentReportDate);
 
-    public IBaseValue getPreviousBaseValue(IBaseValue baseValue, boolean currentReportDate);
+    IBaseValue getLastBaseValue(IBaseValue baseValue, boolean currentReportDate);
 
-    public IBaseValue getLastBaseValue(IBaseValue baseValue, boolean currentReportDate);
-
-    public boolean isSingleBaseValue(IBaseValue baseValue);
-
+    boolean isSingleBaseValue(IBaseValue baseValue);
 }

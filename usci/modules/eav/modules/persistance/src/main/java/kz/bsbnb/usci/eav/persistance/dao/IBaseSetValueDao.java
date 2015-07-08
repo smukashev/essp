@@ -4,13 +4,8 @@ import kz.bsbnb.usci.eav.model.base.IBaseSet;
 
 import java.util.Date;
 
-/**
- * @author alexandr.motov
- */
 public interface IBaseSetValueDao extends IBaseValueDao<IBaseSet> {
+    Date getNextReportDate(long baseSetId, Date reportDate);
 
-    public Date getNextReportDate(long baseSetId, Date reportDate);
-
-    public Date getPreviousReportDate(long baseSetId, Date reportDate);
-
+    Date getPreviousReportDate(long baseSetId, Date reportDate);
 }

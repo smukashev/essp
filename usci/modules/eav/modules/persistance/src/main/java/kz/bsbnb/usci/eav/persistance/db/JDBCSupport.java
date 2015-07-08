@@ -24,10 +24,9 @@ public class JDBCSupport {
     @Autowired
     protected SQLQueriesStats sqlStats;
 
-	@Autowired
-    public void setDataSource(DataSource dataSource)
-    {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     protected class GenericInsertPreparedStatementCreator implements PreparedStatementCreator {
@@ -50,11 +49,10 @@ public class JDBCSupport {
 
         public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
             PreparedStatement ps = con.prepareStatement(
-                    query, new String[] {keyName});
+                    query, new String[]{keyName});
 
             int i = 1;
-            for (Object obj : values)
-            {
+            for (Object obj : values) {
                 ps.setObject(i++, obj);
             }
 
@@ -63,20 +61,15 @@ public class JDBCSupport {
     }
 
 
-    public boolean testConnection()
-	{
-		try
-        {
-			return !jdbcTemplate.getDataSource().getConnection().isClosed();
-		}
-        catch (SQLException e)
-        {
-			return false;
-		}
-	}
+    public boolean testConnection() {
+        try {
+            return !jdbcTemplate.getDataSource().getConnection().isClosed();
+        } catch (SQLException e) {
+            return false;
+        }
+    }
 
-    protected JDBCConfig getConfig()
-    {
+    protected JDBCConfig getConfig() {
         return config;
     }
 
@@ -87,24 +80,22 @@ public class JDBCSupport {
 
     protected int updateWithStats(String sql, Object... args) {
         double t1 = 0;
-        if(sqlStats != null)
+        if (sqlStats != null)
             t1 = System.nanoTime();
 
         int count = jdbcTemplate.update(sql, args);
 
         double t2 = System.nanoTime() - t1;
-        if(sqlStats != null)
-        {
+        if (sqlStats != null) {
             sqlStats.put(sql, t2 / 1000000);
         }
 
         return count;
     }
 
-    protected List<Map<String, Object>> queryForListWithStats(String sql, Object... args)
-    {
+    protected List<Map<String, Object>> queryForListWithStats(String sql, Object... args) {
         double t1 = 0;
-        if(sqlStats != null)
+        if (sqlStats != null)
             t1 = System.nanoTime();
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, args);
@@ -112,21 +103,19 @@ public class JDBCSupport {
         double t2 = System.nanoTime() - t1;
         //double t3 = (t2 % rows.size()) / 1000;
 
-        if(sqlStats != null)
-        {
+        if (sqlStats != null) {
             //for (int i = 0; i < rows.size(); i++)
-                sqlStats.put(sql, t2 / 1000000);
+            sqlStats.put(sql, t2 / 1000000);
         }
 
         return rows;
     }
 
-    protected long insertWithId(String query, Object[] values)
-    {
+    protected long insertWithId(String query, Object[] values) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         double t1 = 0;
-        if(sqlStats != null)
+        if (sqlStats != null)
             t1 = System.nanoTime();
 
         jdbcTemplate.update(new GenericInsertPreparedStatementCreator(query, values), keyHolder);
@@ -134,8 +123,7 @@ public class JDBCSupport {
         double t2 = System.nanoTime() - t1;
         //double t3 = (t2 % rows.size()) / 1000;
 
-        if(sqlStats != null)
-        {
+        if (sqlStats != null) {
             //for (int i = 0; i < rows.size(); i++)
             sqlStats.put(query, t2 / 1000000);
         }

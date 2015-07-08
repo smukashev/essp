@@ -22,7 +22,10 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
@@ -44,11 +47,14 @@ public class ImprovedBaseEntityLocalSearcher extends JDBCSupport {
         SelectConditionStep select = generateSQL(entity, null, parentEntity);
 
         if (select != null) {
-            List<Map<String, Object>> rows = queryForListWithStats(select.limit(1).getSQL(),
+            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
                     select.getBindValues().toArray());
 
-            for (Map<String, Object> row : rows)
-                return (((BigDecimal) row.get("inner_id")).longValue());
+            if (rows.size() > 1)
+                throw new IllegalStateException("Found more than one row(" +
+                    entity.getMeta().getClassName() + "), " + entity);
+
+            return ((BigDecimal) rows.get(0).get("inner_id")).longValue();
         }
 
         return null;

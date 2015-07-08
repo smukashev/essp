@@ -27,9 +27,6 @@ import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
-/**
- * Used to compare BaseEntity in memory, and to retrieve BaseEntities from storage by example.
- */
 @Component
 public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEntitySearcher {
     private final Logger logger = LoggerFactory.getLogger(ImprovedBaseEntitySearcher.class);
@@ -51,32 +48,20 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         if (entity.getId() > 0)
             return entity.getId();
 
-        /*List<Long> ids = searcherPool.getSearcher(entity.getMeta().getClassName()).findAll(entity);
-
-        if (ids.size() > 1) {
-            //throw new RuntimeException("Found more than one instance of BaseEntity. Needed one.");
-        }
-
-        Long id = ids.size() >= 1 ? ids.get(0) : null;
-
-        if (id != null)
-            entity.setId(id);
-
-        return id;*/
-
-        if (entity.getValueCount() == 0) {
+        if (entity.getValueCount() == 0)
             return null;
-        }
 
         SelectConditionStep select = generateSQL(entity, null);
 
         if (select != null) {
-            //orderBy(EAV_BE_ENTITIES.as("root").ID)
-            List<Map<String, Object>> rows = queryForListWithStats(select.limit(1).getSQL(),
+            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
                     select.getBindValues().toArray());
 
-            for (Map<String, Object> row : rows)
-                return (((BigDecimal) row.get("inner_id")).longValue());
+            if (rows.size() > 1)
+                throw new IllegalStateException("Found more than one row(" +
+                    entity.getMeta().getClassName() + "), " + entity);
+
+            return ((BigDecimal) rows.get(0).get("inner_id")).longValue();
         }
 
         return null;
@@ -166,11 +151,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                 if ((baseValue == null || baseValue.getValue() == null) &&
                         (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)) {
-                    /*throw new IllegalArgumentException("Key attribute " + name + " can't be null. MetaClass: " +
-                            entity.getMeta().getClassName());*/
-                    logger.warn("Key attribute " + name + " can't be null. MetaClass: " +
+                    throw new IllegalArgumentException("Key attribute " + name + " can't be null. MetaClass: " +
                             entity.getMeta().getClassName());
-                    continue;
                 }
 
                 if ((baseValue == null || baseValue.getValue() == null) &&
@@ -302,7 +284,6 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         }
                     } else {
                         BaseEntity childBaseEntity = (BaseEntity) baseValue.getValue();
-                        //Long childBaseEntityId = findSingle(childBaseEntity);
                         Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().getClassName()).
                                 findSingle(childBaseEntity);
 
@@ -345,7 +326,6 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                             List<Long> childBaseEntityIds = new ArrayList<Long>();
                             for (IBaseValue childBaseValue : baseSet.get()) {
                                 BaseEntity childBaseEntity = (BaseEntity) childBaseValue.getValue();
-                                //Long childBaseEntityId = findSingle(childBaseEntity);
                                 Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().
                                         getClassName()).findSingle(childBaseEntity);
 
@@ -433,10 +413,10 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
     @Override
     public ArrayList<Long> findAll(BaseEntity baseEntity) {
-        ArrayList<Long> result = new ArrayList<Long>();
-        if (baseEntity.getValueCount() == 0) {
+        ArrayList<Long> result = new ArrayList<>();
+
+        if (baseEntity.getValueCount() == 0)
             return result;
-        }
 
         SelectConditionStep select = generateSQL(baseEntity, null);
 
@@ -447,8 +427,6 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             for (Map<String, Object> row : rows)
                 result.add(((BigDecimal) row.get("inner_id")).longValue());
         }
-
-        logger.debug("Result size: " + result.size());
 
         Collections.sort(result);
 

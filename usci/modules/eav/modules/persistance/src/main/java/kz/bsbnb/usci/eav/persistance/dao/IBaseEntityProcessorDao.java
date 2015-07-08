@@ -14,25 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-/**
- *
- * @author a.motov
- * @since 1.0
- * @version 1.0
- */
-public interface IBaseEntityProcessorDao
-{
-
-    /**
-     * Search BaseEntity on key fields in the DB. In case
-     * if the search found more than one instance, it will
-     * return the first in the list. If the search has not
-     * been found a single instance, it returns a null value.
-     *
-     * @param baseEntity instance of the BaseEntity for search
-     * @return obtained instance of the BaseEntity by the search.
-     * @since 1.0
-     */
+public interface IBaseEntityProcessorDao {
     long search(IBaseEntity baseEntity);
 
     List<Long> search(long metaClassId);
@@ -93,13 +75,7 @@ public interface IBaseEntityProcessorDao
 
     RefColumnsResponse getRefColumns(long metaClassId);
 
-    enum MergeResultChoice
-    {
-        RIGHT,
-        LEFT
-    }
-
-    public IBaseEntity merge(IBaseEntity baseEntityLeft, IBaseEntity baseEntityRight,
+    IBaseEntity merge(IBaseEntity baseEntityLeft, IBaseEntity baseEntityRight,
                              IBaseEntityMergeManager mergeManager, MergeResultChoice choice, boolean deleteUnused);
 
     void populate(String metaName, Long id, Date reportDate);
@@ -124,4 +100,8 @@ public interface IBaseEntityProcessorDao
 
     void removeNewTableIds(List<Long> list, Long id);
 
+    enum MergeResultChoice {
+        RIGHT,
+        LEFT
+    }
 }

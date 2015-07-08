@@ -5,15 +5,22 @@ import kz.bsbnb.usci.cr.model.PortalUser;
 
 import java.util.List;
 
-public interface IUserDao
-{
-    public boolean hasPortalUserCreditor(long userId, long creditorId);
-    public void setPortalUserCreditors(long userId, long creditorId);
-    public void unsetPortalUserCreditors(long userId, long creditorId);
-    public List<Creditor> getPortalUserCreditorList(long userId);
-    public void synchronize(List<PortalUser> users);
-    public List<String> getAllowedClasses(long portalUserId);
-    public List<Long> getAllowedRefs(long portalUserId, String meta);
-    public PortalUser getUser(long userId);
+public interface IUserDao {
+    boolean hasPortalUserCreditor(long userId, long creditorId);
+
+    void setPortalUserCreditors(long userId, long creditorId);
+
+    void unsetPortalUserCreditors(long userId, long creditorId);
+
+    List<Creditor> getPortalUserCreditorList(long userId);
+
+    void synchronize(List<PortalUser> users);
+
+    List<String> getAllowedClasses(long portalUserId);
+
+    List<Long> getAllowedRefs(long portalUserId, String meta);
+
+    PortalUser getUser(long userId);
+
     List<PortalUser> getPortalUsersHavingAccessToCreditor(Creditor creditor);
 }

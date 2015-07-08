@@ -14,18 +14,13 @@ import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author alexandr.motov
- */
 @Repository
-public class PersistableDaoPool implements IPersistableDaoPool
-{
-
+public class PersistableDaoPool implements IPersistableDaoPool {
     @Autowired
     private ApplicationContext applicationContext;
 
     private Map<Class<? extends IPersistable>, Class<? extends IPersistableDao>> persistableDaoMap =
-            new HashMap<Class<? extends IPersistable>, Class<? extends IPersistableDao>>();
+            new HashMap<>();
 
     public PersistableDaoPool() {
         persistableDaoMap.put(BaseEntity.class, IBaseEntityDao.class);
@@ -47,34 +42,32 @@ public class PersistableDaoPool implements IPersistableDaoPool
         persistableDaoMap.put(BaseSetComplexValue.class, IBaseSetComplexValueDao.class);
     }
 
-    public IPersistableDao getPersistableDao(Class<? extends IPersistable> persistableClass)
-    {
+    public IPersistableDao getPersistableDao(Class<? extends IPersistable> persistableClass) {
         if (persistableClass == null)
-        {
             throw new RuntimeException("Persistable class can not be null.");
-        }
 
-        Class<? extends IPersistableDao> persistableDaoClass =  persistableDaoMap.get(persistableClass);
+        Class<? extends IPersistableDao> persistableDaoClass = persistableDaoMap.get(persistableClass);
+
         if (persistableDaoClass != null)
-        {
             return applicationContext.getBean(persistableDaoClass);
-        }
-        throw new RuntimeException("Not found appropriate interface for persistable class " + persistableClass.getName());
+
+        throw new RuntimeException("Not found appropriate interface for persistable class " +
+                persistableClass.getName());
     }
 
-    public <T extends IPersistableDao> T getPersistableDao(Class<? extends IPersistable> persistableClass, Class<T> extendedPersistableDaoClass)
-    {
+    @SuppressWarnings("unchecked")
+    public <T extends IPersistableDao> T getPersistableDao(Class<? extends IPersistable> persistableClass,
+                                                           Class<T> extendedPersistableDaoClass) {
         if (persistableClass == null)
-        {
             throw new RuntimeException("Persistable class can not be null.");
-        }
 
-        Class<? extends IPersistableDao> persistableDaoClass =  persistableDaoMap.get(persistableClass);
+        Class<? extends IPersistableDao> persistableDaoClass = persistableDaoMap.get(persistableClass);
+
         if (persistableDaoClass != null && extendedPersistableDaoClass.isAssignableFrom(persistableDaoClass))
-        {
-            return (T)applicationContext.getBean(persistableDaoClass);
-        }
-        throw new RuntimeException("Not found appropriate interface for persistable class " + persistableClass.getName());
+            return (T) applicationContext.getBean(persistableDaoClass);
+
+        throw new RuntimeException("Not found appropriate interface for persistable class " +
+                persistableClass.getName());
     }
 
 }

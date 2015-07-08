@@ -5,21 +5,17 @@ import kz.bsbnb.usci.eav.model.base.IBaseValue;
 
 import java.util.Date;
 
-/**
- * @author alexandr.motov
- */
 public interface IBaseValueDao<T extends IBaseContainer> extends IPersistableDao {
+    IBaseValue getNextBaseValue(IBaseValue baseValue);
 
-    public IBaseValue getNextBaseValue(IBaseValue baseValue);
+    IBaseValue getPreviousBaseValue(IBaseValue baseValue);
 
-    public IBaseValue getPreviousBaseValue(IBaseValue baseValue);
+    IBaseValue getClosedBaseValue(IBaseValue baseValue);
 
-    public IBaseValue getClosedBaseValue(IBaseValue baseValue);
+    IBaseValue getLastBaseValue(IBaseValue baseValue);
 
-    public IBaseValue getLastBaseValue(IBaseValue baseValue);
+    void loadBaseValues(T baseContainer, Date actualReportDate, boolean lastReportDate);
 
-    public void loadBaseValues(T baseContainer, Date actualReportDate, boolean lastReportDate);
-
-    public void deleteAll(long baseContainerId);
+    void deleteAll(long baseContainerId);
 
 }
