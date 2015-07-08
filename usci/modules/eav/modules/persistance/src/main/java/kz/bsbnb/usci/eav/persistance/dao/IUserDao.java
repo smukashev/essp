@@ -12,8 +12,6 @@ public interface IUserDao
     public void unsetPortalUserCreditors(long userId, long creditorId);
     public List<Creditor> getPortalUserCreditorList(long userId);
     public void synchronize(List<PortalUser> users);
-    public List<String> getAllowedClasses(long portalUserId);
-    public List<Long> getAllowedRefs(long portalUserId, String meta);
     public PortalUser getUser(long userId);
     List<PortalUser> getPortalUsersHavingAccessToCreditor(Creditor creditor);
 }

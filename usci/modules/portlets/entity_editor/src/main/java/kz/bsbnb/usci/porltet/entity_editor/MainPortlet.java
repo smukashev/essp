@@ -9,7 +9,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.liferay.util.portlet.PortletProps;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
-import kz.bsbnb.usci.core.service.ISearcherFormService;
+import kz.bsbnb.usci.core.service.form.ISearcherFormService;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -371,80 +371,60 @@ public class MainPortlet extends MVCPortlet {
 
             switch (operationType) {
                 case LIST_CLASSES:
-                    List<Pair> classes = searcherFormService.getMetaClasses(currentUser.getUserId());
+                    //List<Pair> classes = searcherFormService.getMetaClasses(currentUser.getUserId());
+                    List<String[]> classes = searcherFormService.getMetaClasses(currentUser.getUserId());
+
                     if(classes.size() < 1)
                         throw new RuntimeException("no.any.rights");
-                    List<Pair> afterFilter = new LinkedList<>();
-                    for(Pair c : classes)
+                    //List<Pair> afterFilter = new LinkedList<>();
+                    List<String[]> afterFilter = new LinkedList<>();
+                    /*for(Pair c : classes)
                         if(classesFilter.contains(c.getName()))
+                            afterFilter.add(c);*/
+                    for(String[]  c: classes)
+                        if(classesFilter.contains(c[1]))
                             afterFilter.add(c);
+                    //for(String[] c : classes)
 
-                    writer.write(JsonMaker.getJson(afterFilter));
+                    writer.write(JsonMaker.getCaptionedArray(afterFilter,
+                            new String[]{"searchName", "metaName", "title"}));
+
+                    //writer.write(JsonMaker.getJson(afterFilter));
                     break;
                 case GET_FORM:
-                    Long metaId = Long.valueOf(resourceRequest.getParameter("metaId"));
-                    String generatedForm = searcherFormService.getDom(currentUser.getUserId(), metaFactoryService.getMetaClass(metaId));
+                    //Long metaId = Long.valueOf(resourceRequest.getParameter("metaId"));
+                    String searchClassName = resourceRequest.getParameter("search");
+                    String metaName = resourceRequest.getParameter("metaName");
+
+                    //String generatedForm = searcherFormService.getDom(currentUser.getUserId(), metaFactoryService.getMetaClass(metaId));
+                    String generatedForm = searcherFormService.getDom(currentUser.getUserId(),
+                            searchClassName, metaFactoryService.getMetaClass(metaName));
                     writer.write(generatedForm);
                     break;
                 case FIND_ACTION:
                     Enumeration<String> list = resourceRequest.getParameterNames();
 
-                    metaId = Long.valueOf(resourceRequest.getParameter("metaClass"));
+                    metaName = resourceRequest.getParameter("metaClass");
 
-                    MetaClass metaClass = metaFactoryService.getMetaClass(metaId);
-                    BaseEntity baseEntity = new BaseEntity(metaClass, new Date());
+                    MetaClass metaClass = metaFactoryService.getMetaClass(metaName);
+                    HashMap<String,String> parameters = new HashMap<String,String>();
+                    searchClassName = resourceRequest.getParameter("searchName");
 
                     while(list.hasMoreElements()) {
                         String attribute = list.nextElement();
-
-                        if(attribute.equals("op") || attribute.equals("metaClass"))
+                        if(attribute.equals("op") || attribute.equals("metaClass") || attribute.equals("searchName"))
                             continue;
-
-                        Object value;
-                        String parameterValue = resourceRequest.getParameter(attribute);
-
-                        IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
-                        if(metaAttribute == null)
-                            continue;
-                        IMetaType metaType = metaAttribute.getMetaType();
-
-                        if(metaType.isSetOfSets())
-                            throw new UnsupportedOperationException("Not yet implemented");
-
-                        if(metaType.isSet()) {
-                            BaseSet childBaseSet = new BaseSet(metaType);
-                            IMetaType itemMeta = ((MetaSet) metaType).getMemberType();
-                            BaseEntity childBaseEntity = new BaseEntity((MetaClass) itemMeta, new Date());
-                            childBaseEntity.setId(Long.valueOf(parameterValue));
-                            Batch b = new Batch(new Date(), currentUser.getUserId());
-                            b.setId(777L);
-                            childBaseSet.put(BaseValueFactory.create(BaseContainerType.BASE_SET, itemMeta, b, 1, childBaseEntity));
-                            value = childBaseSet;
-                        } else if(metaType.isComplex()) {
-                            BaseEntity childBaseEntity = new BaseEntity((MetaClass) metaType, new Date());
-                            childBaseEntity.setId(Long.valueOf(parameterValue));
-                            value = childBaseEntity;
-
-                        } else {
-                            MetaValue metaValue = (MetaValue) metaType;
-                            value = DataTypes.fromString(metaValue.getTypeCode(), parameterValue);
-                        }
-
-                        Batch b = new Batch(new Date(), currentUser.getUserId());
-                        b.setId(777L);
-
-                        baseEntity.put(attribute, BaseValueFactory.create(
-                                BaseContainerType.BASE_ENTITY,
-                                metaAttribute.getMetaType(),
-                                b, 1, value));
+                        parameters.put(attribute, resourceRequest.getParameter(attribute));
                     }
 
-                    baseEntity = entityService.search(baseEntity);
+                    List<BaseEntity> entityList = searcherFormService.search(searchClassName, parameters, metaClass);
 
                     long ret = -1;
 
-                    if(baseEntity.getId() > 0)
-                        ret = baseEntity.getId();
+                    if(entityList.size() > 0) {
+                        ret = entityList.get(0).getId();
+                        ret = ret > 0 ? ret : -1;
+                    }
 
                     writer.write("{\"success\": true, \"data\":\""+ ret +"\"}");
 
@@ -466,22 +446,55 @@ public class MainPortlet extends MVCPortlet {
                 case LIST_ENTITY:
                     String entityId = resourceRequest.getParameter("entityId");
 
-                    Date date = null;
+                    if(entityId != null) {
+                        //search by single Id
+                        Date date = null;
+                        if(resourceRequest.getParameter("date") != null)
+                            date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
 
-                    if(resourceRequest.getParameter("date") != null)
-                        date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+                        if(date == null)
+                            date = new Date();
 
-                    if(date == null)
-                        date = new Date();
+                        if (entityId != null && entityId.trim().length() > 0) {
+                            //BaseEntity entity = entityService.load(Integer.parseInt(entityId));
+                            BaseEntity entity = entityService.load(Long.valueOf(entityId), date);
 
-                    if (entityId != null && entityId.trim().length() > 0) {
-                        //BaseEntity entity = entityService.load(Integer.parseInt(entityId));
-                        BaseEntity entity = entityService.load(Long.valueOf(entityId), date);
+                            writer.write("{\"text\":\".\",\"children\": [\n" +
+                                    entityToJson(entity, entity.getMeta().getClassTitle(),
+                                            entity.getMeta().getClassName()) + "]}");
+                        }
+                    } else {
+                        //search by parameters
 
-                        writer.write("{\"text\":\".\",\"children\": [\n" +
-                                entityToJson(entity, entity.getMeta().getClassTitle(),
-                                        entity.getMeta().getClassName()) +
-                                "]}");
+                        list = resourceRequest.getParameterNames();
+                        metaName = resourceRequest.getParameter("metaClass");
+                        searchClassName = resourceRequest.getParameter("searchName");
+
+                        metaClass = metaFactoryService.getMetaClass(metaName);
+                        parameters = new HashMap<String,String>();
+
+                        while(list.hasMoreElements()) {
+                            String attribute = list.nextElement();
+                            if(attribute.equals("op") || attribute.equals("metaClass") || attribute.equals("searchName"))
+                                continue;
+                            parameters.put(attribute, resourceRequest.getParameter(attribute));
+                        }
+
+                        entityList = searcherFormService.search(searchClassName, parameters, metaClass);
+                        StringBuilder sb = new StringBuilder("{\"text\":\".\",\"children\": [\n");
+                        Iterator<BaseEntity> it = entityList.iterator();
+                        do {
+                            if(!it.hasNext())
+                                break;
+                            BaseEntity currentEntity = it.next();
+                            sb.append(entityToJson(currentEntity, currentEntity.getMeta().getClassTitle(),
+                                    currentEntity.getMeta().getClassName()));
+
+                            if(it.hasNext()) sb.append(",");
+                        } while(true);
+
+                        sb.append("]}");
+                        writer.write(sb.toString());
                     }
                     break;
                 default:

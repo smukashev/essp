@@ -6,17 +6,20 @@ Ext.require([
 ]);
 
 var regex = /^\S+-(\d+)-(\S+)-(\S+)$/;
-var currentClass;
+var currentSearch;
+var currentMeta;
 
 
 function getForm(){
-    currentClass = Ext.getCmp('edClass').value;
+    currentSearch = Ext.getCmp('edSearch').value;
+    currentMeta = Ext.getCmp('edSearch').displayTplData[0].metaName;
     Ext.Ajax.request({
         url: dataUrl,
         method: 'POST',
         params: {
             op: 'GET_FORM',
-            metaId: currentClass
+            search: currentSearch,
+            metaName: currentMeta
         },
         success: function(data){
             document.getElementById('entity-editor-form').innerHTML = data.responseText;
@@ -76,7 +79,7 @@ function find(control){
     var info = inputDiv.id.match(regex);
 
 
-    var params = {op : 'FIND_ACTION', metaClass: info[2]};
+    var params = {op : 'FIND_ACTION', metaClass: info[2], searchName: currentSearch};
     for(var i=0;i<errors.length;i++)
         errors[i].style.display = 'none';
 
@@ -169,9 +172,9 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first) {
 
 Ext.onReady(function() {
 
-    Ext.define('classesStoreModel', {
+    Ext.define('searchStoreModel', {
         extend: 'Ext.data.Model',
-        fields: ['id','name', 'title']
+        fields: ['searchName','metaName', 'title']
     });
 
     Ext.define('entityModel', {
@@ -202,20 +205,43 @@ Ext.onReady(function() {
         text: label_VIEW,
         handler : function (){
             //entityId = Ext.getCmp("entityId");
-            var entityId = document.getElementById('inp-1-' + currentClass + '-null').value;
+            var keySearchComponent = document.getElementById('inp-1-' + currentMeta + '-null');
 
-            entityStore.load({
-                params: {
-                    op : 'LIST_ENTITY',
-                    entityId: entityId,
-                    date: Ext.getCmp('edDate').value
-                },
-                callback: function(records, operation, success) {
-                    if (!success) {
-                        Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
+            if(keySearchComponent != null) {
+                var entityId = document.getElementById('inp-1-' + currentMeta + '-null').value;
+                   entityStore.load({
+                    params: {
+                        op: 'LIST_ENTITY',
+                        entityId: entityId,
+                        searchName: currentSearch,
+                        date: Ext.getCmp('edDate').value
+                    },
+                    callback: function (records, operation, success) {
+                        if (!success) {
+                            Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
+                        }
+                    }
+                });
+            } else {
+                //for custom implementations
+                var params = {op : 'LIST_ENTITY', metaClass: currentMeta, searchName: currentSearch };
+                var inputs = document.getElementById("entity-editor-form").childNodes;
+                for(i=0;i<inputs.length;i++) {
+                    if(inputs[i].tagName == 'INPUT') {
+                        params[inputs[i].name] = inputs[i].value;
                     }
                 }
-            });
+
+                console.log(params);
+
+                entityStore.load({
+                    params: params,
+                    callback: function (records, operation, success) {
+                        if (!success) {
+                            Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
+                        }
+                    }});
+            }
         },
         maxWidth: 70,
         shadow: true
@@ -413,7 +439,7 @@ Ext.onReady(function() {
     });
 
     var classesStore = Ext.create('Ext.data.Store', {
-        model: 'classesStoreModel',
+        model: 'searchStoreModel',
         pageSize: 100,
         proxy: {
             type: 'ajax',
@@ -453,12 +479,12 @@ Ext.onReady(function() {
                     align: 'stretch'
                 },
                 items: [{
-                    id: 'edClass',
+                    id: 'edSearch',
                     xtype: 'combobox',
+                    displayField:'title',
                     store: classesStore,
                     labelWidth: 70,
-                    valueField:'id',
-                    displayField:'title',
+                    valueField:'searchName',
                     fieldLabel: label_CLASS,
                     editable: false
                 }, {
