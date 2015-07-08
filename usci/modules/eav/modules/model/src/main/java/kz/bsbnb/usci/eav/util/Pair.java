@@ -2,10 +2,7 @@ package kz.bsbnb.usci.eav.util;
 
 import java.io.Serializable;
 
-/**
- * Use for anything that will contain combination [id,name] or [id, title]
- */
-public class Pair implements Serializable{
+public class Pair implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -24,7 +21,7 @@ public class Pair implements Serializable{
         this.title = title;
     }
 
-    public Pair(long id,String title, boolean another) {
+    public Pair(long id, String title, boolean another) {
         this.id = id;
         this.title = title;
     }

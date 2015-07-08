@@ -10,9 +10,6 @@ import java.util.EventObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- */
 public class ListenerMethod implements EventListener, Serializable {
 
     private static final Logger logger = Logger.getLogger(ListenerMethod.class.getName());
@@ -41,7 +38,7 @@ public class ListenerMethod implements EventListener, Serializable {
             throw e;
         }
 
-    };
+    }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException,
             ClassNotFoundException {
@@ -53,7 +50,9 @@ public class ListenerMethod implements EventListener, Serializable {
         } catch (SecurityException e) {
             logger.log(Level.SEVERE, "Internal deserialization error", e);
         }
-    };
+    }
+
+    ;
 
     private static Method findHighestMethod(Class<?> cls, String method,
                                             Class<?>[] paramTypes) {
@@ -199,7 +198,7 @@ public class ListenerMethod implements EventListener, Serializable {
         if (params.length == 0) {
             arguments = new Object[0];
         } else if (params.length == 1 && params[0].isAssignableFrom(eventType)) {
-            arguments = new Object[] { null };
+            arguments = new Object[]{null};
             eventArgumentIndex = 0;
         } else {
             throw new IllegalArgumentException();
@@ -231,7 +230,7 @@ public class ListenerMethod implements EventListener, Serializable {
         if (params.length == 0) {
             arguments = new Object[0];
         } else if (params.length == 1 && params[0].isAssignableFrom(eventType)) {
-            arguments = new Object[] { null };
+            arguments = new Object[]{null};
             eventArgumentIndex = 0;
         } else {
             throw new IllegalArgumentException();
@@ -244,7 +243,7 @@ public class ListenerMethod implements EventListener, Serializable {
             try {
                 if (eventArgumentIndex >= 0) {
                     if (eventArgumentIndex == 0 && arguments.length == 1) {
-                        method.invoke(target, new Object[] { event });
+                        method.invoke(target, new Object[]{event});
                     } else {
                         final Object[] arg = new Object[arguments.length];
                         for (int i = 0; i < arg.length; i++) {

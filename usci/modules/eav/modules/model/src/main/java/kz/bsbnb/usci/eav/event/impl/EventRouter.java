@@ -3,30 +3,22 @@ package kz.bsbnb.usci.eav.event.impl;
 import kz.bsbnb.usci.eav.event.IMethodEventSource;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EventObject;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 
-/**
- *
- */
 public class EventRouter implements IMethodEventSource {
 
     private LinkedHashSet<ListenerMethod> listenerList = null;
 
     public void addListener(Class<?> eventType, Object object, Method method) {
         if (listenerList == null) {
-            listenerList = new LinkedHashSet<ListenerMethod>();
+            listenerList = new LinkedHashSet<>();
         }
         listenerList.add(new ListenerMethod(eventType, object, method));
     }
 
     public void addListener(Class<?> eventType, Object object, String methodName) {
         if (listenerList == null) {
-            listenerList = new LinkedHashSet<ListenerMethod>();
+            listenerList = new LinkedHashSet<>();
         }
         listenerList.add(new ListenerMethod(eventType, object, methodName));
     }
@@ -57,10 +49,7 @@ public class EventRouter implements IMethodEventSource {
         }
     }
 
-    public void removeListener(Class<?> eventType, Object target,
-                               String methodName) {
-
-        // Find the correct method
+    public void removeListener(Class<?> eventType, Object target, String methodName) {
         final Method[] methods = target.getClass().getMethods();
         Method method = null;
         for (int i = 0; i < methods.length; i++) {
