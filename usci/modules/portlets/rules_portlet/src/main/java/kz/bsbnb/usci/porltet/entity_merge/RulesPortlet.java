@@ -75,7 +75,8 @@ public class RulesPortlet extends MVCPortlet{
             User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
             if(user != null) {
                 for (Role role : user.getRoles()) {
-                    if (role.getName().equals("Administrator") || role.getName().equals("NationalBankEmployee"))
+                    if (role.getName().equals("Administrator") || role.getName().equals("NationalBankEmployee")
+                            || role.getName().equals("BankUser"))
                         hasRights = true;
                 }
 
@@ -116,6 +117,22 @@ public class RulesPortlet extends MVCPortlet{
         DEL_ATTR
     }
 
+    public void getWriteAccess(ResourceRequest resourceRequest){
+        boolean writeAccessGranted = false;
+        try {
+            User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(resourceRequest));
+            if (user != null) {
+                for (Role role : user.getRoles()) {
+                    if (role.getName().equals("Administrator") || role.getName().equals("NationalBankEmployee"))
+                        writeAccessGranted = true;
+                }
+            }
+        } catch (Exception e) {}
+
+        if(!writeAccessGranted)
+            throw new RuntimeException("нет прав");
+    }
+
     @Override
     public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse)
             throws IOException {
@@ -150,6 +167,7 @@ public class RulesPortlet extends MVCPortlet{
                     writer.write(JsonMaker.getJson(ruleService.getRule(ruleId)));
                     break;
                 case UPDATE_RULE:
+                    getWriteAccess(resourceRequest);
                     String ruleBody = resourceRequest.getParameter("ruleBody");
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     String pkgName = resourceRequest.getParameter("pkgName");
@@ -161,23 +179,27 @@ public class RulesPortlet extends MVCPortlet{
                     writer.write(JsonMaker.getJson(true));
                     break;
                 case DEL_RULE:
+                    getWriteAccess(resourceRequest);
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     long packageVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
                     ruleService.deleteRule(ruleId, packageVersionId);
                     writer.write(JsonMaker.getJson(true));
                     break;
                 case NEW_RULE:
+                    getWriteAccess(resourceRequest);
                     batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
                     title = resourceRequest.getParameter("title");
                     writer.write(JsonMaker.getJson(ruleService.saveEmptyRule(title, batchVersionId)));
                     break;
                 case COPY_EXISTING_RULE:
+                    getWriteAccess(resourceRequest);
                     batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     ruleService.copyExistingRule(ruleId, batchVersionId);
                     writer.write(JsonMaker.getJson(true));
                     break;
                 case COPY_RULE:
+                    getWriteAccess(resourceRequest);
                     batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     title = resourceRequest.getParameter("title");
@@ -185,6 +207,7 @@ public class RulesPortlet extends MVCPortlet{
                     writer.write(JsonMaker.getJson(ruleId));
                     break;
                 case RUN_RULE:
+                    getWriteAccess(resourceRequest);
                     String batchName = resourceRequest.getParameter("batchName");
                     date = df.parse(resourceRequest.getParameter("date"));
                     baseEntityId = Long.parseLong(resourceRequest.getParameter("baseEntityId"));
@@ -193,14 +216,17 @@ public class RulesPortlet extends MVCPortlet{
                     writer.write(JsonMaker.getJson(be.getValidationErrors()));
                     break;
                 case FLUSH:
+                    getWriteAccess(resourceRequest);
                     ruleService.reloadCache();
                     break;
                 case RENAME_RULE:
+                    getWriteAccess(resourceRequest);
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     title = resourceRequest.getParameter("title");
                     ruleService.renameRule(ruleId, title);
                     break;
                 case RULE_SWITCH:
+                    getWriteAccess(resourceRequest);
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     pkgName = resourceRequest.getParameter("pkgName");
                     date = df.parse(resourceRequest.getParameter("date"));
@@ -237,7 +263,7 @@ public class RulesPortlet extends MVCPortlet{
             }
 
         } catch (Exception e) {
-
+            String originalError = e.getMessage();
             if(!retry) {
                 retry = true;
                 try {
@@ -245,7 +271,7 @@ public class RulesPortlet extends MVCPortlet{
                     serveResource(resourceRequest, resourceResponse);
                 } catch (PortletException e1) {
                     //resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
-                    writer.write("{ \"success\": false, \"errorMessage\": \""+ e1.getMessage()
+                    writer.write("{ \"success\": false, \"errorMessage\": \""+ originalError + e1.getMessage()
                             .replaceAll("\"","").replaceAll("\n","")+"\"}");
                 } finally {
                     retry = false;
@@ -254,7 +280,7 @@ public class RulesPortlet extends MVCPortlet{
             }
 
             //resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
-            writer.write("{ \"success\": false, \"errorMessage\": \""+ e.getMessage().replaceAll("\"","").replaceAll("\n","")+"\"}");
+            writer.write("{ \"success\": false, \"errorMessage\": \""+ originalError +"\"}");
         }
 
     }
