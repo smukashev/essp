@@ -10,7 +10,10 @@ import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.*;
 import kz.bsbnb.usci.eav.model.base.impl.*;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexSet;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.meta.*;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
@@ -2890,6 +2893,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     @Transactional
     public IBaseEntity process(IBaseEntity baseEntity) {
+        if (!keyAttributesPresent(baseEntity))
+            throw new RuntimeException("Some key attributes are missing");
+
         EntityHolder entityHolder = new EntityHolder();
 
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
@@ -2927,6 +2933,56 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     entityHolder.applied, baseEntityManager);
 
         return baseEntityApplied;
+    }
+
+    private boolean keyAttributesPresent(IBaseEntity baseEntity) {
+        for (String attributeName : baseEntity.getMeta().getAttributeNames()) {
+            IMetaAttribute metaAttribute = baseEntity.getMeta().getMetaAttribute(attributeName);
+
+            if (metaAttribute.isKey()) {
+                IBaseValue baseValue = baseEntity.getBaseValue(attributeName);
+
+                if (baseValue != null) {
+                    if (baseValue.getValue() != null) {
+                        if (metaAttribute.getMetaType().isSetOfSets()) {
+                            throw new UnsupportedOperationException("Set of sets is not supported!");
+                        } else if (metaAttribute.getMetaType().isSet()) {
+                            BaseSet set = (BaseSet) baseValue.getValue();
+
+                            if (set.get() != null && !set.get().isEmpty()) {
+                                for (IBaseValue setBaseValue : set.get()) {
+                                    if (setBaseValue.getValue() != null) {
+                                        if (metaAttribute.getMetaType().isComplex()) {
+                                            BaseEntity setBaseEntity = (BaseEntity) setBaseValue.getValue();
+
+                                            if (!keyAttributesPresent(setBaseEntity)) {
+                                                return false;
+                                            }
+                                        }
+                                    } else {
+                                        return false;
+                                    }
+                                }
+                            } else {
+                                return false;
+                            }
+                        } else if (metaAttribute.getMetaType().isComplex()) {
+                            BaseEntity valueBaseEntity = (BaseEntity) baseValue.getValue();
+
+                            if (!keyAttributesPresent(valueBaseEntity)) {
+                                return false;
+                            }
+                        }
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     private boolean historyExists(long metaId, long entityId) {

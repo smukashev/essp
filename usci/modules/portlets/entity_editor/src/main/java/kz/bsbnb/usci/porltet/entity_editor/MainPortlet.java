@@ -459,9 +459,11 @@ public class MainPortlet extends MVCPortlet {
                             //BaseEntity entity = entityService.load(Integer.parseInt(entityId));
                             BaseEntity entity = entityService.load(Long.valueOf(entityId), date);
 
-                            writer.write("{\"text\":\".\",\"children\": [\n" +
+                            String sJson = "{\"text\":\".\",\"children\": [\n" +
                                     entityToJson(entity, entity.getMeta().getClassTitle(),
-                                            entity.getMeta().getClassName()) + "]}");
+                                            entity.getMeta().getClassName()) + "]}";
+
+                            writer.write(sJson);
                         }
                     } else {
                         //search by parameters
