@@ -61,6 +61,9 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                 throw new IllegalStateException("Found more than one row(" +
                     entity.getMeta().getClassName() + "), " + entity);
 
+            if (rows.size() < 1)
+                return null;
+
             return ((BigDecimal) rows.get(0).get("inner_id")).longValue();
         }
 
