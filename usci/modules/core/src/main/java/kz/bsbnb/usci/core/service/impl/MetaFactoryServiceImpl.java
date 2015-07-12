@@ -16,9 +16,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author k.tulbassiyev
- */
 @Service
 public class MetaFactoryServiceImpl implements IMetaFactoryService {
     @Autowired
@@ -63,8 +60,8 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     public List<BaseEntity> getBaseEntities() {
         List<BaseEntity> baseEntityList = new ArrayList<BaseEntity>();
 
-        for (MetaClass metaClass : metaClassRepository.getMetaClasses()){
-            baseEntityList.add(new BaseEntity(metaClass,new Date()));
+        for (MetaClass metaClass : metaClassRepository.getMetaClasses()) {
+            baseEntityList.add(new BaseEntity(metaClass, new Date()));
         }
 
         return baseEntityList;
@@ -72,14 +69,12 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     }
 
     @Override
-    public List<MetaClass> getMetaClasses()
-    {
+    public List<MetaClass> getMetaClasses() {
         return metaClassRepository.getMetaClasses();
     }
 
     @Override
-    public List<MetaClassName> getMetaClassesNames()
-    {
+    public List<MetaClassName> getMetaClassesNames() {
         return metaClassRepository.getMetaClassesNames();
     }
 
@@ -89,8 +84,7 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     }
 
     @Override
-    public MetaClass getMetaClass(String name)
-    {
+    public MetaClass getMetaClass(String name) {
         return metaClassRepository.getMetaClass(name);
     }
 
@@ -100,15 +94,13 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     }
 
     @Override
-    public boolean saveMetaClass(MetaClass meta)
-    {
+    public boolean saveMetaClass(MetaClass meta) {
         metaClassRepository.saveMetaClass(meta);
         return true;
     }
 
     @Override
-    public boolean delMetaClass(String className)
-    {
+    public boolean delMetaClass(String className) {
         return metaClassRepository.delMetaClass(className);
     }
 

@@ -6,10 +6,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IReportDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.jooq.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
@@ -20,14 +17,8 @@ import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
-/**
- * Created by n.seitkozhayev on 2/18/15.
- */
 @Repository
 public class ReportDaoImpl extends JDBCSupport implements IReportDao {
-
-    private final Logger logger  = LoggerFactory.getLogger(ReportDaoImpl.class);
-
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
@@ -64,26 +55,28 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
             Update update = context.update(EAV_REPORT)
                     .set(EAV_REPORT.USERNAME, username)
                     .set(EAV_REPORT.CREDITOR_ID, report.getCreditor().getId())
-                            .set(EAV_REPORT.REPORT_DATE, DataUtils.convert(report.getReportDate()))
-                                    .set(EAV_REPORT.STATUS_ID, report.getStatusId())
-                                    .set(EAV_REPORT.TOTAL_COUNT, report.getTotalCount())
-                                            .set(EAV_REPORT.ACTUAL_COUNT, report.getActualCount())
-                                                    .set(EAV_REPORT.BEG_DATE, DataUtils.convert(report.getBeginningDate()))
-                                                            .set(EAV_REPORT.END_DATE, DataUtils.convert(report.getEndDate()))
-                                                                    .set(EAV_REPORT.LAST_MANUAL_EDIT_DATE, DataUtils.convert(report.getLastManualEditDate()))
-                                                                    .where(EAV_REPORT.USERNAME.equal(username)).and(EAV_REPORT.REPORT_DATE.eq(DataUtils.convert(report.getBeginningDate())));
+                    .set(EAV_REPORT.REPORT_DATE, DataUtils.convert(report.getReportDate()))
+                    .set(EAV_REPORT.STATUS_ID, report.getStatusId())
+                    .set(EAV_REPORT.TOTAL_COUNT, report.getTotalCount())
+                    .set(EAV_REPORT.ACTUAL_COUNT, report.getActualCount())
+                    .set(EAV_REPORT.BEG_DATE, DataUtils.convert(report.getBeginningDate()))
+                    .set(EAV_REPORT.END_DATE, DataUtils.convert(report.getEndDate()))
+                    .set(EAV_REPORT.LAST_MANUAL_EDIT_DATE, DataUtils.convert(report.getLastManualEditDate()))
+                    .where(EAV_REPORT.USERNAME.equal(username)).
+                            and(EAV_REPORT.REPORT_DATE.eq(DataUtils.convert(report.getBeginningDate())));
 
             updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
             SelectForUpdateStep select = context
                     .select()
                     .from(EAV_REPORT)
-                    .where(EAV_REPORT.USERNAME.equal(username)).and(EAV_REPORT.REPORT_DATE.eq(DataUtils.convert(report.getBeginningDate())));
+                    .where(EAV_REPORT.USERNAME.equal(username)).
+                            and(EAV_REPORT.REPORT_DATE.eq(DataUtils.convert(report.getBeginningDate())));
 
             List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
             for (Map<String, Object> row : rows) {
-                reportId = ((BigDecimal)row.get(EAV_REPORT.ID.getName())).longValue();
+                reportId = ((BigDecimal) row.get(EAV_REPORT.ID.getName())).longValue();
                 break;
             }
         }
@@ -108,7 +101,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
 
         for (Map<String, Object> row : rows) {
             Report report = new Report();
-            report.setId(((BigDecimal)row.get(EAV_REPORT.ID.getName())).longValue());
+            report.setId(((BigDecimal) row.get(EAV_REPORT.ID.getName())).longValue());
             report.setCreditor(creditorMap.get(((BigDecimal) row.get(EAV_REPORT.CREDITOR_ID.getName())).longValue()));
             report.setTotalCount(((BigDecimal) row.get(EAV_REPORT.TOTAL_COUNT.getName())).longValue());
             report.setActualCount(((BigDecimal) row.get(EAV_REPORT.ACTUAL_COUNT.getName())).longValue());
@@ -136,7 +129,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
 
         Date date = null;
         if (!rows.isEmpty()) {
-            date = DataUtils.convert((Timestamp)rows.get(0).get("FIRST_NOT_APPROVED_DATE"));
+            date = DataUtils.convert((Timestamp) rows.get(0).get("FIRST_NOT_APPROVED_DATE"));
         }
         return date;
     }
@@ -155,7 +148,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
 
         Date date = null;
         if (!rows.isEmpty()) {
-            date = DataUtils.convert((Timestamp)rows.get(0).get("LAST_APPROVED_DATE"));
+            date = DataUtils.convert((Timestamp) rows.get(0).get("LAST_APPROVED_DATE"));
         }
         return date;
     }
@@ -291,25 +284,25 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.isEmpty()) {
-            return null;
-        }
+        if (rows.isEmpty()) return null;
 
         Map<String, Object> row = rows.get(0);
 
         Report report = new Report();
         report.setId(((BigDecimal) row.get(EAV_REPORT.ID.getName())).longValue());
-        {
-            Creditor creditor = new Creditor();
-            creditor.setId(((BigDecimal) row.get(EAV_REPORT.CREDITOR_ID.getName())).longValue());
 
-            report.setCreditor(creditor);
-        }
+        Creditor creditor = new Creditor();
+        creditor.setId(((BigDecimal) row.get(EAV_REPORT.CREDITOR_ID.getName())).longValue());
+
+        report.setCreditor(creditor);
+
         report.setTotalCount(((BigDecimal) row.get(EAV_REPORT.TOTAL_COUNT.getName())).longValue());
         report.setActualCount(((BigDecimal) row.get(EAV_REPORT.ACTUAL_COUNT.getName())).longValue());
         report.setBeginningDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.BEG_DATE.getName())));
         report.setEndDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.END_DATE.getName())));
-        report.setLastManualEditDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.LAST_MANUAL_EDIT_DATE.getName())));
+        report.setLastManualEditDate(DataUtils.convert((Timestamp)
+                row.get(EAV_REPORT.LAST_MANUAL_EDIT_DATE.getName())));
+
         report.setStatusId(((BigDecimal) row.get(EAV_REPORT.STATUS_ID.getName())).longValue());
         report.setReportDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.REPORT_DATE.getName())));
 

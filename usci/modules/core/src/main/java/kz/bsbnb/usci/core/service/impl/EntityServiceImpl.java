@@ -5,9 +5,9 @@ import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMailDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -27,24 +27,30 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
-/**
- * @author k.tulbassiyev
- */
 @Service
 public class EntityServiceImpl extends UnicastRemoteObject implements IEntityService {
     private final Logger logger = LoggerFactory.getLogger(EntityServiceImpl.class);
+
     @Autowired
     protected StatusSingleton statusSingleton;
+
     @Autowired
     IBaseEntityProcessorDao baseEntityProcessorDao;
+
     @Autowired
     IBaseEntitySearcherPool searcherPool;
+
     @Autowired
     IMetaClassDao metaClassDao;
+
     @Autowired
     SQLQueriesStats stats;
+
     @Autowired
     IMailDao mailDao;
+
+    @Autowired
+    IBaseEntityLoadDao baseEntityLoadDao;
 
     public EntityServiceImpl() throws RemoteException {
         super();
@@ -83,7 +89,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Override
     public BaseEntity search(BaseEntity baseEntity) {
         ArrayList<Long> result = searcherPool.getSearcher(baseEntity.getMeta().getClassName()).findAll(baseEntity);
-        if(result.size() > 0)
+        if (result.size() > 0)
             baseEntity.setId(result.get(0));
         return baseEntity;
     }
@@ -103,12 +109,12 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Override
     public BaseEntity load(long id) {
         System.out.println("Load with id: " + id);
-        return (BaseEntity) baseEntityProcessorDao.load(id);
+        return (BaseEntity) baseEntityLoadDao.load(id);
     }
 
     @Override
     public BaseEntity load(long id, Date date) {
-        return (BaseEntity) baseEntityProcessorDao.loadByMaxReportDate(id, date);
+        return (BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, date);
     }
 
     public List<RefListItem> getRefsByMetaclass(long metaClassId) {

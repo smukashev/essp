@@ -14,6 +14,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
@@ -53,12 +54,18 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
 
     @Autowired
     IBatchRepository batchRepository;
+
     @Autowired
     IMetaClassDao postgreSQLMetaClassDaoImpl;
+
     @Autowired
     IBaseEntityProcessorDao baseEntityProcessorDao;
+
     @Autowired
     IBatchDao postgreSQLBatchEntityDaoImpl;
+
+    @Autowired
+    IBaseEntityLoadDao baseEntityLoadDao;
 
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
 
@@ -569,7 +576,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
         entityCreated.put("complex_set", new BaseValue(batch, 1L, baseSetForComplex));
 
         BaseEntity entityProcessed = (BaseEntity) baseEntityProcessorDao.process(entityCreated.clone());
-        BaseEntity entityLoaded = (BaseEntity) baseEntityProcessorDao.load(entityProcessed.getId());
+        BaseEntity entityLoaded = (BaseEntity) baseEntityLoadDao.load(entityProcessed.getId());
 
         long countCreate = entityCreated.getValueCount();
         long countLoad = entityLoaded.getValueCount();
@@ -748,7 +755,7 @@ public class PostgreSQLBaseEntityDaoImplTest  extends GenericTestCase
                 new BaseValue(batchSecond, 2L, entityFourthForUpdate));
 
         BaseEntity entityUpdated = (BaseEntity) baseEntityProcessorDao.process(entityForUpdate.clone());
-        BaseEntity entityLoaded = (BaseEntity) baseEntityProcessorDao.load(entityUpdated.getId(), false);
+        BaseEntity entityLoaded = (BaseEntity) baseEntityLoadDao.load(entityUpdated.getId(), false);
 
         assertEquals("Incorrect number of attribute values in the saved BaseEntity,",
                 4, entitySaved.getValueCount());

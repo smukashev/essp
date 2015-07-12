@@ -22,15 +22,12 @@ import kz.bsbnb.usci.cli.app.mnt.Mnt;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.core.service.IEntityService;
-import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
-import kz.bsbnb.usci.eav.model.base.IBaseSet;
-import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
@@ -42,6 +39,8 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityMergeDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
@@ -76,7 +75,6 @@ import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import javax.annotation.PostConstruct;
@@ -91,8 +89,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -110,18 +106,28 @@ public class CLI {
     String line;
     Exception lastException = null;
     private String command;
-    private ArrayList<String> args = new ArrayList<String>();
+    private ArrayList<String> args = new ArrayList<>();
     @Autowired
     private IStorage storage;
 
     @Autowired
     private IMetaClassDao metaClassDao;
+
     @Autowired
     private Xsd2MetaClass xsdConverter;
+
     @Autowired
     private MainParser crParser;
+
     @Autowired
     private IBaseEntityProcessorDao baseEntityProcessorDao;
+
+    @Autowired
+    private IBaseEntityLoadDao baseEntityLoadDao;
+
+    @Autowired
+    private IBaseEntityMergeDao baseEntityMergeDao;
+
     @Autowired
     private ImprovedBaseEntitySearcher searcher;
 
@@ -357,13 +363,13 @@ public class CLI {
             DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
             try {
-                entity = baseEntityProcessorDao.loadByMaxReportDate(id, dateFormat.parse(reportDateStr));
+                entity = baseEntityLoadDao.loadByMaxReportDate(id, dateFormat.parse(reportDateStr));
             } catch (ParseException e) {
                 e.printStackTrace();
                 return;
             }
         } else {
-            entity = baseEntityProcessorDao.load(id);
+            entity = baseEntityLoadDao.load(id);
         }
 
         System.out.println(BaseEntityOutput.toJava((BaseEntity) entity, "", 0));
@@ -376,13 +382,13 @@ public class CLI {
             DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
             try {
-                entity = baseEntityProcessorDao.loadByMaxReportDate(id, dateFormat.parse(reportDateStr));
+                entity = baseEntityLoadDao.loadByMaxReportDate(id, dateFormat.parse(reportDateStr));
             } catch (ParseException e) {
                 e.printStackTrace();
                 return;
             }
         } else {
-            entity = baseEntityProcessorDao.load(id);
+            entity = baseEntityLoadDao.load(id);
         }
 
         if (entity == null) {
@@ -1185,7 +1191,7 @@ public class CLI {
 
         while (st.hasMoreTokens()) {
             long id = Long.parseLong(st.nextToken());
-            IBaseEntity entity = baseEntityProcessorDao.load(id);
+            IBaseEntity entity = baseEntityLoadDao.load(id);
             if (entity != null) {
                 entities.add((BaseEntity) entity);
             }
@@ -1208,7 +1214,7 @@ public class CLI {
 
         while (st.hasMoreTokens()) {
             long id = Long.parseLong(st.nextToken());
-            IBaseEntity entity = baseEntityProcessorDao.load(id);
+            IBaseEntity entity = baseEntityLoadDao.load(id);
             if (entity != null) {
                 entities.add((BaseEntity) entity);
             }
@@ -1325,7 +1331,7 @@ public class CLI {
     }
 
     public void showEntityAttr(String path, long id) {
-        IBaseEntity entity = baseEntityProcessorDao.load(id);
+        IBaseEntity entity = baseEntityLoadDao.load(id);
 
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
@@ -1341,8 +1347,8 @@ public class CLI {
     }
 
     public void showEntityInter(long id1, long id2) {
-        IBaseEntity entity1 = baseEntityProcessorDao.load(id1);
-        IBaseEntity entity2 = baseEntityProcessorDao.load(id2);
+        IBaseEntity entity1 = baseEntityLoadDao.load(id1);
+        IBaseEntity entity2 = baseEntityLoadDao.load(id2);
 
         if (entity1 == null) {
             System.out.println("No such entity with id: " + id1);
@@ -1358,7 +1364,7 @@ public class CLI {
     }
 
     public void showEntitySQ(long id) {
-        IBaseEntity entity = baseEntityProcessorDao.load(id);
+        IBaseEntity entity = baseEntityLoadDao.load(id);
 
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
@@ -1374,7 +1380,7 @@ public class CLI {
     }
 
     public void execEntitySQ(long id) {
-        IBaseEntity entity = baseEntityProcessorDao.load(id);
+        IBaseEntity entity = baseEntityLoadDao.load(id);
 
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
@@ -1637,8 +1643,8 @@ public class CLI {
 
                         batchProcessService.processBatchWithoutUser(newFile.getAbsolutePath());
 
-                        preparedStatementDone.setInt(1, 1);
-                        preparedStatementDone.setInt(2, id);
+                        preparedStatementDone.setInt(Integer.valueOf(1), 1);
+                        preparedStatementDone.setInt(Integer.valueOf(2), id);
 
                         if (preparedStatementDone.execute()) {
                             System.out.println("Error can't mark sent file: " + id);
@@ -1659,8 +1665,8 @@ public class CLI {
                 } catch (Exception e) {
                     e.printStackTrace();
                     try {
-                        preparedStatementDone.setInt(1, 1);
-                        preparedStatementDone.setInt(2, id);
+                        preparedStatementDone.setInt(Integer.valueOf(1), 1);
+                        preparedStatementDone.setInt(Integer.valueOf(2), id);
 
                         if (preparedStatementDone.execute()) {
                             System.out.println("Error can't mark sent file: " + id);
@@ -2904,8 +2910,8 @@ public class CLI {
             System.out.println("\n >>>>>>>>>>>>>>RIGHT ENTITY<<<<<<<<<<<<<<<<<<<<<");
             System.out.println(entityList.get(1));
             System.out.println("\n >>>>>>>>>>>>>>>RESULT!!!<<<<<<<<<<<<<<<<<<< ");
-            IBaseEntity result = baseEntityProcessorDao.merge(entityList.get(0), entityList.get(1), mergeManager,
-                    IBaseEntityProcessorDao.MergeResultChoice.LEFT, true);
+            IBaseEntity result = baseEntityMergeDao.merge(entityList.get(0), entityList.get(1), mergeManager,
+                    IBaseEntityMergeDao.MergeResultChoice.LEFT, true);
 
             System.out.println(result);
         } else {

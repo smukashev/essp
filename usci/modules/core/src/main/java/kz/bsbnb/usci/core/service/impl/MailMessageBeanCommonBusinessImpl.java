@@ -13,7 +13,6 @@ import java.util.Properties;
 
 @Service
 public class MailMessageBeanCommonBusinessImpl implements MailMessageBeanCommonBusiness {
-
     @Autowired
     IMailDao mailDao;
 

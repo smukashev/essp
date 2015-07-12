@@ -24,8 +24,7 @@ public class BatchEntryServiceImpl implements IBatchEntryService {
     }
 
     @Override
-    public List<BatchEntry> getListByUser(long userId)
-    {
+    public List<BatchEntry> getListByUser(long userId) {
         return batchEntriesDao.getBatchEntriesByUserId(userId);
     }
 

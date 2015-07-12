@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.CoreShowcaseService;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.eav.showcase.ShowcaseMessageProducer;
@@ -24,23 +25,27 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     private final Logger logger = LoggerFactory.getLogger(CoreShowcaseServiceImpl.class);
     @Autowired
     protected IBaseEntityProcessorDao baseEntityProcessorDao;
+
     @Autowired
     protected ShowcaseMessageProducer producer;
 
-    private Map<String, QueueViewMBean> queueViewBeanCache = new HashMap<String, QueueViewMBean>();
-    private Map<Long, Thread> SCThreads = new HashMap<Long, Thread>();
+    @Autowired
+    IBaseEntityLoadDao baseEntityLoadDao;
+
+    private Map<String, QueueViewMBean> queueViewBeanCache = new HashMap<>();
+    private Map<Long, Thread> SCThreads = new HashMap<>();
 
     private static final int ENTITY_COUNT_PER_LOAD = 10;
     private static final int ENTITY_COUNT_PER_CLEAR = 10;
     private static final int SC_HISTORY_THREADS_COUNT = 10;
     private static final int SLEEP_TIME_MILLIS = 1000;
 
-    private Map<Integer, Thread> scHistoryThreads = new HashMap<Integer, Thread>();
+    private Map<Integer, Thread> scHistoryThreads = new HashMap<>();
     private Thread historyParentThread;
 
     @Override
     public void start(String metaName, Long id, Date reportDate, boolean doPopulate) {
-        if(doPopulate) {
+        if (doPopulate) {
             System.out.println("Populating SC_ID_BAG ....");
             baseEntityProcessorDao.populate(metaName, id, reportDate);
             System.out.println("Finished");
@@ -90,8 +95,8 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
     }
 
     @Override
-    public void pause(Long id){
-        if(SCThreads.containsKey(id))
+    public void pause(Long id) {
+        if (SCThreads.containsKey(id))
             SCThreads.get(id).interrupt();
     }
 
@@ -221,9 +226,9 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
 
                     for (Date reportDate : reportDates) {
                         QueueEntry entry = new QueueEntry()
-                                .setBaseEntityApplied(baseEntityProcessorDao.loadByReportDate(entityId, reportDate));
+                                .setBaseEntityApplied(baseEntityLoadDao.loadByReportDate(entityId, reportDate));
 
-                            producer.produce(entry);
+                        producer.produce(entry);
                     }
 
                     idSupplier.done(entityId);
@@ -293,7 +298,7 @@ public class CoreShowcaseServiceImpl implements CoreShowcaseService {
                         return;
                     }
                     for (Long id : list) {
-                        QueueEntry entry = new QueueEntry().setBaseEntityApplied(baseEntityProcessorDao.loadByReportDate(id, reportDate))
+                        QueueEntry entry = new QueueEntry().setBaseEntityApplied(baseEntityLoadDao.loadByReportDate(id, reportDate))
                                 .setScId(scId);
                         try {
                             producer.produce(entry);

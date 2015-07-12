@@ -24,9 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by Bauyrzhan.Makhambeto on 19/02/2015.
- */
 @Service
 public class SearcherFormServiceImpl implements ISearcherFormService {
 

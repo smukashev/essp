@@ -51,8 +51,6 @@ public class InfoParser extends BatchParser {
     private BaseValue<Date> reportDate;
     private BaseValue actualCreditCount;
 
-
-
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("info")) {
@@ -71,7 +69,7 @@ public class InfoParser extends BatchParser {
             for(Map<String,Object> m : refListResponse.getData())
                 if(m.get("CODE") != null && m.get("CODE").equals(crCode)){
                     long creditorId = ((BigDecimal)m.get("ID")).longValue();
-                    IBaseEntity loadedCreditor = processorDao.load(creditorId);
+                    IBaseEntity loadedCreditor = baseEntityLoadDao.load(creditorId);
                     BaseSet creditorDocsLoaded = (BaseSet)loadedCreditor.getEl("docs");
                     BaseSet creditorDocs = new BaseSet(metaClassRepository.getMetaClass("document"));
                     for(IBaseValue bv:  creditorDocsLoaded.get()) {

@@ -10,53 +10,52 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBusiness
-{
+public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBusiness {
     @Autowired
     IUserDao userDao;
 
     /**
      * Проверяет наличие связи между пользователем портала и БВУ/НО.
-     * @param userId Id пользователя портала.
+     *
+     * @param userId     Id пользователя портала.
      * @param creditorId Id БВУ/НО.
      * @return true, если связь есть, false в противном случае.
      */
     @Override
-    public boolean hasPortalUserCreditor(long userId, long creditorId)
-    {
+    public boolean hasPortalUserCreditor(long userId, long creditorId) {
         return userDao.hasPortalUserCreditor(userId, creditorId);
     }
 
     /**
      * Устанавливает связь между пользователем портала и БВУ/НО.
-     * @param userId Id пользователя Liferay-я.
+     *
+     * @param userId     Id пользователя Liferay-я.
      * @param creditorId Id БВУ/НО.
      */
     @Override
-    public void setPortalUserCreditors(long userId, long creditorId)
-    {
+    public void setPortalUserCreditors(long userId, long creditorId) {
         userDao.setPortalUserCreditors(userId, creditorId);
     }
 
     /**
      * Удаляет связь между пользователем портала и БВУ/НО.
-     * @param userId Id пользователя Liferay-я.
+     *
+     * @param userId     Id пользователя Liferay-я.
      * @param creditorId Id БВУ/НО.
      */
     @Override
-    public void unsetPortalUserCreditors(long userId, long creditorId)
-    {
+    public void unsetPortalUserCreditors(long userId, long creditorId) {
         userDao.unsetPortalUserCreditors(userId, creditorId);
     }
 
     /**
      * Возвращает список БВУ/НО пользователя портала.
+     *
      * @param userId Id пользователя Liferay-я.
      * @return Список БВУ/НО.
      */
     @Override
-    public List<Creditor> getPortalUserCreditorList(long userId)
-    {
+    public List<Creditor> getPortalUserCreditorList(long userId) {
         return userDao.getPortalUserCreditorList(userId);
     }
 
@@ -67,18 +66,17 @@ public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBus
      * то сначала они будут удалены, после этого будет добавлен соответствующий пользователь.
      * В случае присутствия соответствующего пользователя портала,
      * то он будет проверен по полю modifiedDate и при необходимости изменен.
+     *
      * @param users Список пользователей Liferay-я.
-     * @exception Exception Неожиданная ошибка.
+     * @throws Exception Неожиданная ошибка.
      */
     @Override
-    public void synchronize(List<PortalUser> users)
-    {
+    public void synchronize(List<PortalUser> users) {
         userDao.synchronize(users);
     }
 
     @Override
-    public List<Creditor> getMainCreditorsInAlphabeticalOrder(long userId)
-    {
+    public List<Creditor> getMainCreditorsInAlphabeticalOrder(long userId) {
         return userDao.getPortalUserCreditorList(userId);
     }
 

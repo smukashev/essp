@@ -21,26 +21,6 @@ public interface IBaseEntityProcessorDao {
 
     List<Long> search(String className);
 
-    IBaseEntity loadByMaxReportDate(long id, Date reportDate);
-
-    IBaseEntity loadByMaxReportDate(long id, Date reportDate, boolean caching);
-
-    IBaseEntity loadByMinReportDate(long id, Date reportDate);
-
-    IBaseEntity loadByMinReportDate(long id, Date reportDate, boolean caching);
-
-    IBaseEntity loadByReportDate(long id, Date actualReportDate, boolean caching);
-
-    IBaseEntity loadByReportDate(long id, Date actualReportDate);
-
-    IBaseEntity load(long id);
-
-    IBaseEntity load(long id, boolean caching);
-
-    IBaseEntity load(long id, Date maxReportDate, Date actualReportDate);
-
-    IBaseEntity load(long id, Date maxReportDate, Date actualReportDate, boolean caching);
-
     IBaseEntity prepare(IBaseEntity baseEntity);
 
     IBaseEntity process(IBaseEntity baseEntity);
@@ -57,8 +37,6 @@ public interface IBaseEntityProcessorDao {
 
     boolean isApproved(long id);
 
-    int batchCount(long id, String className);
-
     boolean remove(long baseEntityId);
 
     long getRandomBaseEntityId(long metaClassId);
@@ -67,16 +45,11 @@ public interface IBaseEntityProcessorDao {
 
     Set<Long> getChildBaseEntityIds(long parentBaseEntityIds);
 
-    IDaoListener getApplyListener();
-
-    void setApplyListener(IDaoListener applyListener);
-
     List<Date> getEntityReportDates(Long entityId);
 
     RefColumnsResponse getRefColumns(long metaClassId);
 
-    IBaseEntity merge(IBaseEntity baseEntityLeft, IBaseEntity baseEntityRight,
-                             IBaseEntityMergeManager mergeManager, MergeResultChoice choice, boolean deleteUnused);
+
 
     void populate(String metaName, Long id, Date reportDate);
 
@@ -99,9 +72,4 @@ public interface IBaseEntityProcessorDao {
     List<Long> getNewTableIds(Long id);
 
     void removeNewTableIds(List<Long> list, Long id);
-
-    enum MergeResultChoice {
-        RIGHT,
-        LEFT
-    }
 }

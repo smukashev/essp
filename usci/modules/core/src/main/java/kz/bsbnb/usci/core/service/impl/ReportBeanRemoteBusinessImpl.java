@@ -1,9 +1,11 @@
 package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
-import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.cr.model.Report;
+import kz.bsbnb.usci.cr.model.ReportMessage;
+import kz.bsbnb.usci.cr.model.ReportMessageAttachment;
 import kz.bsbnb.usci.eav.persistance.dao.IReportDao;
-import kz.bsbnb.usci.eav.persistance.dao.IUserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,14 +15,12 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness
-{
+public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness {
     @Autowired
     IReportDao reportDao;
 
     @Override
-    public Date getReportDate(long creditorId)
-    {
+    public Date getReportDate(long creditorId) {
         Date firstNotApprovedDate = reportDao.getFirstNotApprovedDate(creditorId);
         if (firstNotApprovedDate != null) {
             return firstNotApprovedDate;
@@ -58,8 +58,7 @@ public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness
 
     @Override
     @Deprecated
-    public Report getByCreditor_ReportDate(Creditor creditor, Date reportDate)
-    {
+    public Report getByCreditor_ReportDate(Creditor creditor, Date reportDate) {
         return null;
     }
 

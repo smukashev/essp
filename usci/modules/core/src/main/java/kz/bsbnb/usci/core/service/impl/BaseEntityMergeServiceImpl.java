@@ -6,39 +6,44 @@ import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityMergeDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Date;
-import java.util.UUID;
 
-/**
- * Created by dakkuliyev on 7/20/14.
- */
 @Service
 public class BaseEntityMergeServiceImpl implements IBaseEntityMergeService {
-
     @Autowired
     IBaseEntityProcessorDao baseEntityProcessorDao;
+
+    @Autowired
+    IBaseEntityLoadDao baseEntityLoadDao;
+
+    @Autowired
+    IBaseEntityMergeDao baseEntityMergeDao;
 
     @Override
     public void mergeBaseEntities(long leftEntityId, long rightEntityId, Date leftReportDate, Date rightReportDate,
                                   String json, boolean deleteUnused) {
         IBaseEntityMergeManager mergeManager = constructMergeManagerFromJson(json);
 
-        IBaseEntity leftEntity = baseEntityProcessorDao.loadByMaxReportDate(leftEntityId, leftReportDate);
-        IBaseEntity rightEntity = baseEntityProcessorDao.loadByMaxReportDate(rightEntityId, rightReportDate);
+        IBaseEntity leftEntity = baseEntityLoadDao.loadByMaxReportDate(leftEntityId, leftReportDate);
+        IBaseEntity rightEntity = baseEntityLoadDao.loadByMaxReportDate(rightEntityId, rightReportDate);
 
-        if(mergeManager != null && leftEntity != null && rightEntity != null){
-            baseEntityProcessorDao.merge(leftEntity, rightEntity, mergeManager,  IBaseEntityProcessorDao.MergeResultChoice.LEFT, deleteUnused);
+        if (mergeManager != null && leftEntity != null && rightEntity != null) {
+            baseEntityMergeDao.merge(leftEntity, rightEntity, mergeManager,
+                    IBaseEntityMergeDao.MergeResultChoice.LEFT, deleteUnused);
         }
 
     }
 
-    private IBaseEntityMergeManager constructMergeManagerFromJson(String jsonStr)
-    {
+    private IBaseEntityMergeManager constructMergeManagerFromJson(String jsonStr) {
         IBaseEntityMergeManager mergeManager = new BaseEntityMergeManager();
 
         try {
@@ -54,42 +59,33 @@ public class BaseEntityMergeServiceImpl implements IBaseEntityMergeService {
         return mergeManager;
     }
 
-    public IBaseEntityMergeManager jsonToMergeManager(JsonReader jsonReader) throws IOException
-    {
+    public IBaseEntityMergeManager jsonToMergeManager(JsonReader jsonReader) throws IOException {
         IBaseEntityMergeManager mergeManager = new BaseEntityMergeManager();
-        while (jsonReader.hasNext())
-        {
+        while (jsonReader.hasNext()) {
             String name = jsonReader.nextName();
-            if (name.equals("action"))
-            {
+            if (name.equals("action")) {
                 String action = jsonReader.nextString();
-                if(action.equals("keep_left"))
+                if (action.equals("keep_left"))
                     mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_LEFT);
-                if(action.equals("keep_right"))
+                if (action.equals("keep_right"))
                     mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_RIGHT);
-                if(action.equals("merge"))
+                if (action.equals("merge"))
                     mergeManager.setAction(IBaseEntityMergeManager.Action.TO_MERGE);
-                if(action.equals("keep_both"))
+                if (action.equals("keep_both"))
                     mergeManager.setAction(IBaseEntityMergeManager.Action.KEEP_BOTH);
-            } else if (name.equals("childMap"))
-            {
+            } else if (name.equals("childMap")) {
                 jsonReader.beginArray();
-                while(jsonReader.hasNext())
-                {
-                    MergeManagerKey key =  null;
+                while (jsonReader.hasNext()) {
+                    MergeManagerKey key = null;
                     IBaseEntityMergeManager childManager = null;
                     jsonReader.beginObject();
-                    while(jsonReader.hasNext())
-                    {
+                    while (jsonReader.hasNext()) {
                         String innerName = jsonReader.nextName();
-                        if(innerName.equals("id"))
-                        {
+                        if (innerName.equals("id")) {
                             jsonReader.beginObject();
                             key = getKeyFromJson(jsonReader);
                             jsonReader.endObject();
-                        }
-                        else if(innerName.equals("map"))
-                        {
+                        } else if (innerName.equals("map")) {
                             jsonReader.beginObject();
                             childManager = jsonToMergeManager(jsonReader);
                             jsonReader.endObject();
@@ -106,33 +102,29 @@ public class BaseEntityMergeServiceImpl implements IBaseEntityMergeService {
     }
 
 
-    private MergeManagerKey getKeyFromJson(JsonReader jsonReader)
-    {
+    private MergeManagerKey getKeyFromJson(JsonReader jsonReader) {
         String type = null;
-        String left =  null;
-        String right =  null;
-        String attr =  null;
+        String left = null;
+        String right = null;
+        String attr = null;
         try {
-            while(jsonReader.hasNext())
-            {
+            while (jsonReader.hasNext()) {
                 String name = jsonReader.nextName();
-                if(name.equals("type"))
-                {
+                if (name.equals("type")) {
                     type = jsonReader.nextString();
-                } else if(name.equals("left")){
+                } else if (name.equals("left")) {
                     left = jsonReader.nextString();
-                } else if(name.equals("right")){
+                } else if (name.equals("right")) {
                     right = jsonReader.nextString();
-                } else if(name.equals("attr")){
+                } else if (name.equals("attr")) {
                     attr = jsonReader.nextString();
                 }
             }
-            if(type.equals("attribute"))
-            {
+            if (type.equals("attribute")) {
                 MergeManagerKey<String> key = new MergeManagerKey<String>(attr);
                 return key;
             }
-            if(type.equals("long")){
+            if (type.equals("long")) {
                 MergeManagerKey<Long> key = new MergeManagerKey<Long>(Long.parseLong(left), Long.parseLong(right));
                 return key;
             }

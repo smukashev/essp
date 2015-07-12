@@ -1,7 +1,10 @@
 package kz.bsbnb.usci.core.service.impl;
 
 import com.couchbase.client.CouchbaseClient;
-import com.couchbase.client.protocol.views.*;
+import com.couchbase.client.protocol.views.Query;
+import com.couchbase.client.protocol.views.View;
+import com.couchbase.client.protocol.views.ViewResponse;
+import com.couchbase.client.protocol.views.ViewRow;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.core.service.ProtocolBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.InputInfo;
@@ -19,14 +22,12 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.*;
 
 import static kz.bsbnb.usci.tool.couchbase.EntityStatuses.*;
 
 @Service
-public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusiness
-{
+public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusiness {
     @Autowired
     private CouchbaseClientManager couchbaseClientManager;
 
@@ -56,13 +57,12 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
     }
 
     @Override
-    public List<Protocol> getProtocolsBy_InputInfo(InputInfo inputInfoId)
-    {
+    public List<Protocol> getProtocolsBy_InputInfo(InputInfo inputInfoId) {
         ArrayList<Protocol> list = new ArrayList<Protocol>();
 
         String batchId = "" + inputInfoId.getId();
 
-        if(batchId != null) {
+        if (batchId != null) {
             View view = couchbaseClient.getView("batch", "entity_status");
             Query query = new Query();
             query.setDescending(true);
@@ -74,7 +74,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
 
             Iterator<ViewRow> rows = response.iterator();
 
-            while(rows.hasNext()) {
+            while (rows.hasNext()) {
                 ViewRow viewRowNoDocs = rows.next();
 
                 EntityStatusArrayJModel batchFullStatusJModel =

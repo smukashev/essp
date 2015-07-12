@@ -4,6 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.repository.IBaseEntityRepository;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,34 +18,26 @@ import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-/**
- *
- */
 @Aspect
 @Component
 @Scope(value = "singleton")
 public class BaseEntityRepositoryImpl implements IBaseEntityRepository {
-
     private final Logger logger = LoggerFactory.getLogger(BaseEntityRepositoryImpl.class);
 
-    private class BaseEntityKey
-    {
+    private class BaseEntityKey {
         private long id;
         private Date reportDate;
 
-        public BaseEntityKey(long id, Date reportDate)
-        {
+        public BaseEntityKey(long id, Date reportDate) {
             this.id = id;
             this.reportDate = reportDate;
         }
 
-        public long getId()
-        {
+        public long getId() {
             return id;
         }
 
-        public Date getReportDate()
-        {
+        public Date getReportDate() {
             return reportDate;
         }
 
@@ -84,6 +77,9 @@ public class BaseEntityRepositoryImpl implements IBaseEntityRepository {
     @Autowired
     private IBaseEntityProcessorDao baseEntityProcessorDao;
 
+    @Autowired
+    private IBaseEntityLoadDao baseEntityLoadDao;
+
     // TODO: Maybe use LinkedHashMap
     LoadingCache<BaseEntityKey, IBaseEntity> cache;
 
@@ -92,95 +88,78 @@ public class BaseEntityRepositoryImpl implements IBaseEntityRepository {
         return this.baseEntityProcessorDao;
     }
 
-    public BaseEntityRepositoryImpl()
-    {
-        if (enabled)
-        {
+    public BaseEntityRepositoryImpl() {
+        if (enabled) {
             initialize();
         }
     }
 
-    public synchronized void initialize()
-    {
+    public synchronized void initialize() {
         cache = CacheBuilder.newBuilder()
-            .concurrencyLevel(concurrencyLevel)
-            .softValues()
-            .maximumSize(maximumSize)
-            .expireAfterAccess(duration, timeUnit)
-            .build(
-                    new CacheLoader<BaseEntityKey, IBaseEntity>() {
-                        public IBaseEntity load(BaseEntityKey key) throws Exception {
-                            //TODO: Dates messed up
-                            return baseEntityProcessorDao.loadByMaxReportDate(key.getId(), key.getReportDate());
-                        }
-                    });
+                .concurrencyLevel(concurrencyLevel)
+                .softValues()
+                .maximumSize(maximumSize)
+                .expireAfterAccess(duration, timeUnit)
+                .build(
+                        new CacheLoader<BaseEntityKey, IBaseEntity>() {
+                            public IBaseEntity load(BaseEntityKey key) throws Exception {
+                                //TODO: Dates messed up
+                                return baseEntityLoadDao.loadByMaxReportDate(key.getId(), key.getReportDate());
+                            }
+                        });
     }
 
-    public IBaseEntity getBaseEntity(long id, Date reportDate)
-    {
-        if (id < 1)
-        {
+    public IBaseEntity getBaseEntity(long id, Date reportDate) {
+        if (id < 1) {
             throw new IllegalArgumentException("Unable to load a instance of BaseEntity without ID.");
         }
 
-        if (reportDate == null)
-        {
+        if (reportDate == null) {
             throw new IllegalArgumentException("Unable to load a instance of BaseEntity without report date.");
         }
 
-        if (enabled)
-        {
+        if (enabled) {
             BaseEntityKey key = new BaseEntityKey(id, reportDate);
             try {
                 return cache.get(key);
             } catch (ExecutionException e) {
                 throw new RuntimeException("When receiving instance of BaseEntity unexpected error occurred.");
             }
-        }
-        else
-        {
+        } else {
             //TODO: Dates messed up
-            return baseEntityProcessorDao.loadByMaxReportDate(id, reportDate);
+            return baseEntityLoadDao.loadByMaxReportDate(id, reportDate);
         }
     }
 
-    public void setEnabled(boolean enabled)
-    {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
-    public boolean getEnabled()
-    {
+    public boolean getEnabled() {
         return enabled;
     }
 
-    public void setConcurrencyLevel(int concurrencyLevel)
-    {
+    public void setConcurrencyLevel(int concurrencyLevel) {
         this.concurrencyLevel = concurrencyLevel;
     }
 
-    public int getConcurrencyLevel()
-    {
+    public int getConcurrencyLevel() {
         return concurrencyLevel;
     }
 
-    public void setDuration(long duration)
-    {
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 
-    public long getDuration()
-    {
+    public long getDuration() {
         return duration;
     }
 
-    public void setTimeUnit(TimeUnit timeUnit)
-    {
+    public void setTimeUnit(TimeUnit timeUnit) {
         this.timeUnit = timeUnit;
     }
 
-    public TimeUnit getTimeUnit()
-    {
+    public TimeUnit getTimeUnit() {
         return timeUnit;
     }
 

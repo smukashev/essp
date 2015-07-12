@@ -7,7 +7,6 @@ import kz.bsbnb.usci.cr.model.ReportMessageAttachment;
 import java.util.List;
 
 public interface ReportMessageBeanRemoteBusiness {
-
     List<ReportMessage> getMessagesByReport(Report report);
 
     void addNewMessage(Report report, ReportMessage message, List<ReportMessageAttachment> attachments);

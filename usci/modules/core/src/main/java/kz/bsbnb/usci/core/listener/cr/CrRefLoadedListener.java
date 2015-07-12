@@ -2,7 +2,6 @@ package kz.bsbnb.usci.core.listener.cr;
 
 import kz.bsbnb.usci.core.listener.IRefLoadedListener;
 import kz.bsbnb.usci.cr.model.Creditor;
-import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IUserDao;
@@ -19,7 +18,7 @@ public class CrRefLoadedListener implements IRefLoadedListener {
     @Override
     public void process(long userId, IMetaClass metaClass, String attr, List<RefListItem> list) {
 
-        if(metaClass.getClassName().equals("ref_creditor")) {
+        if (metaClass.getClassName().equals("ref_creditor")) {
             List<Creditor> creditors = userDao.getPortalUserCreditorList(userId);
 
             if (creditors.size() == 1) {
@@ -33,7 +32,7 @@ public class CrRefLoadedListener implements IRefLoadedListener {
                         break;
                     }
 
-                if (refItem != null){
+                if (refItem != null) {
                     list.clear();
                     list.add(refItem);
                 }

@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import kz.bsbnb.usci.core.service.InputInfoBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.model.json.*;
-import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +19,7 @@ import static kz.bsbnb.usci.tool.couchbase.BatchStatuses.COMPLETED;
 import static kz.bsbnb.usci.tool.couchbase.BatchStatuses.ERROR;
 
 @Service
-public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusiness
-{
+public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusiness {
     @Autowired
     private CouchbaseClientManager couchbaseClientManager;
 
@@ -50,7 +48,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
         Iterator<ViewRow> rows = response.iterator();
 
-        if(rows.hasNext()) {
+        if (rows.hasNext()) {
             ViewRowReduced viewRowNoDocs = (ViewRowReduced) rows.next();
 
             System.out.println("==================");
@@ -89,8 +87,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     }
 
     @Override
-    public List<InputInfo> getAllInputInfos(List<Creditor> creditorsList, Date reportDate)
-    {
+    public List<InputInfo> getAllInputInfos(List<Creditor> creditorsList, Date reportDate) {
         ArrayList<InputInfo> list = new ArrayList<InputInfo>();
 
         View view = couchbaseClient.getView("batch", "batch");
@@ -105,19 +102,19 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
         HashMap<Long, Creditor> inputCreditors = new HashMap<Long, Creditor>();
 
-        for(Creditor cred : creditorsList) {
+        for (Creditor cred : creditorsList) {
             inputCreditors.put(cred.getId(), cred);
         }
 
         BatchFullStatusJModel batchFullStatusJModel = null;
 
-        if(viewResponse != null) {
-            for(ViewRow row : viewResponse) {
+        if (viewResponse != null) {
+            for (ViewRow row : viewResponse) {
                 ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) row;
 
                 if (batchFullStatusJModel == null) {
                     batchFullStatusJModel =
-                        gson.fromJson(viewRowNoDocs.getValue(), BatchFullStatusJModel.class);
+                            gson.fromJson(viewRowNoDocs.getValue(), BatchFullStatusJModel.class);
                 } else {
                     Long id = batchFullStatusJModel.getId();
 
@@ -186,9 +183,9 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
         if (lastStatus.equals("PROCESSING")) {
             inputInfo.setStartedDate(statusModel.getReceived());
-        } else if(lastStatus.equals("COMPLETED")) {
+        } else if (lastStatus.equals("COMPLETED")) {
             inputInfo.setCompletionDate(statusModel.getReceived());
-        } else if(lastStatus.equals("WAITING")) {
+        } else if (lastStatus.equals("WAITING")) {
             inputInfo.setReceiverDate(statusModel.getReceived());
         } else if (lastStatus.equals("ERROR") &&
                 inputInfo.getReceiverDate() == null) {
@@ -253,12 +250,12 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 Long key = Long.parseLong(viewRowNoDocs.getKey());
 
                 Long creditorId;
-                if(batchFullStatusJModel.getCreditorId() != null)
+                if (batchFullStatusJModel.getCreditorId() != null)
                     creditorId = batchFullStatusJModel.getCreditorId();
                 else
                     creditorId = getCreditorId(key.longValue());
 
-                if(inputCreditors.get(creditorId) != null) {
+                if (inputCreditors.get(creditorId) != null) {
                     InputInfo inputInfo = new InputInfo();
                     inputInfo.setFileName(batchFullStatusJModel.getFileName());
                     inputInfo.setId(BigInteger.valueOf(key));

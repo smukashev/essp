@@ -11,7 +11,6 @@ import java.util.List;
 
 @Service
 public class ReportMessageBeanRemoteBusinessImpl implements ReportMessageBeanRemoteBusiness {
-
     public List<ReportMessage> getMessagesByReport(Report report) {
         ArrayList<ReportMessage> reportMessages = new ArrayList<ReportMessage>();
         return reportMessages;

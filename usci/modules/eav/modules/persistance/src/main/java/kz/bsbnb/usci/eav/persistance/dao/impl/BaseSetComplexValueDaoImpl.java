@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseSetComplexValueDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
@@ -45,8 +46,12 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
     @Autowired
     IBaseEntityDao baseEntityDao;
+
     @Autowired
     IBaseEntityProcessorDao baseEntityProcessorDao;
+
+    @Autowired
+    IBaseEntityLoadDao baseEntityLoadDao;
 
     @Override
     public long insert(IPersistable persistable) {
@@ -199,7 +204,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     .get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
             Batch batch = batchRepository.getBatch(batchId);
-            IBaseEntity childBaseEntityLoaded = baseEntityProcessorDao
+            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao
                     .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate ?
                             baseValue.getRepDate() : reportDate);
 
@@ -279,7 +284,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     .get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
             Batch batch = batchRepository.getBatch(batchId);
-            IBaseEntity childBaseEntityLoaded = baseEntityProcessorDao
+            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao
                     .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate
                             ? baseValue.getRepDate() : reportDate);
 
@@ -335,7 +340,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     .get(EAV_BE_COMPLEX_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
             Batch batch = batchRepository.getBatch(batchId);
-            IBaseEntity childBaseEntityLoaded = baseEntityProcessorDao
+            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao
                     .loadByMaxReportDate(childBaseEntity.getId(), baseValue.getRepDate());
 
             closedBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
@@ -393,7 +398,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     .get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
             Batch batch = batchRepository.getBatch(batchId);
-            IBaseEntity childBaseEntityLoaded = baseEntityProcessorDao
+            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao
                     .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate
                             ? baseValue.getRepDate() : reportDate);
 
@@ -474,7 +479,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
             Batch batch = batchRepository.getBatch(batchId);
-            IBaseEntity baseEntity = baseEntityProcessorDao.loadByMaxReportDate(entityValueId, actualReportDate,
+            IBaseEntity baseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, actualReportDate,
                     metaClass.isReference());
 
             baseSet.put(BaseValueFactory.create(MetaContainerTypes.META_SET, baseSet.getMemberType(),

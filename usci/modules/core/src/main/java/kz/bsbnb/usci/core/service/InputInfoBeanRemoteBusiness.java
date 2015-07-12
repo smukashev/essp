@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface InputInfoBeanRemoteBusiness {
     List<InputInfo> getAllInputInfos(List<Creditor> creditorsList, Date reportDate);
+
     List<InputInfo> getPendingBatches(List<Creditor> creditorsList);
+
     BatchFullJModel getBatchFullModel(BigInteger batchId);
 }

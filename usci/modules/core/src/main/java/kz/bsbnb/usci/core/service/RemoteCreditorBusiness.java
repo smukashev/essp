@@ -8,6 +8,4 @@ public interface RemoteCreditorBusiness {
     List<Creditor> findMainOfficeCreditors();
 
     boolean creditorApproved(Creditor cred);
-
-    int contractCount(Creditor cred);
 }
