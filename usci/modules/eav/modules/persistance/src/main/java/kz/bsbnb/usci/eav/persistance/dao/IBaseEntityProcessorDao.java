@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.dao;
 
-import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.RefListResponse;
@@ -8,7 +7,6 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 
 import java.util.Date;
 import java.util.List;
@@ -48,8 +46,6 @@ public interface IBaseEntityProcessorDao {
     List<Date> getEntityReportDates(Long entityId);
 
     RefColumnsResponse getRefColumns(long metaClassId);
-
-
 
     void populate(String metaName, Long id, Date reportDate);
 
