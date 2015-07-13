@@ -2,7 +2,7 @@ rule clear
 #rule set date 01.04.2001
 #rule create package credit_parser
 #rule rc
-#rule set package credit_parser
+rule set package credit_parser
 rule set version
 
 rule import modules/cli/src/main/resources/rules/imports.cli
@@ -21,6 +21,18 @@ rule import modules/cli/src/main/resources/rules/ba/rule_ba_7.cli
 rule import modules/cli/src/main/resources/rules/ba/rule_bact.cli
 rule import modules/cli/src/main/resources/rules/ba/rule_badrt.cli
 rule import modules/cli/src/main/resources/rules/ba/rule_noba.cli
+
+#ref_creditor
+#rule set date 01.04.2001
+#rule create package credit_parser
+#rule rc
+rule set package ref_creditor_parser
+rule set version
+
+rule import modules/cli/src/main/resources/rules/imports.cli
+rule import modules/cli/src/main/resources/rules/rule_functions.cli
+rule import modules/cli/src/main/resources/rules/docs/rule_functions_iin.cli
+rule import modules/cli/src/main/resources/rules/docs/ref_creditor.cli
 
 rule rc
 

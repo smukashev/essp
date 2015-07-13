@@ -1,0 +1,92 @@
+rule read $$$
+title: документ РНН должен содержать 12 символов
+rule "документ РНН должен содержать 12 символов"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "ref_creditor"
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}docs[doc_type.code=11]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: документ БИН должен содержать 12 символов
+rule "документ БИН головной банк должен содержать 12 символов"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "ref_creditor"
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}docs[doc_type.code=07]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: документ ИИН филиал банка должен содержать 12 символов
+rule "документ ИИН филиал банка должен содержать 12 символов"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "ref_creditor"
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: документ ИИН из 12 нулей
+rule "документ ИИН из 12 нулей"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "ref_creditor"
+			&& ( $r : get12ZeroStrings((List)getEls("{get}docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("документ содержит 12 нулей: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: документ РНН из 12 нулей
+rule "документ РНН из 12 нулей"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "ref_creditor"
+			&& ( $r : get12ZeroStrings((List)getEls("{get}docs[doc_type.code=11]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("документ содержит 12 нулей: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: документ БИН из 12 нулей
+rule "документ БИН из 12 нулей"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "ref_creditor"
+			&& ( $r : get12ZeroStrings((List)getEls("{get}docs[doc_type.code=07]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("документ содержит 12 нулей: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: проверка иин
+rule "проверка иин"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "ref_creditor"
+			&& ( $r : getInvalidIINs((List)getEls("{get}docs[doc_type.code=06]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("обнаружен некорректный иин: " + $r);
+end
+$$$
+
+rule save
+
+quit
