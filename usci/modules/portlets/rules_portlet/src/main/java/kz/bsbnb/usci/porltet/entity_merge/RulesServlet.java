@@ -7,6 +7,7 @@ import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.porltet.entity_merge.model.json.JsonMaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -58,65 +59,69 @@ public class RulesServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setCharacterEncoding("utf-8");
-        PrintWriter writer = resp.getWriter();
+    protected void service(HttpServletRequest resourceRequest, HttpServletResponse resourceResponse) throws ServletException, IOException {
+        resourceResponse.setCharacterEncoding("utf-8");
+        PrintWriter writer = resourceResponse.getWriter();
 
         try {
-            OperationTypes operationType = OperationTypes.valueOf(req.getParameter("op"));
-            long ruleId, batchVersionId;
+            OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
+            long ruleId, batchVersionId, batchId;
             String title;
             DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             long baseEntityId;
 
-            if(req.getParameterMap().containsKey("fail"))
+            if(resourceRequest.getParameterMap().containsKey("fail"))
                 throw new RuntimeException("some error Message");
 
             switch(operationType){
                 case PACKAGE_ALL:
                     writer.write(JsonMaker.getJson(batchService.getAllBatches()));
                     break;
+                case PACKAGE_VERSIONS:
+                    batchId = Long.parseLong(resourceRequest.getParameter("packageId"));
+                    writer.write(JsonMaker.getJson(batchService.getBatchVersions(batchId)));
+                    break;
                 case GET_RULE_TITLES:
-                    long packageId = Long.parseLong(req.getParameter("packageId"));
-                    Date date =  df.parse(req.getParameter("date"));
+                    long packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
+                    Date date =  df.parse(resourceRequest.getParameter("date"));
                     writer.write(JsonMaker.getJson(ruleService.getRuleTitles(packageId,date)));
                     break;
                 case GET_RULE :
-                    ruleId = Long.parseLong(req.getParameter("ruleId"));
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     writer.write(JsonMaker.getJson(ruleService.getRule(ruleId)));
                     break;
                 case UPDATE_RULE:
-                    String ruleBody = req.getParameter("ruleBody");
-                    ruleId = Long.parseLong(req.getParameter("ruleId"));
-
-                    String errors = ruleService.getRuleErrors(ruleBody);
+                    String ruleBody = resourceRequest.getParameter("ruleBody");
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    String pkgName = resourceRequest.getParameter("pkgName");
+                    date =  df.parse(resourceRequest.getParameter("date"));
+                    String errors = ruleService.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, date);
                     if(errors != null)
                         throw new RuntimeException(errors);
-
                     ruleService.updateBody(ruleId, ruleBody);
                     writer.write(JsonMaker.getJson(true));
                     break;
                 case DEL_RULE:
-                    ruleId = Long.parseLong(req.getParameter("ruleId"));
-                    long packageVersionId = Long.parseLong(req.getParameter("batchVersionId"));
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    long packageVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
                     ruleService.deleteRule(ruleId, packageVersionId);
                     writer.write(JsonMaker.getJson(true));
                     break;
                 case NEW_RULE:
-                    batchVersionId = Long.parseLong(req.getParameter("batchVersionId"));
-                    title = req.getParameter("title");
+                    batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
+                    title = resourceRequest.getParameter("title");
                     writer.write(JsonMaker.getJson(ruleService.saveEmptyRule(title, batchVersionId)));
                     break;
                 case COPY_EXISTING_RULE:
-                    batchVersionId = Long.parseLong(req.getParameter("batchVersionId"));
-                    ruleId = Long.parseLong(req.getParameter("ruleId"));
+                    batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     ruleService.copyExistingRule(ruleId, batchVersionId);
                     writer.write(JsonMaker.getJson(true));
                     break;
                 case COPY_RULE:
-                    batchVersionId = Long.parseLong(req.getParameter("batchVersionId"));
-                    ruleId = Long.parseLong(req.getParameter("ruleId"));
-                    title = req.getParameter("title");
+                    batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    title = resourceRequest.getParameter("title");
                     ruleId = ruleService.createCopy(ruleId,title,batchVersionId);
                     writer.write(JsonMaker.getJson(ruleId));
                     break;
@@ -128,17 +133,22 @@ public class RulesServlet extends HttpServlet {
                     //rulesSingleton.runRules(be,batchName,date);
                     //ruleService.runRules(be,batchName,date);
                     //writer.write(JsonMaker.getJson(be.getValidationErrors()));
-                    String rule = req.getParameter("body");
-                    String entityBody = req.getParameter("entity");
+                    String rule = resourceRequest.getParameter("body");
+                    String entityBody = resourceRequest.getParameter("entity");
                     //writer.write(JsonMaker.getJson(ruleService.runRule(entityBody, rule)));
                     break;
                 case FLUSH:
                     ruleService.reloadCache();
                     break;
                 case RENAME_RULE:
-                    ruleId = Long.parseLong(req.getParameter("ruleId"));
-                    title = req.getParameter("title");
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    title = resourceRequest.getParameter("title");
                     ruleService.renameRule(ruleId,title);
+                    break;
+                case NEW_PACKAGE_VERSION:
+                    packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
+                    date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+                    ruleService.insertBatchVersion(packageId, date);
                     break;
                 /*case LIST_TEST_ENTITY:
                     //writer.write(JsonMaker.getJson(ruleService.listTestEntity(100500L)));
@@ -170,9 +180,9 @@ public class RulesServlet extends HttpServlet {
                 retry = true;
                 try {
                     init();
-                    service(req, resp);
+                    service(resourceRequest, resourceResponse);
                 } catch (Exception e1) {
-                    resp.setHeader(ResourceResponse.HTTP_STATUS_CODE, "400");
+                    resourceResponse.setHeader(ResourceResponse.HTTP_STATUS_CODE, "400");
                     writer.write("{ \"success\": false, \"errorMessage\": \""+ e1.getMessage()
                             .replaceAll("\"","").replaceAll("\n","")+"\"}");
                 } finally {
@@ -181,7 +191,7 @@ public class RulesServlet extends HttpServlet {
                 }
             }
 
-            resp.setHeader(ResourceResponse.HTTP_STATUS_CODE, "400");
+            resourceResponse.setHeader(ResourceResponse.HTTP_STATUS_CODE, "400");
             writer.write("{ \"success\": false, \"errorMessage\": \""+ e.getMessage().replaceAll("\"","").replaceAll("\n","")+"\"}");
             e.printStackTrace();
         }
@@ -232,6 +242,7 @@ public class RulesServlet extends HttpServlet {
 
     enum OperationTypes {
         PACKAGE_ALL,
+        PACKAGE_VERSIONS,
         GET_RULE_TITLES,
         GET_RULE,
         UPDATE_RULE,
@@ -242,7 +253,8 @@ public class RulesServlet extends HttpServlet {
         RUN_RULE,
         FLUSH,
         RENAME_RULE,
-        LIST_TEST_ENTITY,
+        RULE_SWITCH,
+        NEW_PACKAGE_VERSION,
 
         LIST_ALL,
         LIST_CLASS,
@@ -250,7 +262,7 @@ public class RulesServlet extends HttpServlet {
         DEL_CLASS,
         SAVE_ATTR,
         GET_ATTR,
-        INSERT_TEST_ENTITY, DELETE_TEST_ENTITY, UPDATE_TEST_ENTITY, DEL_ATTR
+        DEL_ATTR
     }
 
     public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse)

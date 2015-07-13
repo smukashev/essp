@@ -39,6 +39,7 @@
 <script src="<%=request.getContextPath()%>/js/require.js" type="text/javascript"></script>
 <script src="/static-usci/ext/ext-all.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/rform.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/package_control.js" type="text/javascript"></script>
 
 <script>
     require.config({

@@ -339,6 +339,13 @@ function initGrid(){
                 handler: function(){
                     updateRules();
                 }
+            },{
+                text: 'пакеты',
+                id: 'btnPackages',
+                hidden: readOnly,
+                handler: function(){
+                    packageControlForm().show();
+                }
             }]
         }],
         height: '75%',

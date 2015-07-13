@@ -10,6 +10,7 @@ import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.porltet.entity_merge.model.json.JsonMaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -107,6 +108,7 @@ public class RulesPortlet extends MVCPortlet{
         FLUSH,
         RENAME_RULE,
         RULE_SWITCH,
+        NEW_PACKAGE_VERSION,
 
         LIST_ALL,
         LIST_CLASS,
@@ -260,6 +262,13 @@ public class RulesPortlet extends MVCPortlet{
                         else
                             writer.write(JsonMaker.getJson(true));
                     }
+                    break;
+                case NEW_PACKAGE_VERSION:
+                    getWriteAccess(resourceRequest);
+                    packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
+                    date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+                    ruleService.insertBatchVersion(packageId, date);
+                    break;
             }
 
         } catch (Exception e) {
