@@ -198,10 +198,9 @@ function loadSubEntity(subNode, idSuffix) {
             } else {
                 subNode.data.value = records[0].data.value;
                 subNode.data.children = records[0].data.children;
-                //subNode.childNodes = records[0].childNodes;
 
                 for (i = 0; i < records[0].childNodes.length; i++) {
-                    subNode.appendChild(records[0].childNodes[i]);
+                    subNode.appendChild(records[0].data.children[i]);
                 }
             }
         }

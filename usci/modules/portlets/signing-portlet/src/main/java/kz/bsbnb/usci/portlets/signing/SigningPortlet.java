@@ -9,6 +9,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import kz.bsbnb.usci.cr.model.Creditor;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -137,7 +138,9 @@ public class SigningPortlet extends GenericPortlet {
                 log.log(Level.INFO, "Entry key: {0}", entry.getKey());
                 log.log(Level.INFO, "Entry value: {0}", Arrays.toString(entry.getValue()));
                 String key = entry.getKey();
-                if (key != null && key.startsWith("sign") && entry.getValue().length > 0) {
+                if (key != null && key.startsWith("sign") && entry.getValue().length > 0
+                        && StringUtils.isNotEmpty(entry.getValue()[0])) {
+
                     BigInteger signId = new BigInteger(key.substring(4));
                     FileSignatureRecord record = filesById.get(signId);
                     if (record != null) {

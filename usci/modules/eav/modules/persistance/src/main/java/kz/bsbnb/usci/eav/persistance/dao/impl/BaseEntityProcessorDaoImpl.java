@@ -10,7 +10,10 @@ import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.*;
 import kz.bsbnb.usci.eav.model.base.impl.*;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexSet;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.meta.*;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
@@ -2890,6 +2893,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     @Transactional
     public IBaseEntity process(IBaseEntity baseEntity) {
+        if (!keyAttributesPresent(baseEntity))
+            throw new RuntimeException("Some key attributes are missing");
+
         EntityHolder entityHolder = new EntityHolder();
 
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
@@ -2906,6 +2912,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     if (baseEntity.getMeta().isReference() && historyExists(
                             baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId()))
                         throw new RuntimeException("Reference with history cannot be deleted!");
+
+                    if (baseEntity.getMeta().isReference()) {
+                        failIfHasUsages(baseEntityPostPrepared);
+                    }
 
                     baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
@@ -2927,6 +2937,97 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     entityHolder.applied, baseEntityManager);
 
         return baseEntityApplied;
+    }
+
+    private void failIfHasUsages(IBaseEntity baseEntity) {
+        MetaClass metaClassOfDeleting = metaClassRepository.getMetaClass(baseEntity.getMeta().getId());
+
+        {
+            Select select = context.selectDistinct(EAV_BE_ENTITIES.CLASS_ID).from(EAV_BE_COMPLEX_VALUES)
+                    .join(EAV_BE_ENTITIES).on(EAV_BE_COMPLEX_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
+                    .where(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.eq(baseEntity.getId()));
+
+            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+            StringBuilder sbUsages = new StringBuilder();
+
+            for (Map<String, Object> row : rows) {
+                Long metaId = ((BigDecimal) row.get(EAV_BE_ENTITIES.CLASS_ID.getName())).longValue();
+
+                MetaClass metaClass = metaClassRepository.getMetaClass(metaId);
+
+                sbUsages.append(metaClass.getClassName() + ", ");
+            }
+
+            if (rows.size() > 0) {
+                throw new RuntimeException("Deleting baseEntity " + metaClassOfDeleting.getClassName()
+                        + "(id: " + baseEntity.getId() + ") has usages in classes: " + sbUsages.toString());
+            }
+        }
+
+        {
+            if ("ref_creditor".equals(metaClassOfDeleting.getClassName())) {
+                Select select = context.select().from(EAV_A_CREDITOR_USER)
+                        .where(EAV_A_CREDITOR_USER.CREDITOR_ID.eq(baseEntity.getId())).limit(1);
+
+                List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+                if (rows.size() > 0) {
+                    throw new RuntimeException("Deleting ref_creditor "
+                            + "(id: " + baseEntity.getId() + ") has binded users");
+                }
+            }
+        }
+    }
+
+    private boolean keyAttributesPresent(IBaseEntity baseEntity) {
+        for (String attributeName : baseEntity.getMeta().getAttributeNames()) {
+            IMetaAttribute metaAttribute = baseEntity.getMeta().getMetaAttribute(attributeName);
+
+            if (metaAttribute.isKey()) {
+                IBaseValue baseValue = baseEntity.getBaseValue(attributeName);
+
+                if (baseValue != null) {
+                    if (baseValue.getValue() != null) {
+                        if (metaAttribute.getMetaType().isSetOfSets()) {
+                            throw new UnsupportedOperationException("Set of sets is not supported!");
+                        } else if (metaAttribute.getMetaType().isSet()) {
+                            BaseSet set = (BaseSet) baseValue.getValue();
+
+                            if (set.get() != null && !set.get().isEmpty()) {
+                                for (IBaseValue setBaseValue : set.get()) {
+                                    if (setBaseValue.getValue() != null) {
+                                        if (metaAttribute.getMetaType().isComplex()) {
+                                            BaseEntity setBaseEntity = (BaseEntity) setBaseValue.getValue();
+
+                                            if (!keyAttributesPresent(setBaseEntity)) {
+                                                return false;
+                                            }
+                                        }
+                                    } else {
+                                        return false;
+                                    }
+                                }
+                            } else {
+                                return false;
+                            }
+                        } else if (metaAttribute.getMetaType().isComplex()) {
+                            BaseEntity valueBaseEntity = (BaseEntity) baseValue.getValue();
+
+                            if (!keyAttributesPresent(valueBaseEntity)) {
+                                return false;
+                            }
+                        }
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     private boolean historyExists(long metaId, long entityId) {

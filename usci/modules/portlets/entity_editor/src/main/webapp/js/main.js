@@ -209,7 +209,7 @@ Ext.onReady(function() {
 
             if(keySearchComponent != null) {
                 var entityId = document.getElementById('inp-1-' + currentMeta + '-null').value;
-                   entityStore.load({
+                entityStore.load({
                     params: {
                         op: 'LIST_ENTITY',
                         entityId: entityId,
@@ -532,7 +532,7 @@ Ext.onReady(function() {
     });
 
     if (givenEntityId && givenRepDate && givenEntityId.length && givenRepDate.length
-            && givenEntityId != "null" && givenRepDate != "null") {
+        && givenEntityId != "null" && givenRepDate != "null") {
         var edDate = Ext.getCmp("edDate");
         edDate.setValue(givenRepDate);
 
