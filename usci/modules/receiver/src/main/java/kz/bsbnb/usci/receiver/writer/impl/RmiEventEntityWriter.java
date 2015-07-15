@@ -56,6 +56,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
         ruleService = (IRuleService) rmiProxyRuleService.getObject();
 
         metaRules.add("credit");
+        metaRules.add("ref_creditor");
     }
 
     @Override

@@ -1,5 +1,8 @@
 <%@ page import="com.liferay.portal.kernel.util.WebKeys" %>
 <%@ page import="com.liferay.portal.theme.ThemeDisplay" %>
+<%@ page import="com.liferay.portal.util.PortalUtil" %>
+<%@ page import="com.liferay.portal.service.UserLocalServiceUtil" %>
+<%@ page import="com.liferay.portal.model.Role" %>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 <%@ taglib prefix="aui" uri="http://alloy.liferay.com/tld/aui" %>
 
@@ -7,6 +10,15 @@
 
 <%
 //    List<BaseEntity> baseEntityList = (List<BaseEntity>)renderRequest.getAttribute("entityList");
+%>
+
+<%
+    boolean readOnly = true;
+
+    for(Role r : UserLocalServiceUtil.getUser(PortalUtil.getUserId(request)).getRoles()) {
+        if(r.getName().equals("NationalBankEmployee") || r.getName().equals("Administrator"))
+            readOnly = false;
+    }
 %>
 
 <portlet:resourceURL var="getDataURL">
@@ -21,11 +33,13 @@
 <script>
     var dataUrl = '<%=getDataURL%>';
     var contextPathUrl = '<%=request.getContextPath()%>';
+    var readOnly = '<%=readOnly%>' == 'true';
 </script>
 
 <script src="<%=request.getContextPath()%>/js/require.js" type="text/javascript"></script>
 <script src="/static-usci/ext/ext-all.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/rform.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/package_control.js" type="text/javascript"></script>
 
 <script>
     require.config({
@@ -42,6 +56,7 @@
     require(['ace/ace'],function(ace){
         console.log("ace code")
         editor = ace.edit('bkeditor');
+        editor.setReadOnly(readOnly);
         editor.getSession().on('change', function(){
             Ext.getCmp('btnDel').setDisabled(false);
             if(editor.getSession().getValue() != editor.backup)

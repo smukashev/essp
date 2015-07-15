@@ -125,7 +125,8 @@ public class BatchDao implements IBatchDao
     public List<IBatchVersion> getBatchVersions(long batchId) {
         Select select = context.select(LOGIC_PACKAGE_VERSIONS.ID, LOGIC_PACKAGE_VERSIONS.OPEN_DATE)
                 .from(LOGIC_PACKAGE_VERSIONS)
-                .where(LOGIC_PACKAGE_VERSIONS.PACKAGE_ID.eq(batchId));
+                .where(LOGIC_PACKAGE_VERSIONS.PACKAGE_ID.eq(batchId))
+                .orderBy(LOGIC_PACKAGE_VERSIONS.OPEN_DATE.desc());
 
         List<Map<String,Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
         List<IBatchVersion> ret = new LinkedList<>();

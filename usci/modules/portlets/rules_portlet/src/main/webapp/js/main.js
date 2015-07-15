@@ -101,6 +101,7 @@ function initGrid(){
                 dataIndex: 'isActive',
                 listeners : {
                     beforecheckchange: function( a, rowIndex, newValue, eOpts ) {
+                        if(readOnly) return false;
                         var ruleId = ruleListGrid.store.getAt(rowIndex).raw.id;
                         var ruleBody = editor.getSession().getValue();
                         var ruleEdited = false;
@@ -132,7 +133,6 @@ function initGrid(){
                             },
                             success: function(response, opts) {
                                 var r = Ext.decode(response.responseText);
-                                console.log(r);
                                 if(r.success) {
                                     t = true;
                                 } else {
@@ -147,7 +147,6 @@ function initGrid(){
                             }
                         });
 
-                        console.log('333 ' + t);
                         return t;
                     }
                 }
@@ -199,6 +198,7 @@ function initGrid(){
                 text: 'добавить',
                 icon: contextPathUrl + '/pics/add.png',
                 id: 'btnNewRule',
+                hidden: readOnly,
                 handler: function(e1,e2){
                     Ext.getCmp('txtTitle').show();
                     Ext.getCmp('txtTitle').focus(false,200);
@@ -299,6 +299,7 @@ function initGrid(){
             }*/,{
                 text: 'сброс',
                 icon: contextPathUrl + '/pics/bin.png',
+                hidden: readOnly,
                 id: 'btnFlush',
                 handler: function(){
                     Ext.Ajax.request({
@@ -326,6 +327,7 @@ function initGrid(){
                 text: 'копировать',
                 id: 'btnCopy',
                 icon: contextPathUrl + '/pics/copy2.png',
+                hidden: readOnly,
                 //disabled: true,
                 handler: function(){
                     createRuleForm().show();
@@ -337,6 +339,13 @@ function initGrid(){
                 handler: function(){
                     updateRules();
                 }
+            },{
+                text: 'пакеты',
+                id: 'btnPackages',
+                hidden: readOnly,
+                handler: function(){
+                    packageControlForm().show();
+                }
             }]
         }],
         height: '75%',
@@ -344,6 +353,7 @@ function initGrid(){
     });
 
     ruleListGrid.on('edit', function(e,r){
+        if(readOnly) return;
         Ext.Ajax.request({
             url: dataUrl,
             waitMsg: 'adding',
@@ -541,6 +551,7 @@ Ext.onReady(function(){
                     tbar: [
                         {
                             text : 'отменить',
+                            hidden: readOnly,
                             id: 'btnCancel',  icon: contextPathUrl + '/pics/undo.png', handler: function(){ editor.setValue(editor.backup, -1); }, disabled: true},
                         {
                             text: 'сохранить',
@@ -548,6 +559,7 @@ Ext.onReady(function(){
                             id: 'btnSave',
                             icon: contextPathUrl + '/pics/save.png',
                             disabled: true,
+                            hidden: readOnly,
                             handler: function(){
 
                                 Ext.Ajax.request({
@@ -605,6 +617,7 @@ Ext.onReady(function(){
                             id: 'btnDel',
                             icon: contextPathUrl + '/pics/crop2.png',
                             disabled: true,
+                            hidden: readOnly,
                             handler: function(){
                                 //Ext.Msg.alert("Сообщение","Вы точно хотите удалить правило ?");
                                 Ext.Msg.show({
@@ -677,7 +690,7 @@ Ext.onReady(function(){
                     ]
                 },{
                     region: 'south',
-                    html: 'here errors',
+                    html: 'ошибок нет',
                     id: 'errorPanel',
                     collapsible: true,
                     collapsed: true,
