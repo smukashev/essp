@@ -40,6 +40,15 @@ function boolean identificationDocCheckSuccess(List subjects) {
         return true;
 }
 
+function List get12ZeroStrings(List docs){
+    List ret = new ArrayList();
+        for(Object doc: docs) {
+            if(((String) doc ).equals("000000000000"))
+                ret.add(doc);
+        }
+    return ret;
+}
+
 $$$
 
 rule save

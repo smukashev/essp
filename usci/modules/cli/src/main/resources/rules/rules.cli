@@ -1,4 +1,8 @@
 rule clear
+
+#===========================================================================================
+# credit
+#===========================================================================================
 #rule set date 01.04.2001
 #rule create package credit_parser
 #rule rc
@@ -22,17 +26,33 @@ rule import modules/cli/src/main/resources/rules/ba/rule_bact.cli
 rule import modules/cli/src/main/resources/rules/ba/rule_badrt.cli
 rule import modules/cli/src/main/resources/rules/ba/rule_noba.cli
 
-#ref_creditor
+#===========================================================================================
+# ref_creditor
+#===========================================================================================
 #rule set date 01.04.2001
-#rule create package credit_parser
+#rule create package ref_creditor_parser
 #rule rc
 rule set package ref_creditor_parser
 rule set version
 
 rule import modules/cli/src/main/resources/rules/imports.cli
 rule import modules/cli/src/main/resources/rules/rule_functions.cli
-rule import modules/cli/src/main/resources/rules/docs/rule_functions_iin.cli
 rule import modules/cli/src/main/resources/rules/docs/ref_creditor.cli
+
+
+#===========================================================================================
+# ref_creditor_branch
+#===========================================================================================
+#rule set date 01.04.2001
+#rule create package ref_creditor_branch_parser
+#rule rc
+rule set package ref_creditor_branch_parser
+rule set version
+
+rule import modules/cli/src/main/resources/rules/imports.cli
+rule import modules/cli/src/main/resources/rules/rule_functions.cli
+rule import modules/cli/src/main/resources/rules/docs/ref_creditor_branch.cli
+
 
 rule rc
 
