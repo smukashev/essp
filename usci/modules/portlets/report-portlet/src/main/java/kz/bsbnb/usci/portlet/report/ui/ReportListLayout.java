@@ -60,7 +60,7 @@ public class ReportListLayout extends VerticalLayout {
         displayReportHeader(Localization.START_HEADER.getValue());
 
         ReportController reportController = new ReportController();
-        List<Report> reports = reportController.loadReports();
+        List<Report> reports = reportController.loadReports(connect);
         BeanItemContainer<Report> reportsContainer = new BeanItemContainer<Report>(Report.class, reports);
         reportsTable = new Table(Localization.REPORTS_TABLE_CAPTION.getValue(), reportsContainer);
         reportsTable.setVisibleColumns(COLUMN_ORDER);

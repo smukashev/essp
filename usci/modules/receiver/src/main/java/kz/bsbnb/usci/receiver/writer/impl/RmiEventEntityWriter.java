@@ -57,6 +57,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
         metaRules.add("credit");
         metaRules.add("ref_creditor");
+        metaRules.add("ref_creditor_branch");
     }
 
     @Override

@@ -5,6 +5,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,6 +60,10 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
         String name = parameters.get("name");
         if(name.trim().length() < 1)
             return ret;
+        Date reportDate = null;
+        if(parameters.get("date")!=null)
+            reportDate = (Date) DataTypes.fromString(DataTypes.DATE, parameters.get("date"));
+
 
         MetaClass orgNameMeta = metaClassRepository.getMetaClass("organization_name");
         MetaClass orgMeta = metaClassRepository.getMetaClass("organization");
@@ -86,8 +92,13 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
 
         List<Long> orgIds = jdbcTemplate.queryForList(orgSelect.getSQL(), orgSelect.getBindValues().toArray(), Long.class);
 
-        for(Long id : orgIds) {
-            ret.add((BaseEntity) baseEntityProcessorDao.load(id));
+        if(reportDate != null) {
+            for (Long id : orgIds) {
+                ret.add((BaseEntity) baseEntityProcessorDao.loadByMaxReportDate(id, reportDate));
+            }
+        } else {
+            for(Long id : orgIds)
+                ret.add((BaseEntity) baseEntityProcessorDao.load(id));
         }
 
         return ret;

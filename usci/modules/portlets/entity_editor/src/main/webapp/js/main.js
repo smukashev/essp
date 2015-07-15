@@ -686,7 +686,12 @@ Ext.onReady(function() {
                 loadEntity(entityId, Ext.getCmp('edDate').value, currentSearch);
             } else {
                 //for custom implementations
-                var params = {op : 'LIST_ENTITY', metaClass: currentMeta, searchName: currentSearch };
+                var params = {op : 'LIST_ENTITY',
+                    metaClass: currentMeta,
+                    searchName: currentSearch,
+                    date: Ext.getCmp('edDate').value
+                };
+
                 var inputs = document.getElementById("entity-editor-form").childNodes;
                 for(i=0;i<inputs.length;i++) {
                     if(inputs[i].tagName == 'INPUT') {
