@@ -2,26 +2,13 @@ package kz.bsbnb.usci.portlet.report.dm;
 
 import kz.bsbnb.usci.portlet.report.ReportApplication;
 
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
 
 ;
 
@@ -195,6 +182,9 @@ public class Report implements Serializable {
     public List<ExportType> getExportTypesList() {
         return exportTypesList;
     }
+
+
+    public void setExportTypeList(List<ExportType> exportTypeList){ this.exportTypesList = exportTypeList;}
 
     /**
      * @return the orderNumber

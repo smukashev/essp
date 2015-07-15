@@ -38,6 +38,10 @@ public class DatabaseConnect {
 
     private User user;
 
+
+    public DatabaseConnect() {
+
+    }
     public DatabaseConnect(User user) {
         this.user = user;
     }
@@ -92,7 +96,7 @@ public class DatabaseConnect {
         return users;
     }
 
-    private Connection getConnection() {
+    public Connection getConnection() {
         try {
             Locale previousLocale = Locale.getDefault();
             // log.log(Level.INFO, "Current locale: {0}-{1}",
