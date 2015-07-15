@@ -8,6 +8,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
@@ -20,10 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
@@ -50,6 +48,11 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
         String lastName = parameters.get("lastName");
         String middleName = parameters.get("middleName");
         List<BaseEntity> ret = new ArrayList<>();
+        Date reportDate = null;
+
+        if(parameters.get("date")!=null)
+            reportDate = (Date) DataTypes.fromString(DataTypes.DATE, parameters.get("date"));
+
 
         MetaClass personNameClass = metaClassRepository.getMetaClass("person_name");
         MetaClass personClass = metaClassRepository.getMetaClass("person");
@@ -59,8 +62,6 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
         IMetaAttribute middleNameAttribute = personNameClass.getMetaAttribute("middlename");
 
         IMetaAttribute namesAttribute = personClass.getMetaAttribute("names");
-
-
 
         List<String> vals = new LinkedList<>();
         List<Long> attributeIds = new LinkedList<>();
@@ -116,8 +117,13 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
 
         List<Long> personIds = jdbcTemplate.queryForList(entitySelect.getSQL(), entitySelect.getBindValues().toArray(), Long.class);
 
-        for(Long id : personIds) {
-            ret.add((BaseEntity) baseEntityProcessorDao.load(id));
+        if(reportDate != null) {
+            for (Long id : personIds) {
+                ret.add((BaseEntity) baseEntityProcessorDao.loadByMaxReportDate(id, reportDate));
+            }
+        } else {
+            for(Long id : personIds)
+                ret.add((BaseEntity) baseEntityProcessorDao.load(id));
         }
 
         return ret;
