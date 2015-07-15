@@ -139,7 +139,7 @@ function find(control){
     });
 }
 
-function createXML(currentNode, rootFlag, offset, arrayEl, first) {
+function createXML(currentNode, rootFlag, offset, arrayEl, first, remove) {
     var xmlStr = "";
 
     var children = currentNode.childNodes;
@@ -149,7 +149,8 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first) {
     } else {
         if(first) {
             xmlStr += offset + "<entity " +
-            (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
+            (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") +
+            (remove ? " operation=\"DELETE\"" : "") + ">\n";
         } else {
             xmlStr += offset + "<" + currentNode.data.code +
             (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
@@ -183,6 +184,36 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first) {
     }
 
     return xmlStr;
+}
+
+function addArrayElementButton(form) {
+    form.add(Ext.create('Ext.button.Button', {
+        id: "btnFormAddArrayElement",
+        text: "Добавить элемент",
+        margin: '0 0 5 0',
+
+        handler : function () {
+            var tree = Ext.getCmp('entityTreeView');
+            var selectedNode = tree.getSelectionModel().getLastSelected();
+
+            if (selectedNode.data.simple) {
+                var element = {
+                    title: "[" + nextArrayIndex + "]",
+                    code: "[" + nextArrayIndex + "]",
+                    metaId: selectedNode.childMetaId,
+                    type: selectedNode.childType,
+                    value: true
+                };
+                newArrayElements.push(element);
+                addField(form, element, "_edit", selectedNode);
+            } else {
+                var arrayElForm= Ext.getCmp('ArrayElFormPannel');
+                arrayElForm.removeAll();
+                loadAttributes(arrayElForm, selectedNode, true);
+                arrayElWindow.show();
+            }
+        }
+    }));
 }
 
 function loadAttributes(form, selectedNode, arrayElAddition) {
@@ -257,10 +288,9 @@ function loadSubEntity(subNode, idSuffix) {
                 Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
             } else {
                 subNode.data.value = records[0].data.value;
-                subNode.data.children = records[0].data.children;
 
-                for (i = 0; i < records[0].childNodes.length; i++) {
-                    subNode.appendChild(records[0].data.children[i]);
+                while (records[0].childNodes.length > 0) {
+                    subNode.appendChild(records[0].childNodes[0]);
                 }
             }
         }
@@ -275,11 +305,10 @@ function addField(form, attr, idSuffix, node) {
         nextArrayIndex++;
     }
 
-    var readOnly = (node && node.value && attr.isKey)
+    var readOnly = (node && node.value && node.value != true && attr.isKey)
         || (attr.isKey && (attr.array || (!attr.simple && !attr.ref)))
         || (node && !node.root && node.ref)
         || (node && node.array && !attr.simple && !attr.ref);
-    //|| (!attr.simple && !attr.array && !attr.ref);
 
     var allowBlank = !(attr.isRequired || attr.isKey);
 
@@ -287,7 +316,7 @@ function addField(form, attr, idSuffix, node) {
         form.add(Ext.create("MyCheckboxField",
                 {
                     id: attr.code + "FromItem" + idSuffix,
-                    fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
                     labelWidth: labelWidth,
                     width: width,
                     readOnly: readOnly,
@@ -300,7 +329,7 @@ function addField(form, attr, idSuffix, node) {
         form.add(Ext.create("Ext.form.field.Date",
                 {
                     id: attr.code + "FromItem" + idSuffix,
-                    fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
                     labelWidth: labelWidth,
                     width: width,
                     format: 'd.m.Y',
@@ -314,7 +343,7 @@ function addField(form, attr, idSuffix, node) {
         form.add(Ext.create("Ext.form.field.Number",
                 {
                     id: attr.code + "FromItem" + idSuffix,
-                    fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
                     labelWidth: labelWidth,
                     width: width,
                     value: attr.value,
@@ -328,7 +357,7 @@ function addField(form, attr, idSuffix, node) {
         form.add(Ext.create("Ext.form.field.ComboBox",
                 {
                     id: attr.code + "FromItem" + idSuffix,
-                    fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
                     labelWidth: labelWidth,
                     width: width,
                     readOnly: readOnly,
@@ -350,7 +379,7 @@ function addField(form, attr, idSuffix, node) {
     } else if (attr.ref) {
         form.add(Ext.create("Ext.form.field.ComboBox", {
             id: attr.code + "FromItem" + idSuffix,
-            fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+            fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
             labelWidth: labelWidth,
             width: width,
             readOnly: readOnly,
@@ -384,7 +413,7 @@ function addField(form, attr, idSuffix, node) {
         form.add(Ext.create("Ext.form.field.Text",
                 {
                     id: attr.code + "FromItem" + idSuffix,
-                    fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
                     labelWidth: labelWidth,
                     width: width,
                     value: attr.value,
@@ -438,7 +467,8 @@ function saveFormValues(formKind) {
             title: "[" + arrayIndex + "]",
             code: "[" + arrayIndex + "]",
             type: selectedNode.data.childType,
-            metaId: selectedNode.data.childMetaId
+            metaId: selectedNode.data.childMetaId,
+            value: true
         };
         selectedNode.appendChild(element);
         selectedNode.data.value = selectedNode.childNodes.length;
@@ -468,6 +498,8 @@ function saveFormValues(formKind) {
 
             if (attr.type == "DATE") {
                 fieldValue = field.getSubmitValue();
+                //} else  if (!attr.simple && !attr.ref) {
+                // do nothing
             } else {
                 fieldValue = field.getValue();
             }
@@ -511,6 +543,29 @@ function saveFormValues(formKind) {
         modalWindow.hide();
         arrayElWindow.hide();
     }
+}
+
+function hasEmptyKeyAttr(mainNode) {
+    for(var i = 0; i < mainNode.childNodes.length; i++) {
+        var currentNode = mainNode.childNodes[i];
+
+        if (currentNode.data.simple) {
+            if (!currentNode.data.value) {
+                Ext.MessageBox.alert(label_ERROR, "Не заполнен ключевой атрибут: " + currentNode.data.title);
+                return true;
+            }
+        } else {
+            if (currentNode.data.isKey && currentNode.childNodes.length == 0) {
+                Ext.MessageBox.alert(label_ERROR, "Не заполнен ключевой атрибут: " + currentNode.data.title);
+                return true;
+            } else if (currentNode.childNodes.length == 0) {
+                // do nothing
+            } else if (hasEmptyKeyAttr(currentNode)) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 Ext.onReady(function() {
@@ -661,7 +716,14 @@ Ext.onReady(function() {
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
 
-            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
+            var xmlStr = "";
+
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                if (hasEmptyKeyAttr(rootNode.childNodes[i])) {
+                    return;
+                }
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true);
+            }
 
             Ext.Ajax.request({
                 url: dataUrl,
@@ -686,7 +748,11 @@ Ext.onReady(function() {
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
 
-            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
+            var xmlStr = "";
+
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true);
+            }
 
             var buttonClose = Ext.create('Ext.button.Button', {
                 id: "itemFormCancel",
@@ -731,6 +797,35 @@ Ext.onReady(function() {
             xmlFromWin.show();
         },
         maxWidth: 50
+    });
+
+    var buttonDelete = Ext.create('Ext.button.Button', {
+        id: "buttonDelete",
+        text: label_DEL,
+        maxWidth: 200,
+        handler : function (){
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+
+            var xmlStr = "";
+
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true, true);
+            }
+
+            Ext.Ajax.request({
+                url: dataUrl,
+                method: 'POST',
+                params: {
+                    xml_data: xmlStr,
+                    date: Ext.getCmp('edDate').value,
+                    op: 'SAVE_XML'
+                },
+                success: function(response) {
+                    Ext.MessageBox.alert("", "Операция выполнена успешно");
+                }
+            });
+        }
     });
 
     modalWindow = Ext.create("Ext.Window",{
@@ -947,7 +1042,7 @@ Ext.onReady(function() {
                 height: '80%',
                 split: true,
                 html: '<div id="entity-editor-form"></div>',
-                tbar: [buttonShow, buttonXML, buttonShowXML, buttonAdd]
+                tbar: [buttonShow, buttonXML, buttonShowXML, buttonDelete , buttonAdd]
             }]
         },{
             region: 'center',
