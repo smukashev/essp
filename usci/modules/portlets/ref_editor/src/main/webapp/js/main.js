@@ -814,7 +814,7 @@ Ext.onReady(function() {
         modal : true,
         closable : true,
         closeAction: 'hide',
-        items  : [
+        items : [
             {
                 id: "ArrayElFormPannel",
                 xtype: 'form',
