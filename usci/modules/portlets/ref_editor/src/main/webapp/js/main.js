@@ -197,10 +197,9 @@ function loadSubEntity(subNode, idSuffix) {
                 Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
             } else {
                 subNode.data.value = records[0].data.value;
-                subNode.data.children = records[0].data.children;
 
-                for (i = 0; i < records[0].childNodes.length; i++) {
-                    subNode.appendChild(records[0].data.children[i]);
+                while (records[0].childNodes.length > 0) {
+                    subNode.appendChild(records[0].childNodes[0]);
                 }
             }
         }
@@ -814,7 +813,7 @@ Ext.onReady(function() {
         modal : true,
         closable : true,
         closeAction: 'hide',
-        items : [
+        items  : [
             {
                 id: "ArrayElFormPannel",
                 xtype: 'form',
