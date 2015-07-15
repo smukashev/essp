@@ -17,4 +17,5 @@ public interface IBatchVersionDao extends IDao {
     public List<BatchVersion> getBatchVersions(Batch batch);
     public void copyRule(Long ruleId,Batch batch,Date versionDate);
     public BatchVersion getBatchVersion(String name, Date repdate);
+    public long insertBatchVersion(long packageId, Date date);
 }

@@ -125,6 +125,11 @@ public class RuleService implements IRuleService {
     }
 
     @Override
+    public long insertBatchVersion(long packageId, Date date) {
+        return batchVersionDao.insertBatchVersion(packageId, date);
+    }
+
+    @Override
     public void reloadCache() {
         rulesSingleton.reloadCache();
     }

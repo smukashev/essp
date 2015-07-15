@@ -81,6 +81,8 @@ public interface IRuleService {
     public long createNewRuleInBatch(Rule rule, BatchVersion batchVersion);
 
     public void renameRule(long ruleId, String title);
+
+    public long insertBatchVersion(long packageId, Date date);
     /**
      * ============================
      * RuleSingleton interface
