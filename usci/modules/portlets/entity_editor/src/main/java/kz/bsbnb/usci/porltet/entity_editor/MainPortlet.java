@@ -12,10 +12,10 @@ import kz.bsbnb.usci.core.service.IBatchEntryService;
 import kz.bsbnb.usci.core.service.form.ISearcherFormService;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchEntry;
+import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.*;
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
@@ -23,11 +23,13 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.Pair;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -138,7 +140,9 @@ public class MainPortlet extends MVCPortlet {
         LIST_ENTITY,
         SAVE_XML,
         FIND_ACTION,
-        GET_FORM
+        GET_FORM,
+        LIST_ATTRIBUTES,
+        LIST_BY_CLASS_SHORT
     }
 
     private String testNull(String str) {
@@ -148,12 +152,11 @@ public class MainPortlet extends MVCPortlet {
     }
 
     private String clearSlashes(String str) {
-        //TODO: str.replaceAll("\"","\\\""); does not work! Fix needed.
-        String outStr = str.replaceAll("\""," ");
+        String outStr = str.replaceAll("\"", "\\\\\"");
         return outStr;
     }
 
-    private String entityToJson(BaseEntity entity, String title, String code) {
+    private String entityToJson(BaseEntity entity, String title, String code, IMetaAttribute attr, boolean asRoot) {
         MetaClass meta = entity.getMeta();
 
         if (title == null) {
@@ -164,10 +167,16 @@ public class MainPortlet extends MVCPortlet {
 
         str += "\"title\": \"" + title + "\",";
         str += "\"code\": \"" + code + "\",";
-        str += "\"value\": \"" + clearSlashes(testNull(meta.getClassTitle())) + "\",";
+//        str += "\"value\": \"" + clearSlashes(testNull(meta.getClassTitle())) + "\",";
+        str += "\"value\": \"" + entity.getId() + "\",";
         str += "\"simple\": false,";
         str += "\"array\": false,";
+        str += "\"ref\": " + entity.getMeta().isReference() + ",";
+        str += "\"isKey\": " + (attr != null ? attr.isKey() : false) + ",";
+        str += "\"isRequired\": " + (attr != null ? attr.isRequired() : false) + ",";
+        str += "\"root\": " + asRoot + ",";
         str += "\"type\": \"META_CLASS\",";
+        str += "\"metaId\": \"" + entity.getMeta().getId() + "\",";
         str += "\"iconCls\":\"folder\",";
         str += "\"children\":[";
 
@@ -188,7 +197,8 @@ public class MainPortlet extends MVCPortlet {
                     first = false;
                 }
 
-                str +=  entityToJson((BaseEntity)(value.getValue()), attrTitle, innerClassesNames);
+                str +=  entityToJson((BaseEntity)(value.getValue()), attrTitle, innerClassesNames,
+                        meta.getMetaAttribute(innerClassesNames), false);
             }
 
         }
@@ -208,7 +218,7 @@ public class MainPortlet extends MVCPortlet {
                     first = false;
                 }
 
-                str +=  setToJson((BaseSet) (value.getValue()), attrTitle, innerClassesNames);
+                str +=  setToJson((BaseSet) (value.getValue()), attrTitle, innerClassesNames, value.getMetaAttribute());
             }
         }
 
@@ -229,16 +239,17 @@ public class MainPortlet extends MVCPortlet {
 
                 if(((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() != DataTypes.DATE) {
                     str +=  "{" +
-                            "\"title\":\"" + attrTitle + "\",\n" +
-                            "\"code\":\"" + innerClassesNames + "\",\n" +
-                            "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
-                            "\"simple\": true,\n" +
-                            "\"array\": false,\n" +
-                            "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
-                            "\"leaf\":true,\n" +
-                            "\"iconCls\":\"file\",\n" +
-                            "\"isKey\":\""+meta.getMetaAttribute(innerClassesNames).isKey()+"\"\n" +
-                            "}";
+                    "\"title\":\"" + attrTitle + "\",\n" +
+                    "\"code\":\"" + innerClassesNames + "\",\n" +
+                    "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
+                    "\"simple\": true,\n" +
+                    "\"array\": false,\n" +
+                    "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
+                    "\"leaf\":true,\n" +
+                    "\"iconCls\":\"file\",\n" +
+                    "\"isKey\":\""+meta.getMetaAttribute(innerClassesNames).isKey()+"\",\n" +
+                    "\"isRequired\":\""+meta.getMetaAttribute(innerClassesNames).isRequired()+"\"\n" +
+                    "}";
                 } else {
                     Object dtVal = value.getValue();
                     String dtStr = "";
@@ -255,7 +266,8 @@ public class MainPortlet extends MVCPortlet {
                             "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
                             "\"leaf\":true,\n" +
                             "\"iconCls\":\"file\",\n" +
-                            "\"isKey\":\""+meta.getMetaAttribute(innerClassesNames).isKey()+"\"\n" +
+                            "\"isKey\":\""+meta.getMetaAttribute(innerClassesNames).isKey()+"\",\n" +
+                            "\"isRequired\":\""+meta.getMetaAttribute(innerClassesNames).isRequired()+"\"\n" +
                             "}";
                 }
             }
@@ -266,7 +278,7 @@ public class MainPortlet extends MVCPortlet {
         return str;
     }
 
-    private String setToJson(BaseSet set, String title, String code) {
+    private String setToJson(BaseSet set, String title, String code, IMetaAttribute attr) {
         IMetaType type = set.getMemberType();
 
         if (title == null) {
@@ -278,10 +290,31 @@ public class MainPortlet extends MVCPortlet {
         str += "\"title\": \"" + title + "\",";
         str += "\"code\": \"" + code + "\",";
         str += "\"value\": \"" + set.get().size() + "\",";
-        str += "\"simple\": false,";
+        str += "\"simple\": " + !attr.getMetaType().isComplex() + ",";
         str += "\"array\": true,";
+        str += "\"isKey\": " + attr.isKey() + ",";
         str += "\"type\": \"META_SET\",";
         str += "\"iconCls\":\"folder\",";
+
+        {
+            StringBuilder result = new StringBuilder();
+            IMetaType memberType = set.getMemberType();
+
+            if (memberType.isComplex()) {
+                result.append("\"childMetaId\":");
+                result.append("\"");
+                result.append(((IMetaClass) memberType).getId());
+                result.append("\",");
+            }
+
+            result.append("\"childType\":");
+            result.append("\"");
+            result.append(getMetaTypeStr(memberType));
+            result.append("\",");
+
+            str += result.toString();
+        }
+
         str += "\"children\":[";
 
         boolean first = true;
@@ -297,8 +330,7 @@ public class MainPortlet extends MVCPortlet {
                         first = false;
                     }
 
-                    str +=  entityToJson((BaseEntity)(value.getValue()), "[" + i + "]",
-                            "[" + i + "]");
+                    str +=  entityToJson((BaseEntity)(value.getValue()), "[" + i + "]", "[" + i + "]", null, false);
                     i++;
                 }
 
@@ -315,15 +347,15 @@ public class MainPortlet extends MVCPortlet {
                     if(((MetaValue)type).getTypeCode() != DataTypes.DATE)
                     {
                         str +=  "{" +
-                                "\"title\":\"" + "[" + i + "]" + "\",\n" +
-                                "\"code\":\"" + "[" + i + "]" + "\",\n" +
-                                "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
-                                "\"simple\": true,\n" +
-                                "\"array\": false,\n" +
-                                "\"type\": \"" + ((MetaValue)type).getTypeCode() + "\",\n" +
-                                "\"leaf\":true,\n" +
-                                "\"iconCls\":\"file\"\n" +
-                                "}";
+                            "\"title\":\"" + "[" + i + "]" + "\",\n" +
+                            "\"code\":\"" + "[" + i + "]" + "\",\n" +
+                            "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
+                            "\"simple\": true,\n" +
+                            "\"array\": false,\n" +
+                            "\"type\": \"" + ((MetaValue)type).getTypeCode() + "\",\n" +
+                            "\"leaf\":true,\n" +
+                            "\"iconCls\":\"file\"\n" +
+                            "}";
                     } else {
                         Object dtVal = value.getValue();
                         String dtStr = "";
@@ -332,15 +364,15 @@ public class MainPortlet extends MVCPortlet {
                         }
 
                         str +=  "{" +
-                                "\"title\":\"" + "[" + i + "]" + "\",\n" +
-                                "\"code\":\"" + "[" + i + "]" + "\",\n" +
-                                "\"value\":\"" + dtStr + "\",\n" +
-                                "\"simple\": true,\n" +
-                                "\"array\": false,\n" +
-                                "\"type\": \"" + ((MetaValue)type).getTypeCode() + "\",\n" +
-                                "\"leaf\":true,\n" +
-                                "\"iconCls\":\"file\"\n" +
-                                "}";
+                            "\"title\":\"" + "[" + i + "]" + "\",\n" +
+                            "\"code\":\"" + "[" + i + "]" + "\",\n" +
+                            "\"value\":\"" + dtStr + "\",\n" +
+                            "\"simple\": true,\n" +
+                            "\"array\": false,\n" +
+                            "\"type\": \"" + ((MetaValue)type).getTypeCode() + "\",\n" +
+                            "\"leaf\":true,\n" +
+                            "\"iconCls\":\"file\"\n" +
+                            "}";
                     }
                 }
             }
@@ -361,7 +393,8 @@ public class MainPortlet extends MVCPortlet {
             if (metaFactoryService == null)
                 return;
         }
-        PrintWriter writer = resourceResponse.getWriter();
+
+        OutputStream out = resourceResponse.getPortletOutputStream();
 
         try {
             OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
@@ -386,8 +419,8 @@ public class MainPortlet extends MVCPortlet {
                             afterFilter.add(c);
                     //for(String[] c : classes)
 
-                    writer.write(JsonMaker.getCaptionedArray(afterFilter,
-                            new String[]{"searchName", "metaName", "title"}));
+                    out.write(JsonMaker.getCaptionedArray(afterFilter,
+                            new String[]{"searchName", "metaName", "title"}).getBytes());
 
                     //writer.write(JsonMaker.getJson(afterFilter));
                     break;
@@ -399,7 +432,7 @@ public class MainPortlet extends MVCPortlet {
                     //String generatedForm = searcherFormService.getDom(currentUser.getUserId(), metaFactoryService.getMetaClass(metaId));
                     String generatedForm = searcherFormService.getDom(currentUser.getUserId(),
                             searchClassName, metaFactoryService.getMetaClass(metaName));
-                    writer.write(generatedForm);
+                    out.write(generatedForm.getBytes());
                     break;
                 case FIND_ACTION:
                     Enumeration<String> list = resourceRequest.getParameterNames();
@@ -426,45 +459,65 @@ public class MainPortlet extends MVCPortlet {
                         ret = ret > 0 ? ret : -1;
                     }
 
-                    writer.write("{\"success\": true, \"data\":\""+ ret +"\"}");
+                    out.write(("{\"success\": true, \"data\":\"" + ret + "\"}").getBytes());
 
+                    break;
+                case LIST_BY_CLASS_SHORT:
+                    String metaId = resourceRequest.getParameter("metaId");
+                    RefListResponse refListResponse = entityService.getRefListResponse(Long.parseLong(metaId), null, false);
+                    refListResponse = refListToShort(refListResponse);
+                    String sJson = gson.toJson(refListResponse);
+                    out.write(sJson.getBytes());
                     break;
                 case SAVE_XML:
                     String xml = resourceRequest.getParameter("xml_data");
+                    String sDate = resourceRequest.getParameter("date");
+                    Date date = (Date) DataTypes.fromString(DataTypes.DATE, sDate);
 
                     BatchEntry batchEntry = new BatchEntry();
 
                     batchEntry.setValue(xml);
-
+                    batchEntry.setRepDate(date);
                     batchEntry.setUserId(currentUser.getUserId());
 
                     batchEntryService.save(batchEntry);
 
-                    writer.write("{\"success\": true }");
+                    out.write(("{\"success\": true }").getBytes());
+
+                    break;
+                case LIST_ATTRIBUTES:
+                    metaId = resourceRequest.getParameter("metaId");
+
+                    if (StringUtils.isNotEmpty(metaId)) {
+                        metaClass = metaFactoryService.getMetaClass(Long.valueOf(metaId));
+                        sJson = getAttributesJson(metaClass);
+                        out.write(sJson.getBytes());
+                    }
 
                     break;
                 case LIST_ENTITY:
                     String entityId = resourceRequest.getParameter("entityId");
+                    String asRootStr = resourceRequest.getParameter("asRoot");
 
-                    if(entityId != null) {
+                    boolean asRoot = StringUtils.isNotEmpty(asRootStr) ? Boolean.valueOf(asRootStr) : false;
+
+                    if (entityId != null && entityId.trim().length() > 0) {
                         //search by single Id
-                        Date date = null;
+                        date = null;
                         if(resourceRequest.getParameter("date") != null)
                             date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
 
                         if(date == null)
                             date = new Date();
 
-                        if (entityId != null && entityId.trim().length() > 0) {
-                            //BaseEntity entity = entityService.load(Integer.parseInt(entityId));
-                            BaseEntity entity = entityService.load(Long.valueOf(entityId), date);
+                        BaseEntity entity = entityService.load(Integer.parseInt(entityId), date);
 
-                            String sJson = "{\"text\":\".\",\"children\": [\n" +
-                                    entityToJson(entity, entity.getMeta().getClassTitle(),
-                                            entity.getMeta().getClassName()) + "]}";
+                        sJson = "{\"text\":\".\",\"children\": [\n" +
+                                entityToJson(entity, entity.getMeta().getClassTitle(),
+                                        entity.getMeta().getClassName(), null, asRoot) +
+                                "]}";
 
-                            writer.write(sJson);
-                        }
+                        out.write(sJson.getBytes());
                     } else {
                         //search by parameters
 
@@ -490,13 +543,13 @@ public class MainPortlet extends MVCPortlet {
                                 break;
                             BaseEntity currentEntity = it.next();
                             sb.append(entityToJson(currentEntity, currentEntity.getMeta().getClassTitle(),
-                                    currentEntity.getMeta().getClassName()));
+                                    currentEntity.getMeta().getClassName(), null, true));
 
                             if(it.hasNext()) sb.append(",");
                         } while(true);
 
                         sb.append("]}");
-                        writer.write(sb.toString());
+                        out.write(sb.toString().getBytes());
                     }
                     break;
                 default:
@@ -504,7 +557,137 @@ public class MainPortlet extends MVCPortlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            writer.write("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}");
+            out.write(("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}").getBytes());
         }
     }
+
+    private RefListResponse refListToShort(RefListResponse refListResponse) {
+        List<Map<String, Object>> shortRows = new ArrayList<Map<String, Object>>();
+
+        String titleKey = null;
+
+        if (!refListResponse.getData().isEmpty()) {
+            Set<String> keys = refListResponse.getData().get(0).keySet();
+
+            if (keys.contains("name_ru"))
+                titleKey = "name_ru";
+            else if (keys.contains("name_kz"))
+                titleKey = "name_kz";
+            else if (keys.contains("name"))
+                titleKey = "name";
+        }
+
+        for (Map<String, Object> row : refListResponse.getData()) {
+            Object id = row.get("ID");
+            Object title = titleKey != null ? row.get(titleKey) : "------------------------";
+
+            Map<String, Object> shortRow = new HashMap<String, Object>();
+            shortRow.put("ID", id);
+            shortRow.put("title", title);
+            shortRows.add(shortRow);
+        }
+
+        return new RefListResponse(shortRows);
+    }
+
+    private String getAttributesJson(IMetaClass meta) {
+        StringBuilder result = new StringBuilder();
+
+        result.append("{\"total\":");
+        result.append(meta.getAttributeNames().size());
+        result.append(",\"data\":[");
+
+        boolean first = true;
+
+        for (String attrName : meta.getAttributeNames()) {
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(attrName);
+
+            if (first) {
+                first = false;
+            } else {
+                result.append(",");
+            }
+            result.append("{");
+
+            result.append("\"code\":");
+            result.append("\"");
+            result.append(attrName);
+            result.append("\"");
+
+            result.append(",\"title\":");
+            result.append("\"");
+            result.append(metaAttribute.getTitle());
+            result.append("\"");
+
+            result.append(",\"isKey\":");
+            result.append("\"");
+            result.append(metaAttribute.isKey());
+            result.append("\"");
+
+            result.append(",\"isRequired\":");
+            result.append("\"");
+            result.append(metaAttribute.isRequired());
+            result.append("\"");
+
+            result.append(",\"array\":");
+            result.append("\"");
+            result.append(metaAttribute.getMetaType().isSet());
+            result.append("\"");
+
+            result.append(",\"simple\":");
+            result.append("\"");
+            result.append(!metaAttribute.getMetaType().isComplex());
+            result.append("\"");
+
+            result.append(",\"ref\":");
+            result.append("\"");
+            result.append(metaAttribute.getMetaType().isReference());
+            result.append("\"");
+
+            if (metaAttribute.getMetaType().isComplex() && !metaAttribute.getMetaType().isSet()) {
+                result.append(",\"metaId\":");
+                result.append("\"");
+                result.append(((IMetaClass)metaAttribute.getMetaType()).getId());
+                result.append("\"");
+            }
+
+            result.append(",\"type\":");
+            result.append("\"");
+            result.append(getMetaTypeStr(metaAttribute.getMetaType()));
+            result.append("\"");
+
+            if (metaAttribute.getMetaType().isSet()) {
+                IMetaType memberType = ((IMetaSet) metaAttribute.getMetaType()).getMemberType();
+
+                if (memberType.isComplex()) {
+                    result.append(",\"childMetaId\":");
+                    result.append("\"");
+                    result.append(((IMetaClass) memberType).getId());
+                    result.append("\"");
+                }
+
+                result.append(",\"childType\":");
+                result.append("\"");
+                result.append(getMetaTypeStr(memberType));
+                result.append("\"");
+            }
+
+            result.append("}");
+        }
+
+        result.append("]}");
+
+        return result.toString();
+    }
+
+    private String getMetaTypeStr(IMetaType metaType) {
+        if (metaType.isSet())
+            return "META_SET";
+        else if (metaType.isComplex()) {
+            return "META_CLASS";
+        } else {
+            return ((IMetaValue)metaType).getTypeCode().name();
+        }
+    }
+
 }
