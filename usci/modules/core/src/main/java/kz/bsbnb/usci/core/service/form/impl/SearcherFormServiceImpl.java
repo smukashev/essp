@@ -45,14 +45,14 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
     }
 
     @Override
-    public String getDom(Long userId, String search, IMetaClass metaClass) {
+    public String getDom(Long userId, String search, IMetaClass metaClass, String prefix) {
         ISearcherForm sf = searcherFormPool.getSearchForm(search);
-        return sf.getDom(userId, metaClass);
+        return sf.getDom(userId, metaClass, prefix);
     }
 
     @Override
-    public List<BaseEntity> search(String searchClassName, HashMap<String, String> parameters, MetaClass metaClass) {
+    public List<BaseEntity> search(String searchClassName, HashMap<String, String> parameters, MetaClass metaClass,String prefix) {
         ISearcherForm sf = getSearchForm(searchClassName);
-        return sf.search(parameters, metaClass);
+        return sf.search(parameters, metaClass, prefix);
     }
 }

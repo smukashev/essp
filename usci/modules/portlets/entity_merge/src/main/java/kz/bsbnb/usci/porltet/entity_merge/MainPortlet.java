@@ -578,9 +578,11 @@ public class MainPortlet extends MVCPortlet {
                 case GET_FORM:
                     //Long metaId = Long.valueOf(resourceRequest.getParameter("meta"));
                     String searchClassName = resourceRequest.getParameter("search");
+                    String prefix = resourceRequest.getParameter("prefix");
 
                     String generatedForm = searcherFormService.getDom(currentUser.getUserId(),
-                            searchClassName, metaFactoryService.getMetaClass(resourceRequest.getParameter("metaName")));
+                            searchClassName, metaFactoryService.getMetaClass(resourceRequest.getParameter("metaName")),
+                            prefix);
 
                     writer.write(generatedForm);
                     break;
@@ -589,53 +591,28 @@ public class MainPortlet extends MVCPortlet {
 
                     //metaId = Long.valueOf(resourceRequest.getParameter("metaClass"));
 
-                    MetaClass metaClass = metaFactoryService.getMetaClass(resourceRequest.getParameter("metaName"));
-                    BaseEntity baseEntity = new BaseEntity(metaClass, new Date());
+                    MetaClass metaClass = metaFactoryService.getMetaClass(resourceRequest.getParameter("metaClass"));
+                    searchClassName = resourceRequest.getParameter("searchName");
+                    prefix = resourceRequest.getParameter("prefix");
+                    HashMap<String,String> parameters = new HashMap<String,String>();
 
                     while(list.hasMoreElements()) {
                         String attribute = list.nextElement();
-
-                        if(attribute.equals("op") || attribute.equals("metaClass"))
+                        if(attribute.equals("op") || attribute.equals("metaClass") || attribute.equals("searchName"))
                             continue;
-
-                        Object value;
-                        String parameterValue = resourceRequest.getParameter(attribute);
-
-                        IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
-                        if(metaAttribute == null)
-                            continue;
-                        IMetaType metaType = metaAttribute.getMetaType();
-
-                        if(metaType.isSet() || metaType.isSetOfSets())
-                            throw new UnsupportedOperationException("Not yet implemented");
-
-                        if(metaType.isComplex()) {
-                            BaseEntity childBaseEntity = new BaseEntity((MetaClass) metaType, new Date());
-                            childBaseEntity.setId(Long.valueOf(parameterValue));
-                            value = childBaseEntity;
-
-                        } else {
-                            MetaValue metaValue = (MetaValue) metaType;
-                            value = DataTypes.fromString(metaValue.getTypeCode(), parameterValue);
-                        }
-
-                        Batch b = new Batch(new Date(), currentUser.getUserId());
-                        b.setId(777L);
-
-                        baseEntity.put(attribute, BaseValueFactory.create(
-                                BaseContainerType.BASE_ENTITY,
-                                metaAttribute.getMetaType(),
-                                b, 1, value));
+                        parameters.put(attribute, resourceRequest.getParameter(attribute));
                     }
 
-                    baseEntity = entityService.search(baseEntity);
+                    List<BaseEntity> entityList = searcherFormService.search(searchClassName, parameters, metaClass, prefix);
 
                     long ret = -1;
 
-                    if(baseEntity.getId() > 0)
-                        ret = baseEntity.getId();
+                    if(entityList.size() > 0) {
+                        ret = entityList.get(0).getId();
+                        ret = ret > 0 ? ret : -1;
+                    }
 
-                    writer.write("{\"success\": true, \"data\":\""+ ret +"\"}");
+                    writer.write("{\"success\": true, \"data\":\"" + ret + "\"}");
 
                     break;
                 case LIST_CLASSES:
@@ -651,8 +628,9 @@ public class MainPortlet extends MVCPortlet {
 
                     List<String[]> afterFilter = new LinkedList<>();
 
+                    //portlet props + remove cr implementations
                     for(String[]  c: classes)
-                        if(classesFilter.contains(c[1]))
+                        if(classesFilter.contains(c[1]) && !c[0].contains("cr"))
                             afterFilter.add(c);
 
                     writer.write(JsonMaker.getCaptionedArray(afterFilter,
