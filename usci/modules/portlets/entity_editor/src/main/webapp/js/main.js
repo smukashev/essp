@@ -1047,7 +1047,7 @@ Ext.onReady(function() {
                 height: '80%',
                 split: true,
                 html: '<div id="entity-editor-form"></div>',
-                tbar: [buttonShow, buttonXML, buttonShowXML, buttonDelete , buttonAdd]
+                tbar: [buttonShow, buttonXML, buttonShowXML, buttonDelete /*, buttonAdd*/]
             }]
         },{
             region: 'center',
