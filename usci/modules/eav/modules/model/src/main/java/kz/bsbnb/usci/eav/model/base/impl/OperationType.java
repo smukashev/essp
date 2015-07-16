@@ -1,12 +1,9 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
-/**
- * Created by Bauyrzhan.Makhambeto on 26.01.2015.
- */
 public enum OperationType {
-
     NEW(OperationTypes.NEW),
-    DELETE(OperationTypes.DELETE);
+    DELETE(OperationTypes.DELETE),
+    CLOSE(OperationTypes.CLOSE);
 
     private int value;
 

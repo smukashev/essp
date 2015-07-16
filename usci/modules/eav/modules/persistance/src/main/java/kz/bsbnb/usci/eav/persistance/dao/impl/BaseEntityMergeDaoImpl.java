@@ -108,7 +108,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                 // since there is no child map - there is need to look for child merge manager
                 if (mergeManager.getChildMap() == null) {
                     if (metaType.isSetOfSets()) {
-                        throw new UnsupportedOperationException("Not yet implemented.");
+                        throw new UnsupportedOperationException("Не реализовано;");
                     }
 
                     if (metaType.isSet()) {
@@ -125,7 +125,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                     if (mergeManager.containsKey(attrKey)) {
 
                         if (metaType.isSetOfSets()) {
-                            throw new UnsupportedOperationException("Not yet implemented.");
+                            throw new UnsupportedOperationException("Не реализовано;");
                         }
 
                         if (metaType.isSet()) {

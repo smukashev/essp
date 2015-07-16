@@ -11,9 +11,6 @@ import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 
 import java.util.*;
 
-/**
- * @author alexandr.motov
- */
 public class BaseEntityManager implements IBaseEntityManager {
 
     public static List<Class> CLASS_PRIORITY = new ArrayList<>();
@@ -51,7 +48,7 @@ public class BaseEntityManager implements IBaseEntityManager {
 
     public void registerAsInserted(IPersistable insertedObject) {
         if (insertedObject == null)
-            throw new RuntimeException("Inserted object can not be null;");
+            throw new RuntimeException("Обьект для вставки не может быть NULL;");
 
         Class objectClass = insertedObject.getClass();
         if (insertedObjects.containsKey(objectClass)) {
@@ -66,7 +63,7 @@ public class BaseEntityManager implements IBaseEntityManager {
 
     public void registerAsUpdated(IPersistable updatedObject) {
         if (updatedObject == null)
-            throw new RuntimeException("Updated object can not be null;");
+            throw new RuntimeException("Обьект для обновления не может быть NULL");
 
         Class objectClass = updatedObject.getClass();
         if (updatedObjects.containsKey(objectClass)) {
@@ -81,7 +78,7 @@ public class BaseEntityManager implements IBaseEntityManager {
 
     public void registerAsDeleted(IPersistable deletedObject) {
         if (deletedObject == null)
-            throw new RuntimeException("Deleted object can not be null;");
+            throw new RuntimeException("Обьект для удаления не может быть NULL");
 
         Class objectClass = deletedObject.getClass();
         if (deletedObjects.containsKey(objectClass)) {
@@ -97,7 +94,7 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public void registerUnusedBaseEntity(IBaseEntity unusedBaseEntity) {
         if (unusedBaseEntity == null)
-            throw new RuntimeException("Unused instance of BaseEntity can not be null;");
+            throw new RuntimeException("Неиспользуемые обьект для очистки не может быть NULL");
 
         unusedBaseEntities.add(unusedBaseEntity);
     }

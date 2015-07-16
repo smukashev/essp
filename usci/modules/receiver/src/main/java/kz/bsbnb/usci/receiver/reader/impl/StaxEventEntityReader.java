@@ -46,16 +46,25 @@ import java.util.Stack;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-/**
- * @author k.tulbassiyev
- */
 @Component
 @Scope("step")
 public class StaxEventEntityReader<T> extends CommonReader<T> {
-    private static final long WAIT_TIMEOUT = 3600; //in sec
+    @Autowired
+    private CouchbaseClientManager couchbaseClientManager;
+
+    @Autowired
+    private IServiceRepository serviceFactory;
+
+    @Value("#{jobParameters['reportId']}")
+    private Long reportId;
+
+    @Value("#{jobParameters['actualCount']}")
+    private Long actualCount;
+
+    private static final long WAIT_TIMEOUT = 3600; // in sec
     private Logger logger = Logger.getLogger(StaxEventEntityReader.class);
-    private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
-    private Stack<Boolean> flagsStack = new Stack<Boolean>();
+    private Stack<IBaseContainer> stack = new Stack<>();
+    private Stack<Boolean> flagsStack = new Stack<>();
     private IBaseContainer currentContainer;
     private Batch batch;
     private Long index = 1L, level = 0L;
@@ -63,22 +72,11 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     private IMetaFactoryService metaFactoryService;
     private ReportBeanRemoteBusiness reportService;
 
-    @Autowired
-    private CouchbaseClientManager couchbaseClientManager;
-
     private CouchbaseClient couchbaseClient;
     private Gson gson = new Gson();
     private BatchFullJModel batchFullJModel;
-    @Autowired
-    private IServiceRepository serviceFactory;
 
     private boolean hasMembers = false;
-
-    @Value("#{jobParameters['reportId']}")
-    private Long reportId;
-
-    @Value("#{jobParameters['actualCount']}")
-    private Long actualCount;
 
     private int totalCount = 0;
 
@@ -122,17 +120,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     continue;
 
                 int len;
-                /*
-                out = new ByteArrayOutputStream((int)entry.getSize());
-                int size = (int)entry.getSize();
-                while ((len = zis.read(buffer, 0, Math.min(buffer.length, size))) > 0) {
-                    size -= len;
-                    out.write(buffer, 0, len);
-                    if (size <= 0)
-                        break;
-                }
-                */
-                // modified for generated batch files
+
                 out = new ByteArrayOutputStream(4096);
                 while ((len = zis.read(buffer, 0, 4096)) > 0) {
                     out.write(buffer, 0, len);
@@ -164,6 +152,12 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                         .equalsIgnoreCase(OperationType.DELETE.toString());
     }
 
+    private boolean hasOperationClose(StartElement startElement) {
+        return startElement.getAttributeByName(new QName("operation")) != null &&
+                startElement.getAttributeByName(new QName("operation")).getValue()
+                        .equalsIgnoreCase(OperationType.CLOSE.toString());
+    }
+
     private boolean hasOperationNew(StartElement startElement) {
         return startElement.getAttributeByName(new QName("operation")) != null &&
                 startElement.getAttributeByName(new QName("operation")).getValue()
@@ -182,6 +176,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
             if (hasOperationDelete(startElement))
                 baseEntity.setOperation(OperationType.DELETE);
+
+            if (hasOperationClose(startElement))
+                baseEntity.setOperation(OperationType.CLOSE);
 
             currentContainer = baseEntity;
         } else {
@@ -284,7 +281,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 }
             } else if (event.isEndDocument()) {
                 logger.debug("end document");
-                //couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
             } else {
                 logger.debug(event);
             }

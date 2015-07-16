@@ -519,7 +519,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         IMetaType metaType = baseSet.getMemberType();
         if (metaType.isSet())
         {
-            throw new UnsupportedOperationException("Not yet implemented.");
+            throw new UnsupportedOperationException("Не реализовано;");
         }
 
         IMetaValue metaValue = (IMetaValue)metaType;

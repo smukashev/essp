@@ -490,7 +490,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             IBaseSet baseSet = new BaseSet(setId, metaSetMemberType);
 
             if (metaSetMemberType.isSet()) {
-                throw new UnsupportedOperationException("Not yet implemented.");
+                throw new UnsupportedOperationException("Не реализовано;");
             }
 
             baseSetComplexValueDao.loadBaseValues(baseSet, actualReportDate, lastReportDate);

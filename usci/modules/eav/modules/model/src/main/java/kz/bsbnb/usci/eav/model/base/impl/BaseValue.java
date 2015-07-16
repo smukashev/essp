@@ -316,7 +316,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
         {
             if (metaType.isSetOfSets())
             {
-                throw new UnsupportedOperationException("Not yet implemented.");
+                throw new UnsupportedOperationException("Не реализовано;");
             }
 
             if (metaType.isSet())

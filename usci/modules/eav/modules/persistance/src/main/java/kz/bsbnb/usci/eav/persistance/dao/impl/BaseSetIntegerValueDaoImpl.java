@@ -127,22 +127,22 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
 
     @Override
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        throw new UnsupportedOperationException("Не реализовано;");
     }
 
     @Override
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        throw new UnsupportedOperationException("Не реализовано;");
     }
 
     @Override
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        throw new UnsupportedOperationException("Не реализовано;");
     }
 
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        throw new UnsupportedOperationException("Не реализовано;");
     }
 
     @Override

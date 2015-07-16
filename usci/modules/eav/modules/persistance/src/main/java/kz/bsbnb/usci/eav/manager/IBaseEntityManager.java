@@ -6,9 +6,6 @@ import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import java.util.List;
 import java.util.Set;
 
-/**
- * @author alexandr.motov
- */
 public interface IBaseEntityManager {
 
     void registerAsInserted(IPersistable persistableObject);

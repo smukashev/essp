@@ -11,10 +11,9 @@ import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
@@ -23,10 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
@@ -51,7 +48,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
     @Override
     public long insert(IPersistable persistable) {
-        IBaseEntity baseEntity = (IBaseEntity)persistable;
+        IBaseEntity baseEntity = (IBaseEntity) persistable;
         long baseEntityId =
                 insert(
                         baseEntity.getMeta().getId()
@@ -72,13 +69,13 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
     @Override
     public void update(IPersistable persistable) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        throw new UnsupportedOperationException("Не реализовано;");
     }
 
     @Override
     public void delete(IPersistable persistable) {
-        IBaseEntity baseEntity = (BaseEntity)persistable;
-        if(baseEntity.getOperation() == OperationType.DELETE){
+        IBaseEntity baseEntity = (BaseEntity) persistable;
+        if (baseEntity.getOperation() == OperationType.DELETE) {
             Update update = context
                     .update(EAV_BE_ENTITIES)
                     .set(EAV_BE_ENTITIES.DELETED, DataUtils.convert(true))
@@ -86,20 +83,17 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
             logger.debug(update.toString());
             int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
-            if (count > 1)
-            {
+            if (count > 1) {
                 throw new RuntimeException("DELETE operation should update only one record. ID: " + baseEntity.getId());
             }
-            if (count < 1)
-            {
+            if (count < 1) {
                 logger.warn("DELETE operation should update a record. ID: " + baseEntity.getId());
             }
-        }else
+        } else
             delete(persistable.getId());
     }
 
-    protected void delete(long id)
-    {
+    protected void delete(long id) {
         String tableAlias = "e";
         Delete delete = context
                 .delete(EAV_BE_ENTITIES.as(tableAlias))
@@ -107,19 +101,16 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
         logger.debug(delete.toString());
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-        if (count > 1)
-        {
+        if (count > 1) {
             throw new RuntimeException("DELETE operation should be delete only one record. ID: " + id);
         }
-        if (count < 1)
-        {
+        if (count < 1) {
             logger.warn("DELETE operation should delete a record. ID: " + id);
         }
     }
 
     @Override
-    public boolean isDeleted(long id)
-    {
+    public boolean isDeleted(long id) {
         Select select = context.select(EAV_BE_ENTITIES.ID)
                 .from(EAV_BE_ENTITIES)
                 .where(EAV_BE_ENTITIES.ID.eq(id))
@@ -129,16 +120,14 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         return rows.size() > 0;
     }
 
-    public IBaseEntity load(long id)
-    {
-        MetaClass metaClass = (MetaClass)getMetaClass(id);
+    public IBaseEntity load(long id) {
+        MetaClass metaClass = (MetaClass) getMetaClass(id);
         return new BaseEntity(id, metaClass);
     }
 
     @Override
-    public IBaseEntity load(long id, Date reportDate, Date actualReportDate)
-    {
-        if(id < 1)
+    public IBaseEntity load(long id, Date reportDate, Date savingReportDate) {
+        if (id < 1)
             throw new IllegalArgumentException("Does not have id. Can't load.");
 
         if (reportDate == null)
@@ -166,14 +155,14 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id);
         boolean last = DataTypeUtil.compareBeginningOfTheDay(maxReportDate, reportDate) == 0;
 
-        for (Class<? extends IBaseValue> baseValueClass: baseValueCounts.keySet()) {
+        for (Class<? extends IBaseValue> baseValueClass : baseValueCounts.keySet()) {
             long baseValuesCount = baseValueCounts.get(baseValueClass);
             if (baseValuesCount > 0) {
                 IBaseEntityValueDao baseEntityValueDao = persistableDaoPool
                         .getPersistableDao(baseValueClass, IBaseEntityValueDao.class);
 
-                int compare = DataTypeUtil.compareBeginningOfTheDay(actualReportDate, reportDate);
-                baseEntityValueDao.loadBaseValues(baseEntity, compare == -1 ? reportDate : actualReportDate, last);
+                int compare = DataTypeUtil.compareBeginningOfTheDay(savingReportDate, reportDate);
+                baseEntityValueDao.loadBaseValues(baseEntity, compare == -1 ? reportDate : savingReportDate, last);
             }
         }
 
@@ -191,25 +180,20 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1)
-        {
+        if (rows.size() > 1) {
             throw new IllegalArgumentException("More then one instance of BaseEntity found.");
         }
 
-        if (rows.size() < 1)
-        {
+        if (rows.size() < 1) {
             throw new IllegalStateException("Instance of BaseEntity was not found.");
         }
 
         Map<String, Object> row = rows.get(0);
-        if(row != null)
-        {
-            long classId = ((BigDecimal)row.get(EAV_BE_ENTITIES.as(tableAlias).CLASS_ID.getName())).longValue();
+        if (row != null) {
+            long classId = ((BigDecimal) row.get(EAV_BE_ENTITIES.as(tableAlias).CLASS_ID.getName())).longValue();
             return metaClassRepository.getMetaClass(classId);
 
-        }
-        else
-        {
+        } else {
             logger.error("Can't load instance of BaseEntity, empty data set.");
         }
         return null;
@@ -228,22 +212,22 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
                 .where(
                         DSL.exists(
                                 context.select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID)
-                                .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
-                                .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))
-                                .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.notEqual(exceptContainingId))
+                                        .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
+                                        .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))
+                                        .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.notEqual(exceptContainingId))
                         )
                 ).or(
                         DSL.exists(
                                 context.select(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID)
-                                .from(
-                                        EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias)
-                                        .join(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias)).on(
-                                                EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).SET_ID
-                                                .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).SET_ID)
+                                        .from(
+                                                EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias)
+                                                        .join(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias)).on(
+                                                        EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).SET_ID
+                                                                .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).SET_ID)
+                                                )
                                         )
-                                )
-                                .where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))
-                                .and(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).ENTITY_ID.notEqual(exceptContainingId))
+                                        .where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))
+                                        .and(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).ENTITY_ID.notEqual(exceptContainingId))
                         )
                 );
 
@@ -254,8 +238,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     }
 
     @Override
-    public boolean isUsed(long baseEntityId)
-    {
+    public boolean isUsed(long baseEntityId) {
         String complexValuesTableAlias = "cv";
         String complexSetValuesTableAlias = "csv";
 
@@ -280,17 +263,14 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
     @Override
     //@Transactional
-    public boolean deleteRecursive(long baseEntityId)
-    {
+    public boolean deleteRecursive(long baseEntityId) {
         IMetaClass metaClass = getMetaClass(baseEntityId);
         return deleteRecursive(baseEntityId, metaClass);
     }
 
-    public boolean deleteRecursive(long baseEntityId, IMetaClass metaClass)
-    {
+    public boolean deleteRecursive(long baseEntityId, IMetaClass metaClass) {
         boolean baseEntityUsed = isUsed(baseEntityId);
-        if (baseEntityUsed || metaClass.isReference())
-        {
+        if (baseEntityUsed || metaClass.isReference()) {
             return false;
         }
 
@@ -305,8 +285,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         baseValueClasses.add(BaseEntitySimpleSet.class);
         baseValueClasses.add(BaseEntityComplexSet.class);
 
-        for (Class<? extends IBaseValue> baseValueClass: baseValueClasses)
-        {
+        for (Class<? extends IBaseValue> baseValueClass : baseValueClasses) {
             IBaseValueDao baseValueDao = persistableDaoPool
                     .getPersistableDao(baseValueClass, IBaseValueDao.class);
             baseValueDao.deleteAll(baseEntityId);
@@ -321,8 +300,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     }
 
     @Override
-    public Set<Long> getChildBaseEntityIds(long parentBaseEntityId)
-    {
+    public Set<Long> getChildBaseEntityIds(long parentBaseEntityId) {
         Set<Long> allChildBaseEntitiesIds = new HashSet<Long>();
 
         // Complex values
@@ -330,8 +308,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
                 .getPersistableDao(BaseEntityComplexValue.class, IBaseEntityComplexValueDao.class);
         Set<Long> complexValuesBaseEntitiesIds = baseEntityComplexValueDao
                 .getChildBaseEntityIdsWithoutRefs(parentBaseEntityId);
-        for (Long complexValuesBaseEntitiesId: complexValuesBaseEntitiesIds)
-        {
+        for (Long complexValuesBaseEntitiesId : complexValuesBaseEntitiesIds) {
             Set<Long> childBaseEntitiesIds = getChildBaseEntityIds(complexValuesBaseEntitiesId);
             allChildBaseEntitiesIds.addAll(childBaseEntitiesIds);
         }
@@ -342,8 +319,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
                 .getPersistableDao(BaseEntityComplexSet.class, IBaseEntityComplexSetDao.class);
         Set<Long> complexSetsBaseEntitiesIds = baseEntityComplexSetDao
                 .getChildBaseEntityIdsWithoutRefs(parentBaseEntityId);
-        for (Long complexSetsBaseEntitiesId: complexSetsBaseEntitiesIds)
-        {
+        for (Long complexSetsBaseEntitiesId : complexSetsBaseEntitiesIds) {
             Set<Long> childBaseEntitiesIds = getChildBaseEntityIds(complexSetsBaseEntitiesId);
             allChildBaseEntitiesIds.addAll(childBaseEntitiesIds);
         }
@@ -354,14 +330,12 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
 
     @Override
-    public long getRandomBaseEntityId(IMetaClass metaClass)
-    {
+    public long getRandomBaseEntityId(IMetaClass metaClass) {
         return getRandomBaseEntityId(metaClass.getId());
     }
 
     @Override
-    public long getRandomBaseEntityId(long metaClassId)
-    {
+    public long getRandomBaseEntityId(long metaClassId) {
         String tableAlias = "e";
         Select select = context
                 .select(EAV_BE_ENTITIES.as(tableAlias).ID)
@@ -373,7 +347,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 0) {
-            return ((BigDecimal)(rows.get(0).get(EAV_BE_ENTITIES.ID.getName()))).longValue();
+            return ((BigDecimal) (rows.get(0).get(EAV_BE_ENTITIES.ID.getName()))).longValue();
         }
 
         return 0;

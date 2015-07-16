@@ -129,7 +129,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         IMetaType childMetaType = childMetaSet.getMemberType();
 
                         if (childMetaType.isSet()) {
-                            throw new UnsupportedOperationException("Not yet implemented.");
+                            throw new UnsupportedOperationException("Не реализовано;");
                         } else {
                             IBaseSet childBaseSet = (IBaseSet) memberValue.getValue();
 
@@ -173,7 +173,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         IMetaSet childMetaSet = (IMetaSet) metaType;
                         IMetaType childMetaType = childMetaSet.getMemberType();
                         if (childMetaType.isSet()) {
-                            throw new UnsupportedOperationException("Not yet implemented.");
+                            throw new UnsupportedOperationException("Не реализовано;");
                         } else {
                             IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
                             for (IBaseValue childBaseValue : childBaseSet.get()) {
@@ -202,10 +202,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return baseEntity;
     }
 
+    private boolean historyExists(long metaId, long entityId) {
+        List<Map<String, Object>> rows = getRefListResponseWithHis(metaId, entityId);
+        return rows.size() > 1;
+    }
 
     @Override
     @Transactional
-    public IBaseEntity process(IBaseEntity baseEntity) {
+    public IBaseEntity process(final IBaseEntity baseEntity) {
         EntityHolder entityHolder = new EntityHolder();
 
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
@@ -213,62 +217,42 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         IBaseEntity baseEntityPostPrepared = postPrepare(((BaseEntity) baseEntityPrepared).clone(), null);
         IBaseEntity baseEntityApplied;
 
-        baseEntityApplied = baseEntityApplyDao.apply(baseEntityPostPrepared, baseEntityManager, entityHolder);
-
-        baseEntityApplyDao.applyToDb(baseEntityManager);
-
-        // TODO: Uncomment on finish
-        /* if (baseEntityPostPrepared.getOperation() != null) {
+        if (baseEntityPostPrepared.getOperation() != null) {
             switch (baseEntityPostPrepared.getOperation()) {
                 case DELETE:
                     if (baseEntityPostPrepared.getId() <= 0)
-                        throw new RuntimeException("deleting entity must be found");
+                        throw new RuntimeException("Сущность для удаления не найдена!");
 
                     if (baseEntity.getMeta().isReference() && historyExists(
                             baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId()))
-                        throw new RuntimeException("Reference with history cannot be deleted!");
+                        throw new RuntimeException("Справочник с историей не может быть удалена");
 
                     baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
-                    entityHolder.applied = baseEntityApplied;
-                    entityHolder.saving = baseEntityPostPrepared;
+                    entityHolder.setApplied(baseEntityApplied);
+                    entityHolder.setSaving(baseEntityPostPrepared);
+                    break;
+                case CLOSE:
+                    if (baseEntityPostPrepared.getId() <= 0)
+                        throw new RuntimeException("Сущность для закрытия не найдена!");
+
+                    baseEntityApplied = baseEntityPostPrepared;
+
                     break;
                 default:
-                    throw new UnsupportedOperationException("Unsupported operation: "
+                    throw new UnsupportedOperationException("Операция не поддерживается: "
                             + baseEntityPostPrepared.getOperation());
             }
         } else {
-            baseEntityApplied = apply(baseEntityPostPrepared, baseEntityManager, entityHolder);
-        } */
+            baseEntityApplied = baseEntityApplyDao.apply(baseEntityPostPrepared, baseEntityManager, entityHolder);
+            baseEntityApplyDao.applyToDb(baseEntityManager);
+        }
 
         /* if (applyListener != null)
             applyListener.applyToDBEnded(entityHolder.saving, entityHolder.loaded,
                     entityHolder.applied, baseEntityManager); */
 
         return baseEntityApplied;
-    }
-
-    private Set<BaseEntity> collectComplexSetValues(BaseSet baseSet) {
-        Set<BaseEntity> entities = new HashSet<>();
-
-        IMetaType metaType = baseSet.getMemberType();
-        if (metaType.isSetOfSets()) {
-            Collection<IBaseValue> baseValues = baseSet.get();
-            Iterator<IBaseValue> it = baseValues.iterator();
-            while (it.hasNext()) {
-                IBaseValue baseValue = it.next();
-                entities.addAll(collectComplexSetValues((BaseSet) baseValue.getValue()));
-            }
-        } else {
-            Collection<IBaseValue> baseValues = baseSet.get();
-            Iterator<IBaseValue> it = baseValues.iterator();
-            while (it.hasNext()) {
-                IBaseValue baseValue = it.next();
-                entities.add((BaseEntity) baseValue.getValue());
-            }
-        }
-
-        return entities;
     }
 
     public List<Long> getEntityIDsByMetaclass(long metaClassId) {
@@ -366,7 +350,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             groupedRows.put(groupPropertyValue, row);
         }
 
-        return new ArrayList<Map<String, Object>>(groupedRows.values());
+        return new ArrayList<>(groupedRows.values());
     }
 
     private List<Map<String, Object>> filter(List<Map<String, Object>> rows, Date date) {
@@ -473,6 +457,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
     }
 
+    @SuppressWarnings("unchecked")
     private List<Map<String, Object>> getRefListResponseWithoutHis(long metaClassId, Date date) {
         java.sql.Date dt = null;
 
@@ -595,7 +580,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public List<BaseEntity> getEntityByMetaclass(MetaClass meta) {
         List<Long> ids = getEntityIDsByMetaclass(meta.getId());
 
-        ArrayList<BaseEntity> entities = new ArrayList<BaseEntity>();
+        ArrayList<BaseEntity> entities = new ArrayList<>();
 
         for (Long id : ids)
             entities.add((BaseEntity) baseEntityLoadDao.load(id));

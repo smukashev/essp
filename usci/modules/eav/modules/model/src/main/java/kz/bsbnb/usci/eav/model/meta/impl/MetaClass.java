@@ -815,7 +815,7 @@ public class MetaClass extends MetaContainer implements IMetaClass
                 {
                     if (metaType.isSetOfSets())
                     {
-                        throw new UnsupportedOperationException("Not yet implemented.");
+                        throw new UnsupportedOperationException("Не реализовано;");
                     }
 
                     IMetaSet childMetaSet = (IMetaSet)metaType;

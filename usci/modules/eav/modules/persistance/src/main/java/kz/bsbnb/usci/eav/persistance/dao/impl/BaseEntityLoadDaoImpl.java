@@ -17,95 +17,52 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao {
     @Autowired
     IPersistableDaoPool persistableDaoPool;
 
-    public IBaseEntity loadByMaxReportDate(long id, Date actualReportDate, boolean caching) {
+    public IBaseEntity loadByMaxReportDate(long id, Date savingReportDate) {
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
-        Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id, actualReportDate);
+
+        Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id, savingReportDate);
         if (maxReportDate == null)
-            throw new RuntimeException("No data found on report date " + actualReportDate + ".");
+            throw new RuntimeException("В базе нет данных для сущности(" + id + ") до отчетной даты(включительно): "
+                    + savingReportDate + ";");
 
-        return load(id, maxReportDate, actualReportDate, caching);
+        return load(id, maxReportDate, savingReportDate);
     }
 
     @Override
-    public IBaseEntity loadByMaxReportDate(long id, Date reportDate) {
-        return loadByMaxReportDate(id, reportDate, false);
-    }
-
-    @Override
-    public IBaseEntity loadByMinReportDate(long id, Date reportDate) {
-        return loadByMinReportDate(id, reportDate, false);
-    }
-
-    @Override
-    public IBaseEntity loadByMinReportDate(long id, Date actualReportDate, boolean caching) {
+    public IBaseEntity loadByMinReportDate(long id, Date savingReportDate) {
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
-        Date minReportDate = baseEntityReportDateDao.getMinReportDate(id, actualReportDate);
+
+        Date minReportDate = baseEntityReportDateDao.getMinReportDate(id, savingReportDate);
         if (minReportDate == null)
-            throw new RuntimeException("No data found on report date " + actualReportDate + ".");
+            throw new RuntimeException("В базе нет данных для сущности(" + id + ") после отчетной даты(включительно): "
+                    + savingReportDate + ";");
 
-        return load(id, minReportDate, actualReportDate, caching);
-    }
-
-    @Override
-    public IBaseEntity loadByReportDate(long id, Date reportDate) {
-        return loadByReportDate(id, reportDate, false);
-    }
-
-    @Override
-    public IBaseEntity loadByReportDate(long id, Date actualReportDate, boolean caching) {
-        IBaseEntityReportDateDao baseEntityReportDateDao =
-                persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
-        Date reportDate = baseEntityReportDateDao.getMaxReportDate(id, actualReportDate);
-        if (reportDate == null) {
-            reportDate = baseEntityReportDateDao.getMinReportDate(id, actualReportDate);
-            if (reportDate == null)
-                throw new RuntimeException("No data found on report date " + actualReportDate + ".");
-        }
-
-        return load(id, reportDate, actualReportDate, caching);
+        return load(id, minReportDate, savingReportDate);
     }
 
     @Override
     public IBaseEntity load(long id) {
-        return load(id, false);
-    }
-
-    @Override
-    public IBaseEntity load(long id, boolean caching) {
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id);
         if (maxReportDate == null)
-            throw new UnsupportedOperationException("Not found appropriate report date.");
+            throw new UnsupportedOperationException("В базе отсутсвует отчетная дата на ID: " + id + ";");
 
-        IBaseEntityDao baseEntityDao =
-                persistableDaoPool.getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
+        IBaseEntityDao baseEntityDao = persistableDaoPool.getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
         if (baseEntityDao.isDeleted(id))
-            return baseEntityDao.load(id);
-
-        /*
-        if (caching)
-            return baseEntityCacheDao.getBaseEntity(id, maxReportDate);
-        */
+            return null;
 
         return load(id, maxReportDate, maxReportDate);
     }
 
     @Override
-    public IBaseEntity load(long id, Date maxReportDate, Date actualReportDate, boolean caching) {
-        /*
-        if (caching)
-            return baseEntityCacheDao.getBaseEntity(id, actualReportDate);
-        */
-
-        return load(id, maxReportDate, actualReportDate);
-    }
-
-    public IBaseEntity load(long id, Date reportDate, Date actualReportDate) {
+    public IBaseEntity load(long id, Date reportDate, Date savingReportDate) {
         IBaseEntityDao baseEntityDao =
                 persistableDaoPool.getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
-        return baseEntityDao.load(id, reportDate, actualReportDate);
+
+        return baseEntityDao.load(id, reportDate, savingReportDate);
     }
 }

@@ -43,7 +43,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         return apply(baseEntityForSave, baseEntityManager, null);
     }
 
-    public IBaseEntity apply(IBaseEntity baseEntityForSave, IBaseEntityManager baseEntityManager, EntityHolder entityHolder) {
+    public IBaseEntity apply(IBaseEntity baseEntityForSave, IBaseEntityManager baseEntityManager,
+                             EntityHolder entityHolder) {
         IBaseEntity baseEntityLoaded = null;
         IBaseEntity baseEntityApplied;
 
@@ -62,8 +63,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 Date minReportDate = baseEntityReportDateDao.getMinReportDate(baseEntityForSave.getId(), reportDate);
 
                 if (minReportDate == null)
-                    throw new UnsupportedOperationException("No report date for this entity. Entity ID: "
-                            + baseEntityForSave.getId());
+                    throw new UnsupportedOperationException("Найденный объект (" + baseEntityForSave.getId()
+                            + ") не имеет отчетный даты;");
 
                 baseEntityLoaded = baseEntityLoadDao.load(baseEntityForSave.getId(), minReportDate, reportDate);
                 baseEntityApplied = applyBaseEntityAdvanced(baseEntityForSave, baseEntityLoaded, baseEntityManager);
@@ -142,7 +143,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
             if (metaType.isComplex()) {
                 if (metaType.isSetOfSets())
-                    throw new UnsupportedOperationException("Not yet implemented.");
+                    throw new UnsupportedOperationException("Не реализовано;");
 
                 if (metaType.isSet())
                     applyComplexSet(baseEntityApplied, baseValueSaving, baseValueLoaded, baseEntityManager);
@@ -150,7 +151,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     applyComplexValue(baseEntityApplied, baseValueSaving, baseValueLoaded, baseEntityManager);
             } else {
                 if (metaType.isSetOfSets())
-                    throw new UnsupportedOperationException("Not yet implemented.");
+                    throw new UnsupportedOperationException("Не реализовано;");
 
                 if (metaType.isSet())
                     applySimpleSet(baseEntityApplied, baseValueSaving, baseValueLoaded, baseEntityManager);
@@ -193,27 +194,22 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
     public void applyBaseValueBasic(IBaseEntity baseEntityApplied, IBaseValue baseValue,
                                        IBaseEntityManager baseEntityManager) {
-        if (baseValue.getValue() == null) {
-            throw new RuntimeException("Basic applying instance of BaseValue changes with null value is not possible.");
-        }
+        if (baseValue.getValue() == null)
+            throw new RuntimeException("Значение аттрибута не может быть NULL;");
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        if (baseContainer != null && baseContainer.getBaseContainerType() != BaseContainerType.BASE_ENTITY) {
-            throw new RuntimeException("Basic applying instance of BaseValue changes contained not in the instance " +
-                    "of BaseEntity is not possible.");
-        }
+        if (baseContainer != null && baseContainer.getBaseContainerType() != BaseContainerType.BASE_ENTITY)
+            throw new RuntimeException("Родитель аттрибута должна быть сущность;");
 
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        if (metaAttribute == null) {
-            throw new RuntimeException("Basic applying instance of BaseValue changes without meta" +
-                    " data is not possible.");
-        }
+        if (metaAttribute == null)
+            throw new RuntimeException("Аттрибут должен содержать мета данные;");
 
         IMetaType metaType = metaAttribute.getMetaType();
         if (metaType.isComplex()) {
             if (metaType.isSet()) {
                 if (metaType.isSetOfSets())
-                    throw new UnsupportedOperationException("Not yet implemented.");
+                    throw new UnsupportedOperationException("Поддержка массив массивов не реализовано;");
 
                 IMetaSet childMetaSet = (IMetaSet) metaType;
                 IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
@@ -247,16 +243,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
                     if (childBaseEntity.getValueCount() != 0) {
                         if (childBaseEntity.getId() < 1)
-                            throw new UnsupportedOperationException("Attempt to write immutable instance " +
-                                    "of BaseEntity with classname: " +
-                                    childBaseEntity.getMeta().getClassName() + "\n" + childBaseEntity.toString());
+                            throw new UnsupportedOperationException("Сущность класса " +
+                                    childBaseEntity.getMeta().getClassName() + " не найдена;" +
+                                    "\n" + childBaseEntity.toString());
 
-                        IBaseEntity childBaseEntityImmutable = baseEntityLoadDao.loadByMaxReportDate(childBaseEntity.getId(),
-                                childBaseEntity.getReportDate(), childMetaClass.isReference());
+                        IBaseEntity childBaseEntityImmutable = baseEntityLoadDao.loadByMaxReportDate(
+                                childBaseEntity.getId(), childBaseEntity.getReportDate());
 
                         if (childBaseEntityImmutable == null)
-                            throw new RuntimeException("Instance of BaseEntity with id " + childBaseEntity.getId() +
-                                    "not found in the DB.");
+                            throw new RuntimeException("В базе нет данных для сущности(" + childBaseEntity.getId()
+                                    + ") до отчетной даты(включительно): " + childBaseEntity.getReportDate() + ";");
 
                         IBaseValue baseValueApplied = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
                                 baseValue.getBatch(), baseValue.getIndex(), new Date(baseValue.getRepDate().getTime()),
@@ -280,7 +276,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         } else {
             if (metaType.isSet()) {
                 if (metaType.isSetOfSets()) {
-                    throw new UnsupportedOperationException("Not yet implemented.");
+                    throw new UnsupportedOperationException("Не реализовано;");
                 }
 
                 IMetaSet childMetaSet = (IMetaSet) metaType;
@@ -347,7 +343,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         IMetaType metaType = metaAttribute.getMetaType();
 
         if (metaAttribute.isFinal()) {
-            throw new UnsupportedOperationException("Not yet implemented.");
+            throw new UnsupportedOperationException("Не реализовано;");
         }
 
         IMetaSet childMetaSet = (IMetaSet) metaType;
@@ -1082,7 +1078,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 }
                             }
                         } else {
-                            throw new UnsupportedOperationException("Not yet implemented.");
+                            throw new UnsupportedOperationException("Не реализовано;");
                         }
                     }
                 }
@@ -2237,8 +2233,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 "BaseEntity with classname: " +
                                 baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
                     }
-                    //baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
-                    baseEntityApplied = baseEntityLoadDao.loadByReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
+                    baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
+                            baseEntitySaving.getReportDate());
                 } else {
                     baseEntityApplied = metaClass.isSearchable() ?
                             apply(baseEntitySaving, baseEntityManager) :
@@ -2270,8 +2266,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 "BaseEntity with classname: " +
                                 baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
 
-                    //baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
-                    baseEntityApplied = baseEntityLoadDao.loadByReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
+                    baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
+                            baseEntitySaving.getReportDate());
                 } else {
                     baseEntityApplied = metaClass.isSearchable() ?
                             apply(baseEntitySaving, baseEntityManager) :
@@ -2396,9 +2392,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
                                         baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
                             }
-                            //baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(),
-                            //        baseEntitySaving.getReportDate());
-                            baseEntityApplied = baseEntityLoadDao.loadByReportDate(baseEntitySaving.getId(),
+                            baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                                     baseEntitySaving.getReportDate());
                         } else {
                             baseEntityApplied = metaClass.isSearchable() ?
@@ -2425,9 +2419,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                         "BaseEntity with classname: " + baseEntitySaving.getMeta().getClassName() +
                                         "\n" + baseEntitySaving.toString());
 
-                            //baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(),
-                            //        baseEntitySaving.getReportDate());
-                            baseEntityApplied = baseEntityLoadDao.loadByReportDate(baseEntitySaving.getId(),
+                            baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                                     baseEntitySaving.getReportDate());
                         } else {
                             baseEntityApplied = metaClass.isSearchable() ?
@@ -2454,9 +2446,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 "BaseEntity with classname: " + baseEntitySaving.getMeta().getClassName() +
                                 "\n" + baseEntitySaving.toString());
 
-                    //baseEntityApplied = loadByMaxReportDate(baseEntitySaving.getId(),
-                    //        baseEntitySaving.getReportDate());
-                    baseEntityApplied = baseEntityLoadDao.loadByReportDate(baseEntitySaving.getId(),
+                    baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
                 } else {
                     if (metaAttribute.isFinal()) {

@@ -646,6 +646,7 @@
 		<column name="complex_values_count" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="simple_sets_count" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="complex_sets_count" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="is_closed" primaryKey="false" required="false" type="NUMERIC" size="1" autoIncrement="false"/>
 		<!--<foreign-key foreignTable="eav_be_entities" name="eav_fk_012_00">
 			<reference local="entity_id" foreign="id"/>
 		</foreign-key>-->

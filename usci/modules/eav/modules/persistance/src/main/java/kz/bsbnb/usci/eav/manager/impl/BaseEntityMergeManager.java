@@ -1,13 +1,11 @@
 package kz.bsbnb.usci.eav.manager.impl;
 
 import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
+
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author dakkuliyev
- */
-public class BaseEntityMergeManager implements IBaseEntityMergeManager{
+public class BaseEntityMergeManager implements IBaseEntityMergeManager {
 
     private Action action;
     private Map<MergeManagerKey, IBaseEntityMergeManager> childMap = null;
@@ -22,7 +20,7 @@ public class BaseEntityMergeManager implements IBaseEntityMergeManager{
     }
 
     @Override
-    public boolean containsKey(MergeManagerKey attr){
+    public boolean containsKey(MergeManagerKey attr) {
         return this.childMap.containsKey(attr);
     }
 
@@ -38,11 +36,9 @@ public class BaseEntityMergeManager implements IBaseEntityMergeManager{
 
     @Override
     public void setChildManager(MergeManagerKey key, IBaseEntityMergeManager member) {
-        if(childMap == null)
-        {
-            childMap = new HashMap<MergeManagerKey, IBaseEntityMergeManager>();
-        }
+        if (childMap == null)
+            childMap = new HashMap<>();
+
         childMap.put(key, member);
     }
-
 }

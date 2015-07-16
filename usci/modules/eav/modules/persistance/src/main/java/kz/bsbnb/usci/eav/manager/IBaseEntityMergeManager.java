@@ -1,29 +1,26 @@
 package kz.bsbnb.usci.eav.manager;
 
 import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
+
 import java.util.Map;
 
-/**
- * @author dakkuliyev
- */
-public interface IBaseEntityMergeManager{
-
-    enum Action
-    {
+public interface IBaseEntityMergeManager {
+    enum Action {
         KEEP_RIGHT,
         KEEP_LEFT,
         TO_MERGE,
         KEEP_BOTH
     }
 
-    public Action getAction();
-    public void setAction(Action action);
+    Action getAction();
 
-    public Map<MergeManagerKey, IBaseEntityMergeManager> getChildMap();
+    void setAction(Action action);
 
-    public IBaseEntityMergeManager getChildManager(MergeManagerKey key);
+    Map<MergeManagerKey, IBaseEntityMergeManager> getChildMap();
 
-    public void setChildManager(MergeManagerKey key, IBaseEntityMergeManager member);
+    IBaseEntityMergeManager getChildManager(MergeManagerKey key);
 
-    public boolean containsKey(MergeManagerKey key);
+    void setChildManager(MergeManagerKey key, IBaseEntityMergeManager member);
+
+    boolean containsKey(MergeManagerKey key);
 }

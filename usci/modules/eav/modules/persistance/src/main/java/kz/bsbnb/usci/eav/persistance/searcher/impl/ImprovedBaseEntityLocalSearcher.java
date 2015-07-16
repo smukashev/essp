@@ -259,7 +259,7 @@ public class ImprovedBaseEntityLocalSearcher extends JDBCSupport {
                     MetaSet metaSet = (MetaSet) memberType;
                     if (baseSet.get().size() > 0) {
                         if (!memberType.isComplex()) {
-                            throw new UnsupportedOperationException("Not yet implemented.");
+                            throw new UnsupportedOperationException("Не реализовано;");
                         } else {
 
                             MetaClass childMetaClass = (MetaClass) metaSet.getMemberType();

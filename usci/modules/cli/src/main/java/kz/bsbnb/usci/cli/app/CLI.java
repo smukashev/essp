@@ -1707,11 +1707,11 @@ public class CLI {
                 while (inputScanner.hasNextLine()) {
                     String nextLine = inputScanner.nextLine();
 
-                    int idIndex = nextLine.indexOf("Not yet implemented. Entity ID:");
+                    int idIndex = nextLine.indexOf("Не реализовано; Entity ID:");
 
                     if (idIndex > 0) {
                         String idString = nextLine.substring(idIndex +
-                                "Not yet implemented. Entity ID:".length()).trim();
+                                "Не реализовано; Entity ID:".length()).trim();
 
                         Long id = Long.parseLong(idString);
                         ids.add(id);
