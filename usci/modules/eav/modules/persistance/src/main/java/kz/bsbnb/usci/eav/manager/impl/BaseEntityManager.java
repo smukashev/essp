@@ -13,7 +13,7 @@ import java.util.*;
 
 public class BaseEntityManager implements IBaseEntityManager {
 
-    private static final List<Class> CLASS_PRIORITY = new ArrayList<>();
+    public final static List<Class> CLASS_PRIORITY = new ArrayList<>();
 
     static {
         CLASS_PRIORITY.add(BaseEntity.class);

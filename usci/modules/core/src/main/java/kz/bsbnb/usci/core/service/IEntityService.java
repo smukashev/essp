@@ -21,8 +21,6 @@ public interface IEntityService {
 
     BaseEntity search(BaseEntity baseEntity);
 
-    void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
-
     List<Long> getEntityIDsByMetaclass(long id);
 
     List<RefListItem> getRefsByMetaclass(long metaClassId);
@@ -34,8 +32,6 @@ public interface IEntityService {
     void clearSQLStats();
 
     void remove(long id);
-
-    void removeAllByMetaClass(IMetaClass metaClass);
 
     Set<Long> getChildBaseEntityIds(long parentBaseEntityIds);
 

@@ -20,8 +20,6 @@ public interface IEntityService {
 
     BaseEntity load(long id, Date date);
 
-    void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
-
     BaseEntity search(BaseEntity baseEntity);
 
     List<Long> getEntityIDsByMetaclass(long id);

@@ -24,10 +24,11 @@ public class MergeManagerKey<T> {
 
     @Override
     public int hashCode() {
-        String keyHash = "";
-        for (T key : keyStore) {
-            keyHash += key.toString();
-        }
+        StringBuilder keyHash = new StringBuilder();
+
+        for (T key : keyStore)
+            keyHash.append(key.toString());
+
         return keyHash.hashCode();
     }
 

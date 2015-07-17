@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.persistance.IRefProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IUserDao;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
@@ -31,7 +32,7 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
     IMetaClassRepository metaClassRepository;
 
     @Autowired
-    private IBaseEntityProcessorDao baseEntityProcessorDao;
+    private IRefProcessorDao refProcessorDao;
 
     @Autowired
     private IUserDao userDao;
@@ -76,7 +77,7 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
         String ret = "<div class='leaf'> %s: <select id='ref-%d-%s-%s'>";
         ret = String.format(ret, ((MetaClass)metaClass).getClassTitle(), nextId(), metaClass.getClassName(), attr);
 
-        List<RefListItem> list = baseEntityProcessorDao.getRefsByMetaclassRaw(metaClass.getId());
+        List<RefListItem> list = refProcessorDao.getRefsByMetaclassRaw(metaClass.getId());
         if(refLoadedListener !=null)
             refLoadedListener.process(userId, metaClass, attr, list);
         //List<Long> allowedRefs = userDao.getAllowedRefs(userId, metaClass.getClassName());

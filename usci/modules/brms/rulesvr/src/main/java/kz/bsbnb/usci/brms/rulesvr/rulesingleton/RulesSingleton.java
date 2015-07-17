@@ -225,10 +225,6 @@ public class RulesSingleton
         ruleCache.clear();
 
         for (Batch curBatch : allBatches) {
-            if (curBatch == null) {
-                throw new IllegalArgumentException("Null package recieved from service " + curBatch);
-            }
-
             List<BatchVersion> versions = ruleBatchVersionService.getBatchVersions(curBatch);
 
             ArrayList<RuleCasheEntry> ruleCasheEntries = new ArrayList<RuleCasheEntry>();

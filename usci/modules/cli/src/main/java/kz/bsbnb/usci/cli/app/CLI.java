@@ -28,12 +28,11 @@ import kz.bsbnb.usci.eav.manager.impl.BaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.*;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.eav.model.json.EntityStatusArrayJModel;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
-import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -1160,31 +1159,6 @@ public class CLI {
         jobDispatcher.addThread(new DeleteJob(getEntityService(url), id));
     }
 
-    public void removeAllEntityByMetaId(long metaClassId) {
-        RmiProxyFactoryBean serviceFactory = null;
-
-        IEntityService entityServiceCore = null;
-
-        try {
-            serviceFactory = new RmiProxyFactoryBean();
-            serviceFactory.setServiceUrl("rmi://127.0.0.1:1099/entityService");
-            serviceFactory.setServiceInterface(IEntityService.class);
-            serviceFactory.setRefreshStubOnConnectFailure(true);
-
-            serviceFactory.afterPropertiesSet();
-            entityServiceCore = (IEntityService) serviceFactory.getObject();
-        } catch (Exception e) {
-            System.out.println("Can't connect to receiver service: " + e.getMessage());
-        }
-
-        IMetaClass metaClass = metaClassDao.load(metaClassId);
-
-        if(entityServiceCore == null)
-            throw new NullPointerException("EntityService is null!");
-
-        entityServiceCore.removeAllByMetaClass(metaClass);
-    }
-
     public void dumpEntityToXML(String ids, String fileName) {
         StringTokenizer st = new StringTokenizer(ids, ",");
         ArrayList<BaseEntity> entities = new ArrayList<BaseEntity>();
@@ -2109,14 +2083,6 @@ public class CLI {
                     System.out.println("Argument needed: <rm> <id> <service_url>");
                     System.out.println("Example: rm 100 rmi://127.0.0.1:1099/batchEntryService");
                 }
-            } else if (args.get(0).equals("rmall")) {
-                if (args.size() > 1) {
-                    removeAllEntityByMetaId(Long.parseLong(args.get(1)));
-                    System.out.println("All entities with CLASS_ID " + args.get(1) + " has been removed");
-                } else {
-                    System.out.println("Argument needed: <rmall> <meta_class_id>");
-                    System.out.println("Example: rmall 59");
-                }
             } else if (args.get(0).equals("read")) {
                 if (args.size() > 2) {
                     readEntityFromXML(args.get(1), args.get(2));
@@ -2309,7 +2275,7 @@ public class CLI {
                     CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, reportDate);
                     currentBaseEntity = reader.read();
                     reader.close();
-                    List<String> errors = ruleService.runRules(currentBaseEntity, currentPackageName,currentDate);
+                    List<String> errors = ruleService.runRules(currentBaseEntity, currentPackageName, currentDate);
 
                     for (String s : errors)
                         System.out.println("Validation error:" + s);
@@ -2352,17 +2318,17 @@ public class CLI {
                 System.out.println(currentBaseEntity.getEl(args.get(1)));
             } else if (args.get(0).equals("clear")) {
                 ruleService.clearAllRules();
-            } else if(args.get(0).equals("import")) {
+            } else if (args.get(0).equals("import")) {
                 try {
                     Scanner importedPath = new Scanner(new File(args.get(1)));
 
-                    while(importedPath.hasNext()) {
+                    while (importedPath.hasNext()) {
                         String line1 = importedPath.nextLine();
-                        if(line1.equals("") || line1.startsWith("#"))
+                        if (line1.equals("") || line1.startsWith("#"))
                             continue;
                         StringTokenizer st = new StringTokenizer(line1);
                         command = st.nextToken().trim();
-                        if(command.equals("quit")) break;
+                        if (command.equals("quit")) break;
                         if (st.hasMoreTokens()) {
                             args.clear();
                             while (st.hasMoreTokens()) {
@@ -2374,10 +2340,10 @@ public class CLI {
 
                     importedPath.close();
 
-                } catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }else throw new IllegalArgumentException();
+            } else throw new IllegalArgumentException();
         } catch (IllegalArgumentException e) {
             if (e.getMessage() == null)
                 System.out.println("Argument needed: <read {label},current [<pckName,date>],save,run {id}," +
@@ -2478,7 +2444,7 @@ public class CLI {
             showCase.setMeta(metaClassRepository.getMetaClass("credit"));
         }
 
-        if(showcaseServiceFactoryBean == null || showcaseService == null)
+        if (showcaseServiceFactoryBean == null || showcaseService == null)
             initSC();
 
         if (args.get(0).equals("status")) {
@@ -2507,7 +2473,7 @@ public class CLI {
                     throw new IllegalArgumentException("no such path for downPath:" + args.get(2));
 
                 showCase.setDownPath(args.get(2));
-            } else if(args.get(1).equals("final")) {
+            } else if (args.get(1).equals("final")) {
                 showCase.setFinal(Boolean.parseBoolean(args.get(2)));
             } else
                 throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
@@ -2516,12 +2482,12 @@ public class CLI {
             if (args.get(1).equals("reset")) {
                 showCase.getFieldsList().clear();
             } else if (args.get(1).equals("add")) {
-                if(args.get(2) == null || args.get(3) == null)
+                if (args.get(2) == null || args.get(3) == null)
                     throw new UnsupportedOperationException("AttributePath and columnName cannot be empty");
 
                 showCase.addField(args.get(2), args.get(3));
             } else if (args.get(1).equals("addCustom")) {
-                if(args.get(2) == null || args.get(3) == null || args.get(4) == null)
+                if (args.get(2) == null || args.get(3) == null || args.get(4) == null)
                     throw new UnsupportedOperationException("MetaClass, attributePath and columnName cannot be empty");
 
                 showCase.addCustomField(args.get(3), args.get(4), metaClassRepository.getMetaClass(args.get(2)));
@@ -2532,7 +2498,7 @@ public class CLI {
             }
         } else if (args.get(0).equals("save")) {
             long scId = showcaseService.add(showCase);
-            if(scId > 0)
+            if (scId > 0)
                 System.out.println(showCase.getName() + ": Showcase successfully added!");
             else
                 System.err.println("Couldn't save " + showCase.getName());
@@ -2545,7 +2511,7 @@ public class CLI {
                 for (ShowCaseField field : holder.getShowCaseMeta().getFieldsList())
                     System.out.println("\t" + field.getColumnName());
 
-                for(ShowCaseField field : holder.getShowCaseMeta().getCustomFieldsList())
+                for (ShowCaseField field : holder.getShowCaseMeta().getCustomFieldsList())
                     System.out.println("\t* " + field.getColumnName());
             }
         } else if (args.get(0).equals("loadSC")) {
@@ -2673,7 +2639,7 @@ public class CLI {
     }
 
     private void commandMaintenance(String line) {
-        if(mnt == null)
+        if (mnt == null)
             mnt = context.getBean(Mnt.class);
 
         mnt.commandMaintenance(line);

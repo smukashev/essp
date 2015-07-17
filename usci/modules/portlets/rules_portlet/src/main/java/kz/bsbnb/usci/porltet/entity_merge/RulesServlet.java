@@ -161,6 +161,8 @@ public class RulesServlet extends HttpServlet {
                     testEntity.setId(Long.parseLong(req.getParameter("id")));
                     //writer.write(JsonMaker.getJson(ruleService.updateTestEntity(testEntity)));
                     break;*/
+                default:
+                    throw new UnsupportedOperationException("Операция не поддерживается(" + operationType + ");");
             }
         } catch (Exception e) {
 

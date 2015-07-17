@@ -25,47 +25,11 @@ public interface IBaseEntityProcessorDao {
 
     List<Long> getEntityIDsByMetaclass(long metaClassId);
 
-    List<RefListItem> getRefsByMetaclass(long metaClassId);
-
-    List<RefListItem> getRefsByMetaclassRaw(long metaClassId);
-
-    RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis);
-
     List<BaseEntity> getEntityByMetaclass(MetaClass meta);
 
     boolean isApproved(long id);
 
     boolean remove(long baseEntityId);
 
-    long getRandomBaseEntityId(long metaClassId);
-
-    long getRandomBaseEntityId(IMetaClass metaClass);
-
     Set<Long> getChildBaseEntityIds(long parentBaseEntityIds);
-
-    List<Date> getEntityReportDates(Long entityId);
-
-    RefColumnsResponse getRefColumns(long metaClassId);
-
-    void populate(String metaName, Long id, Date reportDate);
-
-    void populateSC(Long creditorId);
-
-    void populateSC();
-
-    List<Long> getSCEntityIds(Long id);
-
-    List<Long[]> getSCEntityIds(int limit, Long prevMaxId);
-
-    void removeSCEntityIds(List<Long> list, Long id);
-
-    void removeSCEntityIds(List<Long> entityIds);
-
-    void removeShowcaseId(Long id);
-
-    List<Long> getShowcaseIdsToLoad();
-
-    List<Long> getNewTableIds(Long id);
-
-    void removeNewTableIds(List<Long> list, Long id);
 }

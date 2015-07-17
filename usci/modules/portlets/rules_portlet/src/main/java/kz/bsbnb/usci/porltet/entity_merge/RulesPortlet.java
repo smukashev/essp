@@ -234,6 +234,8 @@ public class RulesPortlet extends MVCPortlet{
                         else
                             writer.write(JsonMaker.getJson(true));
                     }
+                default:
+                    throw new UnsupportedOperationException("Операция не поддерживается(" + operationType + ");");
             }
 
         } catch (Exception e) {

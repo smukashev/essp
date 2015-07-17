@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
+import kz.bsbnb.usci.eav.persistance.IRefProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IMailDao;
@@ -36,6 +37,9 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Autowired
     IBaseEntityProcessorDao baseEntityProcessorDao;
+
+    @Autowired
+    IRefProcessorDao refProcessorDao;
 
     @Autowired
     IBaseEntitySearcherPool searcherPool;
@@ -95,13 +99,6 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     @Override
-    public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad) {
-        // TODO: Uncomment and fix
-        /*Long id = metaClassDao.save(baseEntityLoad.getMeta());
-        baseEntityProcessorDao.saveOrUpdate(baseEntityLoad);*/
-    }
-
-    @Override
     public List<Long> getEntityIDsByMetaclass(long id) {
         return baseEntityProcessorDao.getEntityIDsByMetaclass(id);
     }
@@ -118,12 +115,12 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     public List<RefListItem> getRefsByMetaclass(long metaClassId) {
-        return baseEntityProcessorDao.getRefsByMetaclass(metaClassId);
+        return refProcessorDao.getRefsByMetaclass(metaClassId);
     }
 
     @Override
     public RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis) {
-        return baseEntityProcessorDao.getRefListResponse(metaClassId, date, withHis);
+        return refProcessorDao.getRefListResponse(metaClassId, date, withHis);
     }
 
     @Override
@@ -148,18 +145,6 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Override
     public RefColumnsResponse getRefColumns(long metaClassId) {
-        return baseEntityProcessorDao.getRefColumns(metaClassId);
-    }
-
-    @Override
-    public void removeAllByMetaClass(IMetaClass metaClass) {
-        while (true) {
-            long baseEntityId = baseEntityProcessorDao.getRandomBaseEntityId(metaClass);
-            if (baseEntityId <= 0) {
-                break;
-            }
-
-            baseEntityProcessorDao.remove(baseEntityId);
-        }
+        return refProcessorDao.getRefColumns(metaClassId);
     }
 }

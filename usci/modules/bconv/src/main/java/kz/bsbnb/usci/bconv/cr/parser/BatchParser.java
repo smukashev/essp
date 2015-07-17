@@ -7,6 +7,7 @@ import java.util.Date;
 
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.persistance.IRefProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.repository.IBaseEntityRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
@@ -19,9 +20,6 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-/**
- * @author k.tulbassiyev
- */
 public abstract class BatchParser {
     protected XMLEventReader xmlReader;
     protected DateFormat dateFormat = new SimpleDateFormat(Const.DATE_FORMAT);
@@ -44,6 +42,9 @@ public abstract class BatchParser {
 
     @Autowired
     protected IBaseEntityLoadDao baseEntityLoadDao;
+
+    @Autowired
+    protected IRefProcessorDao refProcessorDao;
 
     public BatchParser() {
         super();

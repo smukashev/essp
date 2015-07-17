@@ -257,7 +257,7 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
         }
         else
         {
-            System.out.println("No such instance of MetaClass with name: " + name);
+            System.out.println("Имя не должно быть NULL;");
             return;
         }
 
