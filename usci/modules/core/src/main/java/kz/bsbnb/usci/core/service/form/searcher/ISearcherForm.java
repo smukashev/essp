@@ -14,6 +14,6 @@ import java.util.List;
  */
 public interface ISearcherForm {
     List<Pair> getMetaClasses(long userId);
-    String getDom(long userId, IMetaClass metaClass);
-    List<BaseEntity> search(HashMap<String,String> parameters, MetaClass metaClass);
+    String getDom(long userId, IMetaClass metaClass, String prefix);
+    List<BaseEntity> search(HashMap<String,String> parameters, MetaClass metaClass, String prefix);
 }

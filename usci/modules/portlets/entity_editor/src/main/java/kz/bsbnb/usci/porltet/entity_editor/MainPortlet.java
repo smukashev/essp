@@ -431,7 +431,7 @@ public class MainPortlet extends MVCPortlet {
 
                     //String generatedForm = searcherFormService.getDom(currentUser.getUserId(), metaFactoryService.getMetaClass(metaId));
                     String generatedForm = searcherFormService.getDom(currentUser.getUserId(),
-                            searchClassName, metaFactoryService.getMetaClass(metaName));
+                            searchClassName, metaFactoryService.getMetaClass(metaName),"");
                     out.write(generatedForm.getBytes());
                     break;
                 case FIND_ACTION:
@@ -450,7 +450,7 @@ public class MainPortlet extends MVCPortlet {
                         parameters.put(attribute, resourceRequest.getParameter(attribute));
                     }
 
-                    List<BaseEntity> entityList = searcherFormService.search(searchClassName, parameters, metaClass);
+                    List<BaseEntity> entityList = searcherFormService.search(searchClassName, parameters, metaClass, "");
 
                     long ret = -1;
 
@@ -535,7 +535,7 @@ public class MainPortlet extends MVCPortlet {
                             parameters.put(attribute, resourceRequest.getParameter(attribute));
                         }
 
-                        entityList = searcherFormService.search(searchClassName, parameters, metaClass);
+                        entityList = searcherFormService.search(searchClassName, parameters, metaClass, "");
                         StringBuilder sb = new StringBuilder("{\"text\":\".\",\"children\": [\n");
                         Iterator<BaseEntity> it = entityList.iterator();
                         do {

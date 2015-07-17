@@ -53,22 +53,22 @@ public class KeySearcherForm implements ISearcherForm {
         return id;
     }
 
-    public String getDom(long userId, IMetaClass metaClass) {
+    public String getDom(long userId, IMetaClass metaClass, String prefix) {
         inputId.set(1L);
-        return getDom(userId, metaClass, "null");
+        return getDom(userId, metaClass, "null", prefix);
     }
 
-    public String getDom(long userId, IMetaClass metaClass,  String attribute) {
+    public String getDom(long userId, IMetaClass metaClass,  String attribute, String prefix) {
         long id = nextId();
 
         String ret =
                 "<div class='node'><div class='leaf'> %s : " +
-                        "<input type=\"text\" id='inp-%d-%s-%s' class='inp-%d' readonly /> " +
+                        "<input type=\"text\" id='%sinp-%d-%s-%s' class='inp-%d' readonly /> " +
                         "<a href='#' onclick='find(this);'>найти</a>" +
                         "<div class='loading'>загрузка</div>" +
-                        "<div class='not-filled' id = 'err-%d'>не заполнено</div></div><div class='node'>";
+                        "<div class='not-filled' id = '%serr-%d'>не заполнено</div></div><div class='node'>";
 
-        ret = String.format(ret, ((MetaClass)metaClass).getClassTitle(), id, metaClass.getClassName(), attribute, id, id);
+        ret = String.format(ret, ((MetaClass)metaClass).getClassTitle(), prefix, id, metaClass.getClassName(), attribute, id, prefix, id);
 
         for(String attr : metaClass.getAttributeNames()) {
             IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attr);
@@ -82,23 +82,23 @@ public class KeySearcherForm implements ISearcherForm {
                         throw new NotImplementedException();
                     if(metaType.isSet()) {
                         IMetaType childMeta = ((MetaSet) metaType).getMemberType();
-                        ret += getDom(userId, (MetaClass) childMeta, attr);
+                        ret += getDom(userId, (MetaClass) childMeta, attr, prefix);
                     } else {
-                        ret += getDom(userId, (MetaClass) metaType, attr);
+                        ret += getDom(userId, (MetaClass) metaType, attr, prefix);
                     }
                 } else {
                     String divSimple;
                     long nextId = nextId();
 
                     if( ((MetaValue)metaType).getTypeCode().equals(DataTypes.DATE)) {
-                        divSimple = "<div class='leaf'> <div id='inp-%d-%s-%s' class='usci-date' ></div>" +
+                        divSimple = "<div class='leaf'> <div id='%sinp-%d-%s-%s' class='usci-date' ></div>" +
                                 "<div class='not-filled' id='err-%d'>not.filled</div></div>";
-                        divSimple = String.format(divSimple, nextId, "simple", attr, nextId);
+                        divSimple = String.format(divSimple, prefix, nextId, "simple", attr, nextId);
                     }
                     else {
                         divSimple = "<div class='leaf'> %s: <input type = 'text' id='inp-%d-%s-%s' />" +
-                                "<div class='not-filled' id='err-%d'>не заполнено</div></div>";
-                        divSimple = String.format(divSimple, metaAttribute.getTitle(), nextId, "simple", attr, nextId);
+                                "<div class='not-filled' id='%serr-%d'>не заполнено</div></div>";
+                        divSimple = String.format(divSimple, metaAttribute.getTitle(), nextId, "simple", attr, prefix, nextId);
                     }
                     ret += divSimple;
                 }
@@ -140,7 +140,7 @@ public class KeySearcherForm implements ISearcherForm {
     }
 
     @Override
-    public List<BaseEntity> search(HashMap<String, String> parameters, MetaClass metaClass) {
+    public List<BaseEntity> search(HashMap<String, String> parameters, MetaClass metaClass, String prefix) {
         BaseEntity baseEntity = new BaseEntity(metaClass, new Date());
         Iterator<String> it = parameters.keySet().iterator();
         while(it.hasNext()) {

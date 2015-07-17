@@ -43,7 +43,7 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
     private final Logger logger = LoggerFactory.getLogger(PersonFormImpl.class);
 
     @Override
-    public List<BaseEntity> search(HashMap<String, String> parameters, MetaClass metaClass) {
+    public List<BaseEntity> search(HashMap<String, String> parameters, MetaClass metaClass, String prefix) {
         String firstName = parameters.get("firstName");
         String lastName = parameters.get("lastName");
         String middleName = parameters.get("middleName");
@@ -138,7 +138,7 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
     }
 
     @Override
-    public String getDom(long userId, IMetaClass metaClass) {
+    public String getDom(long userId, IMetaClass metaClass, String prefix) {
         return "Фамилия: <input type='text' name='lastName' style='width: 95%; margin: 5px'></input><br/>" +
                 "Имя: <input type='text' name='firstName' style='width: 95%; margin: 5px'></input><br/>" +
                 "Отчество: <input type='text' name='middleName' style='width: 95%; margin: 5px'></input></form>";

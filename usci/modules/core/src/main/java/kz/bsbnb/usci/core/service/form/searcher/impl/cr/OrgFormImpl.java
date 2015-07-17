@@ -50,12 +50,12 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
     }
 
     @Override
-    public String getDom(long userId, IMetaClass metaClass) {
+    public String getDom(long userId, IMetaClass metaClass,String prefix) {
         return "Наименование: <input type='text' name='name' style='width: 95%; margin: 5px'></input>";
     }
 
     @Override
-    public List<BaseEntity> search(HashMap<String, String> parameters, MetaClass metaClass) {
+    public List<BaseEntity> search(HashMap<String, String> parameters, MetaClass metaClass, String prefix) {
         List<BaseEntity> ret = new LinkedList<>();
         String name = parameters.get("name");
         if(name.trim().length() < 1)

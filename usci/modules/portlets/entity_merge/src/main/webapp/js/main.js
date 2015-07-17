@@ -317,10 +317,23 @@ function getForm(){
         params: {
             op: 'GET_FORM',
             search: currentSearch,
-            metaName: currentMeta
+            metaName: currentMeta,
+            prefix: 'f1_'
         },
         success: function(data){
-            document.getElementById('entity-editor-form').innerHTML = data.responseText;
+            var form = document.getElementById('f1_entity-editor-form');
+            form.innerHTML = data.responseText;
+            var all = form.getElementsByClassName("usci-date");
+            for(var i = 0; i < all.length;i++) {
+                var info =  all[i].id.match(regex);
+                Ext.create('Ext.form.DateField', {
+                    renderTo: all[i].id,
+                    fieldLabel: 'дата',
+                    labelWidth: 27,
+                    id: 'f1_inp-' + info[1] + '-1',
+                    format: 'd.m.Y',
+                });
+            }
         }
     });
 }
@@ -334,10 +347,23 @@ function getForm2(){
         params: {
             op: 'GET_FORM',
             search: currentSearch2,
-            metaName: currentMeta2
+            metaName: currentMeta2,
+            prefix: 'f2_'
         },
         success: function(data){
-            document.getElementById('entity-editor-form2').innerHTML = data.responseText;
+            var form = document.getElementById('f2_entity-editor-form2');
+            form.innerHTML = data.responseText;
+            var all = form.getElementsByClassName("usci-date");
+            for(var i = 0; i < all.length;i++) {
+                var info =  all[i].id.match(regex);
+                Ext.create('Ext.form.DateField', {
+                    renderTo: all[i].id,
+                    fieldLabel: 'дата',
+                    labelWidth: 27,
+                    id: 'f2_inp-' + info[1] + '-2',
+                    format: 'd.m.Y',
+                });
+            }
         }
     });
 }
@@ -346,10 +372,19 @@ function find(control){
     var nextDiv = control.parentNode.nextSibling;
     var inputDiv = control.previousSibling.previousSibling;
 
+    var first = true;
+
+    for(var i = control.parentNode; i && i!= document.body; i = i.parentNode) {
+        if(i.id.indexOf('f2') > -1)
+            first = false;
+
+        if(i.id.indexOf('f1') > -1)
+            break;
+    }
+
     var info = inputDiv.id.match(regex);
 
-
-    var params = {op : 'FIND_ACTION', metaClass: info[2]};
+    var params = {op : 'FIND_ACTION', metaClass: info[2], searchName: currentSearch};
     for(var i=0;i<errors.length;i++)
         errors[i].style.display = 'none';
 
@@ -358,9 +393,9 @@ function find(control){
     for (var  i = 0; i < nextDiv.childNodes.length; i++) {
         var preKeyElem = nextDiv.childNodes[i];
         if(preKeyElem.className.indexOf('leaf') > -1) {
-            filterLeaf(preKeyElem, params);
+            filterLeaf(preKeyElem, params, first);
         } else {
-            filterNode(preKeyElem, params);
+            filterNode(preKeyElem, params, first);
         }
     }
 
@@ -394,7 +429,7 @@ function find(control){
     });
 }
 
-function filterLeaf(control, queryObject){
+function filterLeaf(control, queryObject, first){
     for(var i =0 ;i<control.childNodes.length;i++) {
         var childControl = control.childNodes[i];
         if(childControl.tagName == 'INPUT' || childControl.tagName=='SELECT') {
@@ -402,7 +437,7 @@ function filterLeaf(control, queryObject){
             var id = info[1];
 
             if(childControl.value.length == 0) {
-                errors.push(document.getElementById('err-' + id));
+                errors.push(document.getElementById( (first ? 'f1_' : 'f2_') + 'err-' + id));
             }
 
             queryObject[info[3]] = childControl.value;
@@ -410,11 +445,11 @@ function filterLeaf(control, queryObject){
     }
 }
 
-function filterNode(control, queryObject){
+function filterNode(control, queryObject, first){
     for(var i =0; i<control.childNodes.length;i++) {
         var childControl = control.childNodes[i];
         if(childControl.className != undefined && childControl.className.indexOf('leaf') > -1) {
-            filterLeaf(childControl, queryObject);
+            filterLeaf(childControl, queryObject, first);
             break;
         }
     }
@@ -818,11 +853,12 @@ Ext.onReady(function() {
                                         id: 'edDate',
                                         labelWidth: 350,
                                         fieldLabel: label_date,
-                                        format: 'd.m.Y'
+                                        format: 'd.m.Y',
+                                        value: new Date()
                                     },
                                     {
                                         xtype: 'component',
-                                        html: '<div id="entity-editor-form" style="height: 350px;"></div>'
+                                        html: '<div id="f1_entity-editor-form" style="height: 350px;"></div>'
                                     }
                                 ]
                             }
@@ -860,11 +896,12 @@ Ext.onReady(function() {
                                         id: 'edDate2',
                                         labelWidth: 350,
                                         fieldLabel: label_date,
-                                        format: 'd.m.Y'
+                                        format: 'd.m.Y',
+                                        value: new Date()
                                     },
                                     {
                                         xtype: 'component',
-                                        html: '<div id="entity-editor-form2" style="height: 350px;"></div>'
+                                        html: '<div id="f2_entity-editor-form2" style="height: 350px;"></div>'
                                     }
                                 ]
                             }
