@@ -209,11 +209,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             switch (baseEntityPostPrepared.getOperation()) {
                 case DELETE:
                     if (baseEntityPostPrepared.getId() <= 0)
-                        throw new RuntimeException("Сущность для удаления не найдена!");
+                        throw new RuntimeException("Сущность для удаления не найдена;");
 
                     if (baseEntity.getMeta().isReference() && refProcessorDao.historyExists(
                             baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId()))
-                        throw new RuntimeException("Справочник с историей не может быть удалена");
+                        throw new RuntimeException("Справочник с историей не может быть удалена;");
 
                     baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
@@ -222,14 +222,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     break;
                 case CLOSE:
                     if (baseEntityPostPrepared.getId() <= 0)
-                        throw new RuntimeException("Сущность для закрытия не найдена!");
+                        throw new RuntimeException("Сущность для закрытия не найдена;");
 
                     baseEntityApplied = baseEntityPostPrepared;
 
                     break;
                 default:
                     throw new UnsupportedOperationException("Операция не поддерживается: "
-                            + baseEntityPostPrepared.getOperation());
+                            + baseEntityPostPrepared.getOperation() + ";");
             }
         } else {
             baseEntityApplied = baseEntityApplyDao.apply(baseEntityPostPrepared, baseEntityManager, entityHolder);

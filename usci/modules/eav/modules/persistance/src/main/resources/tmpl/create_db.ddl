@@ -32,60 +32,16 @@
       <unique-column name="creditor_id"/>
     </unique>
 	</table>
-    <table name="batch_entries">
+  <table name="batch_entries">
     <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
     <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
     <column name="value" primaryKey="false" required="true" type="CLOB" size="14,0" autoIncrement="false"/>
     <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
     <column name="updated_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
     <unique>
-    <unique-column name="id"/>
+    	<unique-column name="id"/>
     </unique>
-    </table>
-	<!--<table name="eav_m_array_key_filter">
-      <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-      <column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-      <column name="attribute_name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-      <unique>
-        <unique-column name="id"/>
-      </unique>
-    </table>-->
-	<table name="eav_m_array_key_filter_values">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="filter_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="value" primaryKey="false" required="true" type="VARCHAR" size="128" autoIncrement="false"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-	</table>
-	<table name="eav_m_attributes">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="containing_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="container_type" required="true" type="NUMERIC" size="10,0"/>
-		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
-		<column name="is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<unique>
-			<unique-column name="containing_id"/>
-			<unique-column name="name"/>
-		</unique>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-		<index name="ind_m_001_01">
-			<index-column name="containing_id"/>
-			<index-column name="container_type"/>
-		</index>
-		<index name="ind_m_001_02">
-			<index-column name="name"/>
-			<index-column name="containing_id"/>
-			<index-column name="container_type"/>
-		</index>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-	</table>
+  </table>
 	<table name="eav_m_classes">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="complex_key_type" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
@@ -102,16 +58,33 @@
 		<unique>
 			<unique-column name="id"/>
 		</unique>
-		<index name="ind_m_002_01">
+		<index name="eav_m_classes_bnd">
 			<index-column name="begin_date"/>
 			<index-column name="name"/>
 			<index-column name="is_disabled"/>
 		</index>
-		<index name="ind_m_002_02">
+		<index name="eav_m_classes_begin_date">
 			<index-column name="begin_date"/>
 		</index>
-		<index name="ind_m_002_03">
+		<index name="eav_m_classes_reference">
 			<index-column name="is_reference"/>
+		</index>
+	</table>
+	<table name="eav_be_sets">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="level_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="is_last" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+	</table>
+	<table name="eav_m_set_key_filter">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="attr_name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
+		<column name="value" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
+		<unique>
+			<unique-column name="id"/>
+		</unique>
+		<index name="ind_m_005_01">
+			<index-column name="set_id"/>
 		</index>
 	</table>
 	<table name="eav_m_complex_attributes">
@@ -129,10 +102,10 @@
 		<unique>
 			<unique-column name="id"/>
 		</unique>
-		<index name="ind_m_003_01">
+		<index name="eav_m_complex_attr_class_id">
 			<index-column name="class_id"/>
 		</index>
-		<index name="ind_m_003_02">
+		<index name="eav_m_complex_attr_cont_id_cont_type">
 			<index-column name="containing_id"/>
 			<index-column name="container_type"/>
 		</index>
@@ -153,63 +126,7 @@
 		<unique>
 			<unique-column name="id"/>
 		</unique>
-		<index name="ind_m_004_01">
-			<index-column name="containing_id"/>
-			<index-column name="container_type"/>
-		</index>
-	</table>
-	<table name="eav_m_set_key_filter">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="attr_name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<column name="value" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-		<index name="ind_m_005_01">
-			<index-column name="set_id"/>
-		</index>
-	</table>
-	<table name="eav_meta_object">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-	</table>
-	<table name="eav_m_set">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="containing_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="container_type" required="true" type="NUMERIC" size="10,0"/>
-		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
-		<column name="is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<column name="array_key_type" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
-		<column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<column name="is_reference" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-		<index name="ind_m_006_01">
-			<index-column name="containing_id"/>
-			<index-column name="container_type"/>
-		</index>
-	</table>
-	<table name="eav_m_set_of_sets">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="containing_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="container_type" required="true" type="NUMERIC" size="10,0"/>
-		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
-		<column name="is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<column name="array_key_type" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
-		<column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<column name="is_reference" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-		<index name="ind_m_007_01">
+		<index name="eav_m_complex_set_cont_id_cont_type">
 			<index-column name="containing_id"/>
 			<index-column name="container_type"/>
 		</index>
@@ -229,7 +146,7 @@
 		<unique>
 			<unique-column name="id"/>
 		</unique>
-		<index name="ind_m_008_01">
+		<index name="eav_m_simple_attr_cont_id_cont_type">
 			<index-column name="containing_id"/>
 			<index-column name="container_type"/>
 		</index>
@@ -255,7 +172,6 @@
 			<index-column name="container_type"/>
 		</index>
 	</table>
-	<!-- EAV_BATCHES -->
 	<table name="eav_batches">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="user_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -264,7 +180,6 @@
 		<column name="end_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="rep_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
 	</table>
-	<!-- EAV_BE_BOOLEAN_SET_VALUES -->
 	<table name="eav_be_boolean_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -290,7 +205,6 @@
 			<index-column name="is_last"/>
 		</index>
 	</table>
-	<!-- EAV_BE_BOOLEAN_VALUES -->
 	<table name="eav_be_boolean_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -334,7 +248,6 @@
 			<unique-column name="report_date"/>
 		</unique>
 	</table>
-	<!-- EAV_BE_COMPLEX_SET_VALUES -->
 	<table name="eav_be_complex_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -373,7 +286,6 @@
 			<index-column name="set_id"/>
 		</index>
 	</table>
-	<!-- EAV_BE_COMPLEX_VALUES -->
 	<table name="eav_be_complex_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -422,7 +334,6 @@
 			<index-column name="entity_id"/>
 		</index>
 	</table>
-	<!-- EAV_BE_DATE_SET_VALUES -->
 	<table name="eav_be_date_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -448,7 +359,6 @@
 			<index-column name="is_last"/>
 		</index>
 	</table>
-	<!-- EAV_BE_DATE_VALUES -->
 	<table name="eav_be_date_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -492,7 +402,6 @@
 			<unique-column name="report_date"/>
 		</unique>
 	</table>
-	<!-- EAV_BE_DOUBLE_SET_VALUES -->
 	<table name="eav_be_double_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -518,7 +427,6 @@
 			<index-column name="is_last"/>
 		</index>
 	</table>
-	<!-- EAV_BE_DOUBLE_VALUES -->
 	<table name="eav_be_double_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -764,98 +672,6 @@
 			<unique-column name="report_date"/>
 		</unique>
 	</table>
-	<table name="eav_be_set_of_complex_sets">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="parent_set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="child_set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="is_closed" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<column name="is_last" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_017_00">
-			<reference local="child_set_id" foreign="id"/>
-		</foreign-key>-->
-		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_017_01">
-			<reference local="parent_set_id" foreign="id"/>
-		</foreign-key>-->
-		<!--<foreign-key foreignTable="eav_batches" name="eav_fk_017_02">
-			<reference local="batch_id" foreign="id"/>
-		</foreign-key>-->
-		<index name="eav_ind_017_00">
-			<index-column name="parent_set_id"/>
-			<index-column name="child_set_id"/>
-			<index-column name="report_date"/>
-			<index-column name="is_closed"/>
-		</index>
-		<index name="eav_ind_017_01">
-			<index-column name="parent_set_id"/>
-			<index-column name="child_set_id"/>
-			<index-column name="is_last"/>
-		</index>
-	</table>
-	<table name="eav_be_set_of_sets">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="parent_set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="child_set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="is_closed" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<column name="is_last" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_018_00">
-			<reference local="child_set_id" foreign="id"/>
-		</foreign-key>-->
-		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_018_01">
-			<reference local="parent_set_id" foreign="id"/>
-		</foreign-key>-->
-		<index name="eav_ind_018_00">
-			<index-column name="parent_set_id"/>
-			<index-column name="child_set_id"/>
-			<index-column name="report_date"/>
-			<index-column name="is_closed"/>
-		</index>
-		<index name="eav_ind_018_01">
-			<index-column name="parent_set_id"/>
-			<index-column name="child_set_id"/>
-			<index-column name="is_last"/>
-		</index>
-	</table>
-	<table name="eav_be_set_of_simple_sets">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="parent_set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="child_set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="is_closed" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<column name="is_last" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<!--<foreign-key foreignTable="eav_be_sets" name="fk_1044">
-			<reference local="child_set_id" foreign="id"/>
-		</foreign-key>-->
-		<!--<foreign-key foreignTable="eav_be_sets" name="fk_1045">
-			<reference local="parent_set_id" foreign="id"/>
-		</foreign-key>-->
-		<!--<foreign-key foreignTable="eav_batches" name="fk_1046">
-			<reference local="batch_id" foreign="id"/>
-		</foreign-key>-->
-		<index name="eav_ind_019_00">
-			<index-column name="parent_set_id"/>
-			<index-column name="child_set_id"/>
-			<index-column name="report_date"/>
-			<index-column name="is_closed"/>
-		</index>
-		<index name="eav_ind_019_01">
-			<index-column name="parent_set_id"/>
-			<index-column name="child_set_id"/>
-			<index-column name="is_last"/>
-		</index>
-	</table>
-	<table name="eav_be_sets">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="level_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="is_last" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-	</table>
 	<table name="eav_be_string_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -953,35 +769,21 @@
 		</foreign-key>-->
 	</table>
 	<table name="sc_id_bag">
-			<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-			<column name="entity_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-			<column name="showcase_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-			<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-			<index name="eav_ind_022_01">
-					<index-column name="entity_id"/>
-					<index-column name="showcase_id"/>
-          <index-column name="report_date"/>
-			</index>
-			<unique name="ind_uk_sc_003_00">
-				<unique-column name="entity_id"/>
-				<unique-column name="showcase_id"/>
-        <unique-column name="report_date"/>
-			</unique>
+    <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+    <column name="entity_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+    <column name="showcase_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+    <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+    <index name="eav_ind_022_01">
+        <index-column name="entity_id"/>
+        <index-column name="showcase_id"/>
+        <index-column name="report_date"/>
+    </index>
+    <unique name="ind_uk_sc_003_00">
+      <unique-column name="entity_id"/>
+      <unique-column name="showcase_id"/>
+      <unique-column name="report_date"/>
+    </unique>
 	</table>
-
-	<!-- Table for showcase entity revisions -->
-	<table name="sc_entities">
-			<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-			<column name="entity_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-			<index name="eav_ind_023_01">
-							<index-column name="entity_id"/>
-					</index>
-			<unique name="ind_uk_sc_023_00">
-				<unique-column name="entity_id"/>
-			</unique>
-	</table>
-	<!-- Table for showcase entity revisions -->
-
 	<!-- DROOLS -->
 	<table name="logic_packages">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -1038,13 +840,11 @@
 			<index-column name="package_versions_id"/>
 		</index>
 	</table>
-
 	<!-- MAINTENANCE -->
 	<table name="mnt_operations">
 			<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 			<column name="name" type="VARCHAR" size="250" />
 	</table>
-
 	<table name="mnt_logs" >
 			<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 			<column name="mnt_operation_id" required="true" type = "NUMERIC" size="14,0" />
@@ -1056,7 +856,6 @@
 			<column name="contract_date" required="true" type = "TIMESTAMP"  />
 			<column name="credit_id" type = "NUMERIC" size="14,0" />
 	</table>
-
 	<!-- entity_editor portlet tables -->
 	<table name="eav_a_user_class">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -1070,7 +869,6 @@
 			<index-column name="meta_name"/>
 		</index>
 	</table>
-
 	<table name="eav_a_user_ref">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="user_id" required="true" type="NUMERIC" size="14,0"/>
@@ -1093,7 +891,6 @@
 			<reference local="entity_id" foreign="id"/>
 		</foreign-key>-->
 	</table>
-
   <!-- BEGIN: tables for approval portlet-->
 	<table name="eav_report">
     <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -1111,7 +908,6 @@
       <unique-column name="report_date"/>
     </unique>
 	</table>
-
   <table name="eav_report_message">
     <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
     <column name="report_id" required="true" type="NUMERIC" size="14,0"/>
@@ -1119,7 +915,6 @@
     <column name="send_date" required="false" type="DATE"/>
     <column name="text" required="false" type="VARCHAR" size="1000"/>
   </table>
-
   <table name="eav_report_message_attachment">
     <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
     <column name="report_message_id" required="true" type="NUMERIC" size="14,0"/>
@@ -1127,7 +922,6 @@
     <column name="content" required="false" type="BLOB"/>
   </table>
   <!-- END: tables for approval portlet-->
-
   <!--BEGIN: tables for notifications portlet -->
 	<table name="mail_template">
 	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
@@ -1138,14 +932,12 @@
 	  <column name="name_kz" type="VARCHAR" size="300" />
 	  <column name="configuration_type_id" type="NUMERIC" size="14,0" />
 	</table>
-
 	<table name="mail_template_parameter">
 	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
 	  <column name="mail_template_id" required="true" type="NUMERIC" size="14,0" />
 	  <column name="code" required="true" type="VARCHAR" size="20" />
 	  <column name="order_number"  type="NUMERIC" size="14,0" />
 	</table>
-
 	<table name="mail_message">
 	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
 	  <column name="recipient_user_id" required="true" type="NUMERIC" size="14,0" />
@@ -1154,14 +946,12 @@
 	  <column name="creation_date"  type="TIMESTAMP" />
 	  <column name="sending_date"  type="TIMESTAMP" />
 	</table>
-
 	<table name="mail_message_parameter">
 	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
 	  <column name="mail_message_id" required="true" type="NUMERIC" size="14,0" />
 	  <column name="mail_template_parameter_id" required="true" type="NUMERIC" size="14,0" />
 	  <column name="value"  type="VARCHAR" size="1000" />
 	</table>
-
 	<table name="mail_user_mail_template">
 	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
 	  <column name="portal_user_id" required="true" type="NUMERIC" size="14,0" />

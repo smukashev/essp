@@ -232,63 +232,41 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
         MetaSet metaSet = (MetaSet) type;
 
-        if (metaSet.getMemberType().isSet()) {
-            insert = context.insertInto(
-                    EAV_M_SET_OF_SETS,
-                    EAV_M_SET_OF_SETS.CONTAINING_ID,
-                    EAV_M_SET_OF_SETS.CONTAINER_TYPE,
-                    EAV_M_SET_OF_SETS.NAME,
-                    EAV_M_SET_OF_SETS.TITLE,
-                    EAV_M_SET_OF_SETS.IS_KEY,
-                    EAV_M_SET_OF_SETS.IS_NULLABLE,
-                    EAV_M_SET_OF_SETS.ARRAY_KEY_TYPE,
-                    EAV_M_SET_OF_SETS.IS_REFERENCE
-            ).values(parentId, parentType, attributeName, metaAttribute.getTitle(),
-                    DataUtils.convert(metaAttribute.isKey()), DataUtils.convert(metaAttribute.isNullable()),
-                    metaSet.getArrayKeyType().toString(),
-                    DataUtils.convert(metaSet.isReference()));
 
-            id = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
-            metaSet.setId(id);
+        if (metaSet.isComplex()) {
+            long innerId = save((MetaClass) metaSet.getMemberType());
 
-            saveSet(metaSet.getMemberType(), id, MetaContainerTypes.META_SET,
-                    new MetaAttribute(false, false, null), "item");
+            insert = context
+                    .insertInto(EAV_M_COMPLEX_SET)
+                    .set(EAV_M_COMPLEX_SET.CONTAINING_ID, parentId)
+                    .set(EAV_M_COMPLEX_SET.CONTAINER_TYPE, parentType)
+                    .set(EAV_M_COMPLEX_SET.NAME, attributeName)
+                    .set(EAV_M_COMPLEX_SET.TITLE, metaAttribute.getTitle())
+                    .set(EAV_M_COMPLEX_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
+                    .set(EAV_M_COMPLEX_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
+                    .set(EAV_M_COMPLEX_SET.IS_FINAL, DataUtils.convert(metaAttribute.isFinal()))
+                    .set(EAV_M_COMPLEX_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
+                    .set(EAV_M_COMPLEX_SET.CLASS_ID, innerId)
+                    .set(EAV_M_COMPLEX_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
+                    .set(EAV_M_COMPLEX_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()));
         } else {
-            if (metaSet.isComplex()) {
-                long innerId = save((MetaClass) metaSet.getMemberType());
-
-                insert = context
-                        .insertInto(EAV_M_COMPLEX_SET)
-                        .set(EAV_M_COMPLEX_SET.CONTAINING_ID, parentId)
-                        .set(EAV_M_COMPLEX_SET.CONTAINER_TYPE, parentType)
-                        .set(EAV_M_COMPLEX_SET.NAME, attributeName)
-                        .set(EAV_M_COMPLEX_SET.TITLE, metaAttribute.getTitle())
-                        .set(EAV_M_COMPLEX_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
-                        .set(EAV_M_COMPLEX_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
-                        .set(EAV_M_COMPLEX_SET.IS_FINAL, DataUtils.convert(metaAttribute.isFinal()))
-                        .set(EAV_M_COMPLEX_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
-                        .set(EAV_M_COMPLEX_SET.CLASS_ID, innerId)
-                        .set(EAV_M_COMPLEX_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
-                        .set(EAV_M_COMPLEX_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()));
-            } else {
-                insert = context
-                        .insertInto(EAV_M_SIMPLE_SET)
-                        .set(EAV_M_SIMPLE_SET.CONTAINING_ID, parentId)
-                        .set(EAV_M_SIMPLE_SET.CONTAINER_TYPE, parentType)
-                        .set(EAV_M_SIMPLE_SET.NAME, attributeName)
-                        .set(EAV_M_SIMPLE_SET.TITLE, metaAttribute.getTitle())
-                        .set(EAV_M_SIMPLE_SET.TYPE_CODE, metaSet.getTypeCode().toString())
-                        .set(EAV_M_SIMPLE_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
-                        .set(EAV_M_SIMPLE_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
-                        .set(EAV_M_SIMPLE_SET.IS_FINAL, DataUtils.convert(metaAttribute.isFinal()))
-                        .set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
-                        .set(EAV_M_SIMPLE_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
-                        .set(EAV_M_SIMPLE_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()));
-            }
-
-            id = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
-            metaSet.setId(id);
+            insert = context
+                    .insertInto(EAV_M_SIMPLE_SET)
+                    .set(EAV_M_SIMPLE_SET.CONTAINING_ID, parentId)
+                    .set(EAV_M_SIMPLE_SET.CONTAINER_TYPE, parentType)
+                    .set(EAV_M_SIMPLE_SET.NAME, attributeName)
+                    .set(EAV_M_SIMPLE_SET.TITLE, metaAttribute.getTitle())
+                    .set(EAV_M_SIMPLE_SET.TYPE_CODE, metaSet.getTypeCode().toString())
+                    .set(EAV_M_SIMPLE_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
+                    .set(EAV_M_SIMPLE_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
+                    .set(EAV_M_SIMPLE_SET.IS_FINAL, DataUtils.convert(metaAttribute.isFinal()))
+                    .set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
+                    .set(EAV_M_SIMPLE_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
+                    .set(EAV_M_SIMPLE_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()));
         }
+
+        id = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        metaSet.setId(id);
 
         if (metaSet.isComplex()) {
             HashMap<String, ArrayList<String>> keyFilter = metaSet.getArrayKeyFilter();
@@ -776,63 +754,9 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         }
     }
 
-    void loadArrayArrays(IMetaContainer meta) {
-        SelectForUpdateStep select = context.select(
-                EAV_M_SET_OF_SETS.ID,
-                EAV_M_SET_OF_SETS.NAME,
-                EAV_M_SET_OF_SETS.TITLE,
-                EAV_M_SET_OF_SETS.IS_NULLABLE,
-                EAV_M_SET_OF_SETS.IS_KEY,
-                EAV_M_SET_OF_SETS.CONTAINER_TYPE,
-                EAV_M_SET_OF_SETS.CONTAINING_ID,
-                EAV_M_SET_OF_SETS.ARRAY_KEY_TYPE,
-                EAV_M_SET_OF_SETS.IS_REFERENCE
-        ).from(EAV_M_SET_OF_SETS
-        ).where(EAV_M_SET_OF_SETS.CONTAINING_ID.eq(meta.getId())
-        ).and(EAV_M_SET_OF_SETS.CONTAINER_TYPE.eq(meta.getType()));
-        long t = 0;
-
-        logger.debug(select.toString());
-
-        if (sqlStats != null) {
-            t = System.nanoTime();
-        }
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
-        if (sqlStats != null) {
-            sqlStats.put(select.getSQL(), (System.nanoTime() - t) / 1000000);
-        }
-
-        for (Map<String, Object> row : rows) {
-
-            MetaAttribute metaAttribute = new MetaAttribute(
-                    ((BigDecimal) row.get("id")).longValue(),
-                    ((BigDecimal) row.get("is_key")).longValue() == 1,
-                    ((BigDecimal) row.get("is_nullable")).longValue() == 1);
-
-
-            MetaSet metaSet = new MetaSet();
-
-            metaSet.setId(((BigDecimal) row.get("id")).longValue());
-            metaSet.setArrayKeyType(ComplexKeyTypes.valueOf((String) row.get("array_key_type")));
-            metaSet.setReference(((BigDecimal) row.get("is_reference")).longValue() == 1);
-
-            loadSimpleArrays(metaSet);
-            loadComplexArrays(metaSet);
-            loadArrayArrays(metaSet);
-
-            metaAttribute.setMetaType(metaSet);
-            metaAttribute.setTitle((String) row.get("title"));
-
-            meta.setMetaAttribute((String) row.get("name"), metaAttribute);
-
-
-        }
-    }
-
     void loadAttributes(MetaClass meta) {
-        if (meta.getId() < 1) {
+        if (meta.getId() < 1)
             throw new IllegalStateException("Can't load atributes of metaclass without id!");
-        }
 
         meta.removeMembers();
 
@@ -840,7 +764,6 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         loadSimpleArrays(meta);
         loadComplexAttributes(meta);
         loadComplexArrays(meta);
-        loadArrayArrays(meta);
     }
 
     @Transactional
