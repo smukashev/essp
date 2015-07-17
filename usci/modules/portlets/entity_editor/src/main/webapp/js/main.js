@@ -139,7 +139,7 @@ function find(control){
     });
 }
 
-function createXML(currentNode, rootFlag, offset, arrayEl, first, remove) {
+function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
     var xmlStr = "";
 
     var children = currentNode.childNodes;
@@ -150,7 +150,7 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, remove) {
         if(first) {
             xmlStr += offset + "<entity " +
             (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") +
-            (remove ? " operation=\"DELETE\"" : "") + ">\n";
+            (operation ? " operation=\"" + operation + "\"" : "") + ">\n";
         } else {
             xmlStr += offset + "<" + currentNode.data.code +
             (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
@@ -686,12 +686,7 @@ Ext.onReady(function() {
                 loadEntity(entityId, Ext.getCmp('edDate').value, currentSearch);
             } else {
                 //for custom implementations
-                var params = {op : 'LIST_ENTITY',
-                    metaClass: currentMeta,
-                    searchName: currentSearch,
-                    date: Ext.getCmp('edDate').value
-                };
-
+                var params = {op : 'LIST_ENTITY', metaClass: currentMeta, searchName: currentSearch };
                 var inputs = document.getElementById("entity-editor-form").childNodes;
                 for(i=0;i<inputs.length;i++) {
                     if(inputs[i].tagName == 'INPUT') {
@@ -815,7 +810,36 @@ Ext.onReady(function() {
             var xmlStr = "";
 
             for (var i = 0; i < rootNode.childNodes.length; i++) {
-                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true, true);
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true, "DELETE");
+            }
+
+            Ext.Ajax.request({
+                url: dataUrl,
+                method: 'POST',
+                params: {
+                    xml_data: xmlStr,
+                    date: Ext.getCmp('edDate').value,
+                    op: 'SAVE_XML'
+                },
+                success: function(response) {
+                    Ext.MessageBox.alert("", "Операция выполнена успешно");
+                }
+            });
+        }
+    });
+
+    var buttonClose = Ext.create('Ext.button.Button', {
+        id: "buttonClose",
+        text: label_CLOSE,
+        maxWidth: 200,
+        handler : function (){
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+
+            var xmlStr = "";
+
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true, "CLOSE");
             }
 
             Ext.Ajax.request({
@@ -1006,7 +1030,7 @@ Ext.onReady(function() {
         layout: 'border',
         items: [{
             region: 'west',
-            width: '20%',
+            width: '30%',
             split: true,
             layout: 'border',
             items: [{
@@ -1047,7 +1071,7 @@ Ext.onReady(function() {
                 height: '80%',
                 split: true,
                 html: '<div id="entity-editor-form"></div>',
-                tbar: [buttonShow, buttonXML, buttonShowXML, buttonDelete /*, buttonAdd*/]
+                tbar: [buttonShow, buttonXML, buttonShowXML, buttonDelete, buttonClose/*, buttonAdd*/]
             }]
         },{
             region: 'center',

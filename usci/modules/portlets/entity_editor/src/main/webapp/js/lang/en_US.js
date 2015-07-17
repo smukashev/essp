@@ -19,6 +19,7 @@ var label_REF = 'Справочник';
 var label_ITEMS = 'Элементы';
 var label_ENTITY_ID = 'Идентификатор сущности';
 var label_DEL = 'Удалить';
+var label_CLOSE = 'Закрыть';
 var label_CLASS = 'Класс';
 var LABEL_UPDATE = 'Обновить';
 var label_date = 'Дата';
