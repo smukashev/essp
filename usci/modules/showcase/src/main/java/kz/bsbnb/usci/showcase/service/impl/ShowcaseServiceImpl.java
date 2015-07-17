@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.showcase.service.impl;
 
-import kz.bsbnb.usci.core.service.CoreShowcaseService;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
@@ -12,16 +11,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ShowcaseServiceImpl implements ShowcaseService {
-
-    @Autowired
-    @Qualifier(value = "remoteCoreShowcaseService")
-    RmiProxyFactoryBean rmiProxyFactoryBean;
     @Autowired
     SQLQueriesStats stats;
+
     @Autowired
     private ShowcaseDao showcaseDao;
 
@@ -35,33 +34,7 @@ public class ShowcaseServiceImpl implements ShowcaseService {
     }
 
     @Override
-    public void startLoad(String name, Date reportDate, boolean doPopulate) {
-        CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
-
-        Long id;
-        try {
-            id = showcaseDao.load(name).getId();
-        } catch(Exception e) {
-            id = 0L;
-        }
-
-        coreShowcaseService.start("credit", id, reportDate, doPopulate);
-    }
-
-    @Override
-    public void startLoadHistory(boolean populate, Queue<Long> creditorIds) {
-        CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
-        coreShowcaseService.startLoadHistory(populate, creditorIds);
-    }
-
-    @Override
-    public void stopLoadHistory() {
-        CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
-        coreShowcaseService.stopHistory();
-    }
-
-    @Override
-    public List<ShowcaseHolder> list(){
+    public List<ShowcaseHolder> list() {
         List<ShowcaseHolder> list = showcaseDao.getHolders();
         return list;
     }
@@ -80,38 +53,6 @@ public class ShowcaseServiceImpl implements ShowcaseService {
     @Override
     public void reloadCash() {
         showcaseDao.reloadCache();
-    }
-
-    @Override
-    public void stopLoad(String name) {
-        CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
-        Long id = showcaseDao.load(name).getId();
-        coreShowcaseService.stop(id);
-    }
-
-    @Override
-    public void pauseLoad(String name) {
-        CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
-        Long id = showcaseDao.load(name).getId();
-        coreShowcaseService.pause(id);
-    }
-
-    @Override
-    public void resumeLoad(String name) {
-        CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
-        Long id = showcaseDao.load(name).getId();
-        coreShowcaseService.resume(id);
-    }
-
-    @Override
-    public List<String> listLoading() {
-        CoreShowcaseService coreShowcaseService = (CoreShowcaseService) rmiProxyFactoryBean.getObject();
-        List<String> list = new ArrayList<String>();
-
-        for (Long id : coreShowcaseService.listLoading())
-            list.add(showcaseDao.load(id).getName());
-
-        return list;
     }
 
     @Override

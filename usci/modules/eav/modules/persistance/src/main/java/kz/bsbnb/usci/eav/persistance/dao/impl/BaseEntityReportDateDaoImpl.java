@@ -33,12 +33,10 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
     @Override
     public IBaseEntityReportDate load(long baseEntityId, Date reportDate) {
         if (baseEntityId < 1)
-            throw new IllegalArgumentException("To load instance of BaseEntityReportDate must always " +
-                    "be specified entity ID.");
+            throw new IllegalArgumentException("Отсутствует ID. Необходимо указать ID сущности;");
 
         if (reportDate == null)
-            throw new IllegalArgumentException("To load instance of BaseEntityReportDate must always " +
-                    "be specified report date.");
+            throw new IllegalArgumentException("Отсутствует отчетная дата. Необходимо указать отчетную дату");
 
         String tableAlias = "rd";
         Select select = context
@@ -55,7 +53,6 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
                 .where(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ENTITY_ID.equal(baseEntityId))
                 .and(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).REPORT_DATE.eq(DataUtils.convert(reportDate)));
 
-        logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)

@@ -479,8 +479,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
             Batch batch = batchRepository.getBatch(batchId);
-            IBaseEntity baseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, actualReportDate,
-                    metaClass.isReference());
+            IBaseEntity baseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, actualReportDate);
 
             baseSet.put(BaseValueFactory.create(MetaContainerTypes.META_SET, baseSet.getMemberType(),
                     id, batch, index, reportDate, baseEntity, false, isLast));

@@ -573,7 +573,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             Batch batch = batchRepository.getBatch(batchId);
             IMetaType metaType = metaClass.getMemberType(attribute);
             IBaseEntity childBaseEntity = baseEntityLoadDao.
-                    loadByMaxReportDate(entityValueId, actualReportDate, metaType.isReference());
+                    loadByMaxReportDate(entityValueId, actualReportDate);
 
             baseEntity.put(attribute,
                     BaseValueFactory.create(

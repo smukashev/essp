@@ -2524,14 +2524,6 @@ public class CLI {
                 if(args.get(2) == null || args.get(3) == null || args.get(4) == null)
                     throw new UnsupportedOperationException("MetaClass, attributePath and columnName cannot be empty");
 
-                MetaClass customMeta;
-
-                if(args.get(2).equals("root")) {
-                    customMeta = metaClassRepository.getMetaClass(args.get(2));
-                } else {
-                    customMeta = metaClassRepository.getMetaClass(args.get(2));
-                }
-
                 showCase.addCustomField(args.get(3), args.get(4), metaClassRepository.getMetaClass(args.get(2)));
             } else {
                 System.err.println("Example: showcase list add [path] [columnName]");
@@ -2569,60 +2561,6 @@ public class CLI {
 
             } else {
                 System.out.println("Usage: loadSC <showcase name>");
-            }
-        } else if (args.get(0).equals("startLoad")) {
-            if (args.size() > 3) {
-                try {
-                    showcaseService.startLoad(args.get(1), sdfout.parse(args.get(2)),
-                            Boolean.parseBoolean(args.get(3).toString()));
-                } catch (ParseException e) {
-                    System.out.println("Date format: \"dd.MM.yyyy\"");
-                }
-            } else {
-                System.out.println("Usage: startLoad <showcase name> <report_date> populate");
-            }
-        } else if(args.get(0).equals("startLoadHistory")){
-            boolean populate = false;
-
-            if (args.size() > 1 && "populate".equals(args.get(1))) {
-                populate = true;
-            }
-
-            Queue<Long> creditorIdsQueue = null;
-
-            if (args.size() > 2) {
-                creditorIdsQueue = new LinkedList<>();
-                for (int i = 2; i < args.size(); i++) {
-                    creditorIdsQueue.add(Long.valueOf(args.get(i)));
-                }
-            }
-
-            showcaseService.startLoadHistory(populate, creditorIdsQueue);
-
-        } else if (args.get(0).equals("stopLoad")) {
-            if (args.size() > 1) {
-                showcaseService.stopLoad(args.get(1));
-            } else {
-                System.out.println("Usage: stopLoad <showcase name>");
-            }
-        } else if(args.get(0).equals("stopLoadHistory")){
-            showcaseService.stopLoadHistory();
-
-        } else if (args.get(0).equals("pauseLoad")) {
-            if (args.size() > 1) {
-                showcaseService.pauseLoad(args.get(1));
-            } else {
-                System.out.println("Usage: pauseLoad <showcase name>");
-            }
-        } else if (args.get(0).equals("resumeLoad")) {
-            if (args.size() > 1) {
-                showcaseService.resumeLoad(args.get(1));
-            } else {
-                System.out.println("Usage: resumeLoad <showcase name>");
-            }
-        } else if (args.get(0).equals("listLoading")) {
-            for (String sc : showcaseService.listLoading()) {
-                System.out.println("\t" + sc);
             }
         } else if (args.get(0).equals("rc")) {
             showcaseService.reloadCash();
