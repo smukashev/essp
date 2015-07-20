@@ -12,6 +12,8 @@ public interface IBaseEntityProcessorDao {
 
     IBaseEntity prepare(IBaseEntity baseEntity);
 
+    IBaseEntity postPrepare(IBaseEntity baseEntity, IBaseEntity parentEntity);
+
     IBaseEntity process(IBaseEntity baseEntity);
 
     List<Long> getEntityIDsByMetaclass(long metaClassId);

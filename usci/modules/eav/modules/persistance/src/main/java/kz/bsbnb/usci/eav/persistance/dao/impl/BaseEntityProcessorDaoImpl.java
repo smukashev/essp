@@ -82,6 +82,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return baseEntityId == null ? 0 : baseEntityId;
     }
 
+    @Override
     public IBaseEntity postPrepare(IBaseEntity baseEntity, IBaseEntity parentEntity) {
         MetaClass metaClass = baseEntity.getMeta();
 
@@ -129,6 +130,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return baseEntity;
     }
 
+    @Override
     public IBaseEntity prepare(IBaseEntity baseEntity) {
         IMetaClass metaClass = baseEntity.getMeta();
 
