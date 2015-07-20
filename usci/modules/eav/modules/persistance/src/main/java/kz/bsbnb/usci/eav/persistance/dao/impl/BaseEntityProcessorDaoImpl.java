@@ -82,30 +82,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return baseEntityId == null ? 0 : baseEntityId;
     }
 
-    public List<Long> search(long metaClassId) {
-        Select select = context
-                .select(EAV_BE_ENTITIES.ID)
-                .from(EAV_BE_ENTITIES)
-                .where(EAV_BE_ENTITIES.CLASS_ID.equal(metaClassId));
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        List<Long> baseEntityIds = new ArrayList<>();
-        for (Map<String, Object> row : rows)
-            baseEntityIds.add(((BigDecimal) row.get(EAV_BE_ENTITIES.ID.getName())).longValue());
-
-        return baseEntityIds;
-    }
-
-    public List<Long> search(String className) {
-        MetaClass metaClass = metaClassRepository.getMetaClass(className);
-        if (metaClass != null)
-            return search(metaClass.getId());
-
-        return new ArrayList<>();
-    }
-
     public IBaseEntity postPrepare(IBaseEntity baseEntity, IBaseEntity parentEntity) {
         MetaClass metaClass = baseEntity.getMeta();
 
