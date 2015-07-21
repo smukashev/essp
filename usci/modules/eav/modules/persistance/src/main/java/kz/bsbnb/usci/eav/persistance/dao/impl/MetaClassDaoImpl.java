@@ -15,7 +15,6 @@ import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -170,38 +169,31 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
     }
 
     private long createClass(MetaClass metaClass) {
-        try {
-            InsertOnDuplicateStep insert = context.insertInto(
-                    EAV_M_CLASSES,
-                    EAV_M_CLASSES.NAME,
-                    EAV_M_CLASSES.TITLE,
-                    EAV_M_CLASSES.COMPLEX_KEY_TYPE,
-                    EAV_M_CLASSES.BEGIN_DATE,
-                    EAV_M_CLASSES.IS_DISABLED,
-                    EAV_M_CLASSES.PARENT_IS_KEY,
-                    EAV_M_CLASSES.IS_REFERENCE
-            ).values(metaClass.getClassName(), metaClass.getClassTitle(),
-                    metaClass.getComplexKeyType().toString(),
-                    DataUtils.convert(metaClass.getBeginDate()),
-                    DataUtils.convert(metaClass.isDisabled()),
-                    DataUtils.convert(metaClass.isParentIsKey()),
-                    DataUtils.convert(metaClass.isReference()));
+        InsertOnDuplicateStep insert = context.insertInto(
+                EAV_M_CLASSES,
+                EAV_M_CLASSES.NAME,
+                EAV_M_CLASSES.TITLE,
+                EAV_M_CLASSES.COMPLEX_KEY_TYPE,
+                EAV_M_CLASSES.BEGIN_DATE,
+                EAV_M_CLASSES.IS_DISABLED,
+                EAV_M_CLASSES.PARENT_IS_KEY,
+                EAV_M_CLASSES.IS_REFERENCE
+        ).values(metaClass.getClassName(), metaClass.getClassTitle(),
+                metaClass.getComplexKeyType().toString(),
+                DataUtils.convert(metaClass.getBeginDate()),
+                DataUtils.convert(metaClass.isDisabled()),
+                DataUtils.convert(metaClass.isParentIsKey()),
+                DataUtils.convert(metaClass.isReference()));
 
-            logger.debug(insert.toString());
-            long metaId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        logger.debug(insert.toString());
+        long metaId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
-            if (metaId < 1) {
-                logger.error("Can't create class");
-                return 0;
-            }
+        if (metaId < 1)
+            throw new IllegalStateException("Мета класс не был создан;");
 
-            metaClass.setId(metaId);
+        metaClass.setId(metaId);
 
-            return metaId;
-        } catch (DuplicateKeyException e) {
-            logger.error("Duplicate name for class: " + metaClass.getClassName());
-            throw new IllegalArgumentException("Duplicate name for class: " + metaClass.getClassName());
-        }
+        return metaId;
     }
 
     private void updateClass(MetaClass metaClass) {

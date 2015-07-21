@@ -558,7 +558,7 @@
 		<!--<foreign-key foreignTable="eav_be_entities" name="eav_fk_012_00">
 			<reference local="entity_id" foreign="id"/>
 		</foreign-key>-->
-		<unique name="eav_ind_012_00">
+		<unique name="eav_be_entity_report_dates_ei_rd">
 			<unique-column name="entity_id"/>
 			<unique-column name="report_date"/>
 		</unique>
