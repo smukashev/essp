@@ -38,11 +38,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Autowired
     private DSLContext context;
 
-    @Override
-    public IBaseEntity apply(IBaseEntity baseEntityForSave, IBaseEntityManager baseEntityManager) {
-        return apply(baseEntityForSave, baseEntityManager, null);
-    }
-
     public IBaseEntity apply(IBaseEntity baseEntityForSave, IBaseEntityManager baseEntityManager,
                              EntityHolder entityHolder) {
         IBaseEntity baseEntityLoaded = null;
@@ -219,7 +214,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IBaseSet childBaseSetApplied = new BaseSet(childMetaSet.getMemberType());
                 for (IBaseValue childBaseValue : childBaseSet.get()) {
                     IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
-                    IBaseEntity childBaseEntityApplied = apply(childBaseEntity, baseEntityManager);
+                    IBaseEntity childBaseEntityApplied = apply(childBaseEntity, baseEntityManager, null);
 
                     IBaseValue childBaseValueApplied = BaseValueFactory.create(MetaContainerTypes.META_SET,
                             childMetaSet.getMemberType(), childBaseValue.getBatch(), childBaseValue.getIndex(),
@@ -263,7 +258,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     }
                 } else {
                     IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
-                    IBaseEntity childBaseEntityApplied = apply(childBaseEntity, baseEntityManager);
+                    IBaseEntity childBaseEntityApplied = apply(childBaseEntity, baseEntityManager, null);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
                             baseValue.getBatch(), baseValue.getIndex(), new Date(baseValue.getRepDate().getTime()),
@@ -1608,7 +1603,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     }
                 }
 
-                IBaseEntity baseEntitySavingTmp = apply(childBaseEntitySaving, baseEntityManager);
+                IBaseEntity baseEntitySavingTmp = apply(childBaseEntitySaving, baseEntityManager, null);
                 IBaseEntityReportDateDao baseEntityReportDateDao =
                         persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
                 Date minReportDate = baseEntityReportDateDao.getMinReportDate(baseEntity.getId());
@@ -2237,7 +2232,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseEntitySaving.getReportDate());
                 } else {
                     baseEntityApplied = metaClass.isSearchable() ?
-                            apply(baseEntitySaving, baseEntityManager) :
+                            apply(baseEntitySaving, baseEntityManager, null) :
                             applyBaseEntityAdvanced(baseEntitySaving, baseEntityLoaded, baseEntityManager);
                 }
 
@@ -2270,7 +2265,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseEntitySaving.getReportDate());
                 } else {
                     baseEntityApplied = metaClass.isSearchable() ?
-                            apply(baseEntitySaving, baseEntityManager) :
+                            apply(baseEntitySaving, baseEntityManager, null) :
                             applyBaseEntityAdvanced(baseEntitySaving, baseEntityLoaded, baseEntityManager);
                 }
 
@@ -2396,7 +2391,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                     baseEntitySaving.getReportDate());
                         } else {
                             baseEntityApplied = metaClass.isSearchable() ?
-                                    apply(baseEntitySaving, baseEntityManager) :
+                                    apply(baseEntitySaving, baseEntityManager, null) :
                                     applyBaseEntityAdvanced(baseEntitySaving, baseEntityClosed, baseEntityManager);
                         }
                         baseValuePrevious.setValue(baseEntityApplied);
@@ -2423,7 +2418,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                     baseEntitySaving.getReportDate());
                         } else {
                             baseEntityApplied = metaClass.isSearchable() ?
-                                    apply(baseEntitySaving, baseEntityManager) :
+                                    apply(baseEntitySaving, baseEntityManager, null) :
                                     applyBaseEntityAdvanced(baseEntitySaving, baseEntityClosed, baseEntityManager);
                         }
 
@@ -2460,11 +2455,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 baseEntityApplied = applyBaseEntityAdvanced(baseEntitySaving,
                                         (IBaseEntity) nextBaseValue.getValue(), baseEntityManager);
                             } else {
-                                baseEntityApplied = apply(baseEntitySaving, baseEntityManager);
+                                baseEntityApplied = apply(baseEntitySaving, baseEntityManager, null);
                             }
                         }
                     } else {
-                        baseEntityApplied = apply(baseEntitySaving, baseEntityManager);
+                        baseEntityApplied = apply(baseEntitySaving, baseEntityManager, null);
                     }
                 }
 

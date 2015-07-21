@@ -6,8 +6,6 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 
 public interface IBaseEntityApplyDao {
-    IBaseEntity apply(IBaseEntity baseEntityForSave, IBaseEntityManager baseEntityManager);
-
     IBaseEntity apply(IBaseEntity baseEntityForSave, IBaseEntityManager baseEntityManager, EntityHolder entityHolder);
 
     IBaseEntity applyBaseEntityBasic(IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager);
