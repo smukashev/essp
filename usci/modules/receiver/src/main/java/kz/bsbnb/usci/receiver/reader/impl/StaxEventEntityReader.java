@@ -245,6 +245,22 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     @Override
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException {
+        try {
+            return readInner();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+
+            EntityStatusJModel entityStatus = new EntityStatusJModel(
+                    0L, EntityStatuses.ERROR, e.getLocalizedMessage(), new Date());
+            statusSingleton.addContractStatus(batchId, entityStatus);
+
+            return null;
+        }
+    }
+
+    private T readInner() {
         logger.debug("Read called");
         logger.debug("Sync queue size: " + serviceFactory.getEntityService().getQueueSize());
         long sleepCounter = 0;
