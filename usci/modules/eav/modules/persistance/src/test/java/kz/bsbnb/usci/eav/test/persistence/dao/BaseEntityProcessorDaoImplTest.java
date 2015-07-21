@@ -229,7 +229,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         uuid.toString(),
                         new String[] {"a", "b"}, 1L);
 
-        BaseEntity baseEntityAB1Saved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB1);
+        BaseEntity baseEntityAB1Applied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB1);
+        IBaseEntity baseEntityAB1Saved = baseEntityProcessorDao.loadByReportDate(baseEntityAB1Applied.getId(), new Date(new Long("1356976800000")));
 
         // 1 march 2013
         IBaseEntity baseEntityAB2 =
@@ -239,7 +240,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         uuid.toString(),
                         new String[] {"a", "b"}, 1L);
 
-        BaseEntity baseEntityAB2Saved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB2);
+        BaseEntity baseEntityAB2Applied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB2);
+        IBaseEntity baseEntityAB2Saved = baseEntityProcessorDao.loadByReportDate(baseEntityAB2Applied.getId(), new Date(new Long("1362074400000")));
 
         // 1 april 2013
         IBaseEntity baseEntityAD =
@@ -249,7 +251,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         uuid.toString(),
                         new String[] {"a", "d"}, 2L);
 
-        BaseEntity baseEntityADSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
+        BaseEntity baseEntityADApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
+        IBaseEntity baseEntityADSaved = baseEntityProcessorDao.loadByReportDate(baseEntityADApplied.getId(), new Date(new Long("1364752800000")));
 
         // 1 february 2013
         IBaseEntity baseEntityAC =
@@ -259,7 +262,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         uuid.toString(),
                         new String[] {"a", "c"}, 3L);
 
-        BaseEntity baseEntityACSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
+        BaseEntity baseEntityACApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
+        IBaseEntity baseEntityACSaved = baseEntityProcessorDao.loadByReportDate(baseEntityACApplied.getId(), new Date(new Long("1359655200000")));
 
         Object[] AB1SavedArray  = ((BaseSet)baseEntityAB1Saved.getBaseValue("string_set").getValue()).get().toArray();
         Object[] AB2SavedArray  = ((BaseSet)baseEntityAB2Saved.getBaseValue("string_set").getValue()).get().toArray();
@@ -286,7 +290,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         uuid.toString(),
                         new String[] {"a", "b"}, 1L);
 
-        BaseEntity baseEntityABSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
+        BaseEntity baseEntityABApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
+        IBaseEntity baseEntityABSaved = baseEntityProcessorDao.loadByReportDate(baseEntityABApplied.getId(), new Date(new Long("1356976800000")));
 
         // 1 march 2013
         IBaseEntity baseEntityAD =
@@ -296,8 +301,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         uuid.toString(),
                         new String[] {"a", "d"}, 2L);
 
-        BaseEntity baseEntityADSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
-
+        BaseEntity baseEntityADApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
+        IBaseEntity baseEntityADSaved = baseEntityProcessorDao.loadByReportDate(baseEntityADApplied.getId(), new Date(new Long("1362074400000")));
         // 1 february 2013
         IBaseEntity baseEntityAC =
                 constuctBaseEntity(
@@ -306,7 +311,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         uuid.toString(),
                         new String[] {"a", "c"}, 3L);
 
-        BaseEntity baseEntityACSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
+        BaseEntity baseEntityACApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
+        IBaseEntity baseEntityACSaved = baseEntityProcessorDao.loadByReportDate(baseEntityACApplied.getId(), new Date(new Long("1359655200000")));
 
         Object[] ABSavedArray  = ((BaseSet)baseEntityABSaved.getBaseValue("string_set").getValue()).get().toArray();
         Object[] ADSavedArray  = ((BaseSet)baseEntityADSaved.getBaseValue("string_set").getValue()).get().toArray();
@@ -331,7 +337,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         uuid.toString(),
                         new String[] {"a", "b"}, 1L);
 
-        BaseEntity baseEntityABSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
+        BaseEntity baseEntityABApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
+        IBaseEntity baseEntityABSaved = baseEntityProcessorDao.loadByReportDate(baseEntityABApplied.getId(), new Date(new Long("1356976800000")));
 
         // 1 february 2013
         IBaseEntity baseEntityAC =
@@ -341,7 +348,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         uuid.toString(),
                         new String[] {"a", "c"}, 2L);
 
-        BaseEntity baseEntityACSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
+        BaseEntity baseEntityACApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
+        IBaseEntity baseEntityACSaved = baseEntityProcessorDao.loadByReportDate(baseEntityACApplied.getId(), new Date(new Long("1359655200000")));
 
         // 1 march 2013
         IBaseEntity baseEntityAD =
@@ -351,7 +359,9 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         uuid.toString(),
                         new String[] {"a", "d"}, 3L);
 
-        BaseEntity baseEntityADSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
+        BaseEntity baseEntityADApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
+        IBaseEntity baseEntityADSaved = baseEntityProcessorDao.loadByReportDate(baseEntityADApplied.getId(), new Date(new Long("1362074400000")));
+
 
         Object[] ABSavedArray  = ((BaseSet)baseEntityABSaved.getBaseValue("string_set").getValue()).get().toArray();
         Object[] ADSavedArray  = ((BaseSet)baseEntityADSaved.getBaseValue("string_set").getValue()).get().toArray();
@@ -385,7 +395,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
 
         baseEntityAB.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1356976800000")))), 1L, child_meta_class));
 
-        BaseEntity baseEntityABComplexSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
+        BaseEntity baseEntityABComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
+        IBaseEntity baseEntityABComplexSaved = baseEntityProcessorDao.loadByReportDate(baseEntityABComplexApplied.getId(), new Date(new Long("1356976800000")));
 
 
         // 1 february 2013
@@ -398,7 +409,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
 
         baseEntityAC.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1359655200000")))), 1L, child_meta_class));
 
-        BaseEntity baseEntityACComplexSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
+        BaseEntity baseEntityACComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
+        IBaseEntity baseEntityACComplexSaved = baseEntityProcessorDao.loadByReportDate(baseEntityACComplexApplied.getId(), new Date(new Long("1359655200000")));
 
         // 1 march 2013
         IBaseEntity baseEntityAD =
@@ -409,7 +421,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new String[] {"a", "d"}, 3L);
         baseEntityAD.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1362074400000")))), 1L, child_meta_class));
 
-        BaseEntity baseEntityADComplexSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
+        BaseEntity baseEntityADComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
+        IBaseEntity baseEntityADComplexSaved = baseEntityProcessorDao.loadByReportDate(baseEntityADComplexApplied.getId(), new Date(new Long("1362074400000")));
 
         assertEquals(((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue(),
                 ((BaseEntity)baseEntityAB.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
@@ -465,7 +478,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
 
         baseEntityAB.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1362074400000")))), 1L, child_meta_class));
 
-        BaseEntity baseEntityABComplexSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
+        BaseEntity baseEntityABComplexApplied= (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
+        IBaseEntity baseEntityABComplexSaved = baseEntityProcessorDao.loadByReportDate(baseEntityABComplexApplied.getId(), new Date(new Long("1362074400000")));
 
         // 1 february 2013
         IBaseEntity baseEntityAC =
@@ -477,7 +491,9 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
 
         baseEntityAC.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1359655200000")))), 1L, child_meta_class));
 
-        BaseEntity baseEntityACComplexSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
+        BaseEntity baseEntityACComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
+        IBaseEntity baseEntityACComplexSaved = baseEntityProcessorDao.loadByReportDate(baseEntityACComplexApplied.getId(), new Date(new Long("1359655200000")));
+
 
         // 1 march 2013
         IBaseEntity baseEntityAD =
@@ -488,7 +504,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new String[] {"a", "d"}, 3L);
         baseEntityAD.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1356976800000")))), 1L, child_meta_class));
 
-        BaseEntity baseEntityADComplexSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
+        BaseEntity baseEntityADComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
+        IBaseEntity baseEntityADComplexSaved = baseEntityProcessorDao.loadByReportDate(baseEntityADComplexApplied.getId(), new Date(new Long("1356976800000")));
 
         assertEquals(((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue(),
                 ((BaseEntity)baseEntityAB.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
@@ -547,7 +564,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
 
         baseEntityAB.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1359655200000")))), 1L, child_meta_class));
 
-        BaseEntity baseEntityABComplexSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
+        BaseEntity baseEntityABComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
+        IBaseEntity baseEntityABComplexSaved = baseEntityProcessorDao.loadByReportDate(baseEntityABComplexApplied.getId(), new Date(new Long("1359655200000")));
 
         // 1 january  2013
         IBaseEntity baseEntityAC =
@@ -559,7 +577,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
 
         baseEntityAC.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1356976800000")))), 1L, child_meta_class));
 
-        BaseEntity baseEntityACComplexSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
+        BaseEntity baseEntityACComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
+        IBaseEntity baseEntityACComplexSaved = baseEntityProcessorDao.loadByReportDate(baseEntityACComplexApplied.getId(), new Date(new Long("1356976800000")));
 
         // 1 march 2013
         IBaseEntity baseEntityAD =
@@ -570,7 +589,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new String[] {"a", "d"}, 3L);
         baseEntityAD.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1362074400000")))), 1L, child_meta_class));
 
-        BaseEntity baseEntityADComplexSaved = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
+        BaseEntity baseEntityADComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
+        IBaseEntity baseEntityADComplexSaved = baseEntityProcessorDao.loadByReportDate(baseEntityADComplexApplied.getId(), new Date(new Long("1362074400000")));
 
         assertEquals(((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue(),
                 ((BaseEntity)baseEntityAB.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
@@ -622,7 +642,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1362074400000")),
                         UUID.randomUUID().toString(),
                         43, 1L);
-        BaseEntity FirstBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        IBaseEntity FirstBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
 
         // 1 february 2013
         IBaseEntity SecondBaseEntity =
@@ -631,7 +652,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1359655200000")),
                         UUID.randomUUID().toString(),
                         44, 2L);
-        BaseEntity SecondBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        IBaseEntity SecondBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
 
         // 1 january 2013
         IBaseEntity ThirdBaseEntity =
@@ -640,8 +662,9 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1356976800000")),
                         UUID.randomUUID().toString(),
                         45, 3L);
-        BaseEntity ThirdBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
 
+        BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        IBaseEntity ThirdBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
         assertEquals(SecondBaseEntity.getReportDate(), SecondBaseEntitySaved.getReportDate());
@@ -674,7 +697,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1359655200000")),
                         UUID.randomUUID().toString(),
                         43, 1L);
-        BaseEntity FirstBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        IBaseEntity FirstBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
 
         // 1 march 2013
         IBaseEntity SecondBaseEntity =
@@ -683,7 +707,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1362074400000")),
                         UUID.randomUUID().toString(),
                         44, 2L);
-        BaseEntity SecondBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        IBaseEntity SecondBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
 
         // 1 january 2013
         IBaseEntity ThirdBaseEntity =
@@ -692,7 +717,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1356976800000")),
                         UUID.randomUUID().toString(),
                         45, 3L);
-        BaseEntity ThirdBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        IBaseEntity ThirdBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
 
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
@@ -725,7 +751,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1362074400000")),
                         UUID.randomUUID().toString(),
                         new Double(111.111), 1L);
-        BaseEntity FirstBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        IBaseEntity FirstBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
 
         // 1 february 2013
         IBaseEntity SecondBaseEntity =
@@ -734,7 +761,9 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1359655200000")),
                         UUID.randomUUID().toString(),
                         new Double(111.222), 2L);
-        BaseEntity SecondBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        IBaseEntity SecondBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
+
 
         // 1 january 2013
         IBaseEntity ThirdBaseEntity =
@@ -743,7 +772,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1356976800000")),
                         UUID.randomUUID().toString(),
                         new Double(111.333), 3L);
-        BaseEntity ThirdBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        IBaseEntity ThirdBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
         assertEquals(SecondBaseEntity.getReportDate(), SecondBaseEntitySaved.getReportDate());
@@ -774,7 +804,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1359655200000")),
                         UUID.randomUUID().toString(),
                         new Double(111.111), 1L);
-        BaseEntity FirstBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        IBaseEntity FirstBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
 
         // 1 january 2013
         IBaseEntity SecondBaseEntity =
@@ -783,7 +814,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1356976800000")),
                         UUID.randomUUID().toString(),
                         new Double(111.222), 2L);
-        BaseEntity SecondBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        IBaseEntity SecondBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
 
         // 1 march 2013
         IBaseEntity ThirdBaseEntity =
@@ -792,7 +824,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1362074400000")),
                         UUID.randomUUID().toString(),
                         new Double(111.333), 3L);
-        BaseEntity ThirdBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        IBaseEntity ThirdBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
         assertEquals(SecondBaseEntity.getReportDate(), SecondBaseEntitySaved.getReportDate());
@@ -824,7 +857,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1362074400000")),
                         UUID.randomUUID().toString(),
                         true, 1L);
-        BaseEntity FirstBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        IBaseEntity FirstBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
 
         // 1 february 2013
         IBaseEntity SecondBaseEntity =
@@ -833,7 +867,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1359655200000")),
                         UUID.randomUUID().toString(),
                         false, 2L);
-        BaseEntity SecondBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        IBaseEntity SecondBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
 
         // 1 january 2013
         IBaseEntity ThirdBaseEntity =
@@ -842,7 +877,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1356976800000")),
                         UUID.randomUUID().toString(),
                         false, 3L);
-        BaseEntity ThirdBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        IBaseEntity ThirdBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
         assertEquals(SecondBaseEntity.getReportDate(), SecondBaseEntitySaved.getReportDate());
@@ -873,7 +909,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1359655200000")),
                         UUID.randomUUID().toString(),
                         true, 1L);
-        BaseEntity FirstBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        IBaseEntity FirstBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
 
         // 1 january 2013
         IBaseEntity SecondBaseEntity =
@@ -882,7 +919,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1356976800000")),
                         UUID.randomUUID().toString(),
                         false, 2L);
-        BaseEntity SecondBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        IBaseEntity SecondBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
 
         // 1 march 2013
         IBaseEntity ThirdBaseEntity =
@@ -891,7 +929,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1362074400000")),
                         UUID.randomUUID().toString(),
                         false, 3L);
-        BaseEntity ThirdBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        IBaseEntity ThirdBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
         assertEquals(SecondBaseEntity.getReportDate(), SecondBaseEntitySaved.getReportDate());
@@ -923,7 +962,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1362074400000")),
                         UUID.randomUUID().toString(),
                         new Date(new Long("1362074400000")), 1L);
-        BaseEntity FirstBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        IBaseEntity FirstBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
 
         // 1 february 2013
         IBaseEntity SecondBaseEntity =
@@ -932,7 +972,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1359655200000")),
                         UUID.randomUUID().toString(),
                         new Date(new Long("1359655200000")), 2L);
-        BaseEntity SecondBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        IBaseEntity SecondBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
 
         // 1 january 2013
         IBaseEntity ThirdBaseEntity =
@@ -941,7 +982,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1356976800000")),
                         UUID.randomUUID().toString(),
                         new Date(new Long("1356976800000")), 3L);
-        BaseEntity ThirdBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        IBaseEntity ThirdBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
         assertEquals(SecondBaseEntity.getReportDate(), SecondBaseEntitySaved.getReportDate());
@@ -972,7 +1014,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1359655200000")),
                         UUID.randomUUID().toString(),
                         new Date(new Long("1359655200000")), 1L);
-        BaseEntity FirstBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
+        IBaseEntity FirstBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
 
         // 1 january 2013
         IBaseEntity SecondBaseEntity =
@@ -981,7 +1024,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1356976800000")),
                         UUID.randomUUID().toString(),
                         new Date(new Long("1356976800000")), 2L);
-        BaseEntity SecondBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
+        IBaseEntity SecondBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
 
         // 1 march 2013
         IBaseEntity ThirdBaseEntity =
@@ -990,7 +1034,8 @@ public class BaseEntityProcessorDaoImplTest extends GenericTestCase
                         new Date(new Long("1362074400000")),
                         UUID.randomUUID().toString(),
                         new Date(new Long("1362074400000")), 3L);
-        BaseEntity ThirdBaseEntitySaved = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+        IBaseEntity ThirdBaseEntitySaved = baseEntityProcessorDao.loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
         assertEquals(SecondBaseEntity.getReportDate(), SecondBaseEntitySaved.getReportDate());
