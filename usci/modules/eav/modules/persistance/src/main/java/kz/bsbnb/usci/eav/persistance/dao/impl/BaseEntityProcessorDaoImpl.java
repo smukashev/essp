@@ -213,7 +213,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                     baseEntityPostPrepared.calculateValueCount();
 
-                    if(reportDateExists) {
+                    if (reportDateExists) {
                         baseEntityManager.registerAsUpdated(baseEntityReportDate);
                     } else {
                         baseEntityManager.registerAsInserted(baseEntityReportDate);
