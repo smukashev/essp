@@ -12,7 +12,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
 
     private IBaseEntity baseEntity;
     private Date reportDate;
-    private boolean is_closed;
+    private boolean isClosed;
 
     private long integerValuesCount = 0;
     private long dateValuesCount = 0;
@@ -49,7 +49,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
     public BaseEntityReportDate(long id, Date reportDate, long integerValuesCount, long dateValuesCount,
                                 long stringValuesCount, long booleanValuesCount, long doubleValuesCount,
                                 long complexValuesCount, long simpleSetsCount, long complexSetsCount,
-                                boolean is_closed) {
+                                boolean isClosed) {
         super(id);
 
         if (reportDate == null) {
@@ -68,7 +68,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
         this.complexValuesCount = complexValuesCount;
         this.simpleSetsCount = simpleSetsCount;
         this.complexSetsCount = complexSetsCount;
-        this.is_closed = is_closed;
+        this.isClosed = isClosed;
     }
 
     public BaseEntityReportDate(IBaseEntity baseEntity, Date reportDate) {
@@ -164,12 +164,12 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
         this.complexSetsCount = complexSetsCount;
     }
 
-    public boolean is_closed() {
-        return is_closed;
+    public boolean isClosed() {
+        return isClosed;
     }
 
-    public void setIs_closed(boolean is_closed) {
-        this.is_closed = is_closed;
+    public void setClosed(boolean closed) {
+        this.isClosed = closed;
     }
 
     @Override
@@ -201,7 +201,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
         if (simpleSetsCount != that.simpleSetsCount) return false;
         if (stringValuesCount != that.stringValuesCount) return false;
         if (!reportDate.equals(that.reportDate)) return false;
-        if (is_closed != that.is_closed) return false;
+        if (isClosed != that.isClosed) return false;
 
         return true;
     }
@@ -209,7 +209,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + (is_closed ? 1 : 0);
+        result = 31 * result + (isClosed ? 1 : 0);
         result = 31 * result + reportDate.hashCode();
         result = 31 * result + (int) (integerValuesCount ^ (integerValuesCount >>> 32));
         result = 31 * result + (int) (dateValuesCount ^ (dateValuesCount >>> 32));

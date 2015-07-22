@@ -39,18 +39,19 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
 
         String tableAlias = "rd";
         Select select = context
-                .select(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ID,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).INTEGER_VALUES_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).DATE_VALUES_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).STRING_VALUES_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).BOOLEAN_VALUES_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).DOUBLE_VALUES_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).COMPLEX_VALUES_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).SIMPLE_SETS_COUNT,
-                        EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).COMPLEX_SETS_COUNT)
-                .from(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias))
-                .where(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ENTITY_ID.equal(baseEntityId))
-                .and(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).REPORT_DATE.eq(DataUtils.convert(reportDate)));
+            .select(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ID,
+                    EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).INTEGER_VALUES_COUNT,
+                    EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).DATE_VALUES_COUNT,
+                    EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).STRING_VALUES_COUNT,
+                    EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).BOOLEAN_VALUES_COUNT,
+                    EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).DOUBLE_VALUES_COUNT,
+                    EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).COMPLEX_VALUES_COUNT,
+                    EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).SIMPLE_SETS_COUNT,
+                    EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).COMPLEX_SETS_COUNT,
+                    EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).IS_CLOSED)
+            .from(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias))
+            .where(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ENTITY_ID.equal(baseEntityId))
+            .and(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).REPORT_DATE.eq(DataUtils.convert(reportDate)));
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
@@ -80,9 +81,12 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
                 .get(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).SIMPLE_SETS_COUNT.getName())).longValue();
         long complexSetsCount = ((BigDecimal) row
                 .get(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).COMPLEX_SETS_COUNT.getName())).longValue();
+        boolean isClosed = ((BigDecimal) row
+                .get(EAV_BE_ENTITY_REPORT_DATES.IS_CLOSED.getName())).longValue() == 1;
 
         return new BaseEntityReportDate(id, reportDate, integerValuesCount, dateValuesCount, stringValuesCount,
-                booleanValuesCount, doubleValuesCount, complexValuesCount, simpleSetsCount, complexSetsCount);
+                booleanValuesCount, doubleValuesCount, complexValuesCount, simpleSetsCount, complexSetsCount,
+                isClosed);
     }
 
     @Override
@@ -93,7 +97,8 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
                 baseEntityReportDate.getIntegerValuesCount(), baseEntityReportDate.getDateValuesCount(),
                 baseEntityReportDate.getStringValuesCount(), baseEntityReportDate.getBooleanValuesCount(),
                 baseEntityReportDate.getDoubleValuesCount(), baseEntityReportDate.getComplexValuesCount(),
-                baseEntityReportDate.getSimpleSetsCount(), baseEntityReportDate.getComplexSetsCount());
+                baseEntityReportDate.getSimpleSetsCount(), baseEntityReportDate.getComplexSetsCount(),
+                baseEntityReportDate.isClosed());
         baseEntityReportDate.setId(baseEntityReportDateId);
 
         return baseEntityReportDateId;
@@ -101,7 +106,7 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
 
     protected long insert(long baseEntityId, Date reportDate, long integerValuesCount, long dateValuesCount,
             long stringValuesCount, long booleanValuesCount, long doubleValuesCount, long complexValuesCount,
-            long simpleSetsCount, long complexSetsCount) {
+            long simpleSetsCount, long complexSetsCount, boolean isClosed) {
         Insert insert = context
                 .insertInto(EAV_BE_ENTITY_REPORT_DATES)
                 .set(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID, baseEntityId)
@@ -113,7 +118,8 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
                 .set(EAV_BE_ENTITY_REPORT_DATES.DOUBLE_VALUES_COUNT, doubleValuesCount)
                 .set(EAV_BE_ENTITY_REPORT_DATES.COMPLEX_VALUES_COUNT, complexValuesCount)
                 .set(EAV_BE_ENTITY_REPORT_DATES.SIMPLE_SETS_COUNT, simpleSetsCount)
-                .set(EAV_BE_ENTITY_REPORT_DATES.COMPLEX_SETS_COUNT, complexSetsCount);
+                .set(EAV_BE_ENTITY_REPORT_DATES.COMPLEX_SETS_COUNT, complexSetsCount)
+                .set(EAV_BE_ENTITY_REPORT_DATES.IS_CLOSED, DataUtils.convert(isClosed));
 
         logger.debug(insert.toString());
 
@@ -130,12 +136,12 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
                 baseEntityReportDate.getDateValuesCount(), baseEntityReportDate.getStringValuesCount(),
                 baseEntityReportDate.getBooleanValuesCount(), baseEntityReportDate.getDoubleValuesCount(),
                 baseEntityReportDate.getComplexValuesCount(), baseEntityReportDate.getSimpleSetsCount(),
-                baseEntityReportDate.getComplexSetsCount());
+                baseEntityReportDate.getComplexSetsCount(), baseEntityReportDate.isClosed());
     }
 
     protected void update(long id, long integerValuesCount, long dateValuesCount, long stringValuesCount,
             long booleanValuesCount, long doubleValuesCount, long complexValuesCount, long simpleSetsCount,
-            long complexSetsCount) {
+            long complexSetsCount, boolean isClosed) {
         String tableAlias = "rd";
         Update update = context
                 .update(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias))
@@ -147,6 +153,7 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
                 .set(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).COMPLEX_VALUES_COUNT, complexValuesCount)
                 .set(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).SIMPLE_SETS_COUNT, simpleSetsCount)
                 .set(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).COMPLEX_SETS_COUNT, complexSetsCount)
+                .set(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).IS_CLOSED, DataUtils.convert(isClosed))
                 .where(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ID.equal(id));
 
         logger.debug(update.toString());
@@ -190,16 +197,16 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
         Set<Date> reportDates = new HashSet<>();
 
         Select select = context
-                .select(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE)
-                .from(EAV_BE_ENTITY_REPORT_DATES)
-                .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId));
+            .select(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE)
+            .from(EAV_BE_ENTITY_REPORT_DATES)
+            .where(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(baseEntityId));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         for (Map<String, Object> row : rows)
             reportDates.add(DataUtils.convert((Timestamp)
-                    row.get(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.getName())));
+                row.get(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.getName())));
 
         return reportDates;
     }

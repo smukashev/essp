@@ -45,7 +45,7 @@ public interface IBaseEntityReportDate extends IBaseObject {
 
     void setComplexSetsCount(long complexSetsCount);
 
-    boolean is_closed();
+    boolean isClosed();
 
-    void setIs_closed(boolean is_closed);
+    void setClosed(boolean is_closed);
 }
