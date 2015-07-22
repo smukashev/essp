@@ -11,7 +11,7 @@
 		<column name="middle_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
 		<column name="modified_date" primaryKey="false" required="false" type="DATE"/>
 		<column name="is_active" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="1"/>
-    <unique>
+    <unique name="eau_UN_ui">
       <unique-column name="user_id"/>
     </unique>
 	</table>
@@ -27,7 +27,7 @@
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-    <unique>
+    <unique name="eacu_UN_ui_ci">
       <unique-column name="user_id"/>
       <unique-column name="creditor_id"/>
     </unique>
@@ -38,9 +38,6 @@
     <column name="value" primaryKey="false" required="true" type="CLOB" size="14,0" autoIncrement="false"/>
     <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
     <column name="updated_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-    <unique>
-    	<unique-column name="id"/>
-    </unique>
   </table>
 	<table name="eav_m_classes">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -51,22 +48,22 @@
 		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
 		<column name="parent_is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_reference" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<unique>
+		<unique name="emc_UN_n_bd">
 			<unique-column name="name"/>
 			<unique-column name="begin_date"/>
 		</unique>
 		<unique>
 			<unique-column name="id"/>
 		</unique>
-		<index name="eav_m_classes_bnd">
+		<index name="emc_IN_bd_n_id">
 			<index-column name="begin_date"/>
 			<index-column name="name"/>
 			<index-column name="is_disabled"/>
 		</index>
-		<index name="eav_m_classes_begin_date">
+		<index name="emc_IN_bd">
 			<index-column name="begin_date"/>
 		</index>
-		<index name="eav_m_classes_reference">
+		<index name="emc_IN_ir">
 			<index-column name="is_reference"/>
 		</index>
 	</table>
@@ -80,10 +77,7 @@
 		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="attr_name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
 		<column name="value" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-		<index name="ind_m_005_01">
+		<index name="emskf_IN_si">
 			<index-column name="set_id"/>
 		</index>
 	</table>
@@ -99,13 +93,10 @@
 		<column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_final" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="class_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-		<index name="eav_m_complex_attr_class_id">
+		<index name="emca_IN_ci">
 			<index-column name="class_id"/>
 		</index>
-		<index name="eav_m_complex_attr_cont_id_cont_type">
+		<index name="emca_IN_ci_ct">
 			<index-column name="containing_id"/>
 			<index-column name="container_type"/>
 		</index>
@@ -123,10 +114,7 @@
 		<column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_final" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_reference" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-		<index name="eav_m_complex_set_cont_id_cont_type">
+		<index name="emcs_IN_ci_ct">
 			<index-column name="containing_id"/>
 			<index-column name="container_type"/>
 		</index>
@@ -143,10 +131,7 @@
 		<column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_final" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="type_code" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-		<index name="eav_m_simple_attr_cont_id_cont_type">
+		<index name="emsa_IN_ci_ct">
 			<index-column name="containing_id"/>
 			<index-column name="container_type"/>
 		</index>
@@ -164,10 +149,7 @@
 		<column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_final" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_reference" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-		<index name="ind_m_009_01">
+		<index name="emss_IN_ci_ct">
 			<index-column name="containing_id"/>
 			<index-column name="container_type"/>
 		</index>
@@ -195,12 +177,12 @@
 		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_002_01">
 			<reference local="set_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_002_00">
+		<index name="ebbsv_IN_si_rd_ic">
 			<index-column name="set_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
-		<index name="eav_ind_002_01">
+		<index name="ebbsv_IN_si_il">
 			<index-column name="set_id"/>
 			<index-column name="is_last"/>
 		</index>
@@ -224,29 +206,29 @@
 		<!--<foreign-key foreignTable="eav_m_simple_attributes" name="eav_fk_003_02">
 			<reference local="attribute_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_003_00">
+		<unique name="ebbv_UN_ei_ai_rd">
+			<unique-column name="entity_id"/>
+			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
+		</unique>
+		<index name="ebbv_IN_ei_ai_rd_ic">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
-		<index name="eav_ind_003_01">
+		<index name="ebbv_IN_ei_ai_il">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="is_last"/>
 		</index>
-		<index name="eav_ind_003_02">
+		<index name="ebbv_IN_ei">
 			<index-column name="entity_id"/>
 		</index>
-		<index name="eav_ind_003_03">
+		<index name="ebbv_IN_ai_v">
 			<index-column name="attribute_id"/>
 			<index-column name="value"/>
 		</index>
-		<unique name="eav_uk_003_00">
-			<unique-column name="entity_id"/>
-			<unique-column name="attribute_id"/>
-			<unique-column name="report_date"/>
-		</unique>
 	</table>
 	<table name="eav_be_complex_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -266,22 +248,22 @@
 		<!--<foreign-key foreignTable="eav_be_entities" name="eav_fk_004_02">
 			<reference local="entity_value_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_004_00">
+		<index name="ebcsv_IN_si_rd_ic">
 			<index-column name="set_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
-		<index name="eav_ind_004_01">
+		<index name="ebcsv_IN_si_il">
 			<index-column name="set_id"/>
 			<index-column name="is_last"/>
 		</index>
-		<index name="eav_ind_004_02">
+		<index name="ebcsv_IN_si">
 			<index-column name="set_id"/>
 		</index>
-		<index name="eav_ind_004_03">
+		<index name="ebcsv_IN_evi">
 			<index-column name="entity_value_id"/>
 		</index>
-		<index name="eav_ind_004_04">
+		<index name="ebcsv_IN_evi_si">
 			<index-column name="entity_value_id"/>
 			<index-column name="set_id"/>
 		</index>
@@ -305,30 +287,30 @@
 		<!--<foreign-key foreignTable="eav_m_complex_attributes" name="eav_fk_005_02">
 			<reference local="attribute_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_005_00">
+		<unique name="ebcv_UN_ei_ai_rd">
+			<unique-column name="entity_id"/>
+			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
+		</unique>
+		<index name="ebcv_IN_ei_ai_rd_ic">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
-		<index name="eav_ind_005_01">
+		<index name="ebcv_IN_ei_ai_il">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="is_last"/>
 		</index>
-		<unique name="eav_uk_005_00">
-			<unique-column name="entity_id"/>
-			<unique-column name="attribute_id"/>
-			<unique-column name="report_date"/>
-		</unique>
-		<index name="eav_ind_005_02">
+		<index name="ebcv_IN_ai_evi">
 			<index-column name="attribute_id"/>
 			<index-column name="entity_value_id"/>
 		</index>
-		<index name="eav_ind_005_03">
+		<index name="ebcv_IN_ei">
 			<index-column name="entity_id"/>
 		</index>
-		<index name="eav_ind_005_04">
+		<index name="ebcv_IN_ai_evi_ei">
 			<index-column name="attribute_id"/>
 			<index-column name="entity_value_id"/>
 			<index-column name="entity_id"/>
@@ -349,12 +331,12 @@
 		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_006_01">
 			<reference local="set_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_006_00">
+		<index name="ebdsv_IN_si_rd_is">
 			<index-column name="set_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
-		<index name="eav_ind_006_01">
+		<index name="ebdsv_IN_si_il">
 			<index-column name="set_id"/>
 			<index-column name="is_last"/>
 		</index>
@@ -378,29 +360,29 @@
 		<!--<foreign-key foreignTable="eav_m_simple_attributes" name="eav_fk_007_02">
 			<reference local="attribute_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_007_00">
+		<unique name="ebdv_ei_ai_rd">
+			<unique-column name="entity_id"/>
+			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
+		</unique>
+		<index name="ebdv_IN_ei_ai_rd_ic">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
-		<index name="eav_ind_007_01">
+		<index name="ebdv_IN_ei_ai_il">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="is_last"/>
 		</index>
-		<index name="eav_ind_007_02">
+		<index name="ebdv_IN_ei">
 			<index-column name="entity_id"/>
 		</index>
-		<index name="eav_ind_007_03">
+		<index name="ebdv_IN_ai_v">
 			<index-column name="attribute_id"/>
 			<index-column name="value"/>
 		</index>
-		<unique name="eav_uk_007_00">
-			<unique-column name="entity_id"/>
-			<unique-column name="attribute_id"/>
-			<unique-column name="report_date"/>
-		</unique>
 	</table>
 	<table name="eav_be_double_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -417,12 +399,12 @@
 		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_008_01">
 			<reference local="set_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_008_00">
+		<index name="ebdsv_IN_si_rd_ic">
 			<index-column name="set_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
-		<index name="eav_ind_008_01">
+		<index name="ebdsv_IN_si_il">
 			<index-column name="set_id"/>
 			<index-column name="is_last"/>
 		</index>
@@ -446,29 +428,29 @@
 		<!--<foreign-key foreignTable="eav_m_simple_attributes" name="eav_fk_009_02">
 			<reference local="attribute_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_009_00">
-			<index-column name="entity_id"/>
-			<index-column name="attribute_id"/>
-			<index-column name="report_date"/>
-			<index-column name="is_closed"/>
-		</index>
-		<index name="eav_ind_009_01">
-			<index-column name="entity_id"/>
-			<index-column name="attribute_id"/>
-			<index-column name="is_last"/>
-		</index>
-		<index name="eav_ind_009_02">
-			<index-column name="entity_id"/>
-		</index>
-		<index name="eav_ind_009_03">
-			<index-column name="attribute_id"/>
-			<index-column name="value"/>
-		</index>
 		<unique name="eav_uk_009_00">
 			<unique-column name="entity_id"/>
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
+		<index name="ebdv_IN_ei_ai_rd_ic">
+			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
+		<index name="ebdv_IN_ei_ai_il">
+			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="is_last"/>
+		</index>
+		<index name="ebdv_IN_ei">
+			<index-column name="entity_id"/>
+		</index>
+		<index name="ebdv_IN_ai_v">
+			<index-column name="attribute_id"/>
+			<index-column name="value"/>
+		</index>
 	</table>
 	<table name="eav_be_entities">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -477,17 +459,17 @@
 		<!--<foreign-key foreignTable="eav_m_classes" name="eav_fk_010_00">
 			<reference local="class_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_010_00">
+		<index name="ebe_IN_ci">
 			<index-column name="class_id"/>
 		</index>
-		<index name="eav_ind_010_01">
+		<index name="ebe_IN_i_ci">
 			<index-column name="id"/>
 			<index-column name="class_id"/>
 		</index>
-		<unique name="eav_uk_010_00">
-		  <unique-column name="id"/>
-		  <unique-column name="deleted"/>
-		</unique>
+		<index name="ebe_IN_i_d">
+		  <index-column name="id"/>
+		  <index-column name="deleted"/>
+		</index>
 	</table>
 	<table name="eav_be_entity_complex_sets">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -511,36 +493,36 @@
 		<!--<foreign-key foreignTable="eav_batches" name="eav_fk_011_03">
 			<reference local="batch_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_011_00">
+		<unique name="ebecs_UN_ei_ai_rd">
+			<unique-column name="entity_id"/>
+			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
+		</unique>
+		<index name="ebecs_IN_ei_ai_si_rd_ic">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="set_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
-		<index name="eav_ind_011_01">
+		<index name="ebecs_IN_ei_ai_si_il">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="set_id"/>
 			<index-column name="is_last"/>
 		</index>
-		<index name="eav_ind_011_02">
+		<index name="ebecs_IN_ei">
 			<index-column name="entity_id"/>
 		</index>
-		<index name="eav_ind_011_03">
+		<index name="ebecs_IN_ai_si">
 			<index-column name="attribute_id"/>
 			<index-column name="set_id"/>
 		</index>
-		<index name="eav_ind_011_04">
+		<index name="ebecs_IN_ai_si_ei">
 			<index-column name="attribute_id"/>
 			<index-column name="set_id"/>
 			<index-column name="entity_id"/>
 		</index>
-		<unique name="eav_uk_011_00">
-			<unique-column name="entity_id"/>
-			<unique-column name="attribute_id"/>
-			<unique-column name="report_date"/>
-		</unique>
 	</table>
 	<table name="eav_be_entity_report_dates">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -554,11 +536,11 @@
 		<column name="complex_values_count" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="simple_sets_count" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="complex_sets_count" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="is_closed" primaryKey="false" required="false" type="NUMERIC" size="1" autoIncrement="false"/>
+		<column name="is_closed" primaryKey="false" required="false" default="0" type="NUMERIC" size="1" autoIncrement="false"/>
 		<!--<foreign-key foreignTable="eav_be_entities" name="eav_fk_012_00">
 			<reference local="entity_id" foreign="id"/>
 		</foreign-key>-->
-		<unique name="eav_be_entity_report_dates_ei_rd">
+		<unique name="eberd_UN_ei_rd">
 			<unique-column name="entity_id"/>
 			<unique-column name="report_date"/>
 		</unique>
@@ -585,24 +567,24 @@
 		<!--<foreign-key foreignTable="eav_batches" name="eav_fk_014_03">
 			<reference local="batch_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_014_00">
+		<unique name="ebess_UN_ei_ai_rd">
+			<unique-column name="entity_id"/>
+			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
+		</unique>
+		<index name="ebess_IN_ei_ai_si_rd_ic">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="set_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
-		<index name="eav_ind_014_01">
+		<index name="ebess_IN_ei_ai_si_il">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="set_id"/>
 			<index-column name="is_last"/>
 		</index>
-		<unique name="eav_uk_014_00">
-			<unique-column name="entity_id"/>
-			<unique-column name="attribute_id"/>
-			<unique-column name="report_date"/>
-		</unique>
 	</table>
 	<table name="eav_be_integer_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -619,12 +601,12 @@
 		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_015_01">
 			<reference local="set_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_015_00">
+		<index name="ebisv_IN_si_rd_ic">
 			<index-column name="set_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
-		<index name="eav_ind_015_01">
+		<index name="ebisv_IN_si_il">
 			<index-column name="set_id"/>
 			<index-column name="is_last"/>
 		</index>
@@ -648,29 +630,29 @@
 		<!--<foreign-key foreignTable="eav_m_simple_attributes" name="eav_fk_016_02">
 			<reference local="attribute_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_016_00">
+		<unique name="ebiv_UN_ei_ai_rd">
+			<unique-column name="entity_id"/>
+			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
+		</unique>
+		<index name="ebiv_IN_ei_ai_rd_ic">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
-		<index name="eav_ind_016_01">
+		<index name="ebiv_IN_ei_ai_il">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="is_last"/>
 		</index>
-		<index name="eav_ind_016_02">
+		<index name="ebiv_IN_ei">
 			<index-column name="entity_id"/>
 		</index>
-		<index name="eav_ind_016_03">
+		<index name="ebiv_IN_ai_v">
 			<index-column name="attribute_id"/>
 			<index-column name="value"/>
 		</index>
-		<unique name="eav_uk_016_00">
-			<unique-column name="entity_id"/>
-			<unique-column name="attribute_id"/>
-			<unique-column name="report_date"/>
-		</unique>
 	</table>
 	<table name="eav_be_string_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -687,12 +669,12 @@
 		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_020_01">
 			<reference local="set_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_020_00">
+		<index name="ebssv_IN_si_rd_ic">
 			<index-column name="set_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
-		<index name="eav_ind_020_01">
+		<index name="ebssv_IN_si_il">
 			<index-column name="set_id"/>
 			<index-column name="is_last"/>
 		</index>
@@ -716,43 +698,43 @@
 		<!--<foreign-key foreignTable="eav_m_simple_attributes" name="eav_fk_021_02">
 			<reference local="attribute_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="eav_ind_021_00">
+		<unique name="ebsv_UN_ei_ai_rd">
+			<unique-column name="entity_id"/>
+			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
+		</unique>
+		<index name="ebsv_IN_ei_ai_rd_ic">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
-		<index name="eav_ind_021_01">
+		<index name="ebsv_IN_ei_ai_il">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="is_last"/>
 		</index>
-		<index name="eav_ind_021_02">
+		<index name="ebsv_IN_ei">
 			<index-column name="entity_id"/>
 		</index>
-		<index name="eav_ind_021_03">
+		<index name="ebsv_IN_ai_v">
 			<index-column name="attribute_id"/>
 			<index-column name="value"/>
 		</index>
-		<index name="eav_ind_021_04">
+		<index name="ebsv_IN_ei_ai_v">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="value"/>
 		</index>
-		<unique>
-			<unique-column name="entity_id"/>
-			<unique-column name="attribute_id"/>
-			<unique-column name="report_date"/>
-		</unique>
 	</table>
-	<table name="AUDIT_EVENT_KIND">
+	<table name="audit_event_kind">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="100" autoIncrement="false"/>
 		<column name="is_always_auditable" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="is_active" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false" default="1"/>
 		<column name="code" primaryKey="false" required="true" type="VARCHAR" size="512" autoIncrement="false"/>
 	</table>
-	<table name="AUDIT_EVENT">
+	<table name="audit_event">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="kind_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="user_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -768,58 +750,24 @@
 			<reference local="kind_id" foreign="id"/>
 		</foreign-key>-->
 	</table>
-	<table name="sc_id_bag">
-    <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-    <column name="entity_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-    <column name="showcase_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-    <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-    <index name="eav_ind_022_01">
-        <index-column name="entity_id"/>
-        <index-column name="showcase_id"/>
-        <index-column name="report_date"/>
-    </index>
-    <unique name="ind_uk_sc_003_00">
-      <unique-column name="entity_id"/>
-      <unique-column name="showcase_id"/>
-      <unique-column name="report_date"/>
-    </unique>
-	</table>
 	<!-- DROOLS -->
 	<table name="logic_packages">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="name" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
 		<column name="description" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
 		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-		<index name="ind_packages_01">
-			<index-column name="id"/>
-		</index>
 	</table>
 	<table name="logic_rules">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="rule" primaryKey="false" required="false" type="VARCHAR" size="2024" autoIncrement="false"/>
 		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
 		<column name="is_active" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="1"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-		<index name="ind_rules_01">
-			<index-column name="id"/>
-		</index>
 	</table>
 	<table name="logic_package_versions">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="package_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="open_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-		<index name="ind_package_versions_01">
-			<index-column name="id"/>
-		</index>
-		<index name="ind_package_versions_02">
+		<index name="lpv_IN_pi">
 			<index-column name="package_id"/>
 		</index>
 	</table>
@@ -827,16 +775,10 @@
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="rule_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="package_versions_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<unique>
-			<unique-column name="id"/>
-		</unique>
-		<index name="ind_rule_package_versions_01">
-			<index-column name="id"/>
-		</index>
-		<index name="ind_rule_package_versions_02">
+		<index name="lrpv_IN_ri">
 			<index-column name="rule_id"/>
 		</index>
-		<index name="ind_rule_package_versions_03">
+		<index name="lrpv_IN_pvi">
 			<index-column name="package_versions_id"/>
 		</index>
 	</table>
@@ -864,7 +806,7 @@
 		<!--<foreign-key foreignTable="eav_m_classes" name="eav_fk_023_00">
 			<reference local="meta_name" foreign="name"/>
 		</foreign-key>-->
-		<index name="ind_023_00">
+		<index name="eauc_IN_ui_mn">
 			<index-column name="user_id"/>
 			<index-column name="meta_name"/>
 		</index>
@@ -874,12 +816,12 @@
 		<column name="user_id" required="true" type="NUMERIC" size="14,0"/>
 		<column name="meta_name" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
 		<column name="entity_id"  required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<unique>
+		<unique name="eaur_UN_ui_mn_ei">
 			<unique-column name="user_id"/>
 			<unique-column name="meta_name"/>
 			<unique-column name="entity_id"/>
 		</unique>
-		<index name="ind_024_00">
+		<index name="eaur_IN_ui_mn_ei">
 			<index-column name="user_id"/>
 			<index-column name="meta_name"/>
 			<index-column name="entity_id" />
@@ -903,7 +845,7 @@
     <column name="status_id" required="true" type="NUMERIC" size="14,0"/>
     <column name="username" required="false" type="VARCHAR" size="80"/>
     <column name="last_manual_edit_date" required="false" type="DATE"/>
-    <unique name="uk_report__c_r">
+    <unique name="er_UN_ci_rd">
       <unique-column name="creditor_id"/>
       <unique-column name="report_date"/>
     </unique>

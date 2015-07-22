@@ -380,11 +380,11 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseSet baseSet, Date actualReportDate, boolean lastReportDate)
+    public void loadBaseValues(IBaseSet baseSet, Date actualReportDate, boolean isLast)
     {
         Table tableOfValues = EAV_BE_STRING_SET_VALUES.as("ssv");
         Select select;
-        if (lastReportDate)
+        if (isLast)
         {
             select = context
                     .select(tableOfValues.field(EAV_BE_STRING_SET_VALUES.ID),

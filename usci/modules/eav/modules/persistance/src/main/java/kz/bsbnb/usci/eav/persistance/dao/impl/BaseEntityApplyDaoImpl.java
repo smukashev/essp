@@ -62,9 +62,21 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             + ") не имеет отчетный даты;");
 
                 baseEntityLoaded = baseEntityLoadDao.load(baseEntityForSave.getId(), minReportDate, reportDate);
+
+                if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
+                    throw new UnsupportedOperationException("Сущность с ID(" + baseEntityLoaded.getId() +
+                            ") является закрытой с даты " + baseEntityLoaded.getBaseEntityReportDate().getReportDate()
+                            +". Обновление после закрытия сущностей не является возможным;");
+
                 baseEntityApplied = applyBaseEntityAdvanced(baseEntityForSave, baseEntityLoaded, baseEntityManager);
             } else {
                 baseEntityLoaded = baseEntityLoadDao.load(baseEntityForSave.getId(), maxReportDate, reportDate);
+
+                if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
+                    throw new UnsupportedOperationException("Сущность с ID(" + baseEntityLoaded.getId() +
+                            ") является закрытой с даты " + baseEntityLoaded.getBaseEntityReportDate().getReportDate()
+                            +". Обновление после закрытия сущностей не является возможным;");
+
                 baseEntityApplied = applyBaseEntityAdvanced(baseEntityForSave, baseEntityLoaded, baseEntityManager);
             }
         }

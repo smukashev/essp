@@ -480,13 +480,13 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate, boolean lastReportDate)
+    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate, boolean isLast)
     {
         Table tableOfAttributes = EAV_M_SIMPLE_ATTRIBUTES.as("a");
         Table tableOfValues = EAV_BE_BOOLEAN_VALUES.as("v");
         Select select = null;
 
-        if (lastReportDate)
+        if (isLast)
         {
             select = context
                     .select(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.NAME),

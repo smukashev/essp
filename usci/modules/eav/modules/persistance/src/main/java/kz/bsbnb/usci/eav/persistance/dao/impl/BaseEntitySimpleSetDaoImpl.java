@@ -424,13 +424,13 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate, boolean lastReportDate)
+    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate, boolean isLast)
     {
         Table tableOfSimpleSets = EAV_M_SIMPLE_SET.as("ss");
         Table tableOfEntitySimpleSets = EAV_BE_ENTITY_SIMPLE_SETS.as("ess");
         Select select = null;
 
-        if (lastReportDate)
+        if (isLast)
         {
             select = context
                     .select(tableOfSimpleSets.field(EAV_M_SIMPLE_SET.NAME),
@@ -506,7 +506,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
             IMetaSet metaSet = (MetaSet)metaType;
             IMetaType metaSetMemberType = metaSet.getMemberType();
             IBaseSet baseSet = new BaseSet(setId, metaSetMemberType);
-            loadBaseValues(baseSet, actualReportDate, lastReportDate);
+            loadBaseValues(baseSet, actualReportDate, isLast);
 
             Batch batch = batchRepository.getBatch(batchId);
             baseEntity.put(attribute, BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
