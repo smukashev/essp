@@ -209,9 +209,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             baseEntityPostPrepared.getReportDate());
 
                     IBaseEntityReportDate baseEntityReportDate = baseEntityPostPrepared.getBaseEntityReportDate();
-                    baseEntityReportDate.setClosed(true);
-
                     baseEntityPostPrepared.calculateValueCount();
+
+                    baseEntityReportDate.setClosed(true);
 
                     if (reportDateExists) {
                         baseEntityManager.registerAsUpdated(baseEntityReportDate);

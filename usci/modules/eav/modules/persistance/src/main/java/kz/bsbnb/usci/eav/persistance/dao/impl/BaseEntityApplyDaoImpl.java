@@ -219,11 +219,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IMetaSet childMetaSet = (IMetaSet) metaType;
                 IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
 
-                // TODO: Add implementation of immutable complex values in sets
-
                 IBaseSet childBaseSetApplied = new BaseSet(childMetaSet.getMemberType());
                 for (IBaseValue childBaseValue : childBaseSet.get()) {
                     IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
+
+                    if (metaAttribute.isImmutable() && childBaseEntity.getValueCount() != 0 &&
+                            childBaseEntity.getId() < 1)
+                        throw new UnsupportedOperationException("Сущность класса " +
+                                childBaseEntity.getMeta().getClassName() + " не найдена;" +
+                                "\n" + childBaseEntity.toString());
+
                     IBaseEntity childBaseEntityApplied = apply(childBaseEntity, baseEntityManager, null);
 
                     IBaseValue childBaseValueApplied = BaseValueFactory.create(MetaContainerTypes.META_SET,
