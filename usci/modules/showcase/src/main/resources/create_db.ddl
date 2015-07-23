@@ -2,18 +2,17 @@
 <!DOCTYPE database SYSTEM "http://db.apache.org/torque/dtd/database">
 <database name="model">
 	<table name="eav_sc_showcases">
-    		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-    		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-    		<column name="table_name" primaryKey="false" required="true" type="VARCHAR" size="128" autoIncrement="false"/>
-    		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
-    		<column name="class_name" primaryKey="false" required="true" type="varchar" size="100" autoIncrement="false"/>
-    		<column name="down_path" primaryKey="false" required="false" type="varchar" size="100" />
-    		<column name="is_final" required="true" type="NUMERIC" size="5,0" autoIncrement="false"/>
-    		<unique name="ind_uk_sc_001_00">
-    			<unique-column name="name"/>
-    		</unique>
-    	</table>
-
+    <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+    <column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
+    <column name="table_name" primaryKey="false" required="true" type="VARCHAR" size="128" autoIncrement="false"/>
+    <column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
+    <column name="class_name" primaryKey="false" required="true" type="varchar" size="100" autoIncrement="false"/>
+    <column name="down_path" primaryKey="false" required="false" type="varchar" size="100" />
+    <column name="is_final" required="true" type="NUMERIC" size="5,0" autoIncrement="false"/>
+    <unique name="ess_UN_n">
+      <unique-column name="name"/>
+    </unique>
+  </table>
   <table name="eav_sc_showcase_fields">
     <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
     <column name="showcase_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -26,7 +25,6 @@
       <reference local="showcase_id" foreign="id"/>
     </foreign-key>-->
   </table>
-
   <table name="eav_sc_bad_entities">
     <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
     <column name="entity_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
