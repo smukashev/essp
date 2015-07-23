@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.porltet.entity_merge.model.json;
+package kz.bsbnb.usci.porltet.meta_editor.model.json;
 
 import java.util.ArrayList;
 
