@@ -720,17 +720,17 @@
 		<column name="end_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="rep_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
 	</table>
-	<table name="eav_statuses">
+	<table name="eav_global">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="type" primaryKey="false" required="true" type="VARCHAR" size="256" autoIncrement="false"/>
 		<column name="code" primaryKey="false" required="true" type="VARCHAR" size="256" autoIncrement="false"/>
 		<column name="value" primaryKey="false" required="true" type="VARCHAR" size="512" autoIncrement="false"/>
 		<column name="description" primaryKey="false" required="true" type="VARCHAR" size="1024" autoIncrement="false"/>
-		<unique name="es_t_c">
+		<unique name="eg_UN_t_c">
 			<unique-column name="type"/>
 			<unique-column name="code"/>
 		</unique>
-		<index name="es_t_c">
+		<index name="eg_IN_t_c">
 			<index-column name="type"/>
 			<index-column name="code"/>
 		</index>
@@ -751,13 +751,9 @@
 		<!--<foreign-key foreignTable="eav_a_user" name="ebs_FK_eau_id">
 			<reference local="user_id" foreign="id"/>
 		</foreign-key>-->
-		<!--<foreign-key foreignTable="eav_statuses" name="ebs_FK_es_id">
+		<!--<foreign-key foreignTable="eav_global" name="ebs_FK_eg_id">
 			<reference local="status_id" foreign="id"/>
 		</foreign-key>-->
-		<unique name="ebs_">
-			<unique-column name="type"/>
-			<unique-column name="code"/>
-		</unique>
 	</table>
 	<table name="eav_entity_statuses">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -769,7 +765,7 @@
 		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="index" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="status_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<!--<foreign-key foreignTable="eav_statuses" name="ebs_FK_id">
+		<!--<foreign-key foreignTable="eav_global" name="ebs_FK_eg_id">
 			<reference local="status_id" foreign="id"/>
 		</foreign-key>-->
 	</table>
