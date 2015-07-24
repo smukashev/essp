@@ -21,7 +21,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,8 +32,7 @@ import java.util.Date;
 import java.util.Stack;
 
 //TODO: merge with StaxEventEntityReader from receiver
-public class CLIXMLReader
-{
+public class CLIXMLReader {
     /////////////////////////
     public static final String DATE_FORMAT = "dd.MM.yyyy";
     protected DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
@@ -41,7 +43,7 @@ public class CLIXMLReader
     private Date reportDate;
 
     public Object getCastObject(DataTypes typeCode, String value) {
-        switch(typeCode) {
+        switch (typeCode) {
             case INTEGER:
                 return Integer.parseInt(value);
             case DATE:
@@ -71,7 +73,8 @@ public class CLIXMLReader
         }
     }
 
-    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchRepository batchRepository, Date repDate){
+
+    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchRepository batchRepository, Date repDate) {
         logger.info("Reader init.");
         metaClassRepository = metaRepo;
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -92,8 +95,7 @@ public class CLIXMLReader
 
     private FileInputStream inputStream;
 
-    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchRepository batchRepository, Date repDate) throws FileNotFoundException
-    {
+    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchRepository batchRepository, Date repDate) throws FileNotFoundException {
         logger.info("Reader init.");
         metaClassRepository = metaRepo;
 
@@ -113,6 +115,7 @@ public class CLIXMLReader
 
         batchRepository.addBatch(batch);
     }
+
     /////////////////////////
     private Logger logger = Logger.getLogger(CLIXMLReader.class);
     private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
@@ -123,42 +126,61 @@ public class CLIXMLReader
 
     private boolean hasMembers = false;
 
-    private boolean hasOperationDelete(StartElement startElement){
-        return startElement.getAttributeByName(new QName("operation"))!=null &&
+    private boolean hasOperationDelete(StartElement startElement) {
+        return startElement.getAttributeByName(new QName("operation")) != null &&
                 startElement.getAttributeByName(new QName("operation")).getValue()
                         .equalsIgnoreCase(OperationType.DELETE.toString());
     }
 
+    private boolean hasOperationClose(StartElement startElement) {
+        return startElement.getAttributeByName(new QName("operation")) != null &&
+                startElement.getAttributeByName(new QName("operation")).getValue()
+                        .equalsIgnoreCase(OperationType.CLOSE.toString());
+    }
+
+    private boolean hasOperationNew(StartElement startElement) {
+        return startElement.getAttributeByName(new QName("operation")) != null &&
+                startElement.getAttributeByName(new QName("operation")).getValue()
+                        .equalsIgnoreCase(OperationType.NEW.toString());
+    }
+
     public void startElement(XMLEvent event, StartElement startElement, String localName) {
-        if(localName.equals("batch")) {
-            //logger.info("batch");
-        } else if(localName.equals("entities")) {
-            //logger.info("entities");
-        } else if(localName.equals("entity")) {
-            //logger.info("entity");
+        if (localName.equals("batch")) {
+            logger.info("batch");
+        } else if (localName.equals("entities")) {
+            logger.info("entities");
+        } else if (localName.equals("entity")) {
             BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass(
                     startElement.getAttributeByName(new QName("class")).getValue()), batch.getRepDate());
-            if(hasOperationDelete(startElement))
+
+            if (hasOperationDelete(startElement))
                 baseEntity.setOperation(OperationType.DELETE);
+
+            if (hasOperationClose(startElement))
+                baseEntity.setOperation(OperationType.CLOSE);
+
+            if (hasOperationNew(startElement))
+                baseEntity.setOperation(OperationType.NEW);
+
             currentContainer = baseEntity;
         } else {
-            //logger.info("other: " + localName);
+            logger.info("other: " + localName);
             IMetaType metaType = currentContainer.getMemberType(localName);
 
-            if(metaType.isSet()) {
+            if (metaType.isSet()) {
                 stack.push(currentContainer);
                 flagsStack.push(hasMembers);
                 hasMembers = false;
-                currentContainer = new BaseSet(((MetaSet)metaType).getMemberType());
+                currentContainer = new BaseSet(((MetaSet) metaType).getMemberType());
                 level++;
-            } else if(metaType.isComplex() && !metaType.isSet()) {
+            } else if (metaType.isComplex() && !metaType.isSet()) {
                 stack.push(currentContainer);
-                currentContainer = new BaseEntity((MetaClass)metaType, batch.getRepDate());
+                currentContainer = new BaseEntity((MetaClass) metaType, batch.getRepDate());
                 flagsStack.push(hasMembers);
                 hasMembers = false;
                 //metaFactoryService.getBaseEntity((MetaClass)metaType, batch.getRepDate());
                 level++;
-            } else if(!metaType.isComplex() && !metaType.isSet()) {
+            } else if (!metaType.isComplex() && !metaType.isSet()) {
                 Object o = null;
                 MetaValue metaValue = (MetaValue) metaType;
 
@@ -191,26 +213,26 @@ public class CLIXMLReader
     }
 
     public BaseEntity read() throws UnexpectedInputException, org.springframework.batch.item.ParseException, NonTransientResourceException {
-        while(xmlEventReader.hasNext()) {
+        while (xmlEventReader.hasNext()) {
             XMLEvent event = (XMLEvent) xmlEventReader.next();
 
-            if(event.isStartDocument()) {
-                //logger.info("start document");
-            } else if(event.isStartElement()) {
+            if (event.isStartDocument()) {
+                logger.info("start document");
+            } else if (event.isStartElement()) {
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
 
                 startElement(event, startElement, localName);
-            } else if(event.isEndElement()) {
+            } else if (event.isEndElement()) {
                 EndElement endElement = event.asEndElement();
                 String localName = endElement.getName().getLocalPart();
 
-                if(endElement(localName)) return (BaseEntity)currentContainer;
-            } else if(event.isEndDocument()) {
-                //logger.info("end document");
+                if (endElement(localName)) return (BaseEntity) currentContainer;
+            } else if (event.isEndDocument()) {
+                logger.info("end document");
                 //couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
             } else {
-                //logger.info(event);
+                logger.info(event);
             }
         }
 
@@ -229,30 +251,30 @@ public class CLIXMLReader
     }
 
     public boolean endElement(String localName) {
-        if(localName.equals("batch")) {
+        if (localName.equals("batch")) {
             //logger.info("batch");
-        } else if(localName.equals("entities")) {
+        } else if (localName.equals("entities")) {
             //logger.info("entities");
             currentContainer = null;
             return true;
-        } else if(localName.equals("entity")) {
+        } else if (localName.equals("entity")) {
             index++;
             return true;
         } else {
             IMetaType metaType;
 
-            if(level == stack.size())
+            if (level == stack.size())
                 metaType = stack.peek().getMemberType(localName);
             else
                 metaType = currentContainer.getMemberType(localName);
 
-            if(metaType.isComplex() || metaType.isSet()) {
+            if (metaType.isComplex() || metaType.isSet()) {
                 Object o = currentContainer;
                 currentContainer = stack.pop();
 
                 if (currentContainer.isSet()) {
                     if (hasMembers) {
-                        ((BaseSet)currentContainer).put(BaseValueFactory
+                        ((BaseSet) currentContainer).put(BaseValueFactory
                                 .create(currentContainer.getBaseContainerType(), metaType, batch, index, o));
                         flagsStack.pop();
                         hasMembers = true;

@@ -1,55 +1,51 @@
 package kz.bsbnb.usci.eav.model.base;
 
 import kz.bsbnb.usci.eav.model.persistable.IBaseObject;
-import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 
 import java.util.Date;
 
-/**
- * @author alexandr.motov
- */
 public interface IBaseEntityReportDate extends IBaseObject {
+    IBaseEntity getBaseEntity();
 
-    public IBaseEntity getBaseEntity();
+    void setBaseEntity(IBaseEntity baseEntity);
 
-    public void setBaseEntity(IBaseEntity baseEntity);
+    Date getReportDate();
 
-    public Date getReportDate();
+    void setReportDate(Date reportDate);
 
-    public void setReportDate(Date reportDate);
+    long getIntegerValuesCount();
 
-    public long getIntegerValuesCount();
+    void setIntegerValuesCount(long integerValuesCount);
 
-    public void setIntegerValuesCount(long integerValuesCount);
+    long getDateValuesCount();
 
-    public long getDateValuesCount();
+    void setDateValuesCount(long dateValuesCount);
 
-    public void setDateValuesCount(long dateValuesCount);
+    long getStringValuesCount();
 
-    public long getStringValuesCount();
+    void setStringValuesCount(long stringValuesCount);
 
-    public void setStringValuesCount(long stringValuesCount);
+    long getBooleanValuesCount();
 
-    public long getBooleanValuesCount();
+    void setBooleanValuesCount(long booleanValuesCount);
 
-    public void setBooleanValuesCount(long booleanValuesCount);
+    long getDoubleValuesCount();
 
-    public long getDoubleValuesCount();
+    void setDoubleValuesCount(long doubleValuesCount);
 
-    public void setDoubleValuesCount(long doubleValuesCount);
+    long getComplexValuesCount();
 
-    public long getComplexValuesCount();
+    void setComplexValuesCount(long complexValuesCount);
 
-    public void setComplexValuesCount(long complexValuesCount);
+    long getSimpleSetsCount();
 
-    public long getSimpleSetsCount();
+    void setSimpleSetsCount(long simpleSetsCount);
 
-    public void setSimpleSetsCount(long simpleSetsCount);
+    long getComplexSetsCount();
 
-    public long getComplexSetsCount();
+    void setComplexSetsCount(long complexSetsCount);
 
-    public void setComplexSetsCount(long complexSetsCount);
+    boolean isClosed();
 
-
-
+    void setClosed(boolean is_closed);
 }

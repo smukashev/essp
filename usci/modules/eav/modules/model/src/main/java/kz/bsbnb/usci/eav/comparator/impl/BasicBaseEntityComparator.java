@@ -24,7 +24,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
 
         if (!type.isComplex()) {
             res = (value1.getValue() == null ?
-                    value2.getValue() == null ? true : false :
+                    value2.getValue() == null :
                     value1.getValue().equals(value2.getValue()));
         } else {
             res = compare((BaseEntity) value1.getValue(),

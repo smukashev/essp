@@ -155,13 +155,14 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id);
         boolean last = DataTypeUtil.compareBeginningOfTheDay(maxReportDate, reportDate) == 0;
 
+        int compare = DataTypeUtil.compareBeginningOfTheDay(savingReportDate, reportDate);
+
         for (Class<? extends IBaseValue> baseValueClass : baseValueCounts.keySet()) {
             long baseValuesCount = baseValueCounts.get(baseValueClass);
             if (baseValuesCount > 0) {
                 IBaseEntityValueDao baseEntityValueDao = persistableDaoPool
                         .getPersistableDao(baseValueClass, IBaseEntityValueDao.class);
 
-                int compare = DataTypeUtil.compareBeginningOfTheDay(savingReportDate, reportDate);
                 baseEntityValueDao.loadBaseValues(baseEntity, compare == -1 ? reportDate : savingReportDate, last);
             }
         }

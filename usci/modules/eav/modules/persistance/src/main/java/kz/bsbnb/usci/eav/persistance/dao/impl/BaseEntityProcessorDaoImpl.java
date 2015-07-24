@@ -4,18 +4,17 @@ import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.model.EntityHolder;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.IRefProcessorDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityApplyDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
+import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
@@ -34,7 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.*;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_A_CREDITOR_STATE;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITIES;
 
 @Repository
 public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEntityProcessorDao {
@@ -202,8 +202,25 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     if (baseEntityPostPrepared.getId() <= 0)
                         throw new RuntimeException("Сущность для закрытия не найдена;");
 
-                    baseEntityApplied = baseEntityPostPrepared;
+                    IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool.getPersistableDao(
+                            BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
+                    boolean reportDateExists = baseEntityReportDateDao.exists(baseEntityPostPrepared.getId(),
+                            baseEntityPostPrepared.getReportDate());
+
+                    IBaseEntityReportDate baseEntityReportDate = baseEntityPostPrepared.getBaseEntityReportDate();
+                    baseEntityPostPrepared.calculateValueCount();
+
+                    baseEntityReportDate.setClosed(true);
+
+                    if (reportDateExists) {
+                        baseEntityManager.registerAsUpdated(baseEntityReportDate);
+                    } else {
+                        baseEntityManager.registerAsInserted(baseEntityReportDate);
+                    }
+
+                    baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
+                    baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
                 default:
                     throw new UnsupportedOperationException("Операция не поддерживается: "
@@ -214,7 +231,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             baseEntityApplyDao.applyToDb(baseEntityManager);
         }
 
-         if (applyListener != null)
+        if (applyListener != null)
             applyListener.applyToDBEnded(entityHolder.getSaving(), entityHolder.getLoaded(),
                     entityHolder.getApplied(), baseEntityManager);
 

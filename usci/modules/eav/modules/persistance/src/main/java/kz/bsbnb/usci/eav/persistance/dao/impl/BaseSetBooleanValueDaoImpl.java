@@ -376,11 +376,11 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseSet baseSet, Date actualReportDate, boolean lastReportDate)
+    public void loadBaseValues(IBaseSet baseSet, Date actualReportDate, boolean isLast)
     {
         Table tableOfValues = EAV_BE_BOOLEAN_SET_VALUES.as("bsv");
         Select select;
-        if (lastReportDate)
+        if (isLast)
         {
             select = context
                     .select(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.ID),

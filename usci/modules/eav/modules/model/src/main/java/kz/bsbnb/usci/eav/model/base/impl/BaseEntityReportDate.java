@@ -2,20 +2,18 @@ package kz.bsbnb.usci.eav.model.base.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
-import kz.bsbnb.usci.eav.model.persistable.IBaseObject;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import org.apache.commons.lang.NotImplementedException;
 
 import java.util.Date;
 
-/**
- * @author alexandr.motov
- */
 public class BaseEntityReportDate extends Persistable implements IBaseEntityReportDate {
 
     private IBaseEntity baseEntity;
     private Date reportDate;
-    
+    private boolean isClosed;
+
     private long integerValuesCount = 0;
     private long dateValuesCount = 0;
     private long stringValuesCount = 0;
@@ -30,14 +28,10 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
                                 long complexValuesCount, long simpleSetsCount, long complexSetsCount) {
         super(id);
 
-        if (reportDate == null)
-        {
-            throw new IllegalArgumentException("Can not create instance of BaseEntityReportDate " +
-                    "with report date equal to null.");
-        }
-        else
-        {
-            Date newReportDate = (Date)reportDate.clone();
+        if (reportDate == null) {
+            throw new IllegalArgumentException("Отчетная не можеть быть NULL;");
+        } else {
+            Date newReportDate = (Date) reportDate.clone();
             DataUtils.toBeginningOfTheDay(newReportDate);
             this.reportDate = newReportDate;
         }
@@ -52,34 +46,42 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
         this.complexSetsCount = complexSetsCount;
     }
 
+    public BaseEntityReportDate(long id, Date reportDate, long integerValuesCount, long dateValuesCount,
+                                long stringValuesCount, long booleanValuesCount, long doubleValuesCount,
+                                long complexValuesCount, long simpleSetsCount, long complexSetsCount,
+                                boolean isClosed) {
+        super(id);
+
+        if (reportDate == null) {
+            throw new IllegalArgumentException("Отчетная не можеть быть NULL;");
+        } else {
+            Date newReportDate = (Date) reportDate.clone();
+            DataUtils.toBeginningOfTheDay(newReportDate);
+            this.reportDate = newReportDate;
+        }
+
+        this.integerValuesCount = integerValuesCount;
+        this.dateValuesCount = dateValuesCount;
+        this.stringValuesCount = stringValuesCount;
+        this.booleanValuesCount = booleanValuesCount;
+        this.doubleValuesCount = doubleValuesCount;
+        this.complexValuesCount = complexValuesCount;
+        this.simpleSetsCount = simpleSetsCount;
+        this.complexSetsCount = complexSetsCount;
+        this.isClosed = isClosed;
+    }
+
     public BaseEntityReportDate(IBaseEntity baseEntity, Date reportDate) {
-        if (reportDate == null)
-        {
+        if (reportDate == null) {
             throw new IllegalArgumentException("Can not create instance of BaseEntityReportDate " +
                     "with report date equal to null.");
-        }
-        else
-        {
-            Date newReportDate = (Date)reportDate.clone();
+        } else {
+            Date newReportDate = (Date) reportDate.clone();
             DataUtils.toBeginningOfTheDay(newReportDate);
             this.reportDate = newReportDate;
         }
 
         this.baseEntity = baseEntity;
-    }
-
-    public BaseEntityReportDate(Date reportDate) {
-        if (reportDate == null)
-        {
-            throw new IllegalArgumentException("Can not create instance of BaseEntityReportDate " +
-                    "with report date equal to null.");
-        }
-        else
-        {
-            Date newReportDate = (Date)reportDate.clone();
-            DataUtils.toBeginningOfTheDay(newReportDate);
-            this.reportDate = newReportDate;
-        }
     }
 
     public IBaseEntity getBaseEntity() {
@@ -162,17 +164,21 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
         this.complexSetsCount = complexSetsCount;
     }
 
+    public boolean isClosed() {
+        return isClosed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.isClosed = closed;
+    }
+
     @Override
-    public BaseEntityReportDate clone()
-    {
+    public BaseEntityReportDate clone() {
         BaseEntityReportDate baseEntityReportDate = null;
-        try
-        {
-            baseEntityReportDate = (BaseEntityReportDate)super.clone();
+        try {
+            baseEntityReportDate = (BaseEntityReportDate) super.clone();
             baseEntity.setReportDate((Date) reportDate.clone());
-        }
-        catch(CloneNotSupportedException ex)
-        {
+        } catch (CloneNotSupportedException ex) {
             throw new RuntimeException("BaseEntityReportDate class does not implement interface Cloneable.");
         }
         return baseEntityReportDate;
@@ -195,6 +201,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
         if (simpleSetsCount != that.simpleSetsCount) return false;
         if (stringValuesCount != that.stringValuesCount) return false;
         if (!reportDate.equals(that.reportDate)) return false;
+        if (isClosed != that.isClosed) return false;
 
         return true;
     }
@@ -202,6 +209,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
     @Override
     public int hashCode() {
         int result = super.hashCode();
+        result = 31 * result + (isClosed ? 1 : 0);
         result = 31 * result + reportDate.hashCode();
         result = 31 * result + (int) (integerValuesCount ^ (integerValuesCount >>> 32));
         result = 31 * result + (int) (dateValuesCount ^ (dateValuesCount >>> 32));
@@ -211,17 +219,18 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
         result = 31 * result + (int) (complexValuesCount ^ (complexValuesCount >>> 32));
         result = 31 * result + (int) (simpleSetsCount ^ (simpleSetsCount >>> 32));
         result = 31 * result + (int) (complexSetsCount ^ (complexSetsCount >>> 32));
+
         return result;
     }
 
     @Override
     public void addListener(Listener listener) {
-
+        throw new NotImplementedException("Не реализовано");
     }
 
     @Override
     public void removeListener(Listener listener) {
-
+        throw new NotImplementedException("Не реализовано");
     }
 
 }

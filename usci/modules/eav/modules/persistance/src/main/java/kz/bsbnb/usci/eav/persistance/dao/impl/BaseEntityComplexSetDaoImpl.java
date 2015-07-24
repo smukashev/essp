@@ -401,12 +401,12 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate, boolean lastReportDate) {
+    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate, boolean isLast) {
         Table tableOfComplexSets = EAV_M_COMPLEX_SET.as("cs");
         Table tableOfEntityComplexSets = EAV_BE_ENTITY_COMPLEX_SETS.as("ecs");
 
         Select select;
-        if (lastReportDate) {
+        if (isLast) {
             select = context
                     .select(tableOfComplexSets.field(EAV_M_COMPLEX_SET.NAME),
                             tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ID),
@@ -493,7 +493,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
                 throw new UnsupportedOperationException("Не реализовано;");
             }
 
-            baseSetComplexValueDao.loadBaseValues(baseSet, actualReportDate, lastReportDate);
+            baseSetComplexValueDao.loadBaseValues(baseSet, actualReportDate, isLast);
 
             Batch batch = batchRepository.getBatch(batchId);
             baseEntity.put(attribute, BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
