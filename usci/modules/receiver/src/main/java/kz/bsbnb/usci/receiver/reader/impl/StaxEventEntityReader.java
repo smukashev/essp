@@ -30,18 +30,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import javax.annotation.PostConstruct;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Stack;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -150,15 +164,51 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         }
 
         try {
-            if (out != null)
-                xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
-        } catch (XMLStreamException e) {
+            if (out != null) {
+                if (validateSchema(new ByteArrayInputStream(out.toByteArray()))) {
+                    xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
+                } else {
+                    throw new RuntimeException("XML validation error");
+                }
+            }
+        } catch (XMLStreamException | SAXException | IOException e) {
             statusSingleton.addBatchStatus(batchId,
                     new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
             throw new RuntimeException(e);
         }
 
         batch = batchService.load(batchId);
+    }
+
+    private boolean validateSchema(ByteArrayInputStream xmlInputStream) throws IOException, SAXException {
+        URL schemaURL = getClass().getClassLoader().getResource("usci.xsd");
+        Source xml = new StreamSource(xmlInputStream);
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        Schema schema = schemaFactory.newSchema(schemaURL);
+
+        Validator validator = schema.newValidator();
+
+        final boolean[] success = {true};
+
+        validator.setErrorHandler(new ErrorHandler() {
+            @Override
+            public void warning(SAXParseException exception) throws SAXException {}
+
+            @Override
+            public void error(SAXParseException exception) throws SAXException {
+                success[0] = false;
+                statusSingleton.addBatchStatus(batchId,
+                        new BatchStatusJModel(BatchStatuses.ERROR, exception.getMessage(), new Date(), 0L));
+            }
+
+            @Override
+            public void fatalError(SAXParseException exception) throws SAXException {
+                throw exception;
+            }
+        });
+
+        validator.validate(xml);
+        return success[0];
     }
 
     private boolean hasOperationDelete(StartElement startElement) {
