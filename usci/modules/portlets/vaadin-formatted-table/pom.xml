@@ -31,7 +31,7 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin</artifactId>
-            <version>6.6.2</version>
+            <version>6.8.14</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.jexcelapi</groupId>
