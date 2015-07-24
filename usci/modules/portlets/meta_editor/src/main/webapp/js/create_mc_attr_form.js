@@ -31,7 +31,9 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
                             attrPathPart = Ext.getCmp('attrPathPart');
                             attrPathCode = Ext.getCmp('attrPathCode');
                             attrTitle = Ext.getCmp('attrTitle');
-
+                            is_Key = Ext.getCmp('is_Key');
+                            is_Required = Ext.getCmp('is_Required');
+                            is_Nullable = Ext.getCmp('is_Nullable');
                             if(attrTypeField.getValue() == 1 || attrTypeField.getValue() == 3) {
                                 callback(attrPathPart.getValue() + attrPathCode.getValue(),
                                     attrTitle.getValue(), true);
@@ -61,6 +63,11 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
             Ext.getCmp('createMCAttrFormWin').destroy();
         }
     });
+
+    var attributeRequireType = [
+        ['true', 'Да'],
+        ['false', 'Нет'],
+    ];
 
     var attributeTypes = [
         [1, 'Простой'],
@@ -209,6 +216,57 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
             store: classesStore,
             valueField:'classId',
             displayField:'className'
+        },{
+            fieldLabel: 'Ключевой аттрибут',
+            id: 'is_Key',
+            name: 'is_Key',
+            xtype: 'combobox',
+            store: new Ext.data.SimpleStore({
+                id:0,
+                fields:
+                    [
+                        'Id',
+                        'Text'
+                    ],
+                data: attributeRequireType
+            }),
+            valueField:'Id',
+            displayField:'Text',
+            queryMode:'local'
+        },{
+            fieldLabel: 'Обязательный аттрибут',
+            id: 'is_Required',
+            name: 'is_Required',
+            xtype: 'combobox',
+            store: new Ext.data.SimpleStore({
+                id:0,
+                fields:
+                    [
+                        'Id',
+                        'Text'
+                    ],
+                data: attributeRequireType
+            }),
+            valueField:'Id',
+            displayField:'Text',
+            queryMode:'local'
+        },{
+            fieldLabel: 'IS NULLABLE',
+            id: 'is_Nullable',
+            name: 'is_Nullable',
+            xtype: 'combobox',
+            store: new Ext.data.SimpleStore({
+                id:0,
+                fields:
+                    [
+                        'Id',
+                        'Text'
+                    ],
+                data: attributeRequireType
+            }),
+            valueField:'Id',
+            displayField:'Text',
+            queryMode:'local'
         }],
 
         buttons: [buttonSave, buttonClose]
@@ -247,6 +305,17 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
 
                     attrTitle = Ext.getCmp('attrTitle');
                     attrTitle.setValue(data.data.title);
+
+                    is_Key = Ext.getCmp('is_Key');
+                    is_Key.setValue(data.data.is_key);
+                    is_Required = Ext.getCmp('is_Required');
+                    is_Required.setValue(data.data.is_required);
+                    if(data.data.is_key=='true')
+                    {
+                        is_Nullable = Ext.getCmp('is_Nullable');
+                        is_Nullable.setValue(data.data.is_nullable);
+                        is_Nullable.setDisabled(true);
+                    }
                 }
             },
             failure: function(response, opts) {
