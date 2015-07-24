@@ -18,6 +18,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.*;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
+import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 //import kz.bsbnb.usci.eav.test.GenericTestCase;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -54,6 +55,9 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
 
     @Autowired
     IPersistableDaoPool persistableDaoPool;
+
+    @Autowired
+    protected IStorage postgreSQLStorageImpl;
 
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImplTest.class);
     private IMetaClass metaClass;
@@ -200,6 +204,16 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
     @Before
     public void initialization() throws Exception
     {
+        if(postgreSQLStorageImpl != null)
+        {
+            postgreSQLStorageImpl.clear();
+            postgreSQLStorageImpl.initialize();
+        }
+        if(batchRepository != null)
+        {
+            batchRepository.clearCache();
+        }
+
         MetaClass metaForCreate = new MetaClass("testMetaClass");
         metaForCreate.setMetaAttribute("uuid",
                 new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
@@ -239,55 +253,69 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
     }
 
     @Test
-    public void testSetValue1() throws Exception
-    {
-        UUID uuid = UUID.randomUUID();
+    public void testSetValue1() throws Exception {
+
 
         // 1 january 2013
         IBaseEntity baseEntityAB1 =
                 constuctBaseEntity(
                         metaClass,
                         new Date(new Long("1356976800000")),
-                        uuid.toString(),
+                        UUID.randomUUID().toString(),
                         new String[] {"a", "b"}, 1L);
 
         BaseEntity baseEntityAB1Applied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB1);
-        IBaseEntity baseEntityAB1Saved = loadByReportDate(baseEntityAB1Applied.getId(), new Date(new Long("1356976800000")));
+
 
         // 1 march 2013
         IBaseEntity baseEntityAB2 =
                 constuctBaseEntity(
                         metaClass,
                         new Date(new Long("1362074400000")),
-                        uuid.toString(),
+                        UUID.randomUUID().toString(),
                         new String[] {"a", "b"}, 1L);
 
         BaseEntity baseEntityAB2Applied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB2);
-        IBaseEntity baseEntityAB2Saved = loadByReportDate(baseEntityAB2Applied.getId(), new Date(new Long("1362074400000")));
+
 
         // 1 april 2013
         IBaseEntity baseEntityAD =
                 constuctBaseEntity(
                         metaClass,
                         new Date(new Long("1364752800000")),
-                        uuid.toString(),
-                        new String[] {"a", "d"}, 2L);
+                        UUID.randomUUID().toString(),
+                        new String[] {"a", "d"}, 1L);
 
         BaseEntity baseEntityADApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
-        IBaseEntity baseEntityADSaved = loadByReportDate(baseEntityADApplied.getId(), new Date(new Long("1364752800000")));
+
 
         // 1 february 2013
         IBaseEntity baseEntityAC =
                 constuctBaseEntity(
                         metaClass,
                         new Date(new Long("1359655200000")),
-                        uuid.toString(),
-                        new String[] {"a", "c"}, 3L);
+                        UUID.randomUUID().toString(),
+                        new String[] {"a", "c"}, 1L);
 
         BaseEntity baseEntityACApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
+
+        IBaseEntity baseEntityAB1Saved = loadByReportDate(baseEntityAB1Applied.getId(), new Date(new Long("1356976800000")));
+        IBaseEntity baseEntityAB2Saved = loadByReportDate(baseEntityAB2Applied.getId(), new Date(new Long("1362074400000")));
+        IBaseEntity baseEntityADSaved = loadByReportDate(baseEntityADApplied.getId(), new Date(new Long("1364752800000")));
         IBaseEntity baseEntityACSaved = loadByReportDate(baseEntityACApplied.getId(), new Date(new Long("1359655200000")));
 
-        Object[] AB1SavedArray  = ((BaseSet)baseEntityAB1Saved.getBaseValue("string_set").getValue()).get().toArray();
+        assertEquals(baseEntityAB1Applied.getBaseValue("uuid").getValue(), baseEntityAB1Saved.getBaseValue("uuid").getValue());
+        assertEquals(baseEntityAB1Applied.getBaseValue("string_set").getValue(), baseEntityAB1Saved.getBaseValue("string_set").getValue());
+
+        assertEquals(baseEntityAB2Applied.getBaseValue("uuid").getValue(), baseEntityAB2Saved.getBaseValue("uuid").getValue());
+        assertEquals(baseEntityAB2Applied.getBaseValue("string_set").getValue(), baseEntityAB2Saved.getBaseValue("string_set").getValue());
+
+        assertEquals(baseEntityACApplied.getBaseValue("uuid").getValue(), baseEntityACSaved.getBaseValue("uuid").getValue());
+        assertEquals(baseEntityACApplied.getBaseValue("string_set").getValue(), baseEntityACSaved.getBaseValue("string_set").getValue());
+
+        assertEquals(baseEntityADApplied.getBaseValue("uuid").getValue(), baseEntityADSaved.getBaseValue("uuid").getValue());
+        assertEquals(baseEntityADApplied.getBaseValue("string_set").getValue(), baseEntityADSaved.getBaseValue("string_set").getValue());
+        /*Object[] AB1SavedArray  = ((BaseSet)baseEntityAB1Saved.getBaseValue("string_set").getValue()).get().toArray();
         Object[] AB2SavedArray  = ((BaseSet)baseEntityAB2Saved.getBaseValue("string_set").getValue()).get().toArray();
         Object[] ADSavedArray   = ((BaseSet)baseEntityADSaved.getBaseValue("string_set").getValue()).get().toArray();
         Object[] ACSavedArray   = ((BaseSet)baseEntityACSaved.getBaseValue("string_set").getValue()).get().toArray();
@@ -296,104 +324,127 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
         Assert.assertTrue(((BaseSetStringValue)AB2SavedArray[0]).getValue().equals("a") && ((BaseSetStringValue)AB2SavedArray[1]).getValue().equals("b"));
         Assert.assertTrue(((BaseSetStringValue)ADSavedArray[0]).getValue().equals("a") && ((BaseSetStringValue)ADSavedArray[1]).getValue().equals("d"));
         Assert.assertTrue(((BaseSetStringValue)ACSavedArray[0]).getValue().equals("a") && ((BaseSetStringValue)ACSavedArray[1]).getValue().equals("c"));
-        assertTrue(baseEntityAB1Saved.getMeta().equals(metaClass));
-        assertTrue(baseEntityAB1Saved.getBaseValue("uuid").getValue().toString().equals(uuid.toString()));
+        assertTrue(baseEntityAB1Saved.getMeta().equals(metaClass));*/
+
     }
     @Test
-    public void testSetValue2() throws Exception
-    {
-        UUID uuid = UUID.randomUUID();
+    public void testSetValue2() throws Exception {
+        //UUID uuid = UUID.randomUUID();
 
         // 1 january 2013
         IBaseEntity baseEntityAB =
                 constuctBaseEntity(
                         metaClass,
                         new Date(new Long("1356976800000")),
-                        uuid.toString(),
+                        UUID.randomUUID().toString(),
                         new String[] {"a", "b"}, 1L);
 
         BaseEntity baseEntityABApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
-        IBaseEntity baseEntityABSaved = loadByReportDate(baseEntityABApplied.getId(), new Date(new Long("1356976800000")));
+
 
         // 1 march 2013
         IBaseEntity baseEntityAD =
                 constuctBaseEntity(
                         metaClass,
                         new Date(new Long("1362074400000")),
-                        uuid.toString(),
+                        UUID.randomUUID().toString(),
                         new String[] {"a", "d"}, 2L);
 
         BaseEntity baseEntityADApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
-        IBaseEntity baseEntityADSaved = loadByReportDate(baseEntityADApplied.getId(), new Date(new Long("1362074400000")));
+
         // 1 february 2013
         IBaseEntity baseEntityAC =
                 constuctBaseEntity(
                         metaClass,
                         new Date(new Long("1359655200000")),
-                        uuid.toString(),
+                        UUID.randomUUID().toString(),
                         new String[] {"a", "c"}, 3L);
 
         BaseEntity baseEntityACApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
+
+
+        IBaseEntity baseEntityABSaved = loadByReportDate(baseEntityABApplied.getId(), new Date(new Long("1356976800000")));
+        IBaseEntity baseEntityADSaved = loadByReportDate(baseEntityADApplied.getId(), new Date(new Long("1362074400000")));
         IBaseEntity baseEntityACSaved = loadByReportDate(baseEntityACApplied.getId(), new Date(new Long("1359655200000")));
 
-        Object[] ABSavedArray  = ((BaseSet)baseEntityABSaved.getBaseValue("string_set").getValue()).get().toArray();
+        assertEquals(baseEntityABApplied.getBaseValue("uuid").getValue(), baseEntityABSaved.getBaseValue("uuid").getValue());
+        assertEquals(baseEntityABApplied.getBaseValue("string_set").getValue(), baseEntityABSaved.getBaseValue("string_set").getValue());
+
+        assertEquals(baseEntityACApplied.getBaseValue("uuid").getValue(), baseEntityACSaved.getBaseValue("uuid").getValue());
+        assertEquals(baseEntityACApplied.getBaseValue("string_set").getValue(), baseEntityACSaved.getBaseValue("string_set").getValue());
+
+        assertEquals(baseEntityADApplied.getBaseValue("uuid").getValue(), baseEntityADSaved.getBaseValue("uuid").getValue());
+        assertEquals(baseEntityADApplied.getBaseValue("string_set").getValue(), baseEntityADSaved.getBaseValue("string_set").getValue());
+
+       /* Object[] ABSavedArray  = ((BaseSet)baseEntityABSaved.getBaseValue("string_set").getValue()).get().toArray();
         Object[] ADSavedArray  = ((BaseSet)baseEntityADSaved.getBaseValue("string_set").getValue()).get().toArray();
         Object[] ACSavedArray  = ((BaseSet)baseEntityACSaved.getBaseValue("string_set").getValue()).get().toArray();
 
         Assert.assertTrue(((BaseSetStringValue)ABSavedArray[0]).getValue().equals("a") && ((BaseSetStringValue)ABSavedArray[1]).getValue().equals("b"));
         Assert.assertTrue(((BaseSetStringValue)ADSavedArray[0]).getValue().equals("a") && ((BaseSetStringValue)ADSavedArray[1]).getValue().equals("d"));
         Assert.assertTrue(((BaseSetStringValue)ACSavedArray[0]).getValue().equals("a") && ((BaseSetStringValue)ACSavedArray[1]).getValue().equals("c"));
-        assertTrue(baseEntityABSaved.getMeta().equals(metaClass));
-        assertTrue(baseEntityABSaved.getBaseValue("uuid").getValue().toString().equals(uuid.toString()));
+        assertTrue(baseEntityABSaved.getMeta().equals(metaClass));*/
+
     }
     @Test
-    public void testSetValue3() throws Exception
-    {
-        UUID uuid = UUID.randomUUID();
+    public void testSetValue3() throws Exception {
+       // UUID uuid = UUID.randomUUID();
 
         // 1 january 2013
         IBaseEntity baseEntityAB =
                 constuctBaseEntity(
                         metaClass,
                         new Date(new Long("1356976800000")),
-                        uuid.toString(),
+                        UUID.randomUUID().toString(),
                         new String[] {"a", "b"}, 1L);
 
         BaseEntity baseEntityABApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
-        IBaseEntity baseEntityABSaved = loadByReportDate(baseEntityABApplied.getId(), new Date(new Long("1356976800000")));
+
 
         // 1 february 2013
         IBaseEntity baseEntityAC =
                 constuctBaseEntity(
                         metaClass,
                         new Date(new Long("1359655200000")),
-                        uuid.toString(),
+                        UUID.randomUUID().toString(),
                         new String[] {"a", "c"}, 2L);
 
         BaseEntity baseEntityACApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
-        IBaseEntity baseEntityACSaved = loadByReportDate(baseEntityACApplied.getId(), new Date(new Long("1359655200000")));
+
 
         // 1 march 2013
         IBaseEntity baseEntityAD =
                 constuctBaseEntity(
                         metaClass,
                         new Date(new Long("1362074400000")),
-                        uuid.toString(),
+                        UUID.randomUUID().toString(),
                         new String[] {"a", "d"}, 3L);
 
         BaseEntity baseEntityADApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
-        IBaseEntity baseEntityADSaved = loadByReportDate(baseEntityADApplied.getId(), new Date(new Long("1362074400000")));
 
 
-        Object[] ABSavedArray  = ((BaseSet)baseEntityABSaved.getBaseValue("string_set").getValue()).get().toArray();
+        IBaseEntity baseEntityABSaved = loadByReportDate(baseEntityABApplied.getId(), new Date(new Long("1356976800000")));
+        IBaseEntity baseEntityADSaved = loadByReportDate(baseEntityADApplied.getId(), new Date(new Long("1359655200000")));
+        IBaseEntity baseEntityACSaved = loadByReportDate(baseEntityACApplied.getId(), new Date(new Long("1362074400000")));
+
+        assertEquals(baseEntityABApplied.getBaseValue("uuid").getValue(), baseEntityABSaved.getBaseValue("uuid").getValue());
+        assertEquals(baseEntityABApplied.getBaseValue("string_set").getValue(), baseEntityABSaved.getBaseValue("string_set").getValue());
+
+        assertEquals(baseEntityACApplied.getBaseValue("uuid").getValue(), baseEntityACSaved.getBaseValue("uuid").getValue());
+        assertEquals(baseEntityACApplied.getBaseValue("string_set").getValue(), baseEntityACSaved.getBaseValue("string_set").getValue());
+
+        assertEquals(baseEntityADApplied.getBaseValue("uuid").getValue(), baseEntityADSaved.getBaseValue("uuid").getValue());
+        assertEquals(baseEntityADApplied.getBaseValue("string_set").getValue(), baseEntityADSaved.getBaseValue("string_set").getValue());
+
+        /*Object[] ABSavedArray  = ((BaseSet)baseEntityABSaved.getBaseValue("string_set").getValue()).get().toArray();
         Object[] ADSavedArray  = ((BaseSet)baseEntityADSaved.getBaseValue("string_set").getValue()).get().toArray();
         Object[] ACSavedArray  = ((BaseSet)baseEntityACSaved.getBaseValue("string_set").getValue()).get().toArray();
 
         Assert.assertTrue(((BaseSetStringValue)ABSavedArray[0]).getValue().equals("a") && ((BaseSetStringValue)ABSavedArray[1]).getValue().equals("b"));
         Assert.assertTrue(((BaseSetStringValue)ADSavedArray[0]).getValue().equals("a") && ((BaseSetStringValue)ADSavedArray[1]).getValue().equals("d"));
         Assert.assertTrue(((BaseSetStringValue)ACSavedArray[0]).getValue().equals("a") && ((BaseSetStringValue)ACSavedArray[1]).getValue().equals("c"));
-        assertTrue(baseEntityABSaved.getMeta().equals(metaClass));
-        assertTrue(baseEntityABSaved.getBaseValue("uuid").getValue().toString().equals(uuid.toString()));
+        assertTrue(baseEntityABSaved.getMeta().equals(metaClass));*/
+
     }
 
     @Test
@@ -408,17 +459,16 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new String[] {"a", "b"}, 1L);
 
-        IBaseEntity child_meta_class =
+        IBaseEntity child_AB =
                 constuctBaseEntity(
                         metaClass,
                         new Date(new Long("1356976800000")),
                         UUID.randomUUID().toString(),
                         new String[]{"a", "c"}, 1L);
 
-        baseEntityAB.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1356976800000")))), 1L, child_meta_class));
-
+        baseEntityAB.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1356976800000")))), 1L, child_AB));
         BaseEntity baseEntityABComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
-        IBaseEntity baseEntityABComplexSaved = loadByReportDate(baseEntityABComplexApplied.getId(), new Date(new Long("1356976800000")));
+
 
 
         // 1 february 2013
@@ -429,10 +479,16 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new String[] {"a", "c"}, 2L);
 
-        baseEntityAC.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1359655200000")))), 1L, child_meta_class));
+        IBaseEntity child_AC =
+                constuctBaseEntity(
+                        metaClass,
+                        new Date(new Long("1359655200000")),
+                        UUID.randomUUID().toString(),
+                        new String[]{"a", "c"}, 1L);
 
+        baseEntityAC.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1359655200000")))), 1L, child_AC));
         BaseEntity baseEntityACComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
-        IBaseEntity baseEntityACComplexSaved = loadByReportDate(baseEntityACComplexApplied.getId(), new Date(new Long("1359655200000")));
+
 
         // 1 march 2013
         IBaseEntity baseEntityAD =
@@ -441,40 +497,52 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         new Date(new Long("1362074400000")),
                         UUID.randomUUID().toString(),
                         new String[] {"a", "d"}, 3L);
-        baseEntityAD.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1362074400000")))), 1L, child_meta_class));
 
+        IBaseEntity child_AD =
+                constuctBaseEntity(
+                        metaClass,
+                        new Date(new Long("1362074400000")),
+                        UUID.randomUUID().toString(),
+                        new String[]{"a", "c"}, 1L);
+
+        baseEntityAD.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1362074400000")))), 1L, child_AD));
         BaseEntity baseEntityADComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
+
+
+
+        IBaseEntity baseEntityABComplexSaved = loadByReportDate(baseEntityABComplexApplied.getId(), new Date(new Long("1356976800000")));
+        IBaseEntity baseEntityACComplexSaved = loadByReportDate(baseEntityACComplexApplied.getId(), new Date(new Long("1359655200000")));
         IBaseEntity baseEntityADComplexSaved = loadByReportDate(baseEntityADComplexApplied.getId(), new Date(new Long("1362074400000")));
 
         assertEquals(((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue(),
                 ((BaseEntity)baseEntityAB.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
-        assertEquals(child_meta_class.getBaseValue("string_set").getValue(),
+        assertEquals(child_AB.getBaseValue("string_set").getValue(),
                 (((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue()));
 
         assertEquals(baseEntityABComplexSaved.getBaseValue("string_set").getValue(), baseEntityAB.getBaseValue("string_set").getValue());
         assertEquals(baseEntityABComplexSaved.getReportDate(), baseEntityAB.getReportDate());
         assertEquals(baseEntityABComplexSaved.getBaseValue("uuid").getValue(), baseEntityAB.getBaseValue("uuid").getValue());
-        assertEquals(((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_meta_class.getBaseValue("uuid").getValue());
+        assertEquals(((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_AB.getBaseValue("uuid").getValue());
 
         assertEquals(((BaseEntity)baseEntityACComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue(),
                 ((BaseEntity)baseEntityAC.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
-        assertEquals(child_meta_class.getBaseValue("string_set").getValue(),
+        assertEquals(child_AC.getBaseValue("string_set").getValue(),
                 (((BaseEntity)baseEntityACComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue()));
 
         assertEquals(baseEntityACComplexSaved.getBaseValue("string_set").getValue(), baseEntityAC.getBaseValue("string_set").getValue());
         assertEquals(baseEntityACComplexSaved.getReportDate(), baseEntityAC.getReportDate());
         assertEquals(baseEntityACComplexSaved.getBaseValue("uuid").getValue(), baseEntityAC.getBaseValue("uuid").getValue());
-        assertEquals(((BaseEntity)baseEntityACComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_meta_class.getBaseValue("uuid").getValue());
+        assertEquals(((BaseEntity)baseEntityACComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_AC.getBaseValue("uuid").getValue());
 
         assertEquals(((BaseEntity)baseEntityADComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue(),
                 ((BaseEntity)baseEntityAD.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
-        assertEquals(child_meta_class.getBaseValue("string_set").getValue(),
+        assertEquals(child_AD.getBaseValue("string_set").getValue(),
                 (((BaseEntity)baseEntityADComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue()));
 
         assertEquals(baseEntityADComplexSaved.getBaseValue("string_set").getValue(), baseEntityAD.getBaseValue("string_set").getValue());
         assertEquals(baseEntityADComplexSaved.getReportDate(), baseEntityAD.getReportDate());
         assertEquals(baseEntityADComplexSaved.getBaseValue("uuid").getValue(), baseEntityAD.getBaseValue("uuid").getValue());
-        assertEquals(((BaseEntity)baseEntityADComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_meta_class.getBaseValue("uuid").getValue());
+        assertEquals(((BaseEntity)baseEntityADComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_AD.getBaseValue("uuid").getValue());
 
 
     }
@@ -491,17 +559,15 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new String[] {"a", "b"}, 1L);
 
-        IBaseEntity child_meta_class =
+        IBaseEntity child_AB =
                 constuctBaseEntity(
                         metaClass,
                         new Date(new Long("1362074400000")),
                         UUID.randomUUID().toString(),
                         new String[]{"d", "g"}, 1L);
 
-        baseEntityAB.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1362074400000")))), 1L, child_meta_class));
-
+        baseEntityAB.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1362074400000")))), 1L, child_AB));
         BaseEntity baseEntityABComplexApplied= (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
-        IBaseEntity baseEntityABComplexSaved = loadByReportDate(baseEntityABComplexApplied.getId(), new Date(new Long("1362074400000")));
 
         // 1 february 2013
         IBaseEntity baseEntityAC =
@@ -511,11 +577,14 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new String[] {"a", "c"}, 2L);
 
-        baseEntityAC.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1359655200000")))), 1L, child_meta_class));
-
+        IBaseEntity child_AC =
+                constuctBaseEntity(
+                        metaClass,
+                        new Date(new Long("1359655200000")),
+                        UUID.randomUUID().toString(),
+                        new String[]{"d", "g"}, 1L);
+        baseEntityAC.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1359655200000")))), 1L, child_AC));
         BaseEntity baseEntityACComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
-        IBaseEntity baseEntityACComplexSaved = loadByReportDate(baseEntityACComplexApplied.getId(), new Date(new Long("1359655200000")));
-
 
         // 1 march 2013
         IBaseEntity baseEntityAD =
@@ -524,43 +593,49 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         new Date(new Long("1356976800000")),
                         UUID.randomUUID().toString(),
                         new String[] {"a", "d"}, 3L);
-        baseEntityAD.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1356976800000")))), 1L, child_meta_class));
 
+        IBaseEntity child_AD =
+                constuctBaseEntity(
+                        metaClass,
+                        new Date(new Long("1356976800000")),
+                        UUID.randomUUID().toString(),
+                        new String[]{"d", "g"}, 1L);
+        baseEntityAD.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1356976800000")))), 1L, child_AD));
         BaseEntity baseEntityADComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
+
+        IBaseEntity baseEntityABComplexSaved = loadByReportDate(baseEntityABComplexApplied.getId(), new Date(new Long("1362074400000")));
+        IBaseEntity baseEntityACComplexSaved = loadByReportDate(baseEntityACComplexApplied.getId(), new Date(new Long("1359655200000")));
         IBaseEntity baseEntityADComplexSaved = loadByReportDate(baseEntityADComplexApplied.getId(), new Date(new Long("1356976800000")));
 
         assertEquals(((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue(),
                 ((BaseEntity)baseEntityAB.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
-        assertEquals(child_meta_class.getBaseValue("string_set").getValue(),
+        assertEquals(child_AB.getBaseValue("string_set").getValue(),
                 (((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue()));
 
         assertEquals(baseEntityABComplexSaved.getBaseValue("string_set").getValue(), baseEntityAB.getBaseValue("string_set").getValue());
         assertEquals(baseEntityABComplexSaved.getReportDate(), baseEntityAB.getReportDate());
         assertEquals(baseEntityABComplexSaved.getBaseValue("uuid").getValue(), baseEntityAB.getBaseValue("uuid").getValue());
-        assertEquals(((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(),
-                child_meta_class.getBaseValue("uuid").getValue());
+        assertEquals(((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_AB.getBaseValue("uuid").getValue());
 
         assertEquals(((BaseEntity)baseEntityACComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue(),
-                ((BaseEntity)baseEntityAB.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
-        assertEquals(child_meta_class.getBaseValue("string_set").getValue(),
+                ((BaseEntity)baseEntityAC.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
+        assertEquals(child_AC.getBaseValue("string_set").getValue(),
                 (((BaseEntity)baseEntityACComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue()));
 
-        assertEquals(baseEntityACComplexSaved.getBaseValue("string_set").getValue(), baseEntityAB.getBaseValue("string_set").getValue());
+        assertEquals(baseEntityACComplexSaved.getBaseValue("string_set").getValue(), baseEntityAC.getBaseValue("string_set").getValue());
         assertEquals(baseEntityACComplexSaved.getReportDate(), baseEntityAC.getReportDate());
-        assertEquals(baseEntityACComplexSaved.getBaseValue("uuid").getValue(), baseEntityAB.getBaseValue("uuid").getValue());
-        assertEquals(((BaseEntity)baseEntityACComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(),
-                child_meta_class.getBaseValue("uuid").getValue());
+        assertEquals(baseEntityACComplexSaved.getBaseValue("uuid").getValue(), baseEntityAC.getBaseValue("uuid").getValue());
+        assertEquals(((BaseEntity)baseEntityACComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_AC.getBaseValue("uuid").getValue());
 
         assertEquals(((BaseEntity)baseEntityADComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue(),
-                ((BaseEntity)baseEntityAB.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
-        assertEquals(child_meta_class.getBaseValue("string_set").getValue(),
+                ((BaseEntity)baseEntityAD.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
+        assertEquals(child_AD.getBaseValue("string_set").getValue(),
                 (((BaseEntity)baseEntityADComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue()));
 
-        assertEquals(baseEntityADComplexSaved.getBaseValue("string_set").getValue(), baseEntityAB.getBaseValue("string_set").getValue());
+        assertEquals(baseEntityADComplexSaved.getBaseValue("string_set").getValue(), baseEntityAD.getBaseValue("string_set").getValue());
         assertEquals(baseEntityADComplexSaved.getReportDate(), baseEntityAD.getReportDate());
-        assertEquals(baseEntityADComplexSaved.getBaseValue("uuid").getValue(), baseEntityAB.getBaseValue("uuid").getValue());
-        assertEquals(((BaseEntity)baseEntityADComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(),
-                child_meta_class.getBaseValue("uuid").getValue());
+        assertEquals(baseEntityADComplexSaved.getBaseValue("uuid").getValue(), baseEntityAD.getBaseValue("uuid").getValue());
+        assertEquals(((BaseEntity)baseEntityADComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_AD.getBaseValue("uuid").getValue());
 
 
     }
@@ -577,17 +652,17 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new String[] {"a", "b"}, 1L);
 
-        IBaseEntity child_meta_class =
+        IBaseEntity child_AB =
                 constuctBaseEntity(
                         metaClass,
                         new Date(new Long("1359655200000")),
                         UUID.randomUUID().toString(),
                         new String[]{"d", "g"}, 1L);
 
-        baseEntityAB.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1359655200000")))), 1L, child_meta_class));
+        baseEntityAB.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1359655200000")))), 1L, child_AB));
 
         BaseEntity baseEntityABComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAB);
-        IBaseEntity baseEntityABComplexSaved = loadByReportDate(baseEntityABComplexApplied.getId(), new Date(new Long("1359655200000")));
+
 
         // 1 january  2013
         IBaseEntity baseEntityAC =
@@ -597,10 +672,17 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new String[] {"a", "c"}, 2L);
 
-        baseEntityAC.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1356976800000")))), 1L, child_meta_class));
+        IBaseEntity child_AC =
+                constuctBaseEntity(
+                        metaClass,
+                        new Date(new Long("1356976800000")),
+                        UUID.randomUUID().toString(),
+                        new String[]{"d", "g"}, 1L);
+
+        baseEntityAC.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1356976800000")))), 1L, child_AC));
 
         BaseEntity baseEntityACComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAC);
-        IBaseEntity baseEntityACComplexSaved = loadByReportDate(baseEntityACComplexApplied.getId(), new Date(new Long("1356976800000")));
+
 
         // 1 march 2013
         IBaseEntity baseEntityAD =
@@ -609,40 +691,51 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         new Date(new Long("1362074400000")),
                         UUID.randomUUID().toString(),
                         new String[] {"a", "d"}, 3L);
-        baseEntityAD.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1362074400000")))), 1L, child_meta_class));
+
+        IBaseEntity child_AD =
+                constuctBaseEntity(
+                        metaClass,
+                        new Date(new Long("1356976800000")),
+                        UUID.randomUUID().toString(),
+                        new String[]{"d", "g"}, 1L);
+        baseEntityAD.put("child_meta_class", new BaseValue(batchRepository.addBatch(new Batch(new Date(new Long("1362074400000")))), 1L, child_AD));
 
         BaseEntity baseEntityADComplexApplied = (BaseEntity) baseEntityProcessorDao.process(baseEntityAD);
+
+
+        IBaseEntity baseEntityABComplexSaved = loadByReportDate(baseEntityABComplexApplied.getId(), new Date(new Long("1359655200000")));
+        IBaseEntity baseEntityACComplexSaved = loadByReportDate(baseEntityACComplexApplied.getId(), new Date(new Long("1356976800000")));
         IBaseEntity baseEntityADComplexSaved = loadByReportDate(baseEntityADComplexApplied.getId(), new Date(new Long("1362074400000")));
 
         assertEquals(((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue(),
                 ((BaseEntity)baseEntityAB.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
-        assertEquals(child_meta_class.getBaseValue("string_set").getValue(),
+        assertEquals(child_AB.getBaseValue("string_set").getValue(),
                 (((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue()));
 
         assertEquals(baseEntityABComplexSaved.getBaseValue("string_set").getValue(), baseEntityAB.getBaseValue("string_set").getValue());
         assertEquals(baseEntityABComplexSaved.getReportDate(), baseEntityAB.getReportDate());
         assertEquals(baseEntityABComplexSaved.getBaseValue("uuid").getValue(), baseEntityAB.getBaseValue("uuid").getValue());
-        assertEquals(((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_meta_class.getBaseValue("uuid").getValue());
+        assertEquals(((BaseEntity)baseEntityABComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_AB.getBaseValue("uuid").getValue());
 
         assertEquals(((BaseEntity)baseEntityACComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue(),
-                ((BaseEntity)baseEntityAB.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
-        assertEquals(child_meta_class.getBaseValue("string_set").getValue(),
+                ((BaseEntity)baseEntityAC.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
+        assertEquals(child_AC.getBaseValue("string_set").getValue(),
                 (((BaseEntity)baseEntityACComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue()));
 
-        assertEquals(baseEntityACComplexSaved.getBaseValue("string_set").getValue(), baseEntityAB.getBaseValue("string_set").getValue());
+        assertEquals(baseEntityACComplexSaved.getBaseValue("string_set").getValue(), baseEntityAC.getBaseValue("string_set").getValue());
         assertEquals(baseEntityACComplexSaved.getReportDate(), baseEntityAC.getReportDate());
-        assertEquals(baseEntityACComplexSaved.getBaseValue("uuid").getValue(), baseEntityAB.getBaseValue("uuid").getValue());
-        assertEquals(((BaseEntity)baseEntityACComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_meta_class.getBaseValue("uuid").getValue());
+        assertEquals(baseEntityACComplexSaved.getBaseValue("uuid").getValue(), baseEntityAC.getBaseValue("uuid").getValue());
+        assertEquals(((BaseEntity)baseEntityACComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_AC.getBaseValue("uuid").getValue());
 
         assertEquals(((BaseEntity)baseEntityADComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue(),
-                ((BaseEntity)baseEntityAB.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
-        assertEquals(child_meta_class.getBaseValue("string_set").getValue(),
+                ((BaseEntity)baseEntityAD.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue());
+        assertEquals(child_AD.getBaseValue("string_set").getValue(),
                 (((BaseEntity)baseEntityADComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("string_set").getValue()));
 
-        assertEquals(baseEntityADComplexSaved.getBaseValue("string_set").getValue(), baseEntityAB.getBaseValue("string_set").getValue());
+        assertEquals(baseEntityADComplexSaved.getBaseValue("string_set").getValue(), baseEntityAD.getBaseValue("string_set").getValue());
         assertEquals(baseEntityADComplexSaved.getReportDate(), baseEntityAD.getReportDate());
-        assertEquals(baseEntityADComplexSaved.getBaseValue("uuid").getValue(), baseEntityAB.getBaseValue("uuid").getValue());
-        assertEquals(((BaseEntity)baseEntityADComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_meta_class.getBaseValue("uuid").getValue());
+        assertEquals(baseEntityADComplexSaved.getBaseValue("uuid").getValue(), baseEntityAD.getBaseValue("uuid").getValue());
+        assertEquals(((BaseEntity)baseEntityADComplexSaved.getBaseValue("child_meta_class").getValue()).getBaseValue("uuid").getValue(), child_AD.getBaseValue("uuid").getValue());
 
 
     }
@@ -650,7 +743,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
     @Test
     public void testIntegerValue1() throws Exception
     {
-        MetaClass metaForCreate = new MetaClass("testMetaClass");
+        MetaClass metaForCreate = new MetaClass("IntegerMetaClass");
         metaForCreate.setMetaAttribute("uuid",
                 new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
         metaForCreate.setMetaAttribute("integer",
@@ -665,7 +758,6 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         43, 1L);
         BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
-        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
 
         // 1 february 2013
         IBaseEntity SecondBaseEntity =
@@ -675,7 +767,6 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         44, 2L);
         BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
-        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
 
         // 1 january 2013
         IBaseEntity ThirdBaseEntity =
@@ -684,8 +775,10 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         new Date(new Long("1356976800000")),
                         UUID.randomUUID().toString(),
                         45, 3L);
-
         BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+
+        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
+        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
         IBaseEntity ThirdBaseEntitySaved = loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
@@ -705,7 +798,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
     @Test
     public void testIntegerValue2() throws Exception
     {
-        MetaClass metaForCreate = new MetaClass("testMetaClass");
+        MetaClass metaForCreate = new MetaClass("IntegerMetaClass");
         metaForCreate.setMetaAttribute("uuid",
                 new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
         metaForCreate.setMetaAttribute("integer",
@@ -720,7 +813,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         43, 1L);
         BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
-        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
+
 
         // 1 march 2013
         IBaseEntity SecondBaseEntity =
@@ -730,7 +823,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         44, 2L);
         BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
-        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
+
 
         // 1 january 2013
         IBaseEntity ThirdBaseEntity =
@@ -740,8 +833,11 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         45, 3L);
         BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
-        IBaseEntity ThirdBaseEntitySaved = loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
 
+
+        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
+        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
+        IBaseEntity ThirdBaseEntitySaved = loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
         assertEquals(SecondBaseEntity.getReportDate(), SecondBaseEntitySaved.getReportDate());
@@ -759,7 +855,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
     @Test
     public void testDoubleValue1() throws Exception
     {
-        MetaClass metaForCreate = new MetaClass("testMetaClass");
+        MetaClass metaForCreate = new MetaClass("IntegerMetaClass");
         metaForCreate.setMetaAttribute("uuid",
                 new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
         metaForCreate.setMetaAttribute("double",
@@ -774,7 +870,6 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new Double(111.111), 1L);
         BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
-        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
 
         // 1 february 2013
         IBaseEntity SecondBaseEntity =
@@ -784,8 +879,6 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new Double(111.222), 2L);
         BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
-        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
-
 
         // 1 january 2013
         IBaseEntity ThirdBaseEntity =
@@ -795,7 +888,11 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new Double(111.333), 3L);
         BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+
+
+        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
         IBaseEntity ThirdBaseEntitySaved = loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
+        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
         assertEquals(SecondBaseEntity.getReportDate(), SecondBaseEntitySaved.getReportDate());
@@ -812,7 +909,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
     @Test
     public void testDoubleValue2() throws Exception
     {
-        MetaClass metaForCreate = new MetaClass("testMetaClass");
+        MetaClass metaForCreate = new MetaClass("DoubleMetaClass");
         metaForCreate.setMetaAttribute("uuid",
                 new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
         metaForCreate.setMetaAttribute("double",
@@ -827,7 +924,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new Double(111.111), 1L);
         BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
-        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
+
 
         // 1 january 2013
         IBaseEntity SecondBaseEntity =
@@ -837,7 +934,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new Double(111.222), 2L);
         BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
-        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
+
 
         // 1 march 2013
         IBaseEntity ThirdBaseEntity =
@@ -847,6 +944,10 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new Double(111.333), 3L);
         BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+
+
+        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
+        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
         IBaseEntity ThirdBaseEntitySaved = loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
@@ -865,7 +966,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
     @Test
     public void testBooleanValue1() throws Exception
     {
-        MetaClass metaForCreate = new MetaClass("testMetaClass");
+        MetaClass metaForCreate = new MetaClass("DoubleMetaClass");
         metaForCreate.setMetaAttribute("uuid",
                 new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
         metaForCreate.setMetaAttribute("boolean",
@@ -880,7 +981,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         true, 1L);
         BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
-        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
+
 
         // 1 february 2013
         IBaseEntity SecondBaseEntity =
@@ -890,7 +991,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         false, 2L);
         BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
-        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
+
 
         // 1 january 2013
         IBaseEntity ThirdBaseEntity =
@@ -900,6 +1001,9 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         false, 3L);
         BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+
+        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
+        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
         IBaseEntity ThirdBaseEntitySaved = loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
@@ -917,7 +1021,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
     @Test
     public void testBooleanValue2() throws Exception
     {
-        MetaClass metaForCreate = new MetaClass("testMetaClass");
+        MetaClass metaForCreate = new MetaClass("DoubleMetaClass");
         metaForCreate.setMetaAttribute("uuid",
                 new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
         metaForCreate.setMetaAttribute("boolean",
@@ -932,7 +1036,6 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         true, 1L);
         BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
-        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
 
         // 1 january 2013
         IBaseEntity SecondBaseEntity =
@@ -942,7 +1045,6 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         false, 2L);
         BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
-        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
 
         // 1 march 2013
         IBaseEntity ThirdBaseEntity =
@@ -952,6 +1054,9 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         false, 3L);
         BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+
+        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
+        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
         IBaseEntity ThirdBaseEntitySaved = loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
@@ -970,7 +1075,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
     @Test
     public void testDateValue1() throws Exception
     {
-        MetaClass metaForCreate = new MetaClass("testMetaClass");
+        MetaClass metaForCreate = new MetaClass("DateMetaClass");
         metaForCreate.setMetaAttribute("uuid",
                 new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
         metaForCreate.setMetaAttribute("date",
@@ -985,7 +1090,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new Date(new Long("1362074400000")), 1L);
         BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
-        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
+
 
         // 1 february 2013
         IBaseEntity SecondBaseEntity =
@@ -995,7 +1100,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new Date(new Long("1359655200000")), 2L);
         BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
-        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
+
 
         // 1 january 2013
         IBaseEntity ThirdBaseEntity =
@@ -1005,6 +1110,10 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new Date(new Long("1356976800000")), 3L);
         BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+
+
+        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
+        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
         IBaseEntity ThirdBaseEntitySaved = loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
@@ -1022,7 +1131,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
     @Test
     public void testDateValue2() throws Exception
     {
-        MetaClass metaForCreate = new MetaClass("testMetaClass");
+        MetaClass metaForCreate = new MetaClass("DateMetaClass");
         metaForCreate.setMetaAttribute("uuid",
                 new MetaAttribute(true, true, new MetaValue(DataTypes.STRING)));
         metaForCreate.setMetaAttribute("date",
@@ -1037,7 +1146,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new Date(new Long("1359655200000")), 1L);
         BaseEntity FirstBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(FirstBaseEntity);
-        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
+
 
         // 1 january 2013
         IBaseEntity SecondBaseEntity =
@@ -1047,7 +1156,7 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new Date(new Long("1356976800000")), 2L);
         BaseEntity SecondBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(SecondBaseEntity);
-        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
+
 
         // 1 march 2013
         IBaseEntity ThirdBaseEntity =
@@ -1057,6 +1166,9 @@ public class BaseEntityProcessorDaoImplTest //extends GenericTestCase
                         UUID.randomUUID().toString(),
                         new Date(new Long("1362074400000")), 3L);
         BaseEntity ThirdBaseEntityApplied = (BaseEntity) baseEntityProcessorDao.process(ThirdBaseEntity);
+
+        IBaseEntity FirstBaseEntitySaved = loadByReportDate(FirstBaseEntityApplied.getId(), new Date(new Long("1359655200000")));
+        IBaseEntity SecondBaseEntitySaved = loadByReportDate(SecondBaseEntityApplied.getId(), new Date(new Long("1356976800000")));
         IBaseEntity ThirdBaseEntitySaved = loadByReportDate(ThirdBaseEntityApplied.getId(), new Date(new Long("1362074400000")));
 
         assertEquals(FirstBaseEntity.getReportDate(), FirstBaseEntitySaved.getReportDate());
