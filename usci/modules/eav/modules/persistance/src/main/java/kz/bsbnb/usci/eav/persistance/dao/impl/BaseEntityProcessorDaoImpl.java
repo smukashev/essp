@@ -13,7 +13,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.persistance.IRefProcessorDao;
+import kz.bsbnb.usci.eav.persistance.dao.IRefProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
