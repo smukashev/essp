@@ -304,9 +304,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             IBaseValue baseValueSaving = baseEntitySaving.getBaseValue(attribute);
             IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
 
-            if (baseValueSaving == null)
-                continue;
-
             IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
             if (metaAttribute == null)
                 throw new RuntimeException("Атрибут должен иметь мета данные;");
@@ -370,7 +367,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     }
 
     @Override
-    public void applySimpleValue(IBaseEntity baseEntity, IBaseValue baseValueSaving, IBaseValue baseValueLoaded,
+    public void applySimpleValue(IBaseEntity baseEntityApplied, IBaseValue baseValueSaving, IBaseValue baseValueLoaded,
                                  IBaseEntityManager baseEntityManager) {
         IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
         IMetaType metaType = metaAttribute.getMetaType();
@@ -392,14 +389,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 baseValueLoaded.getBatch(),
                                 baseValueLoaded.getIndex(),
                                 new Date(baseValueLoaded.getRepDate().getTime()),
-                                metaValue.getTypeCode() == DataTypes.DATE ?
-                                        new Date(((Date) baseValueLoaded.getValue()).getTime()) :
-                                        baseValueLoaded.getValue(),
+                                returnCastedValue(metaValue, baseValueLoaded),
                                 baseValueLoaded.isClosed(),
-                                baseValueLoaded.isLast()
-                        );
+                                baseValueLoaded.isLast());
 
-                        baseValueDeleted.setBaseContainer(baseEntity);
+                        baseValueDeleted.setBaseContainer(baseEntityApplied);
                         baseEntityManager.registerAsDeleted(baseValueDeleted);
 
                         if (baseValueLoaded.isLast()) {
@@ -409,7 +403,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             IBaseValue baseValuePrevious = valueDao.getPreviousBaseValue(baseValueLoaded);
 
                             if (baseValuePrevious != null) {
-                                baseValuePrevious.setBaseContainer(baseEntity);
+                                baseValuePrevious.setBaseContainer(baseEntityApplied);
                                 baseValuePrevious.setMetaAttribute(metaAttribute);
                                 baseValuePrevious.setLast(true);
                                 baseEntityManager.registerAsUpdated(baseValuePrevious);
@@ -423,13 +417,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 baseValueSaving.getBatch(),
                                 baseValueSaving.getIndex(),
                                 new Date(baseValueLoaded.getRepDate().getTime()),
-                                metaValue.getTypeCode() == DataTypes.DATE ?
-                                        new Date(((Date) baseValueLoaded.getValue()).getTime()) :
-                                        baseValueLoaded.getValue(),
+                                returnCastedValue(metaValue, baseValueLoaded),
                                 true,
-                                baseValueLoaded.isLast()
-                        );
-                        baseValueClosed.setBaseContainer(baseEntity);
+                                baseValueLoaded.isLast());
+
+                        baseValueClosed.setBaseContainer(baseEntityApplied);
                         baseValueClosed.setMetaAttribute(metaAttribute);
                         baseEntityManager.registerAsUpdated(baseValueClosed);
                     }
@@ -442,13 +434,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 baseValueSaving.getBatch(),
                                 baseValueSaving.getIndex(),
                                 new Date(baseValueLoaded.getRepDate().getTime()),
-                                metaValue.getTypeCode() == DataTypes.DATE ?
-                                        new Date(((Date) baseValueLoaded.getValue()).getTime()) :
-                                        baseValueLoaded.getValue(),
+                                returnCastedValue(metaValue, baseValueLoaded),
                                 baseValueLoaded.isClosed(),
                                 false);
 
-                        baseValueLast.setBaseContainer(baseEntity);
+                        baseValueLast.setBaseContainer(baseEntityApplied);
                         baseValueLast.setMetaAttribute(metaAttribute);
                         baseEntityManager.registerAsUpdated(baseValueLast);
                     }
@@ -459,15 +449,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueSaving.getBatch(),
                             baseValueSaving.getIndex(),
                             new Date(baseValueSaving.getRepDate().getTime()),
-                            metaValue.getTypeCode() == DataTypes.DATE ?
-                                    new Date(((Date) baseValueLoaded.getValue()).getTime()) :
-                                    baseValueLoaded.getValue(),
+                            returnCastedValue(metaValue, baseValueLoaded),
                             true,
                             baseValueLoaded.isLast());
 
-                    baseValueClosed.setBaseContainer(baseEntity);
+                    baseValueClosed.setBaseContainer(baseEntityApplied);
                     baseValueClosed.setMetaAttribute(metaAttribute);
                     baseEntityManager.registerAsInserted(baseValueClosed);
+                } else {
+                    throw new IllegalStateException("Закрытие атрибута за прошлый период не является возможным. " +
+                            baseValueSaving.getMetaAttribute().getName() +";");
                 }
 
                 return;
@@ -484,9 +475,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 if (baseValueSaving.getNewBaseValue() != null) {
                     baseV = baseValueSaving.getNewBaseValue().getValue();
                 } else {
-                    baseV = metaValue.getTypeCode() == DataTypes.DATE ?
-                            new Date(((Date) baseValueLoaded.getValue()).getTime()) :
-                            baseValueLoaded.getValue();
+                    baseV = returnCastedValue(metaValue, baseValueLoaded);
                 }
 
                 if (compare == 0 || compare == 1) {
@@ -501,7 +490,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueLoaded.isClosed(),
                             baseValueLoaded.isLast());
 
-                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
                 } else if (compare == -1) {
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -514,7 +503,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueLoaded.isClosed(),
                             baseValueLoaded.isLast());
 
-                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsUpdated(baseValueApplied);
                 }
             } else {
@@ -531,13 +520,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueSaving.getBatch(),
                             baseValueSaving.getIndex(),
                             new Date(baseValueLoaded.getRepDate().getTime()),
-                            metaValue.getTypeCode() == DataTypes.DATE ?
-                                    new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            returnCastedValue(metaValue, baseValueSaving),
                             baseValueLoaded.isClosed(),
                             baseValueLoaded.isLast());
 
-                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsUpdated(baseValueApplied);
                 } else if (compare == 1) {
                     IBaseValue baseValueApplied = BaseValueFactory.create(
@@ -546,13 +533,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueSaving.getBatch(),
                             baseValueSaving.getIndex(),
                             new Date(baseValueSaving.getRepDate().getTime()),
-                            metaValue.getTypeCode() == DataTypes.DATE ?
-                                    new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            returnCastedValue(metaValue, baseValueSaving),
                             false,
                             baseValueLoaded.isLast());
 
-                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
 
                     if (baseValueLoaded.isLast()) {
@@ -560,16 +545,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
                                 baseValueLoaded.getId(),
-                                baseValueLoaded.getBatch(),
-                                baseValueLoaded.getIndex(),
+                                baseValueSaving.getBatch(),
+                                baseValueSaving.getIndex(),
                                 new Date(baseValueLoaded.getRepDate().getTime()),
-                                metaValue.getTypeCode() == DataTypes.DATE ?
-                                        new Date(((Date) baseValueLoaded.getValue()).getTime()) :
-                                        baseValueLoaded.getValue(),
+                                returnCastedValue(metaValue, baseValueLoaded),
                                 baseValueLoaded.isClosed(),
                                 false);
 
-                        baseValuePrevious.setBaseContainer(baseEntity);
+                        baseValuePrevious.setBaseContainer(baseEntityApplied);
                         baseValuePrevious.setMetaAttribute(metaAttribute);
 
                         baseEntityManager.registerAsUpdated(baseValuePrevious);
@@ -581,14 +564,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueSaving.getBatch(),
                             baseValueSaving.getIndex(),
                             new Date(baseValueSaving.getRepDate().getTime()),
-                            metaValue.getTypeCode() == DataTypes.DATE ?
-                                    new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            returnCastedValue(metaValue, baseValueSaving),
                             false,
-                            false
-                    );
+                            false);
 
-                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
                 }
             }
@@ -600,15 +580,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             IBaseValueDao valueDao = persistableDaoPool
                     .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
 
-            IBaseValue baseValueClosed = null;
-
             if (!metaAttribute.isFinal()) {
-                baseValueClosed = valueDao.getClosedBaseValue(baseValueSaving);
+                IBaseValue baseValueClosed = valueDao.getClosedBaseValue(baseValueSaving);
+
                 if (baseValueClosed != null) {
                     baseValueClosed.setMetaAttribute(metaAttribute);
 
                     if (baseValueClosed.equalsByValue(baseValueSaving)) {
-                        baseValueClosed.setBaseContainer(baseEntity);
+                        baseValueClosed.setBaseContainer(baseEntityApplied);
                         baseEntityManager.registerAsDeleted(baseValueClosed);
 
                         IBaseValue baseValuePrevious = valueDao.getPreviousBaseValue(baseValueClosed);
@@ -617,23 +596,22 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValuePrevious.setBatch(baseValueSaving.getBatch());
                             baseValuePrevious.setLast(true);
 
-                            baseEntity.put(metaAttribute.getName(), baseValuePrevious);
+                            baseEntityApplied.put(metaAttribute.getName(), baseValuePrevious);
                             baseEntityManager.registerAsUpdated(baseValuePrevious);
                         } else {
-                            baseEntity.put(metaAttribute.getName(), baseValuePrevious);
+                            baseEntityApplied.put(metaAttribute.getName(), baseValuePrevious);
                         }
                     } else {
                         baseValueClosed.setIndex(baseValueSaving.getIndex());
                         baseValueClosed.setBatch(baseValueSaving.getBatch());
                         baseValueClosed.setValue(returnCastedValue(metaValue, baseValueSaving));
                         baseValueClosed.setClosed(false);
-                        baseEntity.put(metaAttribute.getName(), baseValueClosed);
+
+                        baseEntityApplied.put(metaAttribute.getName(), baseValueClosed);
                         baseEntityManager.registerAsUpdated(baseValueClosed);
                     }
                 }
-            }
-
-            if (metaAttribute.isFinal() || baseValueClosed == null) {
+            } else {
                 IBaseValue baseValueLast = valueDao.getLastBaseValue(baseValueSaving);
 
                 if (baseValueLast == null) {
@@ -643,25 +621,20 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueSaving.getBatch(),
                             baseValueSaving.getIndex(),
                             new Date(baseValueSaving.getRepDate().getTime()),
-                            metaValue.getTypeCode() == DataTypes.DATE ?
-                                    new Date(((Date) baseValueSaving.getValue()).getTime()) :
-                                    baseValueSaving.getValue(),
+                            returnCastedValue(metaValue, baseValueSaving),
                             false,
                             true);
 
-                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
                 } else {
                     Date reportDateSaving = baseValueSaving.getRepDate();
                     Date reportDateLast = baseValueLast.getRepDate();
 
-                    int reportDateCompare =
-                            DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLast);
-
-                    boolean last = reportDateCompare != -1;
+                    boolean last = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLast) != -1;
 
                     if (last) {
-                        baseValueLast.setBaseContainer(baseEntity);
+                        baseValueLast.setBaseContainer(baseEntityApplied);
                         baseValueLast.setMetaAttribute(metaAttribute);
                         baseValueLast.setLast(false);
                         baseEntityManager.registerAsUpdated(baseValueLast);
@@ -677,7 +650,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             false,
                             last);
 
-                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
                 }
             }
