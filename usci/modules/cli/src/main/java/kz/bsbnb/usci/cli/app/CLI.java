@@ -1411,7 +1411,7 @@ public class CLI {
     }
 
     public void commandXSD() throws FileNotFoundException {
-        if (args.size() > 1) {
+        if (args.size() > 0) {
             if (args.get(0).equals("list")) {
                 listXSD(args.get(1));
             } else if (args.get(0).equals("convert")) {
@@ -1421,26 +1421,17 @@ public class CLI {
                     System.out.println("Argument needed: <list, convert> <fileName> <className>");
                 }
             } else if (args.get(0).equals("generate")) {
-                if (args.size() > 1) {
-                    generateXSD(args.get(1));
-                } else {
-                    System.out.println("Argument needed: <generate> <fileName>");
-                }
+                generateXSD();
             } else {
                 System.out.println("No such operation: " + args.get(0));
             }
         } else {
-            System.out.println("Argument needed: <list, convert> <fileName> [className]");
+            System.out.println("Argument needed: <list, convert, generate> <fileName> [className]");
         }
     }
 
-    private void generateXSD(String fileName) throws FileNotFoundException {
-//        File inFile = new File(fileName);
-
-//        OutputStream out = new FileOutputStream(inFile);
-
+    private void generateXSD() throws FileNotFoundException {
         List<MetaClass> metaClasses = metaClassRepository.getMetaClasses();
-
         xsdGenerator.generate(System.out, metaClasses);
     }
 
