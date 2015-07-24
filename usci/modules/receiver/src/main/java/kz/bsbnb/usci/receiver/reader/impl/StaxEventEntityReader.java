@@ -82,6 +82,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     private int totalCount = 0;
 
+    private boolean rootEntityExpected = false;
+    private String currentRootMeta = null;
+
     @PostConstruct
     public void init() {
         batchService = serviceRepository.getBatchService();
@@ -174,11 +177,14 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         if (localName.equals("batch")) {
             logger.debug("batch");
         } else if (localName.equals("entities")) {
+            rootEntityExpected = true;
             logger.debug("entities");
-        } else if (localName.equals("entity")) {
-            logger.debug("entity " + startElement.getAttributeByName(new QName("class")).getValue());
-            BaseEntity baseEntity = metaFactoryService.getBaseEntity(
-                    startElement.getAttributeByName(new QName("class")).getValue(), batch.getRepDate());
+        } else if (rootEntityExpected) {
+            currentRootMeta = localName;
+            rootEntityExpected = false;
+
+            logger.debug(localName);
+            BaseEntity baseEntity = metaFactoryService.getBaseEntity(localName, batch.getRepDate());
 
             if (hasOperationDelete(startElement))
                 baseEntity.setOperation(OperationType.DELETE);
@@ -332,7 +338,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             logger.debug("entities");
             currentContainer = null;
             return true;
-        } else if (localName.equals("entity")) {
+        } else if (localName.equals(currentRootMeta)) {
+            rootEntityExpected = true;
             index++;
             return true;
         } else {
