@@ -561,15 +561,18 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
             boolean closed = ((BigDecimal)row.get(EAV_BE_INTEGER_VALUES.IS_CLOSED.getName())).longValue() == 1;
             boolean last = ((BigDecimal)row.get(EAV_BE_INTEGER_VALUES.IS_LAST.getName())).longValue() == 1;
             int value = ((BigDecimal)row.get(EAV_BE_INTEGER_VALUES.VALUE.getName())).intValue();
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName()));
             String attribute = (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
-            Batch batch = batchRepository.getBatch(((BigDecimal)row.get(EAV_BE_INTEGER_VALUES.BATCH_ID.getName())).longValue());
+
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp)
+                    row.get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName()));
+
+            Batch batch = batchRepository.getBatch(((BigDecimal)
+                    row.get(EAV_BE_INTEGER_VALUES.BATCH_ID.getName())).longValue());
 
             IMetaType metaType = baseEntity.getMemberType(attribute);
-            baseEntity.put(
-                    attribute,
-                    BaseValueFactory.create(
-                            MetaContainerTypes.META_CLASS, metaType, id, batch, index, reportDate, value, closed, last));
+
+            baseEntity.put(attribute, BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType, id, batch,
+                    index, reportDate, value, closed, last));
         }
     }
 

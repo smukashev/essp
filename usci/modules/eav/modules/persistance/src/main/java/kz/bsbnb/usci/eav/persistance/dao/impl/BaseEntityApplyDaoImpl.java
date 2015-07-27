@@ -304,6 +304,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             IBaseValue baseValueSaving = baseEntitySaving.getBaseValue(attribute);
             IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
 
+            if (baseValueSaving == null)
+                continue;
+
             IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
             if (metaAttribute == null)
                 throw new RuntimeException("Атрибут должен иметь мета данные;");
@@ -451,7 +454,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             new Date(baseValueSaving.getRepDate().getTime()),
                             returnCastedValue(metaValue, baseValueLoaded),
                             true,
-                            baseValueLoaded.isLast());
+                            true);
 
                     baseValueClosed.setBaseContainer(baseEntityApplied);
                     baseValueClosed.setMetaAttribute(metaAttribute);
@@ -610,6 +613,19 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseEntityApplied.put(metaAttribute.getName(), baseValueClosed);
                         baseEntityManager.registerAsUpdated(baseValueClosed);
                     }
+                } else {
+                    IBaseValue baseValueApplied = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueSaving.getBatch(),
+                            baseValueSaving.getIndex(),
+                            new Date(baseValueSaving.getRepDate().getTime()),
+                            returnCastedValue(metaValue, baseValueSaving),
+                            false,
+                            true);
+
+                    baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityManager.registerAsInserted(baseValueApplied);
                 }
             } else {
                 IBaseValue baseValueLast = valueDao.getLastBaseValue(baseValueSaving);
@@ -663,40 +679,32 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
         IMetaType metaType = metaAttribute.getMetaType();
         IMetaClass metaClass = (IMetaClass) metaType;
+
         if (baseValueLoaded != null) {
             if (baseValueSaving.getValue() == null) {
                 Date reportDateSaving = baseValueSaving.getRepDate();
                 Date reportDateLoaded = baseValueLoaded.getRepDate();
+
                 int compare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
+
                 if (compare == 0) {
                     if (metaAttribute.isFinal()) {
                         IBaseEntity baseEntityLoaded = (IBaseEntity) baseValueLoaded.getValue();
                         IMetaClass childMetaClass = (IMetaClass) metaType;
 
-                        if (childMetaClass.hasNotFinalAttributes() && !childMetaClass.isSearchable()) {
-                            throw new RuntimeException("Detected situation where one or more attributes " +
-                                    "without final flag contains in attribute with final flag. Class name: " +
-                                    baseEntity.getMeta().getClassName() + ", attribute: " + metaAttribute.getName());
-                        }
+                        if (childMetaClass.hasNotFinalAttributes() && !childMetaClass.isSearchable())
+                            throw new IllegalStateException("Оперативные атрибуты могут сожержать только оперативные "
+                                    + "данные. Мета: " + baseEntity.getMeta().getClassName()
+                                    + ", атрибут: " + metaAttribute.getName());
 
-                        // TODO: Clone child instance of BaseEntity or maybe use variable baseEntityLoaded to registration as deleted
-                        IBaseValue baseValueDeleted = BaseValueFactory.create(
-                                MetaContainerTypes.META_CLASS,
-                                metaType,
-                                baseValueLoaded.getId(),
-                                baseValueLoaded.getBatch(),
-                                baseValueLoaded.getIndex(),
-                                new Date(baseValueLoaded.getRepDate().getTime()),
-                                baseValueLoaded.getValue(),
-                                baseValueLoaded.isClosed(),
-                                baseValueLoaded.isLast()
-                        );
+                        IBaseValue baseValueDeleted = ((BaseValue) baseValueLoaded).clone();
                         baseValueDeleted.setBaseContainer(baseEntity);
                         baseEntityManager.registerAsDeleted(baseValueDeleted);
 
                         if (baseValueLoaded.isLast()) {
                             IBaseValueDao valueDao = persistableDaoPool
                                     .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
+
                             IBaseValue baseValuePrevious = valueDao.getPreviousBaseValue(baseValueLoaded);
                             if (baseValuePrevious != null) {
                                 baseValuePrevious.setBaseContainer(baseEntity);
@@ -707,10 +715,13 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         }
 
                         if (!childMetaClass.isSearchable() && !metaAttribute.isImmutable()) {
-                            IBaseEntity baseEntitySaving = new BaseEntity(baseEntityLoaded, baseValueSaving.getRepDate());
+                            IBaseEntity baseEntitySaving = new BaseEntity(baseEntityLoaded,
+                                    baseValueSaving.getRepDate());
+
                             for (String attributeName : childMetaClass.getAttributeNames()) {
                                 IMetaAttribute childMetaAttribute = childMetaClass.getMetaAttribute(attributeName);
                                 IMetaType childMetaType = childMetaAttribute.getMetaType();
+
                                 baseEntitySaving.put(attributeName,
                                         BaseValueFactory.create(
                                                 MetaContainerTypes.META_CLASS,
@@ -720,14 +731,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                                 new Date(baseValueSaving.getRepDate().getTime()),
                                                 null));
                             }
+
                             applyBaseEntityAdvanced(baseEntitySaving, baseEntityLoaded, baseEntityManager);
 
                             IBaseEntityComplexValueDao baseEntityComplexValueDao = persistableDaoPool
                                     .getPersistableDao(baseValueSaving.getClass(), IBaseEntityComplexValueDao.class);
+
                             boolean singleBaseValue = baseEntityComplexValueDao.isSingleBaseValue(baseValueLoaded);
-                            if (singleBaseValue) {
+
+                            if (singleBaseValue)
                                 baseEntityManager.registerAsDeleted(baseEntityLoaded);
-                            }
                         }
                         return;
                     } else {
