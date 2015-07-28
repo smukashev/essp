@@ -322,29 +322,4 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
         return allChildBaseEntitiesIds;
     }
-
-
-    @Override
-    public long getRandomBaseEntityId(IMetaClass metaClass) {
-        return getRandomBaseEntityId(metaClass.getId());
-    }
-
-    @Override
-    public long getRandomBaseEntityId(long metaClassId) {
-        String tableAlias = "e";
-        Select select = context
-                .select(EAV_BE_ENTITIES.as(tableAlias).ID)
-                .from(EAV_BE_ENTITIES.as(tableAlias))
-                .where(EAV_BE_ENTITIES.as(tableAlias).CLASS_ID.equal(metaClassId))
-                .limit(1);
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        if (rows.size() > 0) {
-            return ((BigDecimal) (rows.get(0).get(EAV_BE_ENTITIES.ID.getName()))).longValue();
-        }
-
-        return 0;
-    }
 }

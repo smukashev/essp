@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav.persistance;
+package kz.bsbnb.usci.eav.persistance.dao;
 
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;

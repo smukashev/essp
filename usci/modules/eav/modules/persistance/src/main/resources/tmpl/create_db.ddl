@@ -1,44 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE database SYSTEM "http://db.apache.org/torque/dtd/database">
 <database name="model">
-	<table name="eav_a_user">
-    <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-    <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-    <column name="screen_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
-    <column name="email" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
-    <column name="first_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
-    <column name="last_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
-    <column name="middle_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
-    <column name="modified_date" primaryKey="false" required="false" type="DATE"/>
-    <column name="is_active" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="1"/>
-    <unique name="eau_UN_ui">
-      <unique-column name="user_id"/>
-    </unique>
-	</table>
-	<table name="eav_a_creditor_state">
-      <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-      <column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-      <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-      <!--<foreign-key foreignTable="eav_be_entities" name="eav_fk_022_01">
-        <reference local="creditor_id" foreign="id"/>
-      </foreign-key>-->
-	</table>
-	<table name="eav_a_creditor_user">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-    <unique name="eacu_UN_ui_ci">
-      <unique-column name="user_id"/>
-      <unique-column name="creditor_id"/>
-    </unique>
-	</table>
-  <table name="batch_entries">
-    <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-    <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-    <column name="value" primaryKey="false" required="true" type="CLOB" size="14,0" autoIncrement="false"/>
-    <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-    <column name="updated_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-  </table>
 	<table name="eav_m_classes">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="complex_key_type" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
@@ -153,14 +115,6 @@
 			<index-column name="containing_id"/>
 			<index-column name="container_type"/>
 		</index>
-	</table>
-	<table name="eav_batches">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="user_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="receipt_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="begin_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="end_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="rep_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
 	</table>
 	<table name="eav_be_boolean_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -727,6 +681,101 @@
 			<index-column name="value"/>
 		</index>
 	</table>
+	<table name="eav_a_user">
+    <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+    <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+    <column name="screen_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
+    <column name="email" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
+    <column name="first_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
+    <column name="last_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
+    <column name="middle_name" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
+    <column name="modified_date" primaryKey="false" required="false" type="DATE"/>
+    <column name="is_active" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="1"/>
+    <unique name="eau_UN_ui">
+      <unique-column name="user_id"/>
+    </unique>
+	</table>
+	<table name="eav_a_creditor_state">
+      <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+      <column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+      <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+      <!--<foreign-key foreignTable="eav_be_entities" name="eav_fk_022_01">
+        <reference local="creditor_id" foreign="id"/>
+      </foreign-key>-->
+	</table>
+	<table name="eav_a_creditor_user">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+    <unique name="eacu_UN_ui_ci">
+      <unique-column name="user_id"/>
+      <unique-column name="creditor_id"/>
+    </unique>
+	</table>
+	<table name="eav_batches">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="user_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="receipt_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="begin_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="end_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="rep_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+	</table>
+	<table name="eav_global">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="type" primaryKey="false" required="true" type="VARCHAR" size="256" autoIncrement="false"/>
+		<column name="code" primaryKey="false" required="true" type="VARCHAR" size="256" autoIncrement="false"/>
+		<column name="value" primaryKey="false" required="true" type="VARCHAR" size="512" autoIncrement="false"/>
+		<column name="description" primaryKey="false" required="true" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<unique name="eg_UN_t_c">
+			<unique-column name="type"/>
+			<unique-column name="code"/>
+		</unique>
+		<index name="eg_IN_t_c">
+			<index-column name="type"/>
+			<index-column name="code"/>
+		</index>
+	</table>
+	<table name="eav_batch_statuses">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="user_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="receipt_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="file_name" primaryKey="false" required="true" type="VARCHAR" size="2048" autoIncrement="false"/>
+		<column name="hash" primaryKey="false" required="true" type="VARCHAR" size="128" autoIncrement="false"/>
+		<column name="begin_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="end_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="total_count" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="actual_count" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="status_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<!--<foreign-key foreignTable="eav_a_user" name="ebs_FK_eau_id">
+			<reference local="user_id" foreign="id"/>
+		</foreign-key>-->
+		<!--<foreign-key foreignTable="eav_global" name="ebs_FK_eg_id">
+			<reference local="status_id" foreign="id"/>
+		</foreign-key>-->
+	</table>
+	<table name="eav_entity_statuses">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="receipt_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="begin_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="end_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="index" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="status_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<!--<foreign-key foreignTable="eav_global" name="ebs_FK_eg_id">
+			<reference local="status_id" foreign="id"/>
+		</foreign-key>-->
+	</table>
+	<table name="batch_entries">
+    <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+    <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+    <column name="value" primaryKey="false" required="true" type="CLOB" size="14,0" autoIncrement="false"/>
+    <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+    <column name="updated_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+  </table>
 	<table name="audit_event_kind">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="100" autoIncrement="false"/>
