@@ -31,9 +31,11 @@ public class BaseEntityOutput {
             IBaseValue value = entity.getBaseValue(memberName);
 
             String valueToString = "null";
+            boolean valueIsNull = false;
 
             if (value == null) {
                 valueToString = "not set";
+                valueIsNull = true;
             } else {
                 if (value.getValue() == null) {
                     valueToString = "null";
@@ -53,9 +55,10 @@ public class BaseEntityOutput {
                 }
             }
 
-            str += "\n" + prefix + memberName + " : " +
-                    (value == null ? "" : value.getMetaAttribute().getId()) +
-                    " : " + valueToString;
+            if(!valueIsNull)
+                str += "\n" + prefix + memberName + " : " +
+                        (value == null ? "" : value.getMetaAttribute().getId()) +
+                        " : " + valueToString;
         }
 
         return str;
@@ -76,7 +79,8 @@ public class BaseEntityOutput {
                     + meta.getClassName().toString().substring(1) + "Holder, reportDate);";
         } else {
             str += "\n BaseEntity " + meta.getClassName() +
-                    "Entity" + counter + " = new BaseEntity(meta" + meta.getClassName().toString().substring(0, 1).toUpperCase()
+                    "Entity" + counter + " = new BaseEntity(meta" +
+                    meta.getClassName().toString().substring(0, 1).toUpperCase()
                     + meta.getClassName().toString().substring(1) + "Holder, reportDate);";
         }
 
@@ -94,8 +98,10 @@ public class BaseEntityOutput {
                     {
                         if (type.isComplex()) // puts entity value
                         {
-                            str += toJava((BaseEntity) value.getValue(), prefix, 0) + "\n " + meta.getClassName() + "Entity.put( \"" + memberName +
-                                    "\" , new BaseValue(batch, " + value.getIndex() + " ," + memberName.toString() + "Entity));";
+                            str += toJava((BaseEntity) value.getValue(), prefix, 0) + "\n " + meta.getClassName()
+                                    + "Entity.put( \"" + memberName +
+                                    "\" , new BaseValue(batch, " + value.getIndex() + " ," + memberName.toString()
+                                    + "Entity));";
                         }
                     } else // if a set
                     {
@@ -107,11 +113,14 @@ public class BaseEntityOutput {
                         {
                             str += "\n BaseSet " + meta.getClassName() +
                                     "Set = new BaseSet(((MetaSet)( " + meta.getClassName().toString()
-                                    + "Entity.getMemberType(\"" + memberName + "\"))).getMemberType());" + complexJavaSet((BaseSet) value.getValue(), prefix, (MetaSet) type, meta.getClassName());
+                                    + "Entity.getMemberType(\"" + memberName + "\"))).getMemberType());" +
+                                    complexJavaSet((BaseSet) value.getValue(), prefix, (MetaSet) type,
+                                            meta.getClassName());
                             if (type.isSet()) {
 
                                 str += "\n " + meta.getClassName() + "Entity.put( \"" + memberName +
-                                        "\" , new BaseValue(batch, " + value.getIndex() + " ," + meta.getClassName() + "Set));";
+                                        "\" , new BaseValue(batch, " + value.getIndex() + " ," + meta.getClassName()
+                                        + "Set));";
                             }
                         }
                     }
@@ -126,11 +135,14 @@ public class BaseEntityOutput {
                     {
                         str += "\n BaseSet " + meta.getClassName() +
                                 "Set = new BaseSet(((MetaSet)( " + meta.getClassName().toString()
-                                + "Entity.getMemberType(\"" + memberName + "\"))).getMemberType());" + complexJavaSet((BaseSet) value.getValue(), prefix, (MetaSet) type, meta.getClassName());
+                                + "Entity.getMemberType(\"" + memberName + "\"))).getMemberType());" +
+                                complexJavaSet((BaseSet) value.getValue(), prefix, (MetaSet) type,
+                                        meta.getClassName());
                         if (type.isSet()) {
 
                             str += "\n " + meta.getClassName() + "Entity.put( \"" + memberName +
-                                    "\" , new BaseValue(batch, " + value.getIndex() + " ," + meta.getClassName() + "Set));";
+                                    "\" , new BaseValue(batch, " + value.getIndex() + " ," +
+                                    meta.getClassName() + "Set));";
 
                         }
                     } else //puts simple values
@@ -140,7 +152,8 @@ public class BaseEntityOutput {
                                     "\" , new BaseValue(batch, " + value.getIndex() + " ," + var + "));";
                         } else {
 
-                            valueToString = "\n " + meta.getClassName() + "Entity" + counter + ".put( \"" + memberName +
+                            valueToString = "\n " + meta.getClassName() + "Entity" + counter + ".put( \"" +
+                                    memberName +
                                     "\" , new BaseValue(batch, " + value.getIndex() + " ," + var + "));";
                         }
 
@@ -158,19 +171,23 @@ public class BaseEntityOutput {
         for (IBaseValue value : set.get()) {
             if (metaSet.isSet()) {
                 if (metaSet.isSetOfSets()) {
-                    str += complexJavaSet((BaseSet) value.getValue(), prefix, (MetaSet) metaSet.getMemberType(), memberName);
+                    str += complexJavaSet((BaseSet) value.getValue(), prefix, (MetaSet) metaSet.getMemberType(),
+                            memberName);
                 } else if (metaSet.isComplex())//if an entity
                 {
                     str += toJava((BaseEntity) value.getValue(), prefix, counter);
                 } else {
-                    str += "\n " + memberName + "Set.put(new BaseValue(batch," + value.getIndex() + "," + value.getValue().toString() + "));";
+                    str += "\n " + memberName + "Set.put(new BaseValue(batch," + value.getIndex() + "," +
+                            value.getValue().toString() + "));";
                 }
             }
             if (metaSet.isComplex()) {
                 if (counter == 0) {
-                    str += "\n " + memberName + "Set.put(new BaseValue(batch," + value.getIndex() + "," + memberName.subSequence(0, memberName.length() - 1) + "Entity" + "));";
+                    str += "\n " + memberName + "Set.put(new BaseValue(batch," + value.getIndex() + "," +
+                            memberName.subSequence(0, memberName.length() - 1) + "Entity" + "));";
                 } else {
-                    str += "\n " + memberName + "Set.put(new BaseValue(batch," + value.getIndex() + "," + memberName.subSequence(0, memberName.length() - 1) + "Entity" + counter + "));";
+                    str += "\n " + memberName + "Set.put(new BaseValue(batch," + value.getIndex() + "," +
+                            memberName.subSequence(0, memberName.length() - 1) + "Entity" + counter + "));";
                 }
 
             }
@@ -180,7 +197,8 @@ public class BaseEntityOutput {
     }
 
     public static String getJavaFunction(String fName, BaseEntity entity) {
-        String str = "protected BaseEntity " + fName + "(Batch batch)\n{\n java.util.Date reportDate = new java.util.Date();\n";
+        String str = "protected BaseEntity " + fName +
+                "(Batch batch)\n{\n java.util.Date reportDate = new java.util.Date();\n";
         str += toJava(entity, "", 0);
         str += "\n\n return " + entity.getMeta().getClassName() + "Entity;\n";
         str += "}";

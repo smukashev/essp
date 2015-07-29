@@ -3,9 +3,13 @@ package kz.bsbnb.usci.receiver.monitor;
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
+import kz.bsbnb.usci.core.service.IGlobalService;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.model.json.*;
+import kz.bsbnb.usci.eav.util.IGlobal;
+import kz.bsbnb.usci.eav.util.ReportStatus;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
@@ -39,7 +43,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.net.URI;
 import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -570,13 +573,18 @@ public class ZipFilesMonitor{
         }
     }
 
+    private EavGlobal getGlobal(IGlobal iGlobal) {
+        IGlobalService globalService = serviceFactory.getGlobalService();
+        return globalService.getGlobal(iGlobal);
+    }
+
     private boolean checkAndFillEavReport(long creditorId, BatchInfo batchInfo, long batchId) {
         ReportBeanRemoteBusiness reportBeanRemoteBusiness = serviceFactory.getReportBeanRemoteBusinessService();
 
         Report existing = reportBeanRemoteBusiness.getReport(creditorId, batchInfo.getRepDate());
 
         if (existing != null) {
-            if (ReportStatus.COMPLETED.getStatusId().equals(existing.getStatusId())) {
+            if (getGlobal(ReportStatus.COMPLETED).getId() == existing.getStatusId()) {
                 String errMsg = "Отчет со статусом 'Завершен' уже существует для кредитора = "
                         + creditorId +  ", отчетная дата = " + batchInfo.getRepDate();
                 logger.error(errMsg);
@@ -622,8 +630,10 @@ public class ZipFilesMonitor{
 //            }
         }
 
+        EavGlobal inProgress = getGlobal(ReportStatus.IN_PROGRESS);
+
         if (existing != null) {
-            existing.setStatusId(ReportStatus.IN_PROGRESS.getStatusId());
+            existing.setStatusId(inProgress.getId());
             existing.setTotalCount(batchInfo.getTotalCount());
             existing.setActualCount(batchInfo.getActualCount());
             existing.setEndDate(new Date());
@@ -643,7 +653,7 @@ public class ZipFilesMonitor{
                 creditor.setId(creditorId);
                 report.setCreditor(creditor);
             }
-            report.setStatusId(ReportStatus.IN_PROGRESS.getStatusId());
+            report.setStatusId(inProgress.getId());
             report.setTotalCount(batchInfo.getTotalCount());
             report.setActualCount(batchInfo.getActualCount());
             report.setReportDate(batchInfo.getRepDate());

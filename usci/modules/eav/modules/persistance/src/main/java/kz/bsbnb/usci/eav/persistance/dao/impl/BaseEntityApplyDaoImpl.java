@@ -102,6 +102,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         for (String attribute : baseEntitySaving.getAttributes()) {
             IBaseValue baseValueSaving = baseEntitySaving.getBaseValue(attribute);
+
+            if (baseValueSaving.getValue() == null)
+                continue;
+
             applyBaseValueBasic(baseEntityApplied, baseValueSaving, baseEntityManager);
         }
 
@@ -690,9 +694,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 if (compare == 0) {
                     if (metaAttribute.isFinal()) {
                         IBaseEntity baseEntityLoaded = (IBaseEntity) baseValueLoaded.getValue();
-                        IMetaClass childMetaClass = (IMetaClass) metaType;
 
-                        if (childMetaClass.hasNotFinalAttributes() && !childMetaClass.isSearchable())
+                        if (metaClass.hasNotFinalAttributes() && !metaClass.isSearchable())
                             throw new IllegalStateException("Оперативные атрибуты могут сожержать только оперативные "
                                     + "данные. Мета: " + baseEntity.getMeta().getClassName()
                                     + ", атрибут: " + metaAttribute.getName());
@@ -714,12 +717,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             }
                         }
 
-                        if (!childMetaClass.isSearchable() && !metaAttribute.isImmutable()) {
+                        if (!metaClass.isSearchable() && !metaAttribute.isImmutable()) {
                             IBaseEntity baseEntitySaving = new BaseEntity(baseEntityLoaded,
                                     baseValueSaving.getRepDate());
 
-                            for (String attributeName : childMetaClass.getAttributeNames()) {
-                                IMetaAttribute childMetaAttribute = childMetaClass.getMetaAttribute(attributeName);
+                            for (String attributeName : metaClass.getAttributeNames()) {
+                                IMetaAttribute childMetaAttribute = metaClass.getMetaAttribute(attributeName);
                                 IMetaType childMetaType = childMetaAttribute.getMetaType();
 
                                 baseEntitySaving.put(attributeName,
@@ -742,6 +745,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             if (singleBaseValue)
                                 baseEntityManager.registerAsDeleted(baseEntityLoaded);
                         }
+
                         return;
                     } else {
                         IBaseValue baseValueClosed = BaseValueFactory.create(

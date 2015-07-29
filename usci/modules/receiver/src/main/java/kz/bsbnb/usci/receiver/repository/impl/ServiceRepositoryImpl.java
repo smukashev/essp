@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver.repository.impl;
 
+import kz.bsbnb.usci.core.service.IGlobalService;
 import kz.bsbnb.usci.core.service.MailMessageBeanCommonBusiness;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.RemoteCreditorBusiness;
@@ -49,6 +50,10 @@ public class ServiceRepositoryImpl implements IServiceRepository {
     @Qualifier(value = "mailRemoteBusiness")
     private RmiProxyFactoryBean mailBusinessFactoryBean;
 
+    @Autowired
+    @Qualifier(value = "remoteGlobalService")
+    private RmiProxyFactoryBean globalServiceFactoryBean;
+
     private IEntityService entityService;
     private IBatchService batchService;
     private IMetaFactoryService metaFactoryService;
@@ -56,6 +61,7 @@ public class ServiceRepositoryImpl implements IServiceRepository {
     private RemoteCreditorBusiness remoteCreditorBusiness;
     private ReportBeanRemoteBusiness reportBeanRemoteBusinessService;
     private MailMessageBeanCommonBusiness mailMessageBusiness;
+    private IGlobalService globalService;
 
     @PostConstruct
     public void init() {
@@ -66,6 +72,7 @@ public class ServiceRepositoryImpl implements IServiceRepository {
         remoteCreditorBusiness = (RemoteCreditorBusiness) remoteCreditorService.getObject();
         reportBeanRemoteBusinessService = (ReportBeanRemoteBusiness) reportBeanRemoteBusiness.getObject();
         mailMessageBusiness = (MailMessageBeanCommonBusiness) mailBusinessFactoryBean.getObject();
+        globalService = (IGlobalService) globalServiceFactoryBean.getObject();
     }
 
     @Override
@@ -103,6 +110,11 @@ public class ServiceRepositoryImpl implements IServiceRepository {
     @Override
     public MailMessageBeanCommonBusiness getMailMessageBeanCommonBusiness() {
         return mailMessageBusiness;
+    }
+
+    @Override
+    public IGlobalService getGlobalService() {
+        return globalService;
     }
 }
 

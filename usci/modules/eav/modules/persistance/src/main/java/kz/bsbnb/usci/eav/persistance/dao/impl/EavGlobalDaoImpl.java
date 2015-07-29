@@ -3,16 +3,19 @@ package kz.bsbnb.usci.eav.persistance.dao.impl;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.persistance.dao.IEavGlobalDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import org.jooq.DSLContext;
-import org.jooq.Delete;
-import org.jooq.Insert;
-import org.jooq.Update;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_GLOBAL;
 
+@Repository
 public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
     private final Logger logger = LoggerFactory.getLogger(EavGlobalDaoImpl.class);
 
@@ -71,6 +74,21 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
 
     @Override
     public EavGlobal get(String type, String code) {
+        Select select = context.selectFrom(EAV_GLOBAL)
+                .where(EAV_GLOBAL.TYPE.eq(type).and(EAV_GLOBAL.CODE.eq(code)));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 0) {
+            return new EavGlobal(
+                    ((BigDecimal) rows.get(0).get(EAV_GLOBAL.ID.getName())).longValue(),
+                    (String) rows.get(0).get(EAV_GLOBAL.TYPE.getName()),
+                    (String) rows.get(0).get(EAV_GLOBAL.CODE.getName()),
+                    (String) rows.get(0).get(EAV_GLOBAL.VALUE.getName()),
+                    (String) rows.get(0).get(EAV_GLOBAL.DESCRIPTION.getName())
+            );
+        }
+
         return null;
     }
 }
