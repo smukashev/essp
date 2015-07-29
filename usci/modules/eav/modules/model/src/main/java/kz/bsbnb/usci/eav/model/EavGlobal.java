@@ -8,6 +8,8 @@ public class EavGlobal extends Persistable {
     private String value;
     private String description;
 
+    public EavGlobal() {}
+
     public EavGlobal(Long id, String type, String code, String value, String description) {
         this.id = id;
         this.type = type;

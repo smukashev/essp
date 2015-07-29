@@ -2,10 +2,13 @@ package kz.bsbnb.usci.eav.persistance.dao.impl;
 
 import kz.bsbnb.eav.persistance.generated.tables.records.EavReportRecord;
 import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IReportDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
+import kz.bsbnb.usci.eav.repository.IEavGlobalRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.ReportStatus;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -25,6 +28,9 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
 
     @Autowired
     IBaseEntityProcessorDao baseEntityProcessorDao;
+
+    @Autowired
+    private IEavGlobalRepository eavGlobalRepository;
 
     public Long insertReport(Report report, String username) {
         InsertOnDuplicateStep insert = context.insertInto(
@@ -118,12 +124,16 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
 
     public Date getFirstNotApprovedDate(Long creditorId) {
         Field<java.sql.Date> field = EAV_REPORT.REPORT_DATE.min().as("FIRST_NOT_APPROVED_DATE");
+
+        EavGlobal completed = eavGlobalRepository.getGlobal(ReportStatus.COMPLETED);
+        EavGlobal organizationApproved = eavGlobalRepository.getGlobal(ReportStatus.ORGANIZATION_APPROVED);
+
         SelectForUpdateStep select = context
                 .select(field)
                 .from(EAV_REPORT)
                 .where(EAV_REPORT.CREDITOR_ID.eq(creditorId))
-                .and(EAV_REPORT.STATUS_ID.notEqual(ReportStatus.COMPLETED.getStatusId()))
-                .and(EAV_REPORT.STATUS_ID.notEqual(ReportStatus.ORGANIZATION_APPROVED.getStatusId()));
+                .and(EAV_REPORT.STATUS_ID.notEqual(completed.getId()))
+                .and(EAV_REPORT.STATUS_ID.notEqual(organizationApproved.getId()));
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
@@ -137,12 +147,15 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
     public Date getLastApprovedDate(Long creditorId) {
         Field<java.sql.Date> field = EAV_REPORT.REPORT_DATE.max().as("LAST_APPROVED_DATE");
 
+        EavGlobal completed = eavGlobalRepository.getGlobal(ReportStatus.COMPLETED);
+        EavGlobal organizationApproved = eavGlobalRepository.getGlobal(ReportStatus.ORGANIZATION_APPROVED);
+
         SelectForUpdateStep select = context
                 .select(field)
                 .from(EAV_REPORT)
                 .where(EAV_REPORT.CREDITOR_ID.eq(creditorId))
-                .and(EAV_REPORT.STATUS_ID.eq(ReportStatus.COMPLETED.getStatusId())
-                        .or(EAV_REPORT.STATUS_ID.eq(ReportStatus.ORGANIZATION_APPROVED.getStatusId())));
+                .and(EAV_REPORT.STATUS_ID.eq(completed.getId())
+                        .or(EAV_REPORT.STATUS_ID.eq(organizationApproved.getId())));
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 

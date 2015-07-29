@@ -1,0 +1,34 @@
+#
+# REPORT_STATUS
+#
+global add --type=REPORT_STATUS --code=WE --value=76 --desc=WE
+global add --type=REPORT_STATUS --code=WOE --value=77 --desc=WOE
+global add --type=REPORT_STATUS --code=IN_PROGRESS --value=90 --desc=IN_PROGRESS
+global add --type=REPORT_STATUS --code=CROSS_CHECK_ERROR --value=91 --desc=CROSS_CHECK_ERROR
+global add --type=REPORT_STATUS --code=COMPLETED --value=92 --desc=COMPLETED
+global add --type=REPORT_STATUS --code=ORGANIZATION_APPROVING --value=127 --desc=ORGANIZATION_APPROVING
+global add --type=REPORT_STATUS --code=ORGANIZATION_APPROVED --value=128 --desc=ORGANIZATION_APPROVED
+
+#
+# ENTITY_STATUS
+#
+global add --type=ENTITY_STATUS --code=ERROR --value=ERROR --desc=ERROR
+global add --type=ENTITY_STATUS --code=PARSING --value=PARSING --desc=PARSING
+global add --type=ENTITY_STATUS --code=CHECK_IN_PARSER --value=CHECK_IN_PARSER --desc=CHECK_IN_PARSER
+global add --type=ENTITY_STATUS --code=WAITING --value=WAITING --desc=WAITING
+global add --type=ENTITY_STATUS --code=PROCESSING --value=PROCESSING --desc=PROCESSING
+global add --type=ENTITY_STATUS --code=CHECK_IN_CORE --value=CHECK_IN_CORE --desc=CHECK_IN_CORE
+global add --type=ENTITY_STATUS --code=SAVING --value=SAVING --desc=SAVING
+global add --type=ENTITY_STATUS --code=COMPLETED --value=COMPLETED --desc=COMPLETED
+global add --type=ENTITY_STATUS --code=TOTAL_COUNT --value=TOTAL_COUNT --desc=TOTAL_COUNT
+global add --type=ENTITY_STATUS --code=ACTUAL_COUNT --value=ACTUAL_COUNT --desc=ACTUAL_COUNT
+
+#
+# BATCH_STATUS
+#
+global add --type=BATCH_STATUS --code=WAITING --value=WAITING --desc=WAITING
+global add --type=BATCH_STATUS --code=PROCESSING --value=PROCESSING --desc=PROCESSING
+global add --type=BATCH_STATUS --code=ERROR --value=ERROR --desc=ERROR
+global add --type=BATCH_STATUS --code=COMPLETED --value=COMPLETED --desc=COMPLETED
+
+quit
