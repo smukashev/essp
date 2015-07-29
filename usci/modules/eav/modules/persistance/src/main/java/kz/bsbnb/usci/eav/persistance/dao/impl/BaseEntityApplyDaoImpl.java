@@ -465,7 +465,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseEntityManager.registerAsInserted(baseValueClosed);
                 } else {
                     throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным. " +
-                            baseValueSaving.getMetaAttribute().getName() +";");
+                            baseValueSaving.getMetaAttribute().getName() + ";");
                 }
 
                 return;
@@ -798,9 +798,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseValueClosed.setBaseContainer(baseEntity);
                     baseValueClosed.setMetaAttribute(metaAttribute);
                     baseEntityManager.registerAsInserted(baseValueClosed);
-                } else if(compare == -1) {
+                } else if (compare == -1) {
                     throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным. " +
-                            baseValueSaving.getMetaAttribute().getName() +";");
+                            baseValueSaving.getMetaAttribute().getName() + ";");
                 }
 
                 return;
@@ -1204,7 +1204,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseValueLast.setMetaAttribute(metaAttribute);
                         baseEntityManager.registerAsUpdated(baseValueLast);
                     }
-                } else if (compare == -1){
+                } else if (compare == -1) {
                     throw new UnsupportedOperationException("Закрытие простого массива за прошлый период " +
                             "не является возможным. " + baseValueSaving.getMetaAttribute().getName() + ";");
                 }
@@ -1214,10 +1214,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
-                if (metaAttribute.isFinal() && compare != 0) {
-                    throw new RuntimeException("Оперативные данные в массивах должны изменятся только за загруженные "
-                            + "периоды");
-                } else if (compare >= 0) {
+                if (compare >= 0) {
                     childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
@@ -1287,6 +1284,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 boolean isNew = true;
                 if (compare == 1) {
                     IBaseValue baseValuePrevious = baseValueDao.getPreviousBaseValue(baseValueSaving);
+
                     if (baseValuePrevious != null) {
                         reportDateLoaded = baseValuePrevious.getRepDate();
 
@@ -1302,6 +1300,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 childBaseSetApplied,
                                 false,
                                 baseValuePrevious.isLast());
+
                         baseEntity.put(metaAttribute.getName(), baseValueApplied);
                         baseEntityManager.registerAsInserted(baseValueApplied);
 
@@ -1338,7 +1337,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 new Date(baseValueSaving.getRepDate().getTime()),
                                 childBaseSetApplied,
                                 false,
-                                false); //baseValueNext.isLast());
+                                false);
                         baseEntity.put(metaAttribute.getName(), baseValueApplied);
                         baseEntityManager.registerAsInserted(baseValueApplied);
 
@@ -1415,7 +1414,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         }
 
-        Set<UUID> processedUuids = new HashSet<UUID>();
+        Set<UUID> processedUuids = new HashSet<>();
         if (childBaseSetSaving != null && childBaseSetSaving.getValueCount() > 0) {
             boolean baseValueFound;
             int compare;
