@@ -150,6 +150,12 @@
         <property name="serviceInterface" value="kz.bsbnb.usci.core.service.MailMessageBeanCommonBusiness"/>
     </bean>
 
+    <bean id="remoteGlobalService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="refreshStubOnConnectFailure" value="true"/>
+        <property name="serviceUrl" value="rmi://127.0.0.1:1099/globalService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IGlobalService"/>
+    </bean>
+
     <!-- available services -->
     <bean id="batchProcessRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
         <property name="serviceName" value="batchProcessService"/>

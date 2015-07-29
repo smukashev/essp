@@ -1,9 +1,9 @@
-package kz.bsbnb.usci.cr.model;
+package kz.bsbnb.usci.eav.util;
 
 /**
  * Created by n.seitkozhayev on 3/3/15.
  */
-public enum ReportStatus {
+public enum ReportStatus implements IGlobal {
 
     IN_PROGRESS(90L),
     WE(76L),
@@ -20,4 +20,15 @@ public enum ReportStatus {
     public Long getStatusId() {
         return statusId;
     }
+
+    @Override
+    public String type() {
+        return "REPORT_STATUS";
+    }
+
+    @Override
+    public String code() {
+        return name();
+    }
+
 }

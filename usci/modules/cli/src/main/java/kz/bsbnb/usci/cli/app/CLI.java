@@ -14,10 +14,7 @@ import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
-import kz.bsbnb.usci.cli.app.command.impl.MetaAddCommand;
-import kz.bsbnb.usci.cli.app.command.impl.MetaCreateCommand;
-import kz.bsbnb.usci.cli.app.command.impl.MetaKeyCommand;
-import kz.bsbnb.usci.cli.app.command.impl.MetaShowCommand;
+import kz.bsbnb.usci.cli.app.command.impl.*;
 import kz.bsbnb.usci.cli.app.mnt.Mnt;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
@@ -38,10 +35,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityMergeDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
-import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
@@ -111,6 +105,9 @@ public class CLI {
 
     @Autowired
     private IMetaClassDao metaClassDao;
+
+    @Autowired
+    private IEavGlobalDao eavGlobalDao;
 
     @Autowired
     private Xsd2MetaClass xsdConverter;
@@ -1442,6 +1439,20 @@ public class CLI {
         metaClassRepository.resetCache();
     }
 
+    public void commandGlobal() {
+        if (args.size() > 1) {
+            if (args.get(0).equals("add")) {
+                GlobalAddCommand globalAddCommand = new GlobalAddCommand();
+                globalAddCommand.setEavGlobalDao(eavGlobalDao);
+                globalAddCommand.run(args.toArray(new String[args.size()]));
+            } else {
+                System.out.println("No such operation: " + args.get(0));
+            }
+        } else {
+            System.out.println("Argument needed: <add> <type, code, value, desc>");
+        }
+    }
+
     public void commandMeta() {
         if (args.size() > 1) {
             if (args.get(0).equals("show")) {
@@ -2589,6 +2600,8 @@ public class CLI {
                 commandCRBatch();
             } else if (command.equals("meta")) {
                 commandMeta();
+            } else if (command.equals("global")) {
+                commandGlobal();
             } else if (command.equals("entity")) {
                 commandEntity();
             } else if (command.equals("include")) {
