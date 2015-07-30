@@ -16,6 +16,7 @@ public interface IReportDao {
     public List<Report> getReportsByReportDateAndCreditors(Date reportDate, List<Creditor> creditors);
     public Date getFirstNotApprovedDate(Long creditorId);
     public Date getLastApprovedDate(Long creditorId);
+    public Date getLastReportDate(Long creditorId);
     public List<ReportMessage> getMessagesByReport(Report report);
     public List<ReportMessageAttachment> getAttachmentsByReport(Report report);
     public void addNewMessage(ReportMessage message, Report report, List<ReportMessageAttachment> attachments);

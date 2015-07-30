@@ -171,7 +171,15 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     throw new RuntimeException("XML validation error");
                 }
             }
-        } catch (XMLStreamException | SAXException | IOException e) {
+        } catch (XMLStreamException e) {
+            statusSingleton.addBatchStatus(batchId,
+                    new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
+            throw new RuntimeException(e);
+        } catch (SAXException e) {
+            statusSingleton.addBatchStatus(batchId,
+                    new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
+            throw new RuntimeException(e);
+        } catch (IOException e) {
             statusSingleton.addBatchStatus(batchId,
                     new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
             throw new RuntimeException(e);

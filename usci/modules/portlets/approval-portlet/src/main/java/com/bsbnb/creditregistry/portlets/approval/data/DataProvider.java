@@ -34,4 +34,6 @@ public interface DataProvider {
     public List<ReportMessageAttachment> getReportAttachments(Report report);
 
     public void sendApprovalNotifications(Creditor creditor, Report report, String username, Date sendDate, String text);
+
+    public Date getLastReportDate(Creditor creditor);
 }
