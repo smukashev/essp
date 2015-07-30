@@ -48,7 +48,7 @@ public class BatchJobListener implements IListener {
             Properties properties = new Properties();
             BatchFullJModel batch = statusSingleton.getBatch(batchId);
             properties.put("FILENAME", batch.getFileName());
-            serviceFactory.getMailMessageBeanCommonBusiness().sendMailMessage("FILE_PROCESSING_COMPLETED", batch.getUserId(), properties);
+//            serviceFactory.getMailMessageBeanCommonBusiness().sendMailMessage("FILE_PROCESSING_COMPLETED", batch.getUserId(), properties);
         } catch (BatchNotFoundException e) {
             logger.error("batch with id: " + batchId + " not found");
         }

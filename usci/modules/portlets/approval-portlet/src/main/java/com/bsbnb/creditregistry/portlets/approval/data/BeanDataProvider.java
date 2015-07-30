@@ -141,6 +141,11 @@ public class BeanDataProvider implements DataProvider {
         }
     }
 
+    @Override
+    public Date getLastReportDate(Creditor creditor) {
+        return reportBusiness.getLastReportDate(creditor.getId());
+    }
+
 //    private MailMessageParameter getMailMessageParameter(MailMessage mailMessage, MailTemplateParameter templateParameter, String value) {
 //        MailMessageParameter mailMessageParameter = new MailMessageParameter();
 //        mailMessageParameter.setMailMessage(mailMessage);

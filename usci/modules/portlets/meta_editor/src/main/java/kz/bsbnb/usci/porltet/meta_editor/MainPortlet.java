@@ -295,6 +295,8 @@ public class MainPortlet extends MVCPortlet {
                         }
 
                         meta.setClassTitle(className);
+                       // meta.setClassName(classId);
+
 
                         metaFactoryService.saveMetaClass(meta);
                         writer.write("{\"success\": true, \"data\": {\"id\":\"" + classId + "\"," +

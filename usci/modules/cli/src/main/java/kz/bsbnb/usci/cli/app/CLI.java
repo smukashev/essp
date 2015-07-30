@@ -8,6 +8,7 @@ import com.couchbase.client.protocol.views.ViewRow;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
+import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
@@ -118,6 +119,8 @@ public class CLI {
     private IMetaClassDao metaClassDao;
     @Autowired
     private Xsd2MetaClass xsdConverter;
+    @Autowired
+    private XSDGenerator xsdGenerator;
     @Autowired
     private MainParser crParser;
     @Autowired
@@ -1408,7 +1411,7 @@ public class CLI {
     }
 
     public void commandXSD() throws FileNotFoundException {
-        if (args.size() > 1) {
+        if (args.size() > 0) {
             if (args.get(0).equals("list")) {
                 listXSD(args.get(1));
             } else if (args.get(0).equals("convert")) {
@@ -1417,12 +1420,19 @@ public class CLI {
                 } else {
                     System.out.println("Argument needed: <list, convert> <fileName> <className>");
                 }
+            } else if (args.get(0).equals("generate")) {
+                generateXSD();
             } else {
                 System.out.println("No such operation: " + args.get(0));
             }
         } else {
-            System.out.println("Argument needed: <list, convert> <fileName> [className]");
+            System.out.println("Argument needed: <list, convert, generate> <fileName> [className]");
         }
+    }
+
+    private void generateXSD() throws FileNotFoundException {
+        List<MetaClass> metaClasses = metaClassRepository.getMetaClasses();
+        xsdGenerator.generate(System.out, metaClasses);
     }
 
     public void commandCRBatch() throws IOException, SAXException, XMLStreamException, ParseException {

@@ -391,6 +391,7 @@ public class ProtocolLayout extends VerticalLayout {
         tableProtocol.setVisibleColumns(columns);
         tableProtocol.setColumnHeaders(getResourceStrings(columns));
         tableProtocol.setColumnWidth("note", 300);
+        tableProtocol.setColumnWidth("message", 300);
     }
 
     private void showProtocol(InputInfoDisplayBean ii) throws UnsupportedOperationException {
