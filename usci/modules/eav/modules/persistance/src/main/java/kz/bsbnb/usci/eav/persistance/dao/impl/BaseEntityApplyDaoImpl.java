@@ -464,8 +464,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseValueClosed.setMetaAttribute(metaAttribute);
                     baseEntityManager.registerAsInserted(baseValueClosed);
                 } else {
-                    throw new IllegalStateException("Закрытие атрибута за прошлый период не является возможным. " +
-                            baseValueSaving.getMetaAttribute().getName() +";");
+                    throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным. " +
+                            baseValueSaving.getMetaAttribute().getName() + ";");
                 }
 
                 return;
@@ -757,18 +757,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 new Date(baseValueLoaded.getRepDate().getTime()),
                                 baseValueLoaded.getValue(),
                                 true,
-                                baseValueLoaded.isLast()
-                        );
+                                baseValueLoaded.isLast());
+
                         baseValueClosed.setBaseContainer(baseEntity);
                         baseValueClosed.setMetaAttribute(metaAttribute);
                         baseEntityManager.registerAsUpdated(baseValueClosed);
                     }
 
                 } else if (compare == 1) {
-                    if (metaAttribute.isFinal()) {
-                        throw new RuntimeException("Instance of BaseValue with incorrect report date and final flag " +
-                                "mistakenly loaded from the database.");
-                    }
+                    if (metaAttribute.isFinal())
+                        throw new RuntimeException("Оперативные данные могут удалятся только за существующий период.");
 
                     if (baseValueLoaded.isLast()) {
                         IBaseValue baseValueLast = BaseValueFactory.create(
@@ -780,8 +778,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 new Date(baseValueLoaded.getRepDate().getTime()),
                                 baseValueLoaded.getValue(),
                                 baseValueLoaded.isClosed(),
-                                false
-                        );
+                                false);
+
                         baseValueLast.setBaseContainer(baseEntity);
                         baseValueLast.setMetaAttribute(metaAttribute);
                         baseEntityManager.registerAsUpdated(baseValueLast);
@@ -795,21 +793,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             new Date(baseValueSaving.getRepDate().getTime()),
                             baseValueLoaded.getValue(),
                             true,
-                            baseValueLoaded.isLast()
-                    );
+                            true);
+
                     baseValueClosed.setBaseContainer(baseEntity);
                     baseValueClosed.setMetaAttribute(metaAttribute);
                     baseEntityManager.registerAsInserted(baseValueClosed);
+                } else if (compare == -1) {
+                    throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным. " +
+                            baseValueSaving.getMetaAttribute().getName() + ";");
                 }
-                /*else if(compare == -1)
-                {
-                    if (metaAttribute.isFinal())
-                    {
-                        throw new RuntimeException("Instance of BaseValue with incorrect report date and final flag " +
-                                "mistakenly loaded from the database.");
-                    }
 
-                }*/
                 return;
             }
 
@@ -818,12 +811,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
             if (baseValueSaving.equalsByValue(baseValueLoaded) || !metaClass.isSearchable()) {
                 IBaseEntity baseEntityApplied;
+
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1) {
-                        throw new RuntimeException("Attempt to write immutable instance of " +
-                                "BaseEntity with classname: " +
-                                baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                        throw new UnsupportedOperationException("Сущность класса " +
+                                baseEntitySaving.getMeta().getClassName() + " не найдена;" +
+                                "\n" + baseEntitySaving.toString());
                     }
+
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
                 } else {
@@ -832,7 +827,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             applyBaseEntityAdvanced(baseEntitySaving, baseEntityLoaded, baseEntityManager);
                 }
 
-                int compare = DataTypeUtil.compareBeginningOfTheDay(baseValueSaving.getRepDate(), baseValueLoaded.getRepDate());
+                int compare = DataTypeUtil.compareBeginningOfTheDay(baseValueSaving.getRepDate(),
+                        baseValueLoaded.getRepDate());
+
                 IBaseValue baseValueApplied = BaseValueFactory.create(
                         MetaContainerTypes.META_CLASS,
                         metaType,
@@ -843,19 +840,20 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 new Date(baseValueLoaded.getRepDate().getTime()),
                         baseEntityApplied,
                         baseValueLoaded.isClosed(),
-                        baseValueLoaded.isLast()
-                );
+                        baseValueLoaded.isLast());
+
                 baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                if (compare == -1) {
+
+                if (compare == -1)
                     baseEntityManager.registerAsUpdated(baseValueApplied);
-                }
             } else {
                 IBaseEntity baseEntityApplied;
+
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1)
-                        throw new RuntimeException("Attempt to write immutable instance of " +
-                                "BaseEntity with classname: " +
-                                baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
+                        throw new UnsupportedOperationException("Сущность класса " +
+                                baseEntitySaving.getMeta().getClassName() + " не найдена;" +
+                                "\n" + baseEntitySaving.toString());
 
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
@@ -867,9 +865,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 Date reportDateSaving = baseValueSaving.getRepDate();
                 Date reportDateLoaded = baseValueLoaded.getRepDate();
-/*                boolean reportDateEquals =
-                        DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded) == 0;*/
+
                 int compare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
+
                 if (compare == 0) {
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -880,15 +878,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             new Date(baseValueLoaded.getRepDate().getTime()),
                             baseEntityApplied,
                             baseValueLoaded.isClosed(),
-                            baseValueLoaded.isLast()
-                    );
+                            baseValueLoaded.isLast());
+
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsUpdated(baseValueApplied);
                 } else if (compare == 1) {
-                    if (metaAttribute.isFinal()) {
-                        throw new RuntimeException("Instance of BaseValue with incorrect report date and final flag " +
-                                "mistakenly loaded from the database.");
-                    }
+                    if (metaAttribute.isFinal())
+                        throw new RuntimeException("Оперативные данные(" + metaAttribute.getName() + ")" +
+                                " могут изменятся только за существующие периоды;");
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -898,8 +895,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             new Date(baseValueSaving.getRepDate().getTime()),
                             baseEntityApplied,
                             false,
-                            baseValueLoaded.isLast()
-                    );
+                            true);
+
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
 
@@ -914,18 +911,17 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 baseValueLoaded.getValue(),
                                 baseValueLoaded.isClosed(),
                                 false);
+
                         baseValuePrevious.setBaseContainer(baseEntity);
                         baseValuePrevious.setMetaAttribute(metaAttribute);
                         baseEntityManager.registerAsUpdated(baseValuePrevious);
                     }
                 } else if (compare == -1) {
-                    if (metaAttribute.isFinal()) {
-                        throw new RuntimeException("Instance of BaseValue with incorrect report date and final flag " +
-                                "mistakenly loaded from the database.");
-                    }
+                    if (metaAttribute.isFinal())
+                        throw new RuntimeException("Оперативные данные(" + metaAttribute.getName() + ")" +
+                                " могут изменятся только за существующие периоды;");
 
                     if (baseValueLoaded.isClosed()) {
-
                         IBaseValue newBaseValueLoaded = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
@@ -935,7 +931,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 new Date(baseValueLoaded.getRepDate().getTime()),
                                 baseValueSaving.getValue(),
                                 baseValueLoaded.isClosed(),
-                                baseValueLoaded.isLast());
+                                false);
 
                         newBaseValueLoaded.setBaseContainer(baseEntity);
                         newBaseValueLoaded.setMetaAttribute(metaAttribute);
@@ -950,8 +946,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             new Date(baseValueSaving.getRepDate().getTime()),
                             baseEntityApplied,
                             false,
-                            baseValueLoaded.isLast()
-                    );
+                            baseValueLoaded.isLast());
+
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
 
@@ -959,18 +955,21 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         } else {
             IBaseEntity baseEntitySaving = (IBaseEntity) baseValueSaving.getValue();
-            if (baseEntitySaving == null) {
-                return;
-            }
+            if (baseEntitySaving == null)
+                throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
+                        baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");
 
             IBaseValueDao valueDao = persistableDaoPool
                     .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
+
             IBaseValue baseValueClosed = null;
             if (!metaAttribute.isFinal()) {
                 baseValueClosed = valueDao.getClosedBaseValue(baseValueSaving);
+
                 if (baseValueClosed != null) {
                     baseValueClosed.setMetaAttribute(metaAttribute);
                     IBaseEntity baseEntityClosed = (IBaseEntity) baseValueClosed.getValue();
+
                     if (baseValueClosed.equalsByValue(baseValueSaving)) {
                         baseValueClosed.setBaseContainer(baseEntity);
                         baseEntityManager.registerAsDeleted(baseValueClosed);
@@ -979,10 +978,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
-                            if (baseEntitySaving.getId() < 1) {
-                                throw new RuntimeException("Attempt to write immutable instance of BaseEntity with classname: " +
-                                        baseEntitySaving.getMeta().getClassName() + "\n" + baseEntitySaving.toString());
-                            }
+                            if (baseEntitySaving.getId() < 1)
+                                throw new UnsupportedOperationException("Сущность класса " +
+                                        baseEntitySaving.getMeta().getClassName() + " не найдена;" +
+                                        "\n" + baseEntitySaving.toString());
+
                             baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                                     baseEntitySaving.getReportDate());
                         } else {
@@ -990,6 +990,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                     apply(baseEntitySaving, baseEntityManager, null) :
                                     applyBaseEntityAdvanced(baseEntitySaving, baseEntityClosed, baseEntityManager);
                         }
+
                         baseValuePrevious.setValue(baseEntityApplied);
 
                         if (baseValueClosed.isLast()) {
@@ -1006,8 +1007,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
                             if (baseEntitySaving.getId() < 1)
-                                throw new RuntimeException("Attempt to write immutable instance of " +
-                                        "BaseEntity with classname: " + baseEntitySaving.getMeta().getClassName() +
+                                throw new UnsupportedOperationException("Сущность класса " +
+                                        baseEntitySaving.getMeta().getClassName() + " не найдена;" +
                                         "\n" + baseEntitySaving.toString());
 
                             baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
@@ -1030,30 +1031,21 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
             if (metaAttribute.isFinal() || baseValueClosed == null) {
                 IBaseValue baseValueLast = valueDao.getLastBaseValue(baseValueSaving);
-                IBaseEntity baseEntityApplied = null;
+                IBaseEntity baseEntityApplied;
+
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1)
-                        throw new RuntimeException("Attempt to write immutable instance of " +
-                                "BaseEntity with classname: " + baseEntitySaving.getMeta().getClassName() +
+                        throw new UnsupportedOperationException("Сущность класса " +
+                                baseEntitySaving.getMeta().getClassName() + " не найдена;" +
                                 "\n" + baseEntitySaving.toString());
 
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
                 } else {
-                    if (metaAttribute.isFinal()) {
-                        IBaseValue previousBaseValue = valueDao.getPreviousBaseValue(baseValueSaving);
-                        if (previousBaseValue != null) {
-                            baseEntityApplied = applyBaseEntityAdvanced(baseEntitySaving,
-                                    (IBaseEntity) previousBaseValue.getValue(), baseEntityManager);
-                        } else {
-                            IBaseValue nextBaseValue = valueDao.getNextBaseValue(baseValueSaving);
-                            if (nextBaseValue != null) {
-                                baseEntityApplied = applyBaseEntityAdvanced(baseEntitySaving,
-                                        (IBaseEntity) nextBaseValue.getValue(), baseEntityManager);
-                            } else {
-                                baseEntityApplied = apply(baseEntitySaving, baseEntityManager, null);
-                            }
-                        }
+                    IBaseValue previousBaseValue = valueDao.getPreviousBaseValue(baseValueSaving);
+                    if (previousBaseValue != null) {
+                        baseEntityApplied = applyBaseEntityAdvanced(baseEntitySaving,
+                                (IBaseEntity) previousBaseValue.getValue(), baseEntityManager);
                     } else {
                         baseEntityApplied = apply(baseEntitySaving, baseEntityManager, null);
                     }
@@ -1108,6 +1100,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     Date reportDateLast = baseValueLast.getRepDate();
                     int reportDateCompare =
                             DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLast);
+
                     boolean last = reportDateCompare != -1;
 
                     if (last) {
@@ -1125,8 +1118,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             new Date(baseValueSaving.getRepDate().getTime()),
                             baseEntityApplied,
                             false,
-                            last
-                    );
+                            last);
+
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
                 }
@@ -1138,14 +1131,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     public void applySimpleSet(IBaseEntity baseEntity, IBaseValue baseValueSaving, IBaseValue baseValueLoaded,
                                IBaseEntityManager baseEntityManager) {
         IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
-        IMetaType metaType = metaAttribute.getMetaType();
 
-        if (metaAttribute.isFinal()) {
+        if (metaAttribute.isFinal())
             throw new UnsupportedOperationException("Не реализовано;");
-        }
 
-        IMetaSet childMetaSet = (IMetaSet) metaType;
-        IMetaType childMetaType = childMetaSet.getMemberType();
+        IMetaType metaType = metaAttribute.getMetaType();
+        IMetaSet metaSet = (IMetaSet) metaType;
+
+        IMetaType childMetaType = metaSet.getMemberType();
         IMetaValue childMetaValue = (IMetaValue) childMetaType;
 
         IBaseSet childBaseSetSaving = (IBaseSet) baseValueSaving.getValue();
@@ -1154,14 +1147,17 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         Date reportDateSaving = null;
         Date reportDateLoaded = null;
+
         if (baseValueLoaded != null) {
             childBaseSetLoaded = (IBaseSet) baseValueLoaded.getValue();
-            if (childBaseSetSaving == null || childBaseSetSaving.getValueCount() <= 0) {
+
+            if (childBaseSetSaving == null || childBaseSetSaving.getValueCount() == 0) {
                 childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
 
                 reportDateSaving = baseValueSaving.getRepDate();
                 reportDateLoaded = baseValueLoaded.getRepDate();
                 int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
+
                 if (compare == 0) {
                     IBaseValue baseValueClosed = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -1173,6 +1169,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             childBaseSetLoaded,
                             true,
                             baseValueLoaded.isLast());
+
                     baseValueClosed.setBaseContainer(baseEntity);
                     baseValueClosed.setMetaAttribute(metaAttribute);
                     baseEntityManager.registerAsUpdated(baseValueClosed);
@@ -1185,7 +1182,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             new Date(baseValueSaving.getRepDate().getTime()),
                             childBaseSetLoaded,
                             true,
-                            baseValueLoaded.isLast());
+                            true);
+
                     baseValueClosed.setBaseContainer(baseEntity);
                     baseValueClosed.setMetaAttribute(metaAttribute);
                     baseEntityManager.registerAsInserted(baseValueClosed);
@@ -1201,21 +1199,24 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 childBaseSetLoaded,
                                 baseValueLoaded.isClosed(),
                                 false);
+
                         baseValueLast.setBaseContainer(baseEntity);
                         baseValueLast.setMetaAttribute(metaAttribute);
                         baseEntityManager.registerAsUpdated(baseValueLast);
                     }
+                } else if (compare == -1) {
+                    throw new UnsupportedOperationException("Закрытие простого массива за прошлый период " +
+                            "не является возможным. " + baseValueSaving.getMetaAttribute().getName() + ";");
                 }
             } else {
                 reportDateSaving = baseValueSaving.getRepDate();
                 reportDateLoaded = baseValueLoaded.getRepDate();
+
                 int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
-                if (metaAttribute.isFinal() && !(compare == 0)) {
-                    throw new RuntimeException("Instance of BaseValue with incorrect report date and final flag " +
-                            "mistakenly loaded from the database.");
-                } else if (compare >= 0) {
+                if (compare >= 0) {
                     childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
                             metaType,
@@ -1226,9 +1227,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             childBaseSetApplied,
                             baseValueLoaded.isClosed(),
                             baseValueLoaded.isLast());
+
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                 } else if (compare == -1) {
                     childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
                             metaType,
@@ -1239,19 +1242,21 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             childBaseSetApplied,
                             baseValueLoaded.isClosed(),
                             baseValueLoaded.isLast());
+
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsUpdated(baseValueApplied);
                 }
             }
         } else {
-            if (childBaseSetSaving == null) {
-                return;
-            }
+            if (childBaseSetSaving == null)
+                throw new UnsupportedOperationException("Новый и старый массив являются NULL(" +
+                        baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");
 
             IBaseValueDao baseValueDao = persistableDaoPool
                     .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
 
             IBaseValue baseValueClosed = baseValueDao.getClosedBaseValue(baseValueSaving);
+
             if (baseValueClosed != null) {
                 childBaseSetLoaded = (IBaseSet) baseValueClosed.getValue();
                 childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
@@ -1266,17 +1271,20 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         childBaseSetApplied,
                         false,
                         baseValueClosed.isLast());
+
                 baseEntity.put(metaAttribute.getName(), baseValueApplied);
                 baseEntityManager.registerAsUpdated(baseValueApplied);
             } else {
-                IBaseEntityReportDateDao baseEntityReportDateDao =
-                        persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+                IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool.getPersistableDao(
+                        BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+
                 reportDateLoaded = baseEntityReportDateDao.getMinReportDate(baseEntity.getId());
                 int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
                 boolean isNew = true;
                 if (compare == 1) {
                     IBaseValue baseValuePrevious = baseValueDao.getPreviousBaseValue(baseValueSaving);
+
                     if (baseValuePrevious != null) {
                         reportDateLoaded = baseValuePrevious.getRepDate();
 
@@ -1292,6 +1300,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 childBaseSetApplied,
                                 false,
                                 baseValuePrevious.isLast());
+
                         baseEntity.put(metaAttribute.getName(), baseValueApplied);
                         baseEntityManager.registerAsInserted(baseValueApplied);
 
@@ -1304,8 +1313,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseEntityManager.registerAsUpdated(baseValuePrevious);
                         }
                         isNew = false;
+                    } else {
+                        throw new UnsupportedOperationException("Операция не поддерживается;");
                     }
-
                 } else if (compare == -1) {
                     IBaseValue baseValueNext = baseValueDao.getNextBaseValue(baseValueSaving);
                     if (baseValueNext != null) {
@@ -1327,7 +1337,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 new Date(baseValueSaving.getRepDate().getTime()),
                                 childBaseSetApplied,
                                 false,
-                                false); //baseValueNext.isLast());
+                                false);
                         baseEntity.put(metaAttribute.getName(), baseValueApplied);
                         baseEntityManager.registerAsInserted(baseValueApplied);
 
@@ -1404,7 +1414,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         }
 
-        Set<UUID> processedUuids = new HashSet<UUID>();
+        Set<UUID> processedUuids = new HashSet<>();
         if (childBaseSetSaving != null && childBaseSetSaving.getValueCount() > 0) {
             boolean baseValueFound;
             int compare;
