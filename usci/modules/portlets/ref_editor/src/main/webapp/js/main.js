@@ -22,7 +22,7 @@ var FORM_ADD = 0;
 var FORM_EDIT = 1;
 var FORM_ADD_ARRAY_EL = 2;
 
-function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
+function createXML(currentNode, rootFlag, offset, arrayEl, first, remove) {
     var xmlStr = "";
 
     var children = currentNode.childNodes;
@@ -31,12 +31,11 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
         xmlStr += offset + "<item>\n";
     } else {
         if(first) {
-            xmlStr += offset + "<entity " +
-            (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") +
-            (operation ? " operation=\"" + operation + "\"" : "") + ">\n";
+            xmlStr += offset + "<" + currentNode.data.code +
+                (remove ? " operation=\"DELETE\"" : "") + ">\n";
         } else {
             xmlStr += offset + "<" + currentNode.data.code +
-            (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
+                (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
         }
     }
 
@@ -60,7 +59,7 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
         xmlStr += offset + "</item>\n";
     } else {
         if(first) {
-            xmlStr += offset + "</entity>\n";
+            xmlStr += offset + "</" + currentNode.data.code + ">\n";
         } else {
             xmlStr += offset + "</" + currentNode.data.code + ">\n";
         }
@@ -734,34 +733,7 @@ Ext.onReady(function() {
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
 
-            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true, "DELETE");
-
-            var selected = grid.getSelectionModel().getLastSelected();
-
-            Ext.Ajax.request({
-                url: dataUrl,
-                method: 'POST',
-                params: {
-                    xml_data: xmlStr,
-                    date: selected.data.open_date,
-                    op: 'SAVE_XML'
-                },
-                success: function(response) {
-                    Ext.MessageBox.alert("", "Операция выполнена успешно");
-                }
-            });
-        }
-    });
-
-    var buttonClose = Ext.create('Ext.button.Button', {
-        id: "buttonClose",
-        text: label_CLOSE,
-        maxWidth: 200,
-        handler : function (){
-            var tree = Ext.getCmp('entityTreeView');
-            rootNode = tree.getRootNode();
-
-            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true, "CLOSE");
+            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true, true);
 
             var selected = grid.getSelectionModel().getLastSelected();
 
@@ -1094,7 +1066,7 @@ Ext.onReady(function() {
             }
         ],
         tbar: [
-            buttonAdd, buttonXML, buttonShowXML, buttonDelete, buttonClose, buttonExport
+            buttonAdd, buttonXML, buttonShowXML, buttonDelete, buttonExport
         ]
     });
 });
