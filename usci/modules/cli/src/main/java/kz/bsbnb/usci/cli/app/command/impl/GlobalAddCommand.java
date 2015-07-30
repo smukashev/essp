@@ -88,6 +88,10 @@ public class GlobalAddCommand extends AbstractCommand implements IGlobalCommand 
 
             if (commandLine.hasOption(OPTION_DESC)) {
                 desc = (String) getParsedOption(commandLine, OPTION_DESC);
+
+                if (desc != null) {
+                    desc = desc.replace('_', ' ');
+                }
             }
 
         } catch (ParseException e) {

@@ -21,4 +21,9 @@ public class GlobalServiceImpl implements IGlobalService {
         return eavGlobalRepository.getGlobal(global);
     }
 
+    @Override
+    public EavGlobal getGlobal(Long id) {
+        return eavGlobalRepository.getGlobal(id);
+    }
+
 }

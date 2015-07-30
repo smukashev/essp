@@ -10,4 +10,6 @@ public interface IGlobalService {
 
     EavGlobal getGlobal(IGlobal global);
 
+    EavGlobal getGlobal(Long id);
+
 }

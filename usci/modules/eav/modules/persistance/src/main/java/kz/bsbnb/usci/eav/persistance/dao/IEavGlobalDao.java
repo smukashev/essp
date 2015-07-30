@@ -10,4 +10,6 @@ public interface IEavGlobalDao {
     void delete(Long id);
 
     EavGlobal get(String type, String code);
+
+    EavGlobal get(Long id);
 }

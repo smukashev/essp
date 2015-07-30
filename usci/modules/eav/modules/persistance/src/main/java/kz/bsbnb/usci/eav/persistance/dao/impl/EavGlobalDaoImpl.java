@@ -91,4 +91,24 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
 
         return null;
     }
+
+    @Override
+    public EavGlobal get(Long id) {
+        Select select = context.selectFrom(EAV_GLOBAL)
+                .where(EAV_GLOBAL.ID.eq(id));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 0) {
+            return new EavGlobal(
+                    ((BigDecimal) rows.get(0).get(EAV_GLOBAL.ID.getName())).longValue(),
+                    (String) rows.get(0).get(EAV_GLOBAL.TYPE.getName()),
+                    (String) rows.get(0).get(EAV_GLOBAL.CODE.getName()),
+                    (String) rows.get(0).get(EAV_GLOBAL.VALUE.getName()),
+                    (String) rows.get(0).get(EAV_GLOBAL.DESCRIPTION.getName())
+            );
+        }
+
+        return null;
+    }
 }

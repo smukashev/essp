@@ -39,4 +39,9 @@ public class EavGlobalRepositoryImpl implements IEavGlobalRepository {
         return getGlobal(global.type(), global.code());
     }
 
+    @Override
+    public EavGlobal getGlobal(Long id) {
+        return eavGlobalDao.get(id);
+    }
+
 }

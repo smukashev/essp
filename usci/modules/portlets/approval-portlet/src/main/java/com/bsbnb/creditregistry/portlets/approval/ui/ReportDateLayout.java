@@ -16,10 +16,10 @@ import com.vaadin.ui.RichTextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.BaseTheme;
 import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.eav.util.ReportStatus;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -162,17 +162,17 @@ public class ReportDateLayout extends VerticalLayout {
         reportStatusLabel.setSizeUndefined();
 
         Button approveReportButton = null;
-        if (!ReportType.RECIPIENCY_COMPLETED.getCode().equals(report.getStatus().getCode())) {
+        if (!ReportStatus.COMPLETED.code().equals(report.getStatus().getCode())) {
             String approveReportButtonCaption = environment.getResourceString(Localization.APPROVE_REPORT_BUTTON_CAPTION);
             if (environment.isNbUser()) {
                 approveReportButton = new Button(approveReportButtonCaption, new Button.ClickListener() {
                     public void buttonClick(Button.ClickEvent event) {
-                        updateReportStatus(ReportType.RECIPIENCY_COMPLETED);
+                        updateReportStatus(ReportStatus.COMPLETED);
                     }
                 });
             } else if (environment.isBankUser() && reportDate.equals(currentReportDate)
-                    && !ReportType.ORGANIZATION_APPROVED.getCode().equals(report.getStatus().getCode())
-                    && !ReportType.ORGANIZATION_APPROVING.getCode().equals(report.getStatus().getCode())) {
+                    && !ReportStatus.ORGANIZATION_APPROVED.code().equals(report.getStatus().getCode())
+                    && !ReportStatus.ORGANIZATION_APPROVING.code().equals(report.getStatus().getCode())) {
                 approveReportButton = new Button(approveReportButtonCaption, new Button.ClickListener() {
                     public void buttonClick(Button.ClickEvent event) {
                         ApprovalBusiness approvalBusiness = new ApprovalBusiness();
@@ -187,19 +187,19 @@ public class ReportDateLayout extends VerticalLayout {
                         data.put("creditorId", creditor.getId() + "");
 
                         approvalBusiness.startApprovalProcess(data);
-                        updateReportStatus(ReportType.ORGANIZATION_APPROVING);
+                        updateReportStatus(ReportStatus.ORGANIZATION_APPROVING);
                     }
                 });
             }
         }
         Button undoApproveReportButton = null;
         if (environment.isNbUser()
-                && (report.getStatus().getCode().equals(ReportType.RECIPIENCY_COMPLETED.getCode())
-                || report.getStatus().getCode().equals(ReportType.  ORGANIZATION_APPROVED.getCode()))) {
+                && (report.getStatus().getCode().equals(ReportStatus.COMPLETED.code())
+                || report.getStatus().getCode().equals(ReportStatus.ORGANIZATION_APPROVED.code()))) {
             String undoApproveReportButtonCaption = environment.getResourceString(Localization.UNDO_APPROVE_REPORT_BUTTON_CAPTION);
             undoApproveReportButton = new Button(undoApproveReportButtonCaption, new Button.ClickListener() {
                 public void buttonClick(Button.ClickEvent event) {
-                    updateReportStatus(ReportType.RECIPIENCY_IN_PROGRESS);
+                    updateReportStatus(ReportStatus.IN_PROGRESS);
                 }
             });
         }
@@ -330,7 +330,7 @@ public class ReportDateLayout extends VerticalLayout {
         reportDateDetailsLayout.addComponent(messagesLayout);
     }
 
-    private void updateReportStatus(ReportType newStatus) {
+    private void updateReportStatus(ReportStatus newStatus) {
         provider.updateReportStatus(report, newStatus);
         loadReportDate(reportDate);
         addNewMessage(String.format(environment.getResourceString(Localization.REPORT_APPROVE_MESSAGE_TEMPLATE), report.getStatus().getNameRu()), new ArrayList<ReportMessageAttachment>());

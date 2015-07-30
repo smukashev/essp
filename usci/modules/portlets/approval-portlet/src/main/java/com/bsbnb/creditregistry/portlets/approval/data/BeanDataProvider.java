@@ -1,9 +1,12 @@
 package com.bsbnb.creditregistry.portlets.approval.data;
 
+import kz.bsbnb.usci.core.service.IGlobalService;
 import kz.bsbnb.usci.core.service.MailMessageBeanCommonBusiness;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.eav.model.EavGlobal;
+import kz.bsbnb.usci.eav.util.ReportStatus;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.text.ParseException;
@@ -21,6 +24,7 @@ public class BeanDataProvider implements DataProvider {
     private RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean;
     private RmiProxyFactoryBean reportBusinessFactoryBean;
     private RmiProxyFactoryBean mailBusinessFactoryBean;
+    private RmiProxyFactoryBean globalServiceFactoryBean;
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -28,6 +32,7 @@ public class BeanDataProvider implements DataProvider {
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private ReportBeanRemoteBusiness reportBusiness;
     private MailMessageBeanCommonBusiness mailMessageBusiness;
+    private IGlobalService globalService;
 
     public BeanDataProvider() {
         // portalUserBeanRemoteBusiness
@@ -50,6 +55,11 @@ public class BeanDataProvider implements DataProvider {
         mailBusinessFactoryBean.afterPropertiesSet();
         mailMessageBusiness = (MailMessageBeanCommonBusiness) mailBusinessFactoryBean.getObject();
 
+        globalServiceFactoryBean = new RmiProxyFactoryBean();
+        globalServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/globalService");
+        globalServiceFactoryBean.setServiceInterface(IGlobalService.class);
+        globalServiceFactoryBean.afterPropertiesSet();
+        globalService = (IGlobalService) globalServiceFactoryBean.getObject();
     }
 
     @Override
@@ -104,7 +114,11 @@ public class BeanDataProvider implements DataProvider {
         if (reports.size() > 1) {
             throw new RuntimeException("Reports size > 1");
         }
-        return reports.isEmpty() ? null : reports.get(0);
+        if (reports.isEmpty()) {
+            return null;
+        }
+
+        return reports.get(0);
     }
 
     @Override
@@ -116,8 +130,9 @@ public class BeanDataProvider implements DataProvider {
     }
 
     @Override
-    public void updateReportStatus(Report report, ReportType status) {
-        report.setStatusId(ReportType.STATUS_CODE_ID_MAP.get(status.getCode()));
+    public void updateReportStatus(Report report, ReportStatus status) {
+        EavGlobal eavGlobal = globalService.getGlobal(status);
+        report.setStatusId(eavGlobal.getId());
         reportBusiness.updateReport(report);
     }
 

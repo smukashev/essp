@@ -21,6 +21,7 @@ import java.util.logging.Level;
 //import com.bsbnb.creditregistry.ejb.ref.business.remote.IRemoteSharedBusiness;
 //import com.bsbnb.creditregistry.ejb.ref.exception.ResultInconsistentException;
 //import com.bsbnb.creditregistry.ejb.ref.exception.ResultNotFoundException;
+import kz.bsbnb.usci.eav.util.ReportStatus;
 import kz.bsbnb.usci.portlets.upload.PortletEnvironmentFacade;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
@@ -257,7 +258,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
                 creditor = creditors.get(0);
                 Date reportDate = reportBusiness.getReportDate(creditor.getId());
                 Report report = reportBusiness.getByCreditor_ReportDate(creditor, reportDate);
-                if(report!=null && ReportType.ORGANIZATION_APPROVED.getCode().equals(report.getStatus().getCode())) {
+                if(report!=null && ReportStatus.ORGANIZATION_APPROVED.code().equals(report.getStatus().getCode())) {
                     result = getResourceString(Localization.ORGANIZATION_APPROVED_DATA_MESSAGE.getKey());
                 }
             }
