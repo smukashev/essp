@@ -342,7 +342,7 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao
         List<Map<String, Object>> list = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if(list == null || list.isEmpty())
-            return null;
+            throw new RuntimeException("user not found!!!");
 
         Map<String, Object> row = list.get(0);
 
