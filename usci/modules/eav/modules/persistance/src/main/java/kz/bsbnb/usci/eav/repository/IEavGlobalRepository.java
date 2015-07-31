@@ -12,4 +12,6 @@ public interface IEavGlobalRepository {
 
     EavGlobal getGlobal(IGlobal global);
 
+    EavGlobal getGlobal(Long id);
+
 }

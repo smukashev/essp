@@ -1,13 +1,13 @@
 #
 # REPORT_STATUS
 #
-global add --type=REPORT_STATUS --code=WE --value=76 --desc=WE
-global add --type=REPORT_STATUS --code=WOE --value=77 --desc=WOE
-global add --type=REPORT_STATUS --code=IN_PROGRESS --value=90 --desc=IN_PROGRESS
-global add --type=REPORT_STATUS --code=CROSS_CHECK_ERROR --value=91 --desc=CROSS_CHECK_ERROR
-global add --type=REPORT_STATUS --code=COMPLETED --value=92 --desc=COMPLETED
-global add --type=REPORT_STATUS --code=ORGANIZATION_APPROVING --value=127 --desc=ORGANIZATION_APPROVING
-global add --type=REPORT_STATUS --code=ORGANIZATION_APPROVED --value=128 --desc=ORGANIZATION_APPROVED
+global add --type=REPORT_STATUS --code=WE --value=76 --desc=Отконтроллирован_с_ошибками
+global add --type=REPORT_STATUS --code=WOE --value=77 --desc=Отконтроллирован_без_ошибок
+global add --type=REPORT_STATUS --code=IN_PROGRESS --value=90 --desc=В_процессе
+global add --type=REPORT_STATUS --code=CROSS_CHECK_ERROR --value=91 --desc=Ошибка_межформенного_контроля
+global add --type=REPORT_STATUS --code=COMPLETED --value=92 --desc=Завершен/Утвержден
+global add --type=REPORT_STATUS --code=ORGANIZATION_APPROVING --value=127 --desc=Идет_подтверждение
+global add --type=REPORT_STATUS --code=ORGANIZATION_APPROVED --value=128 --desc=Утвержден_организацией
 
 #
 # ENTITY_STATUS

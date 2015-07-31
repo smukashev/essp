@@ -3,6 +3,7 @@ package com.bsbnb.creditregistry.portlets.approval.data;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.themes.BaseTheme;
 import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.eav.util.ReportStatus;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -78,16 +79,16 @@ public class ReportDisplayBean {
     
     public String getColor() {
         Shared status = report.getStatus();
-        if(ReportType.RECIPIENCY_COMPLETED.getCode().equals(status.getCode())) {
+        if(ReportStatus.COMPLETED.code().equals(status.getCode())) {
             return "lightblue";
         }
-        if(ReportType.ORGANIZATION_APPROVED.getCode().equals(status.getCode())) {
+        if(ReportStatus.ORGANIZATION_APPROVED.code().equals(status.getCode())) {
             return "orange";
         }
-        if(ReportType.CONTROL_WITHOUT_ERRORS.getCode().equals(status.getCode())) {
+        if(ReportStatus.WOE.code().equals(status.getCode())) {
             return "lightgreen";
         }
-        if(ReportType.CONTROL_WITH_ERRORS.getCode().equals(status.getCode())) {
+        if(ReportStatus.WE.code().equals(status.getCode())) {
             return "red";
         }
         return "white";

@@ -117,6 +117,17 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
             report.setStatusId(((BigDecimal) row.get(EAV_REPORT.STATUS_ID.getName())).longValue());
             report.setReportDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.REPORT_DATE.getName())));
             reports.add(report);
+
+            EavGlobal global = eavGlobalRepository.getGlobal(report.getStatusId());
+            {
+                Shared shared = new Shared();
+                shared.setId(global.getId());
+                shared.setType(global.getType());
+                shared.setCode(global.getCode());
+                shared.setNameRu(global.getDescription());
+                shared.setNameKz(global.getDescription());
+                report.setStatus(shared);
+            }
         }
 
         return reports;
@@ -319,6 +330,16 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
         report.setStatusId(((BigDecimal) row.get(EAV_REPORT.STATUS_ID.getName())).longValue());
         report.setReportDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.REPORT_DATE.getName())));
 
+        EavGlobal global = eavGlobalRepository.getGlobal(report.getStatusId());
+        {
+            Shared shared = new Shared();
+            shared.setId(global.getId());
+            shared.setType(global.getType());
+            shared.setCode(global.getCode());
+            shared.setNameRu(global.getDescription());
+            shared.setNameKz(global.getDescription());
+            report.setStatus(shared);
+        }
         return report;
     }
 }

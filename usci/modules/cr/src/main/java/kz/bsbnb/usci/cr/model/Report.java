@@ -42,7 +42,7 @@ public class Report implements Serializable {
     private Date beginningDate;
     private Date endDate;
     private Date lastManualEditDate;
-    private transient Shared status;
+    private Shared status;
 
     public Report() {
     }
@@ -120,13 +120,6 @@ public class Report implements Serializable {
     }
 
     public Shared getStatus() {
-        if (statusId != null && (status == null || status.getId() != statusId.longValue())) {
-            status = new Shared();
-            status.setId(statusId);
-            status.setCode(STATUS_CODE_MAP.get(statusId));
-            status.setNameRu(STATUS_NAME_MAP.get(statusId));
-            status.setNameKz(STATUS_NAME_MAP.get(statusId));
-        }
         return status;
     }
 
