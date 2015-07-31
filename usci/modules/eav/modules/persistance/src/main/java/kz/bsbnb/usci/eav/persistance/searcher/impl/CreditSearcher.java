@@ -77,8 +77,23 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
             }
 
             if (primaryContractId != null && creditorId != null && primaryContractId > 0 && creditorId > 0) {
-                String complexValuesTableAlias = "cv";
-                SelectConditionStep select = context
+                //String complexValuesTableAlias = "cv";
+
+                SelectConditionStep select = (SelectConditionStep) context
+                        .select(EAV_BE_ENTITIES.as("en").ID.as("inner_id"))
+                        .from(EAV_BE_ENTITIES.as("en"))
+                        .join(EAV_BE_COMPLEX_VALUES.as("co"))
+                        .on(EAV_BE_ENTITIES.as("en").ID.equal(EAV_BE_COMPLEX_VALUES.as("co").ENTITY_ID))
+                        .and(EAV_BE_ENTITIES.as("en").DELETED.eq(DataUtils.convert(true)))
+                        .and(EAV_BE_COMPLEX_VALUES.as("co").ATTRIBUTE_ID.equal(entity.getMetaAttribute("primary_contract").getId()))
+                        .and(EAV_BE_COMPLEX_VALUES.as("co").ENTITY_VALUE_ID.equal(primaryContractId))
+                        .join(EAV_BE_COMPLEX_VALUES.as("co2"))
+                        .on(EAV_BE_ENTITIES.as("en").ID.equal(EAV_BE_COMPLEX_VALUES.as("co2").ENTITY_ID))
+                        .and(EAV_BE_COMPLEX_VALUES.as("co2").ATTRIBUTE_ID.equal(entity.getMetaAttribute("data_creditor").getId()))
+                        .and(EAV_BE_COMPLEX_VALUES.as("co2").ENTITY_VALUE_ID.equal(creditorId));
+
+
+                /*SelectConditionStep select = context
                         .select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.as("inner_id"))
                         .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
                         .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ATTRIBUTE_ID.
@@ -88,13 +103,13 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
                         .and(DSL.notExists(context.selectFrom(EAV_BE_ENTITIES).where(EAV_BE_ENTITIES.ID.
                                 eq(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID)
                                 .and(EAV_BE_ENTITIES.DELETED.eq(DataUtils.convert(true))))));
-
+*/
                 List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
                         select.getBindValues().toArray());
 
                 for (Map<String, Object> row : rows) {
                     long innerId = ((BigDecimal) row.get("inner_id")).longValue();
-                    SelectConditionStep selectInner = context
+  /*                  SelectConditionStep selectInner = context
                             .select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.as("inner_id"))
                             .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
                             .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ATTRIBUTE_ID.
@@ -103,7 +118,7 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
                             .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.equal(innerId));
 
                     if (queryForListWithStats(selectInner.getSQL(), selectInner.getBindValues().toArray()).size() <= 0)
-                        continue;
+                        continue;*/
 
                     res.add(innerId);
                 }
