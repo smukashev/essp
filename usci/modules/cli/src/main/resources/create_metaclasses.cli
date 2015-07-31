@@ -35,11 +35,11 @@ meta add --name=ref_doc_type --attribute=weight --type=integer
 #====================================
 
 meta create --name=document
-meta add --name=document --attribute=name --type=string
 meta add --name=document --attribute=no --type=string
 meta key --name=document --attribute=no
 meta add --name=document --attribute=doc_type --type=meta_class --childname=ref_doc_type --keytype=any --immutable
 meta key --name=document --attribute=doc_type
+meta add --name=document --attribute=name --type=string
 
 #====================================
 #= REF_SUBJECT_TYPE
@@ -58,14 +58,14 @@ meta add --name=ref_subject_type --attribute=report_period_duration_months --typ
 #====================================
 
 meta create --name=ref_balance_account --reference --reference
+meta add --name=ref_balance_account --attribute=no_ --type=string --required
+meta key --name=ref_balance_account --attribute=no_
 meta add --name=ref_balance_account --attribute=display_no --type=string
 meta add --name=ref_balance_account --attribute=fifth_sign --type=string
 meta add --name=ref_balance_account --attribute=first_fourth_signs --type=string
 meta add --name=ref_balance_account --attribute=is_in_balance --type=boolean
 meta add --name=ref_balance_account --attribute=name_kz --type=string --required
 meta add --name=ref_balance_account --attribute=name_ru --type=string --required
-meta add --name=ref_balance_account --attribute=no_ --type=string --required
-meta key --name=ref_balance_account --attribute=no_
 meta add --name=ref_balance_account --attribute=seventh_sign --type=string
 meta add --name=ref_balance_account --attribute=sixth_sign --type=string
 
@@ -399,6 +399,8 @@ meta add --name=bank_relation --attribute=creditor --type=meta_class --childname
 #====================================
 
 meta create --name=organization
+meta add --name=organization --attribute=docs --type=meta_class --array --childname=document
+meta key --name=organization --attribute=docs
 meta add --name=organization --attribute=is_se --type=boolean
 meta add --name=organization --attribute=country --type=meta_class --childname=ref_country --keytype=any --immutable
 meta add --name=organization --attribute=econ_trade --type=meta_class --childname=ref_econ_trade --keytype=any --immutable
@@ -409,23 +411,20 @@ meta add --name=organization --attribute=offshore --type=meta_class --childname=
 meta add --name=organization --attribute=addresses --type=meta_class --array --childname=address
 meta add --name=organization --attribute=bank_relations --type=meta_class --childname=bank_relation --array --keytype=any
 meta add --name=organization --attribute=contacts --type=meta_class --array --childname=contact
-meta add --name=organization --attribute=docs --type=meta_class --array --childname=document
 meta add --name=organization --attribute=names --type=meta_class --array --childname=organization_name
-
-meta key --name=organization --attribute=docs
 
 #====================================
 #= PERSON
 #====================================
 
 meta create --name=person
+meta add --name=person --attribute=docs --type=meta_class --array --childname=document
+meta key --name=person --attribute=docs
 meta add --name=person --attribute=country --type=meta_class --childname=ref_country --keytype=any --immutable
 meta add --name=person --attribute=offshore --type=meta_class --childname=ref_offshore --keytype=any --immutable
 meta add --name=person --attribute=addresses --type=meta_class --array --childname=address
 meta add --name=person --attribute=bank_relations --type=meta_class --childname=bank_relation --array --keytype=any
 meta add --name=person --attribute=contacts --type=meta_class --array --childname=contact
-meta add --name=person --attribute=docs --type=meta_class --array --childname=document
-meta key --name=person --attribute=docs
 meta add --name=person --attribute=names --type=meta_class --array --childname=person_name
 
 #====================================
@@ -611,7 +610,13 @@ meta key --name=primary_contract --attribute=no
 meta create --name=data_creditor
 meta add --name=data_creditor --attribute=creditor --type=meta_class --childname=ref_creditor
 meta key --name=data_creditor --attribute=creditor
-meta add --name=data_creditor --attribute=subjects --type=meta_class --array --childname=subject
+
+#meta add --name=data_creditor --attribute=subjects --type=meta_class --array --childname=subject
+
+meta add --name=data_creditor --attribute=organizations --type=meta_class --array --childname=organization
+meta add --name=data_creditor --attribute=persons --type=meta_class --array --childname=person
+meta add --name=data_creditor --attribute=creditors --type=meta_class --array --childname=creditor
+
 meta add --name=data_creditor --attribute=pledges --type=meta_class --array --childname=pledge
 meta add --name=data_creditor --attribute=change --type=meta_class --childname=change --final
 
@@ -633,13 +638,14 @@ meta add --name=credit --attribute=credit_type --type=meta_class --childname=ref
 meta add --name=credit --attribute=currency --type=meta_class --childname=ref_currency --keytype=any --immutable
 meta add --name=credit --attribute=finance_source --type=meta_class --childname=ref_finance_source --keytype=any --immutable
 meta add --name=credit --attribute=portfolio --type=meta_class --childname=portfolio
-meta add --name=credit --attribute=creditor --type=meta_class --childname=ref_creditor --keytype=any --immutable
-meta key --name=credit --attribute=creditor
+#meta add --name=credit --attribute=creditor --type=meta_class --childname=ref_creditor --keytype=any --immutable
+#meta key --name=credit --attribute=creditor
 meta add --name=credit --attribute=primary_contract --type=meta_class --childname=primary_contract
 meta key --name=credit --attribute=primary_contract
 meta add --name=credit --attribute=maturity_date --type=date
 meta add --name=credit --attribute=prolongation_date --type=date
 meta add --name=credit --attribute=data_creditor --type=meta_class --childname=data_creditor
+meta key --name=credit --attribute=data_creditor
 
 #====================================
 #= PORTFOLIO_FLOW_DETAIL
@@ -746,7 +752,6 @@ sql insert into audit_event_kind (name,is_always_auditable,is_active,code) value
 #==============================================================================================
 sql insert into mnt_operations(name) values ('Операция удаления с таблицы MAINTENANCE.CREDREG_DELETE_CREDIT')
 #----------------------------------------------------------------------------------------------
-
 
 #==============================================================================================
 #  NOTIFICATION PORTLET

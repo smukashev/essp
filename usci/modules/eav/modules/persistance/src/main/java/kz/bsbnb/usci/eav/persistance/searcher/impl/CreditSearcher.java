@@ -41,7 +41,7 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
         List<Long> ids = searcherPool.getSearcher(entity.getMeta().getClassName()).findAll(entity);
 
         if (ids.size() > 1)
-            throw new RuntimeException("Found more than one instance of BaseEntity. Needed one.");
+            throw new RuntimeException("Найдено более одного договора;");
 
         if (ids.size() < 1)
             return null;
@@ -56,7 +56,7 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
         ArrayList<Long> res = new ArrayList<>();
 
         BaseEntity primaryContract = (BaseEntity) entity.getEl("primary_contract");
-        BaseEntity creditor = (BaseEntity) entity.getEl("creditor");
+        BaseEntity creditor = (BaseEntity) entity.getEl("data_creditor");
 
         if (primaryContract != null && creditor != null) {
             Long primaryContractId;
@@ -98,7 +98,7 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
                             .select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.as("inner_id"))
                             .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
                             .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ATTRIBUTE_ID.
-                                    equal(entity.getMetaAttribute("creditor").getId()))
+                                    equal(entity.getMetaAttribute("data_creditor").getId()))
                             .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(creditorId))
                             .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.equal(innerId));
 

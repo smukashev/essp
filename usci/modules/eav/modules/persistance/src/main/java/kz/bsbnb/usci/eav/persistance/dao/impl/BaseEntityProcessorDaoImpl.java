@@ -86,6 +86,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public IBaseEntity postPrepare(IBaseEntity baseEntity, IBaseEntity parentEntity) {
         MetaClass metaClass = baseEntity.getMeta();
 
+        if (parentEntity != null && metaClass.isSearchable() && metaClass.isParentIsKey()) {
+            Long baseEntityId = searcherPool.getImprovedBaseEntityLocalSearcher().
+                    findSingleWithParent((BaseEntity) baseEntity, (BaseEntity) parentEntity);
+
+            if (baseEntityId == null) baseEntity.setId(0);
+            else baseEntity.setId(baseEntityId);
+        }
+
         for (String attribute : baseEntity.getAttributes()) {
             IMetaType memberType = baseEntity.getMemberType(attribute);
 
@@ -117,14 +125,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     }
                 }
             }
-        }
-
-        if (parentEntity != null && metaClass.isSearchable() && metaClass.isParentIsKey()) {
-            Long baseEntityId = searcherPool.getImprovedBaseEntityLocalSearcher().
-                    findSingleWithParent((BaseEntity) baseEntity, (BaseEntity) parentEntity);
-
-            if (baseEntityId == null) baseEntity.setId(0);
-            else baseEntity.setId(baseEntityId);
         }
 
         return baseEntity;
@@ -171,7 +171,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         return baseEntity;
     }
-
 
     @Override
     @Transactional
