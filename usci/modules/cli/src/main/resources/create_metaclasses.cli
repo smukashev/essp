@@ -570,7 +570,7 @@ meta add --name=ref_credit_type --attribute=name_ru --type=string --required
 #= PLEDGE
 #====================================
 
-meta create --name=pledge
+meta create --name=pledge --parent_is_key
 meta add --name=pledge --attribute=contract --type=string
 meta add --name=pledge --attribute=value --type=double
 meta add --name=pledge --attribute=pledge_type --type=meta_class --childname=ref_pledge_type --keytype=any --immutable
@@ -579,21 +579,17 @@ meta add --name=pledge --attribute=pledge_type --type=meta_class --childname=ref
 #= SUBJECT
 #====================================
 
-meta create --name=subject
+meta create --name=subject --parent_is_key
 meta add --name=subject --attribute=type --type=meta_class --childname=ref_debtor_type --immutable
-#meta key --name=subject --attribute=creditor
 meta add --name=subject --attribute=creditor --type=meta_class --childname=creditor
-#meta key --name=subject --attribute=creditor
 meta add --name=subject --attribute=organization --type=meta_class --childname=organization
-#meta key --name=subject --attribute=organization
 meta add --name=subject --attribute=person --type=meta_class --childname=person
-#meta key --name=subject --attribute=person
 
 #====================================
 #= CHANGE
 #====================================
 
-meta create --name=change
+meta create --name=change --parent_is_key
 meta add --name=change --attribute=credit_flow --type=meta_class --childname=credit_flow --final
 meta add --name=change --attribute=remains --type=meta_class --childname=remains --final
 meta add --name=change --attribute=turnover --type=meta_class --childname=turnover --final
@@ -607,6 +603,17 @@ meta add --name=primary_contract --attribute=date --type=date
 meta key --name=primary_contract --attribute=date
 meta add --name=primary_contract --attribute=no --type=string
 meta key --name=primary_contract --attribute=no
+
+#====================================
+#= DATA_CREDITOR
+#====================================
+
+meta create --name=data_creditor
+meta add --name=data_creditor --attribute=creditor --type=meta_class --childname=ref_creditor
+meta key --name=data_creditor --attribute=creditor
+meta add --name=data_creditor --attribute=subjects --type=meta_class --array --childname=subject
+meta add --name=data_creditor --attribute=pledges --type=meta_class --array --childname=pledge
+meta add --name=data_creditor --attribute=change --type=meta_class --childname=change --final
 
 #====================================
 #= CREDIT
@@ -626,15 +633,13 @@ meta add --name=credit --attribute=credit_type --type=meta_class --childname=ref
 meta add --name=credit --attribute=currency --type=meta_class --childname=ref_currency --keytype=any --immutable
 meta add --name=credit --attribute=finance_source --type=meta_class --childname=ref_finance_source --keytype=any --immutable
 meta add --name=credit --attribute=portfolio --type=meta_class --childname=portfolio
-meta add --name=credit --attribute=change --type=meta_class --childname=change --final
 meta add --name=credit --attribute=creditor --type=meta_class --childname=ref_creditor --keytype=any --immutable
 meta key --name=credit --attribute=creditor
-meta add --name=credit --attribute=subjects --type=meta_class --array --childname=subject
-meta add --name=credit --attribute=pledges --type=meta_class --array --childname=pledge
 meta add --name=credit --attribute=primary_contract --type=meta_class --childname=primary_contract
 meta key --name=credit --attribute=primary_contract
 meta add --name=credit --attribute=maturity_date --type=date
 meta add --name=credit --attribute=prolongation_date --type=date
+meta add --name=credit --attribute=data_creditor --type=meta_class --childname=data_creditor
 
 #====================================
 #= PORTFOLIO_FLOW_DETAIL
