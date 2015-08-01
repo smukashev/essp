@@ -16,40 +16,6 @@ public class BRMSHelper
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public static boolean hasBACT(String balanceAccountNo, String creditCode){
-        String select = "select count(1)\n" +
-                "  from eav_be_entities ent,\n" +
-                "       eav_be_complex_values cba,\n" +
-                "       eav_be_string_values sba,\n" +
-                "       eav_be_complex_values cct,\n" +
-                "       eav_be_string_values sct\n" +
-                "   where ent.id = cba.entity_id\n" +
-                "     and cba.attribute_id = (select ct.id from vw_complex_attribute ct \n" +
-                "                                    where ct.attribute_name = 'balance_account'\n" +
-                "                                       and ct.containing_name = 'ref_ba_ct'\n" +
-                "                                       and ct.class_name = 'ref_balance_account')\n" +
-                "     and cba.entity_value_id = sba.entity_id\n" +
-                "     and sba.attribute_id = (select st.id from vw_simple_attribute st\n" +
-                "                                    where st.class_name = 'ref_balance_account'\n" +
-                "                                      and st.attribute_name = 'no_')\n" +
-                "     and sba.value = ?\n" +
-                "     and ent.id = cct.entity_id\n" +
-                "     and cct.entity_value_id = sct.entity_id\n" +
-                "     and sct.value = ?\n" +
-                "     and cct.attribute_id = (select ct.id from vw_complex_attribute ct \n" +
-                "                                    where ct.attribute_name = 'credit_type'\n" +
-                "                                       and ct.containing_name = 'ref_ba_ct'\n" +
-                "                                       and ct.class_name = 'ref_credit_type')\n" +
-                "     and sct.attribute_id = (select st.id from vw_simple_attribute st\n" +
-                "                                    where st.class_name = 'ref_credit_type'\n" +
-                "                                      and st.attribute_name = 'code')\n" +
-                "     and rownum = 1\n";
-
-        int ans = jdbcTemplate.queryForInt(select, new String[]{balanceAccountNo, creditCode});
-
-        return ans > 0;
-    }
-
     public static boolean hasBADRT(String balanceAccountNo, String debtRemainTypeCode){
 
         String select ="select count(1)\n" +
