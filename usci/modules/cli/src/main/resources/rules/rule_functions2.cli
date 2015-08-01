@@ -26,6 +26,21 @@ function boolean hasBACT(IEntityService entityService, IMetaFactoryService metaS
     return false;
 }
 
+function boolean isExclusiveIIN(String iin) {
+    try{
+        IEntityService entityService = BRMSHelper.getEntityService();
+        IMetaFactoryService metaService = BRMSHelper.getMetaService();
+        BaseEntity be = new BaseEntity(metaService.getMetaClass("ref_exclusive_iin"), new Date());
+        Batch b = new Batch(new Date());
+        b.setId(1L);
+        be.put("code",new BaseValue(b, 1, iin));
+        BaseEntity res = entityService.prepare(be);
+        return res.getId() > 0;
+    } catch (Exception e) {
+        return false;
+    }
+}
+
 $$$
 
 rule save

@@ -1,6 +1,11 @@
 package kz.bsbnb.usci.brms.rulesvr.rulesingleton;
 
+import kz.bsbnb.usci.sync.service.IEntityService;
+import kz.bsbnb.usci.core.service.IMetaFactoryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 import java.text.ParseException;
@@ -12,9 +17,34 @@ public class BRMSHelper
 {
     private static JdbcTemplate jdbcTemplate;
 
+    private static IEntityService entityService;
+    private static IMetaFactoryService metaService;
+
+
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
+
+    @Autowired
+    @Qualifier("remoteEntityService")
+    public void setEntityService(RmiProxyFactoryBean entityServiceProxy){
+        entityService = (IEntityService)entityServiceProxy.getObject();
+    }
+
+    @Autowired
+    @Qualifier("remoteMetaService")
+    public void setMetaService(RmiProxyFactoryBean entityServiceProxy){
+        metaService = (IMetaFactoryService)entityServiceProxy.getObject();
+    }
+
+    public static IEntityService getEntityService(){
+        return entityService;
+    }
+
+    public static IMetaFactoryService getMetaService(){
+        return metaService;
+    }
+
 
     public static boolean hasBADRT(String balanceAccountNo, String debtRemainTypeCode){
 
@@ -52,19 +82,6 @@ public class BRMSHelper
         return ans > 0;
 
 
-    }
-
-    public static boolean isExclusiveIIN(String iin){
-
-        String select = "select count(1)\n" +
-                "  from eav_be_string_values sv\n" +
-                " where sv.attribute_id = (select id from vw_simple_attribute where attribute_name = 'code' and class_name = 'ref_exclusive_iin')\n" +
-                "   and sv.value = ?\n" +
-                "   and rownum = 1\n";
-
-        int ans = jdbcTemplate.queryForInt(select, new String[]{iin});
-
-        return ans > 0;
     }
 
     public static boolean isCurrencyConvertible(String currencyCode, Date reportDate){
