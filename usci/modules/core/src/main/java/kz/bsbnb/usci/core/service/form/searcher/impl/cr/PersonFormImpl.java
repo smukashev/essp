@@ -89,17 +89,17 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
             select = select.join(EAV_BE_STRING_VALUES.as("t2"))
                     .on(EAV_BE_STRING_VALUES.as("t1").ENTITY_ID.eq(EAV_BE_STRING_VALUES.as("t2").ENTITY_ID))
                     .and(EAV_BE_STRING_VALUES.as("t2").ATTRIBUTE_ID.eq(attributeIds.get(1)))
-                    .and(EAV_BE_STRING_VALUES.as("t2").VALUE.eq(vals.get(1)));
+                    .and(EAV_BE_STRING_VALUES.as("t2").VALUE.lower().like("%" + vals.get(1).toLowerCase() + "%"));
 
         if(vals.size() > 2)
             select = select.join(EAV_BE_STRING_VALUES.as("t3"))
                     .on(EAV_BE_STRING_VALUES.as("t1").ENTITY_ID.eq(EAV_BE_STRING_VALUES.as("t3").ENTITY_ID))
                     .and(EAV_BE_STRING_VALUES.as("t3").ATTRIBUTE_ID.eq(attributeIds.get(2)))
-                    .and(EAV_BE_STRING_VALUES.as("t3").VALUE.eq(vals.get(2)))
+                    .and(EAV_BE_STRING_VALUES.as("t3").VALUE.lower().like("%" + vals.get(2).toLowerCase() + "%"))
                     .and(EAV_BE_STRING_VALUES.as("t2").ENTITY_ID.eq(EAV_BE_STRING_VALUES.as("t3").ENTITY_ID));
 
         Select fioSelect = select.where(EAV_BE_STRING_VALUES.as("t1").ATTRIBUTE_ID.eq(attributeIds.get(0)))
-                .and(EAV_BE_STRING_VALUES.as("t1").VALUE.eq(vals.get(0)));
+                .and(EAV_BE_STRING_VALUES.as("t1").VALUE.lower().like("%" + vals.get(0).toLowerCase() + "%"));
 
 
         Select setSelect = context.select(EAV_BE_COMPLEX_SET_VALUES.SET_ID)
