@@ -1,6 +1,26 @@
 rule read $$$
 title: функций проверки балансовых счетов
 
+function boolean isCurrencyConvertible(String currencyCode, Date reportDate){
+    try{
+        IEntityService entityService = BRMSHelper.getEntityService();
+        IMetaFactoryService metaService = BRMSHelper.getMetaService();
+
+        BaseEntity be = new BaseEntity(metaService.getMetaClass("ref_currency"), reportDate);
+        Batch b = new Batch(new Date());
+        b.setId(1L);
+        be.put("code",new BaseValue(b, 1, currencyCode));
+
+        BaseEntity preparedBe  = entityService.prepare(be);
+        BaseEntity loadedBe = entityService.getActualBaseEntity(preparedBe);
+
+        return loadedBe.getEl("is_convertible").equals(true);
+
+    } catch(Exception e){
+        return false;
+    }
+}
+
 function boolean isBA5thSymbolCorrect(String ba, List subjects){
     if(ba.length() < 5) return true;
     if(ba.length() == 7 && ba.endsWith("000")) return true;
@@ -29,7 +49,7 @@ function boolean isBA7thSymbolCorrect(String ba,String currencyCode, Date report
     if(currencyCode.equals("398"))
        return ba.charAt(6) == '1';
 
-    boolean isConvertible = BRMSHelper.isCurrencyConvertible(currencyCode, reportDate);
+    boolean isConvertible = isCurrencyConvertible(currencyCode, reportDate);
 
     if(isConvertible)
         return ba.charAt(6) == '2';
