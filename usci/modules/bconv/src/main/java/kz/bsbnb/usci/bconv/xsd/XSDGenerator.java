@@ -34,11 +34,28 @@ public class XSDGenerator {
         ps.println("</xsd:all>");
         ps.println("</xsd:complexType>");
         ps.println();
+
+        ps.println("<xsd:simpleType name=\"operation\">");
+        ps.println("<xsd:restriction base=\"xsd:string\">");
+        ps.println("<xsd:enumeration value=\"DELETE\"/>");
+        ps.println("<xsd:enumeration value=\"CLOSE\"/>");
+        ps.println("</xsd:restriction>");
+        ps.println("</xsd:simpleType>");
+
+        ps.println();
         ps.println("<xsd:complexType name=\"entities\">");
         ps.println("<xsd:choice minOccurs=\"1\" maxOccurs=\"unbounded\">");
 
         for (MetaClass metaClass : metaClasses) {
-            ps.println("<xsd:element name=\"" + metaClass.getClassName() + "\" type=\"" + metaClass.getClassName() + "\"/>");
+            ps.println("<xsd:element name=\"" + metaClass.getClassName() + "\">");
+            ps.println("<xsd:complexType>");
+            ps.println("<xsd:complexContent>");
+            ps.println("<xsd:extension base=\"" + metaClass.getClassName() + "\">");
+            ps.println("<xsd:attribute name=\"operation\" type=\"operation\" use=\"optional\"/>");
+            ps.println("</xsd:extension>");
+            ps.println("</xsd:complexContent>");
+            ps.println("</xsd:complexType>");
+            ps.println("</xsd:element>");
         }
 
         ps.println("</xsd:choice>");
