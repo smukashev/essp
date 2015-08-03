@@ -132,7 +132,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         EAV_M_CLASSES.IS_REFERENCE
                     ).from(EAV_M_CLASSES).
                     where(
-                        EAV_M_CLASSES.NAME.equal(metaClass.getClassName())
+                            EAV_M_CLASSES.NAME.equal(metaClass.getClassName())
                     ).and(
                         EAV_M_CLASSES.BEGIN_DATE.le(DataUtils.convert(metaClass.getBeginDate()))
                 ).and(
@@ -154,7 +154,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     EAV_M_CLASSES.IS_REFERENCE
                 ).from(EAV_M_CLASSES).
                 where(
-                    EAV_M_CLASSES.ID.equal(metaClass.getId())
+                        EAV_M_CLASSES.ID.equal(metaClass.getId())
                 ).limit(1).offset(0);
         }
 
@@ -391,10 +391,10 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                                     EAV_M_SET_KEY_FILTER.SET_ID,
                                     EAV_M_SET_KEY_FILTER.ATTR_NAME,
                                     EAV_M_SET_KEY_FILTER.VALUE).values(
-                                        id,
-                                        attrName,
-                                        val
-                                    );
+                            id,
+                            attrName,
+                            val
+                    );
 
                     t = 0;
                     if(sqlStats != null)
@@ -1224,7 +1224,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         join = context.select(
                 EAV_M_CLASSES.ID,
                 EAV_M_CLASSES.NAME,
-                EAV_M_CLASSES.TITLE
+                EAV_M_CLASSES.TITLE,
+                EAV_M_CLASSES.IS_DISABLED
         ).from(EAV_M_CLASSES);
 
         if(refs)
@@ -1243,9 +1244,10 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
             MetaClassName metaClassName = new MetaClassName();
 
-            metaClassName.setId(((BigDecimal)row.get("id")).longValue());
-            metaClassName.setClassName((String)row.get("name"));
-            metaClassName.setClassTitle((String)row.get("title"));
+            metaClassName.setId(((BigDecimal) row.get("id")).longValue());
+            metaClassName.setClassName((String) row.get("name"));
+            metaClassName.setClassTitle((String) row.get("title"));
+            metaClassName.setIsDisabled(((BigDecimal) row.get("is_disabled")).longValue());
             metaClassNameList.add(metaClassName);
         }
 

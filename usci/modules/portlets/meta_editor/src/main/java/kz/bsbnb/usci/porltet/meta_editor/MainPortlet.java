@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.porltet.meta_editor;
 
 import com.google.gson.Gson;
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
@@ -70,6 +70,8 @@ public class MainPortlet extends MVCPortlet {
             e.printStackTrace();
         } catch (SystemException e) {
             e.printStackTrace();
+        } catch (com.liferay.portal.kernel.exception.PortalException e) {
+            e.printStackTrace();
         }
 
         if(!hasRights)
@@ -114,7 +116,8 @@ public class MainPortlet extends MVCPortlet {
 
                     for (MetaClassName metaName : metaClassesList) {
                         MetaClassListEntry metaClassListEntry = new MetaClassListEntry();
-
+                        if(metaName.getIsDisabled()==1)
+                            continue;
                         metaClassListEntry.setClassId(metaName.getClassName());
                         if(metaName.getClassTitle() != null
                                 && metaName.getClassTitle().trim().length() > 0)

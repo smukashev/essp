@@ -177,6 +177,8 @@ function createMetaClassesListView() {
         model: 'metaClassListModel',
         remoteGroup: true,
         buffered: true,
+        autoLoad: true,
+        autoSync: true,
         leadingBufferZone: 300,
         pageSize: 100,
         proxy: {
@@ -234,6 +236,7 @@ function createMetaClassesListView() {
                             },
                             success: function(response, opts) {
                                 //reloadInfinitStore(store);
+                                Ext.getCmp('metaClassesGrid').getStore().load();
                             },
                             failure: function(response, opts) {
                                 alert("error");
