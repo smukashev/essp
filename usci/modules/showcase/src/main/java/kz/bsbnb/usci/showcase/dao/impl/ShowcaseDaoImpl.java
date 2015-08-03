@@ -838,9 +838,15 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         HashSet<PathElement> keyPaths = new HashSet<>();
         HashMap<String, HashSet<PathElement>> paths = generatePaths(entity, showcaseHolder, keyPaths);
 
-        HashSet<PathElement> rootAttributes = paths.get("root");
-        rootAttributes.add(new PathElement("root", "root", entity.getMeta().getClassName() + "_id", true));
+        HashSet<PathElement> rootAttributes;
 
+        if (paths.size() == 0) {
+            rootAttributes = new HashSet<>();
+        } else {
+            rootAttributes = paths.get("root");
+        }
+
+        rootAttributes.add(new PathElement("root", "root", entity.getMeta().getClassName() + "_id", true));
         keyPaths.add(new PathElement("root", "root", entity.getMeta().getClassName() + "_id", true));
 
         HashMap<ValueElement, Object> dirtyMap = readMap("root", entity, paths, false);

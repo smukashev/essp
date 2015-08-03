@@ -598,7 +598,7 @@ meta key --name=primary_contract --attribute=no
 #====================================
 
 meta create --name=data_creditor
-meta add --name=data_creditor --attribute=creditor --type=meta_class --childname=ref_creditor
+meta add --name=data_creditor --attribute=creditor --type=meta_class --childname=ref_creditor --immutable
 meta key --name=data_creditor --attribute=creditor
 meta add --name=data_creditor --attribute=creditor_branch --type=meta_class --childname=ref_creditor_branch --keytype=any --immutable
 meta add --name=data_creditor --attribute=organizations --type=meta_class --array --childname=organization
