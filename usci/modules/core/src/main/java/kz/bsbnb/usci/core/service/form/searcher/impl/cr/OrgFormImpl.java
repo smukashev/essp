@@ -74,7 +74,7 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
 
         Select nameSelect = context.select(EAV_BE_STRING_VALUES.ENTITY_ID)
                 .from(EAV_BE_STRING_VALUES)
-                .where(EAV_BE_STRING_VALUES.VALUE.eq(name))
+                .where(EAV_BE_STRING_VALUES.VALUE.lower().like("%" + name.toLowerCase() + "%"))
                 .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(attribute.getId()));
 
         Select setSelect = context.select(EAV_BE_COMPLEX_SET_VALUES.SET_ID)

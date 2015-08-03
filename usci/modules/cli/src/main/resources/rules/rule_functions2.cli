@@ -1,0 +1,48 @@
+rule read $$$
+title: Общие функций(часть 2)
+
+function boolean hasBACT(IEntityService entityService, IMetaFactoryService metaService, String baNo, String creditCode, Date reportDate, BaseEntity entity){
+    try{
+        BaseEntity be = new BaseEntity(metaService.getMetaClass("ref_ba_ct"), reportDate);
+        BaseEntity beAccount = new BaseEntity(metaService.getMetaClass("ref_balance_account"), reportDate);
+        BaseEntity creditType = new BaseEntity(metaService.getMetaClass("ref_credit_type"), reportDate);
+
+        Batch b = new Batch(reportDate);
+        b.setId(1L);
+
+        beAccount.put("no_", new BaseValue(b, 1, baNo));
+        creditType.put("code", new BaseValue(b, 1, creditCode));
+
+        be.put("balance_account",  new BaseValue(b, 1, beAccount));
+        be.put("credit_type",  new BaseValue(b, 1, creditType));
+
+        BaseEntity res = entityService.search(be);
+
+        return res.getId() > 0;
+    } catch (Exception e) {
+        entity.addValidationError(e.getMessage());
+    }
+
+    return false;
+}
+
+function boolean isExclusiveIIN(String iin) {
+    try{
+        IEntityService entityService = BRMSHelper.getEntityService();
+        IMetaFactoryService metaService = BRMSHelper.getMetaService();
+        BaseEntity be = new BaseEntity(metaService.getMetaClass("ref_exclusive_iin"), new Date());
+        Batch b = new Batch(new Date());
+        b.setId(1L);
+        be.put("code",new BaseValue(b, 1, iin));
+        BaseEntity res = entityService.prepare(be);
+        return res.getId() > 0;
+    } catch (Exception e) {
+        return false;
+    }
+}
+
+$$$
+
+rule save
+
+quit

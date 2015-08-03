@@ -35,7 +35,12 @@ public class CurrencyRepository extends BaseRepository {
                 //System.out.println(rows.getString("NAME_RU"));
                 for(Object s: hs){
                     //System.out.println(s);
-                    tmp.put((String)s,rows.getString((String)s));
+                    if("SHORT_NAME".equals(s))
+                        tmp.put("CODE",rows.getString((String)s));
+                    else if("CODE".equals(s))
+                        tmp.put("SHORT_NAME",rows.getString((String)s));
+                    else
+                        tmp.put((String)s,rows.getString((String)s));
                 }
                 Currency dt = new Currency(tmp);
                 hm.put(dt.get(dt.getKeyName()),dt);

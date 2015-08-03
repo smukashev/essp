@@ -6,6 +6,7 @@ import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
+import kz.bsbnb.usci.core.service.IMetaFactoryService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import org.drools.KnowledgeBase;
@@ -44,6 +45,10 @@ public class RulesSingleton
     private RmiProxyFactoryBean entityRmiService;
     private IEntityService entityService;
 
+    @Autowired
+    @Qualifier(value = "remoteMetaService")
+    private RmiProxyFactoryBean metaRmiService;
+    private IMetaFactoryService metaFactoryService;
 
     private class RuleCasheEntry implements Comparable {
         private Date repDate;
@@ -110,6 +115,7 @@ public class RulesSingleton
     @PostConstruct
     public void init(){
         entityService = (IEntityService) entityRmiService.getObject();
+        metaFactoryService = (IMetaFactoryService) metaRmiService.getObject();
         reloadCache();
     }
 
@@ -301,6 +307,7 @@ public class RulesSingleton
     {
         StatelessKnowledgeSession ksession = getSession();
         ksession.setGlobal("entityService", entityService);
+        ksession.setGlobal("metaService", metaFactoryService);
 
         @SuppressWarnings("rawtypes")
         List<Command> commands = new ArrayList<Command>();
