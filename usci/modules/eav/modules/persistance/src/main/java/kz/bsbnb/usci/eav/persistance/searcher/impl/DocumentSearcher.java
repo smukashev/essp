@@ -40,7 +40,7 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
         List<Long> ids = searcherPool.getSearcher(entity.getMeta().getClassName()).findAll(entity);
 
         if (ids.size() > 1)
-            throw new RuntimeException("Found more than one instance of BaseEntity");
+            throw new RuntimeException("Найдено более одного документа;");
 
         if (ids.size() < 1)
             return null;
@@ -70,14 +70,6 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
                 return res;
 
             if (docTypeId > 0) {
-              /*  SelectConditionStep select = context.
-                        select(EAV_BE_STRING_VALUES.as("d_no").ENTITY_ID.as("inner_id")).
-                        from(EAV_BE_STRING_VALUES.as("d_no")).
-                        where(EAV_BE_STRING_VALUES.as("d_no").ATTRIBUTE_ID.
-                                equal(entity.getMetaAttribute("no").getId())).
-                        and(EAV_BE_STRING_VALUES.as("d_no").VALUE.
-                                equal((String) (entity.getBaseValue("no").getValue())));*/
-
                 SelectConditionStep select = (SelectConditionStep) context.
                         select(EAV_BE_ENTITIES.ID.as("inner_id")).
                         from(EAV_BE_ENTITIES).
@@ -95,19 +87,6 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
 
                 for (Map<String, Object> row : rows) {
                     long newId = ((BigDecimal) row.get("inner_id")).longValue();
-
-                   /* SelectConditionStep selectInner = context.
-                            select(EAV_BE_COMPLEX_VALUES.as("d_dt").ENTITY_ID.as("inner_id")).
-                            from(EAV_BE_COMPLEX_VALUES.as("d_dt")).
-                            where(EAV_BE_COMPLEX_VALUES.as("d_dt").ATTRIBUTE_ID.
-                                    equal(entity.getMetaAttribute("doc_type").getId())).
-                            and(EAV_BE_COMPLEX_VALUES.as("d_dt").ENTITY_VALUE_ID.equal(docTypeId)).
-                            and(EAV_BE_COMPLEX_VALUES.as("d_dt").ENTITY_ID.equal(newId));
-
-                    if (queryForListWithStats(selectInner.getSQL(),
-                            selectInner.getBindValues().toArray()).size() <= 0)
-                        continue;*/
-
                     res.add(newId);
                 }
             }

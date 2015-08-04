@@ -361,7 +361,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             if (reportDateExists) {
                 throw new IllegalStateException("Report date " + baseEntityReportDate.getReportDate()
                         + " already exists");
-            }
+            } else {}
 
             baseEntityManager.registerAsInserted(baseEntityReportDate);
         }
