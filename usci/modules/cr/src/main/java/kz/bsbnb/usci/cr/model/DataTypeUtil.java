@@ -5,10 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.xml.bind.DatatypeConverter;
 
-/**
- * Класс, содержащий статические методы для облегченной работы с типами данных
- * @author alexandr.motov
- */
 public class DataTypeUtil {
     
     public static final String SHORT_DATE_FORMAT = "dd.MM.yyyy";
@@ -71,14 +67,6 @@ public class DataTypeUtil {
         return dates;
     }
     
-    /**
-     * Создание даты с помощью класса Calendar.
-     * При указании параметров стоит помнить, что месяцы в языке Java начинаются с нуля (то есть, январь равен 0).
-     * @param year номер года
-     * @param month номер месяца в году
-     * @param date номер дня в месяце
-     * @return созданная дата
-     */
     public static Date createCalendarDate(int year, int month, int date) {
         Calendar calendar = Calendar.getInstance();
         calendar.clear();
@@ -102,11 +90,6 @@ public class DataTypeUtil {
     	return DatatypeConverter.printDate(cal);
     }
     
-    /**
-     * Форматирует дату в формате по-умолчанию.
-     * @param date Дата для форматирования.
-     * @return Отформатированная дата.
-     */
     public static String formatDate(Date date) {
         if (date == null)
             return null;
@@ -121,11 +104,6 @@ public class DataTypeUtil {
         return simpleDateFormat.format(date);
     }
     
-    /**
-     * Конвертирует дату к первому числу следующего месяца.
-     * @param date Исходная дата.
-     * @return Отконвертированная дата.
-     */
     public static Date convertDateToFirstDay(Date date, int month) {
         if (date == null)
             return null;
@@ -140,17 +118,11 @@ public class DataTypeUtil {
         return currentCalendar.getTime();
     }
     
-    /**
-     * TODO javadoc 
-     */
     public static Date convertCalendarToDate(Calendar calendar){
     	
     	return new Date(calendar.getTimeInMillis());
     }
     
-    /**
-     * TODO javadoc
-     */
     public static Calendar convertDateToCalendar(Date date){
     	
     	Calendar calendar = Calendar.getInstance();
