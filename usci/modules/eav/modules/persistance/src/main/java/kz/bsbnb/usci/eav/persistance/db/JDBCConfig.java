@@ -30,6 +30,7 @@ public class JDBCConfig {
     private String metaObjectTableName;
 
     private String batchesTableName;
+    private String batchStatusesTableName;
 
     private String baseValuesTableName;
     private String baseDateValuesTableName;
@@ -78,7 +79,9 @@ public class JDBCConfig {
         complexSetTableName = tablePrefix + "m_complex_set";
         setOfSetsTableName = tablePrefix + "m_set_of_sets";
         simpleSetTableName = tablePrefix + "m_simple_set";
+
         batchesTableName = tablePrefix + "batches";
+        batchStatusesTableName = tablePrefix + "batch_statuses";
 
         entitiesTableName = tablePrefix + "be_entities";
 
@@ -150,6 +153,10 @@ public class JDBCConfig {
 
     public String getBatchesTableName() {
         return batchesTableName;
+    }
+
+    public String getBatchStatusesTableName() {
+        return batchStatusesTableName;
     }
 
     public String getBaseValuesTableName() {

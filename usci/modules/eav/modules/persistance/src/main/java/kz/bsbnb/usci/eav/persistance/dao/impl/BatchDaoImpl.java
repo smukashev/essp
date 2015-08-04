@@ -1,63 +1,33 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.eav.persistance.generated.tables.records.EavBatchesRecord;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBatchStatusDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- */
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BATCHES;
+
 @Repository
 public class BatchDaoImpl extends JDBCSupport implements IBatchDao
 {
     private final Logger logger = LoggerFactory.getLogger(BatchDaoImpl.class);
 
-    private String INSERT_BATCH_SQL;
-    private String DELETE_BATCH_BY_ID_SQL;
-    private String SELECT_BATCH_BY_ID_SQL;
-
-    @PostConstruct
-    public void init()
-    {
-        INSERT_BATCH_SQL = String.format("INSERT INTO %s (receipt_date, rep_date, user_id) VALUES ( ?, ?, ? )", getConfig().getBatchesTableName());
-        DELETE_BATCH_BY_ID_SQL = String.format("DELETE FROM %s WHERE id = ?", getConfig().getBatchesTableName());
-        SELECT_BATCH_BY_ID_SQL = String.format("SELECT * FROM %s WHERE id = ?", getConfig().getBatchesTableName());
-    }
-
-    private class InsertBatchPreparedStatementCreator
-            implements PreparedStatementCreator {
-        private Batch batch;
-
-        public InsertBatchPreparedStatementCreator(Batch batch) {
-            this.batch = batch;
-        }
-
-        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-            PreparedStatement ps = con.prepareStatement(
-                    INSERT_BATCH_SQL, new String[] {"id"});
-            ps.setTimestamp(1, DataUtils.convertToTimestamp(batch.getReceiptDate()));
-            ps.setDate(2, DataUtils.convert(batch.getRepDate()));
-            ps.setLong(3, batch.getUserId() == null ? 0L : batch.getUserId());
-
-            logger.debug(ps.toString());
-
-            return ps;
-        }
-    }
+    @Autowired
+    private DSLContext context;
 
     @Override
     public Batch load(long id) {
@@ -77,47 +47,80 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
     @Transactional
     public long save(Batch batch) {
         long baseEntityId = 0;
+
         if (batch.getId() < 1) {
             baseEntityId = insertBatch(batch);
             batch.setId(baseEntityId);
+        } else {
+            updateBatch(batch);
+            baseEntityId = batch.getId();
         }
 
         return baseEntityId;
     }
 
-    @Override
-    public void remove(Batch batch) {
-        if(batch.getId() < 1)
-        {
-            throw new IllegalArgumentException("Can't remove Batch without id");
-        }
-
-        logger.debug(DELETE_BATCH_BY_ID_SQL);
-        updateWithStats(DELETE_BATCH_BY_ID_SQL, batch.getId());
-    }
-
     private long insertBatch(Batch batch) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new InsertBatchPreparedStatementCreator(batch), keyHolder);
+        Insert insert = context.insertInto(EAV_BATCHES,
+                EAV_BATCHES.USER_ID,
+                EAV_BATCHES.CREDITOR_ID,
+                EAV_BATCHES.FILE_NAME,
+                EAV_BATCHES.HASH,
+                EAV_BATCHES.SIGN,
+                EAV_BATCHES.REP_DATE,
+                EAV_BATCHES.RECEIPT_DATE,
+                EAV_BATCHES.BEGIN_DATE,
+                EAV_BATCHES.END_DATE
+        ).values(
+                batch.getUserId(),
+                batch.getCreditorId(),
+                batch.getFileName(),
+                batch.getHash(),
+                batch.getSign(),
+                DataUtils.convert(batch.getRepDate()),
+                DataUtils.convertToTimestamp(batch.getReceiptDate()),
+                DataUtils.convertToTimestamp(batch.getBeginDate()),
+                DataUtils.convertToTimestamp(batch.getEndDate())
+        );
 
-        long baseEntityId = keyHolder.getKey().longValue();
+        long batchId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
-        if(baseEntityId < 1)
+        if(batchId < 1)
         {
             logger.error("Can't insert batch");
             return 0;
         }
 
-        return baseEntityId;
+        return batchId;
+    }
+
+    private void updateBatch(Batch batch) {
+        Update update = context.update(EAV_BATCHES)
+                .set(EAV_BATCHES.USER_ID, batch.getUserId())
+                .set(EAV_BATCHES.CREDITOR_ID, batch.getCreditorId())
+                .set(EAV_BATCHES.FILE_NAME, batch.getFileName())
+                .set(EAV_BATCHES.HASH, batch.getHash())
+                .set(EAV_BATCHES.SIGN, batch.getSign())
+                .set(EAV_BATCHES.REP_DATE, DataUtils.convert(batch.getRepDate()))
+                .set(EAV_BATCHES.RECEIPT_DATE, DataUtils.convertToTimestamp(batch.getReceiptDate()))
+                .set(EAV_BATCHES.BEGIN_DATE, DataUtils.convertToTimestamp(batch.getBeginDate()))
+                .set(EAV_BATCHES.END_DATE, DataUtils.convertToTimestamp(batch.getEndDate()))
+                .where(EAV_BATCHES.ID.eq(batch.getId()));
+
+        int updatedCount = updateWithStats(update.getSQL(), update.getBindValues().toArray());
+
+        if (updatedCount < 1) {
+            logger.error("Batch not found. Can't update.");
+        }
     }
 
     private void loadBatch(Batch batch) {
-        logger.debug(SELECT_BATCH_BY_ID_SQL);
-        List<Map<String, Object>> rows = queryForListWithStats(SELECT_BATCH_BY_ID_SQL, batch.getId());
+        Select select = context.selectFrom(EAV_BATCHES).where(EAV_BATCHES.ID.eq(batch.getId()));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
         {
-            throw new IllegalArgumentException("More then one batch found. Can't load.");
+            throw new IllegalArgumentException("More than one batch found. Can't load.");
         }
 
         if (rows.size() < 1)
@@ -129,10 +132,16 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
 
         if(row != null)
         {
-            batch.setId(((BigDecimal)row.get("id")).longValue());
-            batch.setReceiptDate(DataUtils.convert((Timestamp)row.get("receipt_date")));
-            batch.setRepDate(DataUtils.convert((Timestamp) row.get("rep_date")));
-            batch.setUserId(((BigDecimal)row.get("user_id")).longValue());
+            batch.setId(((BigDecimal)row.get(EAV_BATCHES.ID.getName())).longValue());
+            batch.setUserId(((BigDecimal) row.get(EAV_BATCHES.USER_ID.getName())).longValue());
+            batch.setCreditorId(((BigDecimal) row.get(EAV_BATCHES.CREDITOR_ID.getName())).longValue());
+            batch.setFileName((String) row.get(EAV_BATCHES.FILE_NAME.getName()));
+            batch.setHash((String) row.get(EAV_BATCHES.HASH.getName()));
+            batch.setSign((String) row.get(EAV_BATCHES.SIGN.getName()));
+            batch.setRepDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.REP_DATE.getName())));
+            batch.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.RECEIPT_DATE.getName())));
+            batch.setBeginDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.BEGIN_DATE.getName())));
+            batch.setEndDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.END_DATE.getName())));
         }
         else
         {

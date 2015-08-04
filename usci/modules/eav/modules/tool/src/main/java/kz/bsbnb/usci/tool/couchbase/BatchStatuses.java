@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.tool.couchbase;
 
+@Deprecated
 public class BatchStatuses {
     public static final String WAITING = "WAITING";
     public static final String PROCESSING = "PROCESSING";

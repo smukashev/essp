@@ -18,6 +18,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
+@Deprecated
 @Component
 public class StatusSingleton {
     @Autowired(required = true)
@@ -38,6 +39,7 @@ public class StatusSingleton {
         client = couchbaseClientManager.get();
     }
 
+    @Deprecated
     public boolean isEntityCompleted(long batchId, long index) {
         Object contractStatus = client.get("entity_status:" + batchId + ":" + index);
 
@@ -56,6 +58,7 @@ public class StatusSingleton {
         return false;
     }
 
+    @Deprecated
     public synchronized void startBatch(Long batchId, BatchFullJModel batchFullJModel, BatchInfo batchInfo) {
         if (readOnly)
             return;
@@ -92,6 +95,7 @@ public class StatusSingleton {
         createBatchStatus(batchId, batchFullJModel.getFileName());
     }
 
+    @Deprecated
     public synchronized void createBatchStatus(Long batchId, String fileName) {
         if (readOnly)
             return;
@@ -111,6 +115,7 @@ public class StatusSingleton {
         client.set("batch_status:" + batchId, 0, gson.toJson(bStatuses));
     }
 
+    @Deprecated
     public synchronized void addBatchStatus(Long batchId, BatchStatusJModel batchStatusJModel) {
         if (readOnly)
             return;
@@ -130,6 +135,7 @@ public class StatusSingleton {
         client.set("batch_status:" + batchId, 0, gson.toJson(bStatuses));
     }
 
+    @Deprecated
     public synchronized BatchStatusArrayJModel getBatchStatus(Long batchId) {
         Object batchStatus = client.get("batch_status:" + batchId);
 
@@ -144,6 +150,7 @@ public class StatusSingleton {
         return bStatuses;
     }
 
+    @Deprecated
     public synchronized void addContractStatus(Long batchId, EntityStatusJModel contractStatusJModel) {
         if (readOnly)
             return;
@@ -181,6 +188,7 @@ public class StatusSingleton {
         }
     }
 
+    @Deprecated
     public synchronized void endBatch(Long batchId, Long userId) {
         if (readOnly)
             return;
@@ -188,7 +196,9 @@ public class StatusSingleton {
         addBatchStatus(batchId, new BatchStatusJModel(
                 BatchStatuses.COMPLETED, null, new Date(), userId));
     }
-     public BatchFullJModel getBatch(long batchId) throws BatchNotFoundException {
+
+    @Deprecated
+    public BatchFullJModel getBatch(long batchId) throws BatchNotFoundException {
         Object batch = client.get("batch:" + batchId);
         if(batch == null)
             throw new BatchNotFoundException("batchId:" + batchId);

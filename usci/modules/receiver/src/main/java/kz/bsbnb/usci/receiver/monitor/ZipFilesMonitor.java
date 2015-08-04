@@ -3,20 +3,17 @@ package kz.bsbnb.usci.receiver.monitor;
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.protocol.views.*;
 import com.google.gson.Gson;
-import kz.bsbnb.usci.core.service.IGlobalService;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.model.json.*;
-import kz.bsbnb.usci.eav.util.IGlobal;
+import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.ReportStatus;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
-import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
-import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -67,13 +64,12 @@ public class ZipFilesMonitor{
     private IServiceRepository serviceFactory;
 
     @Autowired
-    private StatusSingleton statusSingleton;
-
-    @Autowired
     private JobLauncher jobLauncher;
 
     @Autowired
     private ReceiverStatusSingleton receiverStatusSingleton;
+
+    private IBatchService batchService;
 
     private Map<String,Job> jobs;
 
@@ -88,13 +84,13 @@ public class ZipFilesMonitor{
 
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
+        batchService = serviceFactory.getBatchService();
         sender = new SenderThread();
         sender.start();
     }
 
     public boolean restartBatch(long batchId) {
         Gson gson = new Gson();
-        IBatchService batchService = serviceFactory.getBatchService();
 
         try {
             Object batchObject = couchbaseClient.get("batch:" + batchId);
@@ -412,16 +408,15 @@ public class ZipFilesMonitor{
                         if (job != null) {
                             jobLauncher.run(job, jobParametersBuilder.toJobParameters());
                             receiverStatusSingleton.batchStarted();
-                            statusSingleton.addBatchStatus(nextJob.getBatchId(),
-                                    new BatchStatusJModel(BatchStatuses.PROCESSING, null, new Date(),
-                                            nextJob.getBatchInfo().getUserId()));
+                            batchService.addBatchStatus(nextJob.getBatchId(), BatchStatuses.PROCESSING);
                         } else {
                             logger.error("Unknown batch file type: " + nextJob.getBatchInfo().getBatchType() +
                                     " in batch with id: " + nextJob.getBatchId());
-
-                            statusSingleton.addBatchStatus(nextJob.getBatchId(),
-                                    new BatchStatusJModel(BatchStatuses.ERROR, "Unknown batch file type: " +
-                                            nextJob.getBatchInfo().getBatchType(), new Date(), nextJob.getBatchInfo().getUserId()));
+                            batchService.addBatchStatus(
+                                    nextJob.getBatchId(),
+                                    BatchStatuses.ERROR,
+                                    "Unknown batch file type: " + nextJob.getBatchInfo().getBatchType()
+                            );
                         }
 
                         sleep(10000);
@@ -456,9 +451,14 @@ public class ZipFilesMonitor{
 
         IBatchService batchService = serviceFactory.getBatchService();
 
-        Batch batch = new Batch(batchInfo.getRepDate());
+        Batch batch = new Batch();
         batch.setUserId(batchInfo.getUserId());
-        long batchId = batchService.save(batch);
+        batch.setFileName(filename);
+        batch.setContent(bytes);
+        batch.setRepDate(batchInfo.getRepDate());
+        batch.setReceiptDate(new Date());
+
+        long batchId = batchService.uploadBatch(batch);
 
         Long cId = -1l;
         boolean haveError = false;
@@ -470,9 +470,13 @@ public class ZipFilesMonitor{
                 cId = cList.get(0).getId();
             } else {
                 cId = -1L;
-                statusSingleton.addBatchStatus(batchId,
-                        new BatchStatusJModel(BatchStatuses.ERROR,
-                                "Can't find user with id: " + batchInfo.getUserId(), new Date(), batchInfo.getUserId()));
+
+                batchService.addBatchStatus(
+                        batchId,
+                        BatchStatuses.ERROR,
+                        "Can't find user with id: " + batchInfo.getUserId()
+                );
+
                 haveError = true;
             }
         } else {
@@ -548,9 +552,11 @@ public class ZipFilesMonitor{
                     logger.error("Can't find creditor: " + docType +
                             ", " + docValue);
 
-                    statusSingleton.addBatchStatus(batchId,
-                            new BatchStatusJModel(BatchStatuses.ERROR,
-                                    "Кредитор не найден", new Date(), batchInfo.getUserId()));
+                    batchService.addBatchStatus(
+                            batchId,
+                            BatchStatuses.ERROR,
+                            "Кредитор не найден"
+                    );
 
                     haveError = true;
                 }
@@ -563,19 +569,15 @@ public class ZipFilesMonitor{
 
         BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
                 batchInfo.getUserId(), cId);
-        statusSingleton.startBatch(batchId, batchFullJModel, batchInfo);
+
+        batch.setCreditorId(cId);
+
+        batchService.save(batch);
 
         if (!haveError) {
-            statusSingleton.addBatchStatus(batchId,
-                    new BatchStatusJModel(BatchStatuses.WAITING, null, new Date(), batchInfo.getUserId()));
-
+            batchService.addBatchStatus(batchId, BatchStatuses.WAITING);
             sender.addJob(batchId, batchInfo);
         }
-    }
-
-    private EavGlobal getGlobal(IGlobal iGlobal) {
-        IGlobalService globalService = serviceFactory.getGlobalService();
-        return globalService.getGlobal(iGlobal);
     }
 
     private boolean checkAndFillEavReport(long creditorId, BatchInfo batchInfo, long batchId) {
@@ -584,16 +586,12 @@ public class ZipFilesMonitor{
         Report existing = reportBeanRemoteBusiness.getReport(creditorId, batchInfo.getRepDate());
 
         if (existing != null) {
-            if (getGlobal(ReportStatus.COMPLETED).getId() == existing.getStatusId()) {
+            if (ReportStatus.COMPLETED.code().equals(existing.getStatus().getCode())) {
                 String errMsg = "Отчет со статусом 'Завершен' уже существует для кредитора = "
                         + creditorId +  ", отчетная дата = " + batchInfo.getRepDate();
                 logger.error(errMsg);
-                statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
-                        BatchStatuses.ERROR,
-                        errMsg,
-                        new Date(),
-                        batchInfo.getUserId()
-                ));
+
+                batchService.addBatchStatus(batchId, BatchStatuses.ERROR, errMsg);
                 return false;
             }
         } else {
@@ -630,7 +628,8 @@ public class ZipFilesMonitor{
 //            }
         }
 
-        EavGlobal inProgress = getGlobal(ReportStatus.IN_PROGRESS);
+
+        EavGlobal inProgress = serviceFactory.getGlobalService().getGlobal(ReportStatus.IN_PROGRESS);
 
         if (existing != null) {
             existing.setStatusId(inProgress.getId());

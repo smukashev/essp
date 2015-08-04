@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.tool.couchbase;
 
+@Deprecated
 public class EntityStatuses {
     public static final String ERROR = "ERROR";
     public static final String PARSING = "PARSING";

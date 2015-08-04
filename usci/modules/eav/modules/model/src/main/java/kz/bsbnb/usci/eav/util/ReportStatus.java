@@ -4,7 +4,6 @@ package kz.bsbnb.usci.eav.util;
  * Created by n.seitkozhayev on 3/3/15.
  */
 public enum ReportStatus implements IGlobal {
-
     IN_PROGRESS,
     WE,
     WOE,

@@ -715,10 +715,14 @@
 	<table name="eav_batches">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="user_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="receipt_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="begin_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="end_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="rep_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="file_name" primaryKey="false" required="true" type="VARCHAR" size="2048" autoIncrement="false"/>
+		<column name="hash" primaryKey="false" required="true" type="VARCHAR" size="128" autoIncrement="false"/>
+		<column name="sign" primaryKey="false" required="false" type="VARCHAR" size="2048" autoIncrement="false"/>
 	</table>
 	<table name="eav_global">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -737,37 +741,37 @@
 	</table>
 	<table name="eav_batch_statuses">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="user_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="receipt_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="file_name" primaryKey="false" required="true" type="VARCHAR" size="2048" autoIncrement="false"/>
-		<column name="hash" primaryKey="false" required="true" type="VARCHAR" size="128" autoIncrement="false"/>
-		<column name="begin_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="end_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="total_count" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="actual_count" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="status_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="receipt_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="description" primaryKey="false" required="false" type="VARCHAR" size="2048" autoIncrement="false"/>
 		<!--<foreign-key foreignTable="eav_a_user" name="ebs_FK_eau_id">
 			<reference local="user_id" foreign="id"/>
 		</foreign-key>-->
 		<!--<foreign-key foreignTable="eav_global" name="ebs_FK_eg_id">
 			<reference local="status_id" foreign="id"/>
 		</foreign-key>-->
+		<!--foreign-key foreignTable="eav_batches" name="ebs_FK_eb_id">
+			<reference local="batch_id" foreign="id"/>
+		</foreign-key-->
 	</table>
 	<table name="eav_entity_statuses">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="receipt_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="begin_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="end_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="index" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="status_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<!--<foreign-key foreignTable="eav_global" name="ebs_FK_eg_id">
+		<column name="description" primaryKey="false" required="false" type="VARCHAR" size="2048" autoIncrement="false"/>
+		<!--<foreign-key foreignTable="eav_global" name="ees_FK_eg_id">
 			<reference local="status_id" foreign="id"/>
 		</foreign-key>-->
+		<!--foreign-key foreignTable="eav_batches" name="ees_FK_eb_id">
+			<reference local="batch_id" foreign="id"/>
+		</foreign-key-->
+		<!--foreign-key foreignTable="eav_be_entities" name="ees_FK_ebe_id">
+			<reference local="entity_id" foreign="id"/>
+		</foreign-key-->
 	</table>
 	<table name="batch_entries">
     <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>

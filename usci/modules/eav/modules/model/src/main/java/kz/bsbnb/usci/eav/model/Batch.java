@@ -5,7 +5,11 @@ import kz.bsbnb.usci.eav.util.DataUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * General information about the batch, such as:
@@ -21,15 +25,25 @@ public class Batch extends Persistable
      * Date and time of receipt of the batch.
      */
     private Date receiptDate;
+    private Date beginDate;
+    private Date endDate;
 
     private Date repDate;
 
     private Long userId;
 
+    private Long creditorId;
+
+    private String fileName;
+    private byte[] content;
+    private String hash;
+    private String sign;
+
+    public Batch() {}
+
     /**
      * Initializes batch with the default values.
      */
-
     public Batch(Date reportDate, Long userId){
         super();
 
@@ -88,6 +102,28 @@ public class Batch extends Persistable
         return receiptDate;
     }
 
+    public Date getBeginDate() {
+        return beginDate;
+    }
+
+    public void setBeginDate(Date beginDate) {
+        Date newBeginDate = (Date)beginDate.clone();
+        DataUtils.toBeginningOfTheSecond(newBeginDate);
+
+        this.beginDate = beginDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        Date newEndDate = (Date)endDate.clone();
+        DataUtils.toBeginningOfTheSecond(newEndDate);
+
+        this.endDate = endDate;
+    }
+
     public Long getUserId() {
         return userId;
     }
@@ -129,4 +165,54 @@ public class Batch extends Persistable
 
         this.repDate = newReportDate;
     }
+
+    public Long getCreditorId() {
+        return creditorId;
+    }
+
+    public void setCreditorId(Long creditorId) {
+        this.creditorId = creditorId;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public byte[] getContent() {
+        return content;
+    }
+
+    public void setContent(byte[] content) {
+        try {
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            String hash = md5.digest(content).toString();
+
+            this.content = content;
+            this.hash = hash;
+
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    public String getSign() {
+        return sign;
+    }
+
+    public void setSign(String sign) {
+        this.sign = sign;
+    }
+
 }

@@ -232,7 +232,7 @@
                                 </forcedType>
                                 <forcedType>
                                     <name>java.sql.Timestamp</name>
-                                    <expressions>(.*\.RECEIPT_DATE)|(.*\.EVENT_BEGIN_DT)|(.*\.EVENT_END_DT)|(.*\.UPDATE_DATE)|(.*\.CREATION_DATE)|(.*\.SENDING_DATE)</expressions>
+                                    <expressions>(.*\.RECEIPT_DATE)|(.*\.EVENT_BEGIN_DT)|(.*\.EVENT_END_DT)|(.*\.UPDATE_DATE)|(.*\.CREATION_DATE)|(.*\.SENDING_DATE)|(.*EAV_BATCHES\.BEGIN_DATE)|(.*EAV_BATCHES\.END_DATE)</expressions>
                                 </forcedType>
                             </forcedTypes>
                         </database>
