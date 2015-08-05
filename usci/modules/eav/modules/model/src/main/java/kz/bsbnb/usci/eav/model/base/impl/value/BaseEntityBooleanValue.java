@@ -6,17 +6,14 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 
 import java.util.Date;
 
-/**
- * @author alexandr.motov
- */
 public class BaseEntityBooleanValue extends BaseValue<Boolean> implements IBaseValue<Boolean> {
-
-    public BaseEntityBooleanValue(long id, Batch batch, long index, Date reportDate, Boolean value, boolean closed, boolean last) {
-        super(id, batch, index, reportDate, value, closed, last);
+    public BaseEntityBooleanValue(long id, long creditorId, Batch batch, long index, Date reportDate, Boolean value,
+                                  boolean closed, boolean last) {
+        super(id, creditorId, batch, index, reportDate, value, closed, last);
     }
 
-    public BaseEntityBooleanValue(Batch batch, long index, Boolean value) {
-        super(batch, index, value);
+    public BaseEntityBooleanValue(long creditorId, Batch batch, long index, Boolean value) {
+        super(creditorId, batch, index, value);
     }
 
 }

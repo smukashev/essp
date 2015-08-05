@@ -208,8 +208,17 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate ?
                             baseValue.getRepDate() : reportDate);
 
-            previousBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
-                    id, batch, index, reportDate, childBaseEntityLoaded, closed, last);
+            previousBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    childBaseEntityLoaded,
+                    closed,
+                    last);
         }
 
         return previousBaseValue;
@@ -288,8 +297,17 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate
                             ? baseValue.getRepDate() : reportDate);
 
-            nextBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
-                    id, batch, index, reportDate, childBaseEntityLoaded, closed, last);
+            nextBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    childBaseEntityLoaded,
+                    closed,
+                    last);
         }
 
         return nextBaseValue;
@@ -343,8 +361,17 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
             IBaseEntity childBaseEntityLoaded = baseEntityLoadDao
                     .loadByMaxReportDate(childBaseEntity.getId(), baseValue.getRepDate());
 
-            closedBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
-                    id, batch, index, baseValue.getRepDate(), childBaseEntityLoaded, true, last);
+            closedBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    baseValue.getRepDate(),
+                    childBaseEntityLoaded,
+                    true,
+                    last);
         }
 
         return closedBaseValue;
@@ -402,8 +429,17 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate
                             ? baseValue.getRepDate() : reportDate);
 
-            lastBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
-                    id, batch, index, reportDate, childBaseEntityLoaded, closed, true);
+            lastBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    childBaseEntityLoaded,
+                    closed,
+                    true);
         }
 
         return lastBaseValue;
@@ -481,8 +517,17 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
             Batch batch = batchRepository.getBatch(batchId);
             IBaseEntity baseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, actualReportDate);
 
-            baseSet.put(BaseValueFactory.create(MetaContainerTypes.META_SET, baseSet.getMemberType(),
-                    id, batch, index, reportDate, baseEntity, false, isLast));
+            baseSet.put(BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    baseSet.getMemberType(),
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    baseEntity,
+                    false,
+                    isLast));
         }
     }
 

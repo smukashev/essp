@@ -27,9 +27,6 @@ import java.util.logging.Logger;
 @Component
 @Scope("prototype")
 public class InfoParser extends BatchParser {
-    private static final Logger logger
-            = Logger.getLogger(InfoParser.class.getName());
-
     public InfoParser() {
         super();
     }
@@ -45,11 +42,11 @@ public class InfoParser extends BatchParser {
         if (localName.equals("info")) {
         } else if (localName.equals("creditor")) {
             currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor"), batch.getRepDate());
-            //currentBaseEntity.put("code",new BaseValue(batch,index,777));
+
         } else if (localName.equals("code")) {
             event = (XMLEvent) xmlReader.next();
             String crCode = event.asCharacters().getData();
-            IBaseEntityProcessorDao processorDao = baseEntityRepository.getBaseEntityProcessorDao();
+
             RefListResponse refListResponse = refProcessorDao.getRefListResponse(
                     metaClassRepository.getMetaClass("ref_creditor").getId(), batch.getRepDate(), false);
 
@@ -64,15 +61,15 @@ public class InfoParser extends BatchParser {
                     for (IBaseValue bv : creditorDocsLoaded.get()) {
                         BaseEntity docLoaded = (BaseEntity) bv.getValue();
                         BaseEntity doc = new BaseEntity(metaClassRepository.getMetaClass("document"), batch.getRepDate());
-                        doc.put("no", new BaseValue(batch, index, docLoaded.getEl("no")));
+                        doc.put("no", new BaseValue(-1, batch, index, docLoaded.getEl("no")));
 
                         BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), batch.getRepDate());
-                        docType.put("code", new BaseEntityStringValue(batch, index,
+                        docType.put("code", new BaseEntityStringValue(-1, batch, index,
                                 (String) docLoaded.getEl("doc_type.code")));
-                        doc.put("doc_type", new BaseEntityComplexValue(batch, index, docType));
-                        creditorDocs.put(new BaseValue(batch, index, doc));
+                        doc.put("doc_type", new BaseEntityComplexValue(-1, batch, index, docType));
+                        creditorDocs.put(new BaseValue(-1, batch, index, doc));
                     }
-                    currentBaseEntity.put("docs", new BaseEntityComplexSet(batch, index, creditorDocs));
+                    currentBaseEntity.put("docs", new BaseEntityComplexSet(-1, batch, index, creditorDocs));
                     found = true;
                     break;
                 }
@@ -81,27 +78,24 @@ public class InfoParser extends BatchParser {
                 currentBaseEntity.addValidationError(String.format("Кредитор с кодом %s не найден", crCode));
         } else if (localName.equals("docs")) {
             docs = new BaseSet(metaClassRepository.getMetaClass("document"));
-            //docs = new Docs();
         } else if (localName.equals("doc")) {
-            //currentDoc = new CtDoc();
-            //currentDoc.setDocType(attributes.getValue("doc_type"));
             currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"), batch.getRepDate());
 
             BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), batch.getRepDate());
-            docType.put("code", new BaseEntityStringValue(batch, index,
+            docType.put("code", new BaseEntityStringValue(-1, batch, index,
                     event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
-            currentDoc.put("doc_type", new BaseEntityComplexValue(batch, index, docType));
+            currentDoc.put("doc_type", new BaseEntityComplexValue(-1, batch, index, docType));
         } else if (localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("name", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
+            currentDoc.put("name", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
         } else if (localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("no", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
+            currentDoc.put("no", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
         } else if (localName.equals("account_date")) {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                accountDate = new BaseEntityDateValue(batch, index, dateFormat.parse(dateRaw));
+                accountDate = new BaseEntityDateValue(-1, batch, index, dateFormat.parse(dateRaw));
             } catch (ParseException e) {
                 currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }
@@ -109,13 +103,13 @@ public class InfoParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                reportDate = new BaseEntityDateValue(batch, index, dateFormat.parse(dateRaw));
+                reportDate = new BaseEntityDateValue(-1, batch, index, dateFormat.parse(dateRaw));
             } catch (ParseException e) {
                 currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }
         } else if (localName.equals("actual_credit_count")) {
             event = (XMLEvent) xmlReader.next();
-            actualCreditCount = new BaseEntityIntegerValue(batch, index, new Integer(event.asCharacters().getData()));
+            actualCreditCount = new BaseEntityIntegerValue(-1, batch, index, new Integer(event.asCharacters().getData()));
         } else {
             throw new UnknownTagException(localName);
         }
@@ -127,48 +121,26 @@ public class InfoParser extends BatchParser {
     public boolean endElement(String localName) throws SAXException {
         //try {
         if (localName.equals("info")) {
-            //batch.setInfo(info);
-            //xmlReader.setContentHandler(contentHandler);
             return true;
         } else if (localName.equals("creditor")) {
-            //ctCreditor.setDocs(docs);
-            //info.setCreditor(ctCreditor);
         } else if (localName.equals("code")) {
-            //ctCreditor.setCode(contents.toString());
         } else if (localName.equals("docs")) {
-            currentBaseEntity.put("docs", new BaseEntityComplexSet(batch, index, docs));
+            currentBaseEntity.put("docs", new BaseEntityComplexSet(-1, batch, index, docs));
         } else if (localName.equals("doc")) {
-            //docs.getDoc().add(currentDoc);
-            docs.put(new BaseSetComplexValue(batch, index, currentDoc));
+            docs.put(new BaseSetComplexValue(-1, batch, index, currentDoc));
         } else if (localName.equals("name")) {
-            //currentDoc.setName(contents.toString());
         } else if (localName.equals("no")) {
-            //currentDoc.setNo(contents.toString());
         } else if (localName.equals("account_date")) {
-            //info.setAccountDate(convertDateToCalendar(dateFormat.parse(contents.toString())));
         } else if (localName.equals("report_date")) {
-            //info.setReportDate(convertDateToCalendar(dateFormat.parse(contents.toString())));
         } else if (localName.equals("actual_credit_count")) {
-            //info.setActualCreditCount(new BigInteger(contents.toString()));
         } else {
             throw new UnknownTagException(localName);
         }
-        /*} catch(ParseException e) {
-            throw new TypeErrorException(localName);
-        } */
-        return false;
-    }
 
-    public BaseValue getAccountDate() {
-        return accountDate;
+        return false;
     }
 
     public BaseValue<Date> getReportDate() {
         return reportDate;
     }
-
-    public BaseValue getActualCreditCount() {
-        return actualCreditCount;
-    }
-
 }

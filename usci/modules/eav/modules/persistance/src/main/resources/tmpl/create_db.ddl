@@ -29,11 +29,6 @@
 			<index-column name="is_reference"/>
 		</index>
 	</table>
-	<table name="eav_be_sets">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="level_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="is_last" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-	</table>
 	<table name="eav_m_set_key_filter">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -116,6 +111,11 @@
 			<index-column name="container_type"/>
 		</index>
 	</table>
+	<table name="eav_be_sets">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="level_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="is_last" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+	</table>
 	<table name="eav_be_boolean_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -145,6 +145,7 @@
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
@@ -299,6 +300,7 @@
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
@@ -367,6 +369,7 @@
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
@@ -502,6 +505,7 @@
 	<table name="eav_be_entity_simple_sets">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -569,6 +573,7 @@
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
@@ -637,6 +642,7 @@
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>

@@ -213,9 +213,17 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_INTEGER_SET_VALUES.REPORT_DATE.getName()));
 
             Batch batch = batchRepository.getBatch(batchId);
-            baseSet.put(
-                    BaseValueFactory.create(
-                            MetaContainerTypes.META_SET, baseSet.getMemberType(), id, batch, index, reportDate, value, false, last));
+            baseSet.put(BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    baseSet.getMemberType(),
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    value,
+                    false,
+                    last));
         }
     }
 

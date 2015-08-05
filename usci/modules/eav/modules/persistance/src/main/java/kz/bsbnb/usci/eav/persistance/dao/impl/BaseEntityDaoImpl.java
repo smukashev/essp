@@ -28,9 +28,6 @@ import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
-/**
- * @author alexandr.motov
- */
 @Repository
 public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 

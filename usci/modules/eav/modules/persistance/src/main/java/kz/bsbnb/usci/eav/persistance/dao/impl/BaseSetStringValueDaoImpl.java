@@ -28,13 +28,8 @@ import java.util.Map;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_STRING_SET_VALUES;
 
-/**
- *
- */
 @Repository
-public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetStringValueDao
-{
-
+public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetStringValueDao {
     private final Logger logger = LoggerFactory.getLogger(BaseSetStringValueDaoImpl.class);
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
@@ -46,30 +41,33 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
 
     @Override
     public long insert(IPersistable persistable) {
-        IBaseValue baseValue = (IBaseValue)persistable;
+        IBaseValue baseValue = (IBaseValue) persistable;
+
         long baseValueId = insert(
                 baseValue.getBaseContainer().getId(),
+                baseValue.getCreditorId(),
                 baseValue.getBatch().getId(),
                 baseValue.getIndex(),
                 baseValue.getRepDate(),
                 baseValue.getValue(),
                 baseValue.isClosed(),
                 baseValue.isLast());
+
         baseValue.setId(baseValueId);
 
         return baseValueId;
     }
 
-    protected long insert(long baseSetId, long batchId, long index, Date reportDate,
-                          Object value, boolean closed, boolean last)
-    {
+    protected long insert(long baseSetId, long creditorId, long batchId, long index, Date reportDate,
+                          Object value, boolean closed, boolean last) {
         Insert insert = context
                 .insertInto(EAV_BE_STRING_SET_VALUES)
                 .set(EAV_BE_STRING_SET_VALUES.SET_ID, baseSetId)
                 .set(EAV_BE_STRING_SET_VALUES.BATCH_ID, batchId)
+                .set(EAV_BE_STRING_SET_VALUES.BATCH_ID, batchId)
                 .set(EAV_BE_STRING_SET_VALUES.INDEX_, index)
                 .set(EAV_BE_STRING_SET_VALUES.REPORT_DATE, DataUtils.convert(reportDate))
-                .set(EAV_BE_STRING_SET_VALUES.VALUE, (String)value)
+                .set(EAV_BE_STRING_SET_VALUES.VALUE, (String) value)
                 .set(EAV_BE_STRING_SET_VALUES.IS_CLOSED, DataUtils.convert(closed))
                 .set(EAV_BE_STRING_SET_VALUES.IS_LAST, DataUtils.convert(last));
 
@@ -79,15 +77,14 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
 
     @Override
     public void update(IPersistable persistable) {
-        IBaseValue baseValue = (IBaseValue)persistable;
+        IBaseValue baseValue = (IBaseValue) persistable;
         update(baseValue.getId(), baseValue.getBaseContainer().getId(), baseValue.getBatch().getId(),
                 baseValue.getIndex(), baseValue.getRepDate(), baseValue.getValue(),
                 baseValue.isClosed(), baseValue.isLast());
     }
 
     protected void update(long id, long baseSetId, long batchId, long index,
-                          Date reportDate, Object value, boolean closed, boolean last)
-    {
+                          Date reportDate, Object value, boolean closed, boolean last) {
         String tableAlias = "sv";
         Update update = context
                 .update(EAV_BE_STRING_SET_VALUES.as(tableAlias))
@@ -95,15 +92,14 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
                 .set(EAV_BE_STRING_SET_VALUES.as(tableAlias).BATCH_ID, batchId)
                 .set(EAV_BE_STRING_SET_VALUES.as(tableAlias).INDEX_, index)
                 .set(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE, DataUtils.convert(reportDate))
-                .set(EAV_BE_STRING_SET_VALUES.as(tableAlias).VALUE, (String)value)
+                .set(EAV_BE_STRING_SET_VALUES.as(tableAlias).VALUE, (String) value)
                 .set(EAV_BE_STRING_SET_VALUES.as(tableAlias).IS_CLOSED, DataUtils.convert(closed))
                 .set(EAV_BE_STRING_SET_VALUES.as(tableAlias).IS_LAST, DataUtils.convert(last))
                 .where(EAV_BE_STRING_SET_VALUES.as(tableAlias).ID.equal(id));
 
         logger.debug(update.toString());
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
-        if (count != 1)
-        {
+        if (count != 1) {
             throw new RuntimeException("UPDATE operation should be update only one record.");
         }
     }
@@ -113,8 +109,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         delete(persistable.getId());
     }
 
-    protected void delete(long id)
-    {
+    protected void delete(long id) {
         String tableAlias = "sv";
         Delete delete = context
                 .delete(EAV_BE_STRING_SET_VALUES.as(tableAlias))
@@ -122,8 +117,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
 
         logger.debug(delete.toString());
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-        if (count != 1)
-        {
+        if (count != 1) {
             throw new RuntimeException("DELETE operation should be delete only one record.");
         }
     }
@@ -132,7 +126,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        IBaseSet baseSet = (IBaseSet)baseContainer;
+        IBaseSet baseSet = (IBaseSet) baseContainer;
         IMetaType metaType = baseSet.getMemberType();
 
         IBaseValue previousBaseValue = null;
@@ -141,7 +135,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         String subqueryAlias = "bsvn";
         Table subqueryTable = context
                 .select(DSL.rank().over()
-                        .orderBy(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
+                                .orderBy(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_STRING_SET_VALUES.as(tableAlias).ID,
                         EAV_BE_STRING_SET_VALUES.as(tableAlias).BATCH_ID,
                         EAV_BE_STRING_SET_VALUES.as(tableAlias).INDEX_,
@@ -168,32 +162,39 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1)
-        {
+        if (rows.size() > 1) {
             throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
         }
 
-        if (rows.size() == 1)
-        {
+        if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.ID.getName())).longValue();
             long index = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.INDEX_.getName())).longValue();
-            long batchId = ((BigDecimal)row
+            long batchId = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.BATCH_ID.getName())).longValue();
-            boolean last = ((BigDecimal)row
+            boolean last = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.IS_LAST.getName())).longValue() == 1;
-            boolean closed = ((BigDecimal)row
+            boolean closed = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
 
             Batch batch = batchRepository.getBatch(batchId);
 
-            previousBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
-                    id, batch, index, reportDate, baseValue.getValue(), closed, last);
+            previousBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    baseValue.getValue(),
+                    closed,
+                    last);
         }
 
         return previousBaseValue;
@@ -203,7 +204,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        IBaseSet baseSet = (IBaseSet)baseContainer;
+        IBaseSet baseSet = (IBaseSet) baseContainer;
         IMetaType metaType = baseSet.getMemberType();
 
         IBaseValue nextBaseValue = null;
@@ -212,7 +213,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         String subqueryAlias = "bsvn";
         Table subqueryTable = context
                 .select(DSL.rank()
-                        .over().orderBy(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
+                                .over().orderBy(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_STRING_SET_VALUES.as(tableAlias).ID,
                         EAV_BE_STRING_SET_VALUES.as(tableAlias).BATCH_ID,
                         EAV_BE_STRING_SET_VALUES.as(tableAlias).INDEX_,
@@ -239,32 +240,39 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1)
-        {
+        if (rows.size() > 1) {
             throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
         }
 
-        if (rows.size() == 1)
-        {
+        if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.ID.getName())).longValue();
             long index = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.INDEX_.getName())).longValue();
-            long batchId = ((BigDecimal)row
+            long batchId = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.BATCH_ID.getName())).longValue();
-            boolean last = ((BigDecimal)row
+            boolean last = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.IS_LAST.getName())).longValue() == 1;
-            boolean closed = ((BigDecimal)row
+            boolean closed = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
 
             Batch batch = batchRepository.getBatch(batchId);
 
-            nextBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
-                    id, batch, index, reportDate, baseValue.getValue(), closed, last);
+            nextBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    baseValue.getValue(),
+                    closed,
+                    last);
         }
 
         return nextBaseValue;
@@ -274,11 +282,10 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
     @SuppressWarnings("unchecked")
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        IBaseSet baseSet = (IBaseSet)baseContainer;
+        IBaseSet baseSet = (IBaseSet) baseContainer;
         IMetaType metaType = baseSet.getMemberType();
 
-        if (baseContainer == null || baseContainer.getId() < 1)
-        {
+        if (baseContainer == null || baseContainer.getId() < 1) {
             throw new RuntimeException("Can not find closed instance of BaseValue without container or container ID.");
         }
 
@@ -299,28 +306,35 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1)
-        {
+        if (rows.size() > 1) {
             throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
         }
 
-        if (rows.size() == 1)
-        {
+        if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.ID.getName())).longValue();
             long index = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.INDEX_.getName())).longValue();
-            long batchId = ((BigDecimal)row
+            long batchId = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.BATCH_ID.getName())).longValue();
-            boolean last = ((BigDecimal)row
+            boolean last = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
             Batch batch = batchRepository.getBatch(batchId);
 
-            closedBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
-                    id, batch, index, baseValue.getRepDate(), baseValue.getValue(), true, last);
+            closedBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    baseValue.getRepDate(),
+                    baseValue.getValue(),
+                    true,
+                    last);
         }
 
         return closedBaseValue;
@@ -329,7 +343,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        IBaseSet baseSet = (IBaseSet)baseContainer;
+        IBaseSet baseSet = (IBaseSet) baseContainer;
         IMetaType metaType = baseSet.getMemberType();
 
         IBaseValue lastBaseValue = null;
@@ -349,30 +363,37 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1)
-        {
+        if (rows.size() > 1) {
             throw new RuntimeException("Query for get last instance of BaseValue return more than one row.");
         }
 
-        if (rows.size() == 1)
-        {
+        if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.ID.getName())).longValue();
             long index = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.INDEX_.getName())).longValue();
-            long batchId = ((BigDecimal)row
+            long batchId = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.BATCH_ID.getName())).longValue();
-            boolean closed = ((BigDecimal)row
+            boolean closed = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
 
             Batch batch = batchRepository.getBatch(batchId);
 
-            lastBaseValue = BaseValueFactory.create(MetaContainerTypes.META_SET, metaType,
-                    id, batch, index, reportDate, baseValue.getValue(), closed, true);
+            lastBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    baseValue.getValue(),
+                    closed,
+                    true);
         }
 
         return lastBaseValue;
@@ -380,12 +401,10 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseSet baseSet, Date actualReportDate, boolean isLast)
-    {
+    public void loadBaseValues(IBaseSet baseSet, Date actualReportDate, boolean isLast) {
         Table tableOfValues = EAV_BE_STRING_SET_VALUES.as("ssv");
         Select select;
-        if (isLast)
-        {
+        if (isLast) {
             select = context
                     .select(tableOfValues.field(EAV_BE_STRING_SET_VALUES.ID),
                             tableOfValues.field(EAV_BE_STRING_SET_VALUES.BATCH_ID),
@@ -398,13 +417,11 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
                     .where(tableOfValues.field(EAV_BE_STRING_SET_VALUES.SET_ID).equal(baseSet.getId()))
                     .and(tableOfValues.field(EAV_BE_STRING_SET_VALUES.IS_LAST).equal(true)
                             .and(tableOfValues.field(EAV_BE_STRING_SET_VALUES.IS_CLOSED).equal(false)));
-        }
-        else
-        {
+        } else {
             Table tableNumbering = context
                     .select(DSL.rank().over()
-                            .partitionBy(tableOfValues.field(EAV_BE_STRING_SET_VALUES.VALUE))
-                            .orderBy(tableOfValues.field(EAV_BE_STRING_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
+                                    .partitionBy(tableOfValues.field(EAV_BE_STRING_SET_VALUES.VALUE))
+                                    .orderBy(tableOfValues.field(EAV_BE_STRING_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
                             tableOfValues.field(EAV_BE_STRING_SET_VALUES.ID),
                             tableOfValues.field(EAV_BE_STRING_SET_VALUES.VALUE),
                             tableOfValues.field(EAV_BE_STRING_SET_VALUES.BATCH_ID),
@@ -434,21 +451,28 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         Iterator<Map<String, Object>> it = rows.iterator();
-        while (it.hasNext())
-        {
+        while (it.hasNext()) {
             Map<String, Object> row = it.next();
 
             long id = ((BigDecimal) row.get(EAV_BE_STRING_SET_VALUES.ID.getName())).longValue();
-            long batchId = ((BigDecimal)row.get(EAV_BE_STRING_SET_VALUES.BATCH_ID.getName())).longValue();
+            long batchId = ((BigDecimal) row.get(EAV_BE_STRING_SET_VALUES.BATCH_ID.getName())).longValue();
             long index = ((BigDecimal) row.get(EAV_BE_STRING_SET_VALUES.INDEX_.getName())).longValue();
-            boolean last = ((BigDecimal)row.get(EAV_BE_STRING_SET_VALUES.IS_LAST.getName())).longValue() == 1;
-            String value = (String)row.get(EAV_BE_STRING_SET_VALUES.VALUE.getName());
+            boolean last = ((BigDecimal) row.get(EAV_BE_STRING_SET_VALUES.IS_LAST.getName())).longValue() == 1;
+            String value = (String) row.get(EAV_BE_STRING_SET_VALUES.VALUE.getName());
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
 
             Batch batch = batchRepository.getBatch(batchId);
-            baseSet.put(
-                    BaseValueFactory.create(
-                            MetaContainerTypes.META_SET, baseSet.getMemberType(), id, batch, index, reportDate, value, false, last));
+            baseSet.put(BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    baseSet.getMemberType(),
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    value,
+                    false,
+                    last));
         }
     }
 
@@ -464,8 +488,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
     }
 
     @Override
-    public Date getNextReportDate(long baseSetId, Date reportDate)
-    {
+    public Date getNextReportDate(long baseSetId, Date reportDate) {
         String tableAlias = "ssv";
         Select select = context
                 .select(DSL.min(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE).as("next_report_date"))
@@ -475,16 +498,14 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-        if (rows.size() > 0)
-        {
+        if (rows.size() > 0) {
             return DataUtils.convert((Timestamp) rows.get(0).get("next_report_date"));
         }
         return null;
     }
 
     @Override
-    public Date getPreviousReportDate(long baseSetId, Date reportDate)
-    {
+    public Date getPreviousReportDate(long baseSetId, Date reportDate) {
         String tableAlias = "ssv";
         Select select = context
                 .select(DSL.max(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE).as("previous_report_date"))
@@ -494,8 +515,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-        if (rows.size() > 0)
-        {
+        if (rows.size() > 0) {
             return DataUtils.convert((Timestamp) rows.get(0).get("previous_report_date"));
         }
         return null;

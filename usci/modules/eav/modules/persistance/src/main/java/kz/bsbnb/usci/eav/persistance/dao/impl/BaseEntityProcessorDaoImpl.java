@@ -76,63 +76,18 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public long search(IBaseEntity baseEntity) {
+    public long search(IBaseEntity baseEntity, long creditorId) {
         IMetaClass metaClass = baseEntity.getMeta();
-        Long baseEntityId = searcherPool.getSearcher(metaClass.getClassName()).findSingle((BaseEntity) baseEntity);
+
+        Long baseEntityId = searcherPool.getSearcher(metaClass.getClassName()).
+                findSingle((BaseEntity) baseEntity, creditorId);
+
         return baseEntityId == null ? 0 : baseEntityId;
     }
 
     @Override
-    public IBaseEntity postPrepare(IBaseEntity baseEntity, IBaseEntity parentEntity) {
+    public IBaseEntity prepare(IBaseEntity baseEntity, long creditorId) {
         MetaClass metaClass = baseEntity.getMeta();
-
-        if (parentEntity != null && metaClass.isSearchable() && metaClass.isParentIsKey()) {
-            Long baseEntityId = searcherPool.getImprovedBaseEntityLocalSearcher().
-                    findSingleWithParent((BaseEntity) baseEntity, (BaseEntity) parentEntity);
-
-            if (baseEntityId == null) baseEntity.setId(0);
-            else baseEntity.setId(baseEntityId);
-        }
-
-        for (String attribute : baseEntity.getAttributes()) {
-            IMetaType memberType = baseEntity.getMemberType(attribute);
-
-            if (memberType.isComplex()) {
-                IBaseValue memberValue = baseEntity.getBaseValue(attribute);
-
-                if (memberValue.getValue() != null) {
-                    if (memberType.isSet()) {
-                        IMetaSet childMetaSet = (IMetaSet) memberType;
-                        IMetaType childMetaType = childMetaSet.getMemberType();
-
-                        if (childMetaType.isSet()) {
-                            throw new UnsupportedOperationException("Не реализовано;");
-                        } else {
-                            IBaseSet childBaseSet = (IBaseSet) memberValue.getValue();
-
-                            for (IBaseValue childBaseValue : childBaseSet.get()) {
-                                IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
-
-                                if (childBaseEntity.getValueCount() != 0)
-                                    postPrepare((IBaseEntity) childBaseValue.getValue(), baseEntity);
-                            }
-                        }
-                    } else {
-                        IBaseEntity childBaseEntity = (IBaseEntity) memberValue.getValue();
-
-                        if (childBaseEntity.getValueCount() != 0)
-                            postPrepare((IBaseEntity) memberValue.getValue(), baseEntity);
-                    }
-                }
-            }
-        }
-
-        return baseEntity;
-    }
-
-    @Override
-    public IBaseEntity prepare(IBaseEntity baseEntity) {
-        IMetaClass metaClass = baseEntity.getMeta();
 
         for (String attribute : baseEntity.getAttributes()) {
             IMetaType metaType = baseEntity.getMemberType(attribute);
@@ -149,22 +104,22 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             for (IBaseValue childBaseValue : childBaseSet.get()) {
                                 IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
                                 if (childBaseEntity.getValueCount() != 0) {
-                                    prepare((IBaseEntity) childBaseValue.getValue());
+                                    prepare((IBaseEntity) childBaseValue.getValue(), creditorId);
                                 }
                             }
                         }
                     } else {
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
                         if (childBaseEntity.getValueCount() != 0) {
-                            prepare((IBaseEntity) baseValue.getValue());
+                            prepare((IBaseEntity) baseValue.getValue(), creditorId);
                         }
                     }
                 }
             }
         }
 
-        if (metaClass.isSearchable()) {
-            long baseEntityId = search(baseEntity);
+        if (metaClass.isSearchable() && !metaClass.isParentIsKey()) {
+            long baseEntityId = search(baseEntity, creditorId);
             if (baseEntityId > 0)
                 baseEntity.setId(baseEntityId);
         }
@@ -176,11 +131,18 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Transactional
     public IBaseEntity process(final IBaseEntity baseEntity) {
         EntityHolder entityHolder = new EntityHolder();
-
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
-        IBaseEntity baseEntityPrepared = prepare(((BaseEntity) baseEntity).clone());
-        IBaseEntity baseEntityPostPrepared = postPrepare(((BaseEntity) baseEntityPrepared).clone(), null);
+
+        IBaseEntity baseEntityPostPrepared;
         IBaseEntity baseEntityApplied;
+
+        long creditorId = 0L;
+
+        if (baseEntity.getMeta().getClassName().equals("credit")) {
+            creditorId = ((BaseEntity) baseEntity.getEl("data_creditor.creditor")).getId();
+        }
+
+        baseEntityPostPrepared = prepare(((BaseEntity) baseEntity).clone(), creditorId);
 
         if (baseEntityPostPrepared.getOperation() != null) {
             switch (baseEntityPostPrepared.getOperation()) {
@@ -226,7 +188,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             + baseEntityPostPrepared.getOperation() + ";");
             }
         } else {
-            baseEntityApplied = baseEntityApplyDao.apply(baseEntityPostPrepared, baseEntityManager, entityHolder);
+            baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, baseEntityManager,
+                    entityHolder);
+
             baseEntityApplyDao.applyToDb(baseEntityManager);
         }
 

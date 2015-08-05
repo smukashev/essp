@@ -138,9 +138,7 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
 
     @Override
     public boolean delMetaClass(String className) {
-        lock.readLock().lock();
         MetaClass meta = getMetaClass(className);
-        lock.readLock().unlock();
 
         if(meta != null) {
             lock.writeLock().lock();

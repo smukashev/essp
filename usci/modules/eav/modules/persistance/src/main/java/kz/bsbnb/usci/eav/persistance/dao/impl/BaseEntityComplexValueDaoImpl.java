@@ -217,23 +217,39 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
+
             long index = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.INDEX_.getName())).longValue();
+
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.IS_LAST.getName())).longValue() == 1;
+
             long entityValueId = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
+
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
+
             Batch batch = batchRepository.getBatch(((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.BATCH_ID.getName())).longValue());
+
             IBaseEntity childBaseEntity = baseEntityLoadDao
                     .loadByMaxReportDate(entityValueId, currentReportDate ? baseValue.getRepDate() : reportDate);
 
-            nextBaseValue = BaseValueFactory.create(metaClass.getType(), metaType,
-                    id, batch, index, reportDate, childBaseEntity, closed, last);
+            nextBaseValue = BaseValueFactory.create(
+                    metaClass.getType(),
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    childBaseEntity,
+                    closed,
+                    last);
         }
 
         return nextBaseValue;
@@ -317,23 +333,39 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
+
             long index = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.INDEX_.getName())).longValue();
+
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.IS_LAST.getName())).longValue() == 1;
+
             long entityValueId = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
+
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
+
             Batch batch = batchRepository.getBatch(((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.BATCH_ID.getName())).longValue());
+
             IBaseEntity childBaseEntity = baseEntityLoadDao
                     .loadByMaxReportDate(entityValueId, currentReportDate ? baseValue.getRepDate() : reportDate);
 
-            previousBaseValue = BaseValueFactory.create(metaClass.getType(), metaType,
-                    id, batch, index, reportDate, childBaseEntity, closed, last);
+            previousBaseValue = BaseValueFactory.create(
+                    metaClass.getType(),
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    childBaseEntity,
+                    closed,
+                    last);
         }
 
         return previousBaseValue;
@@ -401,8 +433,17 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             IBaseEntity childBaseEntity = baseEntityLoadDao
                     .loadByMaxReportDate(entityValueId, baseValue.getRepDate());
 
-            closedBaseValue = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
-                    id, batch, index, baseValue.getRepDate(), childBaseEntity, true, last);
+            closedBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    baseValue.getRepDate(),
+                    childBaseEntity,
+                    true,
+                    last);
         }
 
         return closedBaseValue;
@@ -478,8 +519,17 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             IBaseEntity childBaseEntity = baseEntityLoadDao
                     .loadByMaxReportDate(entityValueId, currentReportDate ? baseValue.getRepDate() : reportDate);
 
-            lastBaseValue = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
-                    id, batch, index, reportDate, childBaseEntity, closed, true);
+            lastBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    childBaseEntity,
+                    closed,
+                    true);
         }
 
         return lastBaseValue;
@@ -575,9 +625,17 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             IBaseEntity childBaseEntity = baseEntityLoadDao.
                     loadByMaxReportDate(entityValueId, actualReportDate);
 
-            baseEntity.put(attribute,
-                    BaseValueFactory.create(
-                            MetaContainerTypes.META_CLASS, metaType, id, batch, index, reportDate, childBaseEntity, isClosed, isLast));
+            baseEntity.put(attribute, BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    childBaseEntity,
+                    isClosed,
+                    isLast));
         }
     }
 

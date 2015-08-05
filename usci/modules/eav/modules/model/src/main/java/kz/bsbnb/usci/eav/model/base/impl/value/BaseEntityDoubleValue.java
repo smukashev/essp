@@ -6,17 +6,14 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 
 import java.util.Date;
 
-/**
- * @author alexandr.motov
- */
 public class BaseEntityDoubleValue extends BaseValue<Double> implements IBaseValue<Double> {
-
-    public BaseEntityDoubleValue(long id, Batch batch, long index, Date reportDate, Double value, boolean closed, boolean last) {
-        super(id, batch, index, reportDate, value, closed, last);
+    public BaseEntityDoubleValue(long id, long creditorId, Batch batch, long index, Date reportDate, Double value,
+                                 boolean closed, boolean last) {
+        super(id, creditorId, batch, index, reportDate, value, closed, last);
     }
 
-    public BaseEntityDoubleValue(Batch batch, long index, Double value) {
-        super(batch, index, value);
+    public BaseEntityDoubleValue(long creditorId, Batch batch, long index, Double value) {
+        super(creditorId, batch, index, value);
     }
 
 }

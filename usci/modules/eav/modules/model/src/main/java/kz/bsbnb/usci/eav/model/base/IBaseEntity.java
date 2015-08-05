@@ -10,37 +10,32 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * @author a.motov
- */
 public interface IBaseEntity extends IBaseContainer {
+    IMetaAttribute getMetaAttribute(String attribute);
 
-    public IMetaAttribute getMetaAttribute(String attribute);
+    IBaseEntityReportDate getBaseEntityReportDate();
 
-    public IBaseEntityReportDate getBaseEntityReportDate();
+    void setBaseEntityReportDate(IBaseEntityReportDate baseEntityReportDate);
 
-    public void setBaseEntityReportDate(IBaseEntityReportDate baseEntityReportDate);
+    Date getReportDate();
 
-    public Date getReportDate();
+    void setReportDate(Date reportDate);
 
-    public void setReportDate(Date reportDate);
+    MetaClass getMeta();
 
-    public MetaClass getMeta();
+    void remove(String attribute);
 
-    public void remove(String attribute);
+    OperationType getOperation();
 
-    public OperationType getOperation();
+    Object getEl(String path);
 
-    public Object getEl(String path);
+    Object getEls(String path);
 
-    public Object getEls(String path);
+    List<Object> getElWithArrays(String path);
 
-    public List<Object> getElWithArrays(String path);
+    IBaseValue safeGetValue(String name);
 
-    public IBaseValue safeGetValue(String name);
+    void calculateValueCount();
 
-    public void calculateValueCount();
-
-    public UUID getUuid();
-
+    UUID getUuid();
 }

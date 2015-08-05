@@ -91,7 +91,13 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Override
     public BaseEntity search(BaseEntity baseEntity) {
-        ArrayList<Long> result = searcherPool.getSearcher(baseEntity.getMeta().getClassName()).findAll(baseEntity);
+        long creditorId = 0L;
+
+        if (baseEntity.getMeta().getClassName().equals("credit"))
+            creditorId = ((BaseEntity) baseEntity.getEl("data_creditor.creditor")).getId();
+
+        ArrayList<Long> result = searcherPool.getSearcher(baseEntity.getMeta().getClassName()).
+                findAll(baseEntity, creditorId);
         if (result.size() > 0)
             baseEntity.setId(result.get(0));
         return baseEntity;

@@ -81,6 +81,17 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
     private IBaseEntity mergeBaseEntity(IBaseEntity baseEntityLeft, IBaseEntity baseEntityRight, IBaseEntityMergeManager mergeManager,
                                         IBaseEntityManager baseEntityManager, MergeResultChoice choice, boolean deleteUnused) {
 
+        long creditorId = 0;
+        if (baseEntityLeft.getMeta().getClassName().equals("credit")) {
+            long creditorIdLeft = ((BaseEntity) baseEntityLeft.getEl("data_creditor.creditor")).getId();
+            long creditorIdRight = ((BaseEntity) baseEntityRight.getEl("data_creditor.creditor")).getId();
+
+            if (creditorIdLeft != creditorIdRight)
+                throw new IllegalStateException("Нельзя обьединять сущности разных банков");
+
+            creditorId = creditorIdLeft;
+        }
+
         // although it is safe to assume that both entities exist in DB, it is still worth checking
         if (baseEntityLeft.getId() < 1 && baseEntityRight.getId() < 1) {
             throw new RuntimeException("Merging two BaseEntity objects requires " +
@@ -113,11 +124,11 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
                     if (metaType.isSet()) {
                         // merge set
-                        mergeSet(baseEntityApplied, baseValueLeft, baseValueRight,
+                        mergeSet(creditorId, baseEntityApplied, baseValueLeft, baseValueRight,
                                 mergeManager, baseEntityManager, choice, deleteUnused);
                     } else {
                         // merge value
-                        mergeValue(baseEntityApplied, baseValueLeft, baseValueRight,
+                        mergeValue(creditorId, baseEntityApplied, baseValueLeft, baseValueRight,
                                 mergeManager, baseEntityManager, choice, deleteUnused);
                     }
                 } else {
@@ -130,11 +141,11 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
                         if (metaType.isSet()) {
                             // merge set
-                            mergeSet(baseEntityApplied, baseValueLeft, baseValueRight,
+                            mergeSet(creditorId, baseEntityApplied, baseValueLeft, baseValueRight,
                                     mergeManager.getChildManager(attrKey), baseEntityManager, choice, deleteUnused);
                         } else {
                             // merge value
-                            mergeValue(baseEntityApplied, baseValueLeft, baseValueRight,
+                            mergeValue(creditorId, baseEntityApplied, baseValueLeft, baseValueRight,
                                     mergeManager.getChildManager(attrKey), baseEntityManager, choice, deleteUnused);
                         }
 
@@ -145,6 +156,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                                     MetaContainerTypes.META_CLASS,
                                     metaType,
                                     baseValueRight.getId(),
+                                    creditorId,
                                     baseValueRight.getBatch(),
                                     baseValueRight.getIndex(),
                                     new Date(baseValueRight.getRepDate().getTime()),
@@ -157,6 +169,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                                     MetaContainerTypes.META_CLASS,
                                     metaType,
                                     baseValueLeft.getId(),
+                                    creditorId,
                                     baseValueLeft.getBatch(),
                                     baseValueLeft.getIndex(),
                                     new Date(baseValueLeft.getRepDate().getTime()),
@@ -216,6 +229,17 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
     private void mergeNullValue(IBaseEntity baseEntity, IBaseEntity baseEntityLeft, IBaseEntity baseEntityRight,
                                 IBaseEntityMergeManager mergeManager,
                                 IBaseEntityManager baseEntityManager, MergeResultChoice choice, String attribute) {
+        long creditorId = 0;
+        if (baseEntityLeft.getMeta().getClassName().equals("credit")) {
+            long creditorIdLeft = ((BaseEntity) baseEntityLeft.getEl("data_creditor.creditor")).getId();
+            long creditorIdRight = ((BaseEntity) baseEntityRight.getEl("data_creditor.creditor")).getId();
+
+            if (creditorIdLeft != creditorIdRight)
+                throw new IllegalStateException("Нельзя обьединять сущности разных банков");
+
+            creditorId = creditorIdLeft;
+        }
+
         IBaseValue baseValueLeft = baseEntityLeft.getBaseValue(attribute);
         IBaseValue baseValueRight = baseEntityRight.getBaseValue(attribute);
         if (baseValueLeft == null) {
@@ -226,6 +250,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                         MetaContainerTypes.META_CLASS,
                         metaType,
                         baseValueRight.getId(),
+                        creditorId,
                         baseValueRight.getBatch(),
                         baseValueRight.getIndex(),
                         new Date(baseValueRight.getRepDate().getTime()),
@@ -249,6 +274,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                         MetaContainerTypes.META_CLASS,
                         metaType,
                         baseValueRight.getId(),
+                        creditorId,
                         baseValueRight.getBatch(),
                         baseValueRight.getIndex(),
                         new Date(baseValueRight.getRepDate().getTime()),
@@ -278,6 +304,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                         MetaContainerTypes.META_CLASS,
                         metaType,
                         baseValueLeft.getId(),
+                        creditorId,
                         baseValueLeft.getBatch(),
                         baseValueLeft.getIndex(),
                         new Date(baseValueLeft.getRepDate().getTime()),
@@ -300,6 +327,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                         MetaContainerTypes.META_CLASS,
                         metaType,
                         baseValueLeft.getId(),
+                        creditorId,
                         baseValueLeft.getBatch(),
                         baseValueLeft.getIndex(),
                         new Date(baseValueLeft.getRepDate().getTime()),
@@ -338,9 +366,10 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
      * return anything.
      * This method is used when merging SETs
      */
-    private void mergeSet(IBaseEntity baseEntity, IBaseValue baseValueLeft, IBaseValue baseValueRight,
+    private void mergeSet(long creditorId, IBaseEntity baseEntity, IBaseValue baseValueLeft, IBaseValue baseValueRight,
                           IBaseEntityMergeManager mergeManager,
                           IBaseEntityManager baseEntityManager, MergeResultChoice choice, boolean deleteUnused) {
+
         IMetaAttribute metaAttribute = baseValueLeft.getMetaAttribute();
         IMetaType metaType = metaAttribute.getMetaType();
 
@@ -359,6 +388,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                         MetaContainerTypes.META_CLASS,
                         metaType,
                         baseValueRight.getId(),
+                        creditorId,
                         baseValueLeft.getBatch(),
                         baseValueLeft.getIndex(),
                         new Date(baseValueLeft.getRepDate().getTime()),
@@ -388,6 +418,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                         MetaContainerTypes.META_CLASS,
                         metaType,
                         baseValueLeft.getId(),
+                        creditorId,
                         baseValueRight.getBatch(),
                         baseValueRight.getIndex(),
                         new Date(baseValueRight.getRepDate().getTime()),
@@ -416,6 +447,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                         MetaContainerTypes.META_CLASS,
                         metaType,
                         baseValueLeft.getId(),
+                        creditorId,
                         baseValueRight.getBatch(),
                         baseValueRight.getIndex(),
                         new Date(baseValueRight.getRepDate().getTime()),
@@ -448,6 +480,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                                 MetaContainerTypes.META_SET,
                                 childMetaType,
                                 childBaseValueLeft.getId(),
+                                creditorId,
                                 childBaseValueLeft.getBatch(),
                                 childBaseValueLeft.getIndex(),
                                 new Date(childBaseValueLeft.getRepDate().getTime()),
@@ -505,6 +538,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                                     MetaContainerTypes.META_CLASS,
                                     childMetaType,
                                     childBaseValueLeft.getId(),
+                                    creditorId,
                                     childBaseValueLeft.getBatch(),
                                     childBaseValueLeft.getIndex(),
                                     new Date(childBaseValueLeft.getRepDate().getTime()),
@@ -519,6 +553,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                                     MetaContainerTypes.META_CLASS,
                                     childMetaType,
                                     childBaseValueRight.getId(),
+                                    creditorId,
                                     childBaseValueRight.getBatch(),
                                     childBaseValueRight.getIndex(),
                                     new Date(childBaseValueRight.getRepDate().getTime()),
@@ -539,6 +574,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                         MetaContainerTypes.META_CLASS,
                         metaType,
                         baseValueLeft.getId(),
+                        creditorId,
                         baseValueRight.getBatch(),
                         baseValueRight.getIndex(),
                         new Date(baseValueRight.getRepDate().getTime()),
@@ -551,6 +587,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                         MetaContainerTypes.META_CLASS,
                         metaType,
                         baseValueRight.getId(),
+                        creditorId,
                         baseValueLeft.getBatch(),
                         baseValueLeft.getIndex(),
                         new Date(baseValueLeft.getRepDate().getTime()),
@@ -580,7 +617,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
      * return anything.
      * This method is used when merging Complex/Simple values
      */
-    private void mergeValue(IBaseContainer baseEntity, IBaseValue baseValueLeft, IBaseValue baseValueRight,
+    private void mergeValue(long creditorId, IBaseContainer baseEntity, IBaseValue baseValueLeft, IBaseValue baseValueRight,
                             IBaseEntityMergeManager mergeManager, IBaseEntityManager baseEntityManager,
                             MergeResultChoice choice, boolean deleteUnused) {
         IMetaAttribute metaAttribute = baseValueLeft.getMetaAttribute();
@@ -592,6 +629,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                         MetaContainerTypes.META_CLASS,
                         metaType,
                         baseValueRight.getId(),
+                        creditorId,
                         baseValueLeft.getBatch(),
                         baseValueLeft.getIndex(),
                         new Date(baseValueLeft.getRepDate().getTime()),
@@ -628,6 +666,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                         MetaContainerTypes.META_CLASS,
                         metaType,
                         baseValueLeft.getId(),
+                        creditorId,
                         baseValueRight.getBatch(),
                         baseValueRight.getIndex(),
                         new Date(baseValueRight.getRepDate().getTime()),
@@ -686,6 +725,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                             MetaContainerTypes.META_CLASS,
                             metaType,
                             baseValueLeft.getId(),
+                            creditorId,
                             baseValueRight.getBatch(),
                             baseValueRight.getIndex(),
                             new Date(baseValueRight.getRepDate().getTime()),
@@ -700,6 +740,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                             MetaContainerTypes.META_CLASS,
                             metaType,
                             baseValueRight.getId(),
+                            creditorId,
                             baseValueLeft.getBatch(),
                             baseValueLeft.getIndex(),
                             new Date(baseValueLeft.getRepDate().getTime()),

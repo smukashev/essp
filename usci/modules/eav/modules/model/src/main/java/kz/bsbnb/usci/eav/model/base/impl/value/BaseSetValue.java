@@ -7,19 +7,17 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 
 import java.util.Date;
 
-/**
- * @author alexandr.motov
- */
 public class BaseSetValue<T> extends BaseValue<T> implements IBaseValue<T>, IBaseSetValue<T> {
 
     private HistoryType historyType = HistoryType.RESTRICTED_BY_ENTITY;
 
-    public BaseSetValue(long id, Batch batch, long index, Date reportDate, T value, boolean closed, boolean last) {
-        super(id, batch, index, reportDate, value, closed, last);
+    public BaseSetValue(long id, long creditorId, Batch batch, long index, Date reportDate, T value,
+                        boolean closed, boolean last) {
+        super(id, creditorId, batch, index, reportDate, value, closed, last);
     }
 
-    public BaseSetValue(Batch batch, long index, T value) {
-        super(batch, index, value);
+    public BaseSetValue(long creditorId, Batch batch, long index, T value) {
+        super(creditorId, batch, index, value);
     }
 
     public HistoryType getHistoryType() {
@@ -29,7 +27,4 @@ public class BaseSetValue<T> extends BaseValue<T> implements IBaseValue<T>, IBas
     public void setHistoryType(HistoryType historyType) {
         this.historyType = historyType;
     }
-
-
-
 }

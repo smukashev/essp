@@ -1254,8 +1254,13 @@ public class CLI {
             CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
             BaseEntity entity;
             while ((entity = reader.read()) != null) {
-                //long id = baseEntityProcessorDao.process(entity).getId();
-                ArrayList<Long> ids = searcher.findAll(entity);
+                long creditorId = 0L;
+
+                if (entity.getMeta().getClassName().equals("credit"))
+                    creditorId = ((BaseEntity) entity.getEl("data_creditor.creditor")).getId();
+
+
+                ArrayList<Long> ids = searcher.findAll(entity, creditorId);
                 if (ids.size() < 1) {
                     System.out.println("Entity: \n" + entity.toString() + "\nNot found.");
                 } else {
@@ -1340,7 +1345,12 @@ public class CLI {
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
         } else {
-            SelectConditionStep where = searcher.generateSQL(entity, null);
+            long creditorId = 0L;
+
+            if (entity.getMeta().getClassName().equals("credit"))
+                creditorId = ((BaseEntity) entity.getEl("data_creditor.creditor")).getId();
+
+            SelectConditionStep where = searcher.generateSQL(entity, creditorId, null);
 
             if (where != null) {
                 System.out.println(where.getSQL(true));
@@ -1356,8 +1366,12 @@ public class CLI {
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
         } else {
-            //SelectConditionStep where = searcher.generateSQL(entity, null);
-            ArrayList<Long> array = searcher.findAll((BaseEntity) entity);
+            long creditorId = 0L;
+
+            if (entity.getMeta().getClassName().equals("credit"))
+                creditorId = ((BaseEntity) entity.getEl("data_creditor.creditor")).getId();
+
+            ArrayList<Long> array = searcher.findAll((BaseEntity) entity, creditorId);
 
             for (Long ids : array) {
                 System.out.println(ids.toString());

@@ -190,24 +190,39 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();
+
             long index = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_.getName())).longValue();
+
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED.getName())).longValue() == 1;
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST.getName())).longValue() == 1;
+
             long setId = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.getName())).longValue();
+
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE.getName()));
+
             Batch batch = batchRepository.getBatch(((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue());
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
             baseSetComplexValueDao.loadBaseValues(baseSet, reportDate, false);
 
-            nextBaseValue = BaseValueFactory.create(metaClass.getType(), metaType,
-                    id, batch, index, reportDate, baseSet, closed, last);
+            nextBaseValue = BaseValueFactory.create(
+                    metaClass.getType(),
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    baseSet,
+                    closed,
+                    last);
         }
 
         return nextBaseValue;
@@ -269,24 +284,39 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();
+
             long index = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_.getName())).longValue();
+
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED.getName())).longValue() == 1;
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST.getName())).longValue() == 1;
+
             long setId = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.getName())).longValue();
+
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE.getName()));
+
             Batch batch = batchRepository.getBatch(((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue());
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
             baseSetComplexValueDao.loadBaseValues(baseSet, reportDate, false);
 
-            previousBaseValue = BaseValueFactory.create(metaClass.getType(), metaType,
-                    id, batch, index, reportDate, baseSet, closed, last);
+            previousBaseValue = BaseValueFactory.create(
+                    metaClass.getType(),
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    baseSet,
+                    closed,
+                    last);
         }
 
         return previousBaseValue;
@@ -339,7 +369,14 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             baseSetComplexValueDao.loadBaseValues(baseSet, baseValue.getRepDate(), false);
 
             closedBaseValue = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
-                    id, batch, index, baseValue.getRepDate(), baseSet, true, last);
+                    id,
+                    0,
+                    batch,
+                    index,
+                    baseValue.getRepDate(),
+                    baseSet,
+                    true,
+                    last);
         }
 
         return closedBaseValue;
@@ -378,22 +415,36 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();
+
             long index = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_.getName())).longValue();
+
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED.getName())).longValue() == 1;
+
             long setId = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.getName())).longValue();
+
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE.getName()));
+
             Batch batch = batchRepository.getBatch(((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue());
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
             baseSetComplexValueDao.loadBaseValues(baseSet, baseValue.getRepDate(), false);
 
-            lastBaseValue = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
-                    id, batch, index, reportDate, baseSet, closed, true);
+            lastBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    baseSet,
+                    closed,
+                    true);
         }
 
         return lastBaseValue;
@@ -476,7 +527,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
             String attribute = (String) row.get(EAV_M_COMPLEX_SET.NAME.getName());
             long setId = ((BigDecimal) row.get(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.getName())).longValue();
-
             long baseValueId = ((BigDecimal) row.get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();
             long batchId = ((BigDecimal) row.get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue();
             long index = ((BigDecimal) row.get(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_.getName())).longValue();
@@ -489,15 +539,23 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             IMetaType metaSetMemberType = metaSet.getMemberType();
             IBaseSet baseSet = new BaseSet(setId, metaSetMemberType);
 
-            if (metaSetMemberType.isSet()) {
+            if (metaSetMemberType.isSet())
                 throw new UnsupportedOperationException("Не реализовано;");
-            }
 
             baseSetComplexValueDao.loadBaseValues(baseSet, actualReportDate, isLast);
 
             Batch batch = batchRepository.getBatch(batchId);
-            baseEntity.put(attribute, BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
-                    baseValueId, batch, index, reportDate, baseSet));
+            baseEntity.put(attribute, BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    baseValueId,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    baseSet,
+                    false,
+                    true));
         }
     }
 

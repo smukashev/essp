@@ -163,7 +163,7 @@ public class Mnt {
                             continue;
                         }
 
-                        baseEntityProcessorDao.prepare(credit);
+                        baseEntityProcessorDao.prepare(credit, creditorId);
 
                         if (credit.getId() <= 0) {
                             //storage.simpleSql(String.format("insert into MNT_LOGS (MNT_OPERATION_ID, FOREIGN_ID, EXECUTION_TIME, status, error_msg) values (1,%d,sysdate,1,'%s')", mntId, "credit not found"));
@@ -226,13 +226,55 @@ public class Mnt {
                         IBaseEntity primaryContract = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"),
                                 new Date());
 
-                        IBaseValue contractNoValue = BaseValueFactory.create(BaseContainerType.BASE_ENTITY, primaryContract.getMemberType("no"), batch, 0, contractNo);
-                        if (!contractNo.equals(contractNoNew))
-                            contractNoValue.setNewBaseValue(BaseValueFactory.create(BaseContainerType.BASE_ENTITY, primaryContract.getMemberType("no"), batch, 0, contractNoNew));
+                        IBaseValue contractNoValue = BaseValueFactory.create(
+                                BaseContainerType.BASE_ENTITY,
+                                primaryContract.getMemberType("no"),
+                                0,
+                                -1,
+                                batch,
+                                0,
+                                batch.getRepDate(),
+                                contractNo,
+                                false,
+                                true);
 
-                        IBaseValue contractDateValue = BaseValueFactory.create(BaseContainerType.BASE_ENTITY, primaryContract.getMemberType("date"), batch, 0, contractDate);
+                        if (!contractNo.equals(contractNoNew))
+                            contractNoValue.setNewBaseValue(BaseValueFactory.create(
+                                    BaseContainerType.BASE_ENTITY,
+                                    primaryContract.getMemberType("no"),
+                                    0,
+                                    -1,
+                                    batch,
+                                    0,
+                                    batch.getRepDate(),
+                                    contractNoNew,
+                                    false,
+                                    true));
+
+                        IBaseValue contractDateValue = BaseValueFactory.create(
+                                BaseContainerType.BASE_ENTITY,
+                                primaryContract.getMemberType("date"),
+                                0,
+                                -1,
+                                batch,
+                                0,
+                                batch.getRepDate(),
+                                contractDate,
+                                false,
+                                true);
+
                         if (!contractDate.equals(contractDateNew))
-                            contractDateValue.setNewBaseValue(BaseValueFactory.create(BaseContainerType.BASE_ENTITY, primaryContract.getMemberType("date"), batch, 0, contractDateNew));
+                            contractDateValue.setNewBaseValue(BaseValueFactory.create(
+                                    BaseContainerType.BASE_ENTITY,
+                                    primaryContract.getMemberType("date"),
+                                    0,
+                                    -1,
+                                    batch,
+                                    0,
+                                    batch.getRepDate(),
+                                    contractDateNew,
+                                    false,
+                                    true));
 
                         primaryContract.put("no", contractNoValue);
                         primaryContract.put("date", contractDateValue);
@@ -246,10 +288,10 @@ public class Mnt {
                             continue;
                         }
 
-                        credit.put("primary_contract", new BaseValue(batch, 0, primaryContract));
-                        credit.put("creditor", new BaseValue(batch, 0, creditor));
+                        credit.put("primary_contract", new BaseValue(-1, batch, 0, primaryContract));
+                        credit.put("creditor", new BaseValue(-1, batch, 0, creditor));
 
-                        baseEntityProcessorDao.prepare(credit);
+                        baseEntityProcessorDao.prepare(credit, creditorId);
 
                         if (credit.getId() <= 0) {
                             //storage.simpleSql(String.format("insert into MNT_LOGS (MNT_OPERATION_ID, FOREIGN_ID, EXECUTION_TIME, status, error_msg) values (1,%d,sysdate,1,'%s')", mntId, "credit not found"));

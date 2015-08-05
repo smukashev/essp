@@ -1,8 +1,10 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
-import kz.bsbnb.usci.eav.model.base.*;
+import kz.bsbnb.usci.eav.model.base.IBaseContainer;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -18,20 +20,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Implements EAV entity object. 
- *
- * @version 1.0, 17.01.2013
- * @author a.tkachenko
- * @see MetaClass
- * @see DataTypes
- */
-public class BaseEntity extends BaseContainer implements IBaseEntity
-{
+public class BaseEntity extends BaseContainer implements IBaseEntity {
     private static final long serialVersionUID = 1L;
 
     Logger logger = LoggerFactory.getLogger(BaseEntity.class);
@@ -42,6 +34,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     /**
      * Holds data about entity structure
+     *
      * @see MetaClass
      */
     private MetaClass meta;
@@ -49,7 +42,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     OperationType operationType;
 
     private IBaseEntityReportDate baseEntityReportDate;
-    
+
     /**
      * Holds attributes values
      */
@@ -62,20 +55,18 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         return operationType;
     }
 
-    public void setOperation(OperationType type){
+    public void setOperation(OperationType type) {
         operationType = type;
     }
 
     /**
      * Initializes entity.
      */
-    public BaseEntity()
-    {
+    public BaseEntity() {
         super(BaseContainerType.BASE_ENTITY);
     }
 
-    public BaseEntity(IBaseEntity baseEntity, Date reportDate)
-    {
+    public BaseEntity(IBaseEntity baseEntity, Date reportDate) {
         super(baseEntity.getId(), BaseContainerType.BASE_ENTITY);
 
         IBaseEntityReportDate thatBaseEntityReportDate = baseEntity.getBaseEntityReportDate();
@@ -102,29 +93,25 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      *
      * @param meta MetaClass of the entity..
      */
-    public BaseEntity(MetaClass meta, Date reportDate)
-    {
+    public BaseEntity(MetaClass meta, Date reportDate) {
         super(BaseContainerType.BASE_ENTITY);
 
         this.meta = meta;
         this.baseEntityReportDate = new BaseEntityReportDate(this, reportDate);
     }
 
-    public BaseEntity(long id, MetaClass meta)
-    {
+    public BaseEntity(long id, MetaClass meta) {
         super(id, BaseContainerType.BASE_ENTITY);
         this.meta = meta;
     }
 
-    public BaseEntity(long id, MetaClass meta, Date reportDate)
-    {
+    public BaseEntity(long id, MetaClass meta, Date reportDate) {
         super(id, BaseContainerType.BASE_ENTITY);
         this.meta = meta;
         this.baseEntityReportDate = new BaseEntityReportDate(this, reportDate);
     }
 
-    public BaseEntity(long id, MetaClass meta, IBaseEntityReportDate baseEntityReportDate)
-    {
+    public BaseEntity(long id, MetaClass meta, IBaseEntityReportDate baseEntityReportDate) {
         super(id, BaseContainerType.BASE_ENTITY);
         this.meta = meta;
 
@@ -134,11 +121,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     /**
      * Used to retrieve object structure description. Can be used to modify meta.
-     * 
+     *
      * @return Object structure
      */
-    public MetaClass getMeta()
-    {
+    public MetaClass getMeta() {
         return meta;
     }
 
@@ -148,54 +134,41 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      * @param attribute key name. Must exist in entity meta
      * @return key value, null if value is not set
      * @throws IllegalArgumentException if key name does not exist in entity meta,
-     * 	                                or key has type different from <code>DataTypes.DATE</code>
+     *                                  or key has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
     @Override
-    public IBaseValue getBaseValue(String attribute)
-    {
-        if (attribute.contains("."))
-        {
+    public IBaseValue getBaseValue(String attribute) {
+        if (attribute.contains(".")) {
             int index = attribute.indexOf(".");
             String parentAttribute = attribute.substring(0, index);
             String childAttribute = attribute.substring(index, attribute.length() - 1);
 
             IMetaType metaType = meta.getMemberType(parentAttribute);
-            if (metaType == null)
-            {
+            if (metaType == null) {
                 throw new IllegalArgumentException(String.format("Instance of MetaClass with class name {0} " +
                         "does not contain attribute {1}.", meta.getClassName(), parentAttribute));
             }
 
-            if (metaType.isComplex() && !metaType.isSet())
-            {
+            if (metaType.isComplex() && !metaType.isSet()) {
                 IBaseValue baseValue = values.get(parentAttribute);
-                if (baseValue == null)
-                {
+                if (baseValue == null) {
                     return null;
                 }
 
-                IBaseEntity baseEntity = (IBaseEntity)baseValue.getValue();
-                if (baseEntity == null)
-                {
+                IBaseEntity baseEntity = (IBaseEntity) baseValue.getValue();
+                if (baseEntity == null) {
                     return null;
-                }
-                else
-                {
+                } else {
                     return baseEntity.getBaseValue(childAttribute);
                 }
-            }
-            else
-            {
+            } else {
                 return null;
             }
-        }
-        else
-        {
+        } else {
             IMetaType metaType = meta.getMemberType(attribute);
 
-            if (metaType == null)
-            {
+            if (metaType == null) {
                 throw new IllegalArgumentException(String.format("Instance of MetaClass with class name {0} " +
                         "does not contain attribute {1}.", meta.getClassName(), attribute));
             }
@@ -210,65 +183,53 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      * @param attribute name key name. Must exist in entity meta
      * @param baseValue new value of the key
      * @throws IllegalArgumentException if key name does not exist in entity meta,
-     * 	                                or key has type different from <code>DataTypes.DATE</code>
+     *                                  or key has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
     //TODO: Add exception on metaClass mismatch
     @Override
-    public void put(final String attribute, IBaseValue baseValue)
-    {
+    public void put(final String attribute, IBaseValue baseValue) {
         IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
         IMetaType type = metaAttribute.getMetaType();
 
-        if(type == null)
+        if (type == null)
             throw new IllegalArgumentException("Type: " + attribute +
                     ", not found in class: " + meta.getClassName());
 
         if (baseValue == null)
             throw new IllegalArgumentException("Value not be equal to null.");
 
-        if (baseValue.getValue() != null)
-        {
+        if (baseValue.getValue() != null) {
             Class<?> valueClass = baseValue.getValue().getClass();
             Class<?> expValueClass;
 
             if (type.isComplex())
-                if(type.isSet())
-                {
+                if (type.isSet()) {
                     expValueClass = BaseSet.class;
-                }
-                else
-                {
+                } else {
                     expValueClass = BaseEntity.class;
                 }
-            else
-            {
-                if(type.isSet())
-                {
-                    MetaSet metaValue = (MetaSet)type;
+            else {
+                if (type.isSet()) {
+                    MetaSet metaValue = (MetaSet) type;
 
-                    if (type.isSet())
-                    {
+                    if (type.isSet()) {
                         expValueClass = BaseSet.class;
                         valueClass = baseValue.getValue().getClass();
-                    }
-                    else
-                    {
+                    } else {
                         expValueClass = metaValue.getTypeCode().getDataTypeClass();
-                        valueClass = ((MetaValue)(((BaseSet)baseValue.getValue()).getMemberType())).getTypeCode().
+                        valueClass = ((MetaValue) (((BaseSet) baseValue.getValue()).getMemberType())).getTypeCode().
                                 getDataTypeClass();
                     }
 
-                }
-                else
-                {
-                    MetaValue metaValue = (MetaValue)type;
+                } else {
+                    MetaValue metaValue = (MetaValue) type;
                     expValueClass = metaValue.getTypeCode().getDataTypeClass();
                 }
 
             }
 
-            if(expValueClass == null || !expValueClass.isAssignableFrom(valueClass))
+            if (expValueClass == null || !expValueClass.isAssignableFrom(valueClass))
                 throw new IllegalArgumentException("Type mismatch in class: " +
                         meta.getClassName() + ". Needed " + expValueClass + ", got: " +
                         valueClass);
@@ -278,32 +239,24 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         baseValue.setMetaAttribute(metaAttribute);
 
         boolean listening = isListening();
-        if (listening)
-        {
-            if (values.containsKey(attribute))
-            {
+        if (listening) {
+            if (values.containsKey(attribute)) {
                 IBaseValue existingBaseValue = values.get(attribute);
-                if (existingBaseValue.getValue() == null)
-                {
+                if (existingBaseValue.getValue() == null) {
                     removeListeners(attribute);
                 }
 
                 values.put(attribute, baseValue);
 
-                if (baseValue.getValue() != null)
-                {
+                if (baseValue.getValue() != null) {
                     setListeners(attribute);
                 }
                 fireValueChange(attribute);
-            }
-            else
-            {
+            } else {
                 values.put(attribute, baseValue);
                 fireValueChange(attribute);
             }
-        }
-        else
-        {
+        } else {
             values.put(attribute, baseValue);
         }
     }
@@ -323,32 +276,25 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     @Override
     public IMetaType getMemberType(String name) {
-        if (name.contains("."))
-        {
+        if (name.contains(".")) {
             int index = name.indexOf(".");
             String parentIdentifier = name.substring(0, index);
 
             IMetaType metaType = meta.getMemberType(parentIdentifier);
-            if (metaType.isComplex() && !metaType.isSet())
-            {
-                MetaClass childMeta = (MetaClass)metaType;
+            if (metaType.isComplex() && !metaType.isSet()) {
+                MetaClass childMeta = (MetaClass) metaType;
                 String childIdentifier = name.substring(index, name.length() - 1);
                 return childMeta.getMemberType(childIdentifier);
-            }
-            else
-            {
+            } else {
                 return null;
             }
-        }
-        else
-        {
+        } else {
             return meta.getMemberType(name);
         }
     }
 
     @Override
-    public IMetaAttribute getMetaAttribute(String attribute)
-    {
+    public IMetaAttribute getMetaAttribute(String attribute) {
         return meta.getMetaAttribute(attribute);
     }
 
@@ -358,8 +304,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      * @param dataType - attributes are filtered by this type
      * @return - set of needed attributes
      */
-    public Set<String> getPresentSimpleAttributeNames(DataTypes dataType)
-    {
+    public Set<String> getPresentSimpleAttributeNames(DataTypes dataType) {
         return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), values.keySet());
     }
 
@@ -368,8 +313,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      *
      * @return - set of needed attributes
      */
-    public Set<String> getPresentComplexAttributeNames()
-    {
+    public Set<String> getPresentComplexAttributeNames() {
         return SetUtils.intersection(meta.getComplexAttributesNames(), values.keySet());
     }
 
@@ -379,8 +323,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      * @param dataType - attributes are filtered by this type
      * @return - set of needed attributes
      */
-    public Set<String> getPresentSimpleSetAttributeNames(DataTypes dataType)
-    {
+    public Set<String> getPresentSimpleSetAttributeNames(DataTypes dataType) {
         return SetUtils.intersection(meta.getSimpleSetAttributesNames(dataType), values.keySet());
     }
 
@@ -389,13 +332,13 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
      *
      * @return - set of needed attributes
      */
-    public Set<String> getPresentComplexArrayAttributeNames()
-    {
+    public Set<String> getPresentComplexArrayAttributeNames() {
         return SetUtils.intersection(meta.getComplexArrayAttributesNames(), values.keySet());
     }
 
     /**
      * Names of all attributes that are actually set in entity
+     *
      * @return - set of needed attributes
      */
     public Set<String> getAttributes() {
@@ -408,8 +351,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     }
 
     public Date getReportDate() {
-        if (baseEntityReportDate == null)
-        {
+        if (baseEntityReportDate == null) {
             throw new RuntimeException("Instance of BaseEntityReportDate is null. " +
                     "Check the correctness of instance creation");
         }
@@ -417,23 +359,19 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     }
 
     public void setReportDate(Date reportDate) {
-        Date newReportDate = (Date)reportDate.clone();
+        Date newReportDate = (Date) reportDate.clone();
         DataUtils.toBeginningOfTheDay(newReportDate);
 
-        if (baseEntityReportDate == null)
-        {
+        if (baseEntityReportDate == null) {
             this.baseEntityReportDate = new BaseEntityReportDate(this, newReportDate);
-        }
-        else
-        {
+        } else {
             this.baseEntityReportDate.setReportDate(newReportDate);
         }
     }
 
     @Override
     public IBaseEntityReportDate getBaseEntityReportDate() {
-        if (baseEntityReportDate == null)
-        {
+        if (baseEntityReportDate == null) {
             throw new RuntimeException("Instance of BaseEntityReportDate is null. " +
                     "Check the correctness of instance creation");
         }
@@ -445,8 +383,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         this.baseEntityReportDate = baseEntityReportDate;
     }
 
-    public void calculateValueCount()
-    {
+    public void calculateValueCount() {
         long integerValuesCount = 0;
         long dateValuesCount = 0;
         long stringValuesCount = 0;
@@ -456,31 +393,20 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         long simpleSetsCount = 0;
         long complexSetsCount = 0;
 
-        for (String attribute: values.keySet())
-        {
+        for (String attribute : values.keySet()) {
             IMetaType metaType = meta.getMemberType(attribute);
-            if (metaType.isSet())
-            {
-                if (metaType.isComplex())
-                {
+            if (metaType.isSet()) {
+                if (metaType.isComplex()) {
                     complexSetsCount++;
-                }
-                else
-                {
+                } else {
                     simpleSetsCount++;
                 }
-            }
-            else
-            {
-                if (metaType.isComplex())
-                {
+            } else {
+                if (metaType.isComplex()) {
                     complexValuesCount++;
-                }
-                else
-                {
-                    MetaValue metaValue = (MetaValue)metaType;
-                    switch (metaValue.getTypeCode())
-                    {
+                } else {
+                    MetaValue metaValue = (MetaValue) metaType;
+                    switch (metaValue.getTypeCode()) {
                         case INTEGER:
                             integerValuesCount++;
                             break;
@@ -516,27 +442,22 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-        {
+        if (obj == this) {
             return true;
         }
 
-        if (obj == null)
-        {
+        if (obj == null) {
             return false;
         }
 
-        if (!(getClass() == obj.getClass()))
-        {
+        if (!(getClass() == obj.getClass())) {
             return false;
         }
 
         BaseEntity that = (BaseEntity) obj;
 
-        if (meta.isSearchable())
-        {
-            if (this.getId() > 0 && that.getId() > 0 && this.getId() == that.getId())
-            {
+        if (meta.isSearchable()) {
+            if (this.getId() > 0 && that.getId() > 0 && this.getId() == that.getId()) {
                 return true;
             }
             return false;
@@ -545,13 +466,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         int thisValueCount = this.getValueCount();
         int thatValueCount = that.getValueCount();
 
-        if (thisValueCount != thatValueCount)
-        {
+        if (thisValueCount != thatValueCount) {
             return false;
         }
 
-        for (String attribute : values.keySet())
-        {
+        for (String attribute : values.keySet()) {
             Object thisObject = null;
             if (this.safeGetValue(attribute) != null) {
                 thisObject = this.safeGetValue(attribute).getValue();
@@ -562,32 +481,26 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                 thatObject = that.safeGetValue(attribute).getValue();
             }
 
-            if (thisObject == null && thatObject == null)
-            {
+            if (thisObject == null && thatObject == null) {
                 continue;
             }
 
-            if (thisObject == null || thatObject == null)
-            {
+            if (thisObject == null || thatObject == null) {
                 return false;
             }
 
             IMetaType metaType = this.getMemberType(attribute);
-            if (!metaType.isSet() && !metaType.isComplex())
-            {
-                MetaValue metaValue = (MetaValue)metaType;
-                if (metaValue.getTypeCode().equals(DataTypes.DATE))
-                {
-                    if (DataUtils.compareBeginningOfTheDay((Date)thisObject, (Date)thatObject) != 0)
-                    {
+            if (!metaType.isSet() && !metaType.isComplex()) {
+                MetaValue metaValue = (MetaValue) metaType;
+                if (metaValue.getTypeCode().equals(DataTypes.DATE)) {
+                    if (DataUtils.compareBeginningOfTheDay((Date) thisObject, (Date) thatObject) != 0) {
                         return false;
                     }
                 }
 
             }
 
-            if (!thisObject.equals(thatObject))
-            {
+            if (!thisObject.equals(thatObject)) {
                 return false;
             }
         }
@@ -596,34 +509,26 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     }
 
 
-
-    public IBaseValue safeGetValue(String name)
-    {
-        if (this.getAttributes().contains(name))
-        {
+    public IBaseValue safeGetValue(String name) {
+        if (this.getAttributes().contains(name)) {
             return getBaseValue(name);
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return BaseEntityOutput.toString(this);
     }
 
-    public String toJava(String fName)
-    {
-        return BaseEntityOutput.getJavaFunction(fName,this);
+    public String toJava(String fName) {
+        return BaseEntityOutput.getJavaFunction(fName, this);
     }
 
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + meta.hashCode();
         result = 31 * result + values.hashCode();
@@ -633,58 +538,57 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     private Queue queue;
     public List lastRuleErrors;
 
-    public List getLastRuleErrors(){
-        if(lastRuleErrors == null)
+    public List getLastRuleErrors() {
+        if (lastRuleErrors == null)
             lastRuleErrors = new LinkedList();
         return lastRuleErrors;
     }
 
-    public synchronized Object getEls(String path){
-      queue = new LinkedList();
-      StringBuilder str = new StringBuilder();
-      String[] operations = new String[500];
-      boolean[] isFilter = new boolean[500];
-      String function = null;
+    public synchronized Object getEls(String path) {
+        queue = new LinkedList();
+        StringBuilder str = new StringBuilder();
+        String[] operations = new String[500];
+        boolean[] isFilter = new boolean[500];
+        String function = null;
 
-      if(!path.startsWith("{")) throw new RuntimeException("function must be specified");
-      for(int i=0;i<path.length();i++){
-          if(path.charAt(i) == '}')
-          {
-              function = path.substring(1,i);
-              path = path.substring(i+1);
-              break;
-          }
-      }
+        if (!path.startsWith("{")) throw new RuntimeException("function must be specified");
+        for (int i = 0; i < path.length(); i++) {
+            if (path.charAt(i) == '}') {
+                function = path.substring(1, i);
+                path = path.substring(i + 1);
+                break;
+            }
+        }
 
-      if(function == null) throw new RuntimeException("no function");
+        if (function == null) throw new RuntimeException("no function");
 
         Set allowedSet = new TreeSet<Long>();
 
-        if(function.startsWith("set")){
-            String[] elems = function.substring(function.indexOf('(') + 1,function.indexOf(')')).split(",");
-            if(function.startsWith("setInt")){
+        if (function.startsWith("set")) {
+            String[] elems = function.substring(function.indexOf('(') + 1, function.indexOf(')')).split(",");
+            if (function.startsWith("setInt")) {
                 allowedSet = new TreeSet<Integer>();
-                for(String e: elems)
+                for (String e : elems)
                     allowedSet.add(Integer.parseInt(e.trim()));
-            } else if( function.startsWith("setLong")){
+            } else if (function.startsWith("setLong")) {
                 allowedSet = new TreeSet<Long>();
-                for(String e: elems)
+                for (String e : elems)
                     allowedSet.add(Long.parseLong(e.trim()));
-            } else if( function.startsWith("setString")){
+            } else if (function.startsWith("setString")) {
                 allowedSet = new TreeSet<String>();
-                for(String e: elems)
+                for (String e : elems)
                     allowedSet.add(e.trim());
             }
         }
 
-        if(function.startsWith("hasDuplicates")) {
+        if (function.startsWith("hasDuplicates")) {
             String pattern = "hasDuplicates\\((\\S+)\\)";
             Matcher m = Pattern.compile(pattern).matcher(function);
             String downPath;
             boolean ret = false;
             lastRuleErrors = new LinkedList();
 
-            if(m.find()) {
+            if (m.find()) {
                 downPath = m.group(1);
             } else {
                 throw new RuntimeException("function duplicates not correct: " +
@@ -697,23 +601,23 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
             Set controlSet;
 
-            if(fields.length == 1)
+            if (fields.length == 1)
                 controlSet = new HashSet<String>();
-            else if(fields.length == 2)
+            else if (fields.length == 2)
                 controlSet = new HashSet<Map.Entry>();
             else throw new RuntimeException("rule not yet implemented");
 
-            for(Object o : list) {
+            for (Object o : list) {
                 BaseEntity entity = (BaseEntity) o;
                 Object entry = null;
 
-                if(fields.length == 1)
+                if (fields.length == 1)
                     entry = entity.getEl(fields[0]);
-                else if(fields.length == 2) {
+                else if (fields.length == 2) {
                     entry = new AbstractMap.SimpleEntry(entity.getEl(fields[0]), entity.getEl(fields[1]));
                 }
 
-                if(controlSet.contains(entry)) {
+                if (controlSet.contains(entry)) {
                     ret = true;
                     lastRuleErrors.add(entry);
                 } else {
@@ -724,85 +628,81 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         }
 
 
-      int yk = 0;
-      int open = 0;
-      int eqCnt = 0;
+        int yk = 0;
+        int open = 0;
+        int eqCnt = 0;
 
-      for(int i=0;i<=path.length();i++) {
-          if(i==path.length()) {
-              if(open!=0)
-                  throw  new RuntimeException("opening bracket not correct");
-              break;
-          }
-          if(path.charAt(i) == '=') eqCnt++;
-          if(path.charAt(i) =='!' && ( i+1 == path.length() || path.charAt(i+1) != '='))
-              throw new RuntimeException("equal sign must be present after exlaim");
+        for (int i = 0; i <= path.length(); i++) {
+            if (i == path.length()) {
+                if (open != 0)
+                    throw new RuntimeException("opening bracket not correct");
+                break;
+            }
+            if (path.charAt(i) == '=') eqCnt++;
+            if (path.charAt(i) == '!' && (i + 1 == path.length() || path.charAt(i + 1) != '='))
+                throw new RuntimeException("equal sign must be present after exlaim");
 
-          if(path.charAt(i) == '[') open++;
-          if(path.charAt(i) == ']') {
-              open--;
-              if(eqCnt!=1) throw new RuntimeException("only exactly one equal sign in filter and only in filter");
-              eqCnt = 0;
-          }
-          if(open < 0 || open > 1) throw new RuntimeException("brackets not correct");
-      }
+            if (path.charAt(i) == '[') open++;
+            if (path.charAt(i) == ']') {
+                open--;
+                if (eqCnt != 1) throw new RuntimeException("only exactly one equal sign in filter and only in filter");
+                eqCnt = 0;
+            }
+            if (open < 0 || open > 1) throw new RuntimeException("brackets not correct");
+        }
 
-      for(int i=0;i<=path.length();i++){
-          if(i==path.length()){
-              if(str.length() > 0)
-              {
-                  String[] arr = str.toString().split("\\.");
-                  for(int j=0;j<arr.length;j++)
-                  {
-                      operations[yk] = arr[j];
-                      isFilter[yk]=false;
-                      yk++;
-                  }
-              }
-              break;
-          }
-          char c = path.charAt(i);
-          if( c=='[' || c==']'){
-              if(str.length() > 0){
-                  if(c==']'){
-                      operations[yk] = str.toString();
-                      isFilter[yk] = true;
-                      yk++;
-                  }else{
-                      String[] arr = str.toString().split("\\.");
-                      for(int j = 0;j<arr.length;j++){
-                      //operations[yk] = str.toString();
-                      operations[yk] = arr[j];
-                      isFilter[yk] = false;
-                      yk++;
-                      }
-                  }
-                  str.setLength(0);
-              }
-          } else{
-              str.append(c);
-          }
-      }
+        for (int i = 0; i <= path.length(); i++) {
+            if (i == path.length()) {
+                if (str.length() > 0) {
+                    String[] arr = str.toString().split("\\.");
+                    for (int j = 0; j < arr.length; j++) {
+                        operations[yk] = arr[j];
+                        isFilter[yk] = false;
+                        yk++;
+                    }
+                }
+                break;
+            }
+            char c = path.charAt(i);
+            if (c == '[' || c == ']') {
+                if (str.length() > 0) {
+                    if (c == ']') {
+                        operations[yk] = str.toString();
+                        isFilter[yk] = true;
+                        yk++;
+                    } else {
+                        String[] arr = str.toString().split("\\.");
+                        for (int j = 0; j < arr.length; j++) {
+                            //operations[yk] = str.toString();
+                            operations[yk] = arr[j];
+                            isFilter[yk] = false;
+                            yk++;
+                        }
+                    }
+                    str.setLength(0);
+                }
+            } else {
+                str.append(c);
+            }
+        }
 
         List ret = new LinkedList();
         queue.add(this);
         queue.add(0);
         int retCount = 0;
 
-        while(queue.size() > 0){
+        while (queue.size() > 0) {
             Object curO = queue.poll();
             int step = (Integer) queue.poll();
 
-            if(curO == null)
+            if (curO == null)
                 continue;
 
-            if(step == yk)
-            {
-                if(function.startsWith("count")) {
-                    retCount ++;
-                }
-                else if(function.startsWith("set"))
-                    if(allowedSet.contains( curO ))
+            if (step == yk) {
+                if (function.startsWith("count")) {
+                    retCount++;
+                } else if (function.startsWith("set"))
+                    if (allowedSet.contains(curO))
                         retCount++;
                 ret.add(curO);
                 continue;
@@ -812,59 +712,57 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
             BaseEntity curBE = (BaseEntity) curO;
             MetaClass curMeta = curBE.getMeta();
 
-           if(!isFilter[step]){
-                 IMetaAttribute nextAttribute = curMeta.getMetaAttribute(operations[step]);
+            if (!isFilter[step]) {
+                IMetaAttribute nextAttribute = curMeta.getMetaAttribute(operations[step]);
 
-               if(!nextAttribute.getMetaType().isComplex()){ // transition to BASIC type
-                   queue.add(curBE.getEl(operations[step]));
-                   queue.add(step + 1);
-               } else if(nextAttribute.getMetaType().isSet()){ //transition to array
-                   BaseSet next = (BaseSet)curBE.getEl(operations[step]);
-                   if(next!=null){
-                     for(Object o: next.get()){
-                         {
-                             queue.add(((BaseValue) o).getValue());
-                             queue.add(step+1);
-                         }
-                     }
-                   }
-               } else{ //transition to simple
-                   BaseEntity next =  (BaseEntity) curBE.getEl(operations[step]);
-                   queue.add(next);
-                   queue.add(step + 1);
-                 }
-           }else{
-               String [] parts;
-               boolean inv = false;
+                if (!nextAttribute.getMetaType().isComplex()) { // transition to BASIC type
+                    queue.add(curBE.getEl(operations[step]));
+                    queue.add(step + 1);
+                } else if (nextAttribute.getMetaType().isSet()) { //transition to array
+                    BaseSet next = (BaseSet) curBE.getEl(operations[step]);
+                    if (next != null) {
+                        for (Object o : next.get()) {
+                            {
+                                queue.add(((BaseValue) o).getValue());
+                                queue.add(step + 1);
+                            }
+                        }
+                    }
+                } else { //transition to simple
+                    BaseEntity next = (BaseEntity) curBE.getEl(operations[step]);
+                    queue.add(next);
+                    queue.add(step + 1);
+                }
+            } else {
+                String[] parts;
+                boolean inv = false;
 
-               if(operations[step].contains("!")){
-                   parts = operations[step].split("!=");
-                   inv = true;
-               }
-               else
-                   parts = operations[step].split("=");
+                if (operations[step].contains("!")) {
+                    parts = operations[step].split("!=");
+                    inv = true;
+                } else
+                    parts = operations[step].split("=");
 
-               Object o = curBE.getEl(parts[0]);
+                Object o = curBE.getEl(parts[0]);
 
-               boolean expr = (o==null && parts[1].equals("null")) || (o!=null && o.toString().equals(parts[1]));
-               if(inv) expr = !expr;
+                boolean expr = (o == null && parts[1].equals("null")) || (o != null && o.toString().equals(parts[1]));
+                if (inv) expr = !expr;
 
-               if(expr){
-                   queue.add(curO);
-                   queue.add(step+1);
-               }
-           }
+                if (expr) {
+                    queue.add(curO);
+                    queue.add(step + 1);
+                }
+            }
         }
 
-        if(function.startsWith("get"))
+        if (function.startsWith("get"))
             return ret;
 
         return retCount;
     }
 
-    public Object getEl(String path)
-    {
-        if(path.equals("ROOT"))
+    public Object getEl(String path) {
+        if (path.equals("ROOT"))
             return getId();
 
         StringTokenizer tokenizer = new StringTokenizer(path, ".");
@@ -873,13 +771,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         MetaClass theMeta = meta;
         Object valueOut = null;
 
-        while (tokenizer.hasMoreTokens())
-        {
+        while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
             String arrayIndexes = null;
 
-            if (token.contains("["))
-            {
+            if (token.contains("[")) {
                 arrayIndexes = token.substring(token.indexOf("[") + 1, token.length() - 1);
                 token = token.substring(0, token.indexOf("["));
             }
@@ -905,23 +801,20 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
             valueOut = value.getValue();
 
-            if (type.isSet())
-            {
+            if (type.isSet()) {
                 if (arrayIndexes != null) {
-                    valueOut = ((BaseSet)valueOut).getEl(arrayIndexes.replaceAll("->", "."));
-                    type = ((MetaSet)type).getMemberType();
+                    valueOut = ((BaseSet) valueOut).getEl(arrayIndexes.replaceAll("->", "."));
+                    type = ((MetaSet) type).getMemberType();
                 } else {
                     return valueOut;
                 }
             }
 
-            if (type.isComplex())
-            {
-                entity = (BaseEntity)valueOut;
-                theMeta = (MetaClass)type;
+            if (type.isComplex()) {
+                entity = (BaseEntity) valueOut;
+                theMeta = (MetaClass) type;
             } else {
-                if (tokenizer.hasMoreTokens())
-                {
+                if (tokenizer.hasMoreTokens()) {
                     throw new IllegalArgumentException("Path can't have intermediate simple values");
                 }
             }
@@ -930,8 +823,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         return valueOut;
     }
 
-    public List<Object> getElWithArrays(String path)
-    {
+    public List<Object> getElWithArrays(String path) {
         StringTokenizer tokenizer = new StringTokenizer(path, ".");
 
         BaseEntity entity = this;
@@ -940,13 +832,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         Object currentValue = null;
 
         try {
-            while (tokenizer.hasMoreTokens())
-            {
+            while (tokenizer.hasMoreTokens()) {
                 String token = tokenizer.nextToken();
                 String arrayIndexes = null;
 
-                if (token.contains("["))
-                {
+                if (token.contains("[")) {
                     arrayIndexes = token.substring(token.indexOf("[") + 1, token.length() - 1);
                     token = token.substring(0, token.indexOf("["));
                 }
@@ -965,26 +855,24 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
 
                 currentValue = value.getValue();
 
-                if (type.isSet())
-                {
-                    BaseSet set = (BaseSet)currentValue;
+                if (type.isSet()) {
+                    BaseSet set = (BaseSet) currentValue;
                     if (arrayIndexes != null) {
                         currentValue = set.getEl(arrayIndexes.replaceAll("->", "."));
-                        type = ((MetaSet)type).getMemberType();
+                        type = ((MetaSet) type).getMemberType();
                     } else {
-                        if (tokenizer.hasMoreTokens())
-                        {
-                            if(!set.getMemberType().isComplex()) {
+                        if (tokenizer.hasMoreTokens()) {
+                            if (!set.getMemberType().isComplex()) {
                                 throw new IllegalArgumentException("Simple sets not supported");
                             }
 
-                            if(set.getMemberType().isSet()) {
+                            if (set.getMemberType().isSet()) {
                                 throw new IllegalArgumentException("Set of sets not supported");
                             }
 
                             String restOfPath = "";
                             boolean first = true;
-                            while(tokenizer.hasMoreTokens()) {
+                            while (tokenizer.hasMoreTokens()) {
                                 if (first) {
                                     restOfPath += tokenizer.nextToken();
                                     first = false;
@@ -994,7 +882,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                             }
 
                             for (IBaseValue obj : set.get()) {
-                                BaseEntity currentEntity = (BaseEntity)(obj.getValue());
+                                BaseEntity currentEntity = (BaseEntity) (obj.getValue());
                                 if (currentEntity != null)
                                     valueOut.addAll(currentEntity.getElWithArrays(restOfPath));
                                 else
@@ -1006,13 +894,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                     }
                 }
 
-                if (type.isComplex() && !type.isSet())
-                {
-                    entity = (BaseEntity)currentValue;
-                    theMeta = (MetaClass)type;
+                if (type.isComplex() && !type.isSet()) {
+                    entity = (BaseEntity) currentValue;
+                    theMeta = (MetaClass) type;
                 } else {
-                    if (tokenizer.hasMoreTokens())
-                    {
+                    if (tokenizer.hasMoreTokens()) {
                         throw new IllegalArgumentException("Path can't have intermediate simple values");
                     }
                 }
@@ -1029,10 +915,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         return valueOut;
     }
 
-    public boolean equalsToString(HashMap<String, String> params)
-    {
-        for (String fieldName : params.keySet())
-        {
+    public boolean equalsToString(HashMap<String, String> params) {
+        for (String fieldName : params.keySet()) {
             String ownFieldName;
             String innerPath = null;
             if (fieldName.contains(".")) {
@@ -1053,38 +937,34 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
             if (mtype.isSet())
                 throw new IllegalArgumentException("Can't handle arrays: " + fieldName);
 
-            BaseValue bvalue = (BaseValue)getBaseValue(ownFieldName);
+            BaseValue bvalue = (BaseValue) getBaseValue(ownFieldName);
 
             if (mtype.isComplex()) {
-                bvalue = (BaseValue)((BaseEntity)(bvalue.getValue())).getBaseValue(innerPath);
-                mtype = ((MetaClass)mtype).getMemberType(innerPath);
+                bvalue = (BaseValue) ((BaseEntity) (bvalue.getValue())).getBaseValue(innerPath);
+                mtype = ((MetaClass) mtype).getMemberType(innerPath);
             }
 
-            if (!((BaseValue)bvalue).equalsToString(params.get(fieldName), ((MetaValue)mtype).getTypeCode()))
+            if (!((BaseValue) bvalue).equalsToString(params.get(fieldName), ((MetaValue) mtype).getTypeCode()))
                 return false;
         }
 
         return true;
     }
 
-    public void addValidationError(String errorMsg)
-    {
+    public void addValidationError(String errorMsg) {
         validationErrors.add(errorMsg);
     }
 
-    public void clearValidationErrors()
-    {
+    public void clearValidationErrors() {
         validationErrors.clear();
     }
 
-    public Set<String> getValidationErrors()
-    {
+    public Set<String> getValidationErrors() {
         return validationErrors;
     }
 
     @Override
-    protected void setListeners()
-    {
+    protected void setListeners() {
         this.addListener(new IValueChangeListener() {
             @Override
             public void valueChange(ValueChangeEvent event) {
@@ -1092,29 +972,23 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
             }
         });
 
-        for (String attribute : values.keySet())
-        {
+        for (String attribute : values.keySet()) {
             setListeners(attribute);
         }
     }
 
-    private void setListeners(String attribute)
-    {
+    private void setListeners(String attribute) {
         IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
-        if (metaAttribute.isImmutable())
-        {
+        if (metaAttribute.isImmutable()) {
             return;
         }
 
         IMetaType metaType = metaAttribute.getMetaType();
-        if (metaType.isComplex())
-        {
+        if (metaType.isComplex()) {
             IBaseValue baseValue = values.get(attribute);
-            if (baseValue.getValue() != null)
-            {
-                if (metaType.isSet())
-                {
-                    BaseSet baseSet = (BaseSet)baseValue.getValue();
+            if (baseValue.getValue() != null) {
+                if (metaType.isSet()) {
+                    BaseSet baseSet = (BaseSet) baseValue.getValue();
                     baseSet.addListener(new ValueChangeListener(this, attribute) {
 
                         @Override
@@ -1122,20 +996,17 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                             String identifier = this.getIdentifier();
 
                             IBaseContainer target = this.getTarget();
-                            if (target instanceof BaseContainer)
-                            {
-                                ((BaseContainer)target).addModifiedIdentifier(identifier);
+                            if (target instanceof BaseContainer) {
+                                ((BaseContainer) target).addModifiedIdentifier(identifier);
                             }
 
                             fireValueChange(identifier);
                         }
                     });
                     baseSet.setListening(true);
-                }
-                else
-                {
+                } else {
 
-                    BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
+                    BaseEntity baseEntity = (BaseEntity) baseValue.getValue();
                     baseEntity.addListener(new ValueChangeListener(this, attribute) {
 
                         @Override
@@ -1145,9 +1016,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                             String identifier = parentIdentifier + "." + childIdentifier;
 
                             IBaseContainer target = this.getTarget();
-                            if (target instanceof BaseContainer)
-                            {
-                                ((BaseContainer)target).addModifiedIdentifier(identifier);
+                            if (target instanceof BaseContainer) {
+                                ((BaseContainer) target).addModifiedIdentifier(identifier);
                             }
 
                             fireValueChange(identifier);
@@ -1160,45 +1030,37 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         }
     }
 
-    public void removeListeners()
-    {
+    public void removeListeners() {
         List<IValueChangeListener> parentListeners =
-                (List<IValueChangeListener>)this.getListeners(ValueChangeEvent.class);
+                (List<IValueChangeListener>) this.getListeners(ValueChangeEvent.class);
         final Iterator<IValueChangeListener> parentIt = parentListeners.iterator();
-        while (parentIt.hasNext())
-        {
+        while (parentIt.hasNext()) {
             final IValueChangeListener listener = parentIt.next();
             this.removeListener(listener);
         }
 
-        for (String attribute : values.keySet())
-        {
+        for (String attribute : values.keySet()) {
             removeListeners(attribute);
         }
     }
 
-    public void removeListeners(String attribute)
-    {
+    public void removeListeners(String attribute) {
 
         IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
-        if (metaAttribute.isImmutable())
-        {
+        if (metaAttribute.isImmutable()) {
             return;
         }
 
         IMetaType metaType = metaAttribute.getMetaType();
-        if (!metaType.isSet() && metaType.isComplex())
-        {
+        if (!metaType.isSet() && metaType.isComplex()) {
             IBaseValue baseValue = values.get(attribute);
-            BaseEntity baseEntity = (BaseEntity)baseValue.getValue();
+            BaseEntity baseEntity = (BaseEntity) baseValue.getValue();
 
-            if (baseEntity != null)
-            {
+            if (baseEntity != null) {
                 List<IValueChangeListener> childListeners =
-                        (List<IValueChangeListener>)baseEntity.getListeners(ValueChangeEvent.class);
+                        (List<IValueChangeListener>) baseEntity.getListeners(ValueChangeEvent.class);
                 final Iterator<IValueChangeListener> childIt = childListeners.iterator();
-                while (childIt.hasNext())
-                {
+                while (childIt.hasNext()) {
                     final IValueChangeListener listener = childIt.next();
                     baseEntity.removeListener(listener);
                 }
@@ -1207,45 +1069,39 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     }
 
     @Override
-    public BaseEntity clone()
-    {
+    public BaseEntity clone() {
         BaseEntity baseEntityCloned = null;
-        try
-        {
-            baseEntityCloned = (BaseEntity)super.clone();
+        try {
+            baseEntityCloned = (BaseEntity) super.clone();
 
-            BaseEntityReportDate baseEntityReportDateCloned = ((BaseEntityReportDate)baseEntityReportDate).clone();
+            BaseEntityReportDate baseEntityReportDateCloned = ((BaseEntityReportDate) baseEntityReportDate).clone();
             baseEntityReportDateCloned.setBaseEntity(baseEntityCloned);
             baseEntityCloned.setBaseEntityReportDate(baseEntityReportDateCloned);
 
             HashMap<String, IBaseValue> valuesCloned = new HashMap<String, IBaseValue>();
             Iterator<String> attributesIt = values.keySet().iterator();
-            while(attributesIt.hasNext())
-            {
+            while (attributesIt.hasNext()) {
                 String attribute = attributesIt.next();
 
                 IBaseValue baseValue = values.get(attribute);
-                IBaseValue baseValueCloned = ((BaseValue)baseValue).clone();
+                IBaseValue baseValueCloned = ((BaseValue) baseValue).clone();
                 baseValueCloned.setBaseContainer(baseEntityCloned);
                 valuesCloned.put(attribute, baseValueCloned);
             }
             baseEntityCloned.values = valuesCloned;
-        }
-        catch(CloneNotSupportedException ex)
-        {
+        } catch (CloneNotSupportedException ex) {
             throw new RuntimeException("BaseEntity class does not implement interface Cloneable.");
         }
         return baseEntityCloned;
     }
 
-    public boolean applyKeyFilter(HashMap<String, ArrayList<String>> arrayKeyFilter) throws ParseException
-    {
+    public boolean applyKeyFilter(HashMap<String, ArrayList<String>> arrayKeyFilter) throws ParseException {
         for (String attrName : arrayKeyFilter.keySet()) {
             IMetaType type = meta.getMemberType(attrName);
 
             IBaseValue value = safeGetValue(attrName);
 
-            if(value == null) {
+            if (value == null) {
                 throw new IllegalArgumentException("Key attribute " + attrName + " can't be null, " +
                         "it is used in array filter");
             }
@@ -1258,15 +1114,13 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
         return false;
     }
 
-    private boolean testValueOnString(IMetaType type, IBaseValue value, ArrayList<String> filter) throws ParseException
-    {
-        MetaValue simple_value = (MetaValue)type;
+    private boolean testValueOnString(IMetaType type, IBaseValue value, ArrayList<String> filter) throws ParseException {
+        MetaValue simple_value = (MetaValue) type;
 
         for (String strValue : filter) {
-            switch (simple_value.getTypeCode())
-            {
+            switch (simple_value.getTypeCode()) {
                 case BOOLEAN:
-                    Boolean booleanValue = (Boolean)value.getValue();
+                    Boolean booleanValue = (Boolean) value.getValue();
                     if (booleanValue == Boolean.parseBoolean(strValue)) return true;
                     break;
                 case DATE:
@@ -1274,15 +1128,15 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                     if (dateValue == dateFormat.parse(strValue)) return true;
                     break;
                 case DOUBLE:
-                    Double doubleValue = (Double)value.getValue();
+                    Double doubleValue = (Double) value.getValue();
                     if (doubleValue == Double.parseDouble(strValue)) return true;
                     break;
                 case INTEGER:
-                    Integer integerValue = (Integer)value.getValue();
+                    Integer integerValue = (Integer) value.getValue();
                     if (integerValue == Integer.parseInt(strValue)) return true;
                     break;
                 case STRING:
-                    String stringValue = (String)value.getValue();
+                    String stringValue = (String) value.getValue();
                     if (stringValue.equals(strValue)) return true;
                     break;
                 default:
@@ -1294,7 +1148,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     }
 
     public long getBatchId() {
-        for (IBaseValue v :values.values()) {
+        for (IBaseValue v : values.values()) {
             return v.getBatch().getId();
         }
 
@@ -1302,7 +1156,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     }
 
     public long getBatchIndex() {
-        for (IBaseValue v :values.values()) {
+        for (IBaseValue v : values.values()) {
             return v.getIndex();
         }
 
@@ -1323,8 +1177,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
     public int getSearchableChildrenCount() {
         int count = 0;
 
-        for (String attribute: values.keySet())
-        {
+        for (String attribute : values.keySet()) {
             IMetaType metaType = meta.getMemberType(attribute);
             IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
             IBaseValue value = getBaseValue(attribute);
@@ -1338,20 +1191,18 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
             if (metaAttribute.isImmutable())
                 continue;
 
-            if (metaType.isSet())
-            {
-                MetaSet metaSet = (MetaSet)metaType;
+            if (metaType.isSet()) {
+                MetaSet metaSet = (MetaSet) metaType;
 
-                if (metaSet.getMemberType().isComplex() && !metaSet.getMemberType().isSet())
-                {
-                    BaseSet baseSet = (BaseSet)(value.getValue());
-                    MetaClass metaClass = (MetaClass)(baseSet.getMemberType());
+                if (metaSet.getMemberType().isComplex() && !metaSet.getMemberType().isSet()) {
+                    BaseSet baseSet = (BaseSet) (value.getValue());
+                    MetaClass metaClass = (MetaClass) (baseSet.getMemberType());
 
                     for (IBaseValue setValue : baseSet.get()) {
                         if (setValue.getValue() == null)
                             continue;
 
-                        BaseEntity baseEntity = (BaseEntity)(setValue.getValue());
+                        BaseEntity baseEntity = (BaseEntity) (setValue.getValue());
 
                         if (metaClass.isSearchable())
                             count++;
@@ -1359,13 +1210,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity
                         count += baseEntity.getSearchableChildrenCount();
                     }
                 }
-            }
-            else
-            {
-                if (metaType.isComplex())
-                {
-                    MetaClass metaClass = (MetaClass)metaType;
-                    BaseEntity baseEntity = (BaseEntity)(value.getValue());
+            } else {
+                if (metaType.isComplex()) {
+                    MetaClass metaClass = (MetaClass) metaType;
+                    BaseEntity baseEntity = (BaseEntity) (value.getValue());
                     if (metaClass.isSearchable())
                         count++;
 

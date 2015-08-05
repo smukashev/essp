@@ -128,10 +128,10 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 break;
             }
         } catch (IOException e) {
-            logger.error("Batch: " + batchId + " error in entity reader.");
             statusSingleton.addBatchStatus(batchId,
                     new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
-            throw new RuntimeException(e);
+
+            throw new IllegalStateException(e);
         }
 
         try {
@@ -198,12 +198,12 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 hasMembers = false;
                 level++;
             } else {
-                Object o = null;
+                Object obj = null;
                 MetaValue metaValue = (MetaValue) metaType;
 
                 try {
                     event = (XMLEvent) xmlEventReader.next();
-                    o = parserHelper.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
+                    obj = parserHelper.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
                 } catch (NumberFormatException n) {
                     n.printStackTrace();
                     logger.error("Cast error: " + localName + ", exception text: " + n.getMessage());
@@ -213,7 +213,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     level--;
                 }
 
-                if (o != null)
+                if (obj != null)
                     hasMembers = true;
 
                 String memberName = localName;
@@ -222,13 +222,14 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
 
                 IBaseValue baseValue = BaseValueFactory
-                        .create(currentContainer.getBaseContainerType(), metaType, batch, index, o);
+                        .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch,
+                                index, batch.getRepDate(), obj, false, true);
 
                 if (hasOperationNew(startElement)) {
-                    IBaseValue newBaseValue = BaseValueFactory
-                            .create(currentContainer.getBaseContainerType(), metaType, batch, index,
-                                    parserHelper.getCastObject(metaValue.getTypeCode(),
-                                            startElement.getAttributeByName(new QName("data")).getValue()));
+                    IBaseValue newBaseValue = BaseValueFactory.create(currentContainer.getBaseContainerType(),
+                            metaType, 0, -1, batch, index, batch.getRepDate(),
+                            parserHelper.getCastObject(metaValue.getTypeCode(),
+                                    startElement.getAttributeByName(new QName("data")).getValue()), false, true);
 
                     baseValue.setNewBaseValue(newBaseValue);
                 }
@@ -242,9 +243,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     @Override
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException {
-        logger.debug("Read called");
-        logger.debug("Sync queue size: " + serviceFactory.getEntityService().getQueueSize());
         long sleepCounter = 0;
+
         while (serviceFactory.getEntityService().getQueueSize() > ZipFilesMonitor.MAX_SYNC_QUEUE_SIZE) {
             logger.debug("Sync queue limit exceeded: " + serviceFactory.getEntityService().getQueueSize());
             try {
@@ -329,8 +329,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
                 if (currentContainer.isSet()) {
                     if (hasMembers) {
-                        ((BaseSet) currentContainer).put(BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, batch, index, o));
+                        ((BaseSet) currentContainer).put(BaseValueFactory.create(
+                                currentContainer.getBaseContainerType(), metaType, 0, -1, batch, index,
+                                batch.getRepDate(), o, false, true));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
@@ -338,19 +339,20 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     }
                 } else {
                     if (hasMembers) {
-                        currentContainer.put(localName, BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, batch, index, o));
+                        currentContainer.put(localName, BaseValueFactory.create(
+                                currentContainer.getBaseContainerType(), metaType, 0, -1, batch, index,
+                                batch.getRepDate(), o, false, true));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
                         currentContainer.put(localName, BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, batch, index, null));
+                                .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch, index,
+                                        batch.getRepDate(), null, false, true));
                         hasMembers = flagsStack.pop();
                     }
                 }
-
-                //hasMembers = flagsStack.pop();
             }
+
             level--;
         }
 

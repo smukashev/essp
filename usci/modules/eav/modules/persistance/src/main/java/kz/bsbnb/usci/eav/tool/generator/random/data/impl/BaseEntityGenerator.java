@@ -35,18 +35,18 @@ public class BaseEntityGenerator  extends AbstractDataGenerator {
             if(metaType.isComplex()) {
                 if(metaType.isSet()) {
                     BaseSet baseSet = generateBaseSet(batch, (MetaSet)metaType, index);
-                    entity.put(name, new BaseValue(batch, index, batch.getRepDate(), baseSet));
+                    entity.put(name, new BaseValue(0, batch, index, batch.getRepDate(), baseSet));
                 } else {
                     BaseEntity tmpEntity = generateBaseEntity(batch, ((MetaClass) metaType), index);
-                    entity.put(name, new BaseValue(batch, index, batch.getRepDate(), tmpEntity));
+                    entity.put(name, new BaseValue(0, batch, index, batch.getRepDate(), tmpEntity));
                 }
             } else {
                 if(metaType.isSet()) {
                     BaseSet baseSet = generateBaseSet(batch, (MetaSet)metaType, index);
-                    entity.put(name, new BaseValue(batch, index, batch.getRepDate(), baseSet));
+                    entity.put(name, new BaseValue(0, batch, index, batch.getRepDate(), baseSet));
                 } else {
                     MetaValue metaValue = (MetaValue) metaType;
-                    entity.put(name, new BaseValue(batch, index, batch.getRepDate(),
+                    entity.put(name, new BaseValue(0, batch, index, batch.getRepDate(),
                             getCastObject(metaValue.getTypeCode())));
                 }
             }
@@ -65,13 +65,13 @@ public class BaseEntityGenerator  extends AbstractDataGenerator {
                 MetaSet metaSetChild = (MetaSet)metaTypeChild;
                 for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++) {
                     BaseSet baseSetChild = generateBaseSet(batch, metaSetChild, index);
-                    baseSet.put(new BaseValue(batch, index, batch.getRepDate(), baseSetChild));
+                    baseSet.put(new BaseValue(0, batch, index, batch.getRepDate(), baseSetChild));
                 }
             } else {
                 MetaSet metaSetChild = (MetaSet)metaTypeChild;
                 for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++) {
                     BaseSet baseSetChild = generateBaseSet(batch, metaSetChild, index);
-                    baseSet.put(new BaseValue(batch, index, batch.getRepDate(), baseSetChild));
+                    baseSet.put(new BaseValue(0, batch, index, batch.getRepDate(), baseSetChild));
                 }
             }
         } else {
@@ -79,12 +79,12 @@ public class BaseEntityGenerator  extends AbstractDataGenerator {
                 logger.debug("Generating values for complex set.");
                 for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++) {
                     BaseEntity baseEntity = generateBaseEntity(batch, (MetaClass) metaTypeChild, index);
-                    baseSet.put(new BaseValue(batch, index, batch.getRepDate(), baseEntity));
+                    baseSet.put(new BaseValue(0, batch, index, batch.getRepDate(), baseEntity));
                 }
             } else {
                 logger.debug("Generating values for simple set.");
                 for(int i = 0; i < MIN_ARRAY_ELEMENTS + rand.nextInt(MAX_ARRAY_ELEMENTS); i++)
-                    baseSet.put(new BaseValue(batch, index, batch.getRepDate(),
+                    baseSet.put(new BaseValue(0, batch, index, batch.getRepDate(),
                             getCastObject(metaSet.getTypeCode())));
             }
         }
