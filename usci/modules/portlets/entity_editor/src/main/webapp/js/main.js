@@ -564,6 +564,8 @@ function hasEmptyKeyAttr(mainNode) {
 
 Ext.onReady(function() {
 
+    Ext.override(Ext.data.proxy.Ajax, { timeout: 120000 });
+
     Ext.define('MyCheckboxField', {
         extend: 'Ext.form.field.Checkbox',
 
@@ -680,7 +682,7 @@ Ext.onReady(function() {
                 loadEntity(entityId, Ext.getCmp('edDate').value, currentSearch);
             } else {
                 //for custom implementations
-                var params = {op : 'LIST_ENTITY', metaClass: currentMeta, searchName: currentSearch };
+                var params = {op : 'LIST_ENTITY', metaClass: currentMeta, searchName: currentSearch, timeout: 120000 };
                 var inputs = document.getElementById("entity-editor-form").childNodes;
                 for(i=0;i<inputs.length;i++) {
                     if(inputs[i].tagName == 'INPUT') {
