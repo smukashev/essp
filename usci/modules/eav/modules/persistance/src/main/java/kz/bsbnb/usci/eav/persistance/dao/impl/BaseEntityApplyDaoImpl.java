@@ -125,6 +125,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         if (baseValue.getValue() == null)
             throw new RuntimeException("Значение атрибута не может быть NULL;");
 
+
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
             throw new RuntimeException("Атрибут должен содержать мета данные;");
@@ -580,9 +581,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 }
             }
         } else {
-            if (baseValueSaving.getValue() == null)
-                throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
-                        baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");
+            if (baseValueSaving.getValue() == null) {
+                return;
+                // TODO: uncomment
+                /*throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
+                        baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
+            }
 
             IBaseValueDao valueDao = persistableDaoPool
                     .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
@@ -955,9 +959,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         } else {
             IBaseEntity baseEntitySaving = (IBaseEntity) baseValueSaving.getValue();
-            if (baseEntitySaving == null)
-                throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
-                        baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");
+            if (baseEntitySaving == null) {
+                return;
+                // TODO: uncomment
+                /*throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
+                        baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
+            }
 
             IBaseValueDao valueDao = persistableDaoPool
                     .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
@@ -1248,9 +1255,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 }
             }
         } else {
-            if (childBaseSetSaving == null)
-                throw new UnsupportedOperationException("Новый и старый массив являются NULL(" +
-                        baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");
+            if (childBaseSetSaving == null) {
+                return;
+                // TODO: uncomment
+                /*throw new UnsupportedOperationException("Новый и старый массив являются NULL(" +
+                        baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
+            }
 
             IBaseValueDao baseValueDao = persistableDaoPool
                     .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
