@@ -3,21 +3,33 @@ title: Общие функций(часть 2)
 
 function boolean hasBACT(IEntityService entityService, IMetaFactoryService metaService, String baNo, String creditCode, Date reportDate, BaseEntity entity){
     try{
+        //Инициализация сущности - для поиска
+        //  поиск соответсвия из справочника бал счетов и типа кредита
+        //  все классы с префиксом ref - справочники
         BaseEntity be = new BaseEntity(metaService.getMetaClass("ref_ba_ct"), reportDate);
+
+        //Создание сущности балансовый счет (пустой)
         BaseEntity beAccount = new BaseEntity(metaService.getMetaClass("ref_balance_account"), reportDate);
+
+        //Создание сущности тип кредита (пустой)
         BaseEntity creditType = new BaseEntity(metaService.getMetaClass("ref_credit_type"), reportDate);
 
+        //Батч объект - не используется при просмотре данных. Задаем произвольный ид. т.е 1
         Batch b = new Batch(reportDate);
         b.setId(1L);
 
+        //заполняем параметры поиска
         beAccount.put("no_", new BaseValue(b, 1, baNo));
         creditType.put("code", new BaseValue(b, 1, creditCode));
 
+        //заполняем параметры поиска для родительской сущности
         be.put("balance_account",  new BaseValue(b, 1, beAccount));
         be.put("credit_type",  new BaseValue(b, 1, creditType));
 
+        //Поиск сущности (entityService - это сервис ЕССП)
         BaseEntity res = entityService.search(be);
 
+        //если идентификатор больше нуля - данное соответвие присутсвтует в базе
         return res.getId() > 0;
     } catch (Exception e) {
         entity.addValidationError(e.getMessage());
@@ -28,13 +40,27 @@ function boolean hasBACT(IEntityService entityService, IMetaFactoryService metaS
 
 function boolean isExclusiveIIN(String iin) {
     try{
+        //  поиск ислючитльного иин
+        //  все классы с префиксом ref - справочники
+
+        //Получить сервисы ессп
         IEntityService entityService = BRMSHelper.getEntityService();
         IMetaFactoryService metaService = BRMSHelper.getMetaService();
+
+        //Инициализация сущности - для поиска
         BaseEntity be = new BaseEntity(metaService.getMetaClass("ref_exclusive_iin"), new Date());
+
+        //Батч объект - не используется при просмотре данных. Задаем произвольный ид. т.е 1
         Batch b = new Batch(new Date());
         b.setId(1L);
+
+        //заполняем параметры поиска
         be.put("code",new BaseValue(b, 1, iin));
+
+        //Поиск сущности
         BaseEntity res = entityService.prepare(be);
+
+        //если идентификатор больше нуля - данное соответвие присутсвтует в базе
         return res.getId() > 0;
     } catch (Exception e) {
         return false;
