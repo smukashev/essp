@@ -1,21 +1,17 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
-import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.BatchStatus;
+import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
-import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
-import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
-import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
+import kz.bsbnb.usci.eav.util.BatchStatuses;
+import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
-import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
-import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
-import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
 import org.apache.log4j.Logger;
-import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
@@ -50,14 +46,7 @@ public class CREntityReader<T> extends CommonReader<T> {
     private IMetaFactoryService metaFactoryService;
     private ReportBeanRemoteBusiness reportService;
 
-    @Autowired
-    private CouchbaseClientManager couchbaseClientManager;
-
-    private CouchbaseClient couchbaseClient;
-
     private Gson gson = new Gson();
-
-    private BatchFullJModel batchFullJModel;
 
     @Autowired
     private MainParser crParser;
@@ -73,33 +62,11 @@ public class CREntityReader<T> extends CommonReader<T> {
         logger.info("Reader init.");
         batchService = serviceRepository.getBatchService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
-        couchbaseClient = couchbaseClientManager.get();
         reportService = serviceRepository.getReportBeanRemoteBusinessService();
 
-        int counter = 100;
-        Object obj = null;
+        batch = batchService.getBatch(batchId);
 
-        while(counter-- > 0 && (obj = couchbaseClient.get("batch:" + batchId)) == null) {
-            try
-            {
-                Thread.sleep(100);
-            } catch (InterruptedException e)
-            {
-                break;
-            }
-        }
-
-        if (obj == null) {
-            statusSingleton.addBatchStatus(batchId,
-                    new BatchStatusJModel(EntityStatuses.ERROR, "Can't load batch from couchbase!", new Date(),
-                            userId));
-
-            throw new IllegalStateException("Can't load batch from couchbase!");
-        }
-
-        batchFullJModel = gson.fromJson(obj.toString(), BatchFullJModel.class);
-
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(batchFullJModel.getContent());
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(batch.getContent());
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
 
@@ -128,8 +95,14 @@ public class CREntityReader<T> extends CommonReader<T> {
             }
         } catch (IOException e) {
             logger.error("Batch: " + batchId + " error in entity reader.");
-            statusSingleton.addBatchStatus(batchId,
-                    new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
+
+            batchService.addBatchStatus(new BatchStatus()
+                    .setBatchId(batchId)
+                    .setStatus(BatchStatuses.ERROR)
+                    .setDescription(e.getMessage())
+                    .setReceiptDate(new Date())
+            );
+
             throw new RuntimeException(e);
         }
 
@@ -137,13 +110,16 @@ public class CREntityReader<T> extends CommonReader<T> {
             if (out != null)
                 xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
         } catch (XMLStreamException e) {
-            statusSingleton.addBatchStatus(batchId,
-                    new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
+
+            batchService.addBatchStatus(new BatchStatus()
+                            .setBatchId(batchId)
+                            .setStatus(BatchStatuses.ERROR)
+                            .setDescription(e.getMessage())
+                            .setReceiptDate(new Date())
+            );
+
             throw new RuntimeException(e);
         }
-        //
-
-        batch = batchService.load(batchId);
 
         try
         {
@@ -168,16 +144,17 @@ public class CREntityReader<T> extends CommonReader<T> {
                 crParser.parse(xmlEventReader, batch, index);
             } catch (SAXException e)
             {
-                EntityStatusJModel entityStatusJModel = new EntityStatusJModel(index,
-                        EntityStatuses.ERROR, "Can't parse", new Date());
+                batchService.addEntityStatus(new EntityStatus()
+                        .setBatchId(batchId)
+                        .setReceiptDate(new Date())
+                        .setDescription("Can't parse")
+                        .setStatus(EntityStatuses.ERROR)
+                        .setIndex(index)
+                );
 
-                statusSingleton.addContractStatus(batchId, entityStatusJModel);
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
                 return null;
             }
-
-//            System.out.println("####");
-//            System.out.println(entity.toString());
 
             return entity;
         }
@@ -198,16 +175,20 @@ public class CREntityReader<T> extends CommonReader<T> {
 
     private void saveTotalCounts() {
         reportService.setTotalCount(reportId, crParser.getPackageCount());
-        {
-            EntityStatusJModel entityStatus = new EntityStatusJModel(
-                    0L, EntityStatuses.ACTUAL_COUNT, String.valueOf(actualCount), new Date());
-            statusSingleton.addContractStatus(batchId, entityStatus);
-        }
-        {
-            EntityStatusJModel entityStatus = new EntityStatusJModel(
-                    0L, EntityStatuses.TOTAL_COUNT, String.valueOf(crParser.getPackageCount()), new Date());
-            statusSingleton.addContractStatus(batchId, entityStatus);
-        }
+
+        batchService.addEntityStatus(new EntityStatus()
+                .setBatchId(batchId)
+                .setStatus(EntityStatuses.ACTUAL_COUNT)
+                .setDescription(String.valueOf(actualCount))
+                .setReceiptDate(new Date())
+        );
+
+        batchService.addEntityStatus(new EntityStatus()
+                .setBatchId(batchId)
+                .setStatus(EntityStatuses.TOTAL_COUNT)
+                .setDescription(String.valueOf(crParser.getPackageCount()))
+                .setReceiptDate(new Date())
+        );
     }
 
 }

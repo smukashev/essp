@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.tool.couchbase.singleton;
 
+import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 
@@ -37,6 +38,10 @@ public class StatusProperties
             }
         }
         return null;
+    }
+
+    public static void fillSpecificProperties(EntityStatus entityStatus, BaseEntity entity) {
+        // TODO maks
     }
 
 }

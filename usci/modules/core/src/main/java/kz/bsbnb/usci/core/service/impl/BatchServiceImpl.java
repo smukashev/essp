@@ -18,11 +18,10 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author k.tulbassiyev
@@ -51,8 +50,19 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     @Override
-    public Batch load(long batchId) {
-        return batchDao.load(batchId);
+    public Batch getBatch(long batchId) {
+        Batch batch = batchDao.load(batchId);
+        File file = new File(getFilePath(batch));
+
+        try {
+            byte[] bytes = FileCopyUtils.copyToByteArray(file);
+            batch.setContent(bytes);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return batch;
     }
 
     @Override
@@ -62,18 +72,19 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     private void saveBatchFile(Batch batch) {
-        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-
-        String filePath = batchSaveDir + "/" + df.format(batch.getRepDate())
-                + "/" + batch.getCreditorId() + "/" + batch.getHash();
-
-        File outputFile = new File(filePath);
+        File outputFile = new File(getFilePath(batch));
 
         try {
             FileCopyUtils.copy(batch.getContent(), outputFile);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String getFilePath(Batch batch) {
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        return batchSaveDir + "/" + df.format(batch.getRepDate())
+                + "/" + batch.getCreditorId() + "/" + batch.getHash();
     }
 
     @Override
@@ -90,6 +101,15 @@ public class BatchServiceImpl implements IBatchService {
     public void addBatchStatus(long batchId, BatchStatuses batchStatus, String description) {
         EavGlobal status = globalService.getGlobal(batchStatus);
         addBatchStatus(batchId, status.getId(), description);
+    }
+
+    @Override
+    public void addBatchStatus(BatchStatus batchStatus) {
+        if (batchStatus.getStatusId() < 1 && batchStatus.getStatus() != null) {
+            EavGlobal status = globalService.getGlobal(batchStatus.getStatus());
+            batchStatus.setStatusId(status.getId());
+        }
+        batchStatusDao.insert(batchStatus);
     }
 
     @Override
@@ -114,6 +134,20 @@ public class BatchServiceImpl implements IBatchService {
     public void endBatch(long batchId) {
         EavGlobal statusCompleted = globalService.getGlobal(BatchStatuses.COMPLETED);
         addBatchStatus(batchId, statusCompleted.getId(), null);
+    }
+
+    @Override
+    public void addEntityStatus(EntityStatus entityStatus) {
+        if (entityStatus.getStatusId() < 1 && entityStatus.getStatus() != null) {
+            EavGlobal status = globalService.getGlobal(entityStatus.getStatus());
+            entityStatus.setStatusId(status.getId());
+        }
+        entityStatusDao.insert(entityStatus);
+    }
+
+    @Override
+    public List<EntityStatus> getEntityStatusList(long batchId) {
+        return entityStatusDao.getList(batchId);
     }
 
 }

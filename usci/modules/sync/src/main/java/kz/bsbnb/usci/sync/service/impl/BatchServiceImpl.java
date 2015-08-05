@@ -1,6 +1,8 @@
 package kz.bsbnb.usci.sync.service.impl;
 
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.BatchStatus;
+import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.sync.service.IBatchService;
@@ -10,6 +12,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 /**
  * @author k.tulbassiyev
@@ -33,8 +36,8 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     @Override
-    public Batch load(long batchId) {
-        return remoteBatchService.load(batchId);
+    public Batch getBatch(long batchId) {
+        return remoteBatchService.getBatch(batchId);
     }
 
     @Override
@@ -63,6 +66,11 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     @Override
+    public void addBatchStatus(BatchStatus batchStatus) {
+        remoteBatchService.addBatchStatus(batchStatus);
+    }
+
+    @Override
     public void addEntityStatus(long batchId, long entityId, long statusId, Long index) {
         remoteBatchService.addEntityStatus(batchId, entityId, statusId, index, null);
     }
@@ -83,7 +91,17 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     @Override
+    public void addEntityStatus(EntityStatus entityStatus) {
+        remoteBatchService.addEntityStatus(entityStatus);
+    }
+
+    @Override
     public void endBatch(long batchId) {
         remoteBatchService.endBatch(batchId);
+    }
+
+    @Override
+    public List<EntityStatus> getEntityStatusList(long batchId) {
+        return remoteBatchService.getEntityStatusList(batchId);
     }
 }

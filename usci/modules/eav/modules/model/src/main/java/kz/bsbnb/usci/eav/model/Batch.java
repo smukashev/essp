@@ -39,6 +39,9 @@ public class Batch extends Persistable
     private String hash;
     private String sign;
 
+    private String batchType;
+    private Long size;
+
     public Batch() {}
 
     /**
@@ -215,4 +218,19 @@ public class Batch extends Persistable
         this.sign = sign;
     }
 
+    public String getBatchType() {
+        return batchType;
+    }
+
+    public void setBatchType(String batchType) {
+        this.batchType = batchType;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
+    }
 }

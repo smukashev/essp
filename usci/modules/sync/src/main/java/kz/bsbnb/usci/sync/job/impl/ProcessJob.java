@@ -1,12 +1,13 @@
 package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
+import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.sync.job.AbstractJob;
-import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
+import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
-import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 
 import java.util.Date;
 
@@ -16,25 +17,27 @@ import java.util.Date;
 public class ProcessJob extends AbstractJob {
     private BaseEntity baseEntity;
     private IEntityService entityService;
+    private IBatchService batchService;
     private long timeSpent = 0;
 
-    protected StatusSingleton statusSingleton;
-
-    public ProcessJob(IEntityService entityService, BaseEntity baseEntity, StatusSingleton statusSingleton) {
+    public ProcessJob(IEntityService entityService, BaseEntity baseEntity, IBatchService batchService) {
         this.entityService = entityService;
         this.baseEntity = baseEntity;
-        this.statusSingleton = statusSingleton;
+        this.batchService = batchService;
     }
 
     @Override
     public void run() {
-        EntityStatusJModel entityStatusJModel = new EntityStatusJModel(
-                baseEntity.getBatchIndex() - 1,
-                EntityStatuses.PROCESSING, null, new Date());
+        EntityStatus entityStatus = new EntityStatus()
+                .setBatchId(baseEntity.getBatchId())
+                .setEntityId(baseEntity.getId())
+                .setStatus(EntityStatuses.PROCESSING)
+                .setReceiptDate(new Date())
+                .setIndex(baseEntity.getBatchIndex() - 1);
 
-        StatusProperties.fillSpecificProperties(entityStatusJModel, baseEntity);
+        StatusProperties.fillSpecificProperties(entityStatus, baseEntity);
 
-        statusSingleton.addContractStatus(baseEntity.getBatchId(), entityStatusJModel);
+        batchService.addEntityStatus(entityStatus);
 
         long t1 = System.currentTimeMillis();
         entityService.process(baseEntity);

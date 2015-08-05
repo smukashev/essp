@@ -1,9 +1,11 @@
-package kz.bsbnb.usci.eav.model.json; /**
- * @author abukabayev
- */
+package kz.bsbnb.usci.eav.model.json;
+
 import java.util.Date;
 import java.util.HashMap;
 
+/**
+ * @author abukabayev
+ */
 public class BatchInfo {
     private String batchType;
     private String batchName;

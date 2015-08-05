@@ -1,11 +1,7 @@
 package kz.bsbnb.usci.receiver;
 
 import kz.bsbnb.usci.receiver.common.Global;
-import kz.bsbnb.usci.tool.couchbase.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
-import kz.bsbnb.usci.receiver.repository.IServiceRepository;
-import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
-import kz.bsbnb.usci.sync.service.IBatchService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.xml.sax.SAXException;

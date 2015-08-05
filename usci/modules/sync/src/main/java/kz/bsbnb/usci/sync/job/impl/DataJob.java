@@ -4,7 +4,7 @@ import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.sync.job.AbstractDataJob;
-import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
+import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.SyncStatusSingleton;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,10 @@ public final class DataJob extends AbstractDataJob {
     SyncStatusSingleton syncStatusSingleton;
 
     private IEntityService entityService;
+
+    @Autowired
+    private IBatchService batchService;
+
     private final Logger logger = Logger.getLogger(DataJob.class);
 
     protected final List<InProcessTester> entitiesInProcess
@@ -70,9 +74,6 @@ public final class DataJob extends AbstractDataJob {
             return myEntity;
         }
     }
-
-    @Autowired
-    protected StatusSingleton statusSingleton;
 
     private class InProcessContainer extends Thread {
         private BaseEntity entity;
@@ -203,7 +204,7 @@ public final class DataJob extends AbstractDataJob {
 
     private void processNewEntities() {
         final BaseEntity entity = getClearEntity();
-        final ProcessJob processJob = new ProcessJob(entityService, entity, statusSingleton);
+        final ProcessJob processJob = new ProcessJob(entityService, entity, batchService);
 
         if(entity != null) {
             logger.debug("Starting job");

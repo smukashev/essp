@@ -1,10 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.eav.persistance.generated.tables.records.EavBatchesRecord;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBatchStatusDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
@@ -20,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BATCHES;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BATCH_STATUSES;
 
 @Repository
 public class BatchDaoImpl extends JDBCSupport implements IBatchDao
@@ -69,7 +67,9 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
                 EAV_BATCHES.REP_DATE,
                 EAV_BATCHES.RECEIPT_DATE,
                 EAV_BATCHES.BEGIN_DATE,
-                EAV_BATCHES.END_DATE
+                EAV_BATCHES.END_DATE,
+                EAV_BATCHES.BATCH_TYPE,
+                EAV_BATCHES.BATCH_SIZE
         ).values(
                 batch.getUserId(),
                 batch.getCreditorId(),
@@ -79,7 +79,9 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
                 DataUtils.convert(batch.getRepDate()),
                 DataUtils.convertToTimestamp(batch.getReceiptDate()),
                 DataUtils.convertToTimestamp(batch.getBeginDate()),
-                DataUtils.convertToTimestamp(batch.getEndDate())
+                DataUtils.convertToTimestamp(batch.getEndDate()),
+                batch.getBatchType(),
+                batch.getSize()
         );
 
         long batchId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -104,6 +106,8 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
                 .set(EAV_BATCHES.RECEIPT_DATE, DataUtils.convertToTimestamp(batch.getReceiptDate()))
                 .set(EAV_BATCHES.BEGIN_DATE, DataUtils.convertToTimestamp(batch.getBeginDate()))
                 .set(EAV_BATCHES.END_DATE, DataUtils.convertToTimestamp(batch.getEndDate()))
+                .set(EAV_BATCHES.BATCH_TYPE, batch.getBatchType())
+                .set(EAV_BATCHES.BATCH_SIZE, batch.getSize())
                 .where(EAV_BATCHES.ID.eq(batch.getId()));
 
         int updatedCount = updateWithStats(update.getSQL(), update.getBindValues().toArray());
@@ -142,6 +146,8 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
             batch.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.RECEIPT_DATE.getName())));
             batch.setBeginDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.BEGIN_DATE.getName())));
             batch.setEndDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.END_DATE.getName())));
+            batch.setBatchType((String) row.get(EAV_BATCHES.BATCH_TYPE.getName()));
+            batch.setSize(((BigDecimal) row.get(EAV_BATCHES.BATCH_SIZE.getName())).longValue());
         }
         else
         {

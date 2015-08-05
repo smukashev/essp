@@ -723,6 +723,8 @@
 		<column name="file_name" primaryKey="false" required="true" type="VARCHAR" size="2048" autoIncrement="false"/>
 		<column name="hash" primaryKey="false" required="true" type="VARCHAR" size="128" autoIncrement="false"/>
 		<column name="sign" primaryKey="false" required="false" type="VARCHAR" size="2048" autoIncrement="false"/>
+		<column name="batch_type" primaryKey="false" required="false" type="VARCHAR" size="1" autoIncrement="false"/>
+		<column name="batch_size" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 	</table>
 	<table name="eav_global">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>

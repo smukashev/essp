@@ -137,7 +137,7 @@ public class MainPortlet extends MVCPortlet {
                 BaseEntity baseEntityNew = new BaseEntity(meta,new Date());
 
                 Long batchId = batchService.save(new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime())));
-                batch = batchService.load(batchId);
+                batch = batchService.getBatch(batchId);
 
                 for (int i=1;i<=count;i++){
                     if (addJson.get("type_"+i).equals("STRING")){
@@ -183,7 +183,7 @@ public class MainPortlet extends MVCPortlet {
 
 
              Long batchId = batchService.save(new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime())));
-             batch = batchService.load(batchId);
+             batch = batchService.getBatch(batchId);
             BaseEntity baseEntity1 = new BaseEntity(metaClass,new Date());
 
 
@@ -274,7 +274,7 @@ public class MainPortlet extends MVCPortlet {
             result = new BaseEntity(baseEntity2.getMeta(),baseEntity2.getReportDate());
 
             Long batchId = batchService.save(new Batch(new Timestamp(new Date().getTime()), new java.sql.Date(new Date().getTime())));
-            Batch batchNew = batchService.load(batchId);
+            Batch batchNew = batchService.getBatch(batchId);
 
             while (iterator.hasNext()){
                 Map.Entry<String, BaseValueJson> e = (Map.Entry<String, BaseValueJson>) iterator.next();

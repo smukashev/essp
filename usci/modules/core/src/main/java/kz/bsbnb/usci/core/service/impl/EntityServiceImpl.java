@@ -1,11 +1,12 @@
 package kz.bsbnb.usci.core.service.impl;
 
+import kz.bsbnb.usci.core.service.IBatchService;
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.persistance.dao.IRefProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
@@ -14,9 +15,8 @@ import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.IBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
-import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
+import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
-import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +30,6 @@ import java.util.*;
 @Service
 public class EntityServiceImpl extends UnicastRemoteObject implements IEntityService {
     private final Logger logger = LoggerFactory.getLogger(EntityServiceImpl.class);
-
-    @Autowired
-    protected StatusSingleton statusSingleton;
 
     @Autowired
     IBaseEntityProcessorDao baseEntityProcessorDao;
@@ -55,6 +52,12 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Autowired
     IBaseEntityLoadDao baseEntityLoadDao;
 
+    @Autowired
+    IEntityService entityService;
+
+    @Autowired
+    IBatchService batchService;
+
     public EntityServiceImpl() throws RemoteException {
         super();
     }
@@ -68,24 +71,32 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
             stats.put("coreService", t2);
 
-            EntityStatusJModel entityStatus = new EntityStatusJModel(
-                    entity.getBatchIndex() - 1,
-                    EntityStatuses.COMPLETED, "" + entity.getId(), new Date());
+            EntityStatus entityStatus = new EntityStatus();
+            entityStatus.setBatchId(baseEntity.getBatchId());
+            entityStatus.setEntityId(baseEntity.getId());
+            entityStatus.setStatus(EntityStatuses.COMPLETED);
+            entityStatus.setDescription("" + entity.getId());
+            entityStatus.setIndex(entity.getBatchIndex() - 1);
+            entityStatus.setReceiptDate(new Date());
 
             StatusProperties.fillSpecificProperties(entityStatus, baseEntity);
 
-            statusSingleton.addContractStatus(baseEntity.getBatchId(), entityStatus);
+            batchService.addEntityStatus(entityStatus);
         } catch (Exception e) {
             logger.error("Batch id: " + baseEntity.getBatchId() + ", index: " + (baseEntity.getBatchIndex() - 1) +
                     ExceptionUtils.getStackTrace(e));
 
-            EntityStatusJModel entityStatus = new EntityStatusJModel(
-                    baseEntity.getBatchIndex() - 1,
-                    EntityStatuses.ERROR, e.getMessage(), new Date());
+            EntityStatus entityStatus = new EntityStatus();
+            entityStatus.setBatchId(baseEntity.getBatchId());
+            entityStatus.setEntityId(baseEntity.getId());
+            entityStatus.setStatus(EntityStatuses.ERROR);
+            entityStatus.setDescription(e.getMessage());
+            entityStatus.setIndex(baseEntity.getBatchIndex() - 1);
+            entityStatus.setReceiptDate(new Date());
 
             StatusProperties.fillSpecificProperties(entityStatus, baseEntity);
 
-            statusSingleton.addContractStatus(baseEntity.getBatchId(), entityStatus);
+            batchService.addEntityStatus(entityStatus);
         }
     }
 

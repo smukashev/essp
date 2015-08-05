@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.cli.app;
 
-import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.protocol.views.Query;
 import com.couchbase.client.protocol.views.View;
 import com.couchbase.client.protocol.views.ViewResponse;
@@ -11,7 +10,6 @@ import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
-import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.cli.app.command.impl.*;
@@ -24,6 +22,7 @@ import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
@@ -38,17 +37,18 @@ import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
-import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.service.ShowcaseService;
+import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 import kz.bsbnb.usci.tool.status.SyncStatus;
@@ -73,7 +73,6 @@ import org.xml.sax.SAXException;
 import javax.annotation.PostConstruct;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.text.DateFormat;
@@ -91,8 +90,6 @@ public class CLI {
     private static SimpleDateFormat sdfout = new SimpleDateFormat("dd.MM.yyyy");
     @Autowired
     protected IMetaClassRepository metaClassRepository;
-    @Autowired
-    protected IBatchRepository batchRepository;
     RmiProxyFactoryBean serviceFactory = null;
     IEntityService entityServiceCore = null;
     ShowCase showCase;
@@ -132,15 +129,16 @@ public class CLI {
 
     private BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
     private InputStream inputStream = null;
-    private CouchbaseClient couchbaseClient;
     private JobDispatcher jobDispatcher = new JobDispatcher();
+    private RmiProxyFactoryBean ruleBatchServiceFactoryBean;
     private RmiProxyFactoryBean batchServiceFactoryBean;
     private RmiProxyFactoryBean batchVersionServiceFactoryBean;
     private RmiProxyFactoryBean ruleServiceFactoryBean;
     private RmiProxyFactoryBean showcaseServiceFactoryBean;
     private RmiProxyFactoryBean entityServiceFactoryBean;
-    private IBatchService batchService;
     private IRuleService ruleService;
+    private IBatchService batchService;
+    private kz.bsbnb.usci.brms.rulesvr.service.IBatchService ruleBatchService;
     private IBatchVersionService batchVersionService;
     private ShowcaseService showcaseService;
     private Rule currentRule;
@@ -170,25 +168,22 @@ public class CLI {
         return entityServiceCore;
     }
 
-    @PostConstruct
-    public void initBean() {
-        System.setProperty("viewmode", "production");
-        //System.setProperty("viewmode", "development");
+    public void initBatchService() {
+        if (batchService == null) {
+            batchServiceFactoryBean = new RmiProxyFactoryBean();
+            batchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService"); // TODO check
+            batchServiceFactoryBean.setServiceInterface(IBatchService.class);
+            batchServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
-        ArrayList<URI> nodes = new ArrayList<URI>();
-        nodes.add(URI.create("http://localhost:8091/pools"));
-
-        try {
-            couchbaseClient = new CouchbaseClient(nodes, "test", "");
-        } catch (Exception e) {
-            System.out.println("Error connecting to Couchbase: " + e.getMessage());
+            batchServiceFactoryBean.afterPropertiesSet();
+            batchService = (IBatchService) batchServiceFactoryBean.getObject();
         }
-
-        jobDispatcher.start();
     }
 
-    private void shutdown() {
-        couchbaseClient.shutdown();
+    @PostConstruct
+    public void initBean() {
+        initBatchService();
+        jobDispatcher.start();
     }
 
     public void processCRBatch(String fname, int count, int offset, Date repDate)
@@ -200,10 +195,11 @@ public class CLI {
 
         System.out.println("Processing batch with rep date: " + repDate);
 
-        Batch b = new Batch(repDate);
-        b.setUserId(0L);
+        Batch batch = new Batch(repDate);
+        batch.setUserId(0L);
 
-        Batch batch = batchRepository.addBatch(b);
+        long batchId = batchService.save(batch);
+        batch.setId(batchId);
 
         crParser.parse(in, batch);
 
@@ -459,103 +455,30 @@ public class CLI {
 
                             System.out.println("Processing id: " + batchId);
 
-                            Object batchObject = null;
-                            Object manifestObject = null;
-                            Object batchStatusObject = null;
+                            Batch batch = batchService.getBatch(batchId);
 
-                            int counter = 0;
-
-                            while (counter < 100) {
-                                try {
-                                    batchObject = couchbaseClient.get("batch:" + batchId);
-                                    break;
-                                } catch (OperationTimeoutException ex) {
-                                    System.out.println("Timeout. Restarting...");
-                                    counter++;
-                                }
-                            }
-
-                            counter = 0;
-
-                            while (counter < 100) {
-                                try {
-                                    manifestObject = couchbaseClient.get("manifest:" + batchId);
-                                    break;
-                                } catch (OperationTimeoutException ex) {
-                                    System.out.println("Timeout. Restarting...");
-                                    counter++;
-                                }
-                            }
-
-                            counter = 0;
-
-                            while (counter < 100) {
-                                try {
-                                    batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
-                                    break;
-                                } catch (OperationTimeoutException ex) {
-                                    System.out.println("Timeout. Restarting...");
-                                    counter++;
-                                }
-                            }
-
-                            if (batchObject == null || manifestObject == null) {
-                                System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
-
-                                if (batchObject != null) {
-                                    couchbaseClient.delete("batch:" + batchId);
-                                }
-                                if (manifestObject != null) {
-                                    couchbaseClient.delete("manifest:" + batchId);
-                                }
-                                if (batchStatusObject != null) {
-                                    couchbaseClient.delete("batch_status:" + batchId);
-                                }
+                            if (DataUtils.compareBeginningOfTheDay(batch.getRepDate(), reportDate) != 0) {
                                 continue;
                             }
 
-                            String batchStr = batchObject.toString();
-
-                            BatchFullJModel batchFull = gson.fromJson(batchStr, BatchFullJModel.class);
-
-                            String batchInfoStr = manifestObject.toString();
-
-                            BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
-
-                            if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), reportDate) != 0) {
-                                continue;
-                            }
-
-                            View view = couchbaseClient.getView("batch", "entity_status");
-                            Query query = new Query();
-                            query.setDescending(true);
-                            query.setRangeEnd("[" + batchId + ", 0]");
-                            query.setRangeStart("[" + batchId + ", 999999999999999]");
-
-                            ViewResponse response = couchbaseClient.query(view, query);
-
-                            Iterator<ViewRow> rows = response.iterator();
+                            List<EntityStatus> entityStatusList = batchService.getEntityStatusList(batchId);
 
                             int row_count = 0;
                             int error_count = 0;
-                            while (rows.hasNext()) {
-                                ViewRow viewRowNoDocs = rows.next();
 
+                            for (EntityStatus entityStatus : entityStatusList) {
                                 row_count++;
-
-                                EntityStatusArrayJModel batchFullStatusJModel =
-                                        gson.fromJson(viewRowNoDocs.getValue(), EntityStatusArrayJModel.class);
 
                                 boolean errorFound = false;
                                 boolean completedFound = false;
-                                for (EntityStatusJModel csajm : batchFullStatusJModel.getEntityStatuses()) {
-                                    if (csajm.getProtocol().equals("ERROR")) {
-                                        errorFound = true;
-                                    }
-                                    if (csajm.getProtocol().equals("COMPLETED")) {
-                                        completedFound = true;
-                                    }
+
+                                if (entityStatus.getStatus() == EntityStatuses.ERROR) {
+                                    errorFound = true;
                                 }
+                                if (entityStatus.getStatus() == EntityStatuses.COMPLETED) {
+                                    completedFound = true;
+                                }
+
                                 if (errorFound && !completedFound)
                                     error_count++;
                             }
@@ -567,8 +490,9 @@ public class CLI {
 //                        }
 
                             fout.write((batchId + "," +
-                                    batchFull.getFileName() + "," +
-                                    batchInfo.getSize() + "," + row_count + "," + error_count + "\n").getBytes());
+                                    batch.getFileName() + "," +
+                                    batch.getSize() + "," +
+                                    row_count + "," + error_count + "\n").getBytes());
                         }
                         break;
                     } catch (Exception e) {
@@ -680,111 +604,38 @@ public class CLI {
 
                             System.out.println("Processing id: " + batchId);
 
-                            Object batchObject = null;
-                            Object manifestObject = null;
-                            Object batchStatusObject = null;
+                            Batch batch = batchService.getBatch(batchId);
 
-                            int counter = 0;
-
-                            while (counter < 100) {
-                                try {
-                                    batchObject = couchbaseClient.get("batch:" + batchId);
-                                    break;
-                                } catch (OperationTimeoutException ex) {
-                                    System.out.println("Timeout. Restarting.");
-                                    counter++;
-                                }
-                            }
-
-                            counter = 0;
-
-                            while (counter < 100) {
-                                try {
-                                    manifestObject = couchbaseClient.get("manifest:" + batchId);
-                                    break;
-                                } catch (OperationTimeoutException ex) {
-                                    System.out.println("Timeout. Restarting.");
-                                    counter++;
-                                }
-                            }
-
-                            counter = 0;
-
-                            while (counter < 100) {
-                                try {
-                                    batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
-                                    break;
-                                } catch (OperationTimeoutException ex) {
-                                    System.out.println("Timeout. Restarting.");
-                                    counter++;
-                                }
-                            }
-
-                            if (batchObject == null || manifestObject == null) {
-                                System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
-
-                                if (batchObject != null) {
-                                    couchbaseClient.delete("batch:" + batchId);
-                                }
-                                if (manifestObject != null) {
-                                    couchbaseClient.delete("manifest:" + batchId);
-                                }
-                                if (batchStatusObject != null) {
-                                    couchbaseClient.delete("batch_status:" + batchId);
-                                }
+                            if (DataUtils.compareBeginningOfTheDay(batch.getRepDate(), reportDate) != 0) {
                                 continue;
                             }
 
-                            String batchStr = batchObject.toString();
-
-                            BatchFullJModel batchFull = gson.fromJson(batchStr, BatchFullJModel.class);
-
-                            String batchInfoStr = manifestObject.toString();
-
-                            BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
-
-                            if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), reportDate) != 0) {
-                                continue;
-                            }
-
-                            View view = couchbaseClient.getView("batch", "entity_status");
-                            Query query = new Query();
-                            query.setDescending(true);
-                            query.setRangeEnd("[" + batchId + ", 0]");
-                            query.setRangeStart("[" + batchId + ", 999999999999999]");
-
-                            ViewResponse response = couchbaseClient.query(view, query);
-
-                            Iterator<ViewRow> rows = response.iterator();
+                            List<EntityStatus> entityStatusList = batchService.getEntityStatusList(batchId);
 
                             int row_count = 0;
                             int error_count = 0;
-                            while (rows.hasNext()) {
-                                ViewRow viewRowNoDocs = rows.next();
 
+                            for (EntityStatus entityStatus : entityStatusList) {
                                 row_count++;
-
-                                EntityStatusArrayJModel batchFullStatusJModel =
-                                        gson.fromJson(viewRowNoDocs.getValue(), EntityStatusArrayJModel.class);
 
                                 boolean errorFound = false;
                                 boolean completedFound = false;
-                                for (EntityStatusJModel csajm : batchFullStatusJModel.getEntityStatuses()) {
-                                    if (csajm.getProtocol().equals("ERROR")) {
-                                        errorFound = true;
-                                    }
-                                    if (csajm.getProtocol().equals("COMPLETED")) {
-                                        completedFound = true;
-                                    }
+
+                                if (entityStatus.getStatus() == EntityStatuses.ERROR) {
+                                    errorFound = true;
                                 }
+                                if (entityStatus.getStatus() == EntityStatuses.COMPLETED) {
+                                    completedFound = true;
+                                }
+
                                 if (errorFound && !completedFound)
                                     error_count++;
                             }
 
-                            if (error_count > 0 || row_count != batchInfo.getSize()) {
+                            if (error_count > 0 || row_count != batch.getSize()) {
                                 fout.write((batchId + "," +
-                                        batchFull.getFileName() + "," +
-                                        batchInfo.getSize() + "," + row_count + "," + error_count +
+                                        batch.getFileName() + "," +
+                                        batch.getSize() + "," + row_count + "," + error_count +
                                         ",restarted\n").getBytes());
 
                                 //sender.addJob(batchId, batchInfo);
@@ -792,8 +643,8 @@ public class CLI {
                                 batchProcessService.restartBatch(batchId);
                             } else {
                                 fout.write((batchId + "," +
-                                        batchFull.getFileName() + "," +
-                                        batchInfo.getSize() + "," + row_count + "," + error_count +
+                                        batch.getFileName() + "," +
+                                        batch.getSize() + "," + row_count + "," + error_count +
                                         ",skipped\n").getBytes());
                             }
                         }
@@ -908,76 +759,15 @@ public class CLI {
 
                             System.out.println("Processing id: " + batchId);
 
-                            Object batchObject = null;
-                            Object manifestObject = null;
-                            Object batchStatusObject = null;
+                            Batch batch = batchService.getBatch(batchId);
 
-                            int counter = 0;
-
-                            while (counter < 100) {
-                                try {
-                                    batchObject = couchbaseClient.get("batch:" + batchId);
-                                    break;
-                                } catch (OperationTimeoutException ex) {
-                                    System.out.println("Timeout. Restarting.");
-                                    counter++;
-                                }
-                            }
-
-                            counter = 0;
-
-                            while (counter < 100) {
-                                try {
-                                    manifestObject = couchbaseClient.get("manifest:" + batchId);
-                                    break;
-                                } catch (OperationTimeoutException ex) {
-                                    System.out.println("Timeout. Restarting.");
-                                    counter++;
-                                }
-                            }
-
-                            counter = 0;
-
-                            while (counter < 100) {
-                                try {
-                                    batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
-                                    break;
-                                } catch (OperationTimeoutException ex) {
-                                    System.out.println("Timeout. Restarting.");
-                                    counter++;
-                                }
-                            }
-
-                            if (batchObject == null || manifestObject == null) {
-                                System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
-
-                                if (batchObject != null) {
-                                    couchbaseClient.delete("batch:" + batchId);
-                                }
-                                if (manifestObject != null) {
-                                    couchbaseClient.delete("manifest:" + batchId);
-                                }
-                                if (batchStatusObject != null) {
-                                    couchbaseClient.delete("batch_status:" + batchId);
-                                }
-                                continue;
-                            }
-
-                            String batchStr = batchObject.toString();
-
-                            BatchFullJModel batchFull = gson.fromJson(batchStr, BatchFullJModel.class);
-
-                            String batchInfoStr = manifestObject.toString();
-
-                            BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
-
-                            if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), reportDate) != 0) {
+                            if (DataUtils.compareBeginningOfTheDay(batch.getRepDate(), reportDate) != 0) {
                                 continue;
                             }
 
                             fout.write((batchId + "," +
-                                    batchFull.getFileName() + "," +
-                                    batchInfo.getSize() + ",restarted\n").getBytes());
+                                    batch.getFileName() + "," +
+                                    batch.getSize() + ",restarted\n").getBytes());
 
                             batchProcessService.restartBatch(batchId);
                         }
@@ -1039,107 +829,34 @@ public class CLI {
 
         System.out.println("Processing id: " + batchId);
 
-        Object batchObject = null;
-        Object manifestObject = null;
-        Object batchStatusObject = null;
+        Batch batch = batchService.getBatch(batchId);
 
-        int counter = 0;
-
-        while (counter < 100) {
-            try {
-                batchObject = couchbaseClient.get("batch:" + batchId);
-                break;
-            } catch (OperationTimeoutException ex) {
-                System.out.println("Timeout. Restarting.");
-                counter++;
-            }
-        }
-
-        counter = 0;
-
-        while (counter < 100) {
-            try {
-                manifestObject = couchbaseClient.get("manifest:" + batchId);
-                break;
-            } catch (OperationTimeoutException ex) {
-                System.out.println("Timeout. Restarting.");
-                counter++;
-            }
-        }
-
-        counter = 0;
-
-        while (counter < 100) {
-            try {
-                batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
-                break;
-            } catch (OperationTimeoutException ex) {
-                System.out.println("Timeout. Restarting.");
-                counter++;
-            }
-        }
-
-        if (batchObject == null || manifestObject == null) {
-            System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
-
-            if (batchObject != null) {
-                couchbaseClient.delete("batch:" + batchId);
-            }
-            if (manifestObject != null) {
-                couchbaseClient.delete("manifest:" + batchId);
-            }
-            if (batchStatusObject != null) {
-                couchbaseClient.delete("batch_status:" + batchId);
-            }
-            return;
-        }
-
-        String batchStr = batchObject.toString();
-
-        BatchFullJModel batchFull = gson.fromJson(batchStr, BatchFullJModel.class);
-
-        String batchInfoStr = manifestObject.toString();
-
-        BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
-
-        View view = couchbaseClient.getView("batch", "entity_status");
-        Query query = new Query();
-        query.setDescending(true);
-        query.setRangeEnd("[" + batchId + ", 0]");
-        query.setRangeStart("[" + batchId + ", 999999999999999]");
-
-        ViewResponse response = couchbaseClient.query(view, query);
-
-        Iterator<ViewRow> rows = response.iterator();
+        List<EntityStatus> entityStatusList = batchService.getEntityStatusList(batchId);
 
         int row_count = 0;
         int error_count = 0;
-        while (rows.hasNext()) {
-            ViewRow viewRowNoDocs = rows.next();
 
+        for (EntityStatus entityStatus : entityStatusList) {
             row_count++;
-
-            EntityStatusArrayJModel batchFullStatusJModel =
-                    gson.fromJson(viewRowNoDocs.getValue(), EntityStatusArrayJModel.class);
 
             boolean errorFound = false;
             boolean completedFound = false;
-            for (EntityStatusJModel csajm : batchFullStatusJModel.getEntityStatuses()) {
-                if (csajm.getProtocol().equals("ERROR")) {
-                    errorFound = true;
-                }
-                if (csajm.getProtocol().equals("COMPLETED")) {
-                    completedFound = true;
-                }
+
+            if (entityStatus.getStatus() == EntityStatuses.ERROR) {
+                errorFound = true;
             }
+            if (entityStatus.getStatus() == EntityStatuses.COMPLETED) {
+                completedFound = true;
+            }
+
             if (errorFound)// && !completedFound)
                 error_count++;
         }
 
         //if (error_count > 0 || row_count != batchInfo.getSize()) {
         System.out.println(batchId + "," +
-                batchFull.getFileName() + "," +
-                batchInfo.getSize() + "," + row_count + "," + error_count + ",restarted");
+                batch.getFileName() + "," +
+                batch.getSize() + "," + row_count + "," + error_count + ",restarted");
 
         //sender.addJob(batchId, batchInfo);
         //receiverStatusSingleton.batchReceived();
@@ -1206,7 +923,7 @@ public class CLI {
         try {
             Date reportDate = sdfout.parse(repDate);
             CLIXMLReader reader = new CLIXMLReader(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))
-                    , metaClassRepository, batchRepository, reportDate);
+                    , metaClassRepository, batchService, reportDate);
 
             BaseEntity entity;
             while ((entity = reader.read()) != null) {
@@ -1228,7 +945,7 @@ public class CLI {
     public void readEntityFromXML(String fileName, String repDate) {
         try {
             Date reportDate = sdfout.parse(repDate);
-            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
+            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate);
             BaseEntity entity;
             while ((entity = reader.read()) != null) {
                 try {
@@ -1251,7 +968,7 @@ public class CLI {
     public void findEntityFromXML(String fileName, String repDate) {
         try {
             Date reportDate = sdfout.parse(repDate);
-            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
+            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate);
             BaseEntity entity;
             while ((entity = reader.read()) != null) {
                 //long id = baseEntityProcessorDao.process(entity).getId();
@@ -1277,7 +994,7 @@ public class CLI {
     public void testEntityFromXML(String fileName, String repDate) {
         try {
             Date reportDate = sdfout.parse(repDate);
-            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
+            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate);
             BaseEntity entity;
             while ((entity = reader.read()) != null) {
                 BaseEntity clonedEntity = entity.clone();
@@ -2165,13 +1882,14 @@ public class CLI {
 
             entityServiceFactoryBean.afterPropertiesSet();
 
+            ruleBatchServiceFactoryBean = new RmiProxyFactoryBean();
+            ruleBatchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService");
+            ruleBatchServiceFactoryBean.setServiceInterface(IBatchService.class);
 
-            batchServiceFactoryBean = new RmiProxyFactoryBean();
-            batchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService");
-            batchServiceFactoryBean.setServiceInterface(IBatchService.class);
+            ruleBatchServiceFactoryBean.afterPropertiesSet();
+            ruleBatchService = (kz.bsbnb.usci.brms.rulesvr.service.IBatchService) ruleBatchServiceFactoryBean.getObject();
 
-            batchServiceFactoryBean.afterPropertiesSet();
-            batchService = (IBatchService) batchServiceFactoryBean.getObject();
+            initBatchService();
 
             batchVersionServiceFactoryBean = new RmiProxyFactoryBean();
             batchVersionServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchVersionService");
@@ -2209,7 +1927,7 @@ public class CLI {
                 Date date = dateFormatter.parse("05.04.2015");
 
                 try {
-                    CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, date);
+                    CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchService, date);
                     BaseEntity baseEntity = reader.read();
                     //System.out.println(ma);
                 } catch (FileNotFoundException e) {
@@ -2283,7 +2001,7 @@ public class CLI {
                 Date reportDate = dateFormatter.parse("02.05.2015");
 
                 try {
-                    CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchRepository, reportDate);
+                    CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchService, reportDate);
                     currentBaseEntity = reader.read();
                     reader.close();
                     List<String> errors = ruleService.runRules(currentBaseEntity, currentPackageName, currentDate);
@@ -2317,7 +2035,7 @@ public class CLI {
                 kz.bsbnb.usci.brms.rulesvr.model.impl.Batch batch =
                         new kz.bsbnb.usci.brms.rulesvr.model.impl.Batch(args.get(2), currentDate);
 
-                Long id = batchService.save(batch);
+                Long id = ruleBatchService.save(batch);
                 batch.setId(id);
                 batchVersionService.save(batch);
                 System.out.println("ok batch created with id:" + id);
@@ -2690,8 +2408,6 @@ public class CLI {
                 inputStream = null;
             }
         }
-
-        shutdown();
     }
 
     public void commandInclude() {
@@ -2720,24 +2436,9 @@ public class CLI {
             Long batchId = Long.valueOf(args.get(0));
             String path = args.get(1);
 
-            Gson gson = new Gson();
-            BatchFullJModel batchFullJModel;
+            Batch batch = batchService.getBatch(batchId);
 
-            Object batchStr;
-
-            try {
-                batchStr = couchbaseClient.get("batch:" + batchId);
-            } catch (OperationTimeoutException e) {
-                batchStr = null;
-            }
-
-            if (batchStr == null) {
-                System.out.println("Couldn't find batch with id: " + batchId + " in Couchbase");
-                throw new NullPointerException();
-            }
-
-            batchFullJModel = gson.fromJson(batchStr.toString(), BatchFullJModel.class);
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(batchFullJModel.getContent());
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(batch.getContent());
 
             ZipOutputStream zos = null;
 
@@ -2797,7 +2498,7 @@ public class CLI {
             List<IBaseEntity> entityList = new ArrayList<IBaseEntity>();
             try {
                 Date reportDate = sdfout.parse(repDate);
-                CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchRepository, reportDate);
+                CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate);
                 BaseEntity entityToWrite;
                 IBaseEntity savedEntity;
                 while ((entityToWrite = reader.read()) != null) {

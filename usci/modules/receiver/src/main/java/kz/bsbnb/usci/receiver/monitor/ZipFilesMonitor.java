@@ -102,7 +102,7 @@ public class ZipFilesMonitor{
             }
 
             try {
-                batchService.load(batchId);
+                batchService.getBatch(batchId);
             } catch(Exception e) {
                 System.out.println("Can't get batch from eav DB. Skipped.");
                 return false;
@@ -182,7 +182,7 @@ public class ZipFilesMonitor{
 
                         BatchInfo batchInfo = gson.fromJson(manifestObject.toString(), BatchInfo.class);
                         try {
-                            batchService.load(batchId);
+                            batchService.getBatch(batchId);
                         } catch(Exception e) {
                             System.out.println("Can't get batch from eav DB. Skipped.");
                         }
@@ -457,6 +457,8 @@ public class ZipFilesMonitor{
         batch.setContent(bytes);
         batch.setRepDate(batchInfo.getRepDate());
         batch.setReceiptDate(new Date());
+        batch.setBatchType(batchInfo.getBatchType());
+        batch.setSize(batchInfo.getSize());
 
         long batchId = batchService.uploadBatch(batch);
 

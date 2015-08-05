@@ -1,13 +1,14 @@
 package kz.bsbnb.usci.receiver.writer.impl;
 
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
+import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
+import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.receiver.common.Global;
-import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
+import kz.bsbnb.usci.receiver.repository.IServiceRepository;
+import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
-import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import kz.bsbnb.usci.receiver.writer.IWriter;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import org.apache.log4j.Logger;
@@ -34,12 +35,14 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
     @Qualifier(value="remoteRuleService")
     private RmiProxyFactoryBean rmiProxyRuleService;
 
+    @Autowired
+    private IServiceRepository serviceFactory;
+
     private IEntityService entityService;
     private Logger logger = Logger.getLogger(RmiEventEntityWriter.class);
     private IRuleService ruleService;
 
-    @Autowired
-    protected StatusSingleton statusSingleton;
+    private IBatchService batchService;
 
     @Autowired
     protected SQLQueriesStats sqlStats;
@@ -52,8 +55,10 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
     @PostConstruct
     public void init() {
         logger.info("Writer init");
+
         entityService = (IEntityService) rmiProxyFactoryBean.getObject();
         ruleService = (IRuleService) rmiProxyRuleService.getObject();
+        batchService = serviceFactory.getBatchService();
 
         metaRules.add("credit");
     }
@@ -78,13 +83,18 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                 continue;
             }*/
 
-            EntityStatusJModel entityStatusJModel = new EntityStatusJModel(
-                    entity.getBatchIndex() - 1,
-                    EntityStatuses.CHECK_IN_PARSER, null, new Date());
+            {
+                EntityStatus entityStatus = new EntityStatus()
+                        .setBatchId(entity.getBatchId())
+                        .setEntityId(entity.getId())
+                        .setStatus(EntityStatuses.CHECK_IN_PARSER)
+                        .setReceiptDate(new Date())
+                        .setIndex(entity.getBatchIndex() - 1);
 
-            StatusProperties.fillSpecificProperties(entityStatusJModel, entity);
+                StatusProperties.fillSpecificProperties(entityStatus, entity);
 
-            statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
+                batchService.addEntityStatus(entityStatus);
+            }
 
             List<String> errors = new LinkedList<String>(entity.getValidationErrors());
             String ruleRuntimeException = null;
@@ -106,33 +116,47 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
             if(ruleRuntimeException != null) {
                 ruleRuntimeException = "Ошибка при запуске правил: " + ruleRuntimeException;
-                entityStatusJModel = new EntityStatusJModel(
-                        entity.getBatchIndex() - 1,
-                        EntityStatuses.ERROR, ruleRuntimeException, new Date());
 
-                StatusProperties.fillSpecificProperties(entityStatusJModel, entity);
+                EntityStatus entityStatus = new EntityStatus()
+                        .setBatchId(entity.getBatchId())
+                        .setEntityId(entity.getId())
+                        .setStatus(EntityStatuses.ERROR)
+                        .setDescription(ruleRuntimeException)
+                        .setReceiptDate(new Date())
+                        .setIndex(entity.getBatchIndex() - 1);
 
-                statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
+                StatusProperties.fillSpecificProperties(entityStatus, entity);
+
+                batchService.addEntityStatus(entityStatus);
+
             } else if (errors != null && errors.size() > 0) {
                 for (String errorMsg : errors) {
                     System.out.println(errorMsg);
                     //TODO: check for error with Index
-                    entityStatusJModel = new EntityStatusJModel(
-                            entity.getBatchIndex() - 1,
-                            EntityStatuses.ERROR, errorMsg, new Date());
 
-                    StatusProperties.fillSpecificProperties(entityStatusJModel, entity);
+                    EntityStatus entityStatus = new EntityStatus()
+                            .setBatchId(entity.getBatchId())
+                            .setEntityId(entity.getId())
+                            .setStatus(EntityStatuses.ERROR)
+                            .setDescription(errorMsg)
+                            .setReceiptDate(new Date())
+                            .setIndex(entity.getBatchIndex() - 1);
 
-                    statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
+                    StatusProperties.fillSpecificProperties(entityStatus, entity);
+
+                    batchService.addEntityStatus(entityStatus);
                 }
             } else {
-                entityStatusJModel = new EntityStatusJModel(
-                        entity.getBatchIndex() - 1,
-                        EntityStatuses.WAITING, null, new Date());
+                EntityStatus entityStatus = new EntityStatus()
+                        .setBatchId(entity.getBatchId())
+                        .setEntityId(entity.getId())
+                        .setStatus(EntityStatuses.WAITING)
+                        .setReceiptDate(new Date())
+                        .setIndex(entity.getBatchIndex() - 1);
 
-                StatusProperties.fillSpecificProperties(entityStatusJModel, entity);
+                StatusProperties.fillSpecificProperties(entityStatus, entity);
 
-                statusSingleton.addContractStatus(entity.getBatchId(), entityStatusJModel);
+                batchService.addEntityStatus(entityStatus);
 
                 entitiesToSave.add(entity);
             }

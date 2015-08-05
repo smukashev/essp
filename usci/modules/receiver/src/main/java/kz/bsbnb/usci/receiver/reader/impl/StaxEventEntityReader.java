@@ -1,27 +1,23 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
-import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.BatchStatus;
+import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.*;
-import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
-import kz.bsbnb.usci.eav.model.json.BatchStatusJModel;
-import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.util.BatchStatuses;
+import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
-import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
-import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
-import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
-import net.spy.memcached.OperationTimeoutException;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -50,9 +46,6 @@ import java.util.zip.ZipInputStream;
 @Scope("step")
 public class StaxEventEntityReader<T> extends CommonReader<T> {
     @Autowired
-    private CouchbaseClientManager couchbaseClientManager;
-
-    @Autowired
     private IServiceRepository serviceFactory;
 
     @Value("#{jobParameters['reportId']}")
@@ -72,10 +65,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     private IMetaFactoryService metaFactoryService;
     private ReportBeanRemoteBusiness reportService;
 
-    private CouchbaseClient couchbaseClient;
-    private Gson gson = new Gson();
-    private BatchFullJModel batchFullJModel;
-
     private boolean hasMembers = false;
 
     private int totalCount = 0;
@@ -85,28 +74,10 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         batchService = serviceRepository.getBatchService();
         reportService = serviceFactory.getReportBeanRemoteBusinessService();
         metaFactoryService = serviceRepository.getMetaFactoryService();
-        couchbaseClient = couchbaseClientManager.get();
 
-        Object batchStr = null;
-        int counter = 0;
+        batch = batchService.getBatch(batchId);
 
-        while (counter < 100 && batchStr == null) {
-            counter++;
-            try {
-                batchStr = couchbaseClient.get("batch:" + batchId);
-            } catch (OperationTimeoutException e) {
-                batchStr = null;
-            }
-        }
-
-        if (batchStr == null) {
-            logger.error("Can't get batch with id: " + batchId);
-            throw new RuntimeException("Can't get batch with id: " + batchId);
-        }
-
-        batchFullJModel = gson.fromJson(batchStr.toString(), BatchFullJModel.class);
-
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(batchFullJModel.getContent());
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(batch.getContent());
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
 
@@ -129,8 +100,14 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             }
         } catch (IOException e) {
             logger.error("Batch: " + batchId + " error in entity reader.");
-            statusSingleton.addBatchStatus(batchId,
-                    new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
+
+            batchService.addBatchStatus(new BatchStatus()
+                    .setBatchId(batchId)
+                    .setStatus(BatchStatuses.ERROR)
+                    .setDescription(e.getMessage())
+                    .setReceiptDate(new Date())
+            );
+
             throw new RuntimeException(e);
         }
 
@@ -138,12 +115,15 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             if (out != null)
                 xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
         } catch (XMLStreamException e) {
-            statusSingleton.addBatchStatus(batchId,
-                    new BatchStatusJModel(BatchStatuses.ERROR, e.getMessage(), new Date(), 0L));
+            batchService.addBatchStatus(new BatchStatus()
+                    .setBatchId(batchId)
+                    .setStatus(BatchStatuses.ERROR)
+                    .setDescription(e.getMessage())
+                    .setReceiptDate(new Date())
+            );
+
             throw new RuntimeException(e);
         }
-
-        batch = batchService.load(batchId);
     }
 
     private boolean hasOperationDelete(StartElement startElement) {
@@ -293,16 +273,20 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     private void saveTotalCounts() {
         reportService.setTotalCount(reportId, totalCount);
-        {
-            EntityStatusJModel entityStatus = new EntityStatusJModel(
-                    0L, EntityStatuses.ACTUAL_COUNT, String.valueOf(actualCount), new Date());
-            statusSingleton.addContractStatus(batchId, entityStatus);
-        }
-        {
-            EntityStatusJModel entityStatus = new EntityStatusJModel(
-                    0L, EntityStatuses.TOTAL_COUNT, String.valueOf(totalCount), new Date());
-            statusSingleton.addContractStatus(batchId, entityStatus);
-        }
+
+        batchService.addEntityStatus(new EntityStatus()
+                .setBatchId(batchId)
+                        .setStatus(EntityStatuses.ACTUAL_COUNT)
+                        .setDescription(String.valueOf(actualCount))
+                        .setReceiptDate(new Date())
+        );
+
+        batchService.addEntityStatus(new EntityStatus()
+                .setBatchId(batchId)
+                        .setStatus(EntityStatuses.TOTAL_COUNT)
+                        .setDescription(String.valueOf(totalCount))
+                        .setReceiptDate(new Date())
+        );
     }
 
     public boolean endElement(String localName) {

@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.sync.service.IBatchService;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.UnexpectedInputException;
@@ -74,7 +75,7 @@ public class CLIXMLReader {
     }
 
 
-    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchRepository batchRepository, Date repDate) {
+    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate) {
         logger.info("Reader init.");
         metaClassRepository = metaRepo;
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -90,12 +91,12 @@ public class CLIXMLReader {
 
         batch = new Batch(reportDate, 1L);
 
-        batchRepository.addBatch(batch);
+        batchService.save(batch);
     }
 
     private FileInputStream inputStream;
 
-    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchRepository batchRepository, Date repDate) throws FileNotFoundException {
+    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate) throws FileNotFoundException {
         logger.info("Reader init.");
         metaClassRepository = metaRepo;
 
@@ -113,7 +114,7 @@ public class CLIXMLReader {
 
         batch = new Batch(reportDate, 1L);
 
-        batchRepository.addBatch(batch);
+        batchService.save(batch);
     }
 
     /////////////////////////
