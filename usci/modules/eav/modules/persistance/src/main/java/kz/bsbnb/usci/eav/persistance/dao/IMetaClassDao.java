@@ -9,6 +9,7 @@ import java.util.List;
 public interface IMetaClassDao extends IDao<MetaClass>
 {
 	public MetaClass load(String className);
+    public MetaClass loadDisabled(String className);
     public MetaClass load(String className, Date beginDate);
     public List<MetaClass> loadAll();
     public long save(MetaClass meta);

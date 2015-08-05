@@ -7,7 +7,7 @@ public class MetaClassName implements Serializable
     private String className;
     private String classTitle;
     private long id;
-    private long isDisabled;
+    private boolean disabled = false;
 
     public String getClassName()
     {
@@ -39,11 +39,11 @@ public class MetaClassName implements Serializable
         this.id = id;
     }
 
-    public long getIsDisabled() {
-        return isDisabled;
+    public boolean isDisabled() {
+        return disabled;
     }
 
-    public void setIsDisabled(long isDisabled) {
-        this.isDisabled = isDisabled;
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 }

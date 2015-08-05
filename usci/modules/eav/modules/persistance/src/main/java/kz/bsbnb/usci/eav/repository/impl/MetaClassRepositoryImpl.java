@@ -49,7 +49,37 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
          //   lock.writeLock().unlock();
        // }
     }
+    @Override
+    public MetaClass getDisabledMetaClass(String className) {
+        MetaClass metaClass = cache.get(className);
 
+        if (metaClass == null) {
+            lock.readLock().lock();
+            try {
+                metaClass = metaClassDao.loadDisabled(className);
+
+            }
+            finally {
+                lock.readLock().unlock();
+            }
+
+
+            if (metaClass != null) {
+                lock.writeLock().lock();
+                try {
+                    cache.put(className, metaClass);
+                    names.put(metaClass.getId(), className);
+                }
+                finally {
+                    lock.writeLock().unlock();
+                }
+
+
+            }
+        }
+
+        return metaClass;
+    }
     @Override
     public MetaClass getMetaClass(String className) {
            MetaClass metaClass = cache.get(className);

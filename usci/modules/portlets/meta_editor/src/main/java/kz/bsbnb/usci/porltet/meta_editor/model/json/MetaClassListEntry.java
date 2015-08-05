@@ -4,6 +4,7 @@ public class MetaClassListEntry
 {
     private String className;
     private String classId;
+    private boolean disabled = false;
 
     public String getClassName()
     {
@@ -23,5 +24,14 @@ public class MetaClassListEntry
     public void setClassId(String classId)
     {
         this.classId = classId;
+    }
+
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 }
