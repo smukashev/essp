@@ -12,15 +12,15 @@ public class Report implements Serializable {
     public final static HashMap<Long, String> STATUS_CODE_MAP = new HashMap<Long, String>();
 
     static {
-        STATUS_NAME_MAP.put(90l, "Р’ РїСЂРѕС†РµСЃСЃРµ");
-        STATUS_NAME_MAP.put(91l, "РћС€РёР±РєР° РјРµР¶С„РѕСЂРјРµРЅРЅРѕРіРѕ РєРѕРЅС‚СЂРѕР»СЏ");
-        STATUS_NAME_MAP.put(92l, "Р—Р°РІРµСЂС€РµРЅ/РЈС‚РІРµСЂР¶РґРµРЅ");
-        STATUS_NAME_MAP.put(74l, "РћС‚С‡РёС‚Р°Р»РёСЃСЊ РЅРµ РїРѕР»РЅРѕСЃС‚СЊСЋ");
-        STATUS_NAME_MAP.put(75l, "РћС‚С‡РёС‚Р°Р»РёСЃСЊ РїРѕР»РЅРѕСЃС‚СЊСЋ");
-        STATUS_NAME_MAP.put(76l, "РћС‚РєРѕРЅС‚СЂРѕР»Р»РёСЂРѕРІР°РЅ СЃ РѕС€РёР±РєР°РјРё");
-        STATUS_NAME_MAP.put(77l, "РћС‚РєРѕРЅС‚СЂРѕР»Р»РёСЂРѕРІР°РЅ Р±РµР· РѕС€РёР±РѕРє");
-        STATUS_NAME_MAP.put(128l, "РЈС‚РІРµСЂР¶РґРµРЅ РѕСЂРіР°РЅРёР·Р°С†РёРµР№");
-        STATUS_NAME_MAP.put(127l, "РРґРµС‚ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ");
+        STATUS_NAME_MAP.put(90l, "В процессе");
+        STATUS_NAME_MAP.put(91l, "Ошибка межформенного контроля");
+        STATUS_NAME_MAP.put(92l, "Завершен/Утвержден");
+        STATUS_NAME_MAP.put(74l, "Отчитались не полностью");
+        STATUS_NAME_MAP.put(75l, "Отчитались полностью");
+        STATUS_NAME_MAP.put(76l, "Отконтроллирован с ошибками");
+        STATUS_NAME_MAP.put(77l, "Отконтроллирован без ошибок");
+        STATUS_NAME_MAP.put(128l, "Утвержден организацией");
+        STATUS_NAME_MAP.put(127l, "Идет подтверждение");
 
         STATUS_CODE_MAP.put(90l, "RECIPIENCY_IN_PROGRESS");
         STATUS_CODE_MAP.put(91l, "CROSS_CHECK_ERROR");

@@ -54,10 +54,27 @@ public class CreditParser extends BatchParser {
             BaseEntity creditContract = creditContractParser.getCurrentBaseEntity();
             currentBaseEntity.put("contract", new BaseEntityComplexValue(batch, index, creditContract));
         } else if(localName.equals("currency")) {
-            BaseEntity currency = new BaseEntity(metaClassRepository.getMetaClass("ref_currency"), batch.getRepDate());
+
+            RefListResponse refListResponse =  baseEntityRepository.getBaseEntityProcessorDao()
+                    .getRefListResponse(metaClassRepository.getMetaClass("ref_currency").getId(),
+                            batch.getRepDate(), false);
+
+            boolean found = false;
             event = (XMLEvent) xmlReader.next();
-            currency.put("code", new BaseValue(batch, index, event.asCharacters().getData()));
-            currentBaseEntity.put("currency", new BaseValue(batch, index, currency));
+            String crCode = event.asCharacters().getData();
+
+            for(Map<String,Object> o : refListResponse.getData())
+                if(o.get("SHORT_NAME")!=null && o.get("SHORT_NAME").equals(crCode)){
+                    BaseEntity currency = new BaseEntity(metaClassRepository.getMetaClass("ref_currency"),batch.getRepDate());
+                    currency.put("code", new BaseValue(batch, index, o.get("CODE")));
+                    currentBaseEntity.put("currency", new BaseEntityComplexValue(batch, index, currency));
+                    found = true;
+                    break;
+                }
+
+            if(!found)
+                currentBaseEntity.addValidationError(String.format("Валюта с кодом %s не найдена", crCode));
+
         } else if(localName.equals("interest_rate_yearly")) {
             event = (XMLEvent) xmlReader.next();
             currentBaseEntity.put("interest_rate_yearly", new BaseEntityDoubleValue(batch, index,
