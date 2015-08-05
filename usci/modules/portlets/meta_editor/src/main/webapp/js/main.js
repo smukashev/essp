@@ -169,7 +169,7 @@ function createMetaClassTreeStub(classId, className) {
 function createMetaClassesListView() {
     Ext.define('metaClassListModel', {
         extend: 'Ext.data.Model',
-        fields: ['classId','className']
+        fields: ['classId','className', 'disabled']
     });
 
     var metaClassListStore = Ext.create('Ext.data.Store', {
@@ -212,7 +212,7 @@ function createMetaClassesListView() {
                     tooltip: label_EDIT,
                     handler: function (grid, rowIndex, colIndex) {
                         var record = metaClassListStore.getAt(rowIndex);
-                        createMCForm(record.get('classId'), record.get('className'), grid, record).show();
+                        createMCForm(record.get('classId'), record.get('className'), record.get('disabled'), grid, record).show();
                     }}
                 ]
             },
@@ -251,6 +251,18 @@ function createMetaClassesListView() {
                 flex: 1
             }
         ],
+        viewConfig: {
+            forceFit: true,
+            getRowClass: function(record, index) {
+                var rec = metaClassListStore.getAt(index);
+                var c = rec.get('disabled');
+                if (c == 1) {
+                    return 'disable';
+                } else if (c == 0) {
+                    return 'enable';
+                }
+            }
+        },
         xtype : 'panel',
         region: 'west',
         width: 150,
@@ -266,7 +278,7 @@ function createMetaClassesListView() {
             },
             itemdblclick: function(dv, record, item, index, e) {
                 grid = Ext.getCmp("metaClassesGrid");
-                createMCForm(record.get('classId'), record.get('className'), grid, record).show();
+                createMCForm(record.get('classId'), record.get('className'), record.get('disabled'), grid, record).show();
             }
         },
         dockedItems: [{

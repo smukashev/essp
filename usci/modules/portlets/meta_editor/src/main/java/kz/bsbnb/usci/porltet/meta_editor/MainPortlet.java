@@ -23,6 +23,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import javax.portlet.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class MainPortlet extends MVCPortlet {
@@ -116,15 +117,15 @@ public class MainPortlet extends MVCPortlet {
 
                     for (MetaClassName metaName : metaClassesList) {
                         MetaClassListEntry metaClassListEntry = new MetaClassListEntry();
-                        if(metaName.getIsDisabled()==1)
-                            continue;
+                       // if(metaName.getIsDisabled()==1)
+                         //   continue;
                         metaClassListEntry.setClassId(metaName.getClassName());
                         if(metaName.getClassTitle() != null
                                 && metaName.getClassTitle().trim().length() > 0)
                             metaClassListEntry.setClassName(metaName.getClassTitle());
                         else
                             metaClassListEntry.setClassName(metaName.getClassName());
-
+                        metaClassListEntry.setDisabled(metaName.isDisabled());
                         classesListJson.getData().add(metaClassListEntry);
                     }
 
@@ -287,9 +288,11 @@ public class MainPortlet extends MVCPortlet {
                     String classId = resourceRequest.getParameter("classId");
                     if (classId != null && classId.trim().length() > 0) {
                         String className = resourceRequest.getParameter("className");
+                        String isDisabled = resourceRequest.getParameter("isDisabled");
                         MetaClass meta = null;
                         try {
-                            meta = metaFactoryService.getMetaClass(classId);
+
+                            meta = metaFactoryService.getDisabledMetaClass(classId);
                         } catch (IllegalArgumentException ex) {}
 
 
@@ -298,6 +301,8 @@ public class MainPortlet extends MVCPortlet {
                         }
 
                         meta.setClassTitle(className);
+                        meta.setDisabled(Boolean.parseBoolean(isDisabled));
+
                        // meta.setClassName(classId);
 
 
