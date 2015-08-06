@@ -130,10 +130,11 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
                 .where(EAV_BE_INTEGER_VALUES.as(tableAlias).ID.equal(id));
 
         logger.debug(delete.toString());
+
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-        if (count != 1) {
+
+        if (count != 1)
             throw new RuntimeException("DELETE operation should be delete only one record.");
-        }
     }
 
     @Override
@@ -170,8 +171,8 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_INTEGER_VALUES.as(tableAlias).ID,
-                        EAV_BE_INTEGER_VALUES.as(tableAlias).BATCH_ID,
                         EAV_BE_INTEGER_VALUES.as(tableAlias).CREDITOR_ID,
+                        EAV_BE_INTEGER_VALUES.as(tableAlias).BATCH_ID,
                         EAV_BE_INTEGER_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_INTEGER_VALUES.as(tableAlias).VALUE,
@@ -181,7 +182,8 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
                 .where(EAV_BE_INTEGER_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_INTEGER_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_INTEGER_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.
+                        greaterThan(DataUtils.convert(baseValue.getRepDate())))
                 .asTable(subqueryAlias);
 
         Select select = context
@@ -290,8 +292,10 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
                         EAV_BE_INTEGER_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_INTEGER_VALUES.as(tableAlias))
                 .where(EAV_BE_INTEGER_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
+                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).CREDITOR_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_INTEGER_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.
+                        lessThan(DataUtils.convert(baseValue.getRepDate())))
                 .asTable(subqueryAlias);
 
         Select select = context

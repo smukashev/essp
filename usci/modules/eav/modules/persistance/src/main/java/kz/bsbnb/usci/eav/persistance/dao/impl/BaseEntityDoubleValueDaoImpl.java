@@ -174,6 +174,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_DOUBLE_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).ID,
+                        EAV_BE_DOUBLE_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).BATCH_ID,
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).REPORT_DATE,
@@ -182,8 +183,10 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_DOUBLE_VALUES.as(tableAlias))
                 .where(EAV_BE_DOUBLE_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
+                .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).REPORT_DATE.
+                        greaterThan(DataUtils.convert(baseValue.getRepDate())))
                 .asTable(subqueryAlias);
 
         Select select = context
@@ -202,9 +205,8 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1) {
+        if (rows.size() > 1)
             throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
-        }
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -293,9 +295,10 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_DOUBLE_VALUES.as(tableAlias))
                 .where(EAV_BE_DOUBLE_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
-                .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).REPORT_DATE.
+                        lessThan(DataUtils.convert(baseValue.getRepDate())))
                 .asTable(subqueryAlias);
 
         Select select = context
@@ -386,12 +389,14 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         String tableAlias = "bv";
         Select select = context
                 .select(EAV_BE_DOUBLE_VALUES.as(tableAlias).ID,
+                        EAV_BE_DOUBLE_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).BATCH_ID,
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).VALUE,
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_DOUBLE_VALUES.as(tableAlias))
                 .where(EAV_BE_DOUBLE_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).REPORT_DATE.equal(DataUtils.convert(baseValue.getRepDate())))
                 .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
@@ -536,6 +541,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
             select = context
                     .select(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.NAME),
                             tableOfValues.field(EAV_BE_DOUBLE_VALUES.ID),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.CREDITOR_ID),
                             tableOfValues.field(EAV_BE_DOUBLE_VALUES.BATCH_ID),
                             tableOfValues.field(EAV_BE_DOUBLE_VALUES.INDEX_),
                             tableOfValues.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE),
@@ -560,6 +566,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
                                     .orderBy(tableOfValues.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE).desc()).as("num_pp"),
                             tableOfValues.field(EAV_BE_DOUBLE_VALUES.ID),
                             tableOfValues.field(EAV_BE_DOUBLE_VALUES.ENTITY_ID),
+                            tableOfValues.field(EAV_BE_DOUBLE_VALUES.CREDITOR_ID),
                             tableOfValues.field(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID),
                             tableOfValues.field(EAV_BE_DOUBLE_VALUES.VALUE),
                             tableOfValues.field(EAV_BE_DOUBLE_VALUES.BATCH_ID),
@@ -576,6 +583,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
             select = context
                     .select(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.NAME),
                             tableNumbering.field(EAV_BE_DOUBLE_VALUES.ID),
+                            tableNumbering.field(EAV_BE_DOUBLE_VALUES.CREDITOR_ID),
                             tableNumbering.field(EAV_BE_DOUBLE_VALUES.BATCH_ID),
                             tableNumbering.field(EAV_BE_DOUBLE_VALUES.INDEX_),
                             tableNumbering.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE),

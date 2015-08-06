@@ -118,8 +118,15 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             }
         }
 
-        if (metaClass.isSearchable() && !metaClass.isParentIsKey()) {
-            long baseEntityId = search(baseEntity, creditorId);
+        if (metaClass.isSearchable()) {
+            long baseEntityId;
+
+            if (metaClass.isReference()) {
+                baseEntityId = search(baseEntity, 0);
+            } else {
+                baseEntityId = search(baseEntity, creditorId);
+            }
+
             if (baseEntityId > 0)
                 baseEntity.setId(baseEntityId);
         }
@@ -139,7 +146,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         long creditorId = 0L;
 
         if (baseEntity.getMeta().getClassName().equals("credit")) {
-            creditorId = ((BaseEntity) baseEntity.getEl("data_creditor.creditor")).getId();
+            BaseEntity creditor = ((BaseEntity) baseEntity.getEl("data_creditor.creditor"));
+            prepare(creditor, 0);
+            creditorId = creditor.getId();
+
+            if (creditorId < 1)
+                throw new IllegalStateException("Кредитор не найден;");
         }
 
         baseEntityPostPrepared = prepare(((BaseEntity) baseEntity).clone(), creditorId);

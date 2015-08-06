@@ -57,7 +57,7 @@ public class BaseEntityOutput {
             }
 
             if(!valueIsNull)
-                str += "\n" + prefix + memberName + " : " + value.getId() + " : " + valueToString;
+                str += "\n" + prefix + memberName + " : " + value.getCreditorId() + " : " + valueToString;
         }
 
         return str;
