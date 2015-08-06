@@ -79,9 +79,11 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             entityStatus.setIndex(entity.getBatchIndex() - 1);
             entityStatus.setReceiptDate(new Date());
 
-            StatusProperties.fillSpecificProperties(entityStatus, baseEntity);
+            Map<String, String> params = StatusProperties.getSpecificParams(baseEntity);
 
-            batchService.addEntityStatus(entityStatus);
+            Long entityStatusId = batchService.addEntityStatus(entityStatus);
+            batchService.addEntityStatusParams(entityStatusId, params);
+
         } catch (Exception e) {
             logger.error("Batch id: " + baseEntity.getBatchId() + ", index: " + (baseEntity.getBatchIndex() - 1) +
                     ExceptionUtils.getStackTrace(e));
@@ -94,9 +96,10 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             entityStatus.setIndex(baseEntity.getBatchIndex() - 1);
             entityStatus.setReceiptDate(new Date());
 
-            StatusProperties.fillSpecificProperties(entityStatus, baseEntity);
+            Map<String, String> params = StatusProperties.getSpecificParams(baseEntity);
 
-            batchService.addEntityStatus(entityStatus);
+            Long entityStatusId = batchService.addEntityStatus(entityStatus);
+            batchService.addEntityStatusParams(entityStatusId, params);
         }
     }
 

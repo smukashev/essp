@@ -1,10 +1,8 @@
 package kz.bsbnb.usci.receiver.monitor;
 
-import com.couchbase.client.CouchbaseClient;
-import com.couchbase.client.protocol.views.*;
-import com.google.gson.Gson;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.model.json.*;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
@@ -13,7 +11,6 @@ import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
-import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -56,11 +53,6 @@ public class ZipFilesMonitor{
     private final Logger logger = LoggerFactory.getLogger(ZipFilesMonitor.class);
 
     @Autowired
-    private CouchbaseClientManager couchbaseClientManager;
-
-    private CouchbaseClient couchbaseClient;
-
-    @Autowired
     private IServiceRepository serviceFactory;
 
     @Autowired
@@ -90,27 +82,9 @@ public class ZipFilesMonitor{
     }
 
     public boolean restartBatch(long batchId) {
-        Gson gson = new Gson();
-
         try {
-            Object batchObject = couchbaseClient.get("batch:" + batchId);
-            Object manifestObject = couchbaseClient.get("manifest:" + batchId);
-
-            if (batchObject == null || manifestObject == null) {
-                System.out.println("Batch with id: " + batchId + " has no manifest or batch. Restart failed.");
-                return false;
-            }
-
-            try {
-                batchService.getBatch(batchId);
-            } catch(Exception e) {
-                System.out.println("Can't get batch from eav DB. Skipped.");
-                return false;
-            }
-
-            String batchInfoStr = manifestObject.toString();
-            BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
-
+            Batch batch = batchService.getBatch(batchId);
+            BatchInfo batchInfo = new BatchInfo(batch);
             System.out.println(batchId + " - restarted");
             sender.addJob(batchId, batchInfo);
             receiverStatusSingleton.batchReceived();
@@ -129,66 +103,19 @@ public class ZipFilesMonitor{
         creditors = serviceFactory.getRemoteCreditorBusiness().findMainOfficeCreditors();
         System.out.println("Found " + creditors.size() + " creditors");
 
-        Gson gson = new Gson();
-
-        couchbaseClient = couchbaseClientManager.get();
-
         IBatchService batchService = serviceFactory.getBatchService();
 
-        Iterator<ViewRow> rows = null;
-        ViewResponse response = null;
+        List<Batch> pendingBatchList = batchService.getPendingBatchList();
 
         while(true) {
-            if(rows == null) {
-                View view = couchbaseClient.getView("batch", "batch_pending");
-                Query query = new Query();
-                query.setDebug(false);
-                query.setStale(Stale.FALSE);
-
-                response = couchbaseClient.query(view, query);
-
-                rows = response.iterator();
-            }
-
-            if (response.size() > 0) {
-                System.out.println("Found pending jobs: " + response.size());
+            if (pendingBatchList.size() > 0) {
+                System.out.println("Found pending jobs: " + pendingBatchList.size());
                 System.out.println("-------------------------------------------------------------------------");
 
                 int jobsRestarted = 0;
 
-                while(rows.hasNext()) {
+                for (Batch batch : pendingBatchList) {
                     try {
-                        ViewRowNoDocs viewRowNoDocs = (ViewRowNoDocs) rows.next();
-                        long batchId = Long.parseLong(viewRowNoDocs.getKey());
-
-                        if (viewRowNoDocs.getValue().equals("ERROR"))
-                        {
-                            System.out.println("Skipped because of error!");
-                            continue;
-                        }
-
-                        System.out.println("batchId: " + batchId + ", status: " + viewRowNoDocs.getValue());
-
-                        Object batchObject = couchbaseClient.get("batch:" + batchId);
-                        Object manifestObject = couchbaseClient.get("manifest:" + batchId);
-
-                        if (batchObject == null || manifestObject == null) {
-                            System.out.println("Batch with id: " + batchId + " has no manifest or batch. Restart failed.");
-                            continue;
-                        }
-
-                        System.out.println(manifestObject.toString());
-                        System.out.println("-------------------------------------------------------------------------");
-
-                        BatchInfo batchInfo = gson.fromJson(manifestObject.toString(), BatchInfo.class);
-                        try {
-                            batchService.getBatch(batchId);
-                        } catch(Exception e) {
-                            System.out.println("Can't get batch from eav DB. Skipped.");
-                        }
-
-
-
                         //                        if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), cal.getTime()) != 0)
                         //                        {
                         //                            System.out.println("Skipping wrone dates: " + batchInfo.getRepDate());
@@ -196,7 +123,7 @@ public class ZipFilesMonitor{
                         //                            continue;
                         //                        }
 
-                        sender.addJob(batchId, batchInfo);
+                        sender.addJob(batch.getId(), new BatchInfo(batch));
                         receiverStatusSingleton.batchReceived();
                         System.out.println("Restarted job #" + ++jobsRestarted);
                     } catch (Exception e) {
@@ -408,14 +335,17 @@ public class ZipFilesMonitor{
                         if (job != null) {
                             jobLauncher.run(job, jobParametersBuilder.toJobParameters());
                             receiverStatusSingleton.batchStarted();
-                            batchService.addBatchStatus(nextJob.getBatchId(), BatchStatuses.PROCESSING);
+                            batchService.addBatchStatus(new BatchStatus()
+                                    .setBatchId(nextJob.getBatchId())
+                                    .setStatus(BatchStatuses.PROCESSING)
+                            );
                         } else {
                             logger.error("Unknown batch file type: " + nextJob.getBatchInfo().getBatchType() +
                                     " in batch with id: " + nextJob.getBatchId());
-                            batchService.addBatchStatus(
-                                    nextJob.getBatchId(),
-                                    BatchStatuses.ERROR,
-                                    "Unknown batch file type: " + nextJob.getBatchInfo().getBatchType()
+                            batchService.addBatchStatus(new BatchStatus()
+                                    .setBatchId(nextJob.getBatchId())
+                                    .setStatus(BatchStatuses.ERROR)
+                                    .setDescription("Unknown batch file type: " + nextJob.getBatchInfo().getBatchType())
                             );
                         }
 
@@ -458,7 +388,7 @@ public class ZipFilesMonitor{
         batch.setRepDate(batchInfo.getRepDate());
         batch.setReceiptDate(new Date());
         batch.setBatchType(batchInfo.getBatchType());
-        batch.setSize(batchInfo.getSize());
+        batch.setTotalCount(batchInfo.getSize());
 
         long batchId = batchService.uploadBatch(batch);
 
@@ -473,10 +403,10 @@ public class ZipFilesMonitor{
             } else {
                 cId = -1L;
 
-                batchService.addBatchStatus(
-                        batchId,
-                        BatchStatuses.ERROR,
-                        "Can't find user with id: " + batchInfo.getUserId()
+                batchService.addBatchStatus(new BatchStatus()
+                        .setBatchId(batchId)
+                        .setStatus(BatchStatuses.ERROR)
+                        .setDescription("Can't find user with id: " + batchInfo.getUserId())
                 );
 
                 haveError = true;
@@ -554,10 +484,10 @@ public class ZipFilesMonitor{
                     logger.error("Can't find creditor: " + docType +
                             ", " + docValue);
 
-                    batchService.addBatchStatus(
-                            batchId,
-                            BatchStatuses.ERROR,
-                            "Кредитор не найден"
+                    batchService.addBatchStatus(new BatchStatus()
+                            .setBatchId(batchId)
+                            .setStatus(BatchStatuses.ERROR)
+                            .setDescription("Кредитор не найден")
                     );
 
                     haveError = true;
@@ -577,7 +507,10 @@ public class ZipFilesMonitor{
         batchService.save(batch);
 
         if (!haveError) {
-            batchService.addBatchStatus(batchId, BatchStatuses.WAITING);
+            batchService.addBatchStatus(new BatchStatus()
+                    .setBatchId(batchId)
+                    .setStatus(BatchStatuses.WAITING)
+            );
             sender.addJob(batchId, batchInfo);
         }
     }
@@ -593,7 +526,11 @@ public class ZipFilesMonitor{
                         + creditorId +  ", отчетная дата = " + batchInfo.getRepDate();
                 logger.error(errMsg);
 
-                batchService.addBatchStatus(batchId, BatchStatuses.ERROR, errMsg);
+                batchService.addBatchStatus(new BatchStatus()
+                        .setBatchId(batchId)
+                        .setStatus(BatchStatuses.ERROR)
+                        .setDescription(errMsg)
+                );
                 return false;
             }
         } else {
@@ -792,7 +729,6 @@ public class ZipFilesMonitor{
                 } catch (SAXException e) {
                     e.printStackTrace();
                 }
-
 
                 batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent());
                 batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent());

@@ -79,7 +79,6 @@ public class StatusSingleton {
             e.printStackTrace();
         }
 
-
         OperationFuture<Boolean> result = client.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
 
         while(true) if(result.isDone()) break; // must be completed

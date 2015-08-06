@@ -3,13 +3,13 @@ package kz.bsbnb.usci.sync.job.impl;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.sync.job.AbstractJob;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @author k.tulbassiyev
@@ -35,9 +35,10 @@ public class ProcessJob extends AbstractJob {
                 .setReceiptDate(new Date())
                 .setIndex(baseEntity.getBatchIndex() - 1);
 
-        StatusProperties.fillSpecificProperties(entityStatus, baseEntity);
+        Map<String, String> params = StatusProperties.getSpecificParams(baseEntity);
 
-        batchService.addEntityStatus(entityStatus);
+        Long entityStatusId = batchService.addEntityStatus(entityStatus);
+        batchService.addEntityStatusParams(entityStatusId, params);
 
         long t1 = System.currentTimeMillis();
         entityService.process(baseEntity);

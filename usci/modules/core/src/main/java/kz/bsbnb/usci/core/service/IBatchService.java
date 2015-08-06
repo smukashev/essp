@@ -3,10 +3,10 @@ package kz.bsbnb.usci.core.service;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EntityStatus;
-import kz.bsbnb.usci.eav.util.BatchStatuses;
-import kz.bsbnb.usci.eav.util.EntityStatuses;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface IBatchService {
 
@@ -16,20 +16,26 @@ public interface IBatchService {
 
     long uploadBatch(Batch batch);
 
-    void addBatchStatus(long batchId, long statusId, String description);
-
-    void addBatchStatus(long batchId, BatchStatuses batchStatus, String description);
-
-    void addBatchStatus(BatchStatus batchStatus);
-
-    void addEntityStatus(long batchId, long entityId, long statusId, Long index, String description);
-
-    void addEntityStatus(long batchId, long entityId, EntityStatuses entityStatus, Long index, String description);
+    Long addBatchStatus(BatchStatus batchStatus);
 
     void endBatch(long batchId);
 
-    void addEntityStatus(EntityStatus entityStatus);
+    Long addEntityStatus(EntityStatus entityStatus);
 
     List<EntityStatus> getEntityStatusList(long batchId);
+
+    List<BatchStatus> getBatchStatusList(long batchId);
+
+    List<Batch> getPendingBatchList();
+
+    List<Batch> getBatchListToSign(long userId);
+
+    void signBatch(long batchId, String sign);
+
+    List<Batch> getAll(Date repDate);
+
+    Map<String, String> getEntityStatusParams(long entityStatusId);
+
+    void addEntityStatusParams(long entityStatusId, Map<String, String> params);
 
 }

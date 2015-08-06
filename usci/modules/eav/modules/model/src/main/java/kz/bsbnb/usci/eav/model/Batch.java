@@ -7,9 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * General information about the batch, such as:
@@ -40,7 +38,9 @@ public class Batch extends Persistable
     private String sign;
 
     private String batchType;
-    private Long size;
+    private Long totalCount;
+    private Long actualCount;
+    private Long reportId;
 
     public Batch() {}
 
@@ -226,11 +226,27 @@ public class Batch extends Persistable
         this.batchType = batchType;
     }
 
-    public Long getSize() {
-        return size;
+    public Long getTotalCount() {
+        return totalCount;
     }
 
-    public void setSize(Long size) {
-        this.size = size;
+    public void setTotalCount(Long totalCount) {
+        this.totalCount = totalCount;
+    }
+
+    public Long getActualCount() {
+        return actualCount;
+    }
+
+    public void setActualCount(Long actualCount) {
+        this.actualCount = actualCount;
+    }
+
+    public Long getReportId() {
+        return reportId;
+    }
+
+    public void setReportId(Long reportId) {
+        this.reportId = reportId;
     }
 }

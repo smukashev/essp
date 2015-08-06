@@ -1,9 +1,5 @@
 package kz.bsbnb.usci.cli.app;
 
-import com.couchbase.client.protocol.views.Query;
-import com.couchbase.client.protocol.views.View;
-import com.couchbase.client.protocol.views.ViewResponse;
-import com.couchbase.client.protocol.views.ViewRow;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
@@ -25,10 +21,6 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
-import kz.bsbnb.usci.eav.model.json.BatchInfo;
-import kz.bsbnb.usci.eav.model.json.EntityStatusArrayJModel;
-import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -53,7 +45,6 @@ import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 import kz.bsbnb.usci.tool.status.SyncStatus;
 import kz.bsbnb.usci.tool.status.SystemStatus;
-import net.spy.memcached.OperationTimeoutException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -491,7 +482,7 @@ public class CLI {
 
                             fout.write((batchId + "," +
                                     batch.getFileName() + "," +
-                                    batch.getSize() + "," +
+                                    batch.getTotalCount() + "," +
                                     row_count + "," + error_count + "\n").getBytes());
                         }
                         break;
@@ -632,10 +623,10 @@ public class CLI {
                                     error_count++;
                             }
 
-                            if (error_count > 0 || row_count != batch.getSize()) {
+                            if (error_count > 0 || row_count != batch.getTotalCount()) {
                                 fout.write((batchId + "," +
                                         batch.getFileName() + "," +
-                                        batch.getSize() + "," + row_count + "," + error_count +
+                                        batch.getTotalCount() + "," + row_count + "," + error_count +
                                         ",restarted\n").getBytes());
 
                                 //sender.addJob(batchId, batchInfo);
@@ -644,7 +635,7 @@ public class CLI {
                             } else {
                                 fout.write((batchId + "," +
                                         batch.getFileName() + "," +
-                                        batch.getSize() + "," + row_count + "," + error_count +
+                                        batch.getTotalCount() + "," + row_count + "," + error_count +
                                         ",skipped\n").getBytes());
                             }
                         }
@@ -767,7 +758,7 @@ public class CLI {
 
                             fout.write((batchId + "," +
                                     batch.getFileName() + "," +
-                                    batch.getSize() + ",restarted\n").getBytes());
+                                    batch.getTotalCount() + ",restarted\n").getBytes());
 
                             batchProcessService.restartBatch(batchId);
                         }
@@ -856,7 +847,7 @@ public class CLI {
         //if (error_count > 0 || row_count != batchInfo.getSize()) {
         System.out.println(batchId + "," +
                 batch.getFileName() + "," +
-                batch.getSize() + "," + row_count + "," + error_count + ",restarted");
+                batch.getTotalCount() + "," + row_count + "," + error_count + ",restarted");
 
         //sender.addJob(batchId, batchInfo);
         //receiverStatusSingleton.batchReceived();

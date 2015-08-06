@@ -91,9 +91,10 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                         .setReceiptDate(new Date())
                         .setIndex(entity.getBatchIndex() - 1);
 
-                StatusProperties.fillSpecificProperties(entityStatus, entity);
+                Map<String, String> params = StatusProperties.getSpecificParams(entity);
 
-                batchService.addEntityStatus(entityStatus);
+                Long entityStatusId = batchService.addEntityStatus(entityStatus);
+                batchService.addEntityStatusParams(entityStatusId, params);
             }
 
             List<String> errors = new LinkedList<String>(entity.getValidationErrors());
@@ -125,9 +126,10 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                         .setReceiptDate(new Date())
                         .setIndex(entity.getBatchIndex() - 1);
 
-                StatusProperties.fillSpecificProperties(entityStatus, entity);
+                Map<String, String> params = StatusProperties.getSpecificParams(entity);
 
-                batchService.addEntityStatus(entityStatus);
+                Long entityStatusId = batchService.addEntityStatus(entityStatus);
+                batchService.addEntityStatusParams(entityStatusId, params);
 
             } else if (errors != null && errors.size() > 0) {
                 for (String errorMsg : errors) {
@@ -142,9 +144,10 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                             .setReceiptDate(new Date())
                             .setIndex(entity.getBatchIndex() - 1);
 
-                    StatusProperties.fillSpecificProperties(entityStatus, entity);
+                    Map<String, String> params = StatusProperties.getSpecificParams(entity);
 
-                    batchService.addEntityStatus(entityStatus);
+                    Long entityStatusId = batchService.addEntityStatus(entityStatus);
+                    batchService.addEntityStatusParams(entityStatusId, params);
                 }
             } else {
                 EntityStatus entityStatus = new EntityStatus()
@@ -154,9 +157,10 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                         .setReceiptDate(new Date())
                         .setIndex(entity.getBatchIndex() - 1);
 
-                StatusProperties.fillSpecificProperties(entityStatus, entity);
+                Map<String, String> params = StatusProperties.getSpecificParams(entity);
 
-                batchService.addEntityStatus(entityStatus);
+                Long entityStatusId = batchService.addEntityStatus(entityStatus);
+                batchService.addEntityStatusParams(entityStatusId, params);
 
                 entitiesToSave.add(entity);
             }

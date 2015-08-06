@@ -16,8 +16,6 @@ public class EntityStatus extends Persistable {
     private Date receiptDate;
     private Long index;
 
-    // TODO maks add properties
-
     private EntityStatuses status;
 
     public long getBatchId() {

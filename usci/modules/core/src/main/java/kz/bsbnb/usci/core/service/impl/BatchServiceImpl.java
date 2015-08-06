@@ -22,6 +22,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author k.tulbassiyev
@@ -88,66 +89,92 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     @Override
-    public void addBatchStatus(long batchId, long statusId, String description) {
-        BatchStatus batchStatus = new BatchStatus();
-        batchStatus.setBatchId(batchId);
-        batchStatus.setStatusId(statusId);
-        batchStatus.setDescription(description);
-        batchStatus.setReceiptDate(new Date());
-        batchStatusDao.insert(batchStatus);
-    }
-
-    @Override
-    public void addBatchStatus(long batchId, BatchStatuses batchStatus, String description) {
-        EavGlobal status = globalService.getGlobal(batchStatus);
-        addBatchStatus(batchId, status.getId(), description);
-    }
-
-    @Override
-    public void addBatchStatus(BatchStatus batchStatus) {
+    public Long addBatchStatus(BatchStatus batchStatus) {
         if (batchStatus.getStatusId() < 1 && batchStatus.getStatus() != null) {
             EavGlobal status = globalService.getGlobal(batchStatus.getStatus());
             batchStatus.setStatusId(status.getId());
         }
-        batchStatusDao.insert(batchStatus);
-    }
-
-    @Override
-    public void addEntityStatus(long batchId, long entityId, long statusId, Long index, String description) {
-        EntityStatus entityStatus = new EntityStatus();
-        entityStatus.setBatchId(batchId);
-        entityStatus.setEntityId(entityId);
-        entityStatus.setStatusId(statusId);
-        entityStatus.setDescription(description);
-        entityStatus.setReceiptDate(new Date());
-        entityStatus.setIndex(index);
-        entityStatusDao.insert(entityStatus);
-    }
-
-    @Override
-    public void addEntityStatus(long batchId, long entityId, EntityStatuses entityStatus, Long index, String description) {
-        EavGlobal status = globalService.getGlobal(entityStatus);
-        addEntityStatus(batchId, entityId, status.getId(), index, description);
+        return batchStatusDao.insert(batchStatus);
     }
 
     @Override
     public void endBatch(long batchId) {
         EavGlobal statusCompleted = globalService.getGlobal(BatchStatuses.COMPLETED);
-        addBatchStatus(batchId, statusCompleted.getId(), null);
+        addBatchStatus(new BatchStatus()
+                .setBatchId(batchId)
+                .setStatusId(statusCompleted.getId())
+        );
     }
 
     @Override
-    public void addEntityStatus(EntityStatus entityStatus) {
+    public Long addEntityStatus(EntityStatus entityStatus) {
         if (entityStatus.getStatusId() < 1 && entityStatus.getStatus() != null) {
             EavGlobal status = globalService.getGlobal(entityStatus.getStatus());
             entityStatus.setStatusId(status.getId());
         }
-        entityStatusDao.insert(entityStatus);
+        return entityStatusDao.insert(entityStatus);
     }
 
     @Override
     public List<EntityStatus> getEntityStatusList(long batchId) {
-        return entityStatusDao.getList(batchId);
+        List<EntityStatus> entityStatusList = entityStatusDao.getList(batchId);
+
+        for (EntityStatus entityStatus : entityStatusList) {
+            if (entityStatus.getStatusId() > 0 && entityStatus.getStatus() == null) {
+                EavGlobal status = globalService.getGlobal(entityStatus.getStatusId());
+                entityStatus.setStatus(EntityStatuses.valueOf(status.getCode()));
+            }
+        }
+
+        return entityStatusList;
+    }
+
+    @Override
+    public List<BatchStatus> getBatchStatusList(long batchId) {
+        List<BatchStatus> batchStatusList = batchStatusDao.getList(batchId);
+
+        for (BatchStatus batchStatus : batchStatusList) {
+            if (batchStatus.getStatusId() > 0 && batchStatus.getStatus() == null) {
+                EavGlobal status = globalService.getGlobal(batchStatus.getStatusId());
+                batchStatus.setStatus(BatchStatuses.valueOf(status.getCode()));
+            }
+        }
+
+        return batchStatusList;
+    }
+
+    @Override
+    public List<Batch> getPendingBatchList() {
+        return batchDao.getPendingBatchList();
+    }
+
+    @Override
+    public List<Batch> getBatchListToSign(long userId) {
+        return batchDao.getBatchListToSign(userId);
+    }
+
+    @Override
+    public void signBatch(long batchId, String sign) {
+        Batch batch = batchDao.load(batchId);
+        batch.setSign(sign);
+        batchDao.save(batch);
+    }
+
+    @Override
+    public List<Batch> getAll(Date repDate) {
+        return batchDao.getAll(repDate);
+    }
+
+    @Override
+    public Map<String, String> getEntityStatusParams(long entityStatusId) {
+        return batchDao.getEntityStatusParams(entityStatusId);
+    }
+
+    @Override
+    public void addEntityStatusParams(long entityStatusId, Map<String, String> params) {
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            batchDao.addEntityStatusParam(entityStatusId, entry.getKey(), entry.getValue());
+        }
     }
 
 }

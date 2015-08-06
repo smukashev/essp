@@ -3,8 +3,6 @@ package kz.bsbnb.usci.sync.service.impl;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EntityStatus;
-import kz.bsbnb.usci.eav.util.BatchStatuses;
-import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,7 +10,9 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author k.tulbassiyev
@@ -46,53 +46,13 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     @Override
-    public void addBatchStatus(long batchId, long statusId) {
-        remoteBatchService.addBatchStatus(batchId, statusId, null);
+    public Long addBatchStatus(BatchStatus batchStatus) {
+        return remoteBatchService.addBatchStatus(batchStatus);
     }
 
     @Override
-    public void addBatchStatus(long batchId, long statusId, String description) {
-        remoteBatchService.addBatchStatus(batchId, statusId, description);
-    }
-
-    @Override
-    public void addBatchStatus(long batchId, BatchStatuses batchStatus) {
-        remoteBatchService.addBatchStatus(batchId, batchStatus, null);
-    }
-
-    @Override
-    public void addBatchStatus(long batchId, BatchStatuses batchStatus, String description) {
-        remoteBatchService.addBatchStatus(batchId, batchStatus, description);
-    }
-
-    @Override
-    public void addBatchStatus(BatchStatus batchStatus) {
-        remoteBatchService.addBatchStatus(batchStatus);
-    }
-
-    @Override
-    public void addEntityStatus(long batchId, long entityId, long statusId, Long index) {
-        remoteBatchService.addEntityStatus(batchId, entityId, statusId, index, null);
-    }
-
-    @Override
-    public void addEntityStatus(long batchId, long entityId, long statusId, Long index, String description) {
-        remoteBatchService.addEntityStatus(batchId, entityId, statusId, index, description);
-    }
-
-    @Override
-    public void addEntityStatus(long batchId, long entityId, EntityStatuses entityStatus, Long index) {
-        remoteBatchService.addEntityStatus(batchId, entityId, entityStatus, index, null);
-    }
-
-    @Override
-    public void addEntityStatus(long batchId, long entityId, EntityStatuses entityStatus, Long index, String description) {
-        remoteBatchService.addEntityStatus(batchId, entityId, entityStatus, index, description);
-    }
-
-    @Override
-    public void addEntityStatus(EntityStatus entityStatus) {
-        remoteBatchService.addEntityStatus(entityStatus);
+    public Long addEntityStatus(EntityStatus entityStatus) {
+        return remoteBatchService.addEntityStatus(entityStatus);
     }
 
     @Override
@@ -103,5 +63,40 @@ public class BatchServiceImpl implements IBatchService {
     @Override
     public List<EntityStatus> getEntityStatusList(long batchId) {
         return remoteBatchService.getEntityStatusList(batchId);
+    }
+
+    @Override
+    public List<BatchStatus> getBatchStatusList(long batchId) {
+        return remoteBatchService.getBatchStatusList(batchId);
+    }
+
+    @Override
+    public List<Batch> getPendingBatchList() {
+        return remoteBatchService.getPendingBatchList();
+    }
+
+    @Override
+    public List<Batch> getBatchListToSign(long userId) {
+        return remoteBatchService.getBatchListToSign(userId);
+    }
+
+    @Override
+    public void signBatch(long batchId, String sign) {
+        remoteBatchService.signBatch(batchId, sign);
+    }
+
+    @Override
+    public List<Batch> getAll(Date repDate) {
+        return remoteBatchService.getAll(repDate);
+    }
+
+    @Override
+    public Map<String, String> getEntityStatusParams(long entityStatusId) {
+        return remoteBatchService.getEntityStatusParams(entityStatusId);
+    }
+
+    @Override
+    public void addEntityStatusParams(long entityStatusId, Map<String, String> params) {
+        remoteBatchService.addEntityStatusParams(entityStatusId, params);
     }
 }

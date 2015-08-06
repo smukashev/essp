@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav.model.json;
 
+import kz.bsbnb.usci.eav.model.Batch;
+
 import java.util.Date;
 import java.util.HashMap;
 
@@ -17,6 +19,18 @@ public class BatchInfo {
     private long reportId;
     private long totalCount;
     private long actualCount;
+
+    public BatchInfo() {}
+
+    public BatchInfo(Batch batch) {
+        setReportId(batch.getReportId());
+        setRepDate(batch.getRepDate());
+        setBatchType(batch.getBatchType());
+        setSize(batch.getTotalCount());
+        setTotalCount(batch.getTotalCount());
+        setActualCount(batch.getActualCount());
+        setUserId(batch.getUserId());
+    }
 
     public String getBatchName() {
         return batchName;
@@ -85,7 +99,7 @@ public class BatchInfo {
         return totalCount;
     }
 
-    public void setTotalCount(int totalCount) {
+    public void setTotalCount(long totalCount) {
         this.totalCount = totalCount;
     }
 
@@ -93,7 +107,7 @@ public class BatchInfo {
         return actualCount;
     }
 
-    public void setActualCount(int actualCount) {
+    public void setActualCount(long actualCount) {
         this.actualCount = actualCount;
     }
 }
