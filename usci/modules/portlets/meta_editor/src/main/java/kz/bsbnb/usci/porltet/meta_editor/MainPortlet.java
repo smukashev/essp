@@ -322,6 +322,7 @@ public class MainPortlet extends MVCPortlet {
                         Boolean is_key  = false;
                         Boolean is_required  = false;
                         Boolean is_nullable  = false;
+                        Boolean is_final = false;
                         if (dotIndex < 0) {
                             className = attrPath;
                         } else {
@@ -383,9 +384,11 @@ public class MainPortlet extends MVCPortlet {
                                 is_key  = Boolean.parseBoolean(resourceRequest.getParameter("is_Key"));
                                 is_required  = Boolean.parseBoolean(resourceRequest.getParameter("is_Required"));
                                 is_nullable  = Boolean.parseBoolean(resourceRequest.getParameter("is_Nullable"));
+                                is_final  = Boolean.parseBoolean(resourceRequest.getParameter("is_Final"));
                                 attrToAdd.setKey(is_key);
                                 attrToAdd.setRequired(is_required);
                                 attrToAdd.setNullable(is_nullable);
+                                attrToAdd.setFinal(is_final);
                                 metaParent.setMetaAttribute(attrPathCode, attrToAdd);
 
                             }
