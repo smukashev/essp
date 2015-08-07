@@ -1328,7 +1328,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 EAV_M_CLASSES.ID,
                 EAV_M_CLASSES.NAME,
                 EAV_M_CLASSES.TITLE,
-                EAV_M_CLASSES.IS_DISABLED
+                EAV_M_CLASSES.IS_DISABLED,
+                EAV_M_CLASSES.IS_REFERENCE
         ).from(EAV_M_CLASSES);
 
         if(refs)
@@ -1351,6 +1352,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
              metaClassName.setClassName((String) row.get("name"));
             metaClassName.setClassTitle((String) row.get("title"));
             metaClassName.setDisabled(((BigDecimal) row.get("is_disabled")).longValue() == 1);
+            metaClassName.setReference(((BigDecimal) row.get("is_reference")).longValue() == 1);
             metaClassNameList.add(metaClassName);
         }
 

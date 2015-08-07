@@ -126,6 +126,7 @@ public class MainPortlet extends MVCPortlet {
                         else
                             metaClassListEntry.setClassName(metaName.getClassName());
                         metaClassListEntry.setDisabled(metaName.isDisabled());
+                        metaClassListEntry.setReference(metaName.isReference());
                         classesListJson.getData().add(metaClassListEntry);
                     }
 
@@ -289,6 +290,7 @@ public class MainPortlet extends MVCPortlet {
                     if (classId != null && classId.trim().length() > 0) {
                         String className = resourceRequest.getParameter("className");
                         String isDisabled = resourceRequest.getParameter("isDisabled");
+                        String isReference = resourceRequest.getParameter("isReference");
                         MetaClass meta = null;
                         try {
 
@@ -302,6 +304,7 @@ public class MainPortlet extends MVCPortlet {
 
                         meta.setClassTitle(className);
                         meta.setDisabled(Boolean.parseBoolean(isDisabled));
+                        meta.setReference(Boolean.parseBoolean(isReference));
 
                        // meta.setClassName(classId);
 

@@ -3,12 +3,18 @@ Ext.require([
     'Ext.panel.*'
 ]);
 
-function createMCForm(classId, className, PisDisabled, grid, record)
+function createMCForm(classId, className, PisDisabled,PisReference, grid, record)
 {
     var isDisabled = [
         ['false', 'Активный'],
         ['true', 'Не активный'],
     ];
+
+    var isReference = [
+        ['false', 'Не справочник'],
+        ['true', 'Справочник'],
+    ];
+
     var buttonSave = Ext.create('Ext.button.Button', {
         id: "createMCFormOK",
         text: 'Сохранить',
@@ -98,6 +104,31 @@ function createMCForm(classId, className, PisDisabled, grid, record)
                     scope: this,
                     afterRender: function(me){
                         me.setValue(PisDisabled.toString());
+                    }
+                }
+            },
+            {
+                fieldLabel: 'Тип класса',
+                id: 'isReference',
+                name: 'isReference',
+                xtype: 'combobox',
+                store: new Ext.data.SimpleStore({
+                    id:0,
+                    fields:
+                        [
+                            'isReference',
+                            'Text'
+                        ],
+                    data: isReference
+
+                }),
+                valueField:'isReference',
+                displayField:'Text',
+                queryMode:'local',
+                listeners:{
+                    scope: this,
+                    afterRender: function(me){
+                        me.setValue(PisReference.toString());
                     }
                 }
             }

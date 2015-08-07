@@ -8,6 +8,7 @@ public class MetaClassName implements Serializable
     private String classTitle;
     private long id;
     private boolean disabled = false;
+    private boolean isReference = false;
 
     public String getClassName()
     {
@@ -45,5 +46,13 @@ public class MetaClassName implements Serializable
 
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
+    }
+
+    public boolean isReference() {
+        return isReference;
+    }
+
+    public void setReference(boolean isReference) {
+        this.isReference = isReference;
     }
 }
