@@ -769,7 +769,7 @@
 		<column name="begin_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="end_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="index" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="status_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<!--<foreign-key foreignTable="eav_global" name="ebs_FK_eg_id">
 			<reference local="status_id" foreign="id"/>
