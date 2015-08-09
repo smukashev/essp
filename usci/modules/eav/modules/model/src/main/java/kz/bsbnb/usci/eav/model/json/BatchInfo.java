@@ -27,8 +27,8 @@ public class BatchInfo {
         setRepDate(batch.getRepDate());
         setBatchType(batch.getBatchType());
         setSize(batch.getTotalCount());
-        setTotalCount(batch.getTotalCount());
-        setActualCount(batch.getActualCount());
+        setTotalCount(batch.getTotalCount() != null ? batch.getTotalCount() : 0);
+        setActualCount(batch.getActualCount() != null ? batch.getActualCount() : 0);
         setUserId(batch.getUserId());
     }
 

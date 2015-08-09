@@ -53,9 +53,6 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     IBaseEntityLoadDao baseEntityLoadDao;
 
     @Autowired
-    IEntityService entityService;
-
-    @Autowired
     IBatchService batchService;
 
     public EntityServiceImpl() throws RemoteException {
@@ -73,7 +70,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
             EntityStatus entityStatus = new EntityStatus();
             entityStatus.setBatchId(baseEntity.getBatchId());
-            entityStatus.setEntityId(baseEntity.getId());
+            entityStatus.setEntityId(entity.getId());
             entityStatus.setStatus(EntityStatuses.COMPLETED);
             entityStatus.setDescription("" + entity.getId());
             entityStatus.setIndex(entity.getBatchIndex() - 1);

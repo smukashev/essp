@@ -162,7 +162,7 @@ public class CLI {
     public void initBatchService() {
         if (batchService == null) {
             batchServiceFactoryBean = new RmiProxyFactoryBean();
-            batchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService"); // TODO check
+            batchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/batchService");
             batchServiceFactoryBean.setServiceInterface(IBatchService.class);
             batchServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 

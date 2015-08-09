@@ -45,7 +45,6 @@ public class StatusProperties
     }
 
     public static Map<String, String> getSpecificParams(BaseEntity entity) {
-        // TODO maks
         Map<String, String> params = new HashMap<>();
 
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");

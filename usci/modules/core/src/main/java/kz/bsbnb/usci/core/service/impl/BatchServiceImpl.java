@@ -14,10 +14,13 @@ import kz.bsbnb.usci.eav.util.EntityStatuses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,7 +56,12 @@ public class BatchServiceImpl implements IBatchService {
     @Override
     public Batch getBatch(long batchId) {
         Batch batch = batchDao.load(batchId);
-        File file = new File(getFilePath(batch));
+
+        if (batch.getRepDate() == null || batch.getCreditorId() == null || batch.getHash() == null) {
+            return batch;
+        }
+
+        File file = new File(getFullFilePath(batch));
 
         try {
             byte[] bytes = FileCopyUtils.copyToByteArray(file);
@@ -68,24 +76,48 @@ public class BatchServiceImpl implements IBatchService {
 
     @Override
     public long uploadBatch(Batch batch) {
+        setHash(batch);
         saveBatchFile(batch);
         return batchDao.save(batch);
     }
 
     private void saveBatchFile(Batch batch) {
-        File outputFile = new File(getFilePath(batch));
+        File repDateDir = new File(getCreditorDirPath(batch));
+
+        if (!repDateDir.exists()) {
+            repDateDir.mkdirs();
+        }
+
+        File outputFile = new File(getFullFilePath(batch));
 
         try {
+            if (!outputFile.exists()) {
+                outputFile.createNewFile();
+            }
+
             FileCopyUtils.copy(batch.getContent(), outputFile);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private String getFilePath(Batch batch) {
+    private String getFullFilePath(Batch batch) {
+        if (batch.getRepDate() == null || batch.getCreditorId() == null || batch.getHash() == null) {
+            throw new RuntimeException("repDate, creditorId and hash are required for file path!");
+        }
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         return batchSaveDir + "/" + df.format(batch.getRepDate())
                 + "/" + batch.getCreditorId() + "/" + batch.getHash();
+    }
+
+    private String getCreditorDirPath(Batch batch) {
+        if (batch.getRepDate() == null || batch.getCreditorId() == null) {
+            throw new RuntimeException("repDate, creditorId are required for creditor dir path!");
+        }
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        return batchSaveDir + "/" + df.format(batch.getRepDate())
+                + "/" + batch.getCreditorId();
     }
 
     @Override
@@ -103,6 +135,7 @@ public class BatchServiceImpl implements IBatchService {
         addBatchStatus(new BatchStatus()
                 .setBatchId(batchId)
                 .setStatusId(statusCompleted.getId())
+                .setReceiptDate(new Date())
         );
     }
 
@@ -175,6 +208,11 @@ public class BatchServiceImpl implements IBatchService {
         for (Map.Entry<String, String> entry : params.entrySet()) {
             batchDao.addEntityStatusParam(entityStatusId, entry.getKey(), entry.getValue());
         }
+    }
+
+    public void setHash(Batch batch) {
+        String hash = DigestUtils.md5DigestAsHex(batch.getContent());
+        batch.setHash(hash);
     }
 
 }

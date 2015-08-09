@@ -717,11 +717,9 @@
 		<column name="user_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="receipt_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="begin_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="end_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="rep_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="file_name" primaryKey="false" required="true" type="VARCHAR" size="2048" autoIncrement="false"/>
-		<column name="hash" primaryKey="false" required="true" type="VARCHAR" size="128" autoIncrement="false"/>
+		<column name="file_name" primaryKey="false" required="false" type="VARCHAR" size="2048" autoIncrement="false"/>
+		<column name="hash" primaryKey="false" required="false" type="VARCHAR" size="128" autoIncrement="false"/>
 		<column name="sign" primaryKey="false" required="false" type="VARCHAR" size="2048" autoIncrement="false"/>
 		<column name="batch_type" primaryKey="false" required="false" type="VARCHAR" size="1" autoIncrement="false"/>
 		<column name="total_count" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>

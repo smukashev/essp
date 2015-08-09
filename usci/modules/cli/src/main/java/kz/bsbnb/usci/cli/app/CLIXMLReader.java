@@ -114,7 +114,8 @@ public class CLIXMLReader {
 
         batch = new Batch(reportDate, 1L);
 
-        batchService.save(batch);
+        long batchId = batchService.save(batch);
+        batch.setId(batchId);
     }
 
     /////////////////////////

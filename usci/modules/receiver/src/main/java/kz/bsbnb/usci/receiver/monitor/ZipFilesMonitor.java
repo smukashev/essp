@@ -42,8 +42,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.*;
 
 /**
  * @author abukabayev
@@ -76,7 +75,6 @@ public class ZipFilesMonitor{
 
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
-        batchService = serviceFactory.getBatchService();
         sender = new SenderThread();
         sender.start();
     }
@@ -98,6 +96,8 @@ public class ZipFilesMonitor{
 
     @PostConstruct
     public void init() {
+        batchService = serviceFactory.getBatchService();
+
         sender.setReceiverStatusSingleton(receiverStatusSingleton);
         System.out.println("Retrieving creditors list");
         creditors = serviceFactory.getRemoteCreditorBusiness().findMainOfficeCreditors();
@@ -338,6 +338,7 @@ public class ZipFilesMonitor{
                             batchService.addBatchStatus(new BatchStatus()
                                     .setBatchId(nextJob.getBatchId())
                                     .setStatus(BatchStatuses.PROCESSING)
+                                    .setReceiptDate(new Date())
                             );
                         } else {
                             logger.error("Unknown batch file type: " + nextJob.getBatchInfo().getBatchType() +
@@ -346,6 +347,7 @@ public class ZipFilesMonitor{
                                     .setBatchId(nextJob.getBatchId())
                                     .setStatus(BatchStatuses.ERROR)
                                     .setDescription("Unknown batch file type: " + nextJob.getBatchInfo().getBatchType())
+                                    .setReceiptDate(new Date())
                             );
                         }
 
@@ -390,7 +392,8 @@ public class ZipFilesMonitor{
         batch.setBatchType(batchInfo.getBatchType());
         batch.setTotalCount(batchInfo.getSize());
 
-        long batchId = batchService.uploadBatch(batch);
+        long batchId = batchService.save(batch);
+        batch.setId(batchId);
 
         Long cId = -1l;
         boolean haveError = false;
@@ -407,6 +410,7 @@ public class ZipFilesMonitor{
                         .setBatchId(batchId)
                         .setStatus(BatchStatuses.ERROR)
                         .setDescription("Can't find user with id: " + batchInfo.getUserId())
+                        .setReceiptDate(new Date())
                 );
 
                 haveError = true;
@@ -488,6 +492,7 @@ public class ZipFilesMonitor{
                             .setBatchId(batchId)
                             .setStatus(BatchStatuses.ERROR)
                             .setDescription("Кредитор не найден")
+                            .setReceiptDate(new Date())
                     );
 
                     haveError = true;
@@ -495,21 +500,20 @@ public class ZipFilesMonitor{
             }
         }
 
+
         if(!haveError && !checkAndFillEavReport(cId, batchInfo, batchId)) {
             haveError = true;
         }
 
-        BatchFullJModel batchFullJModel = new BatchFullJModel(batchId, filename, bytes, new Date(),
-                batchInfo.getUserId(), cId);
-
         batch.setCreditorId(cId);
-
-        batchService.save(batch);
+        batch.setReportId(batchInfo.getReportId());
+        batchService.uploadBatch(batch);
 
         if (!haveError) {
             batchService.addBatchStatus(new BatchStatus()
                     .setBatchId(batchId)
                     .setStatus(BatchStatuses.WAITING)
+                    .setReceiptDate(new Date())
             );
             sender.addJob(batchId, batchInfo);
         }
@@ -530,6 +534,7 @@ public class ZipFilesMonitor{
                         .setBatchId(batchId)
                         .setStatus(BatchStatuses.ERROR)
                         .setDescription(errMsg)
+                        .setReceiptDate(new Date())
                 );
                 return false;
             }

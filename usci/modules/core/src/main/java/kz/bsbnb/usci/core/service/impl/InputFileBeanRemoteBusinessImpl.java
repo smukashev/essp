@@ -1,8 +1,5 @@
 package kz.bsbnb.usci.core.service.impl;
 
-import com.couchbase.client.CouchbaseClient;
-import com.couchbase.client.protocol.views.*;
-import com.google.gson.Gson;
 import kz.bsbnb.usci.core.service.IBatchService;
 import kz.bsbnb.usci.core.service.InputFileBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.InputFile;
@@ -11,16 +8,11 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.BatchFullStatusJModel;
 import kz.bsbnb.usci.eav.model.json.BatchSign;
-import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
-import net.spy.memcached.internal.OperationFuture;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -46,8 +38,6 @@ public class InputFileBeanRemoteBusinessImpl implements InputFileBeanRemoteBusin
 
     @Override
     public List<InputFile> getFilesForSigning(long userId) {
-        // TODO maks check
-
         List<Batch> batchListToSign = batchService.getBatchListToSign(userId);
 
         ArrayList<InputFile> files = new ArrayList<InputFile>();
@@ -67,8 +57,6 @@ public class InputFileBeanRemoteBusinessImpl implements InputFileBeanRemoteBusin
 
     @Override
     public void signFile(long fileId, String sign) {
-        // TODO maks check
-
         batchService.signBatch(fileId, sign);
     }
 }

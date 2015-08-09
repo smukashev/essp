@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.sql.*;
-import java.sql.Date;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BATCHES;
@@ -41,7 +40,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
             return null;
         }
 
-        Batch batch = new Batch(new Date(System.currentTimeMillis()));
+        Batch batch = new Batch();
         batch.setId(id);
 
         loadBatch(batch);
@@ -67,8 +66,6 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
 
     @Override
     public List<Batch> getPendingBatchList() {
-        // TODO maks check
-
         EavGlobal statusCompleted = eavGlobalDao.get(BatchStatuses.COMPLETED.type(), BatchStatuses.COMPLETED.code());
 
         Select select = context.select(
@@ -80,8 +77,6 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
                 EAV_BATCHES.SIGN,
                 EAV_BATCHES.REP_DATE,
                 EAV_BATCHES.RECEIPT_DATE,
-                EAV_BATCHES.BEGIN_DATE,
-                EAV_BATCHES.END_DATE,
                 EAV_BATCHES.BATCH_TYPE,
                 EAV_BATCHES.TOTAL_COUNT,
                 EAV_BATCHES.ACTUAL_COUNT,
@@ -94,8 +89,8 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
                                 .partitionBy(EAV_BATCH_STATUSES.BATCH_ID)
                                 .orderBy(EAV_BATCH_STATUSES.RECEIPT_DATE.desc()).as("num")
                 ).from(EAV_BATCH_STATUSES).asTable("bs")
-        ).on(EAV_BATCHES.ID.eq(EAV_BATCH_STATUSES.BATCH_ID))
-        .where(DSL.field("\"bs\".\"num\"").eq(1)).and(DSL.field("\"bs\".STATUS_ID").eq(statusCompleted.getId()));
+        ).on(EAV_BATCHES.ID.eq(DSL.field("\"bs\".\"BATCH_ID\"", Long.class)))
+        .where(DSL.field("\"bs\".\"num\"").eq(1)).and(DSL.field("\"bs\".STATUS_ID").ne(statusCompleted.getId()));
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
@@ -110,8 +105,6 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
 
     @Override
     public List<Batch> getBatchListToSign(long userId) {
-        // TODO maks check
-
         Select select = context.selectFrom(EAV_BATCHES)
                 .where(EAV_BATCHES.USER_ID.eq(userId)).and(EAV_BATCHES.SIGN.isNull());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -148,8 +141,6 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
 
     @Override
     public Map<String, String> getEntityStatusParams(long entityStatusId) {
-        // TODO maks check
-
         Select select = context.selectFrom(EAV_ENTITY_STATUS_PARAMS)
                 .where(EAV_ENTITY_STATUS_PARAMS.ENTITY_STATUS_ID.eq(entityStatusId));
 
@@ -169,8 +160,6 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
 
     @Override
     public void addEntityStatusParam(long entityStatusId, String key, String value) {
-        // TODO maks check
-
         Insert insert = context.insertInto(EAV_ENTITY_STATUS_PARAMS,
                 EAV_ENTITY_STATUS_PARAMS.ENTITY_STATUS_ID,
                 EAV_ENTITY_STATUS_PARAMS.KEY,
@@ -198,8 +187,6 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
                 EAV_BATCHES.SIGN,
                 EAV_BATCHES.REP_DATE,
                 EAV_BATCHES.RECEIPT_DATE,
-                EAV_BATCHES.BEGIN_DATE,
-                EAV_BATCHES.END_DATE,
                 EAV_BATCHES.BATCH_TYPE,
                 EAV_BATCHES.TOTAL_COUNT,
                 EAV_BATCHES.ACTUAL_COUNT,
@@ -212,8 +199,6 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
                 batch.getSign(),
                 DataUtils.convert(batch.getRepDate()),
                 DataUtils.convertToTimestamp(batch.getReceiptDate()),
-                DataUtils.convertToTimestamp(batch.getBeginDate()),
-                DataUtils.convertToTimestamp(batch.getEndDate()),
                 batch.getBatchType(),
                 batch.getTotalCount(),
                 batch.getActualCount(),
@@ -240,8 +225,6 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
                 .set(EAV_BATCHES.SIGN, batch.getSign())
                 .set(EAV_BATCHES.REP_DATE, DataUtils.convert(batch.getRepDate()))
                 .set(EAV_BATCHES.RECEIPT_DATE, DataUtils.convertToTimestamp(batch.getReceiptDate()))
-                .set(EAV_BATCHES.BEGIN_DATE, DataUtils.convertToTimestamp(batch.getBeginDate()))
-                .set(EAV_BATCHES.END_DATE, DataUtils.convertToTimestamp(batch.getEndDate()))
                 .set(EAV_BATCHES.BATCH_TYPE, batch.getBatchType())
                 .set(EAV_BATCHES.TOTAL_COUNT, batch.getTotalCount())
                 .set(EAV_BATCHES.ACTUAL_COUNT, batch.getActualCount())
@@ -284,20 +267,23 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
 
     private Batch fillBatch(Batch batch, Map<String, Object> row) {
         batch.setId(((BigDecimal)row.get(EAV_BATCHES.ID.getName())).longValue());
-        batch.setUserId(((BigDecimal) row.get(EAV_BATCHES.USER_ID.getName())).longValue());
-        batch.setCreditorId(((BigDecimal) row.get(EAV_BATCHES.CREDITOR_ID.getName())).longValue());
+        batch.setUserId(getNullSafeLong(row, EAV_BATCHES.USER_ID));
+        batch.setCreditorId(getNullSafeLong(row, EAV_BATCHES.CREDITOR_ID));
         batch.setFileName((String) row.get(EAV_BATCHES.FILE_NAME.getName()));
         batch.setHash((String) row.get(EAV_BATCHES.HASH.getName()));
         batch.setSign((String) row.get(EAV_BATCHES.SIGN.getName()));
         batch.setRepDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.REP_DATE.getName())));
         batch.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.RECEIPT_DATE.getName())));
-        batch.setBeginDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.BEGIN_DATE.getName())));
-        batch.setEndDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.END_DATE.getName())));
         batch.setBatchType((String) row.get(EAV_BATCHES.BATCH_TYPE.getName()));
-        batch.setTotalCount(((BigDecimal) row.get(EAV_BATCHES.TOTAL_COUNT.getName())).longValue());
-        batch.setActualCount(((BigDecimal) row.get(EAV_BATCHES.ACTUAL_COUNT.getName())).longValue());
-        batch.setReportId(((BigDecimal) row.get(EAV_BATCHES.REPORT_ID.getName())).longValue());
+        batch.setTotalCount(getNullSafeLong(row, EAV_BATCHES.TOTAL_COUNT));
+        batch.setActualCount(getNullSafeLong(row, EAV_BATCHES.ACTUAL_COUNT));
+        batch.setReportId(getNullSafeLong(row, EAV_BATCHES.REPORT_ID));
         return batch;
+    }
+
+    private Long getNullSafeLong(Map<String, Object> row, Field field) {
+        Object o = row.get(field.getName());
+        return o == null ? null : ((BigDecimal) o).longValue();
     }
 
 }

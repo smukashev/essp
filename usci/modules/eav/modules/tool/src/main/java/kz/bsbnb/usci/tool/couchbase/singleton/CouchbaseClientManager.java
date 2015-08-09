@@ -12,7 +12,7 @@ import java.util.ArrayList;
 /**
  * Created by maksat on 6/22/15.
  */
-@Component
+//@Component
 public class CouchbaseClientManager {
 
     private CouchbaseClient couchbaseClient;

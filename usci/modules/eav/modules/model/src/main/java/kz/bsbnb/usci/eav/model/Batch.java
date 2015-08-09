@@ -4,6 +4,7 @@ import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.DigestUtils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -23,8 +24,6 @@ public class Batch extends Persistable
      * Date and time of receipt of the batch.
      */
     private Date receiptDate;
-    private Date beginDate;
-    private Date endDate;
 
     private Date repDate;
 
@@ -94,6 +93,11 @@ public class Batch extends Persistable
 
     public void setReceiptDate(Date receiptDate)
     {
+        if (receiptDate == null) {
+            this.receiptDate = null;
+            return;
+        }
+
         Date newReceiptDate = (Date)receiptDate.clone();
         DataUtils.toBeginningOfTheSecond(newReceiptDate);
 
@@ -103,28 +107,6 @@ public class Batch extends Persistable
     public Date getReceiptDate()
     {
         return receiptDate;
-    }
-
-    public Date getBeginDate() {
-        return beginDate;
-    }
-
-    public void setBeginDate(Date beginDate) {
-        Date newBeginDate = (Date)beginDate.clone();
-        DataUtils.toBeginningOfTheSecond(newBeginDate);
-
-        this.beginDate = beginDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        Date newEndDate = (Date)endDate.clone();
-        DataUtils.toBeginningOfTheSecond(newEndDate);
-
-        this.endDate = endDate;
     }
 
     public Long getUserId() {
@@ -163,6 +145,11 @@ public class Batch extends Persistable
 
     public void setRepDate(Date reportDate)
     {
+        if (reportDate == null) {
+            this.repDate = null;
+            return;
+        }
+
         Date newReportDate = (Date)reportDate.clone();
         DataUtils.toBeginningOfTheDay(newReportDate);
 
@@ -190,16 +177,7 @@ public class Batch extends Persistable
     }
 
     public void setContent(byte[] content) {
-        try {
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-            String hash = md5.digest(content).toString();
-
-            this.content = content;
-            this.hash = hash;
-
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        this.content = content;
     }
 
     public String getHash() {

@@ -80,6 +80,7 @@
                     <value>classpath:properties/main.properties</value>
                     <value>classpath:properties/refs.properties</value>
                     <value>classpath:properties/jms.properties</value>
+                    <value>classpath:properties/batch.properties</value>
                 </list>
             </property>
         </bean>

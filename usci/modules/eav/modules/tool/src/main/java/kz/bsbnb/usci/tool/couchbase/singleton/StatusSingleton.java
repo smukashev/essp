@@ -19,7 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 @Deprecated
-@Component
+//@Component
 public class StatusSingleton {
     @Autowired(required = true)
     private ICouchbaseClientFactory clientFactory;

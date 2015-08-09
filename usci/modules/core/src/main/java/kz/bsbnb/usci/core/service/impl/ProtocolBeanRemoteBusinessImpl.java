@@ -45,8 +45,6 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
 
         long batchId = inputInfoId.getId().longValue();
 
-        batchService.getBatch(batchId);
-
         List<EntityStatus> entityStatusList = batchService.getEntityStatusList(batchId);
 
         for (EntityStatus entityStatus : entityStatusList) {
@@ -61,7 +59,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
     private void fillProtocol(EntityStatus entityStatus, InputInfo inputInfoId, ArrayList<Protocol> list) {
         Protocol protocol = new Protocol();
         protocol.setId(1L);
-        protocol.setPackNo(entityStatus.getIndex());
+        protocol.setPackNo(entityStatus.getIndex() != null ? entityStatus.getIndex() : -1l);
         protocol.setInputInfo(inputInfoId);
 
         Message message = new Message();
@@ -90,7 +88,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
             if (COMPLETED == entityStatus.getStatus()) {
                 message.setNameRu("Идентификатор сущности:");
                 message.setNameKz("Идентификатор сущности:");
-                protocol.setNote(entityStatus.getDescription());
+                protocol.setNote(entityStatus.getEntityId() + "");
             }
 
             Map<String, String> entityStatusParams = batchService.getEntityStatusParams(entityStatus.getId());
