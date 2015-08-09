@@ -1,29 +1,19 @@
 package kz.bsbnb.usci.bconv.cr.parser.impl;
 
-import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
+import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexSet;
-import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseSetComplexValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.Date;
 
-/**
- *
- * @author k.tulbassiyev
- */
 @Component
 @Scope("prototype")
 public class PortfolioDataParser extends BatchParser {
@@ -32,7 +22,7 @@ public class PortfolioDataParser extends BatchParser {
 
     @Autowired
     private PortfolioFlowMsfoParser portfolioFlowMsfoParser = new PortfolioFlowMsfoParser();
-    
+
     public PortfolioDataParser() {
         super();
     }
@@ -42,20 +32,22 @@ public class PortfolioDataParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_data"),batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_data"), batch.getRepDate());
     }
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        if(localName.equals("portfolio_data")) {
+        if (localName.equals("portfolio_data")) {
             // do nothing
-        } else if(localName.equals("portfolio_flow")) {
+        } else if (localName.equals("portfolio_flow")) {
             portfolioFlowParser.parse(xmlReader, batch, index);
-            getPortfolioFlow().put(new BaseSetComplexValue(batch, index, portfolioFlowParser.getCurrentBaseEntity()));
+            getPortfolioFlow().put(new BaseSetComplexValue(-1, batch, index,
+                    portfolioFlowParser.getCurrentBaseEntity()));
 
-        } else if(localName.equals("portfolio_flow_msfo")) {
+        } else if (localName.equals("portfolio_flow_msfo")) {
             portfolioFlowMsfoParser.parse(xmlReader, batch, index);
-            getPortfolioFlowMsfo().put(new BaseSetComplexValue(batch, index, portfolioFlowMsfoParser.getCurrentBaseEntity()));
+            getPortfolioFlowMsfo().put(new BaseSetComplexValue(-1, batch, index,
+                    portfolioFlowMsfoParser.getCurrentBaseEntity()));
 
         } else {
             throw new UnknownTagException(localName);
@@ -63,15 +55,17 @@ public class PortfolioDataParser extends BatchParser {
 
         return false;
     }
-    
+
     @Override
     public boolean endElement(String localName) throws SAXException {
-        if(localName.equals("portfolio_data")) {
+        if (localName.equals("portfolio_data")) {
             if (portfolioFlow != null) {
-                currentBaseEntity.put("portfolio_flows_kfn",new BaseEntityComplexSet(batch,index,portfolioFlow));
+                currentBaseEntity.put("portfolio_flows_kfn", new BaseEntityComplexSet(-1, batch, index,
+                        portfolioFlow));
             }
             if (portfolioFlowMsfo != null) {
-                currentBaseEntity.put("portfolio_flows_msfo", new BaseEntityComplexSet(batch,index,portfolioFlowMsfo));
+                currentBaseEntity.put("portfolio_flows_msfo", new BaseEntityComplexSet(-1, batch, index,
+                        portfolioFlowMsfo));
             }
             return true;
         } else {

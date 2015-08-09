@@ -22,6 +22,7 @@ public class BaseEntityOutput {
     public static String toString(BaseEntity entity, String prefix) {
         String str = entity.getMeta().getClassName() + "(" + entity.getId() + ", " +
                 dateFormat.format(entity.getReportDate()) + ");";
+
         MetaClass meta = entity.getMeta();
 
         for (String memberName : meta.getMemberNames()) {
@@ -56,9 +57,7 @@ public class BaseEntityOutput {
             }
 
             if(!valueIsNull)
-                str += "\n" + prefix + memberName + " : " +
-                        (value == null ? "" : value.getMetaAttribute().getId()) +
-                        " : " + valueToString;
+                str += "\n" + prefix + memberName + " : " + value.getCreditorId() + " : " + valueToString;
         }
 
         return str;

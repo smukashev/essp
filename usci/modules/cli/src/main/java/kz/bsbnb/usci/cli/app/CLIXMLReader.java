@@ -183,12 +183,12 @@ public class CLIXMLReader {
                 //metaFactoryService.getBaseEntity((MetaClass)metaType, batch.getRepDate());
                 level++;
             } else if (!metaType.isComplex() && !metaType.isSet()) {
-                Object o = null;
+                Object obj = null;
                 MetaValue metaValue = (MetaValue) metaType;
 
                 try {
                     event = (XMLEvent) xmlEventReader.next();
-                    o = getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
+                    obj = getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
                     //xmlEventReader.next();
                 } catch (NumberFormatException n) {
                     n.printStackTrace();
@@ -197,7 +197,7 @@ public class CLIXMLReader {
                     level--;
                 }
 
-                if (o != null) {
+                if (obj != null) {
                     hasMembers = true;
                 }
 
@@ -207,7 +207,8 @@ public class CLIXMLReader {
                 }
 
                 currentContainer.put(memberName, BaseValueFactory
-                        .create(currentContainer.getBaseContainerType(), metaType, batch, index, o));
+                        .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch, index,
+                                batch.getRepDate(), obj, false, true));
 
                 level++;
             }
@@ -277,7 +278,8 @@ public class CLIXMLReader {
                 if (currentContainer.isSet()) {
                     if (hasMembers) {
                         ((BaseSet) currentContainer).put(BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, batch, index, o));
+                                .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch, index,
+                                        batch.getRepDate(), o, false, true));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
@@ -286,18 +288,19 @@ public class CLIXMLReader {
                 } else {
                     if (hasMembers) {
                         currentContainer.put(localName, BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, batch, index, o));
+                                .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch, index,
+                                        batch.getRepDate(), o, false, true));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
                         currentContainer.put(localName, BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, batch, index, null));
+                                .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch, index,
+                                        batch.getRepDate(), null, false, true));
                         hasMembers = flagsStack.pop();
                     }
                 }
-
-                //hasMembers = flagsStack.pop();
             }
+
             level--;
         }
 

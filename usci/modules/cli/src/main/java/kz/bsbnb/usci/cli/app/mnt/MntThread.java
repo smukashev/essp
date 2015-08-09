@@ -129,7 +129,7 @@ public class MntThread extends Thread {
                     continue;
                 }
 
-                baseEntityProcessorDao.prepare(credit);
+                baseEntityProcessorDao.prepare(credit, creditorId);
 
                 if(credit.getId() <= 0) {
                     System.out.println("credit not found contractNo=" + contractNo + " contractDate=" + contractDate );

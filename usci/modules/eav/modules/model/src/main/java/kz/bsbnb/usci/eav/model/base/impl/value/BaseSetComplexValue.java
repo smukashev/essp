@@ -7,17 +7,14 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 
 import java.util.Date;
 
-/**
- * @author alexandr.motov
- */
 public class BaseSetComplexValue extends BaseSetValue<IBaseEntity> {
-
-    public BaseSetComplexValue(long id, Batch batch, long index, Date reportDate, IBaseEntity value, boolean closed, boolean last) {
-        super(id, batch, index, reportDate, value, closed, last);
+    public BaseSetComplexValue(long id, long creditorId, Batch batch, long index, Date reportDate, IBaseEntity value,
+                               boolean closed, boolean last) {
+        super(id, creditorId, batch, index, reportDate, value, closed, last);
     }
 
-    public BaseSetComplexValue(Batch batch, long index, IBaseEntity value) {
-        super(batch, index, value);
+    public BaseSetComplexValue(long creditorId, Batch batch, long index, IBaseEntity value) {
+        super(creditorId, batch, index, value);
     }
 
 }

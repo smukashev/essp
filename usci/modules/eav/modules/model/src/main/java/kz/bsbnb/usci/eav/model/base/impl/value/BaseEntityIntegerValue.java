@@ -6,17 +6,14 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 
 import java.util.Date;
 
-/**
- * @author alexandr.motov
- */
 public class BaseEntityIntegerValue extends BaseValue<Integer> implements IBaseValue<Integer> {
-
-    public BaseEntityIntegerValue(long id, Batch batch, long index, Date reportDate, Integer value, boolean closed, boolean last) {
-        super(id, batch, index, reportDate, value, closed, last);
+    public BaseEntityIntegerValue(long id, long creditorId, Batch batch, long index, Date reportDate, Integer value,
+                                  boolean closed, boolean last) {
+        super(id, creditorId, batch, index, reportDate, value, closed, last);
     }
 
-    public BaseEntityIntegerValue(Batch batch, long index, Integer value) {
-        super(batch, index, value);
+    public BaseEntityIntegerValue(long creditorId, Batch batch, long index, Integer value) {
+        super(creditorId, batch, index, value);
     }
 
 }

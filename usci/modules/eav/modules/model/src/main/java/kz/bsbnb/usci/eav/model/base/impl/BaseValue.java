@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
-
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -13,49 +12,29 @@ import kz.bsbnb.usci.eav.model.meta.IMetaValue;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DataUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-/**
- * Attributes value place holder for BaseEntity. Contains information about batch and record number of the value's
- * origin and reference to the actual value as an instance of Object.
- *
- * @see kz.bsbnb.usci.eav.model.base.impl.BaseEntity
- *
- * @author a.motov
- */
-public class BaseValue<T> extends Persistable implements IBaseValue<T>
-{
+public class BaseValue<T> extends Persistable implements IBaseValue<T> {
 
     public static final boolean DEFAULT_LAST = true;
 
     public static final boolean DEFAULT_CLOSED = false;
 
-    Logger logger = LoggerFactory.getLogger(BaseValue.class);
-
     private UUID uuid = UUID.randomUUID();
 
     private IBaseContainer baseContainer;
+
+    private long creditorId;
 
     private IMetaAttribute metaAttribute;
 
     private IBaseValue newBaseValue = null;
 
-    /**
-     * Information about the sequential number of record in the batch
-     */
     private long index;
 
-    /**
-     * Information about the origin of this value.
-     */
     private Batch batch;
 
-    /**
-     * Can be a simple type, an array or a complex type.
-     */
     private T value;
 
     private Date reportDate;
@@ -64,28 +43,24 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
 
     private boolean closed = DEFAULT_CLOSED;
 
-    public BaseValue(Batch batch, long index, Date reportDate, T value)
-    {
-        this(DEFAULT_ID, batch, index, reportDate, value, DEFAULT_CLOSED, DEFAULT_LAST);
+    public BaseValue(long creditorId, Batch batch, long index, Date reportDate, T value) {
+        this(DEFAULT_ID, creditorId, batch, index, reportDate, value, DEFAULT_CLOSED, DEFAULT_LAST);
     }
 
-    public BaseValue(Batch batch, long index, Date reportDate, T value, boolean closed, boolean last)
-    {
-        this(DEFAULT_ID, batch, index, reportDate, value, closed, last);
+    public BaseValue(long creditorId, Batch batch, long index, Date reportDate, T value, boolean closed, boolean last) {
+        this(DEFAULT_ID, creditorId, batch, index, reportDate, value, closed, last);
     }
 
-    public BaseValue(long id, Batch batch, long index, Date reportDate, T value)
-    {
-        this(id, batch, index, reportDate, value, DEFAULT_CLOSED, DEFAULT_LAST);
+    public BaseValue(long id, long creditorId, Batch batch, long index, Date reportDate, T value) {
+        this(id, creditorId, batch, index, reportDate, value, DEFAULT_CLOSED, DEFAULT_LAST);
     }
 
-    public BaseValue(Batch batch, long index, T value)
-    {
-        this(DEFAULT_ID, batch, index, batch.getRepDate(), value, DEFAULT_CLOSED, DEFAULT_LAST);
+    public BaseValue(long creditorId, Batch batch, long index, T value) {
+        this(DEFAULT_ID, creditorId, batch, index, batch.getRepDate(), value, DEFAULT_CLOSED, DEFAULT_LAST);
     }
 
-    public BaseValue(long id, Batch batch, long index, Date reportDate, T value, boolean closed, boolean last)
-    {
+    public BaseValue(long id, long creditorId, Batch batch, long index, Date reportDate, T value, boolean closed,
+                     boolean last) {
         super(id);
 
         if (batch == null)
@@ -100,12 +75,13 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
             throw new IllegalArgumentException
                     ("reportDate is null. Initialization of the BaseValue ​​is not possible.");
 
-        Date newReportDate = (Date)reportDate.clone();
+        Date newReportDate = (Date) reportDate.clone();
         DataUtils.toBeginningOfTheDay(newReportDate);
 
+        this.creditorId = creditorId;
         this.batch = batch;
         this.index = index;
-        this.value = (T)value;
+        this.value = value;
         this.reportDate = newReportDate;
         this.closed = closed;
         this.last = last;
@@ -122,6 +98,16 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
     }
 
     @Override
+    public long getCreditorId() {
+        return creditorId;
+    }
+
+    @Override
+    public void setCreditorId(long creditorId) {
+        this.creditorId = creditorId;
+    }
+
+    @Override
     public IMetaAttribute getMetaAttribute() {
         return metaAttribute;
     }
@@ -132,8 +118,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
     }
 
     @Override
-    public Batch getBatch()
-    {
+    public Batch getBatch() {
         return batch;
     }
 
@@ -143,26 +128,22 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
     }
 
     @Override
-    public long getIndex()
-    {
+    public long getIndex() {
         return index;
     }
 
     @Override
-    public void setIndex(long index)
-    {
+    public void setIndex(long index) {
         this.index = index;
     }
 
     @Override
-    public T getValue()
-    {
+    public T getValue() {
         return value;
     }
 
     @Override
-    public void setValue(T value)
-    {
+    public void setValue(T value) {
         this.value = value;
     }
 
@@ -171,26 +152,22 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
     }
 
     @Override
-    public void setLast(boolean last)
-    {
+    public void setLast(boolean last) {
         this.last = last;
     }
 
     @Override
-    public boolean isLast()
-    {
+    public boolean isLast() {
         return last;
     }
 
     @Override
-    public void setClosed(boolean closed)
-    {
+    public void setClosed(boolean closed) {
         this.closed = closed;
     }
 
     @Override
-    public boolean isClosed()
-    {
+    public boolean isClosed() {
         return closed;
     }
 
@@ -205,8 +182,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (obj == this)
             return true;
 
@@ -215,30 +191,26 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
 
         if (!(getClass() == obj.getClass()))
             return false;
-        else
-        {
-            BaseValue that = (BaseValue)obj;
+        else {
+            BaseValue that = (BaseValue) obj;
             return value != null ? value.equals(that.value) : that.value == null;
         }
     }
 
     @Override
-    public Date getRepDate()
-    {
+    public Date getRepDate() {
         return reportDate;
     }
 
-    public void setRepDate(Date reportDate)
-    {
-        Date newReportDate = (Date)reportDate.clone();
+    public void setRepDate(Date reportDate) {
+        Date newReportDate = (Date) reportDate.clone();
         DataUtils.toBeginningOfTheDay(newReportDate);
 
         this.reportDate = newReportDate;
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + (int) (index ^ (index >>> 32));
         result = 31 * result + batch.hashCode();
@@ -247,135 +219,110 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
         return result;
     }
 
-    public boolean equalsByValue(IBaseValue baseValue)
-    {
+    public boolean equalsByValue(IBaseValue baseValue) {
         IMetaAttribute thisMetaAttribute = this.getMetaAttribute();
         IMetaAttribute thatMetaAttribute = baseValue.getMetaAttribute();
 
-        if (thisMetaAttribute == null || thatMetaAttribute == null)
-        {
+        if (thisMetaAttribute == null || thatMetaAttribute == null) {
             throw new RuntimeException("Comparison values of two instances of BaseValue without meta data is not possible.");
         }
 
-        if (thisMetaAttribute.getId() == thatMetaAttribute.getId())
-        {
+        if (thisMetaAttribute.getId() == thatMetaAttribute.getId()) {
             return this.equalsByValue(thisMetaAttribute.getMetaType(), baseValue);
         }
 
         return false;
     }
 
-    public boolean equalsByValue(IMetaType metaType, IBaseValue baseValue)
-    {
+    public boolean equalsByValue(IMetaType metaType, IBaseValue baseValue) {
         Object thisValue = this.getValue();
         Object thatValue = baseValue.getValue();
 
-        if (thisValue == null || thatValue == null)
-        {
+        if (thisValue == null || thatValue == null) {
             throw new RuntimeException("Comparison values of two instances of BaseValue with null values is not possible.");
         }
 
-        if (metaType.isSetOfSets())
-        {
+        if (metaType.isSetOfSets()) {
             throw new UnsupportedOperationException("Not yet implemented");
         }
 
-        if (metaType.isComplex())
-        {
-            if (metaType.isSet())
-            {
-                IBaseSet thisBaseSet = (IBaseSet)thisValue;
-                IBaseSet thatBaseSet = (IBaseSet)thatValue;
+        if (metaType.isComplex()) {
+            if (metaType.isSet()) {
+                IBaseSet thisBaseSet = (IBaseSet) thisValue;
+                IBaseSet thatBaseSet = (IBaseSet) thatValue;
 
                 List<Long> thisIds = new ArrayList<Long>();
-                for (IBaseValue thisChildBaseValue : thisBaseSet.get())
-                {
-                    IBaseEntity thisBaseEntity = (IBaseEntity)thisChildBaseValue.getValue();
+                for (IBaseValue thisChildBaseValue : thisBaseSet.get()) {
+                    IBaseEntity thisBaseEntity = (IBaseEntity) thisChildBaseValue.getValue();
                     thisIds.add(thisBaseEntity.getId());
                 }
 
                 List<Long> thatIds = new ArrayList<Long>();
-                for (IBaseValue thatChildBaseValue : thatBaseSet.get())
-                {
-                    BaseEntity thatBaseEntity = (BaseEntity)thatChildBaseValue.getValue();
+                for (IBaseValue thatChildBaseValue : thatBaseSet.get()) {
+                    BaseEntity thatBaseEntity = (BaseEntity) thatChildBaseValue.getValue();
                     thatIds.add(thatBaseEntity.getId());
                 }
                 Collections.sort(thatIds);
                 Collections.sort(thatIds);
 
                 return thisIds.equals(thatIds);
-            }
-            else
-            {
-                IBaseEntity thisBaseEntity = (IBaseEntity)thisValue;
-                IBaseEntity thatBaseEntity = (IBaseEntity)thatValue;
+            } else {
+                IBaseEntity thisBaseEntity = (IBaseEntity) thisValue;
+                IBaseEntity thatBaseEntity = (IBaseEntity) thatValue;
                 return thisBaseEntity.getId() == thatBaseEntity.getId() && thisBaseEntity.getId() > 0;
             }
-        }
-        else
-        {
-            if (metaType.isSetOfSets())
-            {
+        } else {
+            if (metaType.isSetOfSets()) {
                 throw new UnsupportedOperationException("Не реализовано;");
             }
 
-            if (metaType.isSet())
-            {
-                IMetaSet metaSet = (IMetaSet)metaType;
+            if (metaType.isSet()) {
+                IMetaSet metaSet = (IMetaSet) metaType;
                 IMetaType childMetaType = metaSet.getMemberType();
 
-                IBaseSet thisBaseSet = (IBaseSet)thisValue;
-                IBaseSet thatBaseSet = (IBaseSet)thatValue;
+                IBaseSet thisBaseSet = (IBaseSet) thisValue;
+                IBaseSet thatBaseSet = (IBaseSet) thatValue;
 
                 boolean baseValueNotFound;
                 Set<UUID> processedUuids = new HashSet<UUID>();
-                for (IBaseValue thisBaseValue: thisBaseSet.get())
-                {
+                for (IBaseValue thisBaseValue : thisBaseSet.get()) {
                     baseValueNotFound = true;
-                    for (IBaseValue thatBaseValue: thatBaseSet.get())
-                    {
-                        if (processedUuids.contains(thatBaseValue.getUuid()))
-                        {
+                    for (IBaseValue thatBaseValue : thatBaseSet.get()) {
+                        if (processedUuids.contains(thatBaseValue.getUuid())) {
                             continue;
                         }
 
-                        if (thisBaseValue.equalsByValue(childMetaType, thatBaseValue))
-                        {
+                        if (thisBaseValue.equalsByValue(childMetaType, thatBaseValue)) {
                             processedUuids.add(thatBaseValue.getUuid());
                             baseValueNotFound = false;
                             break;
                         }
                     }
 
-                    if (baseValueNotFound)
-                    {
+                    if (baseValueNotFound) {
                         return false;
                     }
                 }
 
                 return true;
-            }
-            else
-            {
-                IMetaValue metaValue = (IMetaValue)metaType;
+            } else {
+                IMetaValue metaValue = (IMetaValue) metaType;
                 return metaValue.getTypeCode() == DataTypes.DATE ?
-                        DataUtils.compareBeginningOfTheDay((Date)thisValue, (Date)thatValue) == 0 :
+                        DataUtils.compareBeginningOfTheDay((Date) thisValue, (Date) thatValue) == 0 :
                         thisValue.equals(thatValue);
             }
         }
     }
 
-    public boolean equalsToString(String str, DataTypes type)
-    {
-        switch (type)
-        {
+    public boolean equalsToString(String str, DataTypes type) {
+        switch (type) {
             case INTEGER:
                 if (value.equals(Integer.parseInt(str)))
                     return true;
                 break;
             case DATE:
                 //TODO: add date format
-                break;
+                throw new UnsupportedOperationException("DATE is not supported!;");
             case STRING:
                 if (value.equals(str))
                     return true;
@@ -396,32 +343,24 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T>
     }
 
     @Override
-    public BaseValue clone()
-    {
-        BaseValue baseValue = null;
-        try
-        {
-            baseValue = (BaseValue)super.clone();
-            baseValue.setRepDate((Date)reportDate.clone());
+    public BaseValue clone() {
+        BaseValue baseValue;
+        try {
+            baseValue = (BaseValue) super.clone();
+            baseValue.setRepDate((Date) reportDate.clone());
 
-            if (value != null)
-            {
-                if (value instanceof BaseEntity)
-                {
-                    baseValue.setValue(((BaseEntity)value).clone());
+            if (value != null) {
+                if (value instanceof BaseEntity) {
+                    baseValue.setValue(((BaseEntity) value).clone());
                 }
-                if (value instanceof BaseSet)
-                {
-                    baseValue.setValue(((BaseSet)value).clone());
+                if (value instanceof BaseSet) {
+                    baseValue.setValue(((BaseSet) value).clone());
                 }
-                if (value instanceof Date)
-                {
-                    baseValue.setValue(((Date)value).clone());
+                if (value instanceof Date) {
+                    baseValue.setValue(((Date) value).clone());
                 }
             }
-        }
-        catch(CloneNotSupportedException ex)
-        {
+        } catch (CloneNotSupportedException ex) {
             throw new RuntimeException("BaseValue class does not implement interface Cloneable.");
         }
         return baseValue;

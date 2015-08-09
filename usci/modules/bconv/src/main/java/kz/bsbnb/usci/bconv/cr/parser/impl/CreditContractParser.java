@@ -4,77 +4,59 @@ import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownValException;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDateValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.text.ParseException;
-import java.util.Date;
 
-/**
- *
- * @author k.tulbassiyev
- */
 @Component
 @Scope("prototype")
-public class CreditContractParser  extends BatchParser {
+public class CreditContractParser extends BatchParser {
     public CreditContractParser() {
         super();
     }
 
     @Override
-    public void init()
-    {
+    public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("contract"), batch.getRepDate());
     }
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         try {
-            if(localName.equals("contract")) {
-            } else if(localName.equals("no")) {
+            if (localName.equals("contract")) {
+            } else if (localName.equals("no")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("no", new BaseEntityStringValue(batch, index, event.asCharacters().getData()));
-            } else if(localName.equals("date")) {
+                currentBaseEntity.put("no", new BaseEntityStringValue(-1, batch, index,
+                        event.asCharacters().getData()));
+            } else if (localName.equals("date")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("date", new BaseEntityDateValue(batch, index,
-                        dateFormat.parse(event.asCharacters().getData())
-                ));
+                currentBaseEntity.put("date", new BaseEntityDateValue(-1, batch, index,
+                        dateFormat.parse(event.asCharacters().getData())));
             } else {
                 throw new UnknownTagException(localName);
             }
-        } catch(ParseException parseException) {
+        } catch (ParseException parseException) {
             throw new UnknownValException(localName, event.asCharacters().getData());
         }
 
         return false;
-    }       
-    
+    }
+
     @Override
     public boolean endElement(String localName) throws SAXException {
-        //try {
-            if(localName.equals("contract")) {
-                //ctCredit.setContract(ctContract);
-                //xmlReader.setContentHandler(contentHandler);
-                return true;
-            } else if(localName.equals("no")) {
-                //ctContract.setNo(contents.toString());
-            } else if(localName.equals("date")) {
-                //ctContract.setDate(convertDateToCalendar(dateFormat.parse(contents.toString())));
-            } else {
-                throw new UnknownTagException(localName);
-            }
-        /*} catch(ParseException parseException) {
-            throw new UnknownValException(localName, contents.toString());
-        }*/
+        if (localName.equals("contract")) {
+            return true;
+        } else if (localName.equals("no")) {
+        } else if (localName.equals("date")) {
+        } else {
+            throw new UnknownTagException(localName);
+        }
         return false;
-    }  
+    }
 }

@@ -36,8 +36,6 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
     private ExecutorService exec = Executors.newCachedThreadPool();
 
-    private static ReadWriteLock lock = new ReentrantReadWriteLock();
-
     @Override
     public void onMessage(Message message) {
         if (message instanceof ObjectMessage) {
@@ -64,6 +62,8 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     showcaseDao.deleteById(h, queueEntry.getBaseEntityApplied());
                 } else if (queueEntry.getBaseEntityApplied().getOperation() == OperationType.NEW) {
                     throw new UnsupportedOperationException("Operation new not supported in showcase");
+                } else if (queueEntry.getBaseEntityApplied().getOperation() == OperationType.CLOSE) {
+                    throw new UnsupportedOperationException("Operation close not supported in showcase");
                 } else {
                     boolean found = false;
 
@@ -83,8 +83,9 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     }
 
                     if(!found)
-                        System.err.println("MetaClass " + queueEntry.getBaseEntityApplied().getMeta().getClassName() +
-                                " couldn't find matching ShowCase");
+                        System.err.println("Для мета класа  " +
+                                queueEntry.getBaseEntityApplied().getMeta().getClassName() +
+                                " нет существующих витрин;");
 
                     for (Future f : futures)
                         f.get();
@@ -92,6 +93,8 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     futures.removeAll(futures);
                 }
             } catch (Exception e) {
+                e.printStackTrace();
+
                 logger.error(e.getMessage());
 
                 StringBuilder sb = new StringBuilder();

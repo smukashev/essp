@@ -1,30 +1,19 @@
 package kz.bsbnb.usci.bconv.cr.parser.impl;
 
-import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
+import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDateValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import java.text.ParseException;
-import java.util.Date;
-
-import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownValException;
 
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.text.ParseException;
 
-/**
- *
- * @author k.tulbassiyev
- */
 @Component
 @Scope("prototype")
 public class ChangeParser extends BatchParser {
@@ -39,44 +28,45 @@ public class ChangeParser extends BatchParser {
 
     private BaseEntityDateValue maturityDate;
     private BaseEntityDateValue prolongationDate;
-    
+
     public ChangeParser() {
         super();
     }
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("change"),batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("change"), batch.getRepDate());
     }
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        if(localName.equals("change")) {
-        } else if(localName.equals("turnover")) {
+        if (localName.equals("change")) {
+        } else if (localName.equals("turnover")) {
             changeTurnoverParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("turnover",new BaseEntityComplexValue(batch,index,changeTurnoverParser.getCurrentBaseEntity()));
-        } else if(localName.equals("remains")) {
+            currentBaseEntity.put("turnover", new BaseEntityComplexValue(-1, batch, index,
+                    changeTurnoverParser.getCurrentBaseEntity()));
+        } else if (localName.equals("remains")) {
             changeRemainsParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("remains",new BaseEntityComplexValue(batch,index,changeRemainsParser.getCurrentBaseEntity()));
-        } else if(localName.equals("credit_flow")) {
+            currentBaseEntity.put("remains", new BaseEntityComplexValue(-1, batch, index,
+                    changeRemainsParser.getCurrentBaseEntity()));
+        } else if (localName.equals("credit_flow")) {
             changeCreditFlowParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("credit_flow",new BaseEntityComplexValue(batch,index,
+            currentBaseEntity.put("credit_flow", new BaseEntityComplexValue(-1, batch, index,
                     changeCreditFlowParser.getCurrentBaseEntity()));
-        } else if(localName.equals("maturity_date")) {
+        } else if (localName.equals("maturity_date")) {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
-            try{
-              maturityDate = new BaseEntityDateValue(batch,index, dateFormat.parse(dateRaw));
-            } catch (ParseException e){
+            try {
+                maturityDate = new BaseEntityDateValue(-1, batch, index, dateFormat.parse(dateRaw));
+            } catch (ParseException e) {
                 currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }
-        } else if(localName.equals("prolongation_date")) {
+        } else if (localName.equals("prolongation_date")) {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
-            try{
-                prolongationDate = new BaseEntityDateValue(batch,index,
-                        dateFormat.parse(dateRaw));
-            } catch (ParseException e){
+            try {
+                prolongationDate = new BaseEntityDateValue(-1, batch, index, dateFormat.parse(dateRaw));
+            } catch (ParseException e) {
                 currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }
         } else {
@@ -85,31 +75,23 @@ public class ChangeParser extends BatchParser {
 
         return false;
     }
-    
+
     @Override
     public boolean endElement(String localName) throws SAXException {
-        //try {
-            if(localName.equals("change")) {
-                //currentPackage.setChange(ctChange);
-                //xmlReader.setContentHandler(contentHandler);
-                return true;
-            } else if(localName.equals("turnover")) {
-            } else if(localName.equals("remains")) {
-                for(String e: changeRemainsParser.getCurrentBaseEntity().getValidationErrors()){
-                    getCurrentBaseEntity().addValidationError(e);
-                }
-                changeRemainsParser.getCurrentBaseEntity().clearValidationErrors();
-            } else if(localName.equals("credit_flow")) {
-            } else if(localName.equals("maturity_date")) {
-                //ctChange.setMaturityDate(convertDateToCalendar(dateFormat.parse(contents.toString())));
-            } else if(localName.equals("prolongation_date")) {
-                //ctChange.setProlongationDate(convertDateToCalendar(dateFormat.parse(contents.toString())));
-            } else {
-                throw new UnknownTagException(localName);
+        if (localName.equals("change")) {
+            return true;
+        } else if (localName.equals("turnover")) {
+        } else if (localName.equals("remains")) {
+            for (String e : changeRemainsParser.getCurrentBaseEntity().getValidationErrors()) {
+                getCurrentBaseEntity().addValidationError(e);
             }
-        /*} catch(ParseException parseException) {
-            throw new UnknownValException(localName, contents.toString());
-        }*/
+            changeRemainsParser.getCurrentBaseEntity().clearValidationErrors();
+        } else if (localName.equals("credit_flow")) {
+        } else if (localName.equals("maturity_date")) {
+        } else if (localName.equals("prolongation_date")) {
+        } else {
+            throw new UnknownTagException(localName);
+        }
 
         return false;
     }

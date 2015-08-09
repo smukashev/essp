@@ -9,75 +9,51 @@ import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import java.util.Date;
 import java.util.UUID;
 
-/**
- * Actual value placeholder used in BaseEntity.
- *
- * @see kz.bsbnb.usci.eav.model.base.impl.BaseEntity
- *
- * @author a.motov
- */
-public interface IBaseValue<T> extends IPersistable, Cloneable
-{
+public interface IBaseValue<T> extends IPersistable, Cloneable {
+    IBaseContainer getBaseContainer();
 
-    public IBaseContainer getBaseContainer();
+    void setBaseContainer(IBaseContainer baseContainer);
 
-    public void setBaseContainer(IBaseContainer baseContainer);
+    long getCreditorId();
 
-    public IMetaAttribute getMetaAttribute();
+    void setCreditorId(long creditorId);
 
-    public void setMetaAttribute(IMetaAttribute metaAttribute);
+    IMetaAttribute getMetaAttribute();
 
-    /**
-     * Returns the <code>Batch</code> that contains information about the origin of this value.
-     * @return <code>Batch</code> that contains information about the origin of this value.
-     */
-    public Batch getBatch();
+    void setMetaAttribute(IMetaAttribute metaAttribute);
 
-    public void setBatch(Batch batch);
+    Batch getBatch();
 
-    /**
-     * Returns the index of the value.
-     * @return the index
-     */
-    public long getIndex();
+    void setBatch(Batch batch);
 
-    /**
-     * Sets the index values.
-     * @param index the index of value to set.
-     */
-    public void setIndex(long index);
+    long getIndex();
 
-    /**
-     * Return the value. The value can be a simple type, an array or a complex type.
-     * @return value the value. May be is null.
-     *
-     * @see kz.bsbnb.usci.eav.model.type.DataTypes
-     * @see kz.bsbnb.usci.eav.model.base.impl.BaseEntity
-     */
-    public T getValue();
+    void setIndex(long index);
 
-    public void setValue(T value);
+    T getValue();
 
-    public Date getRepDate();
+    void setValue(T value);
 
-    public void setRepDate(Date reportDate);
+    Date getRepDate();
 
-    public void setLast(boolean last);
+    void setRepDate(Date reportDate);
 
-    public boolean isLast();
+    void setLast(boolean last);
 
-    public void setClosed(boolean closed);
+    boolean isLast();
 
-    public boolean isClosed();
+    void setClosed(boolean closed);
 
-    public void setNewBaseValue(IBaseValue baseValue);
+    boolean isClosed();
 
-    public IBaseValue getNewBaseValue();
+    void setNewBaseValue(IBaseValue baseValue);
 
-    public UUID getUuid();
+    IBaseValue getNewBaseValue();
 
-    public boolean equalsByValue(IBaseValue baseValue);
+    UUID getUuid();
 
-    public boolean equalsByValue(IMetaType metaType, IBaseValue baseValue);
+    boolean equalsByValue(IBaseValue baseValue);
+
+    boolean equalsByValue(IMetaType metaType, IBaseValue baseValue);
 
 }

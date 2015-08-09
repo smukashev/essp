@@ -3,16 +3,14 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.base.impl.*;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
@@ -22,10 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
-/**
- *
- * @author k.tulbassiyev
- */
 @Component
 @Scope("prototype")
 public class MainParser extends BatchParser {
@@ -39,17 +33,12 @@ public class MainParser extends BatchParser {
     @Autowired
     private PortfolioDataParser portfolioDataParser;
 
-    private static final Logger logger
-            = Logger.getLogger(MainParser.class.getName());
-
-    public void parse(InputStream in, Batch batch) throws SAXException, IOException, XMLStreamException
-    {
+    public void parse(InputStream in, Batch batch) throws SAXException, IOException, XMLStreamException {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         parse(inputFactory.createXMLEventReader(in), batch, 1L);
     }
 
-    public void parseNextPackage() throws SAXException
-    {
+    public void parseNextPackage() throws SAXException {
         long currentIndex = index++;
 
         packageParser.parse(xmlReader, batch, currentIndex);
@@ -57,36 +46,29 @@ public class MainParser extends BatchParser {
         if (packageParser.hasMore()) {
             currentBaseEntity = packageParser.getCurrentBaseEntity();
             BaseEntity creditor = infoParser.getCurrentBaseEntity();
-            currentBaseEntity.put("creditor", new BaseEntityComplexValue(batch, currentIndex, creditor));
+            currentBaseEntity.put("creditor", new BaseEntityComplexValue(-1, batch, currentIndex, creditor));
 
-            for(String s : creditor.getValidationErrors()) {
+            for (String s : creditor.getValidationErrors()) {
                 currentBaseEntity.addValidationError(s);
             }
-
-            // TODO possibly should be removed, we don't have such fields
-//                currentBaseEntity.put("account_date", infoParser.getAccountDate());
-//                currentBaseEntity.put("report_date", infoParser.getReportDate());
-//                currentBaseEntity.setReportDate(infoParser.getReportDate().getValue());
-//                currentBaseEntity.put("actual_credit_count", infoParser.getActualCreditCount());
         } else {
             parse(xmlReader, batch, index = 1L);
         }
     }
 
-    public void skipNextPackage() throws SAXException
-    {
-        while(xmlReader.hasNext()) {
+    public void skipNextPackage() throws SAXException {
+        while (xmlReader.hasNext()) {
             XMLEvent event = (XMLEvent) xmlReader.next();
             currentBaseEntity = null;
 
-            if(event.isEndElement()) {
+            if (event.isEndElement()) {
                 EndElement endElement = event.asEndElement();
                 String localName = endElement.getName().getLocalPart();
 
-                if(localName.equals("packages")) {
+                if (localName.equals("packages")) {
                     hasMore = false;
                     return;
-                } else if(localName.equals("package")) {
+                } else if (localName.equals("package")) {
                     hasMore = true;
                     return;
                 }
@@ -95,25 +77,26 @@ public class MainParser extends BatchParser {
     }
 
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        if(localName.equals("batch")) {
-        } else if(localName.equals("info")) {
+        if (localName.equals("batch")) {
+        } else if (localName.equals("info")) {
             infoParser.parse(xmlReader, batch, index);
-        } else if(localName.equals("packages")) {
+        } else if (localName.equals("packages")) {
 //            hasMore = true;
 //            parseNextPackage();
 //            return true;
-        } else if(localName.equals("package")) {
+        } else if (localName.equals("package")) {
             BaseEntity pkg = new BaseEntity(metaClassRepository.getMetaClass("credit"), batch.getRepDate());
             pkg.setIndex(Long.parseLong(event.asStartElement().getAttributeByName(new QName("no")).getValue()));
             packageParser.setCurrentBaseEntity(pkg);
             hasMore = true;
             parseNextPackage();
             return true;
-        } else if(localName.equals("portfolio_data")) {
+        } else if (localName.equals("portfolio_data")) {
             hasMore = true;
             portfolioDataParser.parse(xmlReader, batch, index);
             currentBaseEntity = portfolioDataParser.getCurrentBaseEntity();
-            currentBaseEntity.put("creditor", new BaseEntityComplexValue(batch, index, infoParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("creditor", new BaseEntityComplexValue(-1, batch, index,
+                    infoParser.getCurrentBaseEntity()));
             return true;
         } else {
             throw new UnknownTagException(localName);
@@ -123,11 +106,11 @@ public class MainParser extends BatchParser {
     }
 
     public boolean endElement(String localName) throws SAXException {
-        if(localName.equals("batch")) {
+        if (localName.equals("batch")) {
             hasMore = false;
             return true;
-        } else if(localName.equals("info")) {
-        } else if(localName.equals("packages")) {
+        } else if (localName.equals("info")) {
+        } else if (localName.equals("packages")) {
         } else {
             throw new UnknownTagException(localName);
         }

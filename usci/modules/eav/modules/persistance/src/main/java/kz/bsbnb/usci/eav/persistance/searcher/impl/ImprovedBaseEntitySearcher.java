@@ -44,14 +44,14 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public Long findSingle(BaseEntity entity) {
+    public Long findSingle(BaseEntity entity, long creditorId) {
         if (entity.getId() > 0)
             return entity.getId();
 
         if (entity.getValueCount() == 0)
             return null;
 
-        SelectConditionStep select = generateSQL(entity, null);
+        SelectConditionStep select = generateSQL(entity, creditorId, null);
 
         if (select != null) {
             List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
@@ -59,7 +59,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
             if (rows.size() > 1)
                 throw new IllegalStateException("Found more than one row(" +
-                    entity.getMeta().getClassName() + "), " + entity);
+                        entity.getMeta().getClassName() + "), " + entity);
 
             if (rows.size() < 1)
                 return null;
@@ -70,68 +70,11 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         return null;
     }
 
-    public SelectConditionStep generateSQL(IBaseEntity entity, String entityName) {
-        return generateSQL(entity, entityName, null);
+    public SelectConditionStep generateSQL(IBaseEntity entity, long creditorId, String entityName) {
+        return generateSQL(entity, creditorId, entityName, null);
     }
 
-    private SelectJoinStep generateJoins(SelectJoinStep joins, String entityAlias, String name, IMetaType type,
-                                         IMetaAttribute attribute) {
-        String valueAlias = "v_" + name;
-        if (!type.isSet()) {
-            if (!type.isComplex()) {
-                MetaValue metaValue = (MetaValue) type;
-
-                switch (metaValue.getTypeCode()) {
-                    case BOOLEAN:
-                        joins = joins.join(EAV_BE_BOOLEAN_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    case DATE:
-                        joins = joins.join(EAV_BE_DATE_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_DATE_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_DATE_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    case DOUBLE:
-                        joins = joins.join(EAV_BE_DOUBLE_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_DOUBLE_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_DOUBLE_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    case INTEGER:
-                        joins = joins.join(EAV_BE_INTEGER_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_INTEGER_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_INTEGER_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    case STRING:
-                        joins = joins.join(EAV_BE_STRING_VALUES.as(valueAlias)).
-                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
-                                        equal(EAV_BE_STRING_VALUES.as(valueAlias).ENTITY_ID).
-                                        and(EAV_BE_STRING_VALUES.as(valueAlias).ATTRIBUTE_ID.
-                                                equal(attribute.getId())));
-                        break;
-                    default:
-                        throw new IllegalStateException("Unknown data type: " + metaValue.getTypeCode() +
-                                " for attribute: " + name);
-                }
-            } else {
-                joins = joins.join(EAV_BE_COMPLEX_VALUES.as(valueAlias)).
-                        on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_ID).
-                                and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ATTRIBUTE_ID.equal(attribute.getId())));
-            }
-        }
-
-        return joins;
-    }
-
-    public SelectConditionStep generateSQL(IBaseEntity entity, String entityName,
+    public SelectConditionStep generateSQL(IBaseEntity entity, long creditorId, String entityName,
                                            HashMap<String, ArrayList<String>> arrayKeyFilter) {
         MetaClass metaClass = entity.getMeta();
         String entityAlias = (entityName == null ? "root" : "e_" + entityName);
@@ -140,7 +83,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                 from(EAV_BE_ENTITIES.as(entityAlias));
 
         if (metaClass == null)
-            throw new IllegalArgumentException("MetaData can't be null");
+            throw new IllegalArgumentException("Метакласс не может быть NULL;");
 
         Set<String> names = metaClass.getMemberNames();
 
@@ -152,11 +95,11 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             if (metaAttribute.isKey()) {
                 IBaseValue baseValue = entity.safeGetValue(name);
 
-                if ((baseValue == null || baseValue.getValue() == null) &&
-                        (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)) {
-                     throw new IllegalArgumentException("Key attribute " + name + " can't be null. MetaClass: " +
+                if ((baseValue == null || baseValue.getValue() == null) && (metaClass.getComplexKeyType() ==
+                        ComplexKeyTypes.ALL))
+                    throw new IllegalArgumentException("Key attribute " + name + " can't be null. MetaClass: " +
                             entity.getMeta().getClassName());
-                }
+
 
                 if ((baseValue == null || baseValue.getValue() == null) &&
                         (metaClass.getComplexKeyType() == ComplexKeyTypes.ANY))
@@ -164,7 +107,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                 if (!memberType.isSet()) {
                     if (!memberType.isComplex()) {
-                        generateJoins(joins, entityAlias, name, memberType, metaAttribute);
+                        generateJoins(joins, entityAlias, name, memberType, creditorId, metaAttribute);
 
                         MetaValue metaValue = (MetaValue) memberType;
                         switch (metaValue.getTypeCode()) {
@@ -288,13 +231,13 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                     } else {
                         BaseEntity childBaseEntity = (BaseEntity) baseValue.getValue();
                         Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().getClassName()).
-                                findSingle(childBaseEntity);
+                                findSingle(childBaseEntity, creditorId);
 
                         if (childBaseEntityId == null) {
                             if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
                                 return null;
                         } else {
-                            generateJoins(joins, entityAlias, name, memberType, metaAttribute);
+                            generateJoins(joins, entityAlias, name, memberType, creditorId, metaAttribute);
 
                             if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL) {
                                 String valueAlias = "v_" + name;
@@ -330,7 +273,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                             for (IBaseValue childBaseValue : baseSet.get()) {
                                 BaseEntity childBaseEntity = (BaseEntity) childBaseValue.getValue();
                                 Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().
-                                        getClassName()).findSingle(childBaseEntity);
+                                        getClassName()).findSingle(childBaseEntity, creditorId);
 
                                 if (childBaseEntityId != null) {
                                     childBaseEntityIds.add(childBaseEntityId);
@@ -405,23 +348,84 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         if (condition != null) {
             where = where.and(condition);
         } else {
-            logger.warn("No key attributes in entity.");
             return null;
         }
-
-        logger.debug("Searcher SQL after conditions generated: " + where.toString());
 
         return where;
     }
 
+    private SelectJoinStep generateJoins(SelectJoinStep joins, String entityAlias, String name, IMetaType type,
+                                         long creditorId, IMetaAttribute attribute) {
+        String valueAlias = "v_" + name;
+        if (!type.isSet()) {
+            if (!type.isComplex()) {
+                MetaValue metaValue = (MetaValue) type;
+
+                switch (metaValue.getTypeCode()) {
+                    case BOOLEAN:
+                        joins = joins.join(EAV_BE_BOOLEAN_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).CREDITOR_ID.equal(creditorId).
+                                                and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).ATTRIBUTE_ID.
+                                                        equal(attribute.getId()))));
+                        break;
+                    case DATE:
+                        joins = joins.join(EAV_BE_DATE_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_DATE_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_DATE_VALUES.as(valueAlias).CREDITOR_ID.equal(creditorId)).
+                                        and(EAV_BE_DATE_VALUES.as(valueAlias).ATTRIBUTE_ID.equal(attribute.getId())));
+                        break;
+                    case DOUBLE:
+                        joins = joins.join(EAV_BE_DOUBLE_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_DOUBLE_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_DOUBLE_VALUES.as(valueAlias).CREDITOR_ID.
+                                                equal(creditorId)).
+                                        and(EAV_BE_DOUBLE_VALUES.as(valueAlias).ATTRIBUTE_ID.
+                                                equal(attribute.getId())));
+                        break;
+                    case INTEGER:
+                        joins = joins.join(EAV_BE_INTEGER_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_INTEGER_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_INTEGER_VALUES.as(valueAlias).CREDITOR_ID.
+                                                equal(creditorId)).
+                                        and(EAV_BE_INTEGER_VALUES.as(valueAlias).ATTRIBUTE_ID.
+                                                equal(attribute.getId())));
+                        break;
+                    case STRING:
+                        joins = joins.join(EAV_BE_STRING_VALUES.as(valueAlias)).
+                                on(EAV_BE_ENTITIES.as(entityAlias).ID.
+                                        equal(EAV_BE_STRING_VALUES.as(valueAlias).ENTITY_ID).
+                                        and(EAV_BE_STRING_VALUES.as(valueAlias).CREDITOR_ID.
+                                                equal(creditorId)).
+                                        and(EAV_BE_STRING_VALUES.as(valueAlias).ATTRIBUTE_ID.
+                                                equal(attribute.getId())));
+                        break;
+                    default:
+                        throw new IllegalStateException("Unknown data type: " + metaValue.getTypeCode() +
+                                " for attribute: " + name);
+                }
+            } else {
+                joins = joins.join(EAV_BE_COMPLEX_VALUES.as(valueAlias)).
+                        on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_ID).
+                                and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ATTRIBUTE_ID.equal(attribute.getId())));
+            }
+        }
+
+        return joins;
+    }
+
     @Override
-    public ArrayList<Long> findAll(BaseEntity baseEntity) {
+    public ArrayList<Long> findAll(BaseEntity baseEntity, long creditorId) {
         ArrayList<Long> result = new ArrayList<>();
 
         if (baseEntity.getValueCount() == 0)
             return result;
 
-        SelectConditionStep select = generateSQL(baseEntity, null);
+        SelectConditionStep select = generateSQL(baseEntity, creditorId, null);
 
         if (select != null) {
             List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),

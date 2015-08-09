@@ -8,11 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 public interface IBaseEntityProcessorDao {
-    long search(IBaseEntity baseEntity);
+    long search(IBaseEntity baseEntity, long creditorId);
 
-    IBaseEntity prepare(IBaseEntity baseEntity);
-
-    IBaseEntity postPrepare(IBaseEntity baseEntity, IBaseEntity parentEntity);
+    IBaseEntity prepare(IBaseEntity baseEntity, long creditorId);
 
     IBaseEntity process(IBaseEntity baseEntity);
 

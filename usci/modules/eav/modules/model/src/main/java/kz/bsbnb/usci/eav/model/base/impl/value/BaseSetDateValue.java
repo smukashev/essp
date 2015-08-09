@@ -6,13 +6,10 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 
 import java.util.Date;
 
-/**
- * @author alexandr.motov
- */
 public class BaseSetDateValue extends BaseSetValue<Date> {
-
-    public BaseSetDateValue(long id, Batch batch, long index, Date reportDate, Date value, boolean closed, boolean last) {
-        super(id, batch, index, reportDate, value, closed, last);
+    public BaseSetDateValue(long id, long creditorId, Batch batch, long index, Date reportDate, Date value,
+                            boolean closed, boolean last) {
+        super(id, creditorId, batch, index, reportDate, value, closed, last);
     }
 
 }

@@ -20,10 +20,6 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.util.Date;
 
-/**
- *
- * @author k.tulbassiyev
- */
 @Component
 @Scope("prototype")
 public class SubjectsParser extends BatchParser {
@@ -48,15 +44,15 @@ public class SubjectsParser extends BatchParser {
         } else if(localName.equals("person")) {
             subjectPersonParser.parse(xmlReader, batch, index);
             currentBaseEntity.put("person",
-                    new BaseEntityComplexValue(batch, index, subjectPersonParser.getCurrentBaseEntity()));
+                    new BaseEntityComplexValue(-1, batch, index, subjectPersonParser.getCurrentBaseEntity()));
         } else if(localName.equals("organization")) {
             subjectOrganizationParser.parse(xmlReader, batch, index);
             currentBaseEntity.put("organization",
-                    new BaseEntityComplexValue(batch, index, subjectOrganizationParser.getCurrentBaseEntity()));
+                    new BaseEntityComplexValue(-1, batch, index, subjectOrganizationParser.getCurrentBaseEntity()));
         } else if(localName.equals("creditor")) {
             subjectCreditorParser.parse(xmlReader, batch, index);
             currentBaseEntity.put("creditor",
-                    new BaseEntityComplexValue(batch, index, subjectCreditorParser.getCurrentBaseEntity()));
+                    new BaseEntityComplexValue(-1, batch, index, subjectCreditorParser.getCurrentBaseEntity()));
         } else {
             throw new UnknownTagException(localName);
         }
@@ -67,11 +63,8 @@ public class SubjectsParser extends BatchParser {
     @Override
     public boolean endElement(String localName) throws SAXException {
         if(localName.equals("subjects")) {
-            //currentPackage.setSubjects(subjects);
-            //xmlReader.setContentHandler(contentHandler);
             hasMore = false;
         } else if(localName.equals("subject")) {
-            //subjects.setSubject(currentSubject);
             hasMore = true;
         } else {
             throw new UnknownTagException(localName);

@@ -45,26 +45,30 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
     @Override
     public long insert(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
+
         long baseValueId = insert(
                 baseValue.getBaseContainer().getId(),
                 baseValue.getBatch().getId(),
+                baseValue.getCreditorId(),
                 baseValue.getMetaAttribute().getId(),
                 baseValue.getIndex(),
                 baseValue.getRepDate(),
                 baseValue.getValue(),
                 baseValue.isClosed(),
                 baseValue.isLast());
+
         baseValue.setId(baseValueId);
 
         return baseValueId;
     }
 
-    protected long insert(long baseEntityId, long batchId, long metaAttributeId, long index,
+    protected long insert(long baseEntityId, long batchId, long creditorId, long metaAttributeId, long index,
                           Date reportDate, Object value, boolean closed, boolean last) {
         Insert insert = context
                 .insertInto(EAV_BE_STRING_VALUES)
                 .set(EAV_BE_STRING_VALUES.ENTITY_ID, baseEntityId)
                 .set(EAV_BE_STRING_VALUES.BATCH_ID, batchId)
+                .set(EAV_BE_STRING_VALUES.CREDITOR_ID, creditorId)
                 .set(EAV_BE_STRING_VALUES.ATTRIBUTE_ID, metaAttributeId)
                 .set(EAV_BE_STRING_VALUES.INDEX_, index)
                 .set(EAV_BE_STRING_VALUES.REPORT_DATE, DataUtils.convert(reportDate))
@@ -79,18 +83,27 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
     @Override
     public void update(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
-        update(baseValue.getId(), baseValue.getBaseContainer().getId(), baseValue.getBatch().getId(),
-                baseValue.getMetaAttribute().getId(), baseValue.getIndex(), baseValue.getRepDate(),
-                baseValue.getValue(), baseValue.isClosed(), baseValue.isLast());
+
+        update(baseValue.getId(),
+                baseValue.getBaseContainer().getId(),
+                baseValue.getBatch().getId(),
+                baseValue.getCreditorId(),
+                baseValue.getMetaAttribute().getId(),
+                baseValue.getIndex(),
+                baseValue.getRepDate(),
+                baseValue.getValue(),
+                baseValue.isClosed(),
+                baseValue.isLast());
     }
 
-    protected void update(long id, long baseEntityId, long batchId, long metaAttributeId, long index,
+    protected void update(long id, long baseEntityId, long batchId, long creditorId, long metaAttributeId, long index,
                           Date reportDate, Object value, boolean closed, boolean last) {
         String tableAlias = "sv";
         Update update = context
                 .update(EAV_BE_STRING_VALUES.as(tableAlias))
                 .set(EAV_BE_STRING_VALUES.as(tableAlias).ENTITY_ID, baseEntityId)
                 .set(EAV_BE_STRING_VALUES.as(tableAlias).BATCH_ID, batchId)
+                .set(EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID, creditorId)
                 .set(EAV_BE_STRING_VALUES.as(tableAlias).ATTRIBUTE_ID, metaAttributeId)
                 .set(EAV_BE_STRING_VALUES.as(tableAlias).INDEX_, index)
                 .set(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE, DataUtils.convert(reportDate))
@@ -100,10 +113,11 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                 .where(EAV_BE_STRING_VALUES.as(tableAlias).ID.equal(id));
 
         logger.debug(update.toString());
+
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
-        if (count != 1) {
+
+        if (count != 1)
             throw new RuntimeException("UPDATE operation should be update only one record.");
-        }
     }
 
     @Override
@@ -118,37 +132,34 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                 .where(EAV_BE_STRING_VALUES.as(tableAlias).ID.equal(id));
 
         logger.debug(delete.toString());
+
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-        if (count != 1) {
+
+        if (count != 1)
             throw new RuntimeException("DELETE operation should be delete only one record.");
-        }
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        if (baseContainer == null) {
-            throw new RuntimeException("Can not find next instance of BaseEntityStringValue. " +
-                    "Instance of BaseContainer is null.");
-        }
-        if (baseContainer.getId() < 1) {
-            throw new RuntimeException("Can not find next instance of BaseEntityStringValue. " +
-                    "Instance of BaseContainer not contain ID.");
-        }
+
+        if (baseContainer == null)
+            throw new RuntimeException("Родитель не можеть быть NULL;");
+
+        if (baseContainer.getId() < 1)
+            throw new RuntimeException("Родитель должен иметь ID больше 0;");
 
         IBaseEntity baseEntity = (IBaseEntity) baseContainer;
         IMetaClass metaClass = baseEntity.getMeta();
 
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        if (metaAttribute == null) {
-            throw new RuntimeException("Can not find next instance of BaseEntityStringValue. " +
-                    "Instance of MetaAttribute is null.");
-        }
-        if (metaAttribute.getId() < 1) {
-            throw new RuntimeException("Can not find next instance of BaseEntityStringValue. " +
-                    "Instance of MetaAttribute not contain ID.");
-        }
+
+        if (metaAttribute == null)
+            throw new RuntimeException("Мета данные атрибута не могут быть NULL;");
+
+        if (metaAttribute.getId() < 1)
+            throw new RuntimeException("Мета данные атрибута должны иметь ID больше 0;");
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue nextBaseValue = null;
@@ -160,6 +171,7 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_STRING_VALUES.as(tableAlias).ID,
+                        EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_STRING_VALUES.as(tableAlias).BATCH_ID,
                         EAV_BE_STRING_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE,
@@ -168,12 +180,15 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                         EAV_BE_STRING_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_STRING_VALUES.as(tableAlias))
                 .where(EAV_BE_STRING_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
+                .and(EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.greaterThan(
+                        DataUtils.convert(baseValue.getRepDate())))
                 .asTable(subqueryAlias);
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_STRING_VALUES.ID),
+                        subqueryTable.field(EAV_BE_STRING_VALUES.CREDITOR_ID),
                         subqueryTable.field(EAV_BE_STRING_VALUES.BATCH_ID),
                         subqueryTable.field(EAV_BE_STRING_VALUES.INDEX_),
                         subqueryTable.field(EAV_BE_STRING_VALUES.REPORT_DATE),
@@ -187,30 +202,36 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1) {
-            throw new RuntimeException("Query for get next instance of BaseEntityStringValue return more than one row.");
-        }
+        if (rows.size() > 1)
+            throw new RuntimeException("Количество следующих элементов не может быть больше 1;");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_STRING_VALUES.ID.getName())).longValue();
-            long index = ((BigDecimal) row
-                    .get(EAV_BE_STRING_VALUES.INDEX_.getName())).longValue();
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_STRING_VALUES.IS_CLOSED.getName())).longValue() == 1;
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_STRING_VALUES.IS_LAST.getName())).longValue() == 1;
-            String value = (String) row
-                    .get(EAV_BE_STRING_VALUES.VALUE.getName());
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_STRING_VALUES.REPORT_DATE.getName()));
+            long id = ((BigDecimal) row.get(EAV_BE_STRING_VALUES.ID.getName())).longValue();
+            long creditorId = ((BigDecimal) row.get(EAV_BE_STRING_VALUES.CREDITOR_ID.getName())).longValue();
+            long index = ((BigDecimal) row.get(EAV_BE_STRING_VALUES.INDEX_.getName())).longValue();
+            boolean closed = ((BigDecimal) row.get(EAV_BE_STRING_VALUES.IS_CLOSED.getName())).longValue() == 1;
+            boolean last = ((BigDecimal) row.get(EAV_BE_STRING_VALUES.IS_LAST.getName())).longValue() == 1;
+            String value = (String) row.get(EAV_BE_STRING_VALUES.VALUE.getName());
+
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp)
+                    row.get(EAV_BE_STRING_VALUES.REPORT_DATE.getName()));
+
             Batch batch = batchRepository.getBatch(((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.BATCH_ID.getName())).longValue());
 
-            nextBaseValue = BaseValueFactory.create(metaClass.getType(), metaType,
-                    id, batch, index, reportDate, value, closed, last);
+            nextBaseValue = BaseValueFactory.create(
+                    metaClass.getType(),
+                    metaType,
+                    id,
+                    creditorId,
+                    batch,
+                    index,
+                    reportDate,
+                    value,
+                    closed,
+                    last);
         }
 
         return nextBaseValue;
@@ -220,27 +241,25 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        if (baseContainer == null) {
+        if (baseContainer == null)
             throw new RuntimeException("Can not find previous instance of BaseEntityStringValue. " +
                     "Instance of BaseContainer is null.");
-        }
-        if (baseContainer.getId() < 1) {
+
+        if (baseContainer.getId() < 1)
             throw new RuntimeException("Can not find previous instance of BaseEntityStringValue. " +
                     "Instance of BaseContainer not contain ID.");
-        }
 
         IBaseEntity baseEntity = (IBaseEntity) baseContainer;
         IMetaClass metaClass = baseEntity.getMeta();
 
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        if (metaAttribute == null) {
+        if (metaAttribute == null)
             throw new RuntimeException("Can not find previous instance of BaseEntityStringValue. " +
                     "Instance of MetaAttribute is null.");
-        }
-        if (metaAttribute.getId() < 1) {
+
+        if (metaAttribute.getId() < 1)
             throw new RuntimeException("Can not find previous instance of BaseEntityStringValue. " +
                     "Instance of MetaAttribute not contain ID.");
-        }
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue previousBaseValue = null;
@@ -252,6 +271,7 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.desc()).as("num_pp"),
                         EAV_BE_STRING_VALUES.as(tableAlias).ID,
+                        EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_STRING_VALUES.as(tableAlias).BATCH_ID,
                         EAV_BE_STRING_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE,
@@ -260,12 +280,14 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                         EAV_BE_STRING_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_STRING_VALUES.as(tableAlias))
                 .where(EAV_BE_STRING_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
+                .and(EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(baseValue.getRepDate())))
                 .asTable(subqueryAlias);
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_STRING_VALUES.ID),
+                        subqueryTable.field(EAV_BE_STRING_VALUES.CREDITOR_ID),
                         subqueryTable.field(EAV_BE_STRING_VALUES.BATCH_ID),
                         subqueryTable.field(EAV_BE_STRING_VALUES.INDEX_),
                         subqueryTable.field(EAV_BE_STRING_VALUES.REPORT_DATE),
@@ -279,30 +301,47 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1) {
+        if (rows.size() > 1)
             throw new RuntimeException("Query for get previous instance of BaseEntityStringValue return more than one row.");
-        }
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.ID.getName())).longValue();
+
+            long creditorId = ((BigDecimal) row
+                    .get(EAV_BE_STRING_VALUES.CREDITOR_ID.getName())).longValue();
+
             long index = ((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.INDEX_.getName())).longValue();
+
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.IS_LAST.getName())).longValue() == 1;
+
             String value = (String) row
                     .get(EAV_BE_STRING_VALUES.VALUE.getName());
+
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_STRING_VALUES.REPORT_DATE.getName()));
+
             Batch batch = batchRepository.getBatch(((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.BATCH_ID.getName())).longValue());
 
-            previousBaseValue = BaseValueFactory.create(metaClass.getType(), metaType,
-                    id, batch, index, reportDate, value, closed, last);
+            previousBaseValue = BaseValueFactory.create(
+                    metaClass.getType(),
+                    metaType,
+                    id,
+                    creditorId,
+                    batch,
+                    index,
+                    reportDate,
+                    value,
+                    closed,
+                    last);
         }
 
         return previousBaseValue;
@@ -311,24 +350,22 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
     @Override
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        if (baseContainer == null) {
+        if (baseContainer == null)
             throw new RuntimeException("Can not find closed instance of BaseEntityStringValue. " +
                     "Instance of BaseContainer is null.");
-        }
-        if (baseContainer.getId() < 1) {
+
+        if (baseContainer.getId() < 1)
             throw new RuntimeException("Can not find closed instance of BaseEntityStringValue. " +
                     "Instance of BaseContainer not contain ID.");
-        }
 
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        if (metaAttribute == null) {
+        if (metaAttribute == null)
             throw new RuntimeException("Can not find closed instance of BaseEntityStringValue. " +
                     "Instance of MetaAttribute is null.");
-        }
-        if (metaAttribute.getId() < 1) {
+
+        if (metaAttribute.getId() < 1)
             throw new RuntimeException("Can not find closed instance of BaseEntityStringValue. " +
                     "Instance of MetaAttribute not contain ID.");
-        }
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue closedBaseValue = null;
@@ -336,12 +373,14 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         String tableAlias = "bv";
         Select select = context
                 .select(EAV_BE_STRING_VALUES.as(tableAlias).ID,
+                        EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_STRING_VALUES.as(tableAlias).BATCH_ID,
                         EAV_BE_STRING_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_STRING_VALUES.as(tableAlias).VALUE,
                         EAV_BE_STRING_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_STRING_VALUES.as(tableAlias))
                 .where(EAV_BE_STRING_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.equal(DataUtils.convert(baseValue.getRepDate())))
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
@@ -349,26 +388,41 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1) {
+        if (rows.size() > 1)
             throw new RuntimeException("Query for get closed instance of BaseEntityStringValue return more than one row.");
-        }
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.ID.getName())).longValue();
+
+            long creditorId = ((BigDecimal) row
+                    .get(EAV_BE_STRING_VALUES.CREDITOR_ID.getName())).longValue();
+
             long index = ((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.INDEX_.getName())).longValue();
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.IS_LAST.getName())).longValue() == 1;
+
             String value = (String) row
                     .get(EAV_BE_STRING_VALUES.VALUE.getName());
+
             Batch batch = batchRepository.getBatch(((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.BATCH_ID.getName())).longValue());
 
-            closedBaseValue = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
-                    id, batch, index, baseValue.getRepDate(), value, true, last);
+            closedBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    id,
+                    creditorId,
+                    batch,
+                    index,
+                    baseValue.getRepDate(),
+                    value,
+                    true,
+                    last);
         }
 
         return closedBaseValue;
@@ -377,24 +431,22 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        if (baseContainer == null) {
+        if (baseContainer == null)
             throw new RuntimeException("Can not find last instance of BaseEntityStringValue. " +
                     "Instance of BaseContainer is null.");
-        }
-        if (baseContainer.getId() < 1) {
+
+        if (baseContainer.getId() < 1)
             throw new RuntimeException("Can not find last instance of BaseEntityStringValue. " +
                     "Instance of BaseContainer not contain ID.");
-        }
 
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        if (metaAttribute == null) {
+        if (metaAttribute == null)
             throw new RuntimeException("Can not find last instance of BaseEntityStringValue. " +
                     "Instance of MetaAttribute is null.");
-        }
-        if (metaAttribute.getId() < 1) {
+
+        if (metaAttribute.getId() < 1)
             throw new RuntimeException("Can not find last instance of BaseEntityStringValue. " +
                     "Instance of MetaAttribute not contain ID.");
-        }
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue lastBaseValue = null;
@@ -402,6 +454,7 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         String tableAlias = "bv";
         Select select = context
                 .select(EAV_BE_STRING_VALUES.as(tableAlias).ID,
+                        EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_STRING_VALUES.as(tableAlias).BATCH_ID,
                         EAV_BE_STRING_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE,
@@ -410,15 +463,15 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                         EAV_BE_STRING_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_STRING_VALUES.as(tableAlias))
                 .where(EAV_BE_STRING_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).IS_LAST.equal(DataUtils.convert(true)));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1) {
+        if (rows.size() > 1)
             throw new RuntimeException("Query for get last instance of BaseEntityStringValue return more than one row.");
-        }
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -436,8 +489,17 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
             Batch batch = batchRepository.getBatch(((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.BATCH_ID.getName())).longValue());
 
-            lastBaseValue = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
-                    id, batch, index, reportDate, value, closed, true);
+            lastBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    id,
+                    0,
+                    batch,
+                    index,
+                    reportDate,
+                    value,
+                    closed,
+                    true);
         }
 
         return lastBaseValue;
@@ -448,66 +510,70 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
     public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate, boolean isLast) {
         Table tableOfAttributes = EAV_M_SIMPLE_ATTRIBUTES.as("a");
         Table tableOfValues = EAV_BE_STRING_VALUES.as("v");
-        Select select = null;
+        Select select;
 
         if (isLast) {
             select = context
                 .select(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.NAME),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.ID),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.BATCH_ID),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.INDEX_),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.REPORT_DATE),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.VALUE),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.IS_CLOSED),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.IS_LAST))
+                    tableOfValues.field(EAV_BE_STRING_VALUES.ID),
+                    tableOfValues.field(EAV_BE_STRING_VALUES.CREDITOR_ID),
+                    tableOfValues.field(EAV_BE_STRING_VALUES.BATCH_ID),
+                    tableOfValues.field(EAV_BE_STRING_VALUES.INDEX_),
+                    tableOfValues.field(EAV_BE_STRING_VALUES.REPORT_DATE),
+                    tableOfValues.field(EAV_BE_STRING_VALUES.VALUE),
+                    tableOfValues.field(EAV_BE_STRING_VALUES.IS_CLOSED),
+                    tableOfValues.field(EAV_BE_STRING_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .join(tableOfAttributes)
                 .on(tableOfValues.field(EAV_BE_STRING_VALUES.ATTRIBUTE_ID)
-                        .eq(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.ID)))
+                    .eq(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.ID)))
                 .where(tableOfValues.field(EAV_BE_STRING_VALUES.ENTITY_ID).equal(baseEntity.getId()))
                 .and((tableOfValues.field(EAV_BE_STRING_VALUES.IS_LAST).equal(true)
-                        .and(tableOfValues.field(EAV_BE_STRING_VALUES.IS_CLOSED).equal(false))
-                        .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))
-                        .or(tableOfValues.field(EAV_BE_STRING_VALUES.REPORT_DATE).equal(DataUtils.convert(actualReportDate))
-                                .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(true))));
+                    .and(tableOfValues.field(EAV_BE_STRING_VALUES.IS_CLOSED).equal(false))
+                    .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))
+                    .or(tableOfValues.field(EAV_BE_STRING_VALUES.REPORT_DATE).
+                            equal(DataUtils.convert(actualReportDate))
+                            .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(true))));
         } else {
             Table tableNumbering = context
-                .select(DSL.rank().over()
-                                .partitionBy(tableOfValues.field(EAV_BE_STRING_VALUES.ATTRIBUTE_ID))
-                                .orderBy(tableOfValues.field(EAV_BE_STRING_VALUES.REPORT_DATE).desc()).as("num_pp"),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.ID),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.ENTITY_ID),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.ATTRIBUTE_ID),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.VALUE),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.BATCH_ID),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.INDEX_),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.REPORT_DATE),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.IS_CLOSED),
-                        tableOfValues.field(EAV_BE_STRING_VALUES.IS_LAST))
-                .from(tableOfValues)
-                .where(tableOfValues.field(EAV_BE_STRING_VALUES.ENTITY_ID).eq(baseEntity.getId()))
-                .and(tableOfValues.field(EAV_BE_STRING_VALUES.REPORT_DATE)
-                        .lessOrEqual(DataUtils.convert(actualReportDate)))
-                .asTable("vn");
+                    .select(DSL.rank().over()
+                                    .partitionBy(tableOfValues.field(EAV_BE_STRING_VALUES.ATTRIBUTE_ID))
+                                    .orderBy(tableOfValues.field(EAV_BE_STRING_VALUES.REPORT_DATE).desc()).as("num_pp"),
+                            tableOfValues.field(EAV_BE_STRING_VALUES.ID),
+                            tableOfValues.field(EAV_BE_STRING_VALUES.ENTITY_ID),
+                            tableOfValues.field(EAV_BE_STRING_VALUES.CREDITOR_ID),
+                            tableOfValues.field(EAV_BE_STRING_VALUES.ATTRIBUTE_ID),
+                            tableOfValues.field(EAV_BE_STRING_VALUES.VALUE),
+                            tableOfValues.field(EAV_BE_STRING_VALUES.BATCH_ID),
+                            tableOfValues.field(EAV_BE_STRING_VALUES.INDEX_),
+                            tableOfValues.field(EAV_BE_STRING_VALUES.REPORT_DATE),
+                            tableOfValues.field(EAV_BE_STRING_VALUES.IS_CLOSED),
+                            tableOfValues.field(EAV_BE_STRING_VALUES.IS_LAST))
+                    .from(tableOfValues)
+                    .where(tableOfValues.field(EAV_BE_STRING_VALUES.ENTITY_ID).eq(baseEntity.getId()))
+                    .and(tableOfValues.field(EAV_BE_STRING_VALUES.REPORT_DATE)
+                            .lessOrEqual(DataUtils.convert(actualReportDate)))
+                    .asTable("vn");
 
             select = context
-                .select(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.NAME),
-                        tableNumbering.field(EAV_BE_STRING_VALUES.ID),
-                        tableNumbering.field(EAV_BE_STRING_VALUES.BATCH_ID),
-                        tableNumbering.field(EAV_BE_STRING_VALUES.INDEX_),
-                        tableNumbering.field(EAV_BE_STRING_VALUES.REPORT_DATE),
-                        tableNumbering.field(EAV_BE_STRING_VALUES.VALUE),
-                        tableNumbering.field(EAV_BE_STRING_VALUES.IS_CLOSED),
-                        tableNumbering.field(EAV_BE_STRING_VALUES.IS_LAST))
-                .from(tableNumbering)
-                .join(tableOfAttributes)
-                .on(tableNumbering.field(EAV_BE_STRING_VALUES.ATTRIBUTE_ID)
-                        .eq(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.ID)))
-                .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
-                .and((tableNumbering.field(EAV_BE_STRING_VALUES.IS_CLOSED).equal(false)
-                        .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))
-                        .or(tableNumbering.field(EAV_BE_STRING_VALUES.REPORT_DATE).equal(actualReportDate)
-                                .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(true))));
+                    .select(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.NAME),
+                            tableNumbering.field(EAV_BE_STRING_VALUES.ID),
+                            tableNumbering.field(EAV_BE_STRING_VALUES.CREDITOR_ID),
+                            tableNumbering.field(EAV_BE_STRING_VALUES.BATCH_ID),
+                            tableNumbering.field(EAV_BE_STRING_VALUES.INDEX_),
+                            tableNumbering.field(EAV_BE_STRING_VALUES.REPORT_DATE),
+                            tableNumbering.field(EAV_BE_STRING_VALUES.VALUE),
+                            tableNumbering.field(EAV_BE_STRING_VALUES.IS_CLOSED),
+                            tableNumbering.field(EAV_BE_STRING_VALUES.IS_LAST))
+                    .from(tableNumbering)
+                    .join(tableOfAttributes)
+                    .on(tableNumbering.field(EAV_BE_STRING_VALUES.ATTRIBUTE_ID)
+                            .eq(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.ID)))
+                    .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
+                    .and((tableNumbering.field(EAV_BE_STRING_VALUES.IS_CLOSED).equal(false)
+                            .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))
+                            .or(tableNumbering.field(EAV_BE_STRING_VALUES.REPORT_DATE).equal(actualReportDate)
+                                    .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(true))));
         }
 
         logger.debug(select.toString());
@@ -518,6 +584,7 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
             Map<String, Object> row = it.next();
 
             long id = ((BigDecimal) row.get(EAV_BE_STRING_VALUES.ID.getName())).longValue();
+            long creditorId =  ((BigDecimal) row.get(EAV_BE_STRING_VALUES.CREDITOR_ID.getName())).longValue();
             long index = ((BigDecimal) row.get(EAV_BE_STRING_VALUES.INDEX_.getName())).longValue();
             boolean closed = ((BigDecimal) row.get(EAV_BE_STRING_VALUES.IS_CLOSED.getName())).longValue() == 1;
             boolean last = ((BigDecimal) row.get(EAV_BE_STRING_VALUES.IS_LAST.getName())).longValue() == 1;
@@ -529,10 +596,18 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                     row.get(EAV_BE_STRING_VALUES.BATCH_ID.getName())).longValue());
 
             IMetaType metaType = baseEntity.getMemberType(attribute);
-            baseEntity.put(
-                attribute,
-                BaseValueFactory.create(
-                    MetaContainerTypes.META_CLASS, metaType, id, batch, index, reportDate, value, closed, last));
+
+            baseEntity.put(attribute, BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    id,
+                    creditorId,
+                    batch,
+                    index,
+                    reportDate,
+                    value,
+                    closed,
+                    last));
         }
     }
 
