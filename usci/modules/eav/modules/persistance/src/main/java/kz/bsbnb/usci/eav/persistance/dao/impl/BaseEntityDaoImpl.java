@@ -138,6 +138,9 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         IBaseEntityReportDate baseEntityReportDate = baseEntityReportDateDao.load(id, reportDate);
         baseEntity.setBaseEntityReportDate(baseEntityReportDate);
 
+        // BUG-FIX: NullPointerException in BaseEntityReportDate.clone()
+        baseEntityReportDate.setBaseEntity(baseEntity);
+
         Map<Class<? extends IBaseValue>, Long> baseValueCounts = new HashMap<>();
 
         baseValueCounts.put(BaseEntityIntegerValue.class, baseEntityReportDate.getIntegerValuesCount());
