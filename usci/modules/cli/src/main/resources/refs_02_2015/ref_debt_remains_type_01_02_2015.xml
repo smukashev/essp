@@ -1,57 +1,57 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
   <entities>
-    <entity class="ref_debt_remains_type">
+    <ref_debt_remains_type>
       <code>10</code>
       <name_ru>Остаток лимита кредитной карты/овердрафта</name_ru>
-    </entity>
-    <entity class="ref_debt_remains_type">
+    </ref_debt_remains_type>
+    <ref_debt_remains_type>
       <code>11</code>
       <name_ru>Фактически сформированная сумма провизий (резервов), по неоднородным кредитам по требованиям уполномоченного органа</name_ru>
-    </entity>
-    <entity class="ref_debt_remains_type">
+    </ref_debt_remains_type>
+    <ref_debt_remains_type>
       <code>12</code>
       <name_ru>Фактически сформированная сумма провизий (резервов), по неоднородным кредитам по требованиям МСФО</name_ru>
-    </entity>
-    <entity class="ref_debt_remains_type">
+    </ref_debt_remains_type>
+    <ref_debt_remains_type>
       <code>13</code>
       <name_ru>Фактически сформированная сумма провизий (резервов), по неоднородным кредитам по требованиям МСФО (по лимиту кредитной карты/овердрафту)</name_ru>
-    </entity>
-    <entity class="ref_debt_remains_type">
+    </ref_debt_remains_type>
+    <ref_debt_remains_type>
       <code>1</code>
       <name_ru>Остаток основного долга -  непросроченный основной долг</name_ru>
-    </entity>
-    <entity class="ref_debt_remains_type">
+    </ref_debt_remains_type>
+    <ref_debt_remains_type>
       <code>2</code>
       <name_ru>Остаток основного долга -  просроченный основной долг</name_ru>
-    </entity>
-    <entity class="ref_debt_remains_type">
+    </ref_debt_remains_type>
+    <ref_debt_remains_type>
       <code>3</code>
       <name_ru>Остаток основного долга -  списанная с баланса задолженность</name_ru>
-    </entity>
-    <entity class="ref_debt_remains_type">
+    </ref_debt_remains_type>
+    <ref_debt_remains_type>
       <code>4</code>
       <name_ru>Остаток  начисленного вознаграждения  - непросроченное вознаграждение</name_ru>
-    </entity>
-    <entity class="ref_debt_remains_type">
+    </ref_debt_remains_type>
+    <ref_debt_remains_type>
       <code>5</code>
       <name_ru>Остаток  начисленного вознаграждения  - просроченное вознаграждение</name_ru>
-    </entity>
-    <entity class="ref_debt_remains_type">
+    </ref_debt_remains_type>
+    <ref_debt_remains_type>
       <code>6</code>
       <name_ru>Остаток  начисленного вознаграждения  - списанная с баланса задолженность</name_ru>
-    </entity>
-    <entity class="ref_debt_remains_type">
+    </ref_debt_remains_type>
+    <ref_debt_remains_type>
       <code>7</code>
       <name_ru>Дисконт/премия</name_ru>
-    </entity>
-    <entity class="ref_debt_remains_type">
+    </ref_debt_remains_type>
+    <ref_debt_remains_type>
       <code>8</code>
       <name_ru>Положительная/отрицательная корректировка</name_ru>
-    </entity>
-    <entity class="ref_debt_remains_type">
+    </ref_debt_remains_type>
+    <ref_debt_remains_type>
       <code>9</code>
       <name_ru>Дисконтированная (приведенная) стоимость будущих денежных потоков</name_ru>
-    </entity>
+    </ref_debt_remains_type>
   </entities>
 </batch>

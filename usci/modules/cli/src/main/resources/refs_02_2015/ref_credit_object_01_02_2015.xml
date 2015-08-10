@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
   <entities>
-    <entity class="ref_credit_object">
+    <ref_credit_object>
       <code>03</code>
       <name_kz>Потребительские товары и услуги (кроме автотранспорта)</name_kz>
       <name_ru>Потребительские товары и услуги (кроме автотранспорта)</name_ru>
-    </entity>
-    <entity class="ref_credit_object">
+    </ref_credit_object>
+    <ref_credit_object>
       <code>02</code>
       <name_kz>Услуги для производственного процесса</name_kz>
       <name_ru>Услуги для производственного процесса</name_ru>
-    </entity>
-    <entity class="ref_credit_object">
+    </ref_credit_object>
+    <ref_credit_object>
       <code>10</code>
       <name_kz>Прочие</name_kz>
       <name_ru>Прочие</name_ru>
-    </entity>
-    <entity class="ref_credit_object">
+    </ref_credit_object>
+    <ref_credit_object>
       <code>01</code>
       <name_kz>Товары для производственного процесса (оборотные средства)</name_kz>
       <name_ru>Товары для производственного процесса (оборотные средства)</name_ru>
-    </entity>
-    <entity class="ref_credit_object">
+    </ref_credit_object>
+    <ref_credit_object>
       <code>07</code>
       <name_kz>Коммерческая недвижимость</name_kz>
       <name_ru>Коммерческая недвижимость</name_ru>
-    </entity>
-    <entity class="ref_credit_object">
+    </ref_credit_object>
+    <ref_credit_object>
       <code>06</code>
       <name_kz>Жилая недвижимость</name_kz>
       <name_ru>Жилая недвижимость</name_ru>
-    </entity>
-    <entity class="ref_credit_object">
+    </ref_credit_object>
+    <ref_credit_object>
       <code>05</code>
       <name_kz>Земля/земельный участок</name_kz>
       <name_ru>Земля/земельный участок</name_ru>
-    </entity>
-    <entity class="ref_credit_object">
+    </ref_credit_object>
+    <ref_credit_object>
       <code>04</code>
       <name_kz>Автомобильный транспорт</name_kz>
       <name_ru>Автомобильный транспорт</name_ru>
-    </entity>
-    <entity class="ref_credit_object">
+    </ref_credit_object>
+    <ref_credit_object>
       <code>09</code>
       <name_kz>Основные фонды</name_kz>
       <name_ru>Основные фонды</name_ru>
-    </entity>
-    <entity class="ref_credit_object">
+    </ref_credit_object>
+    <ref_credit_object>
       <code>08</code>
       <name_kz>Ценные бумаги </name_kz>
       <name_ru>Ценные бумаги </name_ru>
-    </entity>
+    </ref_credit_object>
   </entities>
 </batch>

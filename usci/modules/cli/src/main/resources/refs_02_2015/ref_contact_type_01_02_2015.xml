@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
   <entities>
-    <entity class="ref_contact_type">
+    <ref_contact_type>
       <code>0003</code>
-      <name_ru>Мобильный телефон</name_ru>
-    </entity>
-    <entity class="ref_contact_type">
+      <name_kz>sdsd</name_kz>
+      <name_ru>Мобильный телефон1</name_ru>
+    </ref_contact_type>
+    <ref_contact_type>
       <code>0002</code>
       <name_ru>Офисный телефон</name_ru>
-    </entity>
-    <entity class="ref_contact_type">
+    </ref_contact_type>
+    <ref_contact_type>
       <code>0001</code>
       <name_kz>Домашний телефон</name_kz>
       <name_ru>Домашний телефон</name_ru>
-    </entity>
-    <entity class="ref_contact_type">
+    </ref_contact_type>
+    <ref_contact_type>
       <code>0006</code>
       <name_ru>Web сайт</name_ru>
-    </entity>
-    <entity class="ref_contact_type">
+    </ref_contact_type>
+    <ref_contact_type>
       <code>0005</code>
       <name_ru>email</name_ru>
-    </entity>
-    <entity class="ref_contact_type">
+    </ref_contact_type>
+    <ref_contact_type>
       <code>0004</code>
       <name_ru>Факс</name_ru>
-    </entity>
+    </ref_contact_type>
   </entities>
 </batch>
