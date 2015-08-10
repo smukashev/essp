@@ -340,14 +340,16 @@ function addField(form, attr, idSuffix, node) {
                 })
         );
     } else if (attr.type == "INTEGER" || attr.type == "DOUBLE") {
-        form.add(Ext.create("Ext.form.field.Number",
+        form.add(Ext.create(Ext.form.NumberField,
                 {
                     id: attr.code + "FromItem" + idSuffix,
                     fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
                     labelWidth: labelWidth,
                     width: width,
                     value: attr.value,
+                    minValue: 0,
                     allowDecimals: attr.type == "DOUBLE",
+                    forcePrecision: attr.type == "DOUBLE",
                     readOnly: readOnly,
                     allowBlank: allowBlank,
                     blankText: label_REQUIRED_FIELD
@@ -583,6 +585,26 @@ Ext.onReady(function() {
             return Ext.apply(me.callParent(), {
                 checked: (me.checked ? 'checked' : '')
             });
+        }
+    });
+
+    Ext.override(Ext.form.NumberField, {
+        forcePrecision : false,
+
+        valueToRaw: function(value) {
+            var me = this,
+                decimalSeparator = me.decimalSeparator;
+            value = me.parseValue(value);
+            value = me.fixPrecision(value);
+            value = Ext.isNumber(value) ? value : parseFloat(String(value).replace(decimalSeparator, '.'));
+            if (isNaN(value))
+            {
+                value = '';
+            } else {
+                value = me.forcePrecision ? value.toFixed(me.decimalPrecision) : parseFloat(value);
+                value = String(value).replace(".", decimalSeparator);
+            }
+            return value;
         }
     });
 
