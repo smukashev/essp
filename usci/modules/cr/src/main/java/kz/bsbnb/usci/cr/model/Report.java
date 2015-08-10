@@ -8,8 +8,8 @@ public class Report implements Serializable {
 
     public final static String INITIAL_REPORT_DATE_STR = "01/04/2013";
 
-    public final static HashMap<Long, String> STATUS_NAME_MAP = new HashMap<Long, String>();
-    public final static HashMap<Long, String> STATUS_CODE_MAP = new HashMap<Long, String>();
+    public final static HashMap<Long, String> STATUS_NAME_MAP = new HashMap<>();
+    public final static HashMap<Long, String> STATUS_CODE_MAP = new HashMap<>();
 
     static {
         STATUS_NAME_MAP.put(90l, "В процессе");
@@ -21,6 +21,7 @@ public class Report implements Serializable {
         STATUS_NAME_MAP.put(77l, "Отконтроллирован без ошибок");
         STATUS_NAME_MAP.put(128l, "Утвержден организацией");
         STATUS_NAME_MAP.put(127l, "Идет подтверждение");
+
 
         STATUS_CODE_MAP.put(90l, "RECIPIENCY_IN_PROGRESS");
         STATUS_CODE_MAP.put(91l, "CROSS_CHECK_ERROR");
@@ -120,7 +121,7 @@ public class Report implements Serializable {
     }
 
     public Shared getStatus() {
-        if (statusId != null && (status == null || status.getId() != statusId.longValue())) {
+        if (statusId != null && (status == null || status.getId() != statusId)) {
             status = new Shared();
             status.setId(statusId);
             status.setCode(STATUS_CODE_MAP.get(statusId));

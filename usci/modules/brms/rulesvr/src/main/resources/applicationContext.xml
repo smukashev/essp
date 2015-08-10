@@ -87,4 +87,10 @@
         <property name="serviceInterface" value="kz.bsbnb.usci.sync.service.IEntityService"/>
     </bean>
 
+    <bean id="remoteMetaService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="refreshStubOnConnectFailure" value="true"/>
+        <property name="serviceUrl" value="rmi://127.0.0.1:1099/metaFactoryService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IMetaFactoryService" />
+    </bean>
+
 </beans>

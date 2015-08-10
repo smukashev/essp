@@ -2,6 +2,7 @@ var label_EDIT = 'Өзгерту';
 var label_CODE = 'Код';
 var label_TITLE = 'Аты';
 var label_ITEMS = 'Элементтер';
+var label_REFERENCE = 'Справочник';
 var label_ERROR = 'Қате';
 var label_ERROR_NO_DATA = 'Мәліметтерді алу мүмкін емес';
 var label_VIEW = 'Көру';

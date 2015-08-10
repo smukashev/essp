@@ -24,10 +24,7 @@ import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.eav.model.mail.*;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;

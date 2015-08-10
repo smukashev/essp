@@ -169,7 +169,7 @@ function createMetaClassTreeStub(classId, className) {
 function createMetaClassesListView() {
     Ext.define('metaClassListModel', {
         extend: 'Ext.data.Model',
-        fields: ['classId','className']
+        fields: ['classId','className', 'disabled', 'isReference']
     });
 
     var metaClassListStore = Ext.create('Ext.data.Store', {
@@ -177,6 +177,8 @@ function createMetaClassesListView() {
         model: 'metaClassListModel',
         remoteGroup: true,
         buffered: true,
+        autoLoad: true,
+        autoSync: true,
         leadingBufferZone: 300,
         pageSize: 100,
         proxy: {
@@ -210,7 +212,7 @@ function createMetaClassesListView() {
                     tooltip: label_EDIT,
                     handler: function (grid, rowIndex, colIndex) {
                         var record = metaClassListStore.getAt(rowIndex);
-                        createMCForm(record.get('classId'), record.get('className'), grid, record).show();
+                        createMCForm(record.get('classId'), record.get('className'), record.get('disabled'), record.get('isReference'), grid, record).show();
                     }}
                 ]
             },
@@ -234,6 +236,7 @@ function createMetaClassesListView() {
                             },
                             success: function(response, opts) {
                                 //reloadInfinitStore(store);
+                                Ext.getCmp('metaClassesGrid').getStore().load();
                             },
                             failure: function(response, opts) {
                                 alert("error");
@@ -246,11 +249,45 @@ function createMetaClassesListView() {
                 text     : label_TITLE,
                 dataIndex: 'className',
                 flex: 1
+            },
+            {
+                text     : label_CODE,
+                dataIndex: 'classId',
+                flex: 1
+            },
+            {
+                text     : label_REFERENCE,
+                dataIndex: 'isReference',
+                flex: 1,
+                renderer: function(val)
+                {
+                    if(val==true)
+                    {
+                       return 'Да';
+                    }
+                    else
+                    {
+                        return 'Нет';
+                    }
+
+                }
             }
         ],
+        viewConfig: {
+            forceFit: true,
+            getRowClass: function(record, index) {
+                var rec = metaClassListStore.getAt(index);
+                var c = rec.get('disabled');
+                if (c == 1) {
+                    return 'disable';
+                } else if (c == 0) {
+                    return 'enable';
+                }
+            }
+        },
         xtype : 'panel',
         region: 'west',
-        width: 150,
+        width: 250,
         collapsible: true,
         split:true,
         minSize:50,
@@ -263,7 +300,7 @@ function createMetaClassesListView() {
             },
             itemdblclick: function(dv, record, item, index, e) {
                 grid = Ext.getCmp("metaClassesGrid");
-                createMCForm(record.get('classId'), record.get('className'), grid, record).show();
+                createMCForm(record.get('classId'), record.get('className'), record.get('disabled'), record.get('isReference'), grid, record).show();
             }
         },
         dockedItems: [{
@@ -273,7 +310,7 @@ function createMetaClassesListView() {
                 icon: contextPathUrl + '/pics/add.png',
                 handler: function(){
                     grid = Ext.getCmp("metaClassesGrid");
-                    createMCForm("", "", grid, null).show();
+                    createMCForm("", "", "", "",  grid, null).show();
                 }
             }]
         }]

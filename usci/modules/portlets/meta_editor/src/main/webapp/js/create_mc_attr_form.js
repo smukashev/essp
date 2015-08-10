@@ -34,6 +34,7 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
                             is_Key = Ext.getCmp('is_Key');
                             is_Required = Ext.getCmp('is_Required');
                             is_Nullable = Ext.getCmp('is_Nullable');
+                            is_Final = Ext.getCmp('is_Final');
                             if(attrTypeField.getValue() == 1 || attrTypeField.getValue() == 3) {
                                 callback(attrPathPart.getValue() + attrPathCode.getValue(),
                                     attrTitle.getValue(), true);
@@ -267,7 +268,26 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
             valueField:'Id',
             displayField:'Text',
             queryMode:'local'
-        }],
+        },
+            {
+                fieldLabel: 'IS FINAL',
+                id: 'is_Final',
+                name: 'is_Final',
+                xtype: 'combobox',
+                store: new Ext.data.SimpleStore({
+                    id:0,
+                    fields:
+                        [
+                            'Id',
+                            'Text'
+                        ],
+                    data: attributeRequireType
+                }),
+                valueField:'Id',
+                displayField:'Text',
+                queryMode:'local'
+            }
+        ],
 
         buttons: [buttonSave, buttonClose]
     });
@@ -310,6 +330,8 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
                     is_Key.setValue(data.data.is_key);
                     is_Required = Ext.getCmp('is_Required');
                     is_Required.setValue(data.data.is_required);
+                    is_Required = Ext.getCmp('is_Final');
+                    is_Required.setValue(data.data.is_final);
                     if(data.data.is_key=='true')
                     {
                         is_Nullable = Ext.getCmp('is_Nullable');

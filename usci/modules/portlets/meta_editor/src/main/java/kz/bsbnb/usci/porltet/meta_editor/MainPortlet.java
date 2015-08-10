@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.porltet.meta_editor;
 
 import com.google.gson.Gson;
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
@@ -23,6 +23,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import javax.portlet.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class MainPortlet extends MVCPortlet {
@@ -70,6 +71,8 @@ public class MainPortlet extends MVCPortlet {
             e.printStackTrace();
         } catch (SystemException e) {
             e.printStackTrace();
+        } catch (com.liferay.portal.kernel.exception.PortalException e) {
+            e.printStackTrace();
         }
 
         if(!hasRights)
@@ -114,14 +117,16 @@ public class MainPortlet extends MVCPortlet {
 
                     for (MetaClassName metaName : metaClassesList) {
                         MetaClassListEntry metaClassListEntry = new MetaClassListEntry();
-
+                       // if(metaName.getIsDisabled()==1)
+                         //   continue;
                         metaClassListEntry.setClassId(metaName.getClassName());
                         if(metaName.getClassTitle() != null
                                 && metaName.getClassTitle().trim().length() > 0)
                             metaClassListEntry.setClassName(metaName.getClassTitle());
                         else
                             metaClassListEntry.setClassName(metaName.getClassName());
-
+                        metaClassListEntry.setDisabled(metaName.isDisabled());
+                        metaClassListEntry.setReference(metaName.isReference());
                         classesListJson.getData().add(metaClassListEntry);
                     }
 
@@ -284,9 +289,12 @@ public class MainPortlet extends MVCPortlet {
                     String classId = resourceRequest.getParameter("classId");
                     if (classId != null && classId.trim().length() > 0) {
                         String className = resourceRequest.getParameter("className");
+                        String isDisabled = resourceRequest.getParameter("isDisabled");
+                        String isReference = resourceRequest.getParameter("isReference");
                         MetaClass meta = null;
                         try {
-                            meta = metaFactoryService.getMetaClass(classId);
+
+                            meta = metaFactoryService.getDisabledMetaClass(classId);
                         } catch (IllegalArgumentException ex) {}
 
 
@@ -295,6 +303,9 @@ public class MainPortlet extends MVCPortlet {
                         }
 
                         meta.setClassTitle(className);
+                        meta.setDisabled(Boolean.parseBoolean(isDisabled));
+                        meta.setReference(Boolean.parseBoolean(isReference));
+
                        // meta.setClassName(classId);
 
 
@@ -314,6 +325,7 @@ public class MainPortlet extends MVCPortlet {
                         Boolean is_key  = false;
                         Boolean is_required  = false;
                         Boolean is_nullable  = false;
+                        Boolean is_final = false;
                         if (dotIndex < 0) {
                             className = attrPath;
                         } else {
@@ -375,9 +387,11 @@ public class MainPortlet extends MVCPortlet {
                                 is_key  = Boolean.parseBoolean(resourceRequest.getParameter("is_Key"));
                                 is_required  = Boolean.parseBoolean(resourceRequest.getParameter("is_Required"));
                                 is_nullable  = Boolean.parseBoolean(resourceRequest.getParameter("is_Nullable"));
+                                is_final  = Boolean.parseBoolean(resourceRequest.getParameter("is_Final"));
                                 attrToAdd.setKey(is_key);
                                 attrToAdd.setRequired(is_required);
                                 attrToAdd.setNullable(is_nullable);
+                                attrToAdd.setFinal(is_final);
                                 metaParent.setMetaAttribute(attrPathCode, attrToAdd);
 
                             }

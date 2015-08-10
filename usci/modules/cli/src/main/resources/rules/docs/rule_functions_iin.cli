@@ -4,7 +4,7 @@ title: функций для проверки иин
 function List getInvalidIINs(List iins){
     List ret = new ArrayList();
     for(Object iin : iins) {
-        if(!iinCorrect((String) iin ) && !BRMSHelper.isExclusiveIIN((String) iin))
+        if(!iinCorrect((String) iin ) && !isExclusiveIIN((String) iin))
             ret.add(iin);
     }
     return ret;

@@ -4,6 +4,8 @@ public class MetaClassListEntry
 {
     private String className;
     private String classId;
+    private boolean disabled = false;
+    private boolean isReference = false;
 
     public String getClassName()
     {
@@ -23,5 +25,22 @@ public class MetaClassListEntry
     public void setClassId(String classId)
     {
         this.classId = classId;
+    }
+
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public boolean isReference() {
+        return isReference;
+    }
+
+    public void setReference(boolean isReference) {
+        this.isReference = isReference;
     }
 }

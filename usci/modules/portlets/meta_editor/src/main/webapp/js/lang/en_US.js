@@ -3,6 +3,7 @@ var label_EDIT = 'Редактировать';
 var label_DATE = 'Дата';
 var label_CODE = 'Код';
 var label_TITLE = 'Наименование';
+var label_REFERENCE = 'Справочник';
 var label_ITEMS = 'Элементы';
 var label_ERROR = 'Ошибка';
 var label_ERROR_NO_DATA = 'Не возможно получить данные';

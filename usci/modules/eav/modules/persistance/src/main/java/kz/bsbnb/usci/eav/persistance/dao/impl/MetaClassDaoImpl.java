@@ -132,7 +132,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         EAV_M_CLASSES.IS_REFERENCE
                     ).from(EAV_M_CLASSES).
                     where(
-                        EAV_M_CLASSES.NAME.equal(metaClass.getClassName())
+                            EAV_M_CLASSES.NAME.equal(metaClass.getClassName())
                     ).and(
                         EAV_M_CLASSES.BEGIN_DATE.le(DataUtils.convert(metaClass.getBeginDate()))
                 ).and(
@@ -154,7 +154,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     EAV_M_CLASSES.IS_REFERENCE
                 ).from(EAV_M_CLASSES).
                 where(
-                    EAV_M_CLASSES.ID.equal(metaClass.getId())
+                        EAV_M_CLASSES.ID.equal(metaClass.getId())
                 ).limit(1).offset(0);
         }
 
@@ -186,7 +186,100 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
             logger.error("Can't load metaClass, empty data set.");
         }
     }
-	
+
+    //This method only for meta editor portlet
+    private void loadAllClass(MetaClass metaClass, boolean beginDateStrict)
+    {
+        SelectForUpdateStep select;
+
+        if(metaClass.getId() < 1)
+        {
+            if(metaClass.getClassName() == null)
+                throw new IllegalArgumentException("Meta class does not have name or id. Can't load.");
+
+            if(beginDateStrict)
+            {
+                select = context.select(
+                        EAV_M_CLASSES.IS_DISABLED,
+                        EAV_M_CLASSES.BEGIN_DATE,
+                        EAV_M_CLASSES.ID,
+                        EAV_M_CLASSES.NAME,
+                        EAV_M_CLASSES.TITLE,
+                        EAV_M_CLASSES.COMPLEX_KEY_TYPE,
+                        EAV_M_CLASSES.PARENT_IS_KEY,
+                        EAV_M_CLASSES.IS_REFERENCE
+                ).from(EAV_M_CLASSES).
+                        where(
+                                EAV_M_CLASSES.NAME.equal(metaClass.getClassName())
+                        ).and(
+                        EAV_M_CLASSES.BEGIN_DATE.eq(DataUtils.convert(metaClass.getBeginDate()))
+                ).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
+            }
+            else
+            {
+                select = context.select(
+                        EAV_M_CLASSES.IS_DISABLED,
+                        EAV_M_CLASSES.BEGIN_DATE,
+                        EAV_M_CLASSES.ID,
+                        EAV_M_CLASSES.NAME,
+                        EAV_M_CLASSES.TITLE,
+                        EAV_M_CLASSES.COMPLEX_KEY_TYPE,
+                        EAV_M_CLASSES.PARENT_IS_KEY,
+                        EAV_M_CLASSES.IS_REFERENCE
+                ).from(EAV_M_CLASSES).
+                        where(
+                                EAV_M_CLASSES.NAME.equal(metaClass.getClassName())
+                        ).and(
+                        EAV_M_CLASSES.BEGIN_DATE.le(DataUtils.convert(metaClass.getBeginDate()))
+                ).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
+            }
+
+        }
+        else
+        {
+            select = context.select(
+                    EAV_M_CLASSES.IS_DISABLED,
+                    EAV_M_CLASSES.BEGIN_DATE,
+                    EAV_M_CLASSES.ID,
+                    EAV_M_CLASSES.NAME,
+                    EAV_M_CLASSES.TITLE,
+                    EAV_M_CLASSES.COMPLEX_KEY_TYPE,
+                    EAV_M_CLASSES.PARENT_IS_KEY,
+                    EAV_M_CLASSES.IS_REFERENCE
+            ).from(EAV_M_CLASSES).
+                    where(
+                            EAV_M_CLASSES.ID.equal(metaClass.getId())
+                    ).limit(1).offset(0);
+        }
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+            throw new IllegalArgumentException("More then one class found. Can't load class : "
+                    + metaClass.getClassName());
+
+        if (rows.size() < 1)
+            throw new IllegalArgumentException("Class not found. Can't load class : "
+                    + metaClass.getClassName());
+
+        Map<String, Object> row = rows.get(0);
+
+        if(row != null) {
+
+
+            metaClass.setDisabled(((BigDecimal)row.get("is_disabled")).longValue() == 1);
+            metaClass.setBeginDate(DataUtils.convert((Timestamp)row.get("begin_date")));
+            metaClass.setId(((BigDecimal)row.get("id")).longValue());
+            metaClass.setClassName((String)row.get("name"));
+            metaClass.setClassTitle((String) row.get("title"));
+            metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
+            metaClass.setReference(((BigDecimal)row.get("is_reference")).longValue() == 1);
+            metaClass.setParentIsKey(((BigDecimal) row.get("parent_is_key")).longValue() == 1);
+        } else {
+            logger.error("Can't load metaClass, empty data set.");
+        }
+    }
 	private long createClass(MetaClass metaClass)
     {
         try
@@ -391,10 +484,10 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                                     EAV_M_SET_KEY_FILTER.SET_ID,
                                     EAV_M_SET_KEY_FILTER.ATTR_NAME,
                                     EAV_M_SET_KEY_FILTER.VALUE).values(
-                                        id,
-                                        attrName,
-                                        val
-                                    );
+                            id,
+                            attrName,
+                            val
+                    );
 
                     t = 0;
                     if(sqlStats != null)
@@ -1078,6 +1171,16 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 	}
 
     @Override
+    public MetaClass loadDisabled(String className) {
+        MetaClass meta = new MetaClass(className);
+
+        loadAllClass(meta, false);
+        loadAttributes(meta);
+
+        return meta;
+    }
+
+    @Override
     public MetaClass load(String className, Date beginDate) {
         MetaClass meta = new MetaClass(className, beginDate);
 
@@ -1224,7 +1327,9 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         join = context.select(
                 EAV_M_CLASSES.ID,
                 EAV_M_CLASSES.NAME,
-                EAV_M_CLASSES.TITLE
+                EAV_M_CLASSES.TITLE,
+                EAV_M_CLASSES.IS_DISABLED,
+                EAV_M_CLASSES.IS_REFERENCE
         ).from(EAV_M_CLASSES);
 
         if(refs)
@@ -1243,9 +1348,11 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
             MetaClassName metaClassName = new MetaClassName();
 
-            metaClassName.setId(((BigDecimal)row.get("id")).longValue());
-            metaClassName.setClassName((String)row.get("name"));
-            metaClassName.setClassTitle((String)row.get("title"));
+            metaClassName.setId(((BigDecimal) row.get("id")).longValue());
+             metaClassName.setClassName((String) row.get("name"));
+            metaClassName.setClassTitle((String) row.get("title"));
+            metaClassName.setDisabled(((BigDecimal) row.get("is_disabled")).longValue() == 1);
+            metaClassName.setReference(((BigDecimal) row.get("is_reference")).longValue() == 1);
             metaClassNameList.add(metaClassName);
         }
 
