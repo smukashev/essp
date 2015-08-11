@@ -9,21 +9,22 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.liferay.util.portlet.PortletProps;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
+import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.form.ISearcherFormService;
-import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.util.Pair;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
@@ -39,11 +40,13 @@ public class MainPortlet extends MVCPortlet {
     private RmiProxyFactoryBean entityServiceFactoryBean;
     private RmiProxyFactoryBean batchEntryServiceFactoryBean;
     private RmiProxyFactoryBean searcherFormEntryServiceFactoryBean;
+    private RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean;
 
     private IMetaFactoryService metaFactoryService;
     private IEntityService entityService;
     private IBatchEntryService batchEntryService;
     private ISearcherFormService searcherFormService;
+    private PortalUserBeanRemoteBusiness portalUserBusiness;
 
     public void connectToServices() {
         try {
@@ -79,11 +82,19 @@ public class MainPortlet extends MVCPortlet {
             searcherFormEntryServiceFactoryBean.afterPropertiesSet();
             searcherFormService = (ISearcherFormService) searcherFormEntryServiceFactoryBean.getObject();
 
+            portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+            portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
+            portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
+
+            portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+            portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+
         } catch (Exception e) {
             System.out.println("Can\"t initialise services: " + e.getMessage());
         }
     }
 
+    private final Logger logger = LoggerFactory.getLogger(MainPortlet.class);
     private List<String> classesFilter;
 
     @Override
@@ -156,7 +167,11 @@ public class MainPortlet extends MVCPortlet {
         return outStr;
     }
 
-    private String entityToJson(BaseEntity entity, String title, String code, IMetaAttribute attr, boolean asRoot) {
+    private String entityToJson(BaseEntity entity, String title, String code, IMetaAttribute attr,
+                                boolean asRoot,
+                                boolean isNb,
+                                long creditorId) {
+
         MetaClass meta = entity.getMeta();
 
         if (title == null) {
@@ -198,7 +213,7 @@ public class MainPortlet extends MVCPortlet {
                 }
 
                 str +=  entityToJson((BaseEntity)(value.getValue()), attrTitle, innerClassesNames,
-                        meta.getMetaAttribute(innerClassesNames), false);
+                        meta.getMetaAttribute(innerClassesNames), false, isNb, creditorId);
             }
 
         }
@@ -218,7 +233,8 @@ public class MainPortlet extends MVCPortlet {
                     first = false;
                 }
 
-                str +=  setToJson((BaseSet) (value.getValue()), attrTitle, innerClassesNames, value.getMetaAttribute());
+                str +=  setToJson((BaseSet) (value.getValue()), attrTitle, innerClassesNames, value.getMetaAttribute(),
+                        isNb, creditorId);
             }
         }
 
@@ -278,7 +294,9 @@ public class MainPortlet extends MVCPortlet {
         return str;
     }
 
-    private String setToJson(BaseSet set, String title, String code, IMetaAttribute attr) {
+    private String setToJson(BaseSet set, String title, String code, IMetaAttribute attr,
+                             boolean isNb,
+                             long creditorId) {
         IMetaType type = set.getMemberType();
 
         if (title == null) {
@@ -324,13 +342,30 @@ public class MainPortlet extends MVCPortlet {
         if (type.isComplex()) {
             for (IBaseValue value : set.get()) {
                 if (value != null && value.getValue() != null) {
+
+                    //bank relation check
+                    try {
+                        if(!isNb) {
+                            if ("bank_relations".equals(attr.getName())) {
+                                BaseEntity relation = (BaseEntity) value.getValue();
+                                if (((BaseEntity) relation.getEl("creditor")).getId() != creditorId)
+                                    continue;
+                            }
+                        }
+                    } catch(Exception e) {
+                        logger.error(e.getMessage());
+                        // strict mode
+                        continue;
+                    }
+
                     if (!first) {
                         str += ",";
                     } else {
                         first = false;
                     }
 
-                    str +=  entityToJson((BaseEntity)(value.getValue()), "[" + i + "]", "[" + i + "]", null, false);
+                    str +=  entityToJson((BaseEntity)(value.getValue()), "[" + i + "]", "[" + i + "]",
+                            null, false, isNb, creditorId);
                     i++;
                 }
 
@@ -440,7 +475,7 @@ public class MainPortlet extends MVCPortlet {
                     metaName = resourceRequest.getParameter("metaClass");
 
                     MetaClass metaClass = metaFactoryService.getMetaClass(metaName);
-                    HashMap<String,String> parameters = new HashMap<String,String>();
+                    HashMap<String,String> parameters = new HashMap<>();
                     searchClassName = resourceRequest.getParameter("searchName");
 
                     while(list.hasMoreElements()) {
@@ -498,6 +533,27 @@ public class MainPortlet extends MVCPortlet {
                 case LIST_ENTITY:
                     String entityId = resourceRequest.getParameter("entityId");
                     String asRootStr = resourceRequest.getParameter("asRoot");
+                    boolean isNb = false;
+                    long creditorId = -1;
+
+                    for(Role r : currentUser.getRoles())
+                        if("NationalBankEmployee".equals(r.getDescriptiveName()) ||
+                           "Administrator".equals(r.getDescriptiveName())) {
+                            isNb = true;
+                            break;
+                        }
+
+                    List<Creditor> creditors = portalUserBusiness.getPortalUserCreditorList(currentUser.getUserId());
+
+                    if(!isNb) {
+                        if(creditors.size() > 1)
+                            throw new RuntimeException("доступ к более одному банку");
+
+                        if(creditors.size() == 0)
+                            throw new RuntimeException("нет доступа к кредиторам");
+
+                        creditorId = creditors.get(0).getId();
+                    }
 
                     boolean asRoot = StringUtils.isNotEmpty(asRootStr) ? Boolean.valueOf(asRootStr) : false;
 
@@ -514,7 +570,7 @@ public class MainPortlet extends MVCPortlet {
 
                         sJson = "{\"text\":\".\",\"children\": [\n" +
                                 entityToJson(entity, entity.getMeta().getClassTitle(),
-                                        entity.getMeta().getClassName(), null, asRoot) +
+                                        entity.getMeta().getClassName(), null, asRoot, isNb, creditorId) +
                                 "]}";
 
                         out.write(sJson.getBytes());
@@ -543,7 +599,7 @@ public class MainPortlet extends MVCPortlet {
                                 break;
                             BaseEntity currentEntity = it.next();
                             sb.append(entityToJson(currentEntity, currentEntity.getMeta().getClassTitle(),
-                                    currentEntity.getMeta().getClassName(), null, true));
+                                    currentEntity.getMeta().getClassName(), null, true, isNb, creditorId));
 
                             if(it.hasNext()) sb.append(",");
                         } while(true);
@@ -562,7 +618,7 @@ public class MainPortlet extends MVCPortlet {
     }
 
     private RefListResponse refListToShort(RefListResponse refListResponse) {
-        List<Map<String, Object>> shortRows = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> shortRows = new ArrayList<>();
 
         String titleKey = null;
 
@@ -581,7 +637,7 @@ public class MainPortlet extends MVCPortlet {
             Object id = row.get("ID");
             Object title = titleKey != null ? row.get(titleKey) : "------------------------";
 
-            Map<String, Object> shortRow = new HashMap<String, Object>();
+            Map<String, Object> shortRow = new HashMap<>();
             shortRow.put("ID", id);
             shortRow.put("title", title);
             shortRows.add(shortRow);
