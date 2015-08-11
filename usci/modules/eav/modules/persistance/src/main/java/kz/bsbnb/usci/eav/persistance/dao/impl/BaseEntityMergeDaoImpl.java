@@ -83,8 +83,8 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
         long creditorId = 0;
         if (baseEntityLeft.getMeta().getClassName().equals("credit")) {
-            long creditorIdLeft = ((BaseEntity) baseEntityLeft.getEl("data_creditor.creditor")).getId();
-            long creditorIdRight = ((BaseEntity) baseEntityRight.getEl("data_creditor.creditor")).getId();
+            long creditorIdLeft = ((BaseEntity) baseEntityLeft.getEl("creditor")).getId();
+            long creditorIdRight = ((BaseEntity) baseEntityRight.getEl("creditor")).getId();
 
             if (creditorIdLeft != creditorIdRight)
                 throw new IllegalStateException("Нельзя обьединять сущности разных банков");
@@ -231,8 +231,8 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                                 IBaseEntityManager baseEntityManager, MergeResultChoice choice, String attribute) {
         long creditorId = 0;
         if (baseEntityLeft.getMeta().getClassName().equals("credit")) {
-            long creditorIdLeft = ((BaseEntity) baseEntityLeft.getEl("data_creditor.creditor")).getId();
-            long creditorIdRight = ((BaseEntity) baseEntityRight.getEl("data_creditor.creditor")).getId();
+            long creditorIdLeft = ((BaseEntity) baseEntityLeft.getEl("creditor")).getId();
+            long creditorIdRight = ((BaseEntity) baseEntityRight.getEl("creditor")).getId();
 
             if (creditorIdLeft != creditorIdRight)
                 throw new IllegalStateException("Нельзя обьединять сущности разных банков");

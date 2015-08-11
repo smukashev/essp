@@ -28,10 +28,10 @@ showcase list add interest_rate_yearly interest_rate_yearly
 showcase list add maturity_date maturity_date
 showcase list add prolongation_date prolongation_date
 
-showcase list add data_creditor.creditor creditor_id
-showcase list add data_creditor.creditor_branch creditor_branch_id
-showcase list add data_creditor.creditor.code creditor_code
-showcase list add data_creditor.creditor_branch.code creditor_branch_code
+showcase list add creditor creditor_id
+showcase list add creditor_branch creditor_branch_id
+showcase list add creditor.code creditor_code
+showcase list add creditor_branch.code creditor_branch_code
 showcase list add contract.no contract_no
 showcase list add contract.date contract_date
 showcase list add primary_contract.no primary_contract_no
@@ -51,31 +51,13 @@ showcase save
 
 
 #=================================================================================
-# Data_creditor
-#=================================================================================
-
-showcase set meta credit
-showcase set name CORE_DATA_CREDITOR
-showcase set tableName CORE_DATA_CREDITOR
-showcase set downPath data_creditor
-
-showcase list add creditor creditor_id
-showcase list add creditor_branch creditor_branch_id
-
-showcase save
-
-#=================================================================================
-
-
-
-#=================================================================================
 # Person
 #=================================================================================
 
 showcase set meta credit
 showcase set name CORE_PERSON
 showcase set tableName CORE_PERSON
-showcase set downPath data_creditor.persons
+showcase set downPath persons
 
 showcase list add country country_id
 showcase list add offshore offshore_id
@@ -83,7 +65,7 @@ showcase list add offshore offshore_id
 showcase list add country.code country_code
 showcase list add offshore.code offshore_code
 
-showcase list addCustom credit data_creditor.creditor creditor_id
+showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -97,7 +79,7 @@ showcase save
 
 showcase set name CORE_ORG
 showcase set tableName CORE_ORG
-showcase set downPath data_creditor.organizations
+showcase set downPath organizations
 
 showcase list add head head_id
 
@@ -108,7 +90,7 @@ showcase list add offshore offshore
 showcase list add enterprise_type enterprise_type
 showcase list add country country
 
-showcase list addCustom credit data_creditor.creditor creditor_id
+showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -122,7 +104,7 @@ showcase save
 
 showcase set name CORE_ORG_HEAD_NAMES
 showcase set tableName CORE_ORG_HEAD_NAMES
-showcase set downPath data_creditor.organizations
+showcase set downPath organizations
 
 showcase list add head.names name_id
 
@@ -143,7 +125,7 @@ showcase save
 
 showcase set name CORE_ORG_HEAD_DOCS
 showcase set tableName CORE_ORG_HEAD_DOCS
-showcase set downPath data_creditor.organizations.head
+showcase set downPath organizations.head
 
 showcase list add docs doc_id
 
@@ -164,9 +146,9 @@ showcase save
 showcase set name CORE_DEBTOR_PERSON
 showcase set tableName CORE_DEBTOR_PERSON
 
-showcase list add data_creditor.persons person_id
+showcase list add persons person_id
 
-showcase list addCustom credit data_creditor.creditor creditor_sender_id
+showcase list addCustom credit creditor creditor_sender_id
 
 showcase save
 
@@ -181,9 +163,9 @@ showcase save
 showcase set name CORE_DEBTOR_ORG
 showcase set tableName CORE_DEBTOR_ORG
 
-showcase list add data_creditor.organizations org_id
+showcase list add organizations org_id
 
-showcase list addCustom credit data_creditor.creditor creditor_sender_id
+showcase list addCustom credit creditor creditor_sender_id
 
 showcase save
 
@@ -198,9 +180,9 @@ showcase save
 showcase set name CORE_DEBTOR_CREDITOR
 showcase set tableName CORE_DEBTOR_CREDITOR
 
-showcase list add data_creditor.creditors creditor_id
+showcase list add creditors creditor_id
 
-showcase list addCustom credit data_creditor.creditor creditor_sender_id
+showcase list addCustom credit creditor creditor_sender_id
 
 showcase save
 
@@ -214,7 +196,7 @@ showcase save
 
 showcase set name CORE_PERSON_ADDRESS
 showcase set tableName CORE_PERSON_ADDRESS
-showcase set downPath data_creditor.persons
+showcase set downPath persons
 
 showcase list add addresses address_id
 showcase list add addresses.region region_id
@@ -235,7 +217,7 @@ showcase save
 
 showcase set name CORE_ORG_ADDRESS
 showcase set tableName CORE_ORG_ADDRESS
-showcase set downPath data_creditor.organizations
+showcase set downPath organizations
 
 showcase list add addresses address_id
 showcase list add addresses.region region_id
@@ -256,7 +238,7 @@ showcase save
 
 showcase set name CORE_PERSON_CONTACTS
 showcase set tableName CORE_PERSON_CONTACTS
-showcase set downPath data_creditor.persons
+showcase set downPath persons
 
 showcase list add contacts contact_id
 showcase list add contacts.contact_type contact_type_id
@@ -275,7 +257,7 @@ showcase save
 
 showcase set name CORE_ORG_CONTACTS
 showcase set tableName CORE_ORG_CONTACTS
-showcase set downPath data_creditor.organizations
+showcase set downPath organizations
 
 showcase list add contacts contact_id
 showcase list add contacts.contact_type contact_type_id
@@ -294,7 +276,7 @@ showcase save
 
 showcase set name CORE_PERSON_DOC
 showcase set tableName CORE_PERSON_DOC
-showcase set downPath data_creditor.persons
+showcase set downPath persons
 
 showcase list add docs doc_id
 
@@ -313,7 +295,7 @@ showcase save
 
 showcase set name CORE_ORG_DOC
 showcase set tableName CORE_ORG_DOC
-showcase set downPath data_creditor.organizations
+showcase set downPath organizations
 
 showcase list add docs doc_id
 
@@ -332,7 +314,7 @@ showcase save
 
 showcase set name CORE_PERSON_NAME
 showcase set tableName CORE_PERSON_NAME
-showcase set downPath data_creditor.persons
+showcase set downPath persons
 
 showcase list add names name_id
 
@@ -353,7 +335,7 @@ showcase save
 
 showcase set name CORE_ORG_NAME
 showcase set tableName CORE_ORG_NAME
-showcase set downPath data_creditor.organizations
+showcase set downPath organizations
 
 showcase list add names name_id
 
@@ -372,7 +354,7 @@ showcase save
 
 showcase set name CORE_TURNOVER
 showcase set tableName CORE_TURNOVER
-showcase set downPath data_creditor.change
+showcase set downPath change
 showcase set final true
 
 showcase list add turnover turnover_id
@@ -386,7 +368,7 @@ showcase list add turnover.issue.interest.amount interest_amount
 showcase list add turnover.issue.interest.amount_currency interest_amount_currency
 
 showcase list addCustom credit root credit_id
-showcase list addCustom credit data_creditor.creditor creditor_id
+showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -400,7 +382,7 @@ showcase save
 
 showcase set name CORE_CREDIT_FLOW
 showcase set tableName CORE_CREDIT_FLOW
-showcase set downPath data_creditor.change
+showcase set downPath change
 showcase set final true
 
 showcase list add credit_flow credit_flow_id
@@ -420,7 +402,7 @@ showcase list add credit_flow.provision.provision_msfo_over_balance.balance_acco
 showcase list add credit_flow.provision.provision_msfo_over_balance.value msfo_ob_value
 
 showcase list addCustom credit root credit_id
-showcase list addCustom credit data_creditor.creditor creditor_id
+showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -434,14 +416,14 @@ showcase save
 
 showcase set name CORE_PLEDGE
 showcase set tableName CORE_PLEDGE
-showcase set downPath data_creditor.pledges
+showcase set downPath pledges
 
 showcase list add pledge_type pledge_type
 showcase list add contract contract
 showcase list add value value
 
 showcase list addCustom credit root credit_id
-showcase list addCustom credit data_creditor.creditor creditor_id
+showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -455,7 +437,7 @@ showcase save
 
 showcase set name CORE_REMAINS
 showcase set tableName CORE_REMAINS
-showcase set downPath data_creditor.change
+showcase set downPath change
 showcase set final true
 
 showcase list add remains remains_id
@@ -507,7 +489,7 @@ showcase list add remains.correction.value corr_value
 showcase list add remains.correction.value_currency corr_cvalue
 
 showcase list addCustom credit root credit_id
-showcase list addCustom credit data_creditor.creditor creditor_id
+showcase list addCustom credit creditor creditor_id
 
 showcase save
 
@@ -521,7 +503,7 @@ showcase save
 
 showcase set name CORE_PERSON_DEBTOR_INFO
 showcase set tableName CORE_PERSON_DEBTOR_INFO
-showcase set downPath data_creditor.persons
+showcase set downPath persons
 
 showcase list add bank_relations person_bank_relation_id
 showcase list add bank_relations.bank_relation ref_bank_relation_id
@@ -539,7 +521,7 @@ showcase save
 
 showcase set name CORE_ORG_DEBTOR_INFO
 showcase set tableName CORE_ORG_DEBTOR_INFO
-showcase set downPath data_creditor.organizations
+showcase set downPath organizations
 
 showcase list add bank_relations org_bank_relation_id
 showcase list add bank_relations.bank_relation ref_bank_relation_id

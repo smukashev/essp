@@ -105,7 +105,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
         long creditorId = 0L;
 
         if (baseEntity.getMeta().getClassName().equals("credit"))
-            creditorId = ((BaseEntity) baseEntity.getEl("data_creditor.creditor")).getId();
+            creditorId = ((BaseEntity) baseEntity.getEl("creditor")).getId();
 
         ArrayList<Long> result = searcherPool.getSearcher(baseEntity.getMeta().getClassName()).
                 findAll(baseEntity, creditorId);

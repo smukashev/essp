@@ -965,7 +965,7 @@ public class CLI {
                 long creditorId = 0L;
 
                 if (entity.getMeta().getClassName().equals("credit"))
-                    creditorId = ((BaseEntity) entity.getEl("data_creditor.creditor")).getId();
+                    creditorId = ((BaseEntity) entity.getEl("creditor")).getId();
 
 
                 ArrayList<Long> ids = searcher.findAll(entity, creditorId);
@@ -1056,7 +1056,7 @@ public class CLI {
             long creditorId = 0L;
 
             if (entity.getMeta().getClassName().equals("credit"))
-                creditorId = ((BaseEntity) entity.getEl("data_creditor.creditor")).getId();
+                creditorId = ((BaseEntity) entity.getEl("creditor")).getId();
 
             SelectConditionStep where = searcher.generateSQL(entity, creditorId, null);
 
@@ -1077,7 +1077,7 @@ public class CLI {
             long creditorId = 0L;
 
             if (entity.getMeta().getClassName().equals("credit"))
-                creditorId = ((BaseEntity) entity.getEl("data_creditor.creditor")).getId();
+                creditorId = ((BaseEntity) entity.getEl("creditor")).getId();
 
             ArrayList<Long> array = searcher.findAll((BaseEntity) entity, creditorId);
 

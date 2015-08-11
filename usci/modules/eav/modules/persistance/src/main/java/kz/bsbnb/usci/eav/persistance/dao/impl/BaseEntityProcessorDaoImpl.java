@@ -146,7 +146,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         long creditorId = 0L;
 
         if (baseEntity.getMeta().getClassName().equals("credit")) {
-            BaseEntity creditor = ((BaseEntity) baseEntity.getEl("data_creditor.creditor"));
+            BaseEntity creditor = ((BaseEntity) baseEntity.getEl("creditor"));
             prepare(creditor, 0);
             creditorId = creditor.getId();
 
