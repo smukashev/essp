@@ -8,6 +8,7 @@ import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.model.json.*;
 import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -143,9 +144,12 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
                     for (BatchStatusJModel statusModel : statusesList) {
                         if (protocolsToDisplay.contains(statusModel.getProtocol())) {
+                            if (StringUtils.isEmpty(lastStatus)) {
+                                lastStatus = statusModel.getProtocol();
+                            }
                             fillProtocol(statusModel, ii);
                         }
-                        lastStatus = fillDates(statusModel, ii);
+                        fillDates(statusModel, ii);
                     }
 
                     BatchInfo manifest = getManifest(id);
