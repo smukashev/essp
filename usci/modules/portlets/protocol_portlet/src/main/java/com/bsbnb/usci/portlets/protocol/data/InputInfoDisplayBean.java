@@ -1,13 +1,14 @@
 package com.bsbnb.usci.portlets.protocol.data;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.util.Date;
 
 import com.bsbnb.usci.portlets.protocol.PortletEnvironmentFacade;
+import com.vaadin.terminal.DownloadStream;
 import com.vaadin.terminal.FileResource;
+import com.vaadin.terminal.StreamResource;
+import com.vaadin.terminal.Terminal;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.BaseTheme;
@@ -22,8 +23,6 @@ public class InputInfoDisplayBean implements Button.ClickListener {
 
     private InputInfo inputInfo;
     private DataProvider provider;
-
-    private final String path = "C:\\tmp_zips";
 
     public InputInfoDisplayBean(InputInfo inputInfo, DataProvider provider) {
         this.inputInfo = inputInfo;
@@ -117,34 +116,21 @@ public class InputInfoDisplayBean implements Button.ClickListener {
 
         final BatchFullJModel batchFullJModel =  provider.getBatchFullModel(batchId);
 
-        final File batchFile = new File(path + "batch_" + batchId + ".zip");
-
-        if(!batchFile.exists()) {
-            try {
-                batchFile.createNewFile();
-            } catch(IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            batchFile.delete();
-        }
-
-        FileOutputStream fos = null;
-
-        try {
-            fos = new FileOutputStream(batchFile);
-            fos.write(batchFullJModel.getContent());
-            fos.close();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        final File batchFile = new File("batch_" + batchId + ".zip");
 
         FileResource resource = new FileResource(batchFile, button.getApplication()) {
             @Override
-            public String getFilename() {
-                return batchFile.getName();
-            }
+            public DownloadStream getStream() {
+                    final DownloadStream ds = new DownloadStream(
+                            new ByteArrayInputStream(batchFullJModel.getContent()),
+                            "application/zip",
+                            new File(batchFullJModel.getFileName()).getName()
+                    );
 
+                    ds.setParameter("Content-Length", String.valueOf(batchFullJModel.getContent()));
+                    ds.setCacheTime(DownloadStream.DEFAULT_CACHETIME);
+                    return ds;
+            }
         };
 
         button.getWindow().open(resource, "_blank");
