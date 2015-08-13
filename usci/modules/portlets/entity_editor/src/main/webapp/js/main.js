@@ -432,7 +432,7 @@ function loadEntity(entityId, date, currentSearch) {
         },
         callback: function(records, operation, success) {
             if (!success) {
-                Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
+                Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
             }
         }
     });

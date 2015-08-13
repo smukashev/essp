@@ -174,6 +174,13 @@ public class MainPortlet extends MVCPortlet {
 
         MetaClass meta = entity.getMeta();
 
+        //credit check
+        if(meta.getClassName().equals("credit") && !isNb) {
+            BaseEntity creditor = (BaseEntity) entity.getEl("creditor");
+            if(creditor.getId() != creditorId)
+                throw new RuntimeException("нет прав для просмотра");
+        }
+
         if (title == null) {
             title = code;
         }
