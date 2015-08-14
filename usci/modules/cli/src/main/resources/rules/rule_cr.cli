@@ -577,4 +577,51 @@ $$$
 
 rule save
 
+rule read $$$
+title: функций проверки филиала
+
+function boolean creditorBranchIsGood(IEntityService entityService, BaseEntity entity) {
+   try {
+      //Извлечь кредитор
+      BaseEntity creditor = (BaseEntity) entity.getEl("creditor");
+      //Проставить ид
+      BaseEntity creditorLoaded = entityService.prepare(creditor);
+
+      //Извлечь филиал
+      BaseEntity creditorBranch = (BaseEntity) entity.getEl("creditor_branch");
+      //Проствить ид
+      BaseEntity creditorBranchFound = entityService.prepare(creditorBranch);
+      Подгрузить все поля филиала
+      BaseEntity creditorBranchLoaded = entityService.load(creditorBranchFound.getId());
+
+      //Извлечь головной банк филиала
+      BaseEntity mainOffice = (BaseEntity) creditorBranchLoaded.getEl("main_office");
+
+      //Проверить на соответсвие
+      return creditorLoaded.getId() == mainOffice.getId();
+
+   } catch (Exception e){
+     //В случае ошибок
+     entity.addValidationError(e.getMessage());
+     return false;
+   }
+}
+$$$
+
+rule save
+
+rule read $$$
+title: проверка филиала
+rule "проверка филиала"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                 &&  !creditorBranchIsGood(entityService, $entity) )
+then
+ $entity.addValidationError("филиал заполнен не верно");
+end
+$$$
+
+rule save
+
+
 quit
