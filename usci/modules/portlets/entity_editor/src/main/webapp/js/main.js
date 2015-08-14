@@ -712,14 +712,17 @@ Ext.onReady(function() {
                     }
                 }
 
-                console.log(params);
+                //console.log(params);
 
+                var loadingGif = document.getElementById('form-loading');
+                loadingGif.style.display = 'inline';
                 entityStore.load({
                     params: params,
                     callback: function (records, operation, success) {
                         if (!success) {
                             Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
                         }
+                        loadingGif.style.display = 'none';
                     }});
             }
         },

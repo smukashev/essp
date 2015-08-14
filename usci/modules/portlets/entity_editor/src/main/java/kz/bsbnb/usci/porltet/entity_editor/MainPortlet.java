@@ -425,6 +425,8 @@ public class MainPortlet extends MVCPortlet {
         return str;
     }
 
+    boolean retry = false;
+
     @Override
     public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws IOException
     {
@@ -619,7 +621,25 @@ public class MainPortlet extends MVCPortlet {
                     break;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            String originalError = e.getMessage();
+            if(originalError.contains("connect"))
+                if(!retry) {
+                    retry = true;
+                    logger.info("connect failed, reconnect triggered");
+                    try {
+                        init();
+                        serveResource(resourceRequest, resourceResponse);
+                    } catch (PortletException e1) {
+                        //resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
+                        out.write(("{ \"success\": false, \"errorMessage\": \""+ originalError + e1.getMessage()
+                                .replaceAll("\"","").replaceAll("\n","")+"\"}").getBytes());
+                    } finally {
+                        retry = false;
+                        return;
+                    }
+                }
+
             out.write(("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}").getBytes());
         }
     }

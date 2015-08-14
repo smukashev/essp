@@ -141,6 +141,7 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
     public String getDom(long userId, IMetaClass metaClass, String prefix) {
         return "Фамилия: <input type='text' name='lastName' style='width: 95%; margin: 5px'></input><br/>" +
                 "Имя: <input type='text' name='firstName' style='width: 95%; margin: 5px'></input><br/>" +
-                "Отчество: <input type='text' name='middleName' style='width: 95%; margin: 5px'></input></form>";
+                "Отчество: <input type='text' name='middleName' style='width: 95%; margin: 5px'></input></form>" +
+                "<div style='text-align:center; width:100%'><img src='/static-usci/ext/resources/ext-theme-classic/images/grid/loading.gif' id='form-loading' style='display:none'/></div>";
     }
 }

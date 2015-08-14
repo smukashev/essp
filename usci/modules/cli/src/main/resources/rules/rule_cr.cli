@@ -591,7 +591,7 @@ function boolean creditorBranchIsGood(IEntityService entityService, BaseEntity e
       BaseEntity creditorBranch = (BaseEntity) entity.getEl("creditor_branch");
       //Проствить ид
       BaseEntity creditorBranchFound = entityService.prepare(creditorBranch);
-      Подгрузить все поля филиала
+      //Подгрузить все поля филиала
       BaseEntity creditorBranchLoaded = entityService.load(creditorBranchFound.getId());
 
       //Извлечь головной банк филиала
