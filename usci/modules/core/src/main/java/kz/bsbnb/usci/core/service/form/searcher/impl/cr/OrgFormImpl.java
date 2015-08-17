@@ -51,7 +51,8 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
 
     @Override
     public String getDom(long userId, IMetaClass metaClass,String prefix) {
-        return "Наименование: <input type='text' name='name' style='width: 95%; margin: 5px'></input>";
+        return "Наименование: <input type='text' name='name' style='width: 95%; margin: 5px'></input>" +
+                "<div style='text-align:center; width:100%'><img src='/static-usci/ext/resources/ext-theme-classic/images/grid/loading.gif' id='form-loading' style='display:none'/></div>";
     }
 
     @Override
