@@ -840,7 +840,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         HashSet<PathElement> rootAttributes;
 
-        if (paths.size() == 0) {
+        if (paths.size() == 0 || paths.get("root") == null) {
             rootAttributes = new HashSet<>();
         } else {
             rootAttributes = paths.get("root");
