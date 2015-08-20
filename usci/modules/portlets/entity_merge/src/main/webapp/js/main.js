@@ -331,7 +331,7 @@ function getForm(){
                     fieldLabel: 'дата',
                     labelWidth: 27,
                     id: 'f1_inp-' + info[1] + '-1',
-                    format: 'd.m.Y',
+                    format: 'd.m.Y'
                 });
             }
         }
@@ -361,7 +361,7 @@ function getForm2(){
                     fieldLabel: 'дата',
                     labelWidth: 27,
                     id: 'f2_inp-' + info[1] + '-2',
-                    format: 'd.m.Y',
+                    format: 'd.m.Y'
                 });
             }
         }
