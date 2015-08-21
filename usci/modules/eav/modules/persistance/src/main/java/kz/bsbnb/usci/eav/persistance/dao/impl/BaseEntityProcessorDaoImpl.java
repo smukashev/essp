@@ -89,6 +89,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public IBaseEntity prepare(IBaseEntity baseEntity, long creditorId) {
         MetaClass metaClass = baseEntity.getMeta();
 
+        creditorId = metaClass.isReference() ? 0 : creditorId;
+
         for (String attribute : baseEntity.getAttributes()) {
             IMetaType metaType = baseEntity.getMemberType(attribute);
             if (metaType.isComplex()) {
@@ -119,13 +121,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
 
         if (metaClass.isSearchable()) {
-            long baseEntityId;
-
-            if (metaClass.isReference()) {
-                baseEntityId = search(baseEntity, 0);
-            } else {
-                baseEntityId = search(baseEntity, creditorId);
-            }
+            long baseEntityId = search(baseEntity, creditorId);
 
             if (baseEntityId > 0)
                 baseEntity.setId(baseEntityId);
