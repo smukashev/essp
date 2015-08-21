@@ -78,4 +78,12 @@ public class BatchFullJModel implements Serializable {
     {
         this.type = type;
     }
+
+    public Long getCreditorId() {
+        return creditorId;
+    }
+
+    public void setCreditorId(Long creditorId) {
+        this.creditorId = creditorId;
+    }
 }
