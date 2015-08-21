@@ -53,14 +53,20 @@ public class UploadApplication extends Application {
             try {
 
                 boolean hasRights = false;
+                boolean isNB = false;
 
                 try {
                     User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
                     if(user != null) {
                         for (Role role : user.getRoles()) {
                             if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
-                                    || role.getName().equals("NationalBankEmployee"))
+                                    || role.getName().equals("NationalBankEmployee")) {
                                 hasRights = true;
+
+                                if (role.getName().equals("NationalBankEmployee")) {
+                                    isNB = true;
+                                }
+                            }
                         }
                     }
                 } catch (PortalException e) {
@@ -74,7 +80,7 @@ public class UploadApplication extends Application {
 
                 Window mainWindow = new Window();
                 mainWindow.addComponent(new MainLayout(
-                        new UploadPortletEnvironmentFacade(PortalUtil.getUser(request))));
+                        new UploadPortletEnvironmentFacade(PortalUtil.getUser(request), isNB)));
                 setMainWindow(mainWindow);
             } catch (PortalException pe) {
                 log.log(Level.SEVERE, "", pe);

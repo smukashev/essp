@@ -15,5 +15,7 @@ public interface PortletEnvironmentFacade {
     public boolean isUsingDigitalSign();
     
     public void setUsingDigitalSign(boolean value);
+
+    public boolean isNB();
     
 }
