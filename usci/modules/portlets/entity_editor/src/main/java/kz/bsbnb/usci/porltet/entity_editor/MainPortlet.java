@@ -602,6 +602,8 @@ public class MainPortlet extends MVCPortlet {
                         }
 
                         searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "");
+                        if(searchResult.getData() == null)
+                            throw new IllegalArgumentException("ошибка сериализации");
 
                         StringBuilder sb = new StringBuilder("{\"text\":\".\",\"children\": [\n");
                         Iterator<BaseEntity> it = searchResult.iterator();
