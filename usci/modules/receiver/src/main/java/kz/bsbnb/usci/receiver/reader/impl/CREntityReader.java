@@ -144,6 +144,7 @@ public class CREntityReader<T> extends CommonReader<T> {
         //
 
         batch = batchService.load(batchId);
+        batch.setCreditorId(batchFullJModel.getCreditorId());
 
         try
         {

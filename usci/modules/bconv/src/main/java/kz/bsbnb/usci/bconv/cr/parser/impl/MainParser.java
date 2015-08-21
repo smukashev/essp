@@ -53,11 +53,17 @@ public class MainParser extends BatchParser {
         long currentIndex = index++;
 
         packageParser.parse(xmlReader, batch, currentIndex);
+        long creditorId = 0;
 
         if (packageParser.hasMore()) {
             currentBaseEntity = packageParser.getCurrentBaseEntity();
             BaseEntity creditor = infoParser.getCurrentBaseEntity();
+            if(creditorId == 0)
+                creditorId = baseEntityRepository.getBaseEntityProcessorDao().prepare(creditor).getId();
+
             currentBaseEntity.put("creditor", new BaseEntityComplexValue(batch, currentIndex, creditor));
+            if(creditorId!= batch.getId())
+                currentBaseEntity.addValidationError("Кредитор заполнен не верно");
 
             for(String s : creditor.getValidationErrors()) {
                 currentBaseEntity.addValidationError(s);

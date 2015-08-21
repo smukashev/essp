@@ -26,6 +26,8 @@ public class Batch extends Persistable
 
     private Long userId;
 
+    private  Long creditorId;
+
     /**
      * Initializes batch with the default values.
      */
@@ -128,5 +130,13 @@ public class Batch extends Persistable
         DataUtils.toBeginningOfTheDay(newReportDate);
 
         this.repDate = newReportDate;
+    }
+
+    public Long getCreditorId() {
+        return creditorId;
+    }
+
+    public void setCreditorId(Long creditorId) {
+        this.creditorId = creditorId;
     }
 }

@@ -3,19 +3,15 @@ package kz.bsbnb.usci.core.service.form.impl;
 import kz.bsbnb.usci.core.service.form.ISearcherFormService;
 import kz.bsbnb.usci.core.service.form.pool.ISearcherFormPool;
 import kz.bsbnb.usci.core.service.form.searcher.ISearcherForm;
-import kz.bsbnb.usci.eav.model.base.IBaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-/**
- * Created by Bauyrzhan.Makhambeto on 19/02/2015.
- */
 @Service
 public class SearcherFormServiceImpl implements ISearcherFormService {
 
@@ -51,7 +47,7 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
     }
 
     @Override
-    public List<BaseEntity> search(String searchClassName, HashMap<String, String> parameters, MetaClass metaClass,String prefix) {
+    public ISearchResult search(String searchClassName, HashMap<String, String> parameters, MetaClass metaClass,String prefix) {
         ISearcherForm sf = getSearchForm(searchClassName);
         return sf.search(parameters, metaClass, prefix);
     }

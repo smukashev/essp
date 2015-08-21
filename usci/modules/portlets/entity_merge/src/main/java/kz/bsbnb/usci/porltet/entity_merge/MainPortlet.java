@@ -20,6 +20,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.Pair;
 import kz.bsbnb.usci.sync.service.IEntityService;
@@ -603,12 +604,17 @@ public class MainPortlet extends MVCPortlet {
                         parameters.put(attribute, resourceRequest.getParameter(attribute));
                     }
 
-                    List<BaseEntity> entityList = searcherFormService.search(searchClassName, parameters, metaClass, prefix);
+                    ISearchResult searchResult = searcherFormService.search(searchClassName, parameters, metaClass, prefix);
+
+                    if(searchResult.getData() == null)
+                        throw new RuntimeException("ошибка сериализации");
+
+                    Iterator<BaseEntity> cursor = searchResult.iterator();
 
                     long ret = -1;
 
-                    if(entityList.size() > 0) {
-                        ret = entityList.get(0).getId();
+                    if(cursor.hasNext()) {
+                        ret = cursor.next().getId();
                         ret = ret > 0 ? ret : -1;
                     }
 
