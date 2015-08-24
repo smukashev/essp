@@ -48,14 +48,19 @@ function boolean isExclusiveIIN(String iin) {
         IMetaFactoryService metaService = BRMSHelper.getMetaService();
 
         //Инициализация сущности - для поиска
-        BaseEntity be = new BaseEntity(metaService.getMetaClass("ref_exclusive_iin"), new Date());
+        BaseEntity be = new BaseEntity(metaService.getMetaClass("ref_exclusive_doc"), new Date());
+
+        BaseEntity docType = new BaseEntity(metaService.getMetaClass("ref_doc_type"), new Date());
 
         //Батч объект - не используется при просмотре данных. Задаем произвольный ид. т.е 1
         Batch b = new Batch(new Date());
         b.setId(1L);
 
+        docType.put("code", new BaseValue(b,1,"06"));
+
         //заполняем параметры поиска
         be.put("code",new BaseValue(b, 1, iin));
+        be.put("doc_type", new BaseValue(b,1, docType));
 
         //Поиск сущности
         BaseEntity res = entityService.prepare(be);

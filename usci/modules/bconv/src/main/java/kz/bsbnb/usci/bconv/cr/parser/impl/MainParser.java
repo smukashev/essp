@@ -62,7 +62,7 @@ public class MainParser extends BatchParser {
                 creditorId = baseEntityRepository.getBaseEntityProcessorDao().prepare(creditor).getId();
 
             currentBaseEntity.put("creditor", new BaseEntityComplexValue(batch, currentIndex, creditor));
-            if(creditorId!= batch.getId())
+            if(creditorId!= batch.getCreditorId())
                 currentBaseEntity.addValidationError("Кредитор заполнен не верно");
 
             for(String s : creditor.getValidationErrors()) {
