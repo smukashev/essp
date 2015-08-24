@@ -1,9 +1,8 @@
 package kz.bsbnb.usci.sync.service.impl;
 
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.util.Pair;
+import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
 import kz.bsbnb.usci.sync.service.ISearcherFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,7 +40,7 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
     }
 
     @Override
-    public List<BaseEntity> search(String searchClassName, HashMap<String, String> parameters, MetaClass metaClass,String prefix) {
+    public ISearchResult search(String searchClassName, HashMap<String, String> parameters, MetaClass metaClass,String prefix) {
         return remoteSearcherFormService.search(searchClassName, parameters, metaClass, prefix);
     }
 }

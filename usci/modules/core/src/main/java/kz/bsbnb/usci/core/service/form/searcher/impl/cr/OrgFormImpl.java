@@ -5,6 +5,9 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
+import kz.bsbnb.usci.eav.model.searchForm.impl.NonPaginableSearchResult;
+import kz.bsbnb.usci.eav.model.searchForm.impl.PaginableSearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
@@ -24,9 +27,6 @@ import java.util.List;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
-/**
- * Created by Bauyrzhan.Makhambeto on 01/07/2015.
- */
 @Component
 public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
 
@@ -51,12 +51,22 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
 
     @Override
     public String getDom(long userId, IMetaClass metaClass,String prefix) {
-        return "Наименование: <input type='text' name='name' style='width: 95%; margin: 5px'></input>";
+        return "Наименование: <input type='text' name='name' style='width: 95%; margin: 5px'></input>" +
+                "<div style='text-align:center; width:100%'><img src='/static-usci/ext/resources/ext-theme-classic/images/grid/loading.gif' id='form-loading' style='display:none'/></div>";
     }
 
     @Override
-    public List<BaseEntity> search(HashMap<String, String> parameters, MetaClass metaClass, String prefix) {
-        List<BaseEntity> ret = new LinkedList<>();
+    public ISearchResult search(HashMap<String, String> parameters, MetaClass metaClass, String prefix) {
+        ISearchResult ret;
+
+        if(parameters.get("pageNo") != null)
+            ret = new PaginableSearchResult();
+        else
+            ret = new NonPaginableSearchResult();
+
+        List<BaseEntity> entities = new LinkedList<>();
+        ret.setData(entities);
+
         String name = parameters.get("name");
         if(name.trim().length() < 1)
             return ret;
@@ -94,11 +104,11 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
 
         if(reportDate != null) {
             for (Long id : orgIds) {
-                ret.add((BaseEntity) baseEntityProcessorDao.loadByMaxReportDate(id, reportDate));
+                entities.add((BaseEntity) baseEntityProcessorDao.loadByMaxReportDate(id, reportDate));
             }
         } else {
             for(Long id : orgIds)
-                ret.add((BaseEntity) baseEntityProcessorDao.load(id));
+                entities.add((BaseEntity) baseEntityProcessorDao.load(id));
         }
 
         return ret;

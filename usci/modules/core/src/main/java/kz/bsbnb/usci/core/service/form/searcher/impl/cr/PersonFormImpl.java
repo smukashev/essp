@@ -1,26 +1,26 @@
 package kz.bsbnb.usci.core.service.form.searcher.impl.cr;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-import kz.bsbnb.usci.core.service.IMetaFactoryService;
 import kz.bsbnb.usci.core.service.form.searcher.ISearcherForm;
-import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
+import kz.bsbnb.usci.eav.model.searchForm.SearchPagination;
+import kz.bsbnb.usci.eav.model.searchForm.impl.NonPaginableSearchResult;
+import kz.bsbnb.usci.eav.model.searchForm.impl.PaginableSearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
@@ -40,19 +40,31 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
     @Autowired
     IBaseEntityProcessorDao baseEntityProcessorDao;
 
+    final private static int maxPageSize = 50;
+    final private static int maxResultSize = 500;
+
     private final Logger logger = LoggerFactory.getLogger(PersonFormImpl.class);
 
     @Override
-    public List<BaseEntity> search(HashMap<String, String> parameters, MetaClass metaClass, String prefix) {
+    public ISearchResult search(HashMap<String, String> parameters, MetaClass metaClass, String prefix) {
+
+        ISearchResult ret;
         String firstName = parameters.get("firstName");
         String lastName = parameters.get("lastName");
         String middleName = parameters.get("middleName");
-        List<BaseEntity> ret = new ArrayList<>();
+        //List<BaseEntity> ret = new ArrayList<>();
+        List<BaseEntity> entities = new ArrayList<>();
         Date reportDate = null;
 
         if(parameters.get("date")!=null)
             reportDate = (Date) DataTypes.fromString(DataTypes.DATE, parameters.get("date"));
 
+        if(parameters.get("pageNo") != null)
+            ret = new PaginableSearchResult();
+        else
+            ret = new NonPaginableSearchResult();
+
+        ret.setData(entities);
 
         MetaClass personNameClass = metaClassRepository.getMetaClass("person_name");
         MetaClass personClass = metaClassRepository.getMetaClass("person");
@@ -113,17 +125,24 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
                 .where(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.in(setSelect))
                 .and(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID.eq(namesAttribute.getId()));
 
+        if(parameters.get("pageNo") != null) {
+            Select countSelect = context.select(DSL.count()).from(entitySelect);
+            int cnt = jdbcTemplate.queryForInt(countSelect.getSQL(), countSelect.getBindValues().toArray());
+            SearchPagination pagination = new SearchPagination(cnt);
+            ret.setPagination(pagination);
+        }
+
         logger.debug(entitySelect.toString());
 
         List<Long> personIds = jdbcTemplate.queryForList(entitySelect.getSQL(), entitySelect.getBindValues().toArray(), Long.class);
 
         if(reportDate != null) {
             for (Long id : personIds) {
-                ret.add((BaseEntity) baseEntityProcessorDao.loadByMaxReportDate(id, reportDate));
+                entities.add((BaseEntity) baseEntityProcessorDao.loadByMaxReportDate(id, reportDate));
             }
         } else {
             for(Long id : personIds)
-                ret.add((BaseEntity) baseEntityProcessorDao.load(id));
+                entities.add((BaseEntity) baseEntityProcessorDao.load(id));
         }
 
         return ret;
@@ -141,6 +160,7 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
     public String getDom(long userId, IMetaClass metaClass, String prefix) {
         return "Фамилия: <input type='text' name='lastName' style='width: 95%; margin: 5px'></input><br/>" +
                 "Имя: <input type='text' name='firstName' style='width: 95%; margin: 5px'></input><br/>" +
-                "Отчество: <input type='text' name='middleName' style='width: 95%; margin: 5px'></input></form>";
+                "Отчество: <input type='text' name='middleName' style='width: 95%; margin: 5px'></input></form>" +
+                "<div style='text-align:center; width:100%'><img src='/static-usci/ext/resources/ext-theme-classic/images/grid/loading.gif' id='form-loading' style='display:none'/></div>";
     }
 }

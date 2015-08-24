@@ -19,6 +19,7 @@ import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
@@ -31,7 +32,6 @@ import javax.portlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -173,6 +173,13 @@ public class MainPortlet extends MVCPortlet {
                                 long creditorId) {
 
         MetaClass meta = entity.getMeta();
+
+        //credit check
+        if(meta.getClassName().equals("credit") && !isNb) {
+            BaseEntity creditor = (BaseEntity) entity.getEl("creditor");
+            if(creditor.getId() != creditorId)
+                throw new RuntimeException("нет прав для просмотра");
+        }
 
         if (title == null) {
             title = code;
@@ -418,6 +425,8 @@ public class MainPortlet extends MVCPortlet {
         return str;
     }
 
+    boolean retry = false;
+
     @Override
     public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws IOException
     {
@@ -485,12 +494,13 @@ public class MainPortlet extends MVCPortlet {
                         parameters.put(attribute, resourceRequest.getParameter(attribute));
                     }
 
-                    List<BaseEntity> entityList = searcherFormService.search(searchClassName, parameters, metaClass, "");
+                    ISearchResult searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "");
+                    Iterator<BaseEntity> cursor = searchResult.iterator();
 
                     long ret = -1;
 
-                    if(entityList.size() > 0) {
-                        ret = entityList.get(0).getId();
+                    if(cursor.hasNext()) {
+                        ret = cursor.next().getId();
                         ret = ret > 0 ? ret : -1;
                     }
 
@@ -591,9 +601,12 @@ public class MainPortlet extends MVCPortlet {
                             parameters.put(attribute, resourceRequest.getParameter(attribute));
                         }
 
-                        entityList = searcherFormService.search(searchClassName, parameters, metaClass, "");
+                        searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "");
+                        if(searchResult.getData() == null)
+                            throw new IllegalArgumentException("ошибка сериализации");
+
                         StringBuilder sb = new StringBuilder("{\"text\":\".\",\"children\": [\n");
-                        Iterator<BaseEntity> it = entityList.iterator();
+                        Iterator<BaseEntity> it = searchResult.iterator();
                         do {
                             if(!it.hasNext())
                                 break;
@@ -612,7 +625,25 @@ public class MainPortlet extends MVCPortlet {
                     break;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            String originalError = e.getMessage();
+            if(originalError.contains("connect") || originalError.contains("rmi"))
+                if(!retry) {
+                    retry = true;
+                    logger.info("connect failed, reconnect triggered");
+                    try {
+                        init();
+                        serveResource(resourceRequest, resourceResponse);
+                    } catch (PortletException e1) {
+                        //resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
+                        out.write(("{ \"success\": false, \"errorMessage\": \""+ originalError + e1.getMessage()
+                                .replaceAll("\"","").replaceAll("\n","")+"\"}").getBytes());
+                    } finally {
+                        retry = false;
+                        return;
+                    }
+                }
+
             out.write(("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}").getBytes());
         }
     }

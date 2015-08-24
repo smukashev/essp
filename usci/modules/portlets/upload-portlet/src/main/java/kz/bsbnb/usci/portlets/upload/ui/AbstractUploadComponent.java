@@ -250,7 +250,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
                 //Устанавливаем СтрокуОшибки - "У вас нет доступа к кредиторам"
                 result = getResourceString(Localization.USER_DOES_NOT_HAVE_ACCESS_TO_CREDITORS_MESSAGE.getKey());
                 //В противном случае, если КоличествоКредиторов больше одного
-            } else if (creditorsNumber > 1) {
+            } else if (creditorsNumber > 1 && !portletEnvironment.isNB()) {
                 //Устанавливаем СтрокуОшибки - "У вас более одного кредитора"
                 result = getResourceString(Localization.USER_HAS_MORE_THAN_ONE_CREDITOR_MESSAGE.getKey());
             } else {

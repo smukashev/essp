@@ -15,6 +15,8 @@ import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
+import kz.bsbnb.usci.eav.model.searchForm.impl.NonPaginableSearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
@@ -140,8 +142,9 @@ public class KeySearcherForm implements ISearcherForm {
     }
 
     @Override
-    public List<BaseEntity> search(HashMap<String, String> parameters, MetaClass metaClass, String prefix) {
+    public ISearchResult search(HashMap<String, String> parameters, MetaClass metaClass, String prefix) {
         BaseEntity baseEntity = new BaseEntity(metaClass, new Date());
+        ISearchResult ret = new NonPaginableSearchResult();
         Iterator<String> it = parameters.keySet().iterator();
         while(it.hasNext()) {
             String attribute = it.next();
@@ -186,6 +189,7 @@ public class KeySearcherForm implements ISearcherForm {
 
         Long id = searcher.findSingle(baseEntity);
         baseEntity.setId(id);
-        return Arrays.asList(new BaseEntity[]{baseEntity});
+        ret.setData(Arrays.asList(new BaseEntity[]{baseEntity}));
+        return ret;
     }
 }
