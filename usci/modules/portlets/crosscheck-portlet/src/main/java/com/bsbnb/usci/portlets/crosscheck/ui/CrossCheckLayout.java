@@ -1,6 +1,5 @@
 package com.bsbnb.usci.portlets.crosscheck.ui;
 
-import static com.bsbnb.usci.portlets.crosscheck.CrossCheckApplication.log;
 import com.bsbnb.usci.portlets.crosscheck.CrossCheckPortletResource;
 import com.bsbnb.usci.portlets.crosscheck.PortletEnvironmentFacade;
 import com.bsbnb.usci.portlets.crosscheck.data.CrossCheckExecutor;
@@ -21,9 +20,17 @@ import com.vaadin.terminal.DownloadStream;
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.terminal.Resource;
 import com.vaadin.terminal.StreamResource;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
+import jxl.CellView;
+import jxl.WorkbookSettings;
+import jxl.format.Border;
+import jxl.format.BorderLineStyle;
+import jxl.format.Colour;
+import jxl.write.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,26 +40,10 @@ import java.math.BigInteger;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
-import jxl.CellView;
-import jxl.WorkbookSettings;
-import jxl.format.Border;
-import jxl.format.BorderLineStyle;
-import jxl.format.Colour;
-import jxl.write.NumberFormat;
-import jxl.write.WritableCellFormat;
-import jxl.write.WritableFont;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
+
+import static com.bsbnb.usci.portlets.crosscheck.CrossCheckApplication.log;
 
 public class CrossCheckLayout extends VerticalLayout {
     private List<Creditor> creditorsList;
@@ -92,7 +83,7 @@ public class CrossCheckLayout extends VerticalLayout {
    
     @Override
     public void attach() {
-        creditorsList = provider.getCreditorsList();
+        creditorsList = provider.getCreditorsList(facade.getCreditorId());
         creditorsSelector = new FilterableSelect<Creditor>(creditorsList, new Selector<Creditor>() {
 
             private boolean isKz = "KZ".equalsIgnoreCase(facade.getCurrentLanguage());

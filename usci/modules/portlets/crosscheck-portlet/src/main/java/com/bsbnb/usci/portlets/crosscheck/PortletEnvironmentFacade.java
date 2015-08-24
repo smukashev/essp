@@ -1,5 +1,7 @@
 package com.bsbnb.usci.portlets.crosscheck;
 
+import java.util.Date;
+
 /**
  *
  * @author Aidar.Myrzahanov
@@ -24,5 +26,9 @@ public abstract class PortletEnvironmentFacade {
     public abstract long getUserID();
     
     public abstract String getBusinessRulesUrl();
+
+    public abstract Date getRepDate();
+
+    public abstract String getCreditorId();
     
 }

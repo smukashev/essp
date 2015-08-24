@@ -49,17 +49,18 @@ public class BeanDataProvider implements DataProvider {
     }
 
     @Override
-    public List<Creditor> getCreditorsList() {
+    public List<Creditor> getCreditorsList(String CreditorId) {
         List<Creditor> creditorList = new ArrayList<Creditor>();
 
         Connection conn = getConnection();
         Statement stmt = null;
         String query = "SELECT t0.REF_CREDITOR_ID AS ID, t0.OPEN_DATE AS CHANGE_DATE, t0.CODE, t0.NAME, t0.SHORT_NAME, " +
                 "t0.CLOSE_DATE AS SHUTDOWN_DATE, 0 AS MAIN_OFFICE_ID, t0.SUBJECT_TYPE_ID " +
-                "FROM " + CrossCheckApplication.SHOWCASE_SCHEMA + ".R_REF_CREDITOR t0, " + CrossCheckApplication.CORE_SCHEMA +
+                "FROM " + CrossCheckApplication.CORE_SCHEMA + ".R_REF_CREDITOR t0, " + CrossCheckApplication.CORE_SCHEMA +
                 ".EAV_A_CREDITOR_USER t2, " + CrossCheckApplication.CORE_SCHEMA + ".EAV_A_USER t1 " +
                 "WHERE ((t1.USER_ID = " + BigInteger.valueOf(facade.getUserID()) +") " +
                 "AND ((t2.CREDITOR_ID = t0.REF_CREDITOR_ID) AND (t1.USER_ID = t2.USER_ID))) " +
+                "AND (t0.REF_CREDITOR_ID = "+CreditorId+" OR "+CreditorId+" is NULL )"+
                 "ORDER BY t0.NAME ASC";
 
         log.log(Level.INFO, "getCreditorsList: " + query);
@@ -313,7 +314,10 @@ public class BeanDataProvider implements DataProvider {
             // TODO Пока что начальная дата как константа, нужно сделать настройку
             Calendar calendar = Calendar.getInstance();
             calendar.clear();
+            if(facade.getRepDate()==null)
             calendar.set(2014, Calendar.JANUARY, 13);
+            else
+            calendar.setTime(facade.getRepDate());
 
             return calendar.getTime();
 

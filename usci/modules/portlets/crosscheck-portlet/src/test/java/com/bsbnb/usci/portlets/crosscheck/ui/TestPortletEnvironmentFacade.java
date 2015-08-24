@@ -2,6 +2,7 @@ package com.bsbnb.usci.portlets.crosscheck.ui;
 
 import com.bsbnb.usci.portlets.crosscheck.PortletEnvironmentFacade;
 
+import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -42,4 +43,8 @@ public class TestPortletEnvironmentFacade extends PortletEnvironmentFacade {
     public String getBusinessRulesUrl() {
         return "dummyUrl";
     }
+
+    public Date getRepDate() { return new Date(); }
+
+    public String getCreditorId() { return "10196";}
 }

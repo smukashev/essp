@@ -1,9 +1,10 @@
 package com.bsbnb.usci.portlets.crosscheck;
 
+import com.liferay.portal.model.User;
+
+import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import com.liferay.portal.model.User;
 
 /**
  *
@@ -14,11 +15,15 @@ public class CrossCheckPortletEnvironmentFacade extends PortletEnvironmentFacade
     private ResourceBundle bundle;
     private User user;
     private String businessRulesUrl;
+    private Date repDate;
+    private String CreditorId;
     
-    public CrossCheckPortletEnvironmentFacade(User user, String businessRulesUrl) {
+    public CrossCheckPortletEnvironmentFacade(User user, String businessRulesUrl, Date repDate, String CreditorId) {
         this.user = user;
         this.businessRulesUrl = businessRulesUrl;
         bundle = ResourceBundle.getBundle(BUNDLE_NAME, user==null ? new Locale("ru", "RU") : user.getLocale());
+        this.repDate=repDate;
+        this.CreditorId=CreditorId;
     }
 
     @Override
@@ -40,5 +45,12 @@ public class CrossCheckPortletEnvironmentFacade extends PortletEnvironmentFacade
     public String getBusinessRulesUrl() {
         return businessRulesUrl;
     }
-    
+
+    public Date getRepDate() {
+        return repDate;
+    }
+
+    public String getCreditorId() {
+        return CreditorId;
+    }
 }

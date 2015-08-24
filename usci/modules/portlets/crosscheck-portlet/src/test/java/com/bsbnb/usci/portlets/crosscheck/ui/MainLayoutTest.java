@@ -6,16 +6,13 @@ import com.bsbnb.usci.portlets.crosscheck.dm.Creditor;
 import com.bsbnb.usci.portlets.crosscheck.dm.CrossCheck;
 import com.bsbnb.usci.portlets.crosscheck.dm.SubjectType;
 import com.vaadin.ui.Window;
+import org.easymock.EasyMock;
+import org.junit.*;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 
 /**
@@ -80,7 +77,7 @@ public class MainLayoutTest extends CrossCheckLayout {
             System.out.println("Language: " + language);
             PortletEnvironmentFacade.set(new TestPortletEnvironmentFacade(language));
             DataProvider providerMock = EasyMock.createMock(DataProvider.class);
-            EasyMock.expect(providerMock.getCreditorsList()).andReturn(sampleCreditors);
+            EasyMock.expect(providerMock.getCreditorsList(facade.getCreditorId())).andReturn(sampleCreditors);
             EasyMock.replay(providerMock);
             CrossCheckLayout instance = new CrossCheckLayout("WORK", facade, providerMock);
             Window window = new Window();

@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface DataProvider {
-    List<Creditor> getCreditorsList();
+    List<Creditor> getCreditorsList(String CreditorId);
 
     List<CrossCheck> getCrossChecks(Creditor[] creditors, Date date);
     

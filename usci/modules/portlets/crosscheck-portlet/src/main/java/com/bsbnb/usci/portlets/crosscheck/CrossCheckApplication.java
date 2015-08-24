@@ -1,22 +1,5 @@
 package com.bsbnb.usci.portlets.crosscheck;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
-import javax.portlet.EventRequest;
-import javax.portlet.EventResponse;
-import javax.portlet.PortletContext;
-import javax.portlet.PortletException;
-import javax.portlet.PortletPreferences;
-import javax.portlet.PortletRequestDispatcher;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
-
 import com.bsbnb.usci.portlets.crosscheck.data.BeanDataProvider;
 import com.bsbnb.usci.portlets.crosscheck.data.DataException;
 import com.bsbnb.usci.portlets.crosscheck.ui.CrossCheckLayout;
@@ -34,6 +17,14 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 
+import javax.portlet.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class CrossCheckApplication extends Application {
 
     private static final long serialVersionUID = 2096197512742005243L;
@@ -42,6 +33,7 @@ public class CrossCheckApplication extends Application {
 
     public static final String CORE_SCHEMA = "CORE";
     public static final String SHOWCASE_SCHEMA = "SHOWCASE";
+    DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 
     @Override
     public void init() {
@@ -92,8 +84,12 @@ public class CrossCheckApplication extends Application {
                 String businessRulesUrl = prefs.getValue(ConfigurationActionImpl.BUSINESS_RULES_URL_KEY, "");
                 User user = PortalUtil.getUser(request);
 
+                Date repDate =  (PortalUtil.getOriginalServletRequest(PortalUtil.getHttpServletRequest(request)).getParameter("repDate")!=null)?
+                        formatter.parse(PortalUtil.getOriginalServletRequest(PortalUtil.getHttpServletRequest(request)).getParameter("repDate")):new Date();
+                String creditorId =  PortalUtil.getOriginalServletRequest(PortalUtil.getHttpServletRequest(request)).getParameter("creditorId");
+
                 CrossCheckPortletEnvironmentFacade portletData =
-                        new CrossCheckPortletEnvironmentFacade(user, businessRulesUrl);
+                        new CrossCheckPortletEnvironmentFacade(user, businessRulesUrl, repDate, creditorId);
                 PortletEnvironmentFacade.set(portletData);
 
                 setTheme("custom");
@@ -111,6 +107,8 @@ public class CrossCheckApplication extends Application {
                 log.log(Level.WARNING, "", pe);
             } catch (SystemException se) {
                 log.log(Level.WARNING, "", se);
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }
 
