@@ -762,6 +762,9 @@
 		<!--foreign-key foreignTable="eav_batches" name="ebs_FK_eb_id">
 			<reference local="batch_id" foreign="id"/>
 		</foreign-key-->
+		<index name="ebs_IN_bi">
+			<index-column name="batch_id"/>
+		</index>
 	</table>
 	<table name="eav_entity_statuses">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -780,12 +783,21 @@
 		<!--foreign-key foreignTable="eav_be_entities" name="ees_FK_ebe_id">
 			<reference local="entity_id" foreign="id"/>
 		</foreign-key-->
+		<index name="ees_IN_bi">
+			<index-column name="batch_id"/>
+		</index>
+		<index name="ebs_IN_ei">
+			<index-column name="entity_id"/>
+		</index>
 	</table>
 	<table name="eav_entity_status_params">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_status_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="key" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
 		<column name="value" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<index name="eesp_esi">
+			<index-column name="entity_status_id"/>
+		</index>
 	</table>
 	<table name="batch_entries">
     <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
