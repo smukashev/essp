@@ -21,5 +21,7 @@ public abstract class PortletEnvironmentFacade {
     public abstract long getUserID();
     
     public abstract boolean isLanguageKazakh();
+
+    public abstract boolean isNB();
     
 }

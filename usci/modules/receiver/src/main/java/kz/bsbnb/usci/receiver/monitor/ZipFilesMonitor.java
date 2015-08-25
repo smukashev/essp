@@ -39,7 +39,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.net.URI;
 import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -447,7 +446,7 @@ public class ZipFilesMonitor{
         }
     }
 
-    public void saveData(BatchInfo batchInfo, String filename, byte[] bytes){
+    public void saveData(BatchInfo batchInfo, String filename, byte[] bytes, boolean isNB){
         // TODO: fix hardcoded settings
         receiverStatusSingleton.batchReceived();
 
@@ -463,13 +462,15 @@ public class ZipFilesMonitor{
         if(batchInfo.getUserId() != 100500L) {
             List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
 
-            if (cList.size() > 0) {
+            if (isNB) {
+                cId = 0L;
+            } else if (cList.size() == 1) {
                 cId = cList.get(0).getId();
             } else {
                 cId = -1L;
                 statusSingleton.addBatchStatus(batchId,
                         new BatchStatusJModel(BatchStatuses.ERROR,
-                                "Can't find user with id: " + batchInfo.getUserId(), new Date(), batchInfo.getUserId()));
+                                "Can't find creditor for user with id: " + batchInfo.getUserId(), new Date(), batchInfo.getUserId()));
                 haveError = true;
             }
         } else {
@@ -683,6 +684,10 @@ public class ZipFilesMonitor{
     }
 
     public void readFiles(String filename, Long userId) {
+        readFiles(filename, userId, false);
+    }
+
+    public void readFiles(String filename, Long userId, boolean isNB) {
         BatchInfo batchInfo = new BatchInfo();
 
         try {
@@ -763,7 +768,7 @@ public class ZipFilesMonitor{
                 }
 
                 zipFile.close();
-                saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));
+                saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
             } else {
                 InputStream inManifest = zipFile.getInputStream(manifestEntry);
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -832,7 +837,7 @@ public class ZipFilesMonitor{
 
 
                 zipFile.close();
-                saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));
+                saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
             }
         }catch(Exception e) {
             e.printStackTrace();
@@ -903,7 +908,7 @@ public class ZipFilesMonitor{
             batchInfo.setRepDate(date);
             zipFile.close();
 
-            saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));
+            saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), false);
         }catch(IOException e){
             e.printStackTrace();
         }
