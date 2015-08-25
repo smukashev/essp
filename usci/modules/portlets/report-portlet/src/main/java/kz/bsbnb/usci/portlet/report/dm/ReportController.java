@@ -1,26 +1,17 @@
 package kz.bsbnb.usci.portlet.report.dm;
 
 import com.liferay.portal.model.User;
+import kz.bsbnb.usci.portlet.report.ReportApplication;
 
+import javax.persistence.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-import javax.persistence.TypedQuery;
-
-import com.liferay.portal.util.PortalUtil;
-import kz.bsbnb.usci.portlet.report.ReportApplication;
-import org.jooq.tools.Convert;
 
 /**
  *
@@ -46,7 +37,11 @@ public class ReportController {
         Statement stmt = null;
         Statement stmt2 = null;
         Statement stmt3 = null;
-        String query = "SELECT r.* FROM Report r WHERE r.type = '"+ReportApplication.getReportType()+"' and r.id in (case when r.type='REPORT' then (select uu.report_id from report_user uu where uu.report_id=r.id and uu.user_id="+connect.getUserId()+") else r.id end) order by r.order_number, r.id";
+        String query;
+        if(!ReportApplication.getReportType().equals("BANKS"))
+        query = "SELECT r.* FROM Report r WHERE r.type = '"+ReportApplication.getReportType()+"' and r.id in (case when r.type='REPORT' then (select uu.report_id from report_user uu where uu.report_id=r.id and uu.user_id="+connect.getUserId()+") else r.id end) order by r.order_number, r.id";
+        else
+            query = "SELECT r.* FROM Report r WHERE r.type IN ('"+ReportApplication.getReportType()+"', 'REFERENCEBANKS') and r.id in (case when r.type='REPORT' then (select uu.report_id from report_user uu where uu.report_id=r.id and uu.user_id="+connect.getUserId()+") else r.id end) order by r.order_number, r.id";
         try
         {
             stmt = conn.createStatement();

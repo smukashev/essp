@@ -291,6 +291,8 @@ public class BeanDataProvider implements DataProvider {
         try {
             BigInteger creditorId = creditor.getId();
             Date firstNotApprovedDate = getFirstNotApprovedDate(creditorId);
+            if(facade.getRepDate()!=null)
+                return facade.getRepDate();
 
             if (firstNotApprovedDate != null)
                 return firstNotApprovedDate;
@@ -314,10 +316,9 @@ public class BeanDataProvider implements DataProvider {
             // TODO Пока что начальная дата как константа, нужно сделать настройку
             Calendar calendar = Calendar.getInstance();
             calendar.clear();
-            if(facade.getRepDate()==null)
             calendar.set(2014, Calendar.JANUARY, 13);
-            else
-            calendar.setTime(facade.getRepDate());
+
+
 
             return calendar.getTime();
 
