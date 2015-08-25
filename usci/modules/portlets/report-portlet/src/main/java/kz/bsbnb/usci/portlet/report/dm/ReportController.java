@@ -46,7 +46,11 @@ public class ReportController {
         Statement stmt = null;
         Statement stmt2 = null;
         Statement stmt3 = null;
-        String query = "SELECT r.* FROM Report r WHERE r.type = '"+ReportApplication.getReportType()+"' and r.id in (case when r.type='REPORT' then (select uu.report_id from report_user uu where uu.report_id=r.id and uu.user_id="+connect.getUserId()+") else r.id end) order by r.order_number, r.id";
+        String query;
+        if(!ReportApplication.getReportType().equals("BANKS"))
+        query = "SELECT r.* FROM Report r WHERE r.type = '"+ReportApplication.getReportType()+"' and r.id in (case when r.type='REPORT' then (select uu.report_id from report_user uu where uu.report_id=r.id and uu.user_id="+connect.getUserId()+") else r.id end) order by r.order_number, r.id";
+        else
+            query = "SELECT r.* FROM Report r WHERE r.type IN ('"+ReportApplication.getReportType()+"', 'REFERENCEBANKS') and r.id in (case when r.type='REPORT' then (select uu.report_id from report_user uu where uu.report_id=r.id and uu.user_id="+connect.getUserId()+") else r.id end) order by r.order_number, r.id";
         try
         {
             stmt = conn.createStatement();
