@@ -29,10 +29,12 @@ import java.util.List;
  */
 public class BaseRepository implements  Runnable
 {
+     private final String startDate = "01.04.2013";
+     private final String endDate = "01.05.2015";
 
-      private static Connection connection;
-      private static Statement statement;
-      protected static String repDate = "01.02.2015";
+     private static Connection connection;
+     private static Statement statement;
+     protected static String repDate = "01.02.2015";
 
      public void saveXml(String[] lookup, ResultSet rows, String path){
          try {
@@ -76,54 +78,97 @@ public class BaseRepository implements  Runnable
 
     @Override
     public void run() {
-        //DocTypeRepository.getById("1043").print(0);
-        //SubjectTypeRepository.getById("8").print();
-        //CreditorRepository.getById("127").print(0);
-        //CreditorDocRepository.getById("118").print();
-        //BalanceAccountRepository.getById("322").
 
-        //CreditorDoc[] arr = CreditorDocRepository.getByProperty("CREDITOR_ID","126");
+        guaranteeNotTooLong(startDate, endDate);
 
-            /*for(int i=0;i<arr.length;i++)
-            {
-                arr[i].print();
-                System.out.println("------------");
-            } */
+        int mo = (startDate.charAt(3) - '0' )* 10 + (startDate.charAt(4) - '0');
+        int year = 2000 + (startDate.charAt(8) - '0') * 10 + (startDate.charAt(9) - '0');
+        String curDate = startDate;
 
-            /*for(int i=103;i<=127;i++)
-                if(CreditorRepository.getById(i+"")!=null)
-                    System.out.print(CreditorRepository.getById(i+"").asXml(0));
-             */
+        boolean oneMore = false;
 
+        while(true){
 
-        (new CreditorCrawler()).work();
-        (new SubjectTypeCrawler()).work();
-        (new CreditorDocCrawler()).work();
-        (new BalanceAccountCrawler()).work();
-        (new BankRelationCrawler()).work();
-        (new ClassificationCrawler()).work();
-        (new CountryCrawler()).work();
-        (new CreditObjectCrawler()).work();
-        (new CreditPurposeCrawler()).work();  //here
-        (new CurrencyCrawler()).work();
-        (new EconTradeCrawler()).work();
-        (new EnterpriseTypeCrawler()).work();
-        (new FinanceSourceCrawler()).work();
-        (new LegalFormCrawler()).work();
-        (new OffshoreCrawler()).work();
-        (new PledgeTypeCrawler()).work();
-        (new PortfolioCrawler()).work();
-        (new RegionCrawler()).work();
-        (new ContactTypeCrawler()).work();
-        (new CreditTypeCrawler()).work();
-        (new DocTypeCrawler()).work();
-        //(new SharedCrawler()).work();
-        (new CreditorBranchCrawler()).work();
-        (new NokbdbCrawler()).work();
-        (new EconSectorCrawler()).work();
-        (new BACTCrawler()).work();
-        new DRTCrawler().work();
-        new BADRTCrawler().work();
+            BaseRepository.repDate = curDate;
+
+            BaseCrawler.fileName = BaseCrawler.prefix + curDate + "\\";
+            File f = new File(BaseCrawler.fileName);
+            f.mkdir();
+
+            (new SubjectTypeCrawler()).work();
+            (new DocTypeCrawler()).work();
+            (new BalanceAccountCrawler()).work();
+            (new BankRelationCrawler()).work();
+            (new ClassificationCrawler()).work();
+            (new ContactTypeCrawler()).work();
+            (new CountryCrawler()).work();
+            (new CreditObjectCrawler()).work();
+            (new CreditPurposeCrawler()).work();
+            (new CreditTypeCrawler()).work();
+            (new RegionCrawler()).work();
+            //(new CreditorDocCrawler()).work(); //obsolete
+            (new CreditorCrawler()).work();
+            (new CreditorBranchCrawler()).work();
+            (new CurrencyCrawler()).work();
+            (new EconTradeCrawler()).work();
+            (new EnterpriseTypeCrawler()).work();
+            (new FinanceSourceCrawler()).work();
+            (new LegalFormCrawler()).work();
+            (new OffshoreCrawler()).work();
+            (new PledgeTypeCrawler()).work();
+            (new PortfolioCrawler()).work();
+
+            //(new SharedCrawler()).work(); //not used
+            //(new NokbdbCrawler()).work(); //not used
+            //(new EconSectorCrawler()).work(); //not used
+            new BACTCrawler().work();
+            new DRTCrawler().work();
+            new BADRTCrawler().work();
+
+            mo ++;
+            if(mo == 13) {
+                mo = 1;
+                year ++;
+            }
+
+            curDate = "01." + mo / 10 + "" + mo % 10 + "." + year;
+
+            if(oneMore)
+                break;
+
+            oneMore = curDate.equals(endDate);
+
+        }
+    }
+
+    public void guaranteeNotTooLong(String startDate, String endDate){
+        if(startDate.equals(endDate))
+            return;
+        if(!startDate.matches("\\d{2}\\.\\d{2}\\.\\d{4}"))
+            throw new RuntimeException("start format not correct");
+
+        if(!endDate.matches("\\d{2}\\.\\d{2}\\.\\d{4}"))
+            throw new RuntimeException("end format not correct");
+
+        int mo = (startDate.charAt(3) - '0' )* 10 + (startDate.charAt(4) - '0');
+        int year = 2000 + (startDate.charAt(8) - '0') * 10 + (startDate.charAt(9) - '0');
+
+        int cnt = 0;
+
+        while(cnt < 300) {
+            mo ++;
+            cnt++;
+            if(mo == 13) {
+                mo = 1;
+                year ++;
+            }
+
+            String prob = "01." + mo / 10 + "" + mo % 10 + "." + year;
+            if(prob.equals(endDate))
+                return;
+        }
+
+        throw new RuntimeException("too long period given");
     }
 
     public static void main( String[] args )
