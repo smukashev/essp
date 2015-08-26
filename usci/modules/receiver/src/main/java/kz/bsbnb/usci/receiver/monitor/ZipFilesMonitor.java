@@ -382,8 +382,8 @@ public class ZipFilesMonitor {
             batchService.addBatchStatus(new BatchStatus()
                             .setBatchId(batchId)
                             .setStatus(BatchStatuses.WAITING)
-                            .setReceiptDate(new Date())
-            );
+                            .setReceiptDate(new Date()));
+
             sender.addJob(batchId, batchInfo);
         }
     }
@@ -760,9 +760,6 @@ public class ZipFilesMonitor {
                     Thread.sleep(1000);
 
                     readFiles(path + "/" + fileName);
-
-                    System.out.println("File sent to parser:" + fileName);
-
                 }
             }
             valid = watchKey.reset();
@@ -770,40 +767,4 @@ public class ZipFilesMonitor {
         } while (valid);
 
     }
-
-    public byte[] extract(byte[] zippedBytes) throws IOException {
-        ByteArrayInputStream bais = null;
-        ZipArchiveInputStream zis = null;
-
-        try {
-            bais = new ByteArrayInputStream(zippedBytes);
-            zis = new ZipArchiveInputStream(bais);
-
-            while (zis.getNextZipEntry() != null) {
-                ByteArrayOutputStream baos = null;
-                try {
-                    int size;
-                    byte[] buffer = new byte[ZIP_BUFFER_SIZE];
-
-                    baos = new ByteArrayOutputStream();
-
-                    while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
-                        baos.write(buffer, 0, size);
-                    }
-                    return baos.toByteArray();
-                } finally {
-                    if (baos != null) {
-                        baos.flush();
-                        baos.close();
-                    }
-                }
-            }
-        } finally {
-            if (zis != null) {
-                zis.close();
-            }
-        }
-        throw new IOException("ZIP file does not contain any files.");
-    }
-
 }
