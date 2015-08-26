@@ -79,22 +79,42 @@ public class PackageParser extends BatchParser {
             credit.put("credit_type", new BaseEntityComplexValue(-1, batch, index,
                     creditType));
         } else if (localName.equals("subjects")) {
-            BaseSet subjects = new BaseSet(metaClassRepository.getMetaClass("subject"));
+            BaseSet organizations = new BaseSet(metaClassRepository.getMetaClass("organization"));
+            BaseSet persons = new BaseSet(metaClassRepository.getMetaClass("person"));
+            BaseSet creditors = new BaseSet(metaClassRepository.getMetaClass("creditor"));
 
             while (true) {
                 subjectsParser.parse(xmlReader, batch, index);
                 if (subjectsParser.hasMore()) {
                     BaseEntity subject = subjectsParser.getCurrentBaseEntity();
                     if (subject != null) {
-                        subjects.put(subject.getMeta().getClassName(),
-                                new BaseSetComplexValue(-1, batch, index, subject));
+                        if (subject.getMeta().getClassName().equals("person")) {
+                            persons.put(subject.getMeta().getClassName(),
+                                    new BaseSetComplexValue(-1, batch, index, subject));
+                        } else if(subject.getMeta().getClassName().equals("organization")) {
+                            organizations.put(subject.getMeta().getClassName(),
+                                    new BaseSetComplexValue(-1, batch, index, subject));
+                        } else if(subject.getMeta().getClassName().equals("creditor")) {
+                            creditors.put(subject.getMeta().getClassName(),
+                                    new BaseSetComplexValue(-1, batch, index, subject));
+                        } else {
+                            throw new IllegalStateException("Тип субъекта не определен(" +
+                                    subject.getMeta().getClassName() + ");");
+                        }
                     }
                 } else {
                     break;
                 }
             }
 
-            currentBaseEntity.put("subjects", new BaseEntityComplexSet(-1, batch, index, subjects));
+            if (organizations.get().size() > 0)
+                currentBaseEntity.put("organizations", new BaseEntityComplexSet(-1, batch, index, organizations));
+
+            if (persons.get().size() > 0)
+                currentBaseEntity.put("persons", new BaseEntityComplexSet(-1, batch, index, persons));
+
+            if (creditors.get().size() > 0)
+                currentBaseEntity.put("creditors", new BaseEntityComplexSet(-1, batch, index, creditors));
         } else if (localName.equals("pledges")) {
             BaseSet pledges = new BaseSet(metaClassRepository.getMetaClass("pledge"));
             while (true) {
