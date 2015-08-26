@@ -169,7 +169,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
             //inputFile.setInputInfo(ii);
             //inputFileBusiness.insertInputFile(inputFile);
             System.out.println("### " + path);
-            batchProcessService.processBatch(path, portletEnvironment.getUserID());
+            batchProcessService.processBatch(path, portletEnvironment.getUserID(), portletEnvironment.isNB());
             addStatusMessage(String.format(getResourceString(Localization.UPLOAD_SUCCEDED_MESSAGE.getKey()), fileName), false);
         } catch (IOException ioe) {
             UploadApplication.log.log(Level.SEVERE, "Can't save file {0}", fileName);

@@ -36,5 +36,10 @@ public class TestPortletEnvironmentFacade extends PortletEnvironmentFacade{
     public boolean isLanguageKazakh() {
         return false;
     }
-    
+
+    @Override
+    public boolean isNB() {
+        return false;
+    }
+
 }

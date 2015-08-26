@@ -14,11 +14,13 @@ public class ProtocolPortletEnvironmentFacade extends PortletEnvironmentFacade{
     private ResourceBundle bundle;
     private boolean isKazakh;
     private User user;
-    
-    public ProtocolPortletEnvironmentFacade(User user) {
+    private boolean isNB;
+
+    public ProtocolPortletEnvironmentFacade(User user, boolean isNB) {
         this.user = user;
         bundle = ResourceBundle.getBundle(BUNDLE_NAME, user.getLocale());
         isKazakh = "kz".equals(user.getLocale().getLanguage());
+        this.isNB = isNB;
     }
 
     @Override
@@ -35,5 +37,10 @@ public class ProtocolPortletEnvironmentFacade extends PortletEnvironmentFacade{
     public boolean isLanguageKazakh() {
         return isKazakh;
     }
-    
+
+    @Override
+    public boolean isNB() {
+        return isNB;
+    }
+
 }
