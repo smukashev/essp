@@ -156,16 +156,20 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
             fieldLabel: 'Код аттрибута',
             id: 'attrPathCode',
             name: 'attrPathCode',
+            allowBlank:false,
             value: attrPathCode
+
         }, {
             fieldLabel: 'Наименование аттрибута',
             id: 'attrTitle',
-            name: 'attrTitle'
+            name: 'attrTitle',
+            allowBlank:false
         },{
             fieldLabel: 'Вид аттрибута',
             id: 'createMCAttrFormAttrType',
             name: 'attrType',
             xtype: 'combobox',
+            allowBlank:false,
             store: new Ext.data.SimpleStore({
                 id:0,
                 fields:
@@ -186,9 +190,13 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
                     if(newValue == 1 || newValue == 3) {
                         attrSimpleTypeField.setDisabled(false);
                         attrComplexTypeField.setDisabled(true);
+                        attrSimpleTypeField.allowBlank=false;
+                        attrComplexTypeField.allowBlank=true;
                     } else {
                         attrSimpleTypeField.setDisabled(true);
                         attrComplexTypeField.setDisabled(false);
+                        attrSimpleTypeField.allowBlank=true;
+                        attrComplexTypeField.allowBlank=false;
                     }
                 }
             }
