@@ -9,6 +9,8 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.core.service.IBaseEntityMergeService;
 import kz.bsbnb.usci.core.service.ISearcherFormService;
+import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
+import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -38,11 +40,13 @@ import java.util.Iterator;
 import java.util.List;
 
 public class MainPortlet extends MVCPortlet {
+    private RmiProxyFactoryBean searcherFormEntryServiceFactoryBean;
+    private RmiProxyFactoryBean portalUserBean;
+
     private IMetaFactoryService metaFactoryService;
     private IEntityService entityService;
     private IBaseEntityMergeService entityMergeService;
-
-    private RmiProxyFactoryBean searcherFormEntryServiceFactoryBean;
+    private PortalUserBeanRemoteBusiness portalUserBeanRemoteBusiness;
     private ISearcherFormService searcherFormService;
 
     void connectToServices() {
@@ -79,6 +83,13 @@ public class MainPortlet extends MVCPortlet {
             searcherFormEntryServiceFactoryBean.afterPropertiesSet();
             searcherFormService = (ISearcherFormService) searcherFormEntryServiceFactoryBean.getObject();
 
+            portalUserBean = new RmiProxyFactoryBean();
+            portalUserBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
+            portalUserBean.setServiceInterface(IMetaFactoryService.class);
+            portalUserBean.setRefreshStubOnConnectFailure(true);
+            portalUserBean.afterPropertiesSet();
+
+            portalUserBeanRemoteBusiness = (PortalUserBeanRemoteBusiness) portalUserBean.getObject();
         } catch (Exception e) {
             System.out.println("Can\"t initialise services: " + e.getMessage());
         }
@@ -579,6 +590,17 @@ public class MainPortlet extends MVCPortlet {
                     writer.write(generatedForm);
                     break;
                 case FIND_ACTION:
+                    List<Creditor> creditorList =
+                            portalUserBeanRemoteBusiness.getPortalUserCreditorList(currentUser.getUserId());
+
+                    Long creditorId = 0L;
+
+                    if(creditorList.size() == 1) {
+                        creditorId = creditorList.get(0).getId();
+                    } else {
+                        System.err.println("Not correct creditors number(" + creditorList.size() + ")");
+                    }
+
                     Enumeration<String> list = resourceRequest.getParameterNames();
 
                     metaId = Long.valueOf(resourceRequest.getParameter("metaClass"));
@@ -619,7 +641,14 @@ public class MainPortlet extends MVCPortlet {
                         baseEntity.put(attribute, BaseValueFactory.create(
                                 BaseContainerType.BASE_ENTITY,
                                 metaAttribute.getMetaType(),
-                                b, 1, value));
+                                0,
+                                creditorId,
+                                b,
+                                1,
+                                new Date(),
+                                value,
+                                false,
+                                true));
                     }
 
                     baseEntity = entityService.search(baseEntity);
