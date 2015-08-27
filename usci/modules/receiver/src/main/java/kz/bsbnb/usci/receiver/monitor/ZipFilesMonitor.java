@@ -15,6 +15,7 @@ import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
 import kz.bsbnb.usci.tool.couchbase.singleton.StatusSingleton;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -695,26 +696,51 @@ public class ZipFilesMonitor{
             ZipEntry manifestEntry = zipFile.getEntry("manifest.xml");
 
             if(manifestEntry == null) { // credit-registry
-                int fileCount = 0;
-                ZipEntry dataXmlFile = null;
-                Enumeration<? extends ZipEntry> entries = zipFile.entries();
+                // this is fix for zip extract for file names with non latin chars
+                String batchName = null;
+                ZipArchiveInputStream zis = null;
+                byte[] extractedBytes = null;
 
-                while(entries.hasMoreElements()) {
-                    if(fileCount >= 1)
-                        throw new UnsupportedOperationException("Zip file must contain exactly one file");
+                try {
+                    zis = new ZipArchiveInputStream(new FileInputStream(filename));
+                    ZipArchiveEntry zipArchiveEntry = null;
 
-                    dataXmlFile = entries.nextElement();
-                    fileCount++;
+                    while ((zipArchiveEntry = zis.getNextZipEntry()) != null) {
+                        ByteArrayOutputStream baos = null;
+                        try {
+                            int size;
+                            byte[] buffer = new byte[ZIP_BUFFER_SIZE];
+
+                            baos = new ByteArrayOutputStream();
+
+                            while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
+                                baos.write(buffer, 0, size);
+                            }
+                            batchName = zipArchiveEntry.getName();
+                            extractedBytes = baos.toByteArray();
+                        } finally {
+                            if (baos != null) {
+                                baos.flush();
+                                baos.close();
+                            }
+                        }
+                    }
+                } finally {
+                    if (zis != null) {
+                        zis.close();
+                    }
                 }
 
-                if(dataXmlFile == null)
-                    throw new NullPointerException("Zip file contains corrupted xml file");
+                if (extractedBytes == null) {
+                    throw new IOException("ZIP file does not contain any files.");
+                }
+                //
 
                 if(userId == null)
                     userId = 100500L;
 
                 batchInfo.setBatchType("2");
-                batchInfo.setBatchName(dataXmlFile.getName());
+                batchInfo.setBatchName(batchName);
                 batchInfo.setUserId(userId);
 
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -730,7 +756,7 @@ public class ZipFilesMonitor{
 
                 try {
                     // TODO: fix OutOfMemory
-                    document = documentBuilder.parse(zipFile.getInputStream(dataXmlFile));
+                    document = documentBuilder.parse(new ByteArrayInputStream(extractedBytes));
                 } catch (SAXException e) {
                     e.printStackTrace();
                 }

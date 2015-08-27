@@ -14,6 +14,7 @@ import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.tool.couchbase.BatchStatuses;
 import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 import kz.bsbnb.usci.tool.couchbase.singleton.CouchbaseClientManager;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.log4j.Logger;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.item.NonTransientResourceException;
@@ -99,17 +100,16 @@ public class CREntityReader<T> extends CommonReader<T> {
 
         batchFullJModel = gson.fromJson(obj.toString(), BatchFullJModel.class);
 
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(batchFullJModel.getContent());
+        ZipArchiveInputStream zais = new ZipArchiveInputStream(new ByteArrayInputStream(batchFullJModel.getContent()));
+
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
-
-        ZipInputStream zis = new ZipInputStream(inputStream);
 
         byte[] buffer = new byte[4096];
         ByteArrayOutputStream out = null;
 
         try {
-            zis.getNextEntry();
+            zais.getNextZipEntry();
             int len;
             /*
             out = new ByteArrayOutputStream((int)entry.getSize());
@@ -123,7 +123,7 @@ public class CREntityReader<T> extends CommonReader<T> {
             */
             // modified for generated batch files
             out = new ByteArrayOutputStream(4096);
-            while ((len = zis.read(buffer, 0, 4096)) > 0) {
+            while ((len = zais.read(buffer, 0, 4096)) > 0) {
                 out.write(buffer, 0, len);
             }
         } catch (IOException e) {
