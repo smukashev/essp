@@ -191,6 +191,26 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
                     baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
+                case INSERT:
+                    if (baseEntityPostPrepared.getId() > 0)
+                        throw new UnsupportedOperationException("Запись была найдена в базе(" +
+                                baseEntityPostPrepared.getId() + "). Вставка не произведена;");
+
+                    baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, baseEntityManager,
+                            entityHolder);
+
+                    baseEntityApplyDao.applyToDb(baseEntityManager);
+                    break;
+                case UPDATE:
+                    if (baseEntityPostPrepared.getId() <= 0)
+                        throw new UnsupportedOperationException("Запись не была найдена в базе. " +
+                                "Обновление не выполнено;");
+
+                    baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, baseEntityManager,
+                            entityHolder);
+
+                    baseEntityApplyDao.applyToDb(baseEntityManager);
+                    break;
                 default:
                     throw new UnsupportedOperationException("Операция не поддерживается: "
                             + baseEntityPostPrepared.getOperation() + ";");

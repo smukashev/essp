@@ -64,7 +64,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     throw new UnsupportedOperationException("Operation new not supported in showcase");
                 } else if (queueEntry.getBaseEntityApplied().getOperation() == OperationType.CLOSE) {
                     throw new UnsupportedOperationException("Operation close not supported in showcase");
-                } else {
+                } else { // insert and update operations are here
                     boolean found = false;
 
                     for (ShowcaseHolder holder : holders) {

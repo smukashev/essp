@@ -4,6 +4,7 @@ import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -23,7 +24,6 @@ import java.util.logging.Logger;
 @Component
 @Scope("prototype")
 public class MainParser extends BatchParser {
-
     @Autowired
     private InfoParser infoParser;
 
@@ -81,12 +81,21 @@ public class MainParser extends BatchParser {
         } else if (localName.equals("info")) {
             infoParser.parse(xmlReader, batch, index);
         } else if (localName.equals("packages")) {
-//            hasMore = true;
-//            parseNextPackage();
-//            return true;
         } else if (localName.equals("package")) {
             BaseEntity pkg = new BaseEntity(metaClassRepository.getMetaClass("credit"), batch.getRepDate());
             pkg.setIndex(Long.parseLong(event.asStartElement().getAttributeByName(new QName("no")).getValue()));
+
+            String strOperationType = event.asStartElement().getAttributeByName(
+                    new QName("operation_type")).getValue();
+
+            if (strOperationType.equals("insert")) {
+                pkg.setOperation(OperationType.INSERT);
+            } else if (strOperationType.equals("update")) {
+                pkg.setOperation(OperationType.UPDATE);
+            } else {
+                throw new IllegalStateException("Операция не поддерживается(" + strOperationType + ");");
+            }
+
             packageParser.setCurrentBaseEntity(pkg);
             hasMore = true;
             parseNextPackage();

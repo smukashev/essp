@@ -1,17 +1,19 @@
 package kz.bsbnb.usci.receiver.monitor;
 
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
-import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.cr.model.PortalUser;
+import kz.bsbnb.usci.cr.model.Report;
+import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EavGlobal;
-import kz.bsbnb.usci.eav.model.json.*;
+import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.ReportStatus;
-import kz.bsbnb.usci.sync.service.IEntityService;
-import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
-import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.sync.service.IBatchService;
+import kz.bsbnb.usci.sync.service.IEntityService;
+import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
@@ -25,11 +27,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import javax.annotation.PostConstruct;
@@ -42,13 +40,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.zip.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * @author abukabayev
  */
 
-public class ZipFilesMonitor{
+public class ZipFilesMonitor {
     private final Logger logger = LoggerFactory.getLogger(ZipFilesMonitor.class);
 
     @Autowired
@@ -62,7 +61,7 @@ public class ZipFilesMonitor{
 
     private IBatchService batchService;
 
-    private Map<String,Job> jobs;
+    private Map<String, Job> jobs;
 
     private List<Creditor> creditors;
 
@@ -90,7 +89,7 @@ public class ZipFilesMonitor{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         return false;
     }
 
@@ -99,167 +98,45 @@ public class ZipFilesMonitor{
         batchService = serviceFactory.getBatchService();
 
         sender.setReceiverStatusSingleton(receiverStatusSingleton);
-        System.out.println("Retrieving creditors list");
         creditors = serviceFactory.getRemoteCreditorBusiness().findMainOfficeCreditors();
-        System.out.println("Found " + creditors.size() + " creditors");
+        System.out.println("Найдено " + creditors.size() + " кредиторов;");
 
         IBatchService batchService = serviceFactory.getBatchService();
 
         List<Batch> pendingBatchList = batchService.getPendingBatchList();
 
-        while(true) {
-            if (pendingBatchList.size() > 0) {
-                System.out.println("Found pending jobs: " + pendingBatchList.size());
-                System.out.println("-------------------------------------------------------------------------");
+        if (pendingBatchList.size() > 0) {
+            System.out.println("Найдены не законченные батчи: " + pendingBatchList.size());
 
-                int jobsRestarted = 0;
-
-                for (Batch batch : pendingBatchList) {
-                    try {
-                        //                        if (DataUtils.compareBeginningOfTheDay(batchInfo.getRepDate(), cal.getTime()) != 0)
-                        //                        {
-                        //                            System.out.println("Skipping wrone dates: " + batchInfo.getRepDate());
-                        //                            System.out.println("Must be: " + cal.getTime());
-                        //                            continue;
-                        //                        }
-
-                        sender.addJob(batch.getId(), new BatchInfo(batch));
-                        receiverStatusSingleton.batchReceived();
-                        System.out.println("Restarted job #" + ++jobsRestarted);
-                    } catch (Exception e) {
-                        System.out.println("Error in pending batches view: " + e.getMessage());
-                        System.out.println("Retrying...");
-                    }
-                }
+            for (Batch b : pendingBatchList) {
+                System.out.println(b.getFileName() + ", " + b.getRepDate());
             }
-            break;
 
-        }
+            System.out.println("-------------------------------------------------------------------------");
 
-//        restartBatch(22265);
+            int jobsRestarted = 0;
 
-        //////////////////////////
-
-        /*File f = new File("D:\\usci\\out.txt");
-        FileOutputStream fout = null;
-        try {
-            f.createNewFile();
-
-            fout = new FileOutputStream(f);
-
-            while(true) {
+            for (Batch batch : pendingBatchList) {
                 try {
-                    for(int batchId = 1; batchId < 5344; batchId++) {
-                        Object batchObject = couchbaseClient.get("batch:" + batchId);
-                        Object manifestObject = couchbaseClient.get("manifest:" + batchId);
-                        Object batchStatusObject = couchbaseClient.get("batch_status:" + batchId);
-
-                        if (batchObject == null || manifestObject == null) {
-                            System.out.println("Batch with id: " + batchId + " has no manifest or batch!");
-
-                            if (batchObject != null) {
-                                couchbaseClient.delete("batch:" + batchId);
-                            }
-                            if (manifestObject != null) {
-                                couchbaseClient.delete("manifest:" + batchId);
-                            }
-                            if (batchStatusObject != null) {
-                                couchbaseClient.delete("batch_status:" + batchId);
-                            }
-                            continue;
-                        }
-
-                        String batchStr = batchObject.toString();
-
-                        BatchFullJModel batchFull = gson.fromJson(batchStr, BatchFullJModel.class);
-
-
-
-                        String batchInfoStr = manifestObject.toString();
-
-                        BatchInfo batchInfo = gson.fromJson(batchInfoStr, BatchInfo.class);
-
-                        View view = couchbaseClient.getView("batch", "entity_status");
-                        Query query = new Query();
-                        query.setDescending(true);
-                        query.setRangeEnd("[" + batchId + ", 0]");
-                        query.setRangeStart("[" + batchId + ", 999999999999999]");
-
-
-                        ViewResponse response = couchbaseClient.query(view, query);
-
-                        Iterator<ViewRow> rows = response.iterator();
-
-                        int row_count = 0;
-                        int error_count = 0;
-                        while(rows.hasNext()) {
-                            ViewRow viewRowNoDocs = rows.next();
-
-                            row_count++;
-
-                            EntityStatusArrayJModel batchFullStatusJModel =
-                                    gson.fromJson(viewRowNoDocs.getValue(), EntityStatusArrayJModel.class);
-
-                            boolean errorFound = false;
-                            boolean completedFound = false;
-                            for (EntityStatusJModel csajm : batchFullStatusJModel.getEntityStatuses()) {
-                                if (csajm.getProtocol().equals("ERROR"))
-                                {
-                                    errorFound = true;
-                                }
-                                if (csajm.getProtocol().equals("COMPLETED"))
-                                {
-                                    completedFound = true;
-                                }
-                            }
-                            if (errorFound && !completedFound)
-                                error_count++;
-                        }
-
-//                        if (error_count > 0 || row_count != batchInfo.getSize()) {
-//                            System.out.println(batchId + " - " + batchInfo.getSize() + "/" + row_count + " - " + error_count);
-//                            sender.addJob(batchId, batchInfo);
-//                            receiverStatusSingleton.batchReceived();
-//                        }
-
-                        fout.write((batchId + "," +
-                                batchFull.getFileName() + "," +
-                                batchInfo.getSize() + "," + row_count + "," + error_count + "\n").getBytes());
-                    }
-                    break;
+                    sender.addJob(batch.getId(), new BatchInfo(batch));
+                    receiverStatusSingleton.batchReceived();
+                    System.out.println("Restarted job #" + ++jobsRestarted);
                 } catch (Exception e) {
                     System.out.println("Error in pending batches view: " + e.getMessage());
-                    e.printStackTrace();
                     System.out.println("Retrying...");
                 }
             }
-            System.out.println("Done");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if(fout != null) {
-                try {
-                    fout.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }      */
-        //////////////////////////
+        }
     }
 
     private class SenderThread extends Thread {
         private ReceiverStatusSingleton receiverStatusSingleton;
 
-        public ReceiverStatusSingleton getReceiverStatusSingleton()
-        {
+        public ReceiverStatusSingleton getReceiverStatusSingleton() {
             return receiverStatusSingleton;
         }
 
-        public void setReceiverStatusSingleton(ReceiverStatusSingleton receiverStatusSingleton)
-        {
+        public void setReceiverStatusSingleton(ReceiverStatusSingleton receiverStatusSingleton) {
             this.receiverStatusSingleton = receiverStatusSingleton;
         }
 
@@ -267,19 +144,16 @@ public class ZipFilesMonitor{
             long batchId;
             BatchInfo batchInfo;
 
-            private JobInfo(long batchId, BatchInfo batchInfo)
-            {
+            private JobInfo(long batchId, BatchInfo batchInfo) {
                 this.batchId = batchId;
                 this.batchInfo = batchInfo;
             }
 
-            public long getBatchId()
-            {
+            public long getBatchId() {
                 return batchId;
             }
 
-            public BatchInfo getBatchInfo()
-            {
+            public BatchInfo getBatchInfo() {
                 return batchInfo;
             }
         }
@@ -296,19 +170,16 @@ public class ZipFilesMonitor{
             return null;
         }
 
-        public void run()
-        {
+        public void run() {
             long sleepCounter = 0;
-            while(true) {
+            while (true) {
                 JobInfo nextJob;
 
                 if (serviceFactory != null && serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
                     System.out.println("Can't send more files because of file limit or sync queue overload.");
-                    try
-                    {
+                    try {
                         sleep(10000L);
-                    } catch (InterruptedException e)
-                    {
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     sleepCounter++;
@@ -336,18 +207,18 @@ public class ZipFilesMonitor{
                             jobLauncher.run(job, jobParametersBuilder.toJobParameters());
                             receiverStatusSingleton.batchStarted();
                             batchService.addBatchStatus(new BatchStatus()
-                                    .setBatchId(nextJob.getBatchId())
-                                    .setStatus(BatchStatuses.PROCESSING)
-                                    .setReceiptDate(new Date())
+                                            .setBatchId(nextJob.getBatchId())
+                                            .setStatus(BatchStatuses.PROCESSING)
+                                            .setReceiptDate(new Date())
                             );
                         } else {
                             logger.error("Unknown batch file type: " + nextJob.getBatchInfo().getBatchType() +
                                     " in batch with id: " + nextJob.getBatchId());
                             batchService.addBatchStatus(new BatchStatus()
-                                    .setBatchId(nextJob.getBatchId())
-                                    .setStatus(BatchStatuses.ERROR)
-                                    .setDescription("Unknown batch file type: " + nextJob.getBatchInfo().getBatchType())
-                                    .setReceiptDate(new Date())
+                                            .setBatchId(nextJob.getBatchId())
+                                            .setStatus(BatchStatuses.ERROR)
+                                            .setDescription("Unknown batch file type: " + nextJob.getBatchInfo().getBatchType())
+                                            .setReceiptDate(new Date())
                             );
                         }
 
@@ -364,11 +235,9 @@ public class ZipFilesMonitor{
                         e.printStackTrace();
                     }
                 } else {
-                    try
-                    {
+                    try {
                         sleep(1000);
-                    } catch (InterruptedException e)
-                    {
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     logger.debug("No files to send");
@@ -377,7 +246,7 @@ public class ZipFilesMonitor{
         }
     }
 
-    public void saveData(BatchInfo batchInfo, String filename, byte[] bytes){
+    public void saveData(BatchInfo batchInfo, String filename, byte[] bytes) {
         // TODO: fix hardcoded settings
         receiverStatusSingleton.batchReceived();
 
@@ -398,7 +267,7 @@ public class ZipFilesMonitor{
         Long cId = -1l;
         boolean haveError = false;
 
-        if(batchInfo.getUserId() != 100500L) {
+        if (batchInfo.getUserId() != 100500L) {
             List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
 
             if (cList.size() > 0) {
@@ -407,16 +276,16 @@ public class ZipFilesMonitor{
                 cId = -1L;
 
                 batchService.addBatchStatus(new BatchStatus()
-                        .setBatchId(batchId)
-                        .setStatus(BatchStatuses.ERROR)
-                        .setDescription("Can't find user with id: " + batchInfo.getUserId())
-                        .setReceiptDate(new Date())
+                                .setBatchId(batchId)
+                                .setStatus(BatchStatuses.ERROR)
+                                .setDescription("Can't find user with id: " + batchInfo.getUserId())
+                                .setReceiptDate(new Date())
                 );
 
                 haveError = true;
             }
         } else {
-            if(batchInfo.getAdditionalParams() != null && batchInfo.getAdditionalParams().size() > 0) {
+            if (batchInfo.getAdditionalParams() != null && batchInfo.getAdditionalParams().size() > 0) {
                 String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
                 String docValue = batchInfo.getAdditionalParams().get("DOC_VALUE");
 
@@ -426,13 +295,13 @@ public class ZipFilesMonitor{
                 String rnn = batchInfo.getAdditionalParams().get("RNN");
 
 
-                if(docType == null) docType = "";
-                if(docValue == null) docValue = "";
+                if (docType == null) docType = "";
+                if (docValue == null) docValue = "";
 
                 boolean foundCreditor = false;
 
                 for (Creditor creditor : creditors) {
-                    if(creditor.getBIK() != null && docType.equals("15") &&
+                    if (creditor.getBIK() != null && docType.equals("15") &&
                             creditor.getBIK().equals(docValue)) {
                         cId = creditor.getId();
                         foundCreditor = true;
@@ -440,7 +309,7 @@ public class ZipFilesMonitor{
 
                     }
 
-                    if(creditor.getBIN() != null && docType.equals("07") &&
+                    if (creditor.getBIN() != null && docType.equals("07") &&
                             creditor.getBIN().equals(docValue)) {
                         cId = creditor.getId();
                         foundCreditor = true;
@@ -448,35 +317,35 @@ public class ZipFilesMonitor{
 
                     }
 
-                    if(creditor.getRNN() != null && docType.equals("11") &&
+                    if (creditor.getRNN() != null && docType.equals("11") &&
                             creditor.getRNN().equals(docValue)) {
                         cId = creditor.getId();
                         foundCreditor = true;
                         break;
                     }
 
-                    if(code != null && code.length() > 0 && creditor.getCode() != null
+                    if (code != null && code.length() > 0 && creditor.getCode() != null
                             && creditor.getCode().length() > 0 && code.equals(creditor.getCode())) {
                         cId = creditor.getId();
                         foundCreditor = true;
                         break;
                     }
 
-                    if(bin != null && bin.length() > 0 && creditor.getBIN() != null
+                    if (bin != null && bin.length() > 0 && creditor.getBIN() != null
                             && creditor.getBIN().length() > 0 && bin.equals(creditor.getBIN())) {
                         cId = creditor.getId();
                         foundCreditor = true;
                         break;
                     }
 
-                    if(bik != null && bik.length() > 0 && creditor.getBIK() != null
+                    if (bik != null && bik.length() > 0 && creditor.getBIK() != null
                             && creditor.getBIK().length() > 0 && bik.equals(creditor.getBIK())) {
                         cId = creditor.getId();
                         foundCreditor = true;
                         break;
                     }
 
-                    if(rnn != null && rnn.length() > 0 && creditor.getRNN() != null
+                    if (rnn != null && rnn.length() > 0 && creditor.getRNN() != null
                             && creditor.getRNN().length() > 0 && rnn.equals(creditor.getRNN())) {
                         cId = creditor.getId();
                         foundCreditor = true;
@@ -489,10 +358,10 @@ public class ZipFilesMonitor{
                             ", " + docValue);
 
                     batchService.addBatchStatus(new BatchStatus()
-                            .setBatchId(batchId)
-                            .setStatus(BatchStatuses.ERROR)
-                            .setDescription("Кредитор не найден")
-                            .setReceiptDate(new Date())
+                                    .setBatchId(batchId)
+                                    .setStatus(BatchStatuses.ERROR)
+                                    .setDescription("Кредитор не найден")
+                                    .setReceiptDate(new Date())
                     );
 
                     haveError = true;
@@ -501,7 +370,7 @@ public class ZipFilesMonitor{
         }
 
 
-        if(!haveError && !checkAndFillEavReport(cId, batchInfo, batchId)) {
+        if (!haveError && !checkAndFillEavReport(cId, batchInfo, batchId)) {
             haveError = true;
         }
 
@@ -511,10 +380,10 @@ public class ZipFilesMonitor{
 
         if (!haveError) {
             batchService.addBatchStatus(new BatchStatus()
-                    .setBatchId(batchId)
-                    .setStatus(BatchStatuses.WAITING)
-                    .setReceiptDate(new Date())
-            );
+                            .setBatchId(batchId)
+                            .setStatus(BatchStatuses.WAITING)
+                            .setReceiptDate(new Date()));
+
             sender.addJob(batchId, batchInfo);
         }
     }
@@ -527,14 +396,14 @@ public class ZipFilesMonitor{
         if (existing != null) {
             if (ReportStatus.COMPLETED.code().equals(existing.getStatus().getCode())) {
                 String errMsg = "Отчет со статусом 'Завершен' уже существует для кредитора = "
-                        + creditorId +  ", отчетная дата = " + batchInfo.getRepDate();
+                        + creditorId + ", отчетная дата = " + batchInfo.getRepDate();
                 logger.error(errMsg);
 
                 batchService.addBatchStatus(new BatchStatus()
-                        .setBatchId(batchId)
-                        .setStatus(BatchStatuses.ERROR)
-                        .setDescription(errMsg)
-                        .setReceiptDate(new Date())
+                                .setBatchId(batchId)
+                                .setStatus(BatchStatuses.ERROR)
+                                .setDescription(errMsg)
+                                .setReceiptDate(new Date())
                 );
                 return false;
             }
@@ -583,7 +452,7 @@ public class ZipFilesMonitor{
 
             PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
             PortalUser portalUser = userService.getUser(batchInfo.getUserId());
-            if(portalUser != null)
+            if (portalUser != null)
                 reportBeanRemoteBusiness.updateReport(existing, portalUser.getScreenName());
             else
                 reportBeanRemoteBusiness.updateReport(existing, "Unknown");
@@ -606,7 +475,7 @@ public class ZipFilesMonitor{
             PortalUserBeanRemoteBusiness userService = serviceFactory.getUserService();
             PortalUser portalUser = userService.getUser(batchInfo.getUserId());
             Long reportId;
-            if(portalUser != null)
+            if (portalUser != null)
                 reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
             else
                 reportId = reportBeanRemoteBusiness.insert(report, "Unknown");
@@ -622,8 +491,8 @@ public class ZipFilesMonitor{
         int nRead;
         byte[] data = new byte[16384];
 
-        while ((nRead = in.read(data,0,data.length)) != -1){
-            buffer.write(data,0,nRead);
+        while ((nRead = in.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
         }
 
         buffer.flush();
@@ -642,23 +511,23 @@ public class ZipFilesMonitor{
             ZipFile zipFile = new ZipFile(filename);
             ZipEntry manifestEntry = zipFile.getEntry("manifest.xml");
 
-            if(manifestEntry == null) { // credit-registry
+            if (manifestEntry == null) { // credit-registry
                 int fileCount = 0;
                 ZipEntry dataXmlFile = null;
                 Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
-                while(entries.hasMoreElements()) {
-                    if(fileCount >= 1)
+                while (entries.hasMoreElements()) {
+                    if (fileCount >= 1)
                         throw new UnsupportedOperationException("Zip file must contain exactly one file");
 
                     dataXmlFile = entries.nextElement();
                     fileCount++;
                 }
 
-                if(dataXmlFile == null)
+                if (dataXmlFile == null)
                     throw new NullPointerException("Zip file contains corrupted xml file");
 
-                if(userId == null)
+                if (userId == null)
                     userId = 100500L;
 
                 batchInfo.setBatchType("2");
@@ -701,17 +570,17 @@ public class ZipFilesMonitor{
 
                 try {
                     NamedNodeMap map = document.getElementsByTagName("doc").item(0).getAttributes();
-                    Node n  = map.getNamedItem("doc_type");
+                    Node n = map.getNamedItem("doc_type");
                     String docType = n.getTextContent();
 
                     String docValue = document.getElementsByTagName("doc").item(0).getTextContent();
 
-                    if(docType != null && docValue != null &&
+                    if (docType != null && docValue != null &&
                             docType.length() > 0 && docValue.length() > 0) {
-                        batchInfo.addParam("DOC_TYPE", docType.replaceAll("\n", ""));
-                        batchInfo.addParam("DOC_VALUE", docValue.replaceAll("\n", ""));
+                        batchInfo.addParam("DOC_TYPE", docType.replaceAll("\n", "").replaceAll("\t", ""));
+                        batchInfo.addParam("DOC_VALUE", docValue.replaceAll("\n", "").replaceAll("\t", ""));
                     }
-                } catch(Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -759,18 +628,18 @@ public class ZipFilesMonitor{
 
                 NodeList propertiesList = document.getElementsByTagName("properties");
 
-                for(int i = 0; i < propertiesList.getLength(); i++) {
+                for (int i = 0; i < propertiesList.getLength(); i++) {
                     Node propertiesNode = propertiesList.item(i);
 
-                    if(propertiesNode.getNodeType() == Node.ELEMENT_NODE) {
+                    if (propertiesNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element propertiesElement = (Element) propertiesNode;
 
                         NodeList propertyList = propertiesElement.getElementsByTagName("property");
 
-                        for(int j = 0; j < propertyList.getLength(); j++) {
+                        for (int j = 0; j < propertyList.getLength(); j++) {
                             Node propertyNode = propertyList.item(j);
 
-                            if(propertyNode.getNodeType() == Node.ELEMENT_NODE) {
+                            if (propertyNode.getNodeType() == Node.ELEMENT_NODE) {
                                 Element propertyElement = (Element) propertyNode;
 
                                 String name = propertyElement.getElementsByTagName("name").item(0).getTextContent();
@@ -786,14 +655,14 @@ public class ZipFilesMonitor{
                 zipFile.close();
                 saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));
             }
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void readFilesWithoutUser(String filename) {
         BatchInfo batchInfo = new BatchInfo();
-        try{
+        try {
 
             ZipFile zipFile = new ZipFile(filename);
 
@@ -856,7 +725,7 @@ public class ZipFilesMonitor{
             zipFile.close();
 
             saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -870,7 +739,7 @@ public class ZipFilesMonitor{
         boolean valid = true;
         long sleepCounter = 0;
         do {
-            while(entityService.getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
+            while (entityService.getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
                 Thread.sleep(1000);
 
                 sleepCounter++;
@@ -890,10 +759,7 @@ public class ZipFilesMonitor{
 
                     Thread.sleep(1000);
 
-                    readFiles(path+"/"+fileName);
-
-                    System.out.println("File sent to parser:" + fileName);
-
+                    readFiles(path + "/" + fileName);
                 }
             }
             valid = watchKey.reset();
@@ -901,39 +767,4 @@ public class ZipFilesMonitor{
         } while (valid);
 
     }
-    public byte[] extract(byte[] zippedBytes) throws IOException {
-        ByteArrayInputStream bais = null;
-        ZipArchiveInputStream zis = null;
-
-        try {
-            bais = new ByteArrayInputStream(zippedBytes);
-            zis = new ZipArchiveInputStream(bais);
-
-            while (zis.getNextZipEntry() != null) {
-                ByteArrayOutputStream baos = null;
-                try {
-                    int size;
-                    byte[] buffer = new byte[ZIP_BUFFER_SIZE];
-
-                    baos = new ByteArrayOutputStream();
-
-                    while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
-                        baos.write(buffer, 0, size);
-                    }
-                    return baos.toByteArray();
-                } finally {
-                    if (baos != null) {
-                        baos.flush();
-                        baos.close();
-                    }
-                }
-            }
-        } finally {
-            if (zis != null) {
-                zis.close();
-            }
-        }
-        throw new IOException("ZIP file does not contain any files.");
-    }
-
 }

@@ -616,8 +616,8 @@ meta add --name=credit --attribute=creditor --type=meta_class --childname=ref_cr
 meta key --name=credit --attribute=creditor
 meta add --name=credit --attribute=organizations --type=meta_class --array --childname=organization
 meta add --name=credit --attribute=persons --type=meta_class --array --childname=person
-meta add --name=credit --attribute=pledges --type=meta_class --array --childname=pledge
 meta add --name=credit --attribute=creditors --type=meta_class --array --childname=creditor
+meta add --name=credit --attribute=pledges --type=meta_class --array --childname=pledge
 meta add --name=credit --attribute=primary_contract --type=meta_class --childname=primary_contract
 meta key --name=credit --attribute=primary_contract
 meta add --name=credit --attribute=maturity_date --type=date
