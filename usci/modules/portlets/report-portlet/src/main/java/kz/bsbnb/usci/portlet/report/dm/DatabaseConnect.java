@@ -1,9 +1,5 @@
 package kz.bsbnb.usci.portlet.report.dm;
 
-import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
-
-import kz.bsbnb.usci.portlet.report.export.ProtocolsTableReportExporter;
-import kz.bsbnb.usci.portlet.report.ui.CustomDataSource;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Organization;
@@ -11,24 +7,22 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portlet.expando.model.ExpandoTableConstants;
 import com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import kz.bsbnb.usci.portlet.report.ui.CustomDataSource;
+import oracle.jdbc.OracleCallableStatement;
+import oracle.jdbc.OracleTypes;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
 
-import oracle.jdbc.OracleCallableStatement;
-import oracle.jdbc.OracleTypes;
+import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
 
 /**
  *
@@ -38,6 +32,10 @@ public class DatabaseConnect {
 
     private User user;
 
+
+    public DatabaseConnect() {
+
+    }
     public DatabaseConnect(User user) {
         this.user = user;
     }
@@ -92,7 +90,7 @@ public class DatabaseConnect {
         return users;
     }
 
-    private Connection getConnection() {
+    public Connection getConnection() {
         try {
             Locale previousLocale = Locale.getDefault();
             // log.log(Level.INFO, "Current locale: {0}-{1}",

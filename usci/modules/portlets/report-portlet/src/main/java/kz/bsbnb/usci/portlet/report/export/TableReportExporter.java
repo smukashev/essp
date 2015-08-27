@@ -1,31 +1,28 @@
 package kz.bsbnb.usci.portlet.report.export;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
-import java.util.logging.Level;
-
-import kz.bsbnb.usci.portlet.report.ReportApplication;
-import static kz.bsbnb.usci.portlet.report.ReportApplication.getApplicationLocale;
-import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
-import kz.bsbnb.usci.portlet.report.ReportPortletResource;
-import kz.bsbnb.usci.portlet.report.dm.Report;
-import kz.bsbnb.usci.portlet.report.ui.ConstantValues;
-import kz.bsbnb.usci.portlet.report.ui.CustomDataSource;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import kz.bsbnb.usci.portlet.report.ReportApplication;
+import kz.bsbnb.usci.portlet.report.ReportPortletResource;
+import kz.bsbnb.usci.portlet.report.dm.Report;
+import kz.bsbnb.usci.portlet.report.ui.ConstantValues;
+import kz.bsbnb.usci.portlet.report.ui.CustomDataSource;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Level;
+
+import static kz.bsbnb.usci.portlet.report.ReportApplication.getApplicationLocale;
+import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
 
 /**
  *
@@ -123,6 +120,7 @@ public class TableReportExporter extends AbstractReportExporter {
     }
 
     protected void loadTable() {
+        loadStarted();
         getTargetReportComponent().clearOutputComponents();
         try {
             CustomDataSource customDataSource = getTargetReportComponent().loadData();
@@ -132,6 +130,10 @@ public class TableReportExporter extends AbstractReportExporter {
             Table table = getTable(customDataSource);
 
             getTargetReportComponent().addOutputComponent(table);
+            //getTargetReportComponent().getConnect().getUserId()
+            //getTargetReportComponent().getReport().getNameRu()
+           // ResultSet rs =  getTargetReportComponent().getConnect().runQuery("select report_mail(2319, 'test', sysdate, 'Тест', sysdate) from dual");
+        loadFinished();
         } catch (SQLException sqle) {
             log.log(Level.SEVERE, "Sql exception", sqle);
             getTargetReportComponent().addOutputComponent(new Label("Sql exception: " + sqle.getMessage()));

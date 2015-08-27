@@ -1,26 +1,16 @@
 package kz.bsbnb.usci.portlet.report.export;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.PropertyResourceBundle;
-import java.util.logging.Level;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
+import com.vaadin.terminal.DownloadStream;
+import com.vaadin.terminal.StreamResource;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Component;
+import kz.bsbnb.usci.portlet.report.Localization;
 import kz.bsbnb.usci.portlet.report.ReportApplication;
 import kz.bsbnb.usci.portlet.report.ReportPortletResource;
 import kz.bsbnb.usci.portlet.report.dm.Report;
+import kz.bsbnb.usci.portlet.report.dm.ReportInputParameter;
+import kz.bsbnb.usci.portlet.report.ui.ConstantValues;
 import kz.bsbnb.usci.portlet.report.ui.CustomDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -30,14 +20,14 @@ import net.sf.jasperreports.engine.export.JExcelApiExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 import net.sf.jasperreports.engine.util.JRLoader;
 
-import kz.bsbnb.usci.portlet.report.Localization;
-import kz.bsbnb.usci.portlet.report.dm.ReportInputParameter;
-import kz.bsbnb.usci.portlet.report.ui.ConstantValues;
-import com.vaadin.terminal.DownloadStream;
-import com.vaadin.terminal.StreamResource;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Component;
+import java.io.*;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  *
@@ -61,9 +51,11 @@ public class JasperReportExporter extends AbstractReportExporter{
 
     protected void exportToXls() {
         try {
+            loadStarted();
             CustomDataSource dataSource = getTargetReportComponent().loadData();
             Report report = getTargetReportComponent().getReport();
             final String reportName = report.getName();
+
             final String reportPath = ConstantValues.REPORT_FILES_CATALOG+reportName+"\\";
             final String jasperFilePath = reportPath+reportName+".jasper";
             final String resourceFilePath = reportPath+reportName+"_"+ ReportApplication.getApplicationLocale().getLanguage()+".properties";
@@ -142,6 +134,7 @@ public class JasperReportExporter extends AbstractReportExporter{
                 }
             };
             (getWindow()).open(resource);
+            loadFinished();
         } catch(JRException jre) {
             ReportApplication.log.log(Level.INFO, "Report exception", jre);
         } catch(IOException ioe) {

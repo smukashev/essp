@@ -1,26 +1,22 @@
 package kz.bsbnb.usci.portlet.report.ui;
 
-import java.util.List;
-import java.util.logging.Level;
-
-import kz.bsbnb.usci.portlet.report.ReportApplication;
-import kz.bsbnb.usci.portlet.report.ReportPortletResource;
-import kz.bsbnb.usci.portlet.report.dm.DatabaseConnect;
-import kz.bsbnb.usci.portlet.report.dm.ExportType;
-import kz.bsbnb.usci.portlet.report.export.BanksWithDataTableReportExporter;
-import kz.bsbnb.usci.portlet.report.export.TableReportExporter;
-import kz.bsbnb.usci.portlet.report.export.TemplatedPagedXlsReportExporter;
-import kz.bsbnb.usci.portlet.report.Localization;
-import kz.bsbnb.usci.portlet.report.dm.Report;
-import kz.bsbnb.usci.portlet.report.dm.ReportController;
-import kz.bsbnb.usci.portlet.report.export.JasperReportExporter;
-import kz.bsbnb.usci.portlet.report.export.OutputFormExporter;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.BaseTheme;
+import kz.bsbnb.usci.portlet.report.Localization;
+import kz.bsbnb.usci.portlet.report.ReportApplication;
+import kz.bsbnb.usci.portlet.report.ReportPortletResource;
+import kz.bsbnb.usci.portlet.report.dm.DatabaseConnect;
+import kz.bsbnb.usci.portlet.report.dm.ExportType;
+import kz.bsbnb.usci.portlet.report.dm.Report;
+import kz.bsbnb.usci.portlet.report.dm.ReportController;
+import kz.bsbnb.usci.portlet.report.export.*;
+
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  *
@@ -60,7 +56,7 @@ public class ReportListLayout extends VerticalLayout {
         displayReportHeader(Localization.START_HEADER.getValue());
 
         ReportController reportController = new ReportController();
-        List<Report> reports = reportController.loadReports();
+        List<Report> reports = reportController.loadReports(connect);
         BeanItemContainer<Report> reportsContainer = new BeanItemContainer<Report>(Report.class, reports);
         reportsTable = new Table(Localization.REPORTS_TABLE_CAPTION.getValue(), reportsContainer);
         reportsTable.setVisibleColumns(COLUMN_ORDER);
