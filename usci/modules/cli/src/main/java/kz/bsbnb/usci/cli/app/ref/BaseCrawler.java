@@ -26,6 +26,7 @@ public class BaseCrawler {
 
     public static Document document;
     public static String fileName;
+    public static String prefix = "C:\\refs\\";
 
     public static Document getDocument(){
 
@@ -47,7 +48,7 @@ public class BaseCrawler {
 
     public void work(){
 
-        fileName = "C:\\refs\\";
+        //fileName = "C:\\refs\\";
 
         try {
             rootElement = getDocument().createElement("batch");
