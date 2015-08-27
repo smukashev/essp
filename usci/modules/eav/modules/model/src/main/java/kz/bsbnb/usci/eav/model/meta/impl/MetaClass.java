@@ -1,8 +1,5 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
-import java.util.*;
-
-import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
@@ -10,6 +7,8 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DataUtils;
+
+import java.util.*;
 
 public class MetaClass extends MetaContainer implements IMetaClass
 {
@@ -61,6 +60,7 @@ public class MetaClass extends MetaContainer implements IMetaClass
         super(meta.id, MetaContainerTypes.META_CLASS);
 
         this.className = meta.className;
+        this.classTitle = meta.classTitle;
         this.disabled = meta.disabled;
         this.beginDate = meta.beginDate;
         this.complexKeyType = meta.complexKeyType;

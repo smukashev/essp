@@ -11,6 +11,8 @@ import java.util.List;
 public interface IMetaClassRepository {
     MetaClass getMetaClass(String className);
 
+    MetaClass getDisabledMetaClass(String className);
+
     MetaClass getMetaClass(long id);
 
     List<MetaClass> getMetaClasses();

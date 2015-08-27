@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface IMetaClassDao extends IDao<MetaClass> {
     MetaClass load(String className);
-
-    MetaClass load(String className, Date beginDate);
+    public MetaClass loadDisabled(String className);
+    public MetaClass load(String className, Date beginDate);
 
     List<MetaClass> loadAll();
 

@@ -33,6 +33,8 @@ public interface IMetaFactoryService {
 
     MetaClass getMetaClass(String name);
 
+    MetaClass getDisabledMetaClass(String name);
+
     MetaClass getMetaClass(Long metaId);
 
     boolean saveMetaClass(MetaClass meta);

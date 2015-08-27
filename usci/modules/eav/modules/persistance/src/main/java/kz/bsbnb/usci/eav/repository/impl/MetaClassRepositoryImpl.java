@@ -26,17 +26,12 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
 
     @Override
     public void afterPropertiesSet() throws Exception {
+       // try {
         lock.readLock().lock();
-        List<MetaClass> metaClassList;
-        try {
-            metaClassList = metaClassDao.loadAll();
-        }
-        finally {
+            List<MetaClass> metaClassList = metaClassDao.loadAll();
             lock.readLock().unlock();
-        }
 
         lock.writeLock().lock();
-        try {
             Iterator<MetaClass> concurrentIterator = metaClassList.iterator();
 
             while (concurrentIterator.hasNext()) {
@@ -45,12 +40,45 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
                 cache.put(tmpMeta.getClassName(), tmpMeta);
                 names.put(tmpMeta.getId(), tmpMeta.getClassName());
             }
+
+            lock.writeLock().unlock();
+       // }
+       // finally {
+         //   lock.readLock().unlock();
+         //   lock.writeLock().unlock();
+       // }
         }
+    @Override
+    public MetaClass getDisabledMetaClass(String className) {
+        MetaClass metaClass = cache.get(className);
+
+        if (metaClass == null) {
+            lock.readLock().lock();
+            try {
+                metaClass = metaClassDao.loadDisabled(className);
+
+            }
         finally {
+                lock.readLock().unlock();
+            }
+
+
+            if (metaClass != null) {
+                lock.writeLock().lock();
+                try {
+                    cache.put(className, metaClass);
+                    names.put(metaClass.getId(), className);
+                }
+                finally {
             lock.writeLock().unlock();
         }
-    }
 
+
+    }
+        }
+
+        return metaClass;
+    }
     @Override
     public MetaClass getMetaClass(String className) {
         MetaClass metaClass = cache.get(className);
@@ -64,6 +92,7 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
                 lock.readLock().unlock();
             }
 
+
             if (metaClass != null) {
                 lock.writeLock().lock();
                 try {
@@ -73,6 +102,8 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
                 finally {
                     lock.writeLock().unlock();
                 }
+
+
             }
         }
 
@@ -113,27 +144,29 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
 
     @Override
     public List<MetaClass> getMetaClasses() {
-        lock.readLock().lock();
+
         List<MetaClass> metaClassList;
+        lock.readLock().lock();
         try {
             metaClassList = metaClassDao.loadAll();
         }
         finally {
             lock.readLock().unlock();
-        }
 
+        }
         return metaClassList;
     }
 
     @Override
     public void saveMetaClass(MetaClass meta) {
+            long id;
         lock.readLock().lock();
-        long id;
         try {
             id = metaClassDao.save(meta);
         }finally {
             lock.readLock().unlock();
         }
+
 
 
         /*for (String name : cache.keySet()) {
@@ -161,7 +194,6 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
             lock.writeLock().unlock();
         }
 
-
         try {
             afterPropertiesSet();
         } catch (Exception ex) {
@@ -181,14 +213,13 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
 
     @Override
     public boolean delMetaClass(String className) {
-        lock.readLock().lock();
         MetaClass meta;
+        lock.readLock().lock();
         try {
             meta = getMetaClass(className);
         }finally {
             lock.readLock().unlock();
         }
-
 
         if(meta != null) {
             lock.writeLock().lock();
@@ -203,4 +234,5 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
         }
         return false;
     }
+
 }

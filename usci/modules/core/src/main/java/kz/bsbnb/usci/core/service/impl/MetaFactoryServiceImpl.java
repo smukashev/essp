@@ -89,6 +89,11 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     }
 
     @Override
+    public MetaClass getDisabledMetaClass(String name)
+    {
+        return metaClassRepository.getDisabledMetaClass(name);
+    }
+    @Override
     public MetaClass getMetaClass(Long metaId) {
         return metaClassRepository.getMetaClass(metaId);
     }
