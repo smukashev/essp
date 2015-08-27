@@ -1,12 +1,14 @@
-package kz.bsbnb.usci.porltet.entity_merge;
+package kz.bsbnb.usci.porltet.meta_editor;
+
 
 import com.google.gson.Gson;
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+//import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
@@ -14,19 +16,21 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.porltet.entity_merge.model.json.MetaClassList;
-import kz.bsbnb.usci.porltet.entity_merge.model.json.MetaClassListEntry;
+import kz.bsbnb.usci.porltet.meta_editor.model.json.MetaClassList;
+import kz.bsbnb.usci.porltet.meta_editor.model.json.MetaClassListEntry;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.List;
 
 public class MainPortlet extends MVCPortlet {
     private RmiProxyFactoryBean metaFactoryServiceFactoryBean;
-
+ //   private XSDGenerator xsdGenerator = new XSDGenerator();
     private IMetaFactoryService metaFactoryService;
 
     public void connectToServices() {
@@ -68,6 +72,8 @@ public class MainPortlet extends MVCPortlet {
         } catch (PortalException e) {
             e.printStackTrace();
         } catch (SystemException e) {
+            e.printStackTrace();
+        } catch (com.liferay.portal.kernel.exception.PortalException e) {
             e.printStackTrace();
         }
 
@@ -113,14 +119,16 @@ public class MainPortlet extends MVCPortlet {
 
                     for (MetaClassName metaName : metaClassesList) {
                         MetaClassListEntry metaClassListEntry = new MetaClassListEntry();
-
+                       // if(metaName.getIsDisabled()==1)
+                         //   continue;
                         metaClassListEntry.setClassId(metaName.getClassName());
                         if(metaName.getClassTitle() != null
                                 && metaName.getClassTitle().trim().length() > 0)
                             metaClassListEntry.setClassName(metaName.getClassTitle());
                         else
                             metaClassListEntry.setClassName(metaName.getClassName());
-
+                        metaClassListEntry.setDisabled(metaName.isDisabled());
+                        metaClassListEntry.setReference(metaName.isReference());
                         classesListJson.getData().add(metaClassListEntry);
                     }
 
@@ -283,9 +291,12 @@ public class MainPortlet extends MVCPortlet {
                     String classId = resourceRequest.getParameter("classId");
                     if (classId != null && classId.trim().length() > 0) {
                         String className = resourceRequest.getParameter("className");
+                        String isDisabled = resourceRequest.getParameter("isDisabled");
+                        String isReference = resourceRequest.getParameter("isReference");
                         MetaClass meta = null;
                         try {
-                            meta = metaFactoryService.getMetaClass(classId);
+
+                            meta = metaFactoryService.getDisabledMetaClass(classId);
                         } catch (IllegalArgumentException ex) {}
 
 
@@ -294,8 +305,21 @@ public class MainPortlet extends MVCPortlet {
                         }
 
                         meta.setClassTitle(className);
+                        meta.setDisabled(Boolean.parseBoolean(isDisabled));
+                        meta.setReference(Boolean.parseBoolean(isReference));
+
+                       // meta.setClassName(classId);
+
 
                         metaFactoryService.saveMetaClass(meta);
+
+
+                        List<MetaClass> metaClasses = metaFactoryService.getMetaClasses();
+                        OutputStream out = new FileOutputStream("C:\\Users\\bauyrzhan.ibraimov\\IdeaProjects\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd");
+                       // xsdGenerator.generate(out, metaClasses);
+
+
+
                         writer.write("{\"success\": true, \"data\": {\"id\":\"" + classId + "\"," +
                                 "\"name\":\"" + className + "\"}}");
                     } else {
@@ -308,6 +332,10 @@ public class MainPortlet extends MVCPortlet {
                         int dotIndex = attrPath.indexOf(".");
                         String className = "";
                         String attrName = "";
+                        Boolean is_key  = false;
+                        Boolean is_required  = false;
+                        Boolean is_nullable  = false;
+                        Boolean is_final = false;
                         if (dotIndex < 0) {
                             className = attrPath;
                         } else {
@@ -366,11 +394,22 @@ public class MainPortlet extends MVCPortlet {
                                 MetaAttribute attrToAdd = new MetaAttribute(false, false, typeToAdd);
                                 attrToAdd.setTitle(resourceRequest.getParameter("attrTitle"));
 
+                                is_key  = Boolean.parseBoolean(resourceRequest.getParameter("is_Key"));
+                                is_required  = Boolean.parseBoolean(resourceRequest.getParameter("is_Required"));
+                                is_nullable  = Boolean.parseBoolean(resourceRequest.getParameter("is_Nullable"));
+                                is_final  = Boolean.parseBoolean(resourceRequest.getParameter("is_Final"));
+                                attrToAdd.setKey(is_key);
+                                attrToAdd.setRequired(is_required);
+                                attrToAdd.setNullable(is_nullable);
+                                attrToAdd.setFinal(is_final);
                                 metaParent.setMetaAttribute(attrPathCode, attrToAdd);
+
                             }
 
                             metaFactoryService.saveMetaClass(metaParent);
-
+                            List<MetaClass> metaClasses = metaFactoryService.getMetaClasses();
+                            OutputStream out = new FileOutputStream("C:\\Users\\bauyrzhan.ibraimov\\IdeaProjects\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd");
+                          //  xsdGenerator.generate(out, metaClasses);
                             writer.write("{\"success\": true, \"data\": {}}");
                         } else {
                             writer.write("{\"success\": false, " +
@@ -382,7 +421,7 @@ public class MainPortlet extends MVCPortlet {
 
                     break;
                 case DEL_CLASS:
-                    classId = resourceRequest.getParameter("id");
+                    classId = resourceRequest.getParameter("classId");
                     if (classId != null && classId.trim().length() > 0) {
                         metaFactoryService.delMetaClass(classId);
                     }
@@ -407,7 +446,7 @@ public class MainPortlet extends MVCPortlet {
 
                         if (attrName.length() > 0) {
                             attribute = meta.getEl(attrName);
-                            //TODO: Add attribute title here
+                            title =  meta.getMetaAttribute(attrName).getTitle();
                         }
 
                         if (!attribute.isSet()) {
@@ -418,9 +457,10 @@ public class MainPortlet extends MVCPortlet {
                                 writer.write("\"type\": 2, ");
                                 writer.write("\"title\": \"" +
                                         title + "\", ");
-                                writer.write("\"complexType\": \"" + value.getClassName() + "\"");
-
-                                writer.write("}}");
+                                writer.write("\"complexType\": \"" + value.getClassName() + "\", ");
+                                writer.write("\"is_key\": \"" + meta.getMetaAttribute(attrName).isKey() + "\", ");
+                                writer.write("\"is_required\": \"" + meta.getMetaAttribute(attrName).isRequired() + "\", ");
+                                writer.write("\"is_nullable\": \"" + meta.getMetaAttribute(attrName).isNullable() + "\"");
                             } else {
                                 MetaValue value = (MetaValue)attribute;
 
@@ -429,8 +469,10 @@ public class MainPortlet extends MVCPortlet {
                                 writer.write("\"type\": 1, ");
                                 writer.write("\"title\": \"" +
                                         title + "\", ");
-                                writer.write("\"simpleType\": \"" + value.getTypeCode() + "\"");
-
+                                writer.write("\"simpleType\": \"" + value.getTypeCode() + "\", ");
+                                writer.write("\"is_key\": \"" + meta.getMetaAttribute(attrName).isKey() + "\", ");
+                                writer.write("\"is_required\": \"" + meta.getMetaAttribute(attrName).isRequired() + "\", ");
+                                writer.write("\"is_nullable\": \"" + meta.getMetaAttribute(attrName).isNullable() + "\"");
                                 writer.write("}}");
                             }
                         } else {
@@ -443,8 +485,10 @@ public class MainPortlet extends MVCPortlet {
                                 writer.write("\"title\": \"" +
                                         title + "\", ");
                                 writer.write("\"complexType\": \"" +
-                                        ((MetaClass)attrMetaSet.getMemberType()).getClassName() + "\"");
-
+                                        ((MetaClass)attrMetaSet.getMemberType()).getClassName() + "\", ");
+                                writer.write("\"is_key\": \"" + meta.getMetaAttribute(attrName).isKey() + "\", ");
+                                writer.write("\"is_required\": \"" + meta.getMetaAttribute(attrName).isRequired() + "\", ");
+                                writer.write("\"is_nullable\": \"" + meta.getMetaAttribute(attrName).isNullable() + "\"");
                                 writer.write("}}");
                             } else {
                                 writer.write("{\"success\": true, \"data\": {");
@@ -452,8 +496,10 @@ public class MainPortlet extends MVCPortlet {
                                 writer.write("\"type\": 3, ");
                                 writer.write("\"title\": \"" +
                                         title + "\", ");
-                                writer.write("\"simpleType\": \"" + attrMetaSet.getTypeCode() + "\"");
-
+                                writer.write("\"simpleType\": \"" + attrMetaSet.getTypeCode() + "\", ");
+                                writer.write("\"is_key\": \"" + meta.getMetaAttribute(attrName).isKey() + "\", ");
+                                writer.write("\"is_required\": \"" + meta.getMetaAttribute(attrName).isRequired() + "\", ");
+                                writer.write("\"is_nullable\": \"" + meta.getMetaAttribute(attrName).isNullable() + "\"");
                                 writer.write("}}");
                             }
                         }
