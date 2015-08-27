@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.porltet.meta_editor;
 
+
 import com.google.gson.Gson;
 import com.liferay.portal.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -7,6 +8,7 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
@@ -17,18 +19,18 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.porltet.meta_editor.model.json.MetaClassList;
 import kz.bsbnb.usci.porltet.meta_editor.model.json.MetaClassListEntry;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
-import org.apache.log4j.helpers.OptionConverter;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.math.BigDecimal;
 import java.util.List;
 
 public class MainPortlet extends MVCPortlet {
     private RmiProxyFactoryBean metaFactoryServiceFactoryBean;
-
+    private XSDGenerator xsdGenerator = new XSDGenerator();
     private IMetaFactoryService metaFactoryService;
 
     public void connectToServices() {
@@ -310,6 +312,14 @@ public class MainPortlet extends MVCPortlet {
 
 
                         metaFactoryService.saveMetaClass(meta);
+
+
+                        List<MetaClass> metaClasses = metaFactoryService.getMetaClasses();
+                        OutputStream out = new FileOutputStream("C:\\Users\\bauyrzhan.ibraimov\\IdeaProjects\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd");
+                        xsdGenerator.generate(out, metaClasses);
+
+
+
                         writer.write("{\"success\": true, \"data\": {\"id\":\"" + classId + "\"," +
                                 "\"name\":\"" + className + "\"}}");
                     } else {
@@ -397,7 +407,9 @@ public class MainPortlet extends MVCPortlet {
                             }
 
                             metaFactoryService.saveMetaClass(metaParent);
-
+                            List<MetaClass> metaClasses = metaFactoryService.getMetaClasses();
+                            OutputStream out = new FileOutputStream("C:\\Users\\bauyrzhan.ibraimov\\IdeaProjects\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd");
+                            xsdGenerator.generate(out, metaClasses);
                             writer.write("{\"success\": true, \"data\": {}}");
                         } else {
                             writer.write("{\"success\": false, " +
