@@ -29,8 +29,6 @@ public class Batch extends Persistable
 
     private Long userId;
 
-    private Long creditorId;
-
     private String fileName;
     private byte[] content;
     private String hash;
@@ -156,14 +154,6 @@ public class Batch extends Persistable
         DataUtils.toBeginningOfTheDay(newReportDate);
 
         this.repDate = newReportDate;
-    }
-
-    public Long getCreditorId() {
-        return creditorId;
-    }
-
-    public void setCreditorId(Long creditorId) {
-        this.creditorId = creditorId;
     }
 
     public String getFileName() {

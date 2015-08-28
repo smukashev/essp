@@ -20,11 +20,9 @@ public interface IEntityService {
 
     BaseEntity load(long id, Date date);
 
-    BaseEntity prepare(BaseEntity baseEntity);
+    BaseEntity prepare(BaseEntity baseEntity, long creditorId);
 
     BaseEntity getActualBaseEntity(BaseEntity baseEntity);
-
-    void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
 
     BaseEntity search(BaseEntity baseEntity);
 

@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.model.searchForm.SearchPagination;
 import kz.bsbnb.usci.eav.model.searchForm.impl.NonPaginableSearchResult;
 import kz.bsbnb.usci.eav.model.searchForm.impl.PaginableSearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
@@ -39,6 +40,9 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
 
     @Autowired
     IBaseEntityProcessorDao baseEntityProcessorDao;
+
+    @Autowired
+    IBaseEntityLoadDao baseEntityLoadDao;
 
     final private static int maxPageSize = 50;
     final private static int maxResultSize = 500;
@@ -138,11 +142,11 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
 
         if(reportDate != null) {
             for (Long id : personIds) {
-                entities.add((BaseEntity) baseEntityProcessorDao.loadByMaxReportDate(id, reportDate));
+                entities.add((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate));
             }
         } else {
             for(Long id : personIds)
-                entities.add((BaseEntity) baseEntityProcessorDao.load(id));
+                entities.add((BaseEntity) baseEntityLoadDao.load(id));
         }
 
         return ret;

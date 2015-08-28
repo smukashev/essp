@@ -11,6 +11,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.text.ParseException;
@@ -20,7 +23,6 @@ import java.util.Stack;
 @Component
 @Scope("prototype")
 public class CreditParser extends BatchParser {
-    private Stack stack = new Stack();
     private int portfolioCount;
     private BaseEntity currentPortfolio;
 
@@ -133,28 +135,45 @@ public class CreditParser extends BatchParser {
             portfolioCount++;
 
             if (portfolioCount == 2) {
-                event = (XMLEvent) xmlReader.next();
-                BaseEntity portfolio = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),
-                        batch.getRepDate());
-                portfolio.put("code", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
-                currentPortfolio.put("portfolio", new BaseEntityComplexValue(-1, batch, index, portfolio));
-            } else {
+                String value = getNullableTagValue(localName, event, xmlReader);
+
+                if (value != null) {
+                    BaseEntity portfolio = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),batch.getRepDate());
+                    portfolio.put("code", new BaseEntityStringValue(-1, batch, index, value));
+                    currentPortfolio.put("portfolio", new BaseEntityComplexValue(-1, batch, index, portfolio));
+                } else {
+                    currentPortfolio.put("portfolio",new BaseEntityComplexValue(-1, batch,index,null));
+                }
+            } else{
                 currentPortfolio = new BaseEntity(metaClassRepository.getMetaClass("portfolio"), batch.getRepDate());
             }
 
         } else if (localName.equals("portfolio_msfo")) {
-            event = (XMLEvent) xmlReader.next();
-            BaseEntity portfolioMSFO = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),
-                    batch.getRepDate());
-            portfolioMSFO.put("code", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
-            currentPortfolio.put("portfolio_msfo", new BaseEntityComplexValue(-1, batch, index, portfolioMSFO));
+            String value = getNullableTagValue(localName, event, xmlReader);
+
+            if (value != null) {
+                BaseEntity portfolioMSFO = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),batch.getRepDate());
+                portfolioMSFO.put("code", new BaseEntityStringValue(-1, batch, index, value));
+                currentPortfolio.put("portfolio_msfo", new BaseEntityComplexValue(-1, batch, index, portfolioMSFO));
+            } else {
+                currentPortfolio.put("portfolio_msfo", new BaseEntityComplexValue(-1, batch, index, null));
+            }
         } else {
             throw new UnknownTagException(localName);
         }
 
-        stack.push(localName);
-
         return false;
+    }
+
+    private String getNullableTagValue(String localName, XMLEvent event, XMLEventReader xmlReader) {
+        Attribute attrNullify = event.asStartElement().getAttributeByName(QName.valueOf("nullify"));
+
+        if (attrNullify == null || !"true".equals(attrNullify.getValue())) {
+            event = (XMLEvent) xmlReader.next();
+            return event.asCharacters().getData();
+        }
+
+        return null;
     }
 
     public boolean endElement(String localName) throws SAXException {
@@ -175,9 +194,7 @@ public class CreditParser extends BatchParser {
             portfolioCount--;
             if (portfolioCount == 0)
                 currentBaseEntity.put("portfolio", new BaseEntityComplexValue(-1, batch, index, currentPortfolio));
-            if (stack.pop().equals("portfolio")) {
-            } else {
-            }
+
         } else if (localName.equals("portfolio_msfo")) {
         } else {
             throw new UnknownTagException(localName);

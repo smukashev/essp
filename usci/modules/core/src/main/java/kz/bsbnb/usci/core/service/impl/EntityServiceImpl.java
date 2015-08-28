@@ -119,8 +119,8 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     @Override
-    public BaseEntity prepare(BaseEntity baseEntity) {
-        baseEntityProcessorDao.prepare(baseEntity);
+    public BaseEntity prepare(BaseEntity baseEntity, long creditorId) {
+        baseEntityProcessorDao.prepare(baseEntity, creditorId);
         return baseEntity;
     }
 

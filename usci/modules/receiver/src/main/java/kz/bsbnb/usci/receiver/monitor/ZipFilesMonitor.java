@@ -756,8 +756,6 @@ public class ZipFilesMonitor {
             batchInfo.setRepDate(date);
             zipFile.close();
 
-            saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)));
-        } catch (IOException e) {
             saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), false);
         }catch(IOException e){
             e.printStackTrace();

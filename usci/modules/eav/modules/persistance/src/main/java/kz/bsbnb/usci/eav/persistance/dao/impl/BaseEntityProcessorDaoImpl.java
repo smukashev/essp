@@ -33,8 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_A_CREDITOR_STATE;
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITIES;
+import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Repository
 public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEntityProcessorDao {
@@ -162,6 +161,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId()))
                         throw new RuntimeException("Справочник с историей не может быть удалена;");
 
+                    if (baseEntity.getMeta().isReference()) {
+                        failIfHasUsages(baseEntityPostPrepared);
+                    }
+
                     baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
                     entityHolder.setApplied(baseEntityApplied);
@@ -227,6 +230,47 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     entityHolder.getApplied(), baseEntityManager);
 
         return baseEntityApplied;
+    }
+
+    private void failIfHasUsages(IBaseEntity baseEntity) {
+        MetaClass metaClassOfDeleting = metaClassRepository.getMetaClass(baseEntity.getMeta().getId());
+
+        {
+            Select select = context.selectDistinct(EAV_BE_ENTITIES.CLASS_ID).from(EAV_BE_COMPLEX_VALUES)
+                    .join(EAV_BE_ENTITIES).on(EAV_BE_COMPLEX_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
+                    .where(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.eq(baseEntity.getId()));
+
+            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+            StringBuilder sbUsages = new StringBuilder();
+
+            for (Map<String, Object> row : rows) {
+                Long metaId = ((BigDecimal) row.get(EAV_BE_ENTITIES.CLASS_ID.getName())).longValue();
+
+                MetaClass metaClass = metaClassRepository.getMetaClass(metaId);
+
+                sbUsages.append(metaClass.getClassName() + ", ");
+            }
+
+            if (rows.size() > 0) {
+                throw new RuntimeException("Deleting baseEntity " + metaClassOfDeleting.getClassName()
+                        + "(id: " + baseEntity.getId() + ") has usages in classes: " + sbUsages.toString());
+            }
+        }
+
+        {
+            if ("ref_creditor".equals(metaClassOfDeleting.getClassName())) {
+                Select select = context.select().from(EAV_A_CREDITOR_USER)
+                        .where(EAV_A_CREDITOR_USER.CREDITOR_ID.eq(baseEntity.getId())).limit(1);
+
+                List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+                if (rows.size() > 0) {
+                    throw new RuntimeException("Deleting ref_creditor "
+                            + "(id: " + baseEntity.getId() + ") has binded users");
+                }
+            }
+        }
     }
 
     public List<Long> getEntityIDsByMetaclass(long metaClassId) {

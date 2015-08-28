@@ -21,11 +21,9 @@ public interface IEntityService {
 
     BaseEntity search(BaseEntity baseEntity);
 
-    BaseEntity prepare(BaseEntity baseEntity);
+    BaseEntity prepare(BaseEntity baseEntity, long creditorId);
 
     BaseEntity getActualBaseEntity(BaseEntity baseEntity);
-
-    void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad);
 
     List<Long> getEntityIDsByMetaclass(long id);
 

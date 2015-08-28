@@ -183,10 +183,10 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             public void error(SAXParseException exception) throws SAXException {
                 success[0] = false;
                 batchService.addBatchStatus(new BatchStatus()
-                        .setBatchId(batchId)
-                        .setStatus(BatchStatuses.ERROR)
-                        .setDescription(exception.getMessage())
-                        .setReceiptDate(new Date())
+                                .setBatchId(batchId)
+                                .setStatus(BatchStatuses.ERROR)
+                                .setDescription(exception.getMessage())
+                                .setReceiptDate(new Date())
                 );
             }
 
@@ -307,12 +307,13 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             e.printStackTrace();
             logger.error(e);
 
-//            batchService.
+            batchService.addEntityStatus(new EntityStatus()
+                    .setBatchId(batchId)
+                    .setStatus(EntityStatuses.ERROR)
+                    .setDescription(e.getLocalizedMessage())
+                    .setReceiptDate(new Date())
+            );
             
-            EntityStatusJModel entityStatus = new EntityStatusJModel(
-                    0L, EntityStatuses.ERROR, e.getLocalizedMessage(), new Date());
-            statusSingleton.addContractStatus(batchId, entityStatus);
-
             return null;
         }
     }

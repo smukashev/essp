@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.json.*;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,9 +53,12 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
             for (BatchStatus batchStatus : batchStatusList) {
                 if (protocolsToDisplay.contains(batchStatus.getStatus())) {
+                    if (StringUtils.isEmpty(lastStatus)) {
+                        lastStatus = batchStatus.getStatus().code();
+                    }
                     fillProtocol(batchStatus, ii);
                 }
-                lastStatus = fillDates(batchStatus, ii);
+                fillDates(batchStatus, ii);
             }
 
             ii.setUserId(batch.getUserId());
