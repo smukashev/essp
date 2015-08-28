@@ -106,17 +106,27 @@ public class MainPortlet extends MVCPortlet {
         try {
             OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
 
+            boolean isNB = false;
+
             User currentUser = PortalUtil.getUser(resourceRequest);
+
+            if(currentUser != null) {
+                for (Role role : currentUser.getRoles()) {
+                    if (role.getName().equals("NationalBankEmployee"))
+                        isNB = true;
+                }
+            }
 
             if (currentUser == null) {
                 writer.write("{\"success\": false, \"errorMessage\": \"Not logged in\"}");
                 return;
             }
 
-            Gson gson = new Gson();
-
             switch (operationType) {
                 case LIST_ENTRIES:
+                    DateFormat dfRep = new SimpleDateFormat("dd.MM.yyyy");
+                    DateFormat dfUpd = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
                     List<BatchEntry> entries = batchEntryService.getListByUser(currentUser.getUserId());
 
                     writer.write("{\"total\":" + entries.size());
@@ -134,8 +144,8 @@ public class MainPortlet extends MVCPortlet {
                         writer.write("{");
 
                         writer.write("\"id\":\"" + batchEntry.getId() + "\",");
-                        writer.write("\"u_date\":\"" + batchEntry.getUpdateDate() + "\",");
-                        writer.write("\"rep_date\":\"" + batchEntry.getRepDate() + "\"");
+                        writer.write("\"u_date\":\"" + dfUpd.format(batchEntry.getUpdateDate()) + "\",");
+                        writer.write("\"rep_date\":\"" + dfRep.format(batchEntry.getRepDate()) + "\"");
                         writer.write("}");
                     }
 
@@ -194,7 +204,7 @@ public class MainPortlet extends MVCPortlet {
 
                         fileOutputStream.close();
 
-                        batchProcessService.processBatch(f.getPath(), currentUser.getUserId());
+                        batchProcessService.processBatch(f.getPath(), currentUser.getUserId(), isNB);
 
                         batchEntryIds.add(batchEntry.getId());
                     }

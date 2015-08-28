@@ -9,6 +9,7 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 //import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
+import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
@@ -31,6 +32,7 @@ import java.util.List;
 public class MainPortlet extends MVCPortlet {
     private RmiProxyFactoryBean metaFactoryServiceFactoryBean;
  //   private XSDGenerator xsdGenerator = new XSDGenerator();
+    private XSDGenerator xsdGenerator = new XSDGenerator();
     private IMetaFactoryService metaFactoryService;
 
     public void connectToServices() {
@@ -316,7 +318,7 @@ public class MainPortlet extends MVCPortlet {
 
                         List<MetaClass> metaClasses = metaFactoryService.getMetaClasses();
                         OutputStream out = new FileOutputStream("C:\\Users\\bauyrzhan.ibraimov\\IdeaProjects\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd");
-                       // xsdGenerator.generate(out, metaClasses);
+                        xsdGenerator.generate(out, metaClasses);
 
 
 
@@ -409,7 +411,7 @@ public class MainPortlet extends MVCPortlet {
                             metaFactoryService.saveMetaClass(metaParent);
                             List<MetaClass> metaClasses = metaFactoryService.getMetaClasses();
                             OutputStream out = new FileOutputStream("C:\\Users\\bauyrzhan.ibraimov\\IdeaProjects\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd");
-                          //  xsdGenerator.generate(out, metaClasses);
+                            xsdGenerator.generate(out, metaClasses);
                             writer.write("{\"success\": true, \"data\": {}}");
                         } else {
                             writer.write("{\"success\": false, " +

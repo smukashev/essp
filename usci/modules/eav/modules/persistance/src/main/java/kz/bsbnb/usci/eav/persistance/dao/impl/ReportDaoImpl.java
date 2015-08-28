@@ -178,6 +178,24 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
     }
 
     @Override
+    public Date getLastReportDate(Long creditorId) {
+        Field<java.sql.Date> field = EAV_REPORT.REPORT_DATE.max().as("LAST_REPORT_DATE");
+
+        SelectForUpdateStep select = context
+                .select(field)
+                .from(EAV_REPORT)
+                .where(EAV_REPORT.CREDITOR_ID.eq(creditorId));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        Date date = null;
+        if (!rows.isEmpty()) {
+            date = DataUtils.convert((Timestamp)rows.get(0).get("LAST_REPORT_DATE"));
+        }
+        return date;
+    }
+
+    @Override
     public List<ReportMessage> getMessagesByReport(Report report) {
         ArrayList<ReportMessage> reportMessages = new ArrayList<ReportMessage>();
 

@@ -28,4 +28,6 @@ public interface IMailDao {
     List<MailMessage> getPendingMessages();
 
     boolean isMailHandlingOn();
+    List<MailTemplate> getUserConfiguredTemplates();
+    public void insertUserMailTemplate(UserMailTemplate userMailTemplate);
 }

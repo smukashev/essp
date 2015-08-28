@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
   <entities>
-    <entity class="ref_creditor">
+    <ref_creditor>
       <name>АО "Ипотечная организация "Казахстанская Ипотечная Компания"</name>
-      <short_name>АО "ИО "КИК"</short_name>
       <docs>
         <item>
           <no>001240001720</no>
@@ -50,10 +49,9 @@
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
       <nokbdb_code>J:КИК:</nokbdb_code>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Ипотечная Организация "Элитстрой Финанс"</name>
-      <short_name>АО "ИО "Элитстрой Финанс"</short_name>
       <docs>
         <item>
           <no>190501794</no>
@@ -76,10 +74,9 @@
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
       <nokbdb_code>J:Элитстрой Финанс:</nokbdb_code>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Алматинская региональная ипотечная организация"</name>
-      <short_name>АО "АРИО"</short_name>
       <docs>
         <item>
           <no>060540010065</no>
@@ -114,11 +111,10 @@
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
       <nokbdb_code>J:АлмРегИпотечОрг:</nokbdb_code>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Жилстройсбербанк Казахстана"</name>
-      <short_name>АО "ЖССБК"</short_name>
-      <code>372</code>
+      <code>972</code>
       <docs>
         <item>
           <no>030740001404</no>
@@ -164,10 +160,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Банк Kassa Nova"</name>
-      <short_name>АО "Банк Kassa Nova"</short_name>
       <code>551</code>
       <docs>
         <item>
@@ -202,10 +197,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Эксимбанк Казахстан"</name>
-      <short_name>АО "Эксимбанк Казахстан"</short_name>
       <code>942</code>
       <docs>
         <item>
@@ -240,10 +234,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "ДБ "КЗИ Банк"</name>
-      <short_name>АО "ДБ "КЗИ Банк"</short_name>
       <code>885</code>
       <docs>
         <item>
@@ -278,10 +271,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Евразийский банк"</name>
-      <short_name>АО "Евразийский банк"</short_name>
       <code>948</code>
       <docs>
         <item>
@@ -328,10 +320,10 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
-      <name>АО "ABC Bank"</name>
-      <short_name>АО "ABC Bank"</short_name>
+    </ref_creditor>
+    <ref_creditor>
+      <name>АО "ForteBank"</name>
+      <short_name>АО "ForteBank"</short_name>
       <code>470</code>
       <docs>
         <item>
@@ -366,10 +358,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "БанкПозитив Казахстан"</name>
-      <short_name>АО "БанкПозитив Казахстан"</short_name>
       <code>492</code>
       <docs>
         <item>
@@ -404,10 +395,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Банк Развития Казахстана"</name>
-      <short_name>АО "БРК"</short_name>
       <code>907</code>
       <docs>
         <item>
@@ -454,10 +444,9 @@
         <code>0008</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Казкоммерцбанк"</name>
-      <short_name>АО "ККБ"</short_name>
       <code>926</code>
       <docs>
         <item>
@@ -492,10 +481,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "AsiaCredit Bank (АзияКредит Банк)"</name>
-      <short_name>АО "AsiaCredit Bank"</short_name>
       <code>774</code>
       <docs>
         <item>
@@ -530,10 +518,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
-      <name>АО "ДБ "Punjab National Bank"-Казахстан"</name>
-      <short_name>АО "ДБ "PNB"</short_name>
+    </ref_creditor>
+    <ref_creditor>
+      <name>АО "ДБ "PNB"</name>
       <code>620</code>
       <docs>
         <item>
@@ -568,10 +555,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
-      <name>АО "Altyn Bank" (ДБ АО "Народный Банк Казахстана")</name>
-      <short_name>АО "Altyn Bank"</short_name>
+    </ref_creditor>
+    <ref_creditor>
+      <name>ДБ АО "HSBC Банк Казахстан"</name>
       <code>949</code>
       <docs>
         <item>
@@ -587,7 +573,7 @@
           </doc_type>
         </item>
         <item>
-          <no>ATYNKZKA</no>
+          <no>HSBCKZKA</no>
           <doc_type>
             <name_ru>Банковский идентификационный код </name_ru>
             <name_kz>Банковский идентификационный код </name_kz>
@@ -606,10 +592,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Исламский Банк "Al Hilal"</name>
-      <short_name>АО "Al Hilal"</short_name>
       <code>246</code>
       <docs>
         <item>
@@ -644,24 +629,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Нурбанк"</name>
-      <short_name>АО "Нурбанк"</short_name>
       <code>849</code>
       <docs>
-        <item>
-          <no>930940000164</no>
-          <doc_type>
-            <name_ru>Бизнес - идентификационный номер </name_ru>
-            <name_kz>Бизнес - идентификационный номер </name_kz>
-            <is_identification>1</is_identification>
-            <is_organization_doc>1</is_organization_doc>
-            <is_person_doc>0</is_person_doc>
-            <weight>10</weight>
-            <code>07</code>
-          </doc_type>
-        </item>
         <item>
           <no>NURSKZKX</no>
           <doc_type>
@@ -686,6 +658,18 @@
             <code>11</code>
           </doc_type>
         </item>
+        <item>
+          <no>930940000164</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
       </docs>
       <subject_type>
         <kind_id>31</kind_id>
@@ -694,10 +678,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Delta Bank"</name>
-      <short_name>АО "Delta Bank"</short_name>
       <code>639</code>
       <docs>
         <item>
@@ -744,10 +727,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО ДБ "Национальный Банк Пакистана" в Казахстане</name>
-      <short_name>АО ДБ "NBP" в Казахстане</short_name>
       <code>553</code>
       <docs>
         <item>
@@ -782,48 +764,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
-      <name>АО "ИПОТЕЧНАЯ ОРГАНИЗАЦИЯ "ЭКСПРЕСС ФИНАНС"</name>
-      <short_name>АО "ИО "ЭКСПРЕСС ФИНАНС"</short_name>
-      <docs>
-        <item>
-          <no>600900577988</no>
-          <doc_type>
-            <name_ru>Регистрационный номер налогоплательщика </name_ru>
-            <name_kz>Регистрационный номер налогоплательщика </name_kz>
-            <is_identification>1</is_identification>
-            <is_organization_doc>1</is_organization_doc>
-            <is_person_doc>1</is_person_doc>
-            <weight>25</weight>
-            <code>11</code>
-          </doc_type>
-        </item>
-        <item>
-          <no>060940001883</no>
-          <doc_type>
-            <name_ru>Бизнес - идентификационный номер </name_ru>
-            <name_kz>Бизнес - идентификационный номер </name_kz>
-            <is_identification>1</is_identification>
-            <is_organization_doc>1</is_organization_doc>
-            <is_person_doc>0</is_person_doc>
-            <weight>10</weight>
-            <code>07</code>
-          </doc_type>
-        </item>
-      </docs>
-      <subject_type>
-        <kind_id>31</kind_id>
-        <name_kz>Ипотечная организация</name_kz>
-        <name_ru>Ипотечная организация</name_ru>
-        <code>0002</code>
-        <report_period_duration_months>1</report_period_duration_months>
-      </subject_type>
-      <nokbdb_code>J600900577988Ипотечная :</nokbdb_code>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>ДО АО Банк ВТБ (Казахстан)</name>
-      <short_name>ДО АО "Банк ВТБ (Казахстан)"</short_name>
       <code>432</code>
       <docs>
         <item>
@@ -870,10 +813,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Цеснабанк"</name>
-      <short_name>АО "Цеснабанк"</short_name>
       <code>998</code>
       <docs>
         <item>
@@ -920,10 +862,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
-      <name>АО "Qazaq Banki" (прежнее наименование АО "СЕНИМ-БАНК")</name>
-      <short_name>АО "Qazaq Banki"</short_name>
+    </ref_creditor>
+    <ref_creditor>
+      <name>АО "СЕНИМ-БАНК"</name>
       <code>549</code>
       <docs>
         <item>
@@ -958,10 +899,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>ДБ АО "Сбербанк"</name>
-      <short_name>ДБ АО "Сбербанк"</short_name>
       <code>914</code>
       <docs>
         <item>
@@ -1008,14 +948,13 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
-      <name>АО "Capital Bank Kazakhstan"</name>
-      <short_name>АО "Capital Bank Kazakhstan"</short_name>
+    </ref_creditor>
+    <ref_creditor>
+      <name>АО ДБ "ТАИБ Казахский Банк"</name>
       <code>781</code>
       <docs>
         <item>
-          <no>920140000143</no>
+          <no>930340001235</no>
           <doc_type>
             <name_ru>Бизнес - идентификационный номер </name_ru>
             <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -1046,10 +985,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Шинхан Банк Казахстан"</name>
-      <short_name>АО "Шинхан Банк Казахстан"</short_name>
       <code>435</code>
       <docs>
         <item>
@@ -1084,10 +1022,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Народный сберегательный банк Казахстана"</name>
-      <short_name>АО "Народный банк Казахстана"</short_name>
       <code>601</code>
       <docs>
         <item>
@@ -1134,10 +1071,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Торгово-промышленный Банк Китая в Алматы"</name>
-      <short_name>АО "ТПБК"</short_name>
       <code>930</code>
       <docs>
         <item>
@@ -1172,10 +1108,10 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
-      <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
-      <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+    </ref_creditor>
+    <ref_creditor>
+      <name>Дочерний банк акционерное общество "Хоум Кредит энд Финанс Банк"</name>
+      <short_name>ДБ АО "Банк Хоум Кредит"</short_name>
       <code>886</code>
       <docs>
         <item>
@@ -1210,12 +1146,23 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Альянс Банк"</name>
-      <short_name>АО "Альянс Банк"</short_name>
       <code>965</code>
       <docs>
+        <item>
+          <no>IRTYKZKA</no>
+          <doc_type>
+            <name_ru>Банковский идентификационный код </name_ru>
+            <name_kz>Банковский идентификационный код </name_kz>
+            <is_identification>0</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>30</weight>
+            <code>15</code>
+          </doc_type>
+        </item>
         <item>
           <no>451800015025</no>
           <doc_type>
@@ -1240,18 +1187,6 @@
             <code>07</code>
           </doc_type>
         </item>
-        <item>
-          <no>IRTYKZKA</no>
-          <doc_type>
-            <name_ru>Банковский идентификационный код </name_ru>
-            <name_kz>Банковский идентификационный код </name_kz>
-            <is_identification>0</is_identification>
-            <is_organization_doc>1</is_organization_doc>
-            <is_person_doc>0</is_person_doc>
-            <weight>30</weight>
-            <code>15</code>
-          </doc_type>
-        </item>
       </docs>
       <subject_type>
         <kind_id>31</kind_id>
@@ -1260,10 +1195,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Темiрбанк"</name>
-      <short_name>АО "Темiрбанк"</short_name>
       <code>780</code>
       <docs>
         <item>
@@ -1310,10 +1244,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Казинвестбанк"</name>
-      <short_name>АО "КИБ"</short_name>
       <code>920</code>
       <docs>
         <item>
@@ -1348,10 +1281,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Банк ЦентрКредит"</name>
-      <short_name>АО "БЦК"</short_name>
       <code>856</code>
       <docs>
         <item>
@@ -1398,10 +1330,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО ДБ "Альфа-Банк"</name>
-      <short_name>АО ДБ "Альфа-Банк"</short_name>
       <code>947</code>
       <docs>
         <item>
@@ -1436,10 +1367,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "ДБ "RBS (Kazakhstan)"</name>
-      <short_name>АО "ДБ "RBS (Kazakhstan)"</short_name>
       <code>922</code>
       <docs>
         <item>
@@ -1474,10 +1404,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "БТА Банк"</name>
-      <short_name>АО "БТА Банк"</short_name>
       <code>319</code>
       <docs>
         <item>
@@ -1512,10 +1441,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Ситибанк Казахстан"</name>
-      <short_name>АО "Ситибанк Казахстан"</short_name>
       <code>832</code>
       <docs>
         <item>
@@ -1550,11 +1478,24 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>Тестовая организация</name>
       <short_name>Тестовая организация</short_name>
+      <code>000</code>
       <docs>
+        <item>
+          <no>920140000084</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
         <item>
           <no>TESTBIN111</no>
           <doc_type>
@@ -1575,11 +1516,10 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО ДБ "Банк Китая в Казахстане"</name>
       <short_name>АО ДБ "БАНК КИТАЯ В КАЗАХСТАНЕ"</short_name>
-      <code>913</code>
       <docs>
         <item>
           <no>BKCHKZKA</no>
@@ -1613,12 +1553,23 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
-      <name>АО "Банк Астаны"</name>
-      <short_name>АО "Банк Астаны"</short_name>
+    </ref_creditor>
+    <ref_creditor>
+      <name>АО "Банк "Астана-финанс"</name>
       <code>450</code>
       <docs>
+        <item>
+          <no>080540014021</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
         <item>
           <no>ASFBKZKA</no>
           <doc_type>
@@ -1643,18 +1594,6 @@
             <code>11</code>
           </doc_type>
         </item>
-        <item>
-          <no>080540014021</no>
-          <doc_type>
-            <name_ru>Бизнес - идентификационный номер </name_ru>
-            <name_kz>Бизнес - идентификационный номер </name_kz>
-            <is_identification>1</is_identification>
-            <is_organization_doc>1</is_organization_doc>
-            <is_person_doc>0</is_person_doc>
-            <weight>10</weight>
-            <code>07</code>
-          </doc_type>
-        </item>
       </docs>
       <subject_type>
         <kind_id>31</kind_id>
@@ -1663,8 +1602,8 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Bank RBK"</name>
       <short_name>АО "Bank RBK"</short_name>
       <code>821</code>
@@ -1713,10 +1652,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "АТФБанк"</name>
-      <short_name>АО "АТФБанк"</short_name>
       <code>826</code>
       <docs>
         <item>
@@ -1751,10 +1689,9 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Аграрная Кредитная корпорация"</name>
-      <short_name>АО "Аграрная Кредитная корпорация"</short_name>
       <code>999</code>
       <docs>
         <item>
@@ -1784,19 +1721,18 @@
       </docs>
       <subject_type>
         <kind_id>31</kind_id>
-        <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
-        <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
-        <code>0003</code>
-        <report_period_duration_months>3</report_period_duration_months>
+        <name_kz>Иное</name_kz>
+        <name_ru>Иное</name_ru>
+        <code>0007</code>
+        <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
       <nokbdb_code>J:Агр КредКорп:</nokbdb_code>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Казагрофинанс"</name>
-      <short_name>АО "Казагрофинанс"</short_name>
       <docs>
         <item>
-          <no>991240000043</no>
+          <no>981140001105</no>
           <doc_type>
             <name_ru>Бизнес - идентификационный номер </name_ru>
             <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -1822,16 +1758,15 @@
       </docs>
       <subject_type>
         <kind_id>31</kind_id>
-        <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
-        <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
-        <code>0003</code>
-        <report_period_duration_months>3</report_period_duration_months>
+        <name_kz>Иное</name_kz>
+        <name_ru>Иное</name_ru>
+        <code>0007</code>
+        <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
       <nokbdb_code>J:КазАгроФин:</nokbdb_code>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Фонд финансовой поддержки сельского хозяйства"</name>
-      <short_name>АО "ФФПСХ"</short_name>
       <docs>
         <item>
           <no>980840000675</no>
@@ -1860,16 +1795,15 @@
       </docs>
       <subject_type>
         <kind_id>31</kind_id>
-        <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
-        <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
-        <code>0003</code>
-        <report_period_duration_months>3</report_period_duration_months>
+        <name_kz>Иное</name_kz>
+        <name_ru>Иное</name_ru>
+        <code>0007</code>
+        <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
       <nokbdb_code>J:Фонд ФПСХ:</nokbdb_code>
-    </entity>
-    <entity class="ref_creditor">
-      <name>АО "Национальная компания Продовольственная контрактная корпорация"</name>
-      <short_name>АО "НК "Продкорпорация"</short_name>
+    </ref_creditor>
+    <ref_creditor>
+      <name>АО «Национальная компания Продовольственная контрактная корпорация»</name>
       <docs>
         <item>
           <no>600700153009</no>
@@ -1898,16 +1832,15 @@
       </docs>
       <subject_type>
         <kind_id>31</kind_id>
-        <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
-        <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
-        <code>0003</code>
-        <report_period_duration_months>3</report_period_duration_months>
+        <name_kz>Иное</name_kz>
+        <name_ru>Иное</name_ru>
+        <code>0007</code>
+        <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
       <nokbdb_code>J:ПродКонтрактКорп:</nokbdb_code>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Kaspi Bank"</name>
-      <short_name>АО "Kaspi Bank"</short_name>
       <code>722</code>
       <docs>
         <item>
@@ -1922,30 +1855,6 @@
             <code>15</code>
           </doc_type>
         </item>
-        <item>
-          <no>971240001315</no>
-          <doc_type>
-            <name_ru>Бизнес - идентификационный номер </name_ru>
-            <name_kz>Бизнес - идентификационный номер </name_kz>
-            <is_identification>1</is_identification>
-            <is_organization_doc>1</is_organization_doc>
-            <is_person_doc>0</is_person_doc>
-            <weight>10</weight>
-            <code>07</code>
-          </doc_type>
-        </item>
-        <item>
-          <no>600700043016</no>
-          <doc_type>
-            <name_ru>Регистрационный номер налогоплательщика </name_ru>
-            <name_kz>Регистрационный номер налогоплательщика </name_kz>
-            <is_identification>1</is_identification>
-            <is_organization_doc>1</is_organization_doc>
-            <is_person_doc>1</is_person_doc>
-            <weight>25</weight>
-            <code>11</code>
-          </doc_type>
-        </item>
       </docs>
       <subject_type>
         <kind_id>31</kind_id>
@@ -1954,8 +1863,8 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>Национальный Банк Республики Казахстан</name>
       <short_name>НБРК</short_name>
       <docs>
@@ -1978,10 +1887,9 @@
         <name_ru>Банк первого уровня</name_ru>
         <code>0009</code>
       </subject_type>
-    </entity>
-    <entity class="ref_creditor">
+    </ref_creditor>
+    <ref_creditor>
       <name>АО "Заман-Банк"</name>
-      <short_name>АО "Заман-Банк"</short_name>
       <code>896</code>
       <docs>
         <item>
@@ -2016,6 +1924,6 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
-    </entity>
+    </ref_creditor>
   </entities>
 </batch>

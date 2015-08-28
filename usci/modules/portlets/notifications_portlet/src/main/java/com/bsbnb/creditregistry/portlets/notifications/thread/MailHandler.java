@@ -5,7 +5,6 @@ import com.bsbnb.creditregistry.dm.maintenance.PortalUser;
 import com.bsbnb.creditregistry.dm.maintenance.mail.MailMessage;
 import com.bsbnb.creditregistry.dm.ref.shared.MailMessageStatus;
 */
-import static com.bsbnb.creditregistry.portlets.notifications.NotificationsApplication.log;
 import com.bsbnb.creditregistry.portlets.notifications.data.BeanDataProvider;
 import com.bsbnb.creditregistry.portlets.notifications.data.DataProvider;
 import com.liferay.util.portlet.PortletProps;
@@ -13,18 +12,18 @@ import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.eav.model.mail.MailMessage;
 import kz.bsbnb.usci.eav.model.mail.MailMessageStatuses;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+
+import static com.bsbnb.creditregistry.portlets.notifications.NotificationsApplication.log;
 
 /**
  *
@@ -83,7 +82,7 @@ public class MailHandler implements Runnable {
 
     private void handleMailMessage(MailMessage mailMessage) throws UnsupportedEncodingException, ConfigurationException, MessagingException {
         long recipientUserId = mailMessage.getRecipientUserId().longValue();
-        boolean isSending = provider.isTemplateSendingEnabled(mailMessage.getMailTemplate(), recipientUserId);;
+        boolean isSending = provider.isTemplateSendingEnabled(mailMessage.getMailTemplate(), recipientUserId);
         PortalUser recipient = provider.getPortalUserByUserId(recipientUserId);
         if (!recipient.isActive()) {
             isSending = false;
@@ -99,7 +98,7 @@ public class MailHandler implements Runnable {
         provider.updateMailMessage(mailMessage);
     }
 
-    private void sendMailMessage(MailMessage mailMessage, String email) throws ConfigurationException, AddressException, MessagingException, UnsupportedEncodingException {
+    private void sendMailMessage(MailMessage mailMessage, String email) throws ConfigurationException, MessagingException, UnsupportedEncodingException {
         String host = PortletProps.get("smtp.host");
         String sender = PortletProps.get("mail.sender");
 
@@ -173,16 +172,18 @@ public class MailHandler implements Runnable {
     }
 
     private boolean isSmtpHostConfigEmpty() {
-        //try {
-            //String smtpHost = configuration.getSmtpHost();
-            String smtpHost = PortletProps.get("smtp.host");
-            if (smtpHost == null || smtpHost.isEmpty() || smtpHost.trim().isEmpty()) {
-                log.log(Level.INFO, "Mail smtp host is empty");
-                return true;
-            }
-        /*} catch (ConfigurationException ce) {
+        String smtpHost = null;
+        try {
+            smtpHost = PortletProps.get("smtp.host");
+        } catch (Exception ce) {
+            //return true;
+        }
+
+        if (smtpHost == null || smtpHost.isEmpty() || smtpHost.trim().isEmpty()) {
+            log.log(Level.INFO, "Mail smtp host is empty");
             return true;
-        }*/
+        }
+
         return false;
     }
 }

@@ -1,29 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
   <entities>
-    <entity class="ref_nokbdb">
+    <ref_nokbdb>
       <code>J:КИК:</code>
-    </entity>
-    <entity class="ref_nokbdb">
+    </ref_nokbdb>
+    <ref_nokbdb>
       <code>J:Элитстрой Финанс:</code>
-    </entity>
-    <entity class="ref_nokbdb">
+    </ref_nokbdb>
+    <ref_nokbdb>
       <code>J:АлмРегИпотечОрг:</code>
-    </entity>
-    <entity class="ref_nokbdb">
+    </ref_nokbdb>
+    <ref_nokbdb>
       <code>J:Агр КредКорп:</code>
-    </entity>
-    <entity class="ref_nokbdb">
+    </ref_nokbdb>
+    <ref_nokbdb>
       <code>J:КазАгроФин:</code>
-    </entity>
-    <entity class="ref_nokbdb">
+    </ref_nokbdb>
+    <ref_nokbdb>
       <code>J:Фонд ФПСХ:</code>
-    </entity>
-    <entity class="ref_nokbdb">
+    </ref_nokbdb>
+    <ref_nokbdb>
       <code>J:ПродКонтрактКорп:</code>
-    </entity>
-    <entity class="ref_nokbdb">
-      <code>J600900577988Ипотечная :</code>
-    </entity>
+    </ref_nokbdb>
   </entities>
 </batch>

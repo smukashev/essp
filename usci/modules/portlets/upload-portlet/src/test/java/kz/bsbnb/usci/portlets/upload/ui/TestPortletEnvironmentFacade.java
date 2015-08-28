@@ -39,4 +39,9 @@ public class TestPortletEnvironmentFacade implements PortletEnvironmentFacade {
     public void setUsingDigitalSign(boolean value) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public boolean isNB() {
+        return false;
+    }
 }

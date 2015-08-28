@@ -391,6 +391,7 @@ public class ProtocolLayout extends VerticalLayout {
         tableProtocol.setVisibleColumns(columns);
         tableProtocol.setColumnHeaders(getResourceStrings(columns));
         tableProtocol.setColumnWidth("note", 300);
+        tableProtocol.setColumnWidth("message", 300);
     }
 
     private void showProtocol(InputInfoDisplayBean ii) throws UnsupportedOperationException {
@@ -536,7 +537,15 @@ public class ProtocolLayout extends VerticalLayout {
         tableProtocol.removeAllItems();
         inputInfoContainer.removeAllItems();
         Date reportDate = (Date) reportDateField.getValue();
-        List<InputInfoDisplayBean> inputInfoList = provider.getInputInfosByCreditors(creditors, reportDate);
+        List<Creditor> newList = new ArrayList<>(creditors);
+        if (PortletEnvironmentFacade.get().isNB()) {
+            Creditor nb = new Creditor();
+            nb.setId(0L);
+            nb.setName("НБРК");
+            nb.setShortName("НБРК");
+            newList.add(nb);
+        }
+        List<InputInfoDisplayBean> inputInfoList = provider.getInputInfosByCreditors(newList, reportDate);
         inputInfoContainer.addAll(inputInfoList);
 
         filesTable.setSortContainerPropertyId("receiverDate");

@@ -1,6 +1,6 @@
-package kz.bsbnb.usci.core.listener.cr;
+package kz.bsbnb.usci.core.service.form.listener.cr;
 
-import kz.bsbnb.usci.core.listener.IRefLoadedListener;
+import kz.bsbnb.usci.core.service.form.listener.IRefLoadedListener;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;

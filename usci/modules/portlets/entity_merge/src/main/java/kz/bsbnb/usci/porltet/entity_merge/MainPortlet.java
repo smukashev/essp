@@ -7,12 +7,12 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.liferay.util.portlet.PortletProps;
 import kz.bsbnb.usci.core.service.IBaseEntityMergeService;
-import kz.bsbnb.usci.core.service.ISearcherFormService;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.core.service.form.ISearcherFormService;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseContainerType;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -22,6 +22,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.Pair;
 import kz.bsbnb.usci.sync.service.IEntityService;
@@ -34,10 +35,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class MainPortlet extends MVCPortlet {
     private RmiProxyFactoryBean searcherFormEntryServiceFactoryBean;
@@ -95,9 +93,17 @@ public class MainPortlet extends MVCPortlet {
         }
     }
 
+    private List<String> classesFilter;
+
     @Override
     public void init() throws PortletException {
         connectToServices();
+
+        classesFilter = new LinkedList<>();
+
+        for(String s : PortletProps.get("classes.filter").split(",")) {
+            classesFilter.add(s);
+        }
 
         super.init();
     }
@@ -582,10 +588,13 @@ public class MainPortlet extends MVCPortlet {
                     break;
                 }
                 case GET_FORM:
-                    Long metaId = Long.valueOf(resourceRequest.getParameter("meta"));
+                    //Long metaId = Long.valueOf(resourceRequest.getParameter("meta"));
+                    String searchClassName = resourceRequest.getParameter("search");
+                    String prefix = resourceRequest.getParameter("prefix");
 
                     String generatedForm = searcherFormService.getDom(currentUser.getUserId(),
-                            metaFactoryService.getMetaClass(metaId));
+                            searchClassName, metaFactoryService.getMetaClass(resourceRequest.getParameter("metaName")),
+                            prefix);
 
                     writer.write(generatedForm);
                     break;
@@ -603,62 +612,36 @@ public class MainPortlet extends MVCPortlet {
 
                     Enumeration<String> list = resourceRequest.getParameterNames();
 
-                    metaId = Long.valueOf(resourceRequest.getParameter("metaClass"));
+                    //metaId = Long.valueOf(resourceRequest.getParameter("metaClass"));
 
-                    MetaClass metaClass = metaFactoryService.getMetaClass(metaId);
-                    BaseEntity baseEntity = new BaseEntity(metaClass, new Date());
+                    MetaClass metaClass = metaFactoryService.getMetaClass(resourceRequest.getParameter("metaClass"));
+                    searchClassName = resourceRequest.getParameter("searchName");
+                    prefix = resourceRequest.getParameter("prefix");
+                    HashMap<String,String> parameters = new HashMap<String,String>();
 
                     while(list.hasMoreElements()) {
                         String attribute = list.nextElement();
-
-                        if(attribute.equals("op") || attribute.equals("metaClass"))
+                        if(attribute.equals("op") || attribute.equals("metaClass") || attribute.equals("searchName"))
                             continue;
-
-                        Object value;
-                        String parameterValue = resourceRequest.getParameter(attribute);
-
-                        IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
-                        if(metaAttribute == null)
-                            continue;
-                        IMetaType metaType = metaAttribute.getMetaType();
-
-                        if(metaType.isSet() || metaType.isSetOfSets())
-                            throw new UnsupportedOperationException("Not yet implemented");
-
-                        if(metaType.isComplex()) {
-                            BaseEntity childBaseEntity = new BaseEntity((MetaClass) metaType, new Date());
-                            childBaseEntity.setId(Long.valueOf(parameterValue));
-                            value = childBaseEntity;
-
-                        } else {
-                            MetaValue metaValue = (MetaValue) metaType;
-                            value = DataTypes.fromString(metaValue.getTypeCode(), parameterValue);
-                        }
-
-                        Batch b = new Batch(new Date(), currentUser.getUserId());
-                        b.setId(777L);
-
-                        baseEntity.put(attribute, BaseValueFactory.create(
-                                BaseContainerType.BASE_ENTITY,
-                                metaAttribute.getMetaType(),
-                                0,
-                                creditorId,
-                                b,
-                                1,
-                                new Date(),
-                                value,
-                                false,
-                                true));
+                        parameters.put(attribute, resourceRequest.getParameter(attribute));
                     }
 
-                    baseEntity = entityService.search(baseEntity);
+                    ISearchResult searchResult = searcherFormService.search(searchClassName, parameters, metaClass, prefix);
+
+                    if(searchResult.getData() == null)
+                        throw new RuntimeException("ошибка сериализации");
+
+                    Iterator<BaseEntity> cursor = searchResult.iterator();
 
                     long ret = -1;
 
-                    if(baseEntity.getId() > 0)
-                        ret = baseEntity.getId();
+                        
+                    if(cursor.hasNext()) {
+                        ret = cursor.next().getId();
+                        ret = ret > 0 ? ret : -1;
+                    }
 
-                    writer.write("{\"success\": true, \"data\":\""+ ret +"\"}");
+                    writer.write("{\"success\": true, \"data\":\"" + ret + "\"}");
 
                     break;
                 case LIST_CLASSES:
@@ -667,12 +650,22 @@ public class MainPortlet extends MVCPortlet {
                     if(currentUser != null)
                         userId = currentUser.getUserId();
 
-                    List<Pair> classes = searcherFormService.getMetaClasses(userId);
+                    List<String[]> classes = searcherFormService.getMetaClasses(userId);
 
                     if(classes.size() < 1)
                         throw new RuntimeException("no.any.rights");
 
-                    writer.write("{\"success\":\"true\", \"data\": " + gson.toJson(classes) + "}");
+                    List<String[]> afterFilter = new LinkedList<>();
+
+                    //portlet props + remove cr implementations
+                    for(String[]  c: classes)
+                        if(classesFilter.contains(c[1]) && !c[0].contains("cr"))
+                            afterFilter.add(c);
+
+                    writer.write(JsonMaker.getCaptionedArray(afterFilter,
+                            new String[]{"searchName", "metaName", "title"}));
+
+                    //writer.write("{\"success\":\"true\", \"data\": " + gson.toJson(classes) + "}");
                     break;
                 case LIST_ENTITY: {
                     String leftEntityId = resourceRequest.getParameter("leftEntityId");

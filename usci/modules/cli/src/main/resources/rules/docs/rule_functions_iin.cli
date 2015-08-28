@@ -4,7 +4,7 @@ title: функций для проверки иин
 function List getInvalidIINs(List iins){
     List ret = new ArrayList();
     for(Object iin : iins) {
-        if(!iinCorrect((String) iin ) && !BRMSHelper.isExclusiveIIN((String) iin))
+        if(!iinCorrect((String) iin ) && !isExclusiveIIN((String) iin))
             ret.add(iin);
     }
     return ret;
@@ -35,15 +35,6 @@ function  boolean iinCorrect(String iin){
         sum %= 11;
     }
     return sum == last;
-}
-
-function List get12ZeroStrings(List docs){
-    List ret = new ArrayList();
-        for(Object doc: docs) {
-            if(((String) doc ).equals("000000000000"))
-                ret.add(doc);
-        }
-    return ret;
 }
 $$$
 

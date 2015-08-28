@@ -170,7 +170,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
             //inputFile.setInputInfo(ii);
             //inputFileBusiness.insertInputFile(inputFile);
             System.out.println("### " + path);
-            batchProcessService.processBatch(path, portletEnvironment.getUserID());
+            batchProcessService.processBatch(path, portletEnvironment.getUserID(), portletEnvironment.isNB());
             addStatusMessage(String.format(getResourceString(Localization.UPLOAD_SUCCEDED_MESSAGE.getKey()), fileName), false);
         } catch (IOException ioe) {
             UploadApplication.log.log(Level.SEVERE, "Can't save file {0}", fileName);
@@ -251,7 +251,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
                 //Устанавливаем СтрокуОшибки - "У вас нет доступа к кредиторам"
                 result = getResourceString(Localization.USER_DOES_NOT_HAVE_ACCESS_TO_CREDITORS_MESSAGE.getKey());
                 //В противном случае, если КоличествоКредиторов больше одного
-            } else if (creditorsNumber > 1) {
+            } else if (creditorsNumber > 1 && !portletEnvironment.isNB()) {
                 //Устанавливаем СтрокуОшибки - "У вас более одного кредитора"
                 result = getResourceString(Localization.USER_HAS_MORE_THAN_ONE_CREDITOR_MESSAGE.getKey());
             } else {

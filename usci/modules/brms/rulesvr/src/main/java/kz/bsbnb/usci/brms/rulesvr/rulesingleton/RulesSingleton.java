@@ -6,7 +6,9 @@ import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
+import kz.bsbnb.usci.core.service.IMetaFactoryService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.sync.service.IEntityService;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
@@ -21,7 +23,9 @@ import org.drools.runtime.rule.AgendaFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
+import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -35,6 +39,16 @@ public class RulesSingleton
     Logger logger = LoggerFactory.getLogger(RulesSingleton.class);
 
     private KnowledgeBase kbase;
+
+    @Autowired
+    @Qualifier(value = "remoteEntityService")
+    private RmiProxyFactoryBean entityRmiService;
+    private IEntityService entityService;
+
+    @Autowired
+    @Qualifier(value = "remoteMetaService")
+    private RmiProxyFactoryBean metaRmiService;
+    private IMetaFactoryService metaFactoryService;
 
     private class RuleCasheEntry implements Comparable {
         private Date repDate;
@@ -100,6 +114,8 @@ public class RulesSingleton
 
     @PostConstruct
     public void init(){
+        entityService = (IEntityService) entityRmiService.getObject();
+        metaFactoryService = (IMetaFactoryService) metaRmiService.getObject();
         reloadCache();
     }
 
@@ -286,6 +302,8 @@ public class RulesSingleton
     public void runRules(BaseEntity entity, String pkgName, Date repDate)
     {
         StatelessKnowledgeSession ksession = getSession();
+        ksession.setGlobal("entityService", entityService);
+        ksession.setGlobal("metaService", metaFactoryService);
 
         @SuppressWarnings("rawtypes")
         List<Command> commands = new ArrayList<Command>();

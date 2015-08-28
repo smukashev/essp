@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -66,17 +67,15 @@ public class CREntityReader<T> extends CommonReader<T> {
 
         batch = batchService.getBatch(batchId);
 
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(batch.getContent());
+        ZipArchiveInputStream zais = new ZipArchiveInputStream(new ByteArrayInputStream(batch.getContent()));
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
-
-        ZipInputStream zis = new ZipInputStream(inputStream);
 
         byte[] buffer = new byte[4096];
         ByteArrayOutputStream out = null;
 
         try {
-            zis.getNextEntry();
+            zais.getNextZipEntry();
             int len;
             /*
             out = new ByteArrayOutputStream((int)entry.getSize());
@@ -90,7 +89,7 @@ public class CREntityReader<T> extends CommonReader<T> {
             */
             // modified for generated batch files
             out = new ByteArrayOutputStream(4096);
-            while ((len = zis.read(buffer, 0, 4096)) > 0) {
+            while ((len = zais.read(buffer, 0, 4096)) > 0) {
                 out.write(buffer, 0, len);
             }
         } catch (IOException e) {

@@ -2,9 +2,7 @@ package kz.bsbnb.usci.porltet.entity_editor;
 
 import com.google.gson.Gson;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -51,6 +49,19 @@ public class JsonMaker {
     public static String getJson(Map m){
         m.put("success", true);
         return gson.toJson(m);
+    }
+
+    public static String getCaptionedArray(List<String[]> data, String captions[]){
+        List<Map> ret = new LinkedList<>();
+
+        for(String[] row : data) {
+            Map m = new HashMap<>();
+            for(int i=0;i<Math.min(row.length, captions.length);i++)
+                m.put(captions[i], row[i]);
+            ret.add(m);
+        }
+
+        return gson.toJson(ret);
     }
 }
 

@@ -43,6 +43,8 @@ public class Batch extends Persistable
 
     public Batch() {}
 
+    private  Long creditorId;
+
     /**
      * Initializes batch with the default values.
      */
@@ -226,5 +228,13 @@ public class Batch extends Persistable
 
     public void setReportId(Long reportId) {
         this.reportId = reportId;
+    }
+
+    public Long getCreditorId() {
+        return creditorId;
+    }
+
+    public void setCreditorId(Long creditorId) {
+        this.creditorId = creditorId;
     }
 }

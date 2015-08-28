@@ -7,11 +7,12 @@ import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.persistance.dao.IRefProcessorDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
-import kz.bsbnb.usci.eav.persistance.dao.IMailDao;
-import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
+import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
+import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
+import kz.bsbnb.usci.eav.persistance.dao.*;
+import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.IBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
@@ -54,6 +55,9 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Autowired
     IBatchService batchService;
+
+    @Autowired
+    IPersistableDaoPool persistableDaoPool;
 
     public EntityServiceImpl() throws RemoteException {
         super();
@@ -112,6 +116,32 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
         if (result.size() > 0)
             baseEntity.setId(result.get(0));
         return baseEntity;
+    }
+
+    @Override
+    public BaseEntity prepare(BaseEntity baseEntity) {
+        baseEntityProcessorDao.prepare(baseEntity);
+        return baseEntity;
+    }
+
+    @Override
+    public BaseEntity getActualBaseEntity(BaseEntity baseEntity) {
+
+        if(baseEntity.getId() < 1)
+            throw new IllegalArgumentException(baseEntity.getMeta().getClassTitle() + " не найден");
+
+        IBaseEntityReportDateDao baseEntityReportDateDao =
+                persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+
+        Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(baseEntity.getId(), baseEntity.getReportDate());
+
+        if(maxReportDate == null)
+            throw new UnsupportedOperationException("maxReportDate not found");
+
+        BaseEntity baseEntityLoaded
+                = (BaseEntity)baseEntityLoadDao.load(baseEntity.getId(), maxReportDate, baseEntity.getReportDate());
+
+        return baseEntityLoaded;
     }
 
     @Override

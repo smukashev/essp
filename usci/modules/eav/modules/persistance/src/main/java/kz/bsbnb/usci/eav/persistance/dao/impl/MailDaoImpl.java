@@ -180,7 +180,7 @@ public class MailDaoImpl extends JDBCSupport implements IMailDao {
         //try {
             MailMessage mailMessage = new MailMessage();
 
-            MailTemplate mailTemplate = null;
+            MailTemplate mailTemplate;
             //try {
                 mailTemplate = getMailTemplateByCode(templateCode);
             /*
@@ -330,11 +330,32 @@ public class MailDaoImpl extends JDBCSupport implements IMailDao {
         Select select = context.select(DSL.count())
                 .from(EAV_A_SYSCONFIG)
                 .where(EAV_A_SYSCONFIG.KEY_.eq("IS_MAIL_HANDLING_ON"))
-                .and(EAV_A_SYSCONFIG.VALUE_.eq("1"))
-                .limit(1);
+                .and(EAV_A_SYSCONFIG.VALUE_.eq("1"));
 
         int ans = jdbcTemplate.queryForInt(select.getSQL(),select.getBindValues().toArray());
 
         return ans > 0;
+    }
+
+    @Override
+    public List<MailTemplate> getUserConfiguredTemplates() {
+        Select select = context.selectFrom(MAIL_TEMPLATE)
+                .where(MAIL_TEMPLATE.CONFIGURATION_TYPE_ID.eq(((long) MailConfigurationTypes.USER_SET)));
+
+
+        List<MailTemplate> ret = jdbcTemplate.query(select.getSQL(), select.getBindValues().toArray(),
+                new BeanPropertyRowMapper(MailTemplate.class));
+
+        return ret;
+    }
+
+    @Override
+    public void insertUserMailTemplate(UserMailTemplate userMailTemplate) {
+        Insert insert = context.insertInto(MAIL_USER_MAIL_TEMPLATE)
+                .set(MAIL_USER_MAIL_TEMPLATE.PORTAL_USER_ID, userMailTemplate.getPortalUserId())
+                .set(MAIL_USER_MAIL_TEMPLATE.MAIL_TEMPLATE_ID, userMailTemplate.getMailTemplate().getId())
+                .set(MAIL_USER_MAIL_TEMPLATE.ENABLED, DataUtils.convert(true));
+
+        jdbcTemplate.update(insert.getSQL(), insert.getBindValues().toArray());
     }
 }

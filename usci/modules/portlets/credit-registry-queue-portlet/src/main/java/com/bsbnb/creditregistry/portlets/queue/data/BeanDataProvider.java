@@ -5,6 +5,7 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -97,7 +98,8 @@ public class BeanDataProvider implements DataProvider {
             file.setStatus(ii.getStatus().getNameRu());
             file.setFilePath(ii.getFileName());
             file.setReceiverDate(ii.getReceiverDate());
-            file.setFilename(ii.getFileName());
+//            file.setFilename(ii.getFileName());
+            file.setFilename(new File(ii.getFileName()).getName());
             queue.add(file);
         }
 

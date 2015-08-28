@@ -9,49 +9,44 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.liferay.util.portlet.PortletProps;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
-import kz.bsbnb.usci.core.service.ISearcherFormService;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
+import kz.bsbnb.usci.core.service.form.ISearcherFormService;
 import kz.bsbnb.usci.cr.model.Creditor;
-import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchEntry;
+import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.base.impl.BaseContainerType;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.base.impl.*;
+import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.util.Pair;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class MainPortlet extends MVCPortlet {
     private RmiProxyFactoryBean metaFactoryServiceFactoryBean;
     private RmiProxyFactoryBean entityServiceFactoryBean;
     private RmiProxyFactoryBean batchEntryServiceFactoryBean;
     private RmiProxyFactoryBean searcherFormEntryServiceFactoryBean;
-    private RmiProxyFactoryBean portalUserBean;
+    private RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean;
 
     private IMetaFactoryService metaFactoryService;
     private IEntityService entityService;
     private IBatchEntryService batchEntryService;
     private ISearcherFormService searcherFormService;
-    private PortalUserBeanRemoteBusiness portalUserBeanRemoteBusiness;
+    private PortalUserBeanRemoteBusiness portalUserBusiness;
 
     public void connectToServices() {
         try {
@@ -59,46 +54,47 @@ public class MainPortlet extends MVCPortlet {
             metaFactoryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/metaFactoryService");
             metaFactoryServiceFactoryBean.setServiceInterface(IMetaFactoryService.class);
             metaFactoryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
-            metaFactoryServiceFactoryBean.afterPropertiesSet();
 
+            metaFactoryServiceFactoryBean.afterPropertiesSet();
             metaFactoryService = (IMetaFactoryService) metaFactoryServiceFactoryBean.getObject();
 
             entityServiceFactoryBean = new RmiProxyFactoryBean();
             entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
             entityServiceFactoryBean.setServiceInterface(IEntityService.class);
             entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
-            entityServiceFactoryBean.afterPropertiesSet();
 
+            entityServiceFactoryBean.afterPropertiesSet();
             entityService = (IEntityService) entityServiceFactoryBean.getObject();
 
             batchEntryServiceFactoryBean = new RmiProxyFactoryBean();
             batchEntryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
             batchEntryServiceFactoryBean.setServiceInterface(IBatchEntryService.class);
             batchEntryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
-            batchEntryServiceFactoryBean.afterPropertiesSet();
 
+            batchEntryServiceFactoryBean.afterPropertiesSet();
             batchEntryService = (IBatchEntryService) batchEntryServiceFactoryBean.getObject();
 
             searcherFormEntryServiceFactoryBean = new RmiProxyFactoryBean();
             searcherFormEntryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/searcherFormService");
             searcherFormEntryServiceFactoryBean.setServiceInterface(ISearcherFormService.class);
             searcherFormEntryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
-            searcherFormEntryServiceFactoryBean.afterPropertiesSet();
 
+            searcherFormEntryServiceFactoryBean.afterPropertiesSet();
             searcherFormService = (ISearcherFormService) searcherFormEntryServiceFactoryBean.getObject();
 
-            portalUserBean = new RmiProxyFactoryBean();
-            portalUserBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
-            portalUserBean.setServiceInterface(IMetaFactoryService.class);
-            portalUserBean.setRefreshStubOnConnectFailure(true);
-            portalUserBean.afterPropertiesSet();
+            portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+            portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
+            portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
 
-            portalUserBeanRemoteBusiness = (PortalUserBeanRemoteBusiness) portalUserBean.getObject();
+            portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+            portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+
         } catch (Exception e) {
             System.out.println("Can\"t initialise services: " + e.getMessage());
         }
     }
 
+    private final Logger logger = LoggerFactory.getLogger(MainPortlet.class);
     private List<String> classesFilter;
 
     @Override
@@ -107,7 +103,7 @@ public class MainPortlet extends MVCPortlet {
 
         classesFilter = new LinkedList<>();
 
-        for (String s : PortletProps.get("classes.filter").split(",")) {
+        for(String s : PortletProps.get("classes.filter").split(",")) {
             classesFilter.add(s);
         }
 
@@ -125,7 +121,7 @@ public class MainPortlet extends MVCPortlet {
 
         try {
             User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
-            if (user != null) {
+            if(user != null) {
                 for (Role role : user.getRoles()) {
                     if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
                             || role.getName().equals("NationalBankEmployee"))
@@ -138,7 +134,7 @@ public class MainPortlet extends MVCPortlet {
             e.printStackTrace();
         }
 
-        if (!hasRights)
+        if(!hasRights)
             return;
 
 
@@ -155,7 +151,9 @@ public class MainPortlet extends MVCPortlet {
         LIST_ENTITY,
         SAVE_XML,
         FIND_ACTION,
-        GET_FORM
+        GET_FORM,
+        LIST_ATTRIBUTES,
+        LIST_BY_CLASS_SHORT
     }
 
     private String testNull(String str) {
@@ -165,13 +163,23 @@ public class MainPortlet extends MVCPortlet {
     }
 
     private String clearSlashes(String str) {
-        //TODO: str.replaceAll("\"","\\\""); does not work! Fix needed.
-        String outStr = str.replaceAll("\"", " ");
+        String outStr = str.replaceAll("\"", "\\\\\"");
         return outStr;
     }
 
-    private String entityToJson(BaseEntity entity, String title, String code) {
+    private String entityToJson(BaseEntity entity, String title, String code, IMetaAttribute attr,
+                                boolean asRoot,
+                                boolean isNb,
+                                long creditorId) {
+
         MetaClass meta = entity.getMeta();
+
+        //credit check
+        if(meta.getClassName().equals("credit") && !isNb) {
+            BaseEntity creditor = (BaseEntity) entity.getEl("creditor");
+            if(creditor.getId() != creditorId)
+                throw new RuntimeException("нет прав для просмотра");
+        }
 
         if (title == null) {
             title = code;
@@ -181,10 +189,16 @@ public class MainPortlet extends MVCPortlet {
 
         str += "\"title\": \"" + title + "\",";
         str += "\"code\": \"" + code + "\",";
-        str += "\"value\": \"" + clearSlashes(testNull(meta.getClassTitle())) + "\",";
+//        str += "\"value\": \"" + clearSlashes(testNull(meta.getClassTitle())) + "\",";
+        str += "\"value\": \"" + entity.getId() + "\",";
         str += "\"simple\": false,";
         str += "\"array\": false,";
+        str += "\"ref\": " + entity.getMeta().isReference() + ",";
+        str += "\"isKey\": " + (attr != null ? attr.isKey() : false) + ",";
+        str += "\"isRequired\": " + (attr != null ? attr.isRequired() : false) + ",";
+        str += "\"root\": " + asRoot + ",";
         str += "\"type\": \"META_CLASS\",";
+        str += "\"metaId\": \"" + entity.getMeta().getId() + "\",";
         str += "\"iconCls\":\"folder\",";
         str += "\"children\":[";
 
@@ -205,7 +219,8 @@ public class MainPortlet extends MVCPortlet {
                     first = false;
                 }
 
-                str += entityToJson((BaseEntity) (value.getValue()), attrTitle, innerClassesNames);
+                str +=  entityToJson((BaseEntity)(value.getValue()), attrTitle, innerClassesNames,
+                        meta.getMetaAttribute(innerClassesNames), false, isNb, creditorId);
             }
 
         }
@@ -225,7 +240,8 @@ public class MainPortlet extends MVCPortlet {
                     first = false;
                 }
 
-                str += setToJson((BaseSet) (value.getValue()), attrTitle, innerClassesNames);
+                str +=  setToJson((BaseSet) (value.getValue()), attrTitle, innerClassesNames, value.getMetaAttribute(),
+                        isNb, creditorId);
             }
         }
 
@@ -244,18 +260,19 @@ public class MainPortlet extends MVCPortlet {
                     first = false;
                 }
 
-                if (((MetaValue) meta.getMemberType(innerClassesNames)).getTypeCode() != DataTypes.DATE) {
-                    str += "{" +
-                            "\"title\":\"" + attrTitle + "\",\n" +
-                            "\"code\":\"" + innerClassesNames + "\",\n" +
-                            "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
-                            "\"simple\": true,\n" +
-                            "\"array\": false,\n" +
-                            "\"type\": \"" + ((MetaValue) meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
-                            "\"leaf\":true,\n" +
-                            "\"iconCls\":\"file\",\n" +
-                            "\"isKey\":\"" + meta.getMetaAttribute(innerClassesNames).isKey() + "\"\n" +
-                            "}";
+                if(((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() != DataTypes.DATE) {
+                    str +=  "{" +
+                    "\"title\":\"" + attrTitle + "\",\n" +
+                    "\"code\":\"" + innerClassesNames + "\",\n" +
+                    "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
+                    "\"simple\": true,\n" +
+                    "\"array\": false,\n" +
+                    "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
+                    "\"leaf\":true,\n" +
+                    "\"iconCls\":\"file\",\n" +
+                    "\"isKey\":\""+meta.getMetaAttribute(innerClassesNames).isKey()+"\",\n" +
+                    "\"isRequired\":\""+meta.getMetaAttribute(innerClassesNames).isRequired()+"\"\n" +
+                    "}";
                 } else {
                     Object dtVal = value.getValue();
                     String dtStr = "";
@@ -263,16 +280,17 @@ public class MainPortlet extends MVCPortlet {
                         dtStr = new SimpleDateFormat("dd.MM.yyyy").format(dtVal);
                     }
 
-                    str += "{" +
+                    str +=  "{" +
                             "\"title\":\"" + attrTitle + "\",\n" +
                             "\"code\":\"" + innerClassesNames + "\",\n" +
                             "\"value\":\"" + dtStr + "\",\n" +
                             "\"simple\": true,\n" +
                             "\"array\": false,\n" +
-                            "\"type\": \"" + ((MetaValue) meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
+                            "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
                             "\"leaf\":true,\n" +
                             "\"iconCls\":\"file\",\n" +
-                            "\"isKey\":\"" + meta.getMetaAttribute(innerClassesNames).isKey() + "\"\n" +
+                            "\"isKey\":\""+meta.getMetaAttribute(innerClassesNames).isKey()+"\",\n" +
+                            "\"isRequired\":\""+meta.getMetaAttribute(innerClassesNames).isRequired()+"\"\n" +
                             "}";
                 }
             }
@@ -283,7 +301,9 @@ public class MainPortlet extends MVCPortlet {
         return str;
     }
 
-    private String setToJson(BaseSet set, String title, String code) {
+    private String setToJson(BaseSet set, String title, String code, IMetaAttribute attr,
+                             boolean isNb,
+                             long creditorId) {
         IMetaType type = set.getMemberType();
 
         if (title == null) {
@@ -295,10 +315,31 @@ public class MainPortlet extends MVCPortlet {
         str += "\"title\": \"" + title + "\",";
         str += "\"code\": \"" + code + "\",";
         str += "\"value\": \"" + set.get().size() + "\",";
-        str += "\"simple\": false,";
+        str += "\"simple\": " + !attr.getMetaType().isComplex() + ",";
         str += "\"array\": true,";
+        str += "\"isKey\": " + attr.isKey() + ",";
         str += "\"type\": \"META_SET\",";
         str += "\"iconCls\":\"folder\",";
+
+        {
+            StringBuilder result = new StringBuilder();
+            IMetaType memberType = set.getMemberType();
+
+            if (memberType.isComplex()) {
+                result.append("\"childMetaId\":");
+                result.append("\"");
+                result.append(((IMetaClass) memberType).getId());
+                result.append("\",");
+            }
+
+            result.append("\"childType\":");
+            result.append("\"");
+            result.append(getMetaTypeStr(memberType));
+            result.append("\",");
+
+            str += result.toString();
+        }
+
         str += "\"children\":[";
 
         boolean first = true;
@@ -308,14 +349,30 @@ public class MainPortlet extends MVCPortlet {
         if (type.isComplex()) {
             for (IBaseValue value : set.get()) {
                 if (value != null && value.getValue() != null) {
+
+                    //bank relation check
+                    try {
+                        if(!isNb) {
+                            if ("bank_relations".equals(attr.getName())) {
+                                BaseEntity relation = (BaseEntity) value.getValue();
+                                if (((BaseEntity) relation.getEl("creditor")).getId() != creditorId)
+                                    continue;
+                            }
+                        }
+                    } catch(Exception e) {
+                        logger.error(e.getMessage());
+                        // strict mode
+                        continue;
+                    }
+
                     if (!first) {
                         str += ",";
                     } else {
                         first = false;
                     }
 
-                    str += entityToJson((BaseEntity) (value.getValue()), "[" + i + "]",
-                            "[" + i + "]");
+                    str +=  entityToJson((BaseEntity)(value.getValue()), "[" + i + "]", "[" + i + "]",
+                            null, false, isNb, creditorId);
                     i++;
                 }
 
@@ -329,17 +386,18 @@ public class MainPortlet extends MVCPortlet {
                         first = false;
                     }
 
-                    if (((MetaValue) type).getTypeCode() != DataTypes.DATE) {
-                        str += "{" +
-                                "\"title\":\"" + "[" + i + "]" + "\",\n" +
-                                "\"code\":\"" + "[" + i + "]" + "\",\n" +
-                                "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
-                                "\"simple\": true,\n" +
-                                "\"array\": false,\n" +
-                                "\"type\": \"" + ((MetaValue) type).getTypeCode() + "\",\n" +
-                                "\"leaf\":true,\n" +
-                                "\"iconCls\":\"file\"\n" +
-                                "}";
+                    if(((MetaValue)type).getTypeCode() != DataTypes.DATE)
+                    {
+                        str +=  "{" +
+                            "\"title\":\"" + "[" + i + "]" + "\",\n" +
+                            "\"code\":\"" + "[" + i + "]" + "\",\n" +
+                            "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
+                            "\"simple\": true,\n" +
+                            "\"array\": false,\n" +
+                            "\"type\": \"" + ((MetaValue)type).getTypeCode() + "\",\n" +
+                            "\"leaf\":true,\n" +
+                            "\"iconCls\":\"file\"\n" +
+                            "}";
                     } else {
                         Object dtVal = value.getValue();
                         String dtStr = "";
@@ -347,16 +405,16 @@ public class MainPortlet extends MVCPortlet {
                             dtStr = new SimpleDateFormat("dd.MM.yyyy").format(dtVal);
                         }
 
-                        str += "{" +
-                                "\"title\":\"" + "[" + i + "]" + "\",\n" +
-                                "\"code\":\"" + "[" + i + "]" + "\",\n" +
-                                "\"value\":\"" + dtStr + "\",\n" +
-                                "\"simple\": true,\n" +
-                                "\"array\": false,\n" +
-                                "\"type\": \"" + ((MetaValue) type).getTypeCode() + "\",\n" +
-                                "\"leaf\":true,\n" +
-                                "\"iconCls\":\"file\"\n" +
-                                "}";
+                        str +=  "{" +
+                            "\"title\":\"" + "[" + i + "]" + "\",\n" +
+                            "\"code\":\"" + "[" + i + "]" + "\",\n" +
+                            "\"value\":\"" + dtStr + "\",\n" +
+                            "\"simple\": true,\n" +
+                            "\"array\": false,\n" +
+                            "\"type\": \"" + ((MetaValue)type).getTypeCode() + "\",\n" +
+                            "\"leaf\":true,\n" +
+                            "\"iconCls\":\"file\"\n" +
+                            "}";
                     }
                 }
             }
@@ -367,8 +425,12 @@ public class MainPortlet extends MVCPortlet {
         return str;
     }
 
+    boolean retry = false;
+
     @Override
-    public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws IOException {
+    public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws IOException
+    {
+
         if (metaFactoryService == null) {
             connectToServices();
             //todo: add error message here
@@ -376,164 +438,343 @@ public class MainPortlet extends MVCPortlet {
                 return;
         }
 
-        PrintWriter writer = resourceResponse.getWriter();
+        OutputStream out = resourceResponse.getPortletOutputStream();
 
         try {
             OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
             User currentUser = PortalUtil.getUser(resourceRequest);
 
+            Gson gson = new Gson();
+
             switch (operationType) {
                 case LIST_CLASSES:
-                    List<Pair> classes = searcherFormService.getMetaClasses(currentUser.getUserId());
-                    if (classes.size() < 1)
-                        throw new RuntimeException("no.any.rights");
-                    List<Pair> afterFilter = new LinkedList<>();
-                    for (Pair c : classes)
-                        if (classesFilter.contains(c.getName()))
-                            afterFilter.add(c);
+                    //List<Pair> classes = searcherFormService.getMetaClasses(currentUser.getUserId());
+                    List<String[]> classes = searcherFormService.getMetaClasses(currentUser.getUserId());
 
-                    writer.write(JsonMaker.getJson(afterFilter));
+                    if(classes.size() < 1)
+                        throw new RuntimeException("no.any.rights");
+                    //List<Pair> afterFilter = new LinkedList<>();
+                    List<String[]> afterFilter = new LinkedList<>();
+                    /*for(Pair c : classes)
+                        if(classesFilter.contains(c.getName()))
+                            afterFilter.add(c);*/
+                    for(String[]  c: classes)
+                        if(classesFilter.contains(c[1]))
+                            afterFilter.add(c);
+                    //for(String[] c : classes)
+
+                    out.write(JsonMaker.getCaptionedArray(afterFilter,
+                            new String[]{"searchName", "metaName", "title"}).getBytes());
+
+                    //writer.write(JsonMaker.getJson(afterFilter));
                     break;
                 case GET_FORM:
-                    Long metaId = Long.valueOf(resourceRequest.getParameter("metaId"));
+                    //Long metaId = Long.valueOf(resourceRequest.getParameter("metaId"));
+                    String searchClassName = resourceRequest.getParameter("search");
+                    String metaName = resourceRequest.getParameter("metaName");
+
+                    //String generatedForm = searcherFormService.getDom(currentUser.getUserId(), metaFactoryService.getMetaClass(metaId));
                     String generatedForm = searcherFormService.getDom(currentUser.getUserId(),
-                            metaFactoryService.getMetaClass(metaId));
-                    writer.write(generatedForm);
+                            searchClassName, metaFactoryService.getMetaClass(metaName),"");
+                    out.write(generatedForm.getBytes());
                     break;
                 case FIND_ACTION:
-                    List<Creditor> creditorList =
-                            portalUserBeanRemoteBusiness.getPortalUserCreditorList(currentUser.getUserId());
-
-                    Long creditorId = 0L;
-
-                    if(creditorList.size() == 1) {
-                        creditorId = creditorList.get(0).getId();
-                    } else {
-                        System.err.println("Not correct creditors number(" + creditorList.size() + ")");
-                    }
-
                     Enumeration<String> list = resourceRequest.getParameterNames();
 
-                    metaId = Long.valueOf(resourceRequest.getParameter("metaClass"));
+                    metaName = resourceRequest.getParameter("metaClass");
 
-                    MetaClass metaClass = metaFactoryService.getMetaClass(metaId);
-                    BaseEntity baseEntity = new BaseEntity(metaClass, new Date());
+                    MetaClass metaClass = metaFactoryService.getMetaClass(metaName);
+                    HashMap<String,String> parameters = new HashMap<>();
+                    searchClassName = resourceRequest.getParameter("searchName");
 
-                    while (list.hasMoreElements()) {
+                    while(list.hasMoreElements()) {
                         String attribute = list.nextElement();
-
-                        if (attribute.equals("op") || attribute.equals("metaClass"))
+                        if(attribute.equals("op") || attribute.equals("metaClass") || attribute.equals("searchName"))
                             continue;
-
-                        Object value;
-                        String parameterValue = resourceRequest.getParameter(attribute);
-
-                        IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
-                        if (metaAttribute == null)
-                            continue;
-                        IMetaType metaType = metaAttribute.getMetaType();
-
-                        if (metaType.isSetOfSets())
-                            throw new UnsupportedOperationException("Not yet implemented");
-
-                        if (metaType.isSet()) {
-                            BaseSet childBaseSet = new BaseSet(metaType);
-                            IMetaType itemMeta = ((MetaSet) metaType).getMemberType();
-                            BaseEntity childBaseEntity = new BaseEntity((MetaClass) itemMeta, new Date());
-                            childBaseEntity.setId(Long.valueOf(parameterValue));
-                            Batch b = new Batch(new Date(), currentUser.getUserId());
-                            b.setId(777L);
-
-                            childBaseSet.put(BaseValueFactory.create(
-                                    BaseContainerType.BASE_SET,
-                                    itemMeta,
-                                    0,
-                                    creditorId,
-                                    b,
-                                    1,
-                                    new Date(),
-                                    childBaseEntity,
-                                    false,
-                                    true));
-
-                            value = childBaseSet;
-                        } else if (metaType.isComplex()) {
-                            BaseEntity childBaseEntity = new BaseEntity((MetaClass) metaType, new Date());
-                            childBaseEntity.setId(Long.valueOf(parameterValue));
-                            value = childBaseEntity;
-
-                        } else {
-                            MetaValue metaValue = (MetaValue) metaType;
-                            value = DataTypes.fromString(metaValue.getTypeCode(), parameterValue);
-                        }
-
-                        Batch b = new Batch(new Date(), currentUser.getUserId());
-                        b.setId(777L);
-
-                        baseEntity.put(attribute, BaseValueFactory.create(
-                                BaseContainerType.BASE_ENTITY,
-                                metaAttribute.getMetaType(),
-                                0,
-                                creditorId,
-                                b,
-                                1,
-                                new Date(),
-                                value,
-                                false,
-                                true));
+                        parameters.put(attribute, resourceRequest.getParameter(attribute));
                     }
 
-                    baseEntity = entityService.search(baseEntity);
+                    ISearchResult searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "");
+                    Iterator<BaseEntity> cursor = searchResult.iterator();
 
                     long ret = -1;
 
-                    if (baseEntity.getId() > 0)
-                        ret = baseEntity.getId();
+                    if(cursor.hasNext()) {
+                        ret = cursor.next().getId();
+                        ret = ret > 0 ? ret : -1;
+                    }
 
-                    writer.write("{\"success\": true, \"data\":\"" + ret + "\"}");
+                    out.write(("{\"success\": true, \"data\":\"" + ret + "\"}").getBytes());
 
+                    break;
+                case LIST_BY_CLASS_SHORT:
+                    String metaId = resourceRequest.getParameter("metaId");
+                    RefListResponse refListResponse = entityService.getRefListResponse(Long.parseLong(metaId), null, false);
+                    refListResponse = refListToShort(refListResponse);
+                    String sJson = gson.toJson(refListResponse);
+                    out.write(sJson.getBytes());
                     break;
                 case SAVE_XML:
                     String xml = resourceRequest.getParameter("xml_data");
+                    String sDate = resourceRequest.getParameter("date");
+                    Date date = (Date) DataTypes.fromString(DataTypes.DATE, sDate);
 
                     BatchEntry batchEntry = new BatchEntry();
 
                     batchEntry.setValue(xml);
-
+                    batchEntry.setRepDate(date);
                     batchEntry.setUserId(currentUser.getUserId());
 
                     batchEntryService.save(batchEntry);
 
-                    writer.write("{\"success\": true }");
+                    out.write(("{\"success\": true }").getBytes());
+
+                    break;
+                case LIST_ATTRIBUTES:
+                    metaId = resourceRequest.getParameter("metaId");
+
+                    if (StringUtils.isNotEmpty(metaId)) {
+                        metaClass = metaFactoryService.getMetaClass(Long.valueOf(metaId));
+                        sJson = getAttributesJson(metaClass);
+                        out.write(sJson.getBytes());
+                    }
 
                     break;
                 case LIST_ENTITY:
                     String entityId = resourceRequest.getParameter("entityId");
+                    String asRootStr = resourceRequest.getParameter("asRoot");
+                    boolean isNb = false;
+                    long creditorId = -1;
 
-                    Date date = null;
+                    for(Role r : currentUser.getRoles())
+                        if("NationalBankEmployee".equals(r.getDescriptiveName()) ||
+                           "Administrator".equals(r.getDescriptiveName())) {
+                            isNb = true;
+                            break;
+                        }
 
-                    if (resourceRequest.getParameter("date") != null)
-                        date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+                    List<Creditor> creditors = portalUserBusiness.getPortalUserCreditorList(currentUser.getUserId());
 
-                    if (date == null)
-                        date = new Date();
+                    if(!isNb) {
+                        if(creditors.size() > 1)
+                            throw new RuntimeException("доступ к более одному банку");
+
+                        if(creditors.size() == 0)
+                            throw new RuntimeException("нет доступа к кредиторам");
+
+                        creditorId = creditors.get(0).getId();
+                    }
+
+                    boolean asRoot = StringUtils.isNotEmpty(asRootStr) ? Boolean.valueOf(asRootStr) : false;
 
                     if (entityId != null && entityId.trim().length() > 0) {
-                        //BaseEntity entity = entityService.load(Integer.parseInt(entityId));
-                        BaseEntity entity = entityService.load(Long.valueOf(entityId), date);
+                        //search by single Id
+                        date = null;
+                        if(resourceRequest.getParameter("date") != null)
+                            date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
 
-                        writer.write("{\"text\":\".\",\"children\": [\n" +
+                        if(date == null)
+                            date = new Date();
+
+                        BaseEntity entity = entityService.load(Integer.parseInt(entityId), date);
+
+                        sJson = "{\"text\":\".\",\"children\": [\n" +
                                 entityToJson(entity, entity.getMeta().getClassTitle(),
-                                        entity.getMeta().getClassName()) +
-                                "]}");
+                                        entity.getMeta().getClassName(), null, asRoot, isNb, creditorId) +
+                                "]}";
+
+                        out.write(sJson.getBytes());
+                    } else {
+                        //search by parameters
+
+                        list = resourceRequest.getParameterNames();
+                        metaName = resourceRequest.getParameter("metaClass");
+                        searchClassName = resourceRequest.getParameter("searchName");
+
+                        metaClass = metaFactoryService.getMetaClass(metaName);
+                        parameters = new HashMap<String,String>();
+
+                        while(list.hasMoreElements()) {
+                            String attribute = list.nextElement();
+                            if(attribute.equals("op") || attribute.equals("metaClass") || attribute.equals("searchName"))
+                                continue;
+                            parameters.put(attribute, resourceRequest.getParameter(attribute));
+                        }
+
+                        searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "");
+                        if(searchResult.getData() == null)
+                            throw new IllegalArgumentException("ошибка сериализации");
+
+                        StringBuilder sb = new StringBuilder("{\"text\":\".\",\"children\": [\n");
+                        Iterator<BaseEntity> it = searchResult.iterator();
+                        do {
+                            if(!it.hasNext())
+                                break;
+                            BaseEntity currentEntity = it.next();
+                            sb.append(entityToJson(currentEntity, currentEntity.getMeta().getClassTitle(),
+                                    currentEntity.getMeta().getClassName(), null, true, isNb, creditorId));
+
+                            if(it.hasNext()) sb.append(",");
+                        } while(true);
+
+                        sb.append("]}");
+                        out.write(sb.toString().getBytes());
                     }
                     break;
                 default:
                     break;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            writer.write("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}");
+            //e.printStackTrace();
+            String originalError = e.getMessage();
+            if(originalError.contains("connect") || originalError.contains("rmi"))
+                if(!retry) {
+                    retry = true;
+                    logger.info("connect failed, reconnect triggered");
+                    try {
+                        init();
+                        serveResource(resourceRequest, resourceResponse);
+                    } catch (PortletException e1) {
+                        //resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
+                        out.write(("{ \"success\": false, \"errorMessage\": \""+ originalError + e1.getMessage()
+                                .replaceAll("\"","").replaceAll("\n","")+"\"}").getBytes());
+                    } finally {
+                        retry = false;
+                        return;
+                    }
+                }
+
+            out.write(("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}").getBytes());
         }
     }
+
+    private RefListResponse refListToShort(RefListResponse refListResponse) {
+        List<Map<String, Object>> shortRows = new ArrayList<>();
+
+        String titleKey = null;
+
+        if (!refListResponse.getData().isEmpty()) {
+            Set<String> keys = refListResponse.getData().get(0).keySet();
+
+            if (keys.contains("name_ru"))
+                titleKey = "name_ru";
+            else if (keys.contains("name_kz"))
+                titleKey = "name_kz";
+            else if (keys.contains("name"))
+                titleKey = "name";
+        }
+
+        for (Map<String, Object> row : refListResponse.getData()) {
+            Object id = row.get("ID");
+            Object title = titleKey != null ? row.get(titleKey) : "------------------------";
+
+            Map<String, Object> shortRow = new HashMap<>();
+            shortRow.put("ID", id);
+            shortRow.put("title", title);
+            shortRows.add(shortRow);
+        }
+
+        return new RefListResponse(shortRows);
+    }
+
+    private String getAttributesJson(IMetaClass meta) {
+        StringBuilder result = new StringBuilder();
+
+        result.append("{\"total\":");
+        result.append(meta.getAttributeNames().size());
+        result.append(",\"data\":[");
+
+        boolean first = true;
+
+        for (String attrName : meta.getAttributeNames()) {
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(attrName);
+
+            if (first) {
+                first = false;
+            } else {
+                result.append(",");
+            }
+            result.append("{");
+
+            result.append("\"code\":");
+            result.append("\"");
+            result.append(attrName);
+            result.append("\"");
+
+            result.append(",\"title\":");
+            result.append("\"");
+            result.append(metaAttribute.getTitle());
+            result.append("\"");
+
+            result.append(",\"isKey\":");
+            result.append("\"");
+            result.append(metaAttribute.isKey());
+            result.append("\"");
+
+            result.append(",\"isRequired\":");
+            result.append("\"");
+            result.append(metaAttribute.isRequired());
+            result.append("\"");
+
+            result.append(",\"array\":");
+            result.append("\"");
+            result.append(metaAttribute.getMetaType().isSet());
+            result.append("\"");
+
+            result.append(",\"simple\":");
+            result.append("\"");
+            result.append(!metaAttribute.getMetaType().isComplex());
+            result.append("\"");
+
+            result.append(",\"ref\":");
+            result.append("\"");
+            result.append(metaAttribute.getMetaType().isReference());
+            result.append("\"");
+
+            if (metaAttribute.getMetaType().isComplex() && !metaAttribute.getMetaType().isSet()) {
+                result.append(",\"metaId\":");
+                result.append("\"");
+                result.append(((IMetaClass)metaAttribute.getMetaType()).getId());
+                result.append("\"");
+            }
+
+            result.append(",\"type\":");
+            result.append("\"");
+            result.append(getMetaTypeStr(metaAttribute.getMetaType()));
+            result.append("\"");
+
+            if (metaAttribute.getMetaType().isSet()) {
+                IMetaType memberType = ((IMetaSet) metaAttribute.getMetaType()).getMemberType();
+
+                if (memberType.isComplex()) {
+                    result.append(",\"childMetaId\":");
+                    result.append("\"");
+                    result.append(((IMetaClass) memberType).getId());
+                    result.append("\"");
+                }
+
+                result.append(",\"childType\":");
+                result.append("\"");
+                result.append(getMetaTypeStr(memberType));
+                result.append("\"");
+            }
+
+            result.append("}");
+        }
+
+        result.append("]}");
+
+        return result.toString();
+    }
+
+    private String getMetaTypeStr(IMetaType metaType) {
+        if (metaType.isSet())
+            return "META_SET";
+        else if (metaType.isComplex()) {
+            return "META_CLASS";
+        } else {
+            return ((IMetaValue)metaType).getTypeCode().name();
+        }
+    }
+
 }

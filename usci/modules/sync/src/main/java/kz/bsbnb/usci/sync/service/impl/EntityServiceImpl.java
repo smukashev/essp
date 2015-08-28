@@ -58,6 +58,21 @@ public class EntityServiceImpl implements IEntityService {
     }
 
     @Override
+    public BaseEntity prepare(BaseEntity baseEntity) {
+        return remoteEntityService.prepare(baseEntity);
+    }
+
+    @Override
+    public BaseEntity getActualBaseEntity(BaseEntity baseEntity) {
+        return remoteEntityService.getActualBaseEntity(baseEntity);
+    }
+
+    @Override
+    public void update(BaseEntity baseEntitySave, BaseEntity baseEntityLoad) {
+        remoteEntityService.update(baseEntitySave, baseEntityLoad);
+    }
+
+    @Override
     public BaseEntity search(BaseEntity baseEntity) {
         return remoteEntityService.search(baseEntity);
     }

@@ -4,12 +4,20 @@ import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.persistable.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.jooq.DSLContext;
+import org.jooq.Insert;
+import org.jooq.Select;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import kz.bsbnb.usci.brms.rulesvr.dao.IBatchVersionDao;
 import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 /**
  * @author abukabayev
@@ -17,13 +25,18 @@ import java.util.List;
 public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
     private final String PREFIX_ = "LOGIC_";
 
+    final Logger logger = LoggerFactory.getLogger(BatchVersionDao.class);
+
+    @Autowired
+    DSLContext context;
+
     public long saveBatchVersion(final Batch batch){
         if(batch.getId() < 1)
         {
             throw new IllegalArgumentException("Batch does not have id. Can't create batch version.");
         }
 
-        String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, REPORT_DATE) VALUES(?, ?)";
+        String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, OPEN_DATE) VALUES(?, ?)";
         return insertWithId(SQL, new Object[]{batch.getId(), DataUtils.convert(batch.getRepDate())});
     }
 
@@ -124,5 +137,27 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
 
         return (BatchVersion) jdbcTemplate.queryForObject(Sql, new BeanPropertyRowMapper(BatchVersion.class),
                 new Object[]{name, repdate});
+    }
+
+    @Override
+    public long insertBatchVersion(long packageId, Date date) {
+        Select controlSelect = context.selectFrom(LOGIC_PACKAGE_VERSIONS)
+                .where(LOGIC_PACKAGE_VERSIONS.OPEN_DATE.ge(DataUtils.convert(date)))
+                .and(LOGIC_PACKAGE_VERSIONS.PACKAGE_ID.eq(packageId))
+                .limit(1);
+
+        List<Map<String,Object>> rows =
+                jdbcTemplate.queryForList(controlSelect.getSQL(), controlSelect.getBindValues().toArray());
+
+        if(rows.size() > 0)
+            throw new RuntimeException("Версия пакета должна быть датой позднее");
+
+        Insert insert = context.insertInto(LOGIC_PACKAGE_VERSIONS)
+                .set(LOGIC_PACKAGE_VERSIONS.OPEN_DATE, DataUtils.convert(date))
+                .set(LOGIC_PACKAGE_VERSIONS.PACKAGE_ID,packageId);
+
+        long id = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+
+        return id;
     }
 }

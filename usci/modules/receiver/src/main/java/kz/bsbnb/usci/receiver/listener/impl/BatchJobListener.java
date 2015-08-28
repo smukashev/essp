@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.receiver.listener.impl;
 
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.exceptions.BatchNotFoundException;
 import kz.bsbnb.usci.receiver.listener.IListener;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
@@ -36,16 +37,14 @@ public class BatchJobListener implements IListener {
         System.out.println(" --- AFTER JOB --- batch: " + batchId + ", userId: " + userId);
 
         IBatchService batchService = serviceFactory.getBatchService();
-
+        
         Properties properties = new Properties();
-
         Batch batch = batchService.getBatch(batchId);
-
         properties.put("FILENAME", batch.getFileName());
-        serviceFactory.getMailMessageBeanCommonBusiness().sendMailMessage("FILE_PROCESSING_COMPLETED", batch.getUserId(), properties);
+//        serviceFactory.getMailMessageBeanCommonBusiness().sendMailMessage("FILE_PROCESSING_COMPLETED", batch.getUserId(), properties);
+
 
         batchService.endBatch(batchId);
-
         receiverStatusSingleton.batchEnded();
     }
 

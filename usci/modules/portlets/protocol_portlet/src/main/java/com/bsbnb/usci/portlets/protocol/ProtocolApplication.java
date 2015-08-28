@@ -54,6 +54,7 @@ public class ProtocolApplication extends Application {
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
             boolean hasRights = false;
+            boolean isNB = false;
             User user = null;
 
             try {
@@ -61,8 +62,13 @@ public class ProtocolApplication extends Application {
                 if(user != null) {
                     for (Role role : user.getRoles()) {
                         if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
-                                || role.getName().equals("NationalBankEmployee"))
+                                || role.getName().equals("NationalBankEmployee")) {
                             hasRights = true;
+
+                            if (role.getName().equals("NationalBankEmployee")) {
+                                isNB = true;
+                            }
+                        }
                     }
                 }
             } catch (PortalException e) {
@@ -77,7 +83,7 @@ public class ProtocolApplication extends Application {
             setTheme("custom");
             log.log(Level.INFO, "User ID: {0}", user.getUserId());
             Window mainWindow = new Window();
-            PortletEnvironmentFacade.set(new ProtocolPortletEnvironmentFacade(user));
+            PortletEnvironmentFacade.set(new ProtocolPortletEnvironmentFacade(user, isNB));
             DataProvider provider = new BeanDataProvider();
             mainWindow.addComponent(new ProtocolLayout(provider));
             setMainWindow(mainWindow);

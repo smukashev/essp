@@ -1,0 +1,53 @@
+rule read $$$
+title: документ РНН должен содержать 12 символов
+rule "документ РНН должен содержать 12 символов"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "ref_creditor"
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}docs[doc_type.code=11]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: документ БИН должен содержать 12 символов
+rule "документ БИН головной банк должен содержать 12 символов"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "ref_creditor"
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}docs[doc_type.code=07]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: документ РНН из 12 нулей
+rule "документ РНН из 12 нулей"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "ref_creditor"
+			&& ( $r : get12ZeroStrings((List)getEls("{get}docs[doc_type.code=11]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("документ содержит 12 нулей: " + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: документ БИН из 12 нулей
+rule "документ БИН из 12 нулей"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "ref_creditor"
+			&& ( $r : get12ZeroStrings((List)getEls("{get}docs[doc_type.code=07]no")) && $r.size() > 0))
+then
+	$entity.addValidationError("документ содержит 12 нулей: " + $r);
+end
+$$$
+
+rule save
+
+quit

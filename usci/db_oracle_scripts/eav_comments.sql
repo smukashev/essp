@@ -25,6 +25,7 @@ update eav_m_classes set title = 	'Договор займа/условного 
 update eav_m_classes set title = 	'Физическое лицо'	WHERE NAME = 'person';
 update eav_m_classes set title = 	'Юридическое лицо'	WHERE NAME = 'organization';
 update eav_m_classes set title = 	'Договор'	WHERE NAME = 'primary_contract';
+update eav_m_classes set title = 	'Исключительный документ'	WHERE NAME = 'ref_exclusive_doc';
 
 update eav_m_simple_attributes set title = 'номер' where name='no';
 update eav_m_simple_attributes set title = 'дата' where name='date';

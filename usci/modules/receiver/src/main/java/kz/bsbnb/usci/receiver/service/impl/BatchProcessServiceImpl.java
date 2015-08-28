@@ -32,6 +32,11 @@ public class BatchProcessServiceImpl implements IBatchProcessService {
     }
 
     @Override
+    public void processBatch(String fileName, Long userId, boolean isNB) {
+        zipFilesMonitor.readFiles(fileName, userId, isNB);
+    }
+
+    @Override
     public void processBatch(String fileName, Long userId) {
         zipFilesMonitor.readFiles(fileName, userId);
     }

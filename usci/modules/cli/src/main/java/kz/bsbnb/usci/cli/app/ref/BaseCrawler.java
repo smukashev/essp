@@ -26,7 +26,6 @@ public class BaseCrawler {
 
     public static Document document;
     public static String fileName;
-    public static String prefix = "C:\\refs\\";
 
     public static Document getDocument(){
 
@@ -48,7 +47,8 @@ public class BaseCrawler {
 
     public void work(){
 
-        //fileName = "C:\\refs\\";
+//        fileName = "C:\\refs\\";
+        fileName = "/home/maksat/ref_imports_generated/";
 
         try {
             rootElement = getDocument().createElement("batch");
@@ -96,14 +96,10 @@ public class BaseCrawler {
             //BaseRef creditor = (BaseRef) getRef().cast(o);
             BaseRef creditor = (BaseRef) o;
 
-            Element entity = getDocument().createElement("entity");
-            root.appendChild(entity);
+            Element entityClass = getDocument().createElement(getClassName());
+            root.appendChild(entityClass);
 
-            Attr attr = getDocument().createAttribute("class");
-            attr.setValue(getClassName());
-            entity.setAttributeNode(attr);
-
-            creditor.buildElement(entity);
+            creditor.buildElement(entityClass);
 
              /*appendToElement(entity,"name",creditor.get("NAME"));
              appendToElement(entity,"short_name",creditor.get("SHORT_NAME"));*/

@@ -6,20 +6,49 @@ Ext.require([
 ]);
 
 var regex = /^\S+-(\d+)-(\S+)-(\S+)$/;
-var currentClass;
+var currentSearch;
+var currentMeta;
 
+var attrStore;
+var entityStore;
+var subEntityStore;
+var newArrayElements = [];
+var nextArrayIndex = 0;
+
+var FORM_ADD = 0;
+var FORM_EDIT = 1;
+var FORM_ADD_ARRAY_EL = 2;
+
+var ADDITION_META_ID = 59;
+var ADDITION_META_NAME = "credit";
+
+var modalWindow;
+var arrayElWindow;
 
 function getForm(){
-    currentClass = Ext.getCmp('edClass').value;
+    currentSearch = Ext.getCmp('edSearch').value;
+    currentMeta = Ext.getCmp('edSearch').displayTplData[0].metaName;
     Ext.Ajax.request({
         url: dataUrl,
         method: 'POST',
         params: {
             op: 'GET_FORM',
-            metaId: currentClass
+            search: currentSearch,
+            metaName: currentMeta
         },
         success: function(data){
             document.getElementById('entity-editor-form').innerHTML = data.responseText;
+            var all = document.getElementsByClassName("usci-date");
+            for(var i = 0; i < all.length;i++) {
+                var info =  all[i].id.match(regex);
+                Ext.create('Ext.form.DateField', {
+                    renderTo: all[i].id,
+                    fieldLabel: 'дата',
+                    labelWidth: 27,
+                    id: 'inp-' + info[1],
+                    format: 'd.m.Y',
+                });
+            }
         }
     });
 }
@@ -38,6 +67,12 @@ function filterLeaf(control, queryObject){
             }
 
             queryObject[info[3]] = childControl.value;
+        } else if(childControl.tagName == 'DIV') {
+            var info = childControl.id.match(regex);
+            if(info == null)
+                continue;
+            var id = info[1];
+            queryObject[info[3]] = Ext.getCmp('inp-' + id).value;
         }
     }
 }
@@ -59,7 +94,7 @@ function find(control){
     var info = inputDiv.id.match(regex);
 
 
-    var params = {op : 'FIND_ACTION', metaClass: info[2]};
+    var params = {op : 'FIND_ACTION', metaClass: info[2], searchName: currentSearch};
     for(var i=0;i<errors.length;i++)
         errors[i].style.display = 'none';
 
@@ -104,7 +139,7 @@ function find(control){
     });
 }
 
-function createXML(currentNode, rootFlag, offset, arrayEl, first) {
+function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
     var xmlStr = "";
 
     var children = currentNode.childNodes;
@@ -113,11 +148,10 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first) {
         xmlStr += offset + "<item>\n";
     } else {
         if(first) {
-            xmlStr += offset + "<entity " +
-            (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
-        } else {
             xmlStr += offset + "<" + currentNode.data.code +
-            (rootFlag ? " class=\"" + currentNode.data.code + "\"" : "") + ">\n";
+                (operation ? " operation=\"" + operation + "\"" : "") + ">\n";
+        } else {
+            xmlStr += offset + "<" + currentNode.data.code + ">\n";
         }
     }
 
@@ -140,21 +174,470 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first) {
     if(arrayEl) {
         xmlStr += offset + "</item>\n";
     } else {
-        if(first) {
-            xmlStr += offset + "</entity>\n";
-        } else {
-            xmlStr += offset + "</" + currentNode.data.code + ">\n";
-        }
+        xmlStr += offset + "</" + currentNode.data.code + ">\n";
     }
 
     return xmlStr;
 }
 
+function addArrayElementButton(form) {
+    form.add(Ext.create('Ext.button.Button', {
+        id: "btnFormAddArrayElement",
+        text: "Добавить элемент",
+        margin: '0 0 5 0',
+
+        handler : function () {
+            var tree = Ext.getCmp('entityTreeView');
+            var selectedNode = tree.getSelectionModel().getLastSelected();
+
+            if (selectedNode.data.simple) {
+                var element = {
+                    title: "[" + nextArrayIndex + "]",
+                    code: "[" + nextArrayIndex + "]",
+                    metaId: selectedNode.childMetaId,
+                    type: selectedNode.childType,
+                    value: true
+                };
+                newArrayElements.push(element);
+                addField(form, element, "_edit", selectedNode);
+            } else {
+                var arrayElForm= Ext.getCmp('ArrayElFormPannel');
+                arrayElForm.removeAll();
+                loadAttributes(arrayElForm, selectedNode, true);
+                arrayElWindow.show();
+            }
+        }
+    }));
+}
+
+function loadAttributes(form, selectedNode, arrayElAddition) {
+    var children;
+    var metaId;
+    var selectedNodeData;
+    var idSuffix;
+
+    if (selectedNode && arrayElAddition) {
+        children = [];
+        metaId = selectedNode.data.childMetaId;
+        selectedNodeData = null;
+        idSuffix = '_add';
+    } else if (selectedNode) {
+        children = selectedNode.childNodes;
+        metaId = selectedNode.data.metaId;
+        selectedNodeData = selectedNode.data;
+        idSuffix = '_edit';
+    } else {
+        children = [];
+        metaId = ADDITION_META_ID; // hard code
+        selectedNodeData = null;
+        idSuffix = '_add';
+    }
+
+    Ext.Ajax.request({
+        url: dataUrl,
+        params: {
+            op: 'LIST_ATTRIBUTES',
+            metaId: metaId
+        },
+        success: function (result) {
+            var json = JSON.parse(result.responseText);
+            attrStore.removeAll();
+            attrStore.add(json.data);
+            var attributes = attrStore.getRange();
+
+            fillAttrValuesFromTree(attributes, children);
+
+            for(var i = 0; i < attributes.length; i++) {
+                addField(form, attributes[i].data, idSuffix, selectedNodeData);
+            }
+        }
+    });
+}
+
+function fillAttrValuesFromTree(attributes, existingVals) {
+    for (i = 0; i < attributes.length; i++) {
+        for (j = 0; j < existingVals.length; j++) {
+            if (attributes[i].data.code == existingVals[j].data.code) {
+                attributes[i].data.value = existingVals[j].data.value;
+                break;
+            }
+        }
+    }
+}
+
+function loadSubEntity(subNode, idSuffix) {
+    subNode.removeAll();
+
+    var subEntityId = Ext.getCmp(subNode.data.code + "FromItem" + idSuffix).getValue();
+
+    subEntityStore.load({
+        params: {
+            op : 'LIST_ENTITY',
+            entityId: subEntityId,
+            date: Ext.getCmp('edDate').value,
+            asRoot: false
+        },
+        callback: function(records, operation, success) {
+            if (!success) {
+                Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
+            } else {
+                subNode.data.value = records[0].data.value;
+
+                while (records[0].childNodes.length > 0) {
+                    subNode.appendChild(records[0].childNodes[0]);
+                }
+            }
+        }
+    });
+}
+
+function addField(form, attr, idSuffix, node) {
+    var labelWidth = "60%";
+    var width = "40%";
+
+    if (node && node.array) {
+        nextArrayIndex++;
+    }
+
+    var readOnly = (node && node.value && node.value != true && attr.isKey)
+        || (attr.isKey && (attr.array || (!attr.simple && !attr.ref)))
+        || (node && !node.root && node.ref)
+        || (node && node.array && !attr.simple && !attr.ref);
+
+    var allowBlank = !(attr.isRequired || attr.isKey);
+
+    if (attr.array || (!attr.simple && !attr.ref)) {
+        form.add(Ext.create("MyCheckboxField",
+                {
+                    id: attr.code + "FromItem" + idSuffix,
+                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    labelWidth: labelWidth,
+                    width: width,
+                    readOnly: readOnly,
+                    allowBlank: allowBlank,
+                    blankText: label_REQUIRED_FIELD,
+                    checked: (attr.isKey || attr.value)
+                })
+        );
+    } else if (attr.type == "DATE") {
+        form.add(Ext.create("Ext.form.field.Date",
+                {
+                    id: attr.code + "FromItem" + idSuffix,
+                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    labelWidth: labelWidth,
+                    width: width,
+                    format: 'd.m.Y',
+                    value: attr.value ? new Date(attr.value.replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1')) : null,
+                    readOnly: readOnly,
+                    allowBlank: allowBlank,
+                    blankText: label_REQUIRED_FIELD
+                })
+        );
+    } else if (attr.type == "INTEGER" || attr.type == "DOUBLE") {
+        form.add(Ext.create(Ext.form.NumberField,
+                {
+                    id: attr.code + "FromItem" + idSuffix,
+                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    labelWidth: labelWidth,
+                    width: width,
+                    value: attr.value,
+                    minValue: 0,
+                    allowDecimals: attr.type == "DOUBLE",
+                    forcePrecision: attr.type == "DOUBLE",
+                    readOnly: readOnly,
+                    allowBlank: allowBlank,
+                    blankText: label_REQUIRED_FIELD
+                })
+        );
+    } else if (attr.type == "BOOLEAN") {
+        form.add(Ext.create("Ext.form.field.ComboBox",
+                {
+                    id: attr.code + "FromItem" + idSuffix,
+                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    labelWidth: labelWidth,
+                    width: width,
+                    readOnly: readOnly,
+                    allowBlank: allowBlank,
+                    blankText: label_REQUIRED_FIELD,
+                    editable : false,
+                    store: Ext.create('Ext.data.Store', {
+                        fields: ['value', 'title'],
+                        data: [
+                            {value: 'true', title: 'Да'},
+                            {value: 'false', title: 'Нет'}
+                        ]
+                    }),
+                    displayField: 'title',
+                    valueField: 'value',
+                    value: attr.value
+                })
+        );
+    } else if (attr.ref) {
+        form.add(Ext.create("Ext.form.field.ComboBox", {
+            id: attr.code + "FromItem" + idSuffix,
+            fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
+            labelWidth: labelWidth,
+            width: width,
+            readOnly: readOnly,
+            allowBlank: allowBlank,
+            blankText: label_REQUIRED_FIELD,
+            store: Ext.create('Ext.data.Store', {
+                model: 'refStoreModel',
+                pageSize: 100,
+                proxy: {
+                    type: 'ajax',
+                    url: dataUrl,
+                    extraParams: {op : 'LIST_BY_CLASS_SHORT', metaId: attr.metaId},
+                    actionMethods: {
+                        read: 'POST'
+                    },
+                    reader: {
+                        type: 'json',
+                        root: 'data',
+                        totalProperty: 'total'
+                    }
+                },
+                autoLoad: true,
+                remoteSort: true
+            }),
+            displayField: 'title',
+            valueField: 'ID',
+            value: attr.value,
+            editable : false
+        }));
+    } else {
+        form.add(Ext.create("Ext.form.field.Text",
+                {
+                    id: attr.code + "FromItem" + idSuffix,
+                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    labelWidth: labelWidth,
+                    width: width,
+                    value: attr.value,
+                    readOnly: readOnly,
+                    allowBlank: allowBlank,
+                    blankText: label_REQUIRED_FIELD
+                })
+        );
+    }
+}
+
+function loadEntity(entityId, date, currentSearch) {
+    entityStore.load({
+        params: {
+            op : 'LIST_ENTITY',
+            entityId: entityId,
+            date: date,
+            searchName: currentSearch,
+            asRoot: true
+        },
+        callback: function(records, operation, success) {
+            if (!success) {
+                Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
+            }
+        }
+    });
+}
+
+function saveFormValues(formKind) {
+    var idSuffix = formKind == FORM_EDIT ? "_edit" : "_add";
+    var tree = Ext.getCmp('entityTreeView');
+    var selectedNode = tree.getSelectionModel().getLastSelected();
+
+    var rootNode = tree.getRootNode();
+
+    if (formKind == FORM_ADD) {
+        rootNode.removeAll();
+        rootNode.appendChild({
+            leaf: false,
+            title: ADDITION_META_NAME,
+            code: ADDITION_META_NAME,
+            type: "META_CLASS",
+            metaId: ADDITION_META_ID
+        });
+        selectedNode = rootNode.getChildAt(0);
+    } else if (formKind == FORM_ADD_ARRAY_EL) {
+        var form = Ext.getCmp('EntityEditorFormPanel');
+        var arrayIndex = selectedNode.childNodes.length;
+        var element = {
+            leaf: false,
+            title: "[" + arrayIndex + "]",
+            code: "[" + arrayIndex + "]",
+            type: selectedNode.data.childType,
+            metaId: selectedNode.data.childMetaId,
+            value: true
+        };
+        selectedNode.appendChild(element);
+        selectedNode.data.value = selectedNode.childNodes.length;
+        selectedNode = selectedNode.getChildAt(arrayIndex);
+        addField(form, element, "_edit", selectedNode);
+    }
+
+    if (selectedNode.data.array && selectedNode.data.simple) {
+        selectedNode.removeAll();
+
+        for (var i = 0; i < newArrayElements.length; i++) {
+            var el = newArrayElements[i];
+            var field = Ext.getCmp(el.code + "FromItem" + idSuffix);
+            el.value = el.type == "DATE" ? field.getSubmitValue() : field.getValue();
+            selectedNode.appendChild(el);
+        }
+        selectedNode.data.value = selectedNode.childNodes.length;
+    } else {
+        var attributes = attrStore.getRange();
+
+        for (var i = 0; i < attributes.length; i++) {
+            var attr = attributes[i].data;
+
+            var field = Ext.getCmp(attr.code + "FromItem" + idSuffix);
+
+            var fieldValue;
+
+            if (attr.type == "DATE") {
+                fieldValue = field.getSubmitValue();
+                //} else  if (!attr.simple && !attr.ref) {
+                // do nothing
+            } else {
+                fieldValue = field.getValue();
+            }
+
+            var existingAttrNode = selectedNode.findChild('code', attr.code);
+
+            if (fieldValue) {
+                var subNode;
+
+                if (existingAttrNode) {
+                    subNode = existingAttrNode;
+                } else {
+                    selectedNode.appendChild(attr);
+                    subNode = selectedNode.getChildAt(selectedNode.childNodes.length - 1);
+                }
+
+                subNode.data.value = fieldValue;
+
+                if (attr.simple) {
+                    subNode.data.leaf = true;
+                    subNode.data.iconCls = 'file';
+                } else {
+                    subNode.data.leaf = false;
+                    subNode.data.iconCls = 'folder';
+
+                    if (attr.ref && attr.type == "META_CLASS") {
+                        loadSubEntity(subNode, idSuffix);
+                    }
+                }
+            } else {
+                if (existingAttrNode) {
+                    selectedNode.removeChild(existingAttrNode);
+                }
+            }
+        }
+    }
+
+    tree.getView().refresh();
+
+    if (formKind != FORM_EDIT) {
+        modalWindow.hide();
+        arrayElWindow.hide();
+    }
+}
+
+function hasEmptyKeyAttr(mainNode) {
+    for(var i = 0; i < mainNode.childNodes.length; i++) {
+        var currentNode = mainNode.childNodes[i];
+
+        if (currentNode.data.simple) {
+            if (!currentNode.data.value) {
+                Ext.MessageBox.alert(label_ERROR, "Не заполнен ключевой атрибут: " + currentNode.data.title);
+                return true;
+            }
+        } else {
+            if (currentNode.data.isKey && currentNode.childNodes.length == 0) {
+                Ext.MessageBox.alert(label_ERROR, "Не заполнен ключевой атрибут: " + currentNode.data.title);
+                return true;
+            } else if (currentNode.childNodes.length == 0) {
+                // do nothing
+            } else if (hasEmptyKeyAttr(currentNode)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 Ext.onReady(function() {
 
-    Ext.define('classesStoreModel', {
+    Ext.override(Ext.data.proxy.Ajax, { timeout: 120000 });
+
+    Ext.define('MyCheckboxField', {
+        extend: 'Ext.form.field.Checkbox',
+
+        initComponent: function () {
+            this.fieldSubTpl[9] = '<input type="checkbox" id="{id}" {checked} {inputAttrTpl}';
+            this.callParent();
+        },
+
+        getSubTplData: function() {
+            var me = this;
+            return Ext.apply(me.callParent(), {
+                checked: (me.checked ? 'checked' : '')
+            });
+        }
+    });
+
+    Ext.override(Ext.form.NumberField, {
+        forcePrecision : false,
+
+        valueToRaw: function(value) {
+            var me = this,
+                decimalSeparator = me.decimalSeparator;
+            value = me.parseValue(value);
+            value = me.fixPrecision(value);
+            value = Ext.isNumber(value) ? value : parseFloat(String(value).replace(decimalSeparator, '.'));
+            if (isNaN(value))
+            {
+                value = '';
+            } else {
+                value = me.forcePrecision ? value.toFixed(me.decimalPrecision) : parseFloat(value);
+                value = String(value).replace(".", decimalSeparator);
+            }
+            return value;
+        }
+    });
+
+    Ext.define('attrsStoreModel', {
         extend: 'Ext.data.Model',
-        fields: ['id','name', 'title']
+        fields: [
+            {name: 'title',     type: 'string'},
+            {name: 'code',     type: 'string'},
+            {name: 'value',     type: 'string'},
+            {name: 'simple',     type: 'boolean'},
+            {name: 'array',     type: 'boolean'},
+            {name: 'ref',     type: 'boolean'},
+            {name: 'type',     type: 'string'},
+            {name: 'isKey',     type: 'boolean'},
+            {name: 'isRequired',     type: 'boolean'},
+            {name: 'metaId',     type: 'string'},
+            {name: 'childMetaId',     type: 'string'},
+            {name: 'childType',     type: 'string'},
+        ]
+    });
+
+    attrStore = Ext.create('Ext.data.Store', {
+        storeId: 'attrsStore',
+        model: 'attrsStoreModel'
+    });
+
+    Ext.define('refStoreModel', {
+        extend: 'Ext.data.Model',
+        fields: [
+            {name: 'ID', type: 'string'},
+            {name: 'title', type: 'string'}
+        ]
+    });
+
+    Ext.define('searchStoreModel', {
+        extend: 'Ext.data.Model',
+        fields: ['searchName','metaName', 'title']
     });
 
     Ext.define('entityModel', {
@@ -165,13 +648,19 @@ Ext.onReady(function() {
             {name: 'value',     type: 'string'},
             {name: 'simple',     type: 'boolean'},
             {name: 'array',     type: 'boolean'},
+            {name: 'ref',     type: 'boolean'},
             {name: 'type',     type: 'string'},
-            {name: 'isKey',     type: 'boolean'}
+            {name: 'isKey',     type: 'boolean'},
+            {name: 'isRequired',     type: 'boolean'},
+            {name: 'metaId',     type: 'string'},
+            {name: 'childMetaId',     type: 'string'},
+            {name: 'childType',     type: 'string'},
         ]
     });
 
-    var entityStore = Ext.create('Ext.data.TreeStore', {
+    entityStore = Ext.create('Ext.data.TreeStore', {
         model: 'entityModel',
+        storeId: 'entityStore',
         proxy: {
             type: 'ajax',
             url: dataUrl,
@@ -180,25 +669,62 @@ Ext.onReady(function() {
         folderSort: true
     });
 
+    subEntityStore = Ext.create('Ext.data.TreeStore', {
+        model: 'entityModel',
+        storeId: 'subEntityStore',
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op : 'LIST_ENTITY'}
+        },
+        folderSort: true
+    });
+
+    var buttonAdd = Ext.create('Ext.button.Button', {
+        id: "entityEditorAddBtn",
+        text: 'Добавить',
+        handler : function (){
+            nextArrayIndex = 0;
+            var form = Ext.getCmp('ModalFormPannel');
+            form.removeAll();
+            loadAttributes(form)
+            modalWindow.show();
+        }
+    });
+
     var buttonShow = Ext.create('Ext.button.Button', {
         id: "entityEditorShowBtn",
         text: label_VIEW,
         handler : function (){
             //entityId = Ext.getCmp("entityId");
-            var entityId = document.getElementById('inp-1-' + currentClass + '-null').value;
+            var keySearchComponent = document.getElementById('inp-1-' + currentMeta + '-null');
 
-            entityStore.load({
-                params: {
-                    op : 'LIST_ENTITY',
-                    entityId: entityId,
-                    date: Ext.getCmp('edDate').value
-                },
-                callback: function(records, operation, success) {
-                    if (!success) {
-                        Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
+            if(keySearchComponent != null) {
+                var entityId = document.getElementById('inp-1-' + currentMeta + '-null').value;
+                loadEntity(entityId, Ext.getCmp('edDate').value, currentSearch);
+            } else {
+                //for custom implementations
+                var params = {op : 'LIST_ENTITY', metaClass: currentMeta, searchName: currentSearch, timeout: 120000 };
+                var inputs = document.getElementById("entity-editor-form").childNodes;
+                for(i=0;i<inputs.length;i++) {
+                    if(inputs[i].tagName == 'INPUT') {
+                        params[inputs[i].name] = inputs[i].value;
                     }
                 }
-            });
+
+                //console.log(params);
+
+                var loadingGif = document.getElementById('form-loading');
+                loadingGif.style.display = 'inline';
+                entityStore.load({
+                    params: params,
+                    callback: function (records, operation, success) {
+                        if (!success) {
+                            Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
+                        }
+                        loadingGif.style.display = 'none';
+                    }});
+            }
         },
         maxWidth: 70,
         shadow: true
@@ -211,20 +737,25 @@ Ext.onReady(function() {
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
 
-            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
+            var xmlStr = "";
+
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                if (hasEmptyKeyAttr(rootNode.childNodes[i])) {
+                    return;
+                }
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true);
+            }
 
             Ext.Ajax.request({
                 url: dataUrl,
                 method: 'POST',
                 params: {
                     xml_data: xmlStr,
+                    date: Ext.getCmp('edDate').value,
                     op: 'SAVE_XML'
                 },
                 success: function() {
-                    console.log('success');
-                },
-                failure: function() {
-                    console.log('woops');
+                    Ext.MessageBox.alert("", "Сохранено успешно");
                 }
             });
         },
@@ -238,7 +769,11 @@ Ext.onReady(function() {
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
 
-            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
+            var xmlStr = "";
+
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true);
+            }
 
             var buttonClose = Ext.create('Ext.button.Button', {
                 id: "itemFormCancel",
@@ -285,6 +820,120 @@ Ext.onReady(function() {
         maxWidth: 50
     });
 
+    var buttonDelete = Ext.create('Ext.button.Button', {
+        id: "buttonDelete",
+        text: label_DEL,
+        maxWidth: 200,
+        handler : function (){
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+
+            var xmlStr = "";
+
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true, "DELETE");
+            }
+
+            Ext.Ajax.request({
+                url: dataUrl,
+                method: 'POST',
+                params: {
+                    xml_data: xmlStr,
+                    date: Ext.getCmp('edDate').value,
+                    op: 'SAVE_XML'
+                },
+                success: function(response) {
+                    Ext.MessageBox.alert("", "Операция выполнена успешно");
+                }
+            });
+        }
+    });
+
+    var buttonClose = Ext.create('Ext.button.Button', {
+        id: "buttonClose",
+        text: label_CLOSE,
+        maxWidth: 200,
+        handler : function (){
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+
+            var xmlStr = "";
+
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true, "CLOSE");
+            }
+
+            Ext.Ajax.request({
+                url: dataUrl,
+                method: 'POST',
+                params: {
+                    xml_data: xmlStr,
+                    date: Ext.getCmp('edDate').value,
+                    op: 'SAVE_XML'
+                },
+                success: function(response) {
+                    Ext.MessageBox.alert("", "Операция выполнена успешно");
+                }
+            });
+        }
+    });
+
+    modalWindow = Ext.create("Ext.Window",{
+        title : 'Добавление записи',
+        width : 400,
+        modal : true,
+        closable : true,
+        closeAction: 'hide',
+        items  : [
+            {
+                id: "ModalFormPannel",
+                xtype: 'form',
+                bodyPadding: '5 5 0',
+                width: "100%",
+                defaults: {
+                    anchor: '100%'
+                },
+                autoScroll:true
+            }],
+        tbar : [{
+            text : 'Сохранить новую запись' ,
+            handler :function(){
+                var form = Ext.getCmp('ModalFormPannel');
+                if (form.isValid()) {
+                    saveFormValues(FORM_ADD);
+                }
+            }
+        }]
+    });
+
+    arrayElWindow = Ext.create("Ext.Window",{
+        title : 'Добавление элемента массива',
+        width : 400,
+        modal : true,
+        closable : true,
+        closeAction: 'hide',
+        items : [
+            {
+                id: "ArrayElFormPannel",
+                xtype: 'form',
+                bodyPadding: '5 5 0',
+                width: "100%",
+                defaults: {
+                    anchor: '100%'
+                },
+                autoScroll:true
+            }],
+        tbar : [{
+            text : 'Сохранить новую запись' ,
+            handler :function() {
+                var form = Ext.getCmp('ArrayElFormPannel');
+                if (form.isValid()) {
+                    saveFormValues(FORM_ADD_ARRAY_EL);
+                }
+            }
+        }]
+    });
+
     var entityGrid = Ext.create('Ext.tree.Panel', {
         //collapsible: true,
         id: 'entityTreeView',
@@ -328,75 +977,54 @@ Ext.onReady(function() {
         }],
         listeners : {
             itemclick: function(view, record, item, index, e, eOpts) {
+                nextArrayIndex = 0;
+                newArrayElements = [];
+                Ext.getCmp('btnConfirmChanges').show();
                 var tree = Ext.getCmp('entityTreeView');
                 var selectedNode = tree.getSelectionModel().getLastSelected();
-
-                var buttonSaveAttributes = Ext.create('Ext.button.Button', {
-                    id: "btnFormSave",
-                    text: label_SAVE,
-                    handler : function () {
-                        var tree = Ext.getCmp('entityTreeView');
-                        var selectedNode = tree.getSelectionModel().getLastSelected();
-
-                        var children = selectedNode.childNodes;
-
-                        for(var i = 0; i < children.length; i++){
-                            if(children[i].data.simple) {
-                                if(children[i].data.type == "DATE") {
-                                    children[i].data.value = Ext.getCmp(children[i].data.code + "FromItem")
-                                        .getSubmitValue();
-                                } else {
-                                    children[i].data.value = Ext.getCmp(children[i].data.code + "FromItem")
-                                        .getValue();
-                                }
-                            }
-                        }
-
-                        Ext.getCmp("entityTreeView").getView().refresh();
-                    }
-                });
-
-
                 var children = selectedNode.childNodes;
 
                 var form = Ext.getCmp('EntityEditorFormPanel');
                 form.removeAll();
-                for(var i = 0; i < children.length; i++){
-                    if(children[i].data.simple) {
-                        if(children[i].data.type == "DATE") {
-                            form.add(Ext.create("Ext.form.field.Date",
-                                {
-                                    id: children[i].data.code + "FromItem",
-                                    fieldLabel: children[i].data.title,
-                                    width: "100%",
-                                    format: 'd.m.Y',
-                                    value: new Date(
-                                        children[i].data.value.
-                                            replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1')),
-                                    disabled: children[i].data.isKey
-                                }));
-                        } else {
-                            form.add(Ext.create("Ext.form.field.Text",
-                                {
-                                    id: children[i].data.code + "FromItem",
-                                    fieldLabel: children[i].data.title,
-                                    width: "100%",
-                                    value: children[i].data.value,
-                                    disabled: children[i].data.isKey
-                                }));
+
+                if (!selectedNode.data.simple) {
+                    if (!selectedNode.data.array) {
+                        loadAttributes(form, selectedNode);
+                    } else {
+                        Ext.getCmp('btnConfirmChanges').hide();
+
+                        addArrayElementButton(form);
+
+                        for(var i = 0; i < children.length; i++){
+                            addField(form, children[i].data, true, selectedNode.data);
                         }
                     }
                 }
-
-                form.add(buttonSaveAttributes);
 
                 form.doLayout();
             }
         }
     });
 
+    // --------------------------------------------
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+
+    if(dd<10) {
+        dd='0'+dd
+    }
+
+    if(mm<10) {
+        mm='0'+mm
+    }
+
+    today = dd+'.'+mm+'.'+yyyy;
+    // ------------------------------------------------
+
     var classesStore = Ext.create('Ext.data.Store', {
-        model: 'classesStoreModel',
+        model: 'searchStoreModel',
         pageSize: 100,
         proxy: {
             type: 'ajax',
@@ -423,7 +1051,7 @@ Ext.onReady(function() {
         layout: 'border',
         items: [{
             region: 'west',
-            width: '20%',
+            width: '30%',
             split: true,
             layout: 'border',
             items: [{
@@ -436,12 +1064,12 @@ Ext.onReady(function() {
                     align: 'stretch'
                 },
                 items: [{
-                    id: 'edClass',
+                    id: 'edSearch',
                     xtype: 'combobox',
+                    displayField:'title',
                     store: classesStore,
                     labelWidth: 70,
-                    valueField:'id',
-                    displayField:'title',
+                    valueField:'searchName',
                     fieldLabel: label_CLASS,
                     editable: false
                 }, {
@@ -456,25 +1084,27 @@ Ext.onReady(function() {
                             console.log('datefield changed');
                         }
                     },
-                    format: 'd.m.Y'
+                    format: 'd.m.Y',
+                    value : today
                 }]
             },{
                 region: 'center',
                 height: '80%',
                 split: true,
                 html: '<div id="entity-editor-form"></div>',
-                tbar: [buttonShow, buttonXML, buttonShowXML]
+                tbar: [buttonShow, buttonXML, buttonShowXML, buttonDelete, buttonClose/*, buttonAdd*/]
             }]
         },{
             region: 'center',
+            width: "40%",
             split: true,
             items: [entityGrid],
             autoScroll:true
         },{
             id: "EntityEditorFormPanel",
-            xtype : 'panel',
+            xtype : 'form',
             region: 'east',
-            width: "20%",
+            width: "40%",
             collapsible: true,
             split:true,
             //preventHeader: true,
@@ -483,28 +1113,29 @@ Ext.onReady(function() {
                 anchor: '100%'
             },
             bodyPadding: '5 5 0',
-            autoScroll:true
+            autoScroll: true,
+            bbar: [
+                Ext.create('Ext.button.Button', {
+                    id: "btnConfirmChanges",
+                    text: label_CONFIRM_CHANGES,
+                    handler : function () {
+                        var form = Ext.getCmp('EntityEditorFormPanel');
+                        if (form.isValid()) {
+                            saveFormValues(FORM_EDIT);
+                        }
+                    }
+                })
+            ]
         }]
 
     });
 
     if (givenEntityId && givenRepDate && givenEntityId.length && givenRepDate.length
-            && givenEntityId != "null" && givenRepDate != "null") {
+        && givenEntityId != "null" && givenRepDate != "null") {
         var edDate = Ext.getCmp("edDate");
         edDate.setValue(givenRepDate);
 
-        entityStore.load({
-            params: {
-                op : 'LIST_ENTITY',
-                entityId: givenEntityId,
-                date: givenRepDate
-            },
-            callback: function(records, operation, success) {
-                if (!success) {
-                    Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
-                }
-            }
-        });
+        loadEntity(givenEntityId, givenRepDate);
     }
 
 });

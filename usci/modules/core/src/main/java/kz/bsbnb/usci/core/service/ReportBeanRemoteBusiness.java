@@ -15,6 +15,8 @@ public interface ReportBeanRemoteBusiness {
 
     Date getLastApprovedDate(long creditorId);
 
+    Date getLastReportDate(long creditorId);
+
     Report getReport(long creditorId, Date reportDate);
 
     Report getByCreditor_ReportDate(Creditor creditor, Date reportDate);

@@ -206,6 +206,11 @@
             <artifactId>drools-spring</artifactId>
             <version>${drools.version}</version>
         </dependency>
+        <dependency>
+            <groupId>kz.bsbnb.usci</groupId>
+            <artifactId>sync</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>
