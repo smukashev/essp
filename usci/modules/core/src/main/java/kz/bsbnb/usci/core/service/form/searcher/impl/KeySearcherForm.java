@@ -19,6 +19,7 @@ import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
 import kz.bsbnb.usci.eav.model.searchForm.impl.NonPaginableSearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
+import kz.bsbnb.usci.eav.persistance.dao.IRefProcessorDao;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.Pair;
@@ -39,6 +40,9 @@ public class KeySearcherForm implements ISearcherForm {
 
     @Autowired
     private IBaseEntityProcessorDao baseEntityProcessorDao;
+
+    @Autowired
+    private IRefProcessorDao refProcessorDao;
 
     @Autowired(required = false)
     private IRefLoadedListener refLoadedListener;
@@ -114,7 +118,7 @@ public class KeySearcherForm implements ISearcherForm {
         String ret = "<div class='leaf'> %s: <select id='ref-%d-%s-%s'>";
         ret = String.format(ret, ((MetaClass)metaClass).getClassTitle(), nextId(), metaClass.getClassName(), attr);
 
-        List<RefListItem> list = baseEntityProcessorDao.getRefsByMetaclassRaw(metaClass.getId());
+        List<RefListItem> list = refProcessorDao.getRefsByMetaclassRaw(metaClass.getId());
         if(refLoadedListener !=null)
             refLoadedListener.process(userId, metaClass, attr, list);
 
@@ -169,7 +173,18 @@ public class KeySearcherForm implements ISearcherForm {
                 BaseEntity childBaseEntity = new BaseEntity((MetaClass) itemMeta, new Date());
                 childBaseEntity.setId(Long.valueOf(parameterValue));
 
-                childBaseSet.put(BaseValueFactory.create(BaseContainerType.BASE_SET, itemMeta, b, 1, childBaseEntity));
+                childBaseSet.put(BaseValueFactory.create(
+                        BaseContainerType.BASE_SET,
+                        itemMeta,
+                        0,
+                        /* TODO set creditorId */ 0,
+                        b,
+                        1,
+                        new Date(),
+                        childBaseEntity,
+                        false,
+                        true
+                ));
                 value = childBaseSet;
             } else if(metaType.isComplex()) {
                 BaseEntity childBaseEntity = new BaseEntity((MetaClass) metaType, new Date());
@@ -184,10 +199,18 @@ public class KeySearcherForm implements ISearcherForm {
             baseEntity.put(attribute, BaseValueFactory.create(
                     BaseContainerType.BASE_ENTITY,
                     metaAttribute.getMetaType(),
-                    b, 1, value));
+                    0,
+                    /* TODO set creditorId */ 0,
+                    b,
+                    1,
+                    new Date(),
+                    value,
+                    false,
+                    true
+                ));
         }
 
-        Long id = searcher.findSingle(baseEntity);
+        Long id = searcher.findSingle(baseEntity, /* TODO set creditorId */ 0);
         baseEntity.setId(id);
         ret.setData(Arrays.asList(new BaseEntity[]{baseEntity}));
         return ret;
