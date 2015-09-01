@@ -557,8 +557,7 @@ public class ProtocolLayout extends VerticalLayout {
         if (!inputInfoList.isEmpty()) {
             filesTableLayout.setVisible(true);
         } else {
-            MessageBox.Show(Localization.MESSAGE_NO_DATA.getValue(),
-                    "Message", null, MessageBoxButtons.OK, MessageBoxType.Information, getWindow());
+            MessageBox.Show(Localization.MESSAGE_NO_DATA.getValue(), getWindow());
         }
     }
 
