@@ -21,6 +21,8 @@ import com.bsbnb.usci.portlets.protocol.data.SharedDisplayBean;
 import com.bsbnb.usci.portlets.protocol.export.XlsProtocolExporter;
 import com.bsbnb.usci.portlets.protocol.export.XmlProtocolExporter;
 import com.bsbnb.usci.portlets.protocol.export.ZippedProtocolExporter;
+import com.bsbnb.vaadin.messagebox.MessageBoxButtons;
+import com.bsbnb.vaadin.messagebox.MessageBoxType;
 import jxl.write.WriteException;
 import com.bsbnb.usci.portlets.protocol.data.DataProvider;
 import com.bsbnb.usci.portlets.protocol.data.ProtocolDisplayBean;
@@ -555,7 +557,8 @@ public class ProtocolLayout extends VerticalLayout {
         if (!inputInfoList.isEmpty()) {
             filesTableLayout.setVisible(true);
         } else {
-            MessageBox.Show(Localization.MESSAGE_NO_DATA.getValue(), getWindow());
+            MessageBox.Show(Localization.MESSAGE_NO_DATA.getValue(),
+                    "Message", null, MessageBoxButtons.OK, MessageBoxType.Information, getWindow());
         }
     }
 
