@@ -172,7 +172,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     break;
                 case CLOSE:
                     if (baseEntityPostPrepared.getId() <= 0)
-                        throw new RuntimeException("Сущность для закрытия не найдена;");
+                        throw new UnsupportedOperationException("Сущность для закрытия не найдена;");
 
                     IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool.getPersistableDao(
                             BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
@@ -180,8 +180,17 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     boolean reportDateExists = baseEntityReportDateDao.exists(baseEntityPostPrepared.getId(),
                             baseEntityPostPrepared.getReportDate());
 
-                    IBaseEntityReportDate baseEntityReportDate = baseEntityPostPrepared.getBaseEntityReportDate();
-                    baseEntityPostPrepared.calculateValueCount();
+                    IBaseEntityReportDate baseEntityReportDate;
+
+                    if (reportDateExists) {
+                        baseEntityReportDate = baseEntityReportDateDao.load(baseEntityPostPrepared.getId(),
+                                baseEntityPostPrepared.getReportDate());
+
+                        baseEntityReportDate.setBaseEntity(baseEntityPostPrepared);
+                    } else {
+                        baseEntityReportDate = baseEntityPostPrepared.getBaseEntityReportDate();
+                        baseEntityPostPrepared.calculateValueCount();
+                    }
 
                     baseEntityReportDate.setClosed(true);
 
