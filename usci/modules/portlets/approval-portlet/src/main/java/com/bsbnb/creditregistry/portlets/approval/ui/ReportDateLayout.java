@@ -121,7 +121,7 @@ public class ReportDateLayout extends VerticalLayout {
         Date lastReportDate = provider.getLastReportDate(creditor);
 
 //        if (provider.getReport(creditor, nextReportDate) != null || nextReportDate.equals(currentReportDate)) {
-        if (!nextReportDate.after(lastReportDate)) {
+        if (lastReportDate != null && !nextReportDate.after(lastReportDate)) {
             final Button nextReportDateLink = new Button(DEFAULT_DATE_FORMAT.format(calendar.getTime()), new Button.ClickListener() {
                 public void buttonClick(Button.ClickEvent event) {
                     loadReportDate(nextReportDate);

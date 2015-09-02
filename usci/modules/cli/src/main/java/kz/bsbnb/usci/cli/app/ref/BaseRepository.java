@@ -29,12 +29,12 @@ import java.util.List;
  */
 public class BaseRepository implements  Runnable
 {
-     private final String startDate = "01.04.2013";
-     private final String endDate = "01.05.2015";
+     private final String startDate = "01.12.2014";
+     private final String endDate = "01.12.2014";
 
      private static Connection connection;
      private static Statement statement;
-     protected static String repDate = "01.02.2015";
+     protected static String repDate;
 
      public void saveXml(String[] lookup, ResultSet rows, String path){
          try {
@@ -81,6 +81,8 @@ public class BaseRepository implements  Runnable
 
         guaranteeNotTooLong(startDate, endDate);
 
+        String exclusiveEndDate = getNextRepDate(endDate);
+
         int mo = (startDate.charAt(3) - '0' )* 10 + (startDate.charAt(4) - '0');
         int year = 2000 + (startDate.charAt(8) - '0') * 10 + (startDate.charAt(9) - '0');
         String curDate = startDate;
@@ -125,19 +127,9 @@ public class BaseRepository implements  Runnable
             new DRTCrawler().work();
             new BADRTCrawler().work();
 
-            mo ++;
-            if(mo == 13) {
-                mo = 1;
-                year ++;
-            }
-
-            curDate = "01." + mo / 10 + "" + mo % 10 + "." + year;
-
-            if(oneMore)
+            curDate = getNextRepDate(curDate);
+            if(curDate.equals(exclusiveEndDate))
                 break;
-
-            oneMore = curDate.equals(endDate);
-
         }
     }
 
@@ -171,6 +163,15 @@ public class BaseRepository implements  Runnable
         throw new RuntimeException("too long period given");
     }
 
+    public String getNextRepDate(String date){
+        int mo = (date.charAt(3) - '0' )* 10 + (date.charAt(4) - '0');
+        int year = 2000 + (date.charAt(8) - '0') * 10 + (date.charAt(9) - '0');
+        mo = mo + 1 < 13 ? mo + 1 : 1;
+        if(mo == 1) year ++;
+
+        return "01." + mo / 10 + "" + mo % 10 + "." + year;
+    }
+
     public static void main( String[] args )
     {
         new BaseRepository().run();
@@ -179,7 +180,7 @@ public class BaseRepository implements  Runnable
     public static Statement getStatement(){
         try {
             if(connection == null){
-                    connection = DriverManager.getConnection("jdbc:oracle:thin:@10.10.20.44:1521:CREDITS", "core","core_sep_2014");
+                    connection = DriverManager.getConnection("jdbc:oracle:thin:@170.7.15.97:1521:CREDITS", "core","core_aug_2015");
                     return statement = connection.createStatement();
             }
 
