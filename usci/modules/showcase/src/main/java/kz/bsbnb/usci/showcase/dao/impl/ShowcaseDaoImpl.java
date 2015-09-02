@@ -253,7 +253,10 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             indexRD.addColumn(new IndexColumn("REP_DATE"));
             table.addIndex(indexRD);
         }
-
+        for(Index index:  showcaseHolder.getShowCaseMeta().getIndexes())
+        {
+            table.addIndex(index);
+        }
         model.addTable(table);
 
         Platform platform = PlatformFactory.createNewPlatformInstance(jdbcTemplateSC.getDataSource());

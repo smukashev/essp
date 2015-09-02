@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav.showcase;
 
+
+import kz.bsbnb.ddlutils.model.Index;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -18,6 +20,7 @@ public class ShowCase extends Persistable {
 
     private ArrayList<ShowCaseField> fields = new ArrayList<ShowCaseField>();
     private ArrayList<ShowCaseField> customFields = new ArrayList<ShowCaseField>();
+    private ArrayList<Index> Indexes = new ArrayList<Index>();
 
     public ShowCase() {
         super();
@@ -70,6 +73,10 @@ public class ShowCase extends Persistable {
     public void addCustomField(ShowCaseField field) {
         customFields.add(field);
     }
+
+    public void addIndex(Index index) {Indexes.add(index);}
+
+    public ArrayList<Index> getIndexes() { return  Indexes;}
 
     public boolean isFinal() {
         return isFinal;

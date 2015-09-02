@@ -86,8 +86,8 @@ public class MessageBox extends Window implements Button.ClickListener {
             case Error:
                 iconName = "cancel";
                 break;
-            default:
-                throw new UnsupportedOperationException("Тип не поддерживается(" + type + ");");
+//            default:
+//                throw new UnsupportedOperationException("Тип не поддерживается(" + type + ");");
         }
         if (iconName.length() > 0) {
             icon = new Embedded("", new ThemeResource("../runo/icons/32/" + iconName + ".png"));

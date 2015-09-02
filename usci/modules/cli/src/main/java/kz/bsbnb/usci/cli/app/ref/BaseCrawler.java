@@ -48,9 +48,6 @@ public class BaseCrawler {
 
     public void work(){
 
-//        fileName = "C:\\refs\\";
-        fileName = "/home/maksat/ref_imports_generated/";
-
         try {
             rootElement = getDocument().createElement("batch");
             getDocument().appendChild(rootElement);
