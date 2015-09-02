@@ -63,8 +63,18 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 } else if (queueEntry.getBaseEntityApplied().getOperation() == OperationType.NEW) {
                     throw new UnsupportedOperationException("Operation new not supported in showcase");
                 } else if (queueEntry.getBaseEntityApplied().getOperation() == OperationType.CLOSE) {
-                    throw new UnsupportedOperationException("Operation close not supported in showcase");
-                } else { // insert and update operations are here
+                    for (ShowcaseHolder holder : holders) {
+                        if (!holder.getShowCaseMeta().getMeta().getClassName()
+                                .equals(queueEntry.getBaseEntityApplied().getMeta().getClassName()))
+                            continue;
+
+                        if (scId == null || scId == 0L || scId == holder.getShowCaseMeta().getId()  &&
+                                holder.getShowCaseMeta().getDownPath() != null &&
+                                holder.getShowCaseMeta().getDownPath().length() > 0) {
+                            System.out.println(holder.getShowCaseMeta().getActualMeta());
+                        }
+                    }
+                } else {
                     boolean found = false;
 
                     for (ShowcaseHolder holder : holders) {
@@ -120,6 +130,21 @@ public class ShowcaseMessageConsumer implements MessageListener {
         @Override
         public void run() {
             showcaseDao.generate(entity, holder);
+        }
+    }
+
+    private class CloseGenerator implements Runnable {
+        private IBaseEntity entity;
+        private ShowcaseHolder holder;
+
+        public CloseGenerator(IBaseEntity entity, ShowcaseHolder holder) {
+            this.entity = entity;
+            this.holder = holder;
+        }
+
+        @Override
+        public void run() {
+
         }
     }
 }

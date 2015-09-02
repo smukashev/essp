@@ -56,7 +56,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), minReportDate, reportDateSaving);
 
                 if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
-                    throw new UnsupportedOperationException("Сущность с ID(" + baseEntityLoaded.getId() +
+                    throw new UnsupportedOperationException("Запись с ID(" + baseEntityLoaded.getId() +
                             ") является закрытой с даты " + baseEntityLoaded.getBaseEntityReportDate().getReportDate()
                             + ". Обновление после закрытия сущностей не является возможным;");
 
@@ -66,7 +66,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), maxReportDate, reportDateSaving);
 
                 if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
-                    throw new UnsupportedOperationException("Сущность с ID(" + baseEntityLoaded.getId() +
+                    throw new UnsupportedOperationException("Запись с ID(" + baseEntityLoaded.getId() +
                             ") является закрытой с даты " + baseEntityLoaded.getBaseEntityReportDate().getReportDate()
                             + ". Обновление после закрытия сущностей не является возможным;");
 
@@ -77,8 +77,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         if (entityHolder != null) {
             entityHolder.setSaving(baseEntitySaving);
-            entityHolder.setLoaded(baseEntityLoaded);
-            entityHolder.setApplied(baseEntityApplied);
+            // entityHolder.setLoaded(baseEntityLoaded);
+            // entityHolder.setApplied(baseEntityApplied);
         }
 
         return baseEntityApplied;
@@ -117,16 +117,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     public void applyBaseValueBasic(long creditorId, IBaseEntity baseEntityApplied, IBaseValue baseValue,
                                     IBaseEntityManager baseEntityManager) {
         if (baseValue.getValue() == null)
-            throw new RuntimeException("Значение атрибута не может быть NULL;");
+            throw new IllegalStateException("Значение атрибута не может быть NULL;");
 
 
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new RuntimeException("Атрибут должен содержать мета данные;");
+            throw new IllegalStateException("Атрибут должен содержать мета данные;");
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer != null && baseContainer.getBaseContainerType() != BaseContainerType.BASE_ENTITY)
-            throw new RuntimeException("Родитель атрибута(" + baseValue.getMetaAttribute().getName() +
+            throw new IllegalStateException("Родитель атрибута(" + baseValue.getMetaAttribute().getName() +
                     ") должна быть сущность;");
 
         IMetaType metaType = metaAttribute.getMetaType();
@@ -144,7 +144,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     if (metaAttribute.isImmutable() && childBaseEntity.getValueCount() != 0 &&
                             childBaseEntity.getId() < 1)
-                        throw new UnsupportedOperationException("Сущность класса " +
+                        throw new UnsupportedOperationException("Запись класса " +
                                 childBaseEntity.getMeta().getClassName() + " не найдена;" +
                                 "\n" + childBaseEntity.toString());
 
@@ -188,7 +188,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     if (childBaseEntity.getValueCount() != 0) {
                         if (childBaseEntity.getId() < 1)
-                            throw new UnsupportedOperationException("Сущность класса " +
+                            throw new UnsupportedOperationException("Запись класса " +
                                     childBaseEntity.getMeta().getClassName() + " не найдена;" +
                                     "\n" + childBaseEntity.toString());
 
@@ -196,7 +196,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 childBaseEntity.getId(), childBaseEntity.getReportDate());
 
                         if (childBaseEntityImmutable == null)
-                            throw new RuntimeException("В базе нет данных для сущности(" + childBaseEntity.getId()
+                            throw new RuntimeException("В базе нет данных для записи(" + childBaseEntity.getId()
                                     + ") до отчетной даты(включительно): " + childBaseEntity.getReportDate() + ";");
 
                         IBaseValue baseValueApplied = BaseValueFactory.create(
@@ -213,6 +213,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
                         baseEntityManager.registerAsInserted(baseValueApplied);
+                    } else {
+                        throw new IllegalStateException("Комплексный элелемент не содержит внутренних элементов(" +
+                            childBaseEntity.getMeta().getClassName() + ");");
                     }
                 } else {
                     IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
@@ -848,7 +851,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1) {
-                        throw new UnsupportedOperationException("Сущность класса " +
+                        throw new UnsupportedOperationException("Запись класса " +
                                 baseEntitySaving.getMeta().getClassName() + " не найдена;" +
                                 "\n" + baseEntitySaving.toString());
                     }
@@ -886,7 +889,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1)
-                        throw new UnsupportedOperationException("Сущность класса " +
+                        throw new UnsupportedOperationException("Запись класса " +
                                 baseEntitySaving.getMeta().getClassName() + " не найдена;" +
                                 "\n" + baseEntitySaving.toString());
 
@@ -1024,7 +1027,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
                             if (baseEntitySaving.getId() < 1)
-                                throw new UnsupportedOperationException("Сущность класса " +
+                                throw new UnsupportedOperationException("Запись класса " +
                                         baseEntitySaving.getMeta().getClassName() + " не найдена;" +
                                         "\n" + baseEntitySaving.toString());
 
@@ -1053,7 +1056,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
                             if (baseEntitySaving.getId() < 1)
-                                throw new UnsupportedOperationException("Сущность класса " +
+                                throw new UnsupportedOperationException("Запись класса " +
                                         baseEntitySaving.getMeta().getClassName() + " не найдена;" +
                                         "\n" + baseEntitySaving.toString());
 
@@ -1082,7 +1085,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1)
-                        throw new UnsupportedOperationException("Сущность класса " +
+                        throw new UnsupportedOperationException("Запись класса " +
                                 baseEntitySaving.getMeta().getClassName() + " не найдена;" +
                                 "\n" + baseEntitySaving.toString());
 
