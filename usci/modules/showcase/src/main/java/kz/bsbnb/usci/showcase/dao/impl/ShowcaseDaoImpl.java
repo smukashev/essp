@@ -424,6 +424,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         return rows;
     }
 
+    @SuppressWarnings("unchecked")
     @Transactional
     public void generate(IBaseEntity globalEntity, ShowcaseHolder showcaseHolder) {
         List<BaseEntity> all;
@@ -436,21 +437,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         } else {
             dbCarteageGenerate(globalEntity, globalEntity, showcaseHolder);
         }
-    }
-
-    private Object[] getObjectArray(boolean reverse, Object[] elementArray, Object... elements) {
-        Object[] newObjectArray = new Object[elementArray.length + elements.length];
-
-        int index = 0;
-        if (!reverse) {
-            for (Object object : elementArray) newObjectArray[index++] = object;
-            for (Object object : elements) newObjectArray[index++] = object;
-        } else {
-            for (Object object : elements) newObjectArray[index++] = object;
-            for (Object object : elementArray) newObjectArray[index++] = object;
-        }
-
-        return newObjectArray;
     }
 
     @Transactional
@@ -580,6 +566,21 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 carteageElements.remove(showcaseHolder.getShowCaseMeta().getId());
             }
         }
+    }
+
+    private Object[] getObjectArray(boolean reverse, Object[] elementArray, Object... elements) {
+        Object[] newObjectArray = new Object[elementArray.length + elements.length];
+
+        int index = 0;
+        if (!reverse) {
+            for (Object object : elementArray) newObjectArray[index++] = object;
+            for (Object object : elements) newObjectArray[index++] = object;
+        } else {
+            for (Object object : elements) newObjectArray[index++] = object;
+            for (Object object : elementArray) newObjectArray[index++] = object;
+        }
+
+        return newObjectArray;
     }
 
     private HashMap<String, HashSet<PathElement>> generatePaths(IBaseEntity entity, ShowcaseHolder showcaseHolder, HashSet<PathElement> keyPaths) {

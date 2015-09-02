@@ -33,11 +33,13 @@ public class BatchStatusDaoImpl extends JDBCSupport implements IBatchStatusDao {
         Insert insert = context.insertInto(EAV_BATCH_STATUSES,
                 EAV_BATCH_STATUSES.BATCH_ID,
                 EAV_BATCH_STATUSES.STATUS_ID,
-                EAV_BATCH_STATUSES.RECEIPT_DATE
+                EAV_BATCH_STATUSES.RECEIPT_DATE,
+                EAV_BATCH_STATUSES.DESCRIPTION
         ).values(
                 batchStatus.getBatchId(),
                 batchStatus.getStatusId(),
-                DataUtils.convertToTimestamp(batchStatus.getReceiptDate())
+                DataUtils.convertToTimestamp(batchStatus.getReceiptDate()),
+                batchStatus.getDescription()
         );
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
