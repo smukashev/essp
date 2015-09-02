@@ -1899,7 +1899,7 @@ public class CLI {
 
             ruleBatchServiceFactoryBean = new RmiProxyFactoryBean();
             ruleBatchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService");
-            ruleBatchServiceFactoryBean.setServiceInterface(IBatchService.class);
+            ruleBatchServiceFactoryBean.setServiceInterface(kz.bsbnb.usci.brms.rulesvr.service.IBatchService.class);
 
             ruleBatchServiceFactoryBean.afterPropertiesSet();
             ruleBatchService = (kz.bsbnb.usci.brms.rulesvr.service.IBatchService) ruleBatchServiceFactoryBean.getObject();
