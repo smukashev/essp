@@ -72,8 +72,6 @@ public class ShowcaseMessageConsumer implements MessageListener {
                             queueEntry.getBaseEntityApplied().getMeta().getClassName());
 
                     showcaseDao.deleteById(h, queueEntry.getBaseEntityApplied());
-                } else if (operationType == OperationType.NEW) {
-                    throw new UnsupportedOperationException("Operation new not supported in showcase");
                 } else if (operationType == OperationType.CLOSE) {
                     showcaseDao.closeEntities(scId, queueEntry.getBaseEntityApplied(), holders);
                 } else {
@@ -132,21 +130,6 @@ public class ShowcaseMessageConsumer implements MessageListener {
         @Override
         public void run() {
             showcaseDao.generate(entity, holder);
-        }
-    }
-
-    private class CloseGenerator implements Runnable {
-        private IBaseEntity entity;
-        private ShowcaseHolder holder;
-
-        public CloseGenerator(IBaseEntity entity, ShowcaseHolder holder) {
-            this.entity = entity;
-            this.holder = holder;
-        }
-
-        @Override
-        public void run() {
-
         }
     }
 }
