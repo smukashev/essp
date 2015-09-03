@@ -76,9 +76,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         }
 
         if (entityHolder != null) {
-            entityHolder.setSaving(baseEntitySaving);
+            // entityHolder.setSaving(baseEntitySaving);
             // entityHolder.setLoaded(baseEntityLoaded);
-            // entityHolder.setApplied(baseEntityApplied);
+            entityHolder.setApplied(baseEntityApplied);
         }
 
         return baseEntityApplied;

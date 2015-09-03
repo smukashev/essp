@@ -34,6 +34,8 @@ public interface ShowcaseDao {
 
     Long insertBadEntity(Long entityId, Long scId, Date report_date, String strackTrace, String message);
 
+    void closeEntities(Long scId, IBaseEntity entity, List<ShowcaseHolder> holders);
+
     @Transactional
     List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate);
 }
