@@ -147,6 +147,18 @@ function createMetaClassTree(classId, className) {
         useArrows: true,
         listeners : {
             itemcontextmenu: function(view, record, item, index, event, eOpts) {
+                var tree = Ext.getCmp('metaTreeView');
+                var selectedNode = tree.getSelectionModel().getLastSelected();
+                if(selectedNode.data.id==currentClassId)
+                {
+                    metaTreeMenu.getComponent('mtm-del').disable(true);
+                    metaTreeMenu.getComponent('mtm-edit').disable(true);
+                }
+                else
+                {
+                    metaTreeMenu.getComponent('mtm-del').enable(true);
+                    metaTreeMenu.getComponent('mtm-edit').enable(true);
+                }
                 metaTreeMenu.showAt(event.getXY());
                 event.stopEvent();
             }
