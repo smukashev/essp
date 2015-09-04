@@ -359,6 +359,59 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     @Transactional
+    public synchronized void closeEntities(Long scId, IBaseEntity entity, List<ShowcaseHolder> holders) {
+        for (ShowcaseHolder holder : holders) {
+            if (!holder.getShowCaseMeta().getMeta().getClassName().equals(entity.getMeta().getClassName()))
+                continue;
+
+            if (scId == null || scId == 0L || scId == holder.getShowCaseMeta().getId()) {
+                if (holder.getShowCaseMeta().getDownPath() == null ||
+                        holder.getShowCaseMeta().getDownPath().length() == 0) {
+                    closeEntity(entity, holder);
+                }
+            }
+        }
+    }
+
+    @Transactional
+    private void closeEntity(IBaseEntity entity, ShowcaseHolder holder) {
+        String sql;
+
+        sql = "UPDATE %s SET close_date = ? WHERE " + holder.getRootClassName() + "_id = ?";
+        sql = String.format(sql, getActualTableName(holder.getShowCaseMeta()),
+                COLUMN_PREFIX, holder.getRootClassName());
+
+        jdbcTemplateSC.update(sql, entity.getBaseEntityReportDate().getReportDate(), entity.getId());
+
+        StringBuilder select = new StringBuilder();
+        StringBuilder sqlBuilder = new StringBuilder("INSERT INTO %s");
+
+        select.append(COLUMN_PREFIX).append(holder.getRootClassName()).append("_id, ");
+
+        for (ShowCaseField sf : holder.getShowCaseMeta().getFieldsList())
+            select.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
+
+        for (ShowCaseField sf : holder.getShowCaseMeta().getCustomFieldsList())
+            select.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
+
+        select.append("cdc, open_date, close_date ");
+        sqlBuilder.append("(").append(select).append(")( SELECT ")
+                .append(select).append("FROM %s WHERE " + holder.getRootClassName() + "_id = ?)");
+
+        String sqlResult = String.format(sqlBuilder.toString(), getHistoryTableName(holder.getShowCaseMeta()),
+                getActualTableName(holder.getShowCaseMeta()), COLUMN_PREFIX,
+                holder.getRootClassName());
+
+        jdbcTemplateSC.update(sqlResult, entity.getId());
+
+        sql = "DELETE FROM %s WHERE " + holder.getRootClassName() + "_id = ?";
+        sql = String.format(sql, getActualTableName(holder.getShowCaseMeta()),
+                COLUMN_PREFIX, holder.getRootClassName());
+
+        jdbcTemplateSC.update(sql, entity.getId());
+    }
+
+    @Transactional
     private void moveActualMapToHistory(KeyData keyData, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
         StringBuilder select = new StringBuilder();
         StringBuilder sql = new StringBuilder("INSERT INTO %s");

@@ -15,14 +15,10 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Component
 public class ShowcaseMessageConsumer implements MessageListener {
@@ -49,22 +45,36 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 return;
             }
 
+            if (queueEntry.getBaseEntityApplied() == null) {
+                System.err.println("Переданный объект пустой;");
+                return;
+            }
+
             Long scId = queueEntry.getScId();
 
             try {
                 ArrayList<Future> futures = new ArrayList<>();
                 List<ShowcaseHolder> holders = showcaseDao.getHolders();
 
-                if (queueEntry.getBaseEntityApplied().getOperation() == OperationType.DELETE) {
+                if (holders.size() == 0)
+                    throw new IllegalStateException("Необходимо создать витрины;");
+
+                OperationType operationType;
+
+                if (queueEntry.getBaseEntityApplied().getOperation() != null) {
+                    operationType = queueEntry.getBaseEntityApplied().getOperation();
+                } else {
+                    operationType = OperationType.INSERT;
+                }
+
+                if (operationType == OperationType.DELETE) {
                     ShowcaseHolder h = showcaseDao.getHolderByClassName(
                             queueEntry.getBaseEntityApplied().getMeta().getClassName());
 
                     showcaseDao.deleteById(h, queueEntry.getBaseEntityApplied());
-                } else if (queueEntry.getBaseEntityApplied().getOperation() == OperationType.NEW) {
-                    throw new UnsupportedOperationException("Operation new not supported in showcase");
-                } else if (queueEntry.getBaseEntityApplied().getOperation() == OperationType.CLOSE) {
-                    throw new UnsupportedOperationException("Operation close not supported in showcase");
-                } else { // insert and update operations are here
+                } else if (operationType == OperationType.CLOSE) {
+                    showcaseDao.closeEntities(scId, queueEntry.getBaseEntityApplied(), holders);
+                } else {
                     boolean found = false;
 
                     for (ShowcaseHolder holder : holders) {

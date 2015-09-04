@@ -176,6 +176,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool.getPersistableDao(
                             BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
+                    if (baseEntityReportDateDao.getMinReportDate(baseEntityPostPrepared.getId()).equals(
+                            baseEntityPostPrepared.getReportDate()))
+                        throw new IllegalStateException("Дата закрытия не может быть одинаковой с датой открытия;");
+
+
                     boolean reportDateExists = baseEntityReportDateDao.exists(baseEntityPostPrepared.getId(),
                             baseEntityPostPrepared.getReportDate());
 
