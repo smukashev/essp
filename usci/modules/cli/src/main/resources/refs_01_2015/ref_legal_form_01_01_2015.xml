@@ -1,115 +1,115 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
   <entities>
-    <entity class="ref_legal_form">
+    <ref_legal_form>
       <code>14</code>
       <name_kz>Национальные управляющие холдинги, национальные холдинги, национальные компании и иные государственные акционерные общества</name_kz>
       <name_ru>Национальные управляющие холдинги, национальные холдинги, национальные компании и иные государственные акционерные общества</name_ru>
       <short_name_kz>АО</short_name_kz>
       <short_name_ru>АО</short_name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>12</code>
       <name_kz> Религиозное объединение</name_kz>
       <name_ru> Религиозное объединение</name_ru>
       <short_name_kz>РО</short_name_kz>
       <short_name_ru>РО</short_name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>13</code>
       <name_kz>Объединение юридических лиц в форме ассоциации (союза)</name_kz>
       <name_ru>Объединение юридических лиц в форме ассоциации (союза)</name_ru>
       <short_name_kz>ОЮЛ</short_name_kz>
       <short_name_ru>ОЮЛ</short_name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>10</code>
       <name_kz>Қор</name_kz>
       <name_ru>Фонд</name_ru>
       <short_name_kz>Қор</short_name_kz>
       <short_name_ru>Фонд</short_name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>11</code>
       <name_kz>Потребительский кооператив</name_kz>
       <name_ru>Потребительский кооператив</name_ru>
       <short_name_kz>ПК</short_name_kz>
       <short_name_ru>ПК</short_name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>03</code>
       <name_kz>Иные товарищества с ограниченной ответственностью</name_kz>
       <name_ru>Иные товарищества с ограниченной ответственностью</name_ru>
       <short_name_kz>ТОО</short_name_kz>
       <short_name_ru>ТОО</short_name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>15</code>
       <name_kz>Государственные товарищества с ограниченной ответственностью</name_kz>
       <name_ru>Государственные товарищества с ограниченной ответственностью</name_ru>
       <short_name_kz>ЖШС</short_name_kz>
       <short_name_ru>ТОО</short_name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>02</code>
       <name_kz>Коммандитное товарищество</name_kz>
       <name_ru>Коммандитное товарищество</name_ru>
       <short_name_kz>КТ</short_name_kz>
       <short_name_ru>КТ</short_name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>01</code>
       <name_kz>Полное товарищество</name_kz>
       <name_ru>Полное товарищество</name_ru>
       <short_name_kz>ПТ</short_name_kz>
       <short_name_ru>ПТ</short_name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>09</code>
       <name_kz>Общественное объединение</name_kz>
       <name_ru>Общественное объединение</name_ru>
       <short_name_kz>ОО</short_name_kz>
       <short_name_ru>ОО</short_name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>60</code>
       <name_kz>Иные организационно-правовые формы некоммерческой организации</name_kz>
       <name_ru>Иные организационно-правовые формы некоммерческой организации</name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>07</code>
       <name_kz>Государственные предприятия на праве хозяйственного ведения и на праве  оперативного управления (казенные)</name_kz>
       <name_ru>Государственные предприятия на праве хозяйственного ведения и на праве  оперативного управления (казенные)</name_ru>
       <short_name_kz>ГПХВ, ГПОУ</short_name_kz>
       <short_name_ru>ГПХВ, ГПОУ</short_name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>06</code>
       <name_kz>Производственный кооператив</name_kz>
       <name_ru>Производственный кооператив</name_ru>
       <short_name_kz>ПК</short_name_kz>
       <short_name_ru>ПК</short_name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>05</code>
       <name_kz>Иные акционерные общества</name_kz>
       <name_ru>Иные акционерные общества</name_ru>
       <short_name_kz>АО</short_name_kz>
       <short_name_ru>АО</short_name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>04</code>
       <name_kz>Товарищество с дополнительной ответственностью</name_kz>
       <name_ru>Товарищество с дополнительной ответственностью</name_ru>
       <short_name_kz>ТДО</short_name_kz>
       <short_name_ru>ТДО</short_name_ru>
-    </entity>
-    <entity class="ref_legal_form">
+    </ref_legal_form>
+    <ref_legal_form>
       <code>08</code>
       <name_kz>Учреждение</name_kz>
       <name_ru>Учреждение</name_ru>
       <short_name_kz>У</short_name_kz>
       <short_name_ru>У</short_name_ru>
-    </entity>
+    </ref_legal_form>
   </entities>
 </batch>
