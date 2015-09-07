@@ -2,13 +2,13 @@ package kz.bsbnb.usci.cli.app;
 
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import org.apache.log4j.Logger;
@@ -32,16 +32,65 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Stack;
 
-//TODO: merge with StaxEventEntityReader from receiver
 public class CLIXMLReader {
-    /////////////////////////
     public static final String DATE_FORMAT = "dd.MM.yyyy";
     protected DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-
-    private IMetaClassRepository metaClassRepository;
-
     protected XMLEventReader xmlEventReader;
+    private IMetaClassRepository metaClassRepository;
     private Date reportDate;
+    private FileInputStream inputStream;
+    private Logger logger = Logger.getLogger(CLIXMLReader.class);
+    private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
+    private Stack<Boolean> flagsStack = new Stack<Boolean>();
+    private IBaseContainer currentContainer;
+    private Batch batch;
+    private Long index = 1L, level = 0L;
+    private boolean hasMembers = false;
+    private boolean rootEntityExpected = false;
+    private String currentRootMeta = null;
+
+    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService,
+                        Date repDate) {
+        logger.info("Reader init.");
+        metaClassRepository = metaRepo;
+        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
+
+        try {
+            xmlEventReader = inputFactory.createXMLEventReader(inputStream);
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+        }
+
+        this.reportDate = repDate;
+
+        batch = new Batch(reportDate, 1L);
+
+        batchService.save(batch);
+    }
+
+    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate)
+            throws FileNotFoundException {
+        logger.info("Reader init.");
+        metaClassRepository = metaRepo;
+
+        inputStream = new FileInputStream(fileName);
+        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
+
+        try {
+            xmlEventReader = inputFactory.createXMLEventReader(inputStream);
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+        }
+
+        this.reportDate = repDate;
+
+        batch = new Batch(reportDate, 1L);
+
+        long batchId = batchService.save(batch);
+        batch.setId(batchId);
+    }
 
     public Object getCastObject(DataTypes typeCode, String value) {
         switch (typeCode) {
@@ -74,65 +123,8 @@ public class CLIXMLReader {
         }
     }
 
-
-    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate) {
-        logger.info("Reader init.");
-        metaClassRepository = metaRepo;
-        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-        inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
-
-        try {
-            xmlEventReader = inputFactory.createXMLEventReader(inputStream);
-        } catch (XMLStreamException e) {
-            e.printStackTrace();
-        }
-
-        this.reportDate = repDate;
-
-        batch = new Batch(reportDate, 1L);
-
-        batchService.save(batch);
-    }
-
-    private FileInputStream inputStream;
-
-    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate) throws FileNotFoundException {
-        logger.info("Reader init.");
-        metaClassRepository = metaRepo;
-
-        inputStream = new FileInputStream(fileName);
-        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-        inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
-
-        try {
-            xmlEventReader = inputFactory.createXMLEventReader(inputStream);
-        } catch (XMLStreamException e) {
-            e.printStackTrace();
-        }
-
-        this.reportDate = repDate;
-
-        batch = new Batch(reportDate, 1L);
-
-        long batchId = batchService.save(batch);
-        batch.setId(batchId);
-    }
-
-    /////////////////////////
-    private Logger logger = Logger.getLogger(CLIXMLReader.class);
-    private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
-    private Stack<Boolean> flagsStack = new Stack<Boolean>();
-    private IBaseContainer currentContainer;
-    private Batch batch;
-    private Long index = 1L, level = 0L;
-
-    private boolean hasMembers = false;
-
-    private boolean rootEntityExpected = false;
-    private String currentRootMeta = null;
-
-    private boolean hasOperationDelete(StartElement startElement){
-        return startElement.getAttributeByName(new QName("operation"))!=null &&
+    private boolean hasOperationDelete(StartElement startElement) {
+        return startElement.getAttributeByName(new QName("operation")) != null &&
                 startElement.getAttributeByName(new QName("operation")).getValue()
                         .equalsIgnoreCase(OperationType.DELETE.toString());
     }
@@ -166,9 +158,6 @@ public class CLIXMLReader {
 
             if (hasOperationClose(startElement))
                 baseEntity.setOperation(OperationType.CLOSE);
-
-            if (hasOperationNew(startElement))
-                baseEntity.setOperation(OperationType.NEW);
 
             currentContainer = baseEntity;
         } else {
@@ -212,16 +201,28 @@ public class CLIXMLReader {
                     memberName += "_" + currentContainer.getValueCount();
                 }
 
-                currentContainer.put(memberName, BaseValueFactory
-                        .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch, index,
-                                batch.getRepDate(), obj, false, true));
+                IBaseValue baseValue = BaseValueFactory
+                        .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch,
+                                index, batch.getRepDate(), obj, false, true);
+
+                if (hasOperationNew(startElement)) {
+                    IBaseValue newBaseValue = BaseValueFactory.create(currentContainer.getBaseContainerType(),
+                            metaType, 0, -1, batch, index, batch.getRepDate(),
+                            getCastObject(metaValue.getTypeCode(),
+                                    startElement.getAttributeByName(new QName("data")).getValue()), false, true);
+
+                    baseValue.setNewBaseValue(newBaseValue);
+                }
+
+                currentContainer.put(memberName, baseValue);
 
                 level++;
             }
         }
     }
 
-    public BaseEntity read() throws UnexpectedInputException, org.springframework.batch.item.ParseException, NonTransientResourceException {
+    public BaseEntity read() throws UnexpectedInputException, org.springframework.batch.item.ParseException,
+            NonTransientResourceException {
         while (xmlEventReader.hasNext()) {
             XMLEvent event = (XMLEvent) xmlEventReader.next();
 
@@ -267,7 +268,7 @@ public class CLIXMLReader {
             currentContainer = null;
             return true;
         } else if (localName.equals("entity")) {
-        } else if(localName.equals(currentRootMeta)) {
+        } else if (localName.equals(currentRootMeta)) {
             rootEntityExpected = true;
             index++;
             return true;

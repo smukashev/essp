@@ -168,20 +168,33 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
                     entityHolder.setApplied(baseEntityApplied);
-                    entityHolder.setSaving(baseEntityPostPrepared);
                     break;
                 case CLOSE:
                     if (baseEntityPostPrepared.getId() <= 0)
-                        throw new RuntimeException("Сущность для закрытия не найдена;");
+                        throw new UnsupportedOperationException("Сущность для закрытия не найдена;");
 
                     IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool.getPersistableDao(
                             BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
+                    if (baseEntityReportDateDao.getMinReportDate(baseEntityPostPrepared.getId()).equals(
+                            baseEntityPostPrepared.getReportDate()))
+                        throw new IllegalStateException("Дата закрытия не может быть одинаковой с датой открытия;");
+
+
                     boolean reportDateExists = baseEntityReportDateDao.exists(baseEntityPostPrepared.getId(),
                             baseEntityPostPrepared.getReportDate());
 
-                    IBaseEntityReportDate baseEntityReportDate = baseEntityPostPrepared.getBaseEntityReportDate();
-                    baseEntityPostPrepared.calculateValueCount();
+                    IBaseEntityReportDate baseEntityReportDate;
+
+                    if (reportDateExists) {
+                        baseEntityReportDate = baseEntityReportDateDao.load(baseEntityPostPrepared.getId(),
+                                baseEntityPostPrepared.getReportDate());
+
+                        baseEntityReportDate.setBaseEntity(baseEntityPostPrepared);
+                    } else {
+                        baseEntityReportDate = baseEntityPostPrepared.getBaseEntityReportDate();
+                        baseEntityPostPrepared.calculateValueCount();
+                    }
 
                     baseEntityReportDate.setClosed(true);
 
@@ -193,6 +206,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
                     baseEntityApplyDao.applyToDb(baseEntityManager);
+
+                    entityHolder.setApplied(baseEntityApplied);
                     break;
                 case INSERT:
                     if (baseEntityPostPrepared.getId() > 0)

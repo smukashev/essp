@@ -33,6 +33,7 @@ import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
+import kz.bsbnb.usci.eav.showcase.ShowCaseIndex;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -1899,7 +1900,7 @@ public class CLI {
 
             ruleBatchServiceFactoryBean = new RmiProxyFactoryBean();
             ruleBatchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService");
-            ruleBatchServiceFactoryBean.setServiceInterface(IBatchService.class);
+            ruleBatchServiceFactoryBean.setServiceInterface(kz.bsbnb.usci.brms.rulesvr.service.IBatchService.class);
 
             ruleBatchServiceFactoryBean.afterPropertiesSet();
             ruleBatchService = (kz.bsbnb.usci.brms.rulesvr.service.IBatchService) ruleBatchServiceFactoryBean.getObject();
@@ -2240,7 +2241,22 @@ public class CLI {
                 System.err.println("Example: showcase list addCustom metaClass [path] [columnName]");
                 throw new IllegalArgumentException();
             }
-        } else if (args.get(0).equals("save")) {
+        } else if(args.get(0).equals("addIndex")){
+
+            if(args.get(1).equals("unique")||args.get(1).equals("nonunique")){
+                String IndexType = args.get(1);
+                args.remove(0);
+                args.remove(0);
+                ShowCaseIndex index = new ShowCaseIndex(IndexType, showCase.getTableName(), args);
+                showCase.addIndex(index.getIndex());
+            }
+            else {
+                System.err.println("Example: addIndex [unique/nonunique] [columName1] .. [columNameN]");
+            }
+
+
+        }
+        else if (args.get(0).equals("save")) {
             long scId = showcaseService.add(showCase);
             if (scId > 0)
                 System.out.println(showCase.getName() + ": Showcase successfully added!");

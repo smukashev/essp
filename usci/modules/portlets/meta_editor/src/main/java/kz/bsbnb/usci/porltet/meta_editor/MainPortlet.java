@@ -3,12 +3,11 @@ package kz.bsbnb.usci.porltet.meta_editor;
 
 import com.google.gson.Gson;
 import com.liferay.portal.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.SystemException;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
-//import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
 import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.MetaClassName;
@@ -31,7 +30,6 @@ import java.util.List;
 
 public class MainPortlet extends MVCPortlet {
     private RmiProxyFactoryBean metaFactoryServiceFactoryBean;
- //   private XSDGenerator xsdGenerator = new XSDGenerator();
     private XSDGenerator xsdGenerator = new XSDGenerator();
     private IMetaFactoryService metaFactoryService;
 
@@ -76,6 +74,8 @@ public class MainPortlet extends MVCPortlet {
         } catch (SystemException e) {
             e.printStackTrace();
         } catch (com.liferay.portal.kernel.exception.PortalException e) {
+            e.printStackTrace();
+        } catch (com.liferay.portal.kernel.exception.SystemException e) {
             e.printStackTrace();
         }
 

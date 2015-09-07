@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.eav.persistance.generated.tables.records.EavMClassesRecord;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -998,7 +999,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
         long t = 0;
 
-        for (String arrayName : metaClass.getArrayArrayAttributesNames()) {
+        /*for (String arrayName : metaClass.getArrayArrayAttributesNames())
+        {
             removeSet(((MetaSet) metaClass.getMemberType(arrayName)));
         }
 
@@ -1006,7 +1008,12 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         removeAllAttributes(metaClass.getId(), MetaContainerTypes.META_CLASS);
 
         //delete class
-        DeleteConditionStep delete = context.delete(EAV_M_CLASSES).where(EAV_M_CLASSES.ID.eq(metaClass.getId()));
+        DeleteConditionStep delete = context.delete(EAV_M_CLASSES).where(EAV_M_CLASSES.ID.eq(metaClass.getId()));*/
+
+        UpdateConditionStep<EavMClassesRecord> delete = context
+                .update(EAV_M_CLASSES)
+                .set(EAV_M_CLASSES.IS_DISABLED, new Byte("1"))
+                .where(EAV_M_CLASSES.ID.eq(metaClass.getId()));
 
         logger.debug(delete.toString());
 
