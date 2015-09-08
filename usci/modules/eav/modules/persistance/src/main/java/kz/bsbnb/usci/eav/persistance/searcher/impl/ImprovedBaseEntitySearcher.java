@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.searcher.impl;
 
-import com.google.common.base.Strings;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -314,24 +313,24 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                                     condition.or(DSL.exists(select));
                                 } else {
                                     Collections.sort(childBaseEntityIds);
-                                    String sChildBaseEntityIds = StringUtils.arrayToDelimitedString(childBaseEntityIds.toArray(), ", ");
+                                    String sChildBaseEntityIds =  StringUtils.arrayToDelimitedString(childBaseEntityIds.toArray(), "',' ");
 
                                     select = context.select(
-                                            DSL.field("listagg(\"" + setValueAlias + "\".\"ENTITY_VALUE_ID\", ', ') " +
-                                                    "within group (order by \"" + setValueAlias + "\".\"ENTITY_VALUE_ID\" asc)")
+                                            EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID
                                     ).from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
                                     .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
                                     .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.eq(metaAttribute.getId()))
                                     .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.
                                             eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
                                     .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.
-                                            eq(EAV_BE_ENTITIES.as(entityAlias).ID));
+                                            eq(EAV_BE_ENTITIES.as(entityAlias).ID)
+                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds)) );
 
-                                    Condition setCondition = select.asField().eq(sChildBaseEntityIds);
+                                    //Condition setCondition = ;
 
-                                    condition = condition == null ? setCondition :
+                                    condition = condition == null ? DSL.exists(select) :
                                             metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
-                                                    condition.and(setCondition) : condition.or(setCondition);
+                                                    condition.and(DSL.exists(select)) : condition.or(DSL.exists(select));
                                 }
                             }
                         }
