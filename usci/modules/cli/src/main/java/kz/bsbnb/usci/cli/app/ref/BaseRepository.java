@@ -36,46 +36,6 @@ public class BaseRepository implements  Runnable
      private static Statement statement;
      protected static String repDate;
 
-     public void saveXml(String[] lookup, ResultSet rows, String path){
-         try {
-             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-             Document doc = docBuilder.newDocument();
-             Element rootElement = doc.createElement("batch");
-             doc.appendChild(rootElement);
-
-             Element entities = doc.createElement("entities");
-             rootElement.appendChild(entities);
-
-             while(rows.next()){
-                 Element entity = doc.createElement("entity");
-                 for(int i=0;i<lookup.length;i++){
-                     Element ne = doc.createElement(lookup[i]);
-                     String val = rows.getString(lookup[i]);
-                     ne.appendChild(doc.createTextNode(val==null?" ":val));
-                     entity.appendChild(ne);
-                 }
-                 entities.appendChild(entity);
-
-             }
-
-             TransformerFactory transformerFactory = TransformerFactory.newInstance();
-             Transformer transformer = transformerFactory.newTransformer();
-             DOMSource source = new DOMSource(doc);
-             StreamResult result = new StreamResult(new File(path));
-
-             // Output to console for testing
-             // StreamResult result = new StreamResult(System.out);
-
-             transformer.transform(source, result);
-
-
-         } catch (Exception e) {
-             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-         }
-     }
-
     @Override
     public void run() {
 
@@ -93,7 +53,7 @@ public class BaseRepository implements  Runnable
 
             BaseRepository.repDate = curDate;
 
-            BaseCrawler.fileName = BaseCrawler.prefix + curDate + "\\";
+            BaseCrawler.fileName = BaseCrawler.prefix + curDate + "/";
             File f = new File(BaseCrawler.fileName);
             f.mkdir();
 
@@ -131,6 +91,8 @@ public class BaseRepository implements  Runnable
             if(curDate.equals(exclusiveEndDate))
                 break;
         }
+
+        System.out.println("Done.");
     }
 
     public void guaranteeNotTooLong(String startDate, String endDate){

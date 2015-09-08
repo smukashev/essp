@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
   <entities>
-    <entity class="ref_offshore">
+    <ref_offshore>
       <code>35</code>
       <name_kz>Республика Палау</name_kz>
       <name_ru>Республика Палау</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>36</code>
       <name_kz>Республика Панама</name_kz>
       <name_ru>Республика Панама</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>33</code>
       <name_kz>Остров Кука</name_kz>
       <name_ru>Остров Кука</name_ru>
@@ -21,8 +21,8 @@
         <name_kz>Новая Зеландия </name_kz>
         <name_ru>Новая Зеландия </name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>34</code>
       <name_kz>Остров Ниуэ</name_kz>
       <name_ru>Остров Ниуэ</name_ru>
@@ -32,23 +32,23 @@
         <name_kz>Новая Зеландия </name_kz>
         <name_ru>Новая Зеландия </name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>39</code>
       <name_kz>Государство Сент-Винсент и Гренадины</name_kz>
       <name_ru>Государство Сент-Винсент и Гренадины</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>37</code>
       <name_kz>Независимое Государство Самоа</name_kz>
       <name_ru>Независимое Государство Самоа</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>38</code>
       <name_kz>Республика Сейшельские острова</name_kz>
       <name_ru>Республика Сейшельские острова</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>43</code>
       <name_kz>Бермудские острова</name_kz>
       <name_ru>Бермудские острова</name_ru>
@@ -58,8 +58,8 @@
         <name_kz>Соединенное Королевство</name_kz>
         <name_ru>Соединенное Королевство</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>42</code>
       <name_kz>Острова Ангилья</name_kz>
       <name_ru>Острова Ангилья</name_ru>
@@ -69,23 +69,23 @@
         <name_kz>Соединенное Королевство</name_kz>
         <name_ru>Соединенное Королевство</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>41</code>
       <name_kz>Государство Сент-Люсия</name_kz>
       <name_ru>Государство Сент-Люсия</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>40</code>
       <name_kz>Федерация Сент-Китс и Невис</name_kz>
       <name_ru>Федерация Сент-Китс и Невис</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>22</code>
       <name_kz>Республика Маврикий</name_kz>
       <name_ru>Республика Маврикий</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>23</code>
       <name_kz>Остров Мадейра</name_kz>
       <name_ru>Остров Мадейра</name_ru>
@@ -95,58 +95,58 @@
         <name_kz>Португалия</name_kz>
         <name_ru>Португалия</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>24</code>
       <name_kz>Мальдивская Республика</name_kz>
       <name_ru>Мальдивская Республика</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>25</code>
       <name_kz>Республика Мальта</name_kz>
       <name_ru>Республика Мальта</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>26</code>
       <name_kz>Республика Маршалловы острова</name_kz>
       <name_ru>Республика Маршалловы острова</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>27</code>
       <name_kz>Княжество Монако</name_kz>
       <name_ru>Княжество Монако</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>28</code>
       <name_kz>Союз Мьянма</name_kz>
       <name_ru>Союз Мьянма</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>29</code>
       <name_kz>Республика Науру</name_kz>
       <name_ru>Республика Науру</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>03</code>
       <name_kz>Содружество Багамских островов</name_kz>
       <name_ru>Содружество Багамских островов</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>02</code>
       <name_kz>Государство Антигуа и Барбуда</name_kz>
       <name_ru>Государство Антигуа и Барбуда</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>01</code>
       <name_kz>Княжество Андорра</name_kz>
       <name_ru>Княжество Андорра</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>07</code>
       <name_kz>Республика Вануату</name_kz>
       <name_ru>Республика Вануату</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>30</code>
       <name_kz>Остров Аруба</name_kz>
       <name_ru>Остров Аруба</name_ru>
@@ -156,28 +156,28 @@
         <name_kz>Нидерланды</name_kz>
         <name_ru>Нидерланды</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>06</code>
       <name_kz>Государство Бруней Даруссалам</name_kz>
       <name_ru>Государство Бруней Даруссалам</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>05</code>
       <name_kz>Государство Белиз</name_kz>
       <name_ru>Государство Белиз</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>32</code>
       <name_kz>Федеративная Республика Нигерия</name_kz>
       <name_ru>Федеративная Республика Нигерия</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>04</code>
       <name_kz>Государство Барбадос</name_kz>
       <name_ru>Государство Барбадос</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>31</code>
       <name_kz>Зависимые территории Антильских островов</name_kz>
       <name_ru>Зависимые территории Антильских островов</name_ru>
@@ -187,33 +187,33 @@
         <name_kz>Нидерланды</name_kz>
         <name_ru>Нидерланды</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>09</code>
       <name_kz>Государство Гренада</name_kz>
       <name_ru>Государство Гренада</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>08</code>
       <name_kz>Республика Гватемала</name_kz>
       <name_ru>Республика Гватемала</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>59</code>
       <name_kz>Демократическая Республика Шри-Ланка</name_kz>
       <name_ru>Демократическая Республика Шри-Ланка</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>58</code>
       <name_kz>Республика Филиппины</name_kz>
       <name_ru>Республика Филиппины</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>57</code>
       <name_kz>Королевство Тонга</name_kz>
       <name_ru>Королевство Тонга</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>56</code>
       <name_kz>Содружество Пуэрто-Рико</name_kz>
       <name_ru>Содружество Пуэрто-Рико</name_ru>
@@ -223,8 +223,8 @@
         <name_kz>Соединенные Штаты Америки</name_kz>
         <name_ru>Соединенные Штаты Америки</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>19</code>
       <name_kz>Территория анклава Лабуан</name_kz>
       <name_ru>Территория анклава Лабуан</name_ru>
@@ -234,8 +234,8 @@
         <name_kz>Малайзия</name_kz>
         <name_ru>Малайзия</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>55</code>
       <name_kz>Остров Гуам</name_kz>
       <name_ru>Остров Гуам</name_ru>
@@ -245,18 +245,18 @@
         <name_kz>Соединенные Штаты Америки</name_kz>
         <name_ru>Соединенные Штаты Америки</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>17</code>
       <name_kz>Федеральная Исламская Республика Коморские Острова</name_kz>
       <name_ru>Федеральная Исламская Республика Коморские Острова</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>18</code>
       <name_kz>Республика Коста-Рика</name_kz>
       <name_ru>Республика Коста-Рика</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>15</code>
       <name_kz>Территория специальных административных районов Аомынь (Макао)</name_kz>
       <name_ru>Территория специальных административных районов Аомынь (Макао)</name_ru>
@@ -266,8 +266,8 @@
         <name_kz>Китай</name_kz>
         <name_ru>Китай</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>16</code>
       <name_kz>Сянган (Гонконг)</name_kz>
       <name_ru>Сянган (Гонконг)</name_ru>
@@ -277,8 +277,8 @@
         <name_kz>Китай</name_kz>
         <name_ru>Китай</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>13</code>
       <name_kz>Территория Канарских островов</name_kz>
       <name_ru>Территория Канарских островов</name_ru>
@@ -288,33 +288,33 @@
         <name_kz>Испания</name_kz>
         <name_ru>Испания</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>14</code>
       <name_kz>Республика Кипр</name_kz>
       <name_ru>Республика Кипр</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>11</code>
       <name_kz>Доминиканская Республика</name_kz>
       <name_ru>Доминиканская Республика</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>12</code>
       <name_kz>Республика Индонезия</name_kz>
       <name_ru>Республика Индонезия</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>21</code>
       <name_kz>Княжество Лихтенштейн</name_kz>
       <name_ru>Княжество Лихтенштейн</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>20</code>
       <name_kz>Республика Либерия</name_kz>
       <name_ru>Республика Либерия</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>49</code>
       <name_kz>Остров Мэн</name_kz>
       <name_ru>Остров Мэн</name_ru>
@@ -324,8 +324,8 @@
         <name_kz>Соединенное Королевство</name_kz>
         <name_ru>Соединенное Королевство</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>48</code>
       <name_kz>Острова Теркс и Кайкос</name_kz>
       <name_ru>Острова Теркс и Кайкос</name_ru>
@@ -335,8 +335,8 @@
         <name_kz>Соединенное Королевство</name_kz>
         <name_ru>Соединенное Королевство</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>45</code>
       <name_kz>Гибралтар</name_kz>
       <name_ru>Гибралтар</name_ru>
@@ -346,8 +346,8 @@
         <name_kz>Соединенное Королевство</name_kz>
         <name_ru>Соединенное Королевство</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>44</code>
       <name_kz>Британские Виргинские острова</name_kz>
       <name_ru>Британские Виргинские острова</name_ru>
@@ -357,8 +357,8 @@
         <name_kz>Соединенное Королевство</name_kz>
         <name_ru>Соединенное Королевство</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>47</code>
       <name_kz>Остров Монтсеррат</name_kz>
       <name_ru>Остров Монтсеррат</name_ru>
@@ -368,8 +368,8 @@
         <name_kz>Соединенное Королевство</name_kz>
         <name_ru>Соединенное Королевство</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>46</code>
       <name_kz>Каймановы острова</name_kz>
       <name_ru>Каймановы острова</name_ru>
@@ -379,13 +379,13 @@
         <name_kz>Соединенное Королевство</name_kz>
         <name_ru>Соединенное Королевство</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>10</code>
       <name_kz>Республика Джибути</name_kz>
       <name_ru>Республика Джибути</name_ru>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>51</code>
       <name_kz>Остров Джерси - Нормандские острова</name_kz>
       <name_ru>Остров Джерси - Нормандские острова</name_ru>
@@ -395,8 +395,8 @@
         <name_kz>Соединенное Королевство</name_kz>
         <name_ru>Соединенное Королевство</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>52</code>
       <name_kz>Остров Сарк - Нормандские острова</name_kz>
       <name_ru>Остров Сарк - Нормандские острова</name_ru>
@@ -406,8 +406,8 @@
         <name_kz>Соединенное Королевство</name_kz>
         <name_ru>Соединенное Королевство</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>53</code>
       <name_kz>Остров Олдерни - Нормандские острова</name_kz>
       <name_ru>Остров Олдерни - Нормандские острова</name_ru>
@@ -417,8 +417,8 @@
         <name_kz>Соединенное Королевство</name_kz>
         <name_ru>Соединенное Королевство</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>54</code>
       <name_kz>Американские Виргинские острова</name_kz>
       <name_ru>Американские Виргинские острова</name_ru>
@@ -428,8 +428,8 @@
         <name_kz>Соединенные Штаты Америки</name_kz>
         <name_ru>Соединенные Штаты Америки</name_ru>
       </country>
-    </entity>
-    <entity class="ref_offshore">
+    </ref_offshore>
+    <ref_offshore>
       <code>50</code>
       <name_kz>Остров Гернси – Нормандские острова</name_kz>
       <name_ru>Остров Гернси – Нормандские острова</name_ru>
@@ -439,6 +439,6 @@
         <name_kz>Соединенное Королевство</name_kz>
         <name_ru>Соединенное Королевство</name_ru>
       </country>
-    </entity>
+    </ref_offshore>
   </entities>
 </batch>

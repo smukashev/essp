@@ -137,6 +137,29 @@ public class BatchServiceImpl implements IBatchService {
                 .setStatusId(statusCompleted.getId())
                 .setReceiptDate(new Date())
         );
+
+        List<BatchStatus> batchStatusList = getBatchStatusList(batchId);
+
+        boolean hasError = false;
+
+        for (BatchStatus batchStatus : batchStatusList) {
+            if (BatchStatuses.ERROR.equals(batchStatus.getStatus())) {
+                hasError = true;
+                break;
+            }
+        }
+
+        if (!hasError) {
+            Batch batch = getBatch(batchId);
+
+            try {
+                File file = new File(batch.getFileName());
+                file.delete();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     @Override
