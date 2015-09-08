@@ -3,7 +3,7 @@ title: документ физ лица состоит из 12 нулей ИИН
 rule "документ физ лица состоит из 12 нулей ИИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.person.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}persons.docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -16,7 +16,7 @@ title: документ юр. лица состоит из 12 нулей ИИН
 rule "документ юр. лица состоит из 12 нулей ИИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.organization.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}organizations.docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -68,7 +68,7 @@ title: документ кредтиора физ лица с особыми о�
 rule "документ кредтиора физ лица с особыми отношениями состоит из 12 нулей ИИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.person.bank_relations.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}persons.bank_relations.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -81,7 +81,7 @@ title: документ руководителя организации сост
 rule "документ руководителя организации состоит из 12 нулей ИИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.organization.head.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}organizations.head.docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -94,7 +94,7 @@ title: документ кредтиора юр лица с особыми от�
 rule "документ кредтиора юр лица с особыми отношениями состоит из 12 нулей ИИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.organization.bank_relations.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}organizations.bank_relations.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -133,7 +133,7 @@ title: документ субъекта кредитора  состоит из
 rule "документ субъекта кредитора  состоит из 12 нулей ИИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}creditors.docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -146,7 +146,7 @@ title: документ физ лица состоит из 12 нулей БИН
 rule "документ физ лица состоит из 12 нулей БИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.person.docs[doc_type.code=07]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}persons.docs[doc_type.code=07]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -159,7 +159,7 @@ title: документ юр. лица состоит из 12 нулей БИН
 rule "документ юр. лица состоит из 12 нулей БИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.organization.docs[doc_type.code=07]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}organizations.docs[doc_type.code=07]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -211,7 +211,7 @@ title: документ кредтиора физ лица с особыми о�
 rule "документ кредтиора физ лица с особыми отношениями состоит из 12 нулей БИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.person.bank_relations.creditor.docs[doc_type.code=07]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}persons.bank_relations.creditor.docs[doc_type.code=07]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -224,7 +224,7 @@ title: документ руководителя организации сост
 rule "документ руководителя организации состоит из 12 нулей БИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.organization.head.docs[doc_type.code=07]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}organizations.head.docs[doc_type.code=07]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -237,7 +237,7 @@ title: документ кредтиора юр лица с особыми от�
 rule "документ кредтиора юр лица с особыми отношениями состоит из 12 нулей БИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.organization.bank_relations.creditor.docs[doc_type.code=07]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}organizations.bank_relations.creditor.docs[doc_type.code=07]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -276,7 +276,7 @@ title: документ субъекта кредитора  состоит из
 rule "документ субъекта кредитора  состоит из 12 нулей БИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.creditor.docs[doc_type.code=07]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}creditors.docs[doc_type.code=07]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -289,7 +289,7 @@ title: документ физ лица состоит из 12 нулей РНН
 rule "документ физ лица состоит из 12 нулей РНН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.person.docs[doc_type.code=11]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}persons.docs[doc_type.code=11]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -302,7 +302,7 @@ title: документ юр. лица состоит из 12 нулей РНН
 rule "документ юр. лица состоит из 12 нулей РНН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.organization.docs[doc_type.code=11]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}organizations.docs[doc_type.code=11]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -354,7 +354,7 @@ title: документ кредтиора физ лица с особыми о�
 rule "документ кредтиора физ лица с особыми отношениями состоит из 12 нулей РНН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.person.bank_relations.creditor.docs[doc_type.code=11]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}persons.bank_relations.creditor.docs[doc_type.code=11]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -367,7 +367,7 @@ title: документ руководителя организации сост
 rule "документ руководителя организации состоит из 12 нулей РНН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.organization.head.docs[doc_type.code=11]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}organizations.head.docs[doc_type.code=11]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -380,7 +380,7 @@ title: документ кредтиора юр лица с особыми от�
 rule "документ кредтиора юр лица с особыми отношениями состоит из 12 нулей РНН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.organization.bank_relations.creditor.docs[doc_type.code=11]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}organizations.bank_relations.creditor.docs[doc_type.code=11]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
@@ -419,7 +419,7 @@ title: документ субъекта кредитора  состоит из
 rule "документ субъекта кредитора  состоит из 12 нулей РНН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : get12ZeroStrings((List)getEls("{get}subjects.creditor.docs[doc_type.code=11]no")) && $r.size() > 0))
+			&& ( $r : get12ZeroStrings((List)getEls("{get}creditors.docs[doc_type.code=11]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ содержит 12 нулей: " + $r);
 end
