@@ -838,7 +838,7 @@
 	</table>
 	<table name="logic_rules">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="rule" primaryKey="false" required="false" type="VARCHAR" size="2024" autoIncrement="false"/>
+		<column name="rule" primaryKey="false" required="false" type="VARCHAR" size="4000" autoIncrement="false"/>
 		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
 		<column name="is_active" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="1"/>
 	</table>
