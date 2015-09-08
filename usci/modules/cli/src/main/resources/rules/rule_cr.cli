@@ -304,11 +304,11 @@ rule "DEBTOR_DOC_ABSENSE"
 //MES903
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
-        && (getEls("{count}subjects[creditor!=null]creditor[docs=null]") > 0
+        && (getEls("{count}creditors[docs=null]") > 0
                 ||
-            getEls("{count}subjects[person!=null]person[docs=null]") > 0
+            getEls("{count}persons[docs=null]") > 0
                 ||
-            getEls("{count}subjects[organization!=null]organization[docs=null]") > 0))
+            getEls("{count}organizations[docs=null]") > 0))
 then
   $entity.addValidationError("Отсутствует документ заемщика");
 end
@@ -322,11 +322,11 @@ rule "SUBJECT_DOC_NO_EMPTY"
 //MES914
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
-        && (getEls("{count}subjects.creditor.docs[no=null]") > 0
+        && (getEls("{count}creditors.docs[no=null]") > 0
                 ||
-            getEls("{count}subjects.person.docs[no=null]") > 0
+            getEls("{count}persons.docs[no=null]") > 0
                 ||
-            getEls("{count}subjects.organization.docs[no=null]") > 0))
+            getEls("{count}organizations.docs[no=null]") > 0))
 then
   $entity.addValidationError("Номер документа субъекта не может быть пустым");
 end
@@ -341,14 +341,14 @@ rule "BANK_RELATION_BLOCK_INVALID"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
         && (
-            (getEls("{count}subjects.person.bank_relations.bank_relation") > 1
-            && getEls("{count}subjects.person.bank_relations[bank_relation.code=50]") > 0)
+            (getEls("{count}persons.bank_relations.bank_relation") > 1
+            && getEls("{count}persons.bank_relations[bank_relation.code=50]") > 0)
             ||
-            (getEls("{count}subjects.organization.bank_relations.bank_relation") > 1
-            && getEls("{count}subjects.organization.bank_relations[bank_relation.code=50]") > 0)
+            (getEls("{count}organizations.bank_relations.bank_relation") > 1
+            && getEls("{count}organizations.bank_relations[bank_relation.code=50]") > 0)
             ||
-            (getEls("{count}subjects.creditor.bank_relations.bank_relation") > 1
-            && getEls("{count}subjects.creditor.bank_relations[bank_relation.code=50]") > 0)
+            (getEls("{count}creditors.bank_relations.bank_relation") > 1
+            && getEls("{count}creditors.bank_relations[bank_relation.code=50]") > 0)
         ))
 then
   $entity.addValidationError("Неправильно сформирован блок \"Признаки связанности с банком\"");
@@ -365,8 +365,8 @@ rule "BANK_RELATION_DUPLICATE"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
   && (
-        getEls("{hasDuplicates(subjects.person.bank_relations)}bank_relation.code") == true ||
-        getEls("{hasDuplicates(subjects.organization.bank_relations)}bank_relation.code") == true
+        getEls("{hasDuplicates(persons.bank_relations)}bank_relation.code") == true ||
+        getEls("{hasDuplicates(organizations.bank_relations)}bank_relation.code") == true
      ))
 then
   $entity.addValidationError("Неправильно сформирован блок \"Признаки связанности с банком\"");
@@ -396,8 +396,8 @@ rule "SUBJECT_DUPLICATE_DOCS"
 //MES922
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
-        && ( getEls("{hasDuplicates(subjects.person.docs)}doc_type.code,no") == true ||
-             getEls("{hasDuplicates(subjects.organization.docs)}doc_type.code,no") == true
+        && ( getEls("{hasDuplicates(persons.docs)}doc_type.code,no") == true ||
+             getEls("{hasDuplicates(organizations.docs)}doc_type.code,no") == true
         ))
 then
   $entity.addValidationError("Дублирующие документы");
@@ -456,7 +456,7 @@ title: документ иной физ лица
 rule "документ иной физ лица"
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
-                && getEls("{count}subjects.person.docs[doc_type.code=16][name=null]") > 0 )
+                && getEls("{count}persons.docs[doc_type.code=16][name=null]") > 0 )
 then
  $entity.addValidationError("При указании иного документа наименование документа не должен быть пустым");
 end
@@ -469,7 +469,7 @@ title: документ иной юр лица
 rule "документ иной юр лица"
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
-                && getEls("{count}subjects.organization.docs[doc_type.code=16][name=null]") > 0 )
+                && getEls("{count}organizations.docs[doc_type.code=16][name=null]") > 0 )
 then
  $entity.addValidationError("При указании иного документа наименование документа не должен быть пустым");
 end
@@ -482,7 +482,7 @@ title: название документа физ лица
 rule "название документа физ лица"
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
-                && getEls("{count}subjects.person.docs[doc_type.code!=16][name!=null]") > 0 )
+                && getEls("{count}persons.docs[doc_type.code!=16][name!=null]") > 0 )
 then
  $entity.addValidationError("При указании не иного документа наименование документа должен быть пустым");
 end
@@ -495,7 +495,7 @@ title: название документа иной юр лица
 rule "название документа иной юр лица"
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
-                && getEls("{count}subjects.organization.docs[doc_type.code!=16][name!=null]") > 0 )
+                && getEls("{count}organizations.docs[doc_type.code!=16][name!=null]") > 0 )
 then
  $entity.addValidationError("При указании не иного документа наименование документа должен быть пустым");
 end
@@ -508,7 +508,7 @@ title: бин у юр лиц с кодам 02 является иином
 rule "бин у юр лиц с кодам 02 является иином"
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
-                && $r: getInvalidIINs((List) getEls("{get}subjects.organization[enterprise_type.code=02]docs[doc_type.code=07]no") )
+                && $r: getInvalidIINs((List) getEls("{get}organizations[enterprise_type.code=02]docs[doc_type.code=07]no") )
                 && $r.size() > 0 )
 then
  $entity.addValidationError("Не правильный БИН у юр лица" + $r);
@@ -522,7 +522,7 @@ title: бин у юр лиц с кодам 05 является иином
 rule "бин у юр лиц с кодам 05 является иином"
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
-                && $r: getInvalidIINs((List) getEls("{get}subjects.organization[enterprise_type.code=05]docs[doc_type.code=07]no") )
+                && $r: getInvalidIINs((List) getEls("{get}organizations[enterprise_type.code=05]docs[doc_type.code=07]no") )
                 && $r.size() > 0 )
 then
  $entity.addValidationError("Не правильный БИН у юр лица" + $r);
@@ -536,9 +536,9 @@ title: признак ИП - тип юр лица
 rule "признак ИП - тип юр лица"
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
-                && (getEls("{setString(01,04,07)}subjects.organization[is_se=true]enterprise_type.code") > 0
+                && (getEls("{setString(01,04,07)}organizations[is_se=true]enterprise_type.code") > 0
                    ||
-                    getEls("{setString(02,05,06)}subjects.organization[is_se=false]enterprise_type.code") > 0))
+                    getEls("{setString(02,05,06)}organizations[is_se=false]enterprise_type.code") > 0))
 then
  $entity.addValidationError("Тип юр лица должен быть ИП");
 end
@@ -551,8 +551,8 @@ title: идентификацонный документ для КЗ
 rule "идентификацонный документ для КЗ"
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
-                 && (!identificationDocCheckSuccess((List)getEls("{get}subjects.person[country.code_numeric=398]"))
-                  || !identificationDocCheckSuccess((List)getEls("{get}subjects.organization[country.code_numeric=398]")))
+                 && (!identificationDocCheckSuccess((List)getEls("{get}persons[country.code_numeric=398]"))
+                  || !identificationDocCheckSuccess((List)getEls("{get}organizations[country.code_numeric=398]")))
                  )
 then
  $entity.addValidationError("Как минимум один идентификационный документ для кз обязателен");
@@ -567,8 +567,8 @@ title: проверка документов по признаку IS_PERSON_DOC
 rule "проверка документов по признаку IS_PERSON_DOC/IS_ORG_DOC"
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
-                 && (getEls("{setString(07,10,15,16)}subjects.person.docs.doc_type.code") > 0
-                  || getEls("{setString(01,02,03,04,05,06,08,09,12,13)}subjects.organization.docs.doc_type.code") > 0
+                 && (getEls("{setString(07,10,15,16)}persons.docs.doc_type.code") > 0
+                  || getEls("{setString(01,02,03,04,05,06,08,09,12,13)}organizations.docs.doc_type.code") > 0
                   ))
 then
  $entity.addValidationError("Документ субъекта сформирован неправильно");
