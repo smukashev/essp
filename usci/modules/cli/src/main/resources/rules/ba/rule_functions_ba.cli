@@ -31,23 +31,29 @@ function boolean isCurrencyConvertible(String currencyCode, Date reportDate){
     }
 }
 
-function boolean isBA5thSymbolCorrect(String ba, List subjects){
+function boolean isBA5thSymbolCorrect(String ba, BaseEntity entity){
     if(ba.length() < 5) return true;
     if(ba.length() == 7 && ba.endsWith("000")) return true;
 
+    List subjects = (List) entity.getEls("{get}organizations");
+    boolean isResident = false;
+
     if(subjects.size() > 0) {
         BaseEntity subject = (BaseEntity) subjects.get(0);
-        boolean isResident = false;
-        isResident = isResident || (Integer)subject.getEls("{count}person.country[code_numeric=398]") > 0;
-        isResident = isResident || (Integer)subject.getEls("{count}organization.country[code_numeric=398]") > 0;
-
-        if(isResident && ba.charAt(4) == '1')
-            return true;
-        if(!isResident && ba.charAt(4) == '2')
-            return true;
-
-        return false;
+        isResident = isResident || (Integer)subject.getEls("{count}country[code_numeric=398]") > 0;
     }
+
+    subjects = (List) entity.getEls("{get}persons");
+
+    if(subjects.size() > 0) {
+        BaseEntity subject = (BaseEntity) subjects.get(0);
+        isResident = isResident || (Integer)subject.getEls("{count}country[code_numeric=398]") > 0;
+    }
+
+    if(isResident && ba.charAt(4) == '1')
+        return true;
+    if(!isResident && ba.charAt(4) == '2')
+        return true;
 
     return false;
 }

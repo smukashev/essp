@@ -5,9 +5,9 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.debt.current.balance_account.no_")
 			&& $r != null
-			&& !isBA5thSymbolCorrect((String)$r, (List)getEls("{get}subjects")))
+			&& !isBA5thSymbolCorrect((String)$r, $entity))
 then
-	$entity.addValidationError("5й символ балансового счета  неккоректный: " + $r);
+	$entity.addValidationError("5й символ балансового счета заполнен не верно: " + $r);
 end
 $$$
 
@@ -20,9 +20,9 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.debt.pastdue.balance_account.no_")
 			&& $r != null
-			&& !isBA5thSymbolCorrect((String)$r, (List)getEls("{get}subjects")))
+			&& !isBA5thSymbolCorrect((String)$r, $entity))
 then
-	$entity.addValidationError("5й символ балансового счета  неккоректный: " + $r);
+	$entity.addValidationError("5й символ балансового счета заполнен не верно: " + $r);
 end
 $$$
 
@@ -35,9 +35,9 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.debt.write_off.balance_account.no_")
 			&& $r != null
-			&& !isBA5thSymbolCorrect((String)$r, (List)getEls("{get}subjects")))
+			&& !isBA5thSymbolCorrect((String)$r, $entity))
 then
-	$entity.addValidationError("5й символ балансового счета  неккоректный: " + $r);
+	$entity.addValidationError("5й символ балансового счета заполнен не верно: " + $r);
 end
 $$$
 
@@ -50,9 +50,9 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.interest.current.balance_account.no_")
 			&& $r != null
-			&& !isBA5thSymbolCorrect((String)$r, (List)getEls("{get}subjects")))
+			&& !isBA5thSymbolCorrect((String)$r, $entity))
 then
-	$entity.addValidationError("5й символ балансового счета  неккоректный: " + $r);
+	$entity.addValidationError("5й символ балансового счета заполнен не верно: " + $r);
 end
 $$$
 
@@ -65,9 +65,9 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.interest.pastdue.balance_account.no_")
 			&& $r != null
-			&& !isBA5thSymbolCorrect((String)$r, (List)getEls("{get}subjects")))
+			&& !isBA5thSymbolCorrect((String)$r, $entity))
 then
-	$entity.addValidationError("5й символ балансового счета  неккоректный: " + $r);
+	$entity.addValidationError("5й символ балансового счета заполнен не верно: " + $r);
 end
 $$$
 
@@ -80,9 +80,9 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.credit_flow.provision.provision_kfn.balance_account.no_")
 			&& $r != null
-			&& !isBA5thSymbolCorrect((String)$r, (List)getEls("{get}subjects")))
+			&& !isBA5thSymbolCorrect((String)$r, $entity))
 then
-	$entity.addValidationError("5й символ балансового счета  неккоректный: " + $r);
+	$entity.addValidationError("5й символ балансового счета заполнен не верно: " + $r);
 end
 $$$
 
@@ -95,9 +95,9 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.credit_flow.provision.provision_msfo.balance_account.no_")
 			&& $r != null
-			&& !isBA5thSymbolCorrect((String)$r, (List)getEls("{get}subjects")))
+			&& !isBA5thSymbolCorrect((String)$r, $entity))
 then
-	$entity.addValidationError("5й символ балансового счета  неккоректный: " + $r);
+	$entity.addValidationError("5й символ балансового счета заполнен не верно: " + $r);
 end
 $$$
 
@@ -110,9 +110,9 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.credit_flow.provision.provision_msfo_over_balance.balance_account.no_")
 			&& $r != null
-			&& !isBA5thSymbolCorrect((String)$r, (List)getEls("{get}subjects")))
+			&& !isBA5thSymbolCorrect((String)$r, $entity))
 then
-	$entity.addValidationError("5й символ балансового счета  неккоректный: " + $r);
+	$entity.addValidationError("5й символ балансового счета заполнен не верно: " + $r);
 end
 $$$
 
@@ -125,9 +125,9 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.correction.balance_account.no_")
 			&& $r != null
-			&& !isBA5thSymbolCorrect((String)$r, (List)getEls("{get}subjects")))
+			&& !isBA5thSymbolCorrect((String)$r, $entity))
 then
-	$entity.addValidationError("5й символ балансового счета  неккоректный: " + $r);
+	$entity.addValidationError("5й символ балансового счета заполнен не верно: " + $r);
 end
 $$$
 
@@ -140,9 +140,9 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.discount.balance_account.no_")
 			&& $r != null
-			&& !isBA5thSymbolCorrect((String)$r, (List)getEls("{get}subjects")))
+			&& !isBA5thSymbolCorrect((String)$r, $entity))
 then
-	$entity.addValidationError("5й символ балансового счета  неккоректный: " + $r);
+	$entity.addValidationError("5й символ балансового счета заполнен не верно: " + $r);
 end
 $$$
 
@@ -155,9 +155,9 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.limit.balance_account.no_")
 			&& $r != null
-			&& !isBA5thSymbolCorrect((String)$r, (List)getEls("{get}subjects")))
+			&& !isBA5thSymbolCorrect((String)$r, $entity))
 then
-	$entity.addValidationError("5й символ балансового счета  неккоректный: " + $r);
+	$entity.addValidationError("5й символ балансового счета заполнен не верно: " + $r);
 end
 $$$
 
