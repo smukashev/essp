@@ -20,7 +20,8 @@ public interface IEntityService {
 
     BaseEntity load(long id, Date date);
 
-    BaseEntity prepare(BaseEntity baseEntity, long creditorId);
+    //used in rules
+    BaseEntity prepare(BaseEntity baseEntity);
 
     BaseEntity getActualBaseEntity(BaseEntity baseEntity);
 

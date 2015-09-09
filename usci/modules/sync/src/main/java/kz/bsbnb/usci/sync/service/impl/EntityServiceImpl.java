@@ -58,8 +58,8 @@ public class EntityServiceImpl implements IEntityService {
     }
 
     @Override
-    public BaseEntity prepare(BaseEntity baseEntity, long creditorId) {
-        return remoteEntityService.prepare(baseEntity, creditorId);
+    public BaseEntity prepare(BaseEntity baseEntity) {
+        return remoteEntityService.prepare(baseEntity, 0L);
     }
 
     @Override
