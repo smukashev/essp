@@ -59,6 +59,11 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         this(DEFAULT_ID, creditorId, batch, index, batch.getRepDate(), value, DEFAULT_CLOSED, DEFAULT_LAST);
     }
 
+    //used in rules
+    public BaseValue(Batch batch, long index, T value) {
+        this(0L, batch, index, value);
+    }
+
     public BaseValue(long id, long creditorId, Batch batch, long index, Date reportDate, T value, boolean closed,
                      boolean last) {
         super(id);
