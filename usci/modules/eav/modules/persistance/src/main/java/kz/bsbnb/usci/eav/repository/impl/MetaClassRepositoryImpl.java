@@ -8,9 +8,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -19,6 +20,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class MetaClassRepositoryImpl implements IMetaClassRepository, InitializingBean {
     @Autowired
     IMetaClassDao metaClassDao;
+
     private HashMap<String, MetaClass> cache = new HashMap<>();
     private HashMap<Long, String> names = new HashMap<>();
 
@@ -26,84 +28,83 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
 
     @Override
     public void afterPropertiesSet() throws Exception {
-       // try {
         lock.readLock().lock();
-            List<MetaClass> metaClassList = metaClassDao.loadAll();
+        List<MetaClass> metaClassList;
+        try {
+            metaClassList = metaClassDao.loadAll();
+        } finally {
             lock.readLock().unlock();
+        }
 
         lock.writeLock().lock();
-            Iterator<MetaClass> concurrentIterator = metaClassList.iterator();
-
-            while (concurrentIterator.hasNext()) {
-                MetaClass tmpMeta = concurrentIterator.next();
-
+        try {
+            for (MetaClass tmpMeta : metaClassList) {
                 cache.put(tmpMeta.getClassName(), tmpMeta);
                 names.put(tmpMeta.getId(), tmpMeta.getClassName());
             }
-
+        } finally {
             lock.writeLock().unlock();
-       // }
-       // finally {
-         //   lock.readLock().unlock();
-         //   lock.writeLock().unlock();
-       // }
         }
+    }
+
     @Override
     public MetaClass getDisabledMetaClass(String className) {
-        MetaClass metaClass = cache.get(className);
+        lock.readLock().lock();
+        MetaClass metaClass;
+        try {
+            metaClass = cache.get(className);
+        } finally {
+            lock.readLock().unlock();
+        }
 
         if (metaClass == null) {
             lock.readLock().lock();
             try {
                 metaClass = metaClassDao.loadDisabled(className);
-
-            }
-        finally {
+            } finally {
                 lock.readLock().unlock();
             }
-
 
             if (metaClass != null) {
                 lock.writeLock().lock();
                 try {
                     cache.put(className, metaClass);
                     names.put(metaClass.getId(), className);
+                } finally {
+                    lock.writeLock().unlock();
                 }
-                finally {
-            lock.writeLock().unlock();
-        }
-
-
-    }
+            }
         }
 
         return metaClass;
     }
+
     @Override
     public MetaClass getMetaClass(String className) {
-        MetaClass metaClass = cache.get(className);
+        lock.readLock().lock();
+        MetaClass metaClass;
+        try {
+            metaClass = cache.get(className);
+        } finally {
+            lock.readLock().unlock();
+        }
 
         if (metaClass == null) {
             lock.readLock().lock();
             try {
                 metaClass = metaClassDao.load(className);
-            }
-            finally {
+            } finally {
                 lock.readLock().unlock();
             }
-
 
             if (metaClass != null) {
                 lock.writeLock().lock();
                 try {
                     cache.put(className, metaClass);
                     names.put(metaClass.getId(), className);
-                }
-                finally {
+                } finally {
                     lock.writeLock().unlock();
                 }
-
-
             }
         }
 
@@ -112,18 +113,30 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
 
     @Override
     public MetaClass getMetaClass(long id) {
-        String className = names.get(id);
+        String className;
+        lock.readLock().lock();
+        try {
+            className = names.get(id);
+        } finally {
+            lock.readLock().unlock();
+        }
+
         MetaClass metaClass = null;
 
-        if (className != null)
-            metaClass = cache.get(className);
+        if (className != null) {
+            lock.readLock().lock();
+            try {
+                metaClass = cache.get(className);
+            } finally {
+                lock.readLock().unlock();
+            }
+        }
 
         if (metaClass == null) {
             lock.readLock().lock();
             try {
                 metaClass = metaClassDao.load(id);
-            }
-            finally {
+            } finally {
                 lock.readLock().unlock();
             }
 
@@ -132,8 +145,7 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
                 try {
                     cache.put(className, metaClass);
                     names.put(metaClass.getId(), metaClass.getClassName());
-                }
-                finally {
+                } finally {
                     lock.writeLock().unlock();
                 }
             }
@@ -144,44 +156,28 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
 
     @Override
     public List<MetaClass> getMetaClasses() {
-
-        List<MetaClass> metaClassList;
+        List<MetaClass> metaClassList = new ArrayList<>();
         lock.readLock().lock();
         try {
-            metaClassList = metaClassDao.loadAll();
-        }
-        finally {
+            for (Map.Entry<String, MetaClass> entry : cache.entrySet())
+                metaClassList.add(entry.getValue());
+        } finally {
             lock.readLock().unlock();
-
         }
         return metaClassList;
     }
 
     @Override
     public void saveMetaClass(MetaClass meta) {
-            long id;
-        lock.readLock().lock();
-        try {
-            id = metaClassDao.save(meta);
-        }finally {
-            lock.readLock().unlock();
-        }
-
-
-
-        /*for (String name : cache.keySet()) {
-            cache.get(name).recursiveSet(meta);
-        }*/
-
+        long id;
         lock.writeLock().lock();
         try {
+            id = metaClassDao.save(meta);
             names.put(id, meta.getClassName());
             cache.put(meta.getClassName(), meta);
-        }
-        finally {
+        } finally {
             lock.writeLock().unlock();
         }
-
     }
 
     @Override
@@ -190,7 +186,7 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
         try {
             cache.clear();
             names.clear();
-        }finally {
+        } finally {
             lock.writeLock().unlock();
         }
 
@@ -213,21 +209,15 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
 
     @Override
     public boolean delMetaClass(String className) {
-        MetaClass meta;
-        lock.readLock().lock();
-        try {
-            meta = getMetaClass(className);
-        }finally {
-            lock.readLock().unlock();
-        }
+        MetaClass meta = getMetaClass(className);
 
-        if(meta != null) {
+        if (meta != null) {
             lock.writeLock().lock();
             try {
                 metaClassDao.remove(meta);
                 cache.remove(className);
                 names.remove(meta.getId());
-            }finally {
+            } finally {
                 lock.writeLock().unlock();
             }
             return true;
