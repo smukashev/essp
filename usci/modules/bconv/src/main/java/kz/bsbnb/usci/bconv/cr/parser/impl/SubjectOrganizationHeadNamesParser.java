@@ -26,16 +26,16 @@ public class SubjectOrganizationHeadNamesParser extends BatchParser {
             currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("person_name"), batch.getRepDate());
         } else if (localName.equals("firstname")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("firstname", new BaseEntityStringValue(-1, batch, index,
-                    event.asCharacters().getData()));
+            currentBaseEntity.put("firstname", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
         } else if (localName.equals("lastname")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("lastname", new BaseEntityStringValue(-1, batch, index,
-                    event.asCharacters().getData()));
+            currentBaseEntity.put("lastname", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
         } else if (localName.equals("middlename")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("middlename", new BaseEntityStringValue(-1, batch, index,
-                    event.asCharacters().getData()));
+            currentBaseEntity.put("middlename", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
         } else {
             throw new UnknownTagException(localName);
         }

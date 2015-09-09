@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.model.base.impl.value;
 
-import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseSetValue;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
@@ -11,13 +10,9 @@ public class BaseSetValue<T> extends BaseValue<T> implements IBaseValue<T>, IBas
 
     private HistoryType historyType = HistoryType.RESTRICTED_BY_ENTITY;
 
-    public BaseSetValue(long id, long creditorId, Batch batch, long index, Date reportDate, T value,
+    public BaseSetValue(long id, long creditorId, Date reportDate, T value,
                         boolean closed, boolean last) {
-        super(id, creditorId, batch, index, reportDate, value, closed, last);
-    }
-
-    public BaseSetValue(long creditorId, Batch batch, long index, T value) {
-        super(creditorId, batch, index, value);
+        super(id, creditorId, reportDate, value, closed, last);
     }
 
     public HistoryType getHistoryType() {

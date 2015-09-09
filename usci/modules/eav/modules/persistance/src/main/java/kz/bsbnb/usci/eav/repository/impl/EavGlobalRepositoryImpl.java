@@ -4,21 +4,30 @@ import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.persistance.dao.IEavGlobalDao;
 import kz.bsbnb.usci.eav.repository.IEavGlobalRepository;
 import kz.bsbnb.usci.eav.util.IGlobal;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
+import java.util.List;
 
-/**
- * Created by maksat on 7/29/15.
- */
 @Repository
-public class EavGlobalRepositoryImpl implements IEavGlobalRepository {
+public class EavGlobalRepositoryImpl implements IEavGlobalRepository, InitializingBean {
 
     private HashMap<String, EavGlobal> cache = new HashMap<>();
 
     @Autowired
     private IEavGlobalDao eavGlobalDao;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        List<EavGlobal> eavGlobalList = eavGlobalDao.getAll();
+
+        for (EavGlobal eavGlobal : eavGlobalList)
+            cache.put(eavGlobal.getType() + "___" + eavGlobal.getCode(), eavGlobal);
+
+        System.out.println(cache.size());
+    }
 
     @Override
     public EavGlobal getGlobal(String type, String code) {

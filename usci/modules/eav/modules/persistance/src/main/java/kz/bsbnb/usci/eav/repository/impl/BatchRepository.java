@@ -9,61 +9,39 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 
-/**
- * Caches crud operations with Batch objects. Uses permanent cache.
- *
- * @author a.motov
- */
 @Component
 @Scope(value = "singleton")
-public class BatchRepository implements IBatchRepository
-{
+public class BatchRepository implements IBatchRepository {
     @Autowired
-    private IBatchDao postgreSQLBatchDaoImpl;
+    private IBatchDao batchDao;
 
-    private HashMap<Long, Batch> cache = new HashMap<Long, Batch>();
+    private HashMap<Long, Batch> cache = new HashMap<>();
 
-    /**
-     * Retrieves Batch from Dao.
-     *
-     * @param batchId - id of Batch in Storage
-     * @return
-     */
     @Override
-    public synchronized Batch getBatch(long batchId)
-    {
+    public Batch getBatch(long batchId) {
         if (cache.containsKey(batchId))
             return cache.get(batchId);
-        else
-        {
-            Batch batch = postgreSQLBatchDaoImpl.load(batchId);
+        else {
+            Batch batch = batchDao.load(batchId);
             cache.put(batchId, batch);
 
             return batch;
         }
     }
 
-    /**
-     * Persists Batch using Dao. Always cache write through.
-     *
-     * @param batch - id of Batch in Storage
-     * @return
-     */
     @Override
-    public synchronized Batch addBatch(Batch batch)
-    {
-        long batchId = batch.getId();
+    public Batch addBatch(Batch batch) {
+        if (batch.getId() < 1) {
+            Long batchId = batchDao.save(batch);
+            batch.setId(batchId);
+            cache.put(batchId, batch);
+        }
 
-        if (batch.getId() < 1)
-            batchId = postgreSQLBatchDaoImpl.save(batch);
-        //else TODO: Add batch update here
-
-        return getBatch(batchId);
+        return batch;
     }
 
     @Override
-    public synchronized void clearCache()
-    {
+    public synchronized void clearCache() {
         cache.clear();
     }
 }

@@ -16,16 +16,16 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.sql.*;
-import java.util.*;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BATCHES;
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BATCH_STATUSES;
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_ENTITY_STATUS_PARAMS;
+import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Repository
-public class BatchDaoImpl extends JDBCSupport implements IBatchDao
-{
+public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
     private final Logger logger = LoggerFactory.getLogger(BatchDaoImpl.class);
 
     @Autowired
@@ -36,9 +36,8 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
 
     @Override
     public Batch load(long id) {
-        if (id < 0) {
+        if (id < 0)
             return null;
-        }
 
         Batch batch = new Batch();
         batch.setId(id);
@@ -51,17 +50,17 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
     @Override
     @Transactional
     public long save(Batch batch) {
-        long baseEntityId = 0;
+        long batchId;
 
         if (batch.getId() < 1) {
-            baseEntityId = insertBatch(batch);
-            batch.setId(baseEntityId);
+            batchId = insertBatch(batch);
+            batch.setId(batchId);
         } else {
             updateBatch(batch);
-            baseEntityId = batch.getId();
+            batchId = batch.getId();
         }
 
-        return baseEntityId;
+        return batchId;
     }
 
     @Override
@@ -91,15 +90,15 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
                                         EAV_BATCH_STATUSES.STATUS_ID.desc()).as("num")
                 ).from(EAV_BATCH_STATUSES).asTable("bs")
         ).on(EAV_BATCHES.ID.eq(DSL.field("\"bs\".\"BATCH_ID\"", Long.class)))
-        .where(DSL.field("\"bs\".\"num\"").eq(1)).and(DSL.field("\"bs\".STATUS_ID").ne(statusCompleted.getId()));
+                .where(DSL.field("\"bs\".\"num\"").eq(1)).and(DSL.field("\"bs\".STATUS_ID").
+                        ne(statusCompleted.getId()));
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         List<Batch> pendingBatchList = new ArrayList<>();
 
-        for (Map<String, Object> row : rows) {
+        for (Map<String, Object> row : rows)
             pendingBatchList.add(fillBatch(new Batch(), row));
-        }
 
         return pendingBatchList;
     }
@@ -165,16 +164,13 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
                 EAV_ENTITY_STATUS_PARAMS.ENTITY_STATUS_ID,
                 EAV_ENTITY_STATUS_PARAMS.KEY,
                 EAV_ENTITY_STATUS_PARAMS.VALUE
-        ).values(
-                entityStatusId,
+        ).values(entityStatusId,
                 key,
-                value
-        );
+                value);
 
         long id = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
-        if(id < 1)
-        {
+        if (id < 1) {
             logger.error("Can't insert entity status param");
         }
     }
@@ -208,8 +204,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
 
         long batchId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
-        if(batchId < 1)
-        {
+        if (batchId < 1) {
             logger.error("Can't insert batch");
             return 0;
         }
@@ -244,30 +239,25 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1)
-        {
+        if (rows.size() > 1) {
             throw new IllegalArgumentException("More than one batch found. Can't load.");
         }
 
-        if (rows.size() < 1)
-        {
+        if (rows.size() < 1) {
             throw new IllegalArgumentException("Batch not found. Can't load.");
         }
 
         Map<String, Object> row = rows.get(0);
 
-        if(row != null)
-        {
+        if (row != null) {
             fillBatch(batch, row);
-        }
-        else
-        {
+        } else {
             logger.error("Can't load batch, empty data set.");
         }
     }
 
     private Batch fillBatch(Batch batch, Map<String, Object> row) {
-        batch.setId(((BigDecimal)row.get(EAV_BATCHES.ID.getName())).longValue());
+        batch.setId(((BigDecimal) row.get(EAV_BATCHES.ID.getName())).longValue());
         batch.setUserId(getNullSafeLong(row, EAV_BATCHES.USER_ID));
         batch.setCreditorId(getNullSafeLong(row, EAV_BATCHES.CREDITOR_ID));
         batch.setFileName((String) row.get(EAV_BATCHES.FILE_NAME.getName()));

@@ -1,15 +1,10 @@
 package kz.bsbnb.usci.eav.model.base.impl.value;
 
-import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
-
 import java.util.Date;
 
 public class BaseSetIntegerValue extends BaseSetValue<Integer> {
-    public BaseSetIntegerValue(long id, long creditorId, Batch batch, long index, Date reportDate, Integer value,
+    public BaseSetIntegerValue(long id, long creditorId, Date reportDate, Integer value,
                                boolean closed, boolean last) {
-        super(id, creditorId, batch, index, reportDate, value, closed, last);
+        super(id, creditorId, reportDate, value, closed, last);
     }
-
 }

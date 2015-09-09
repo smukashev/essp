@@ -30,17 +30,15 @@ public class ChangeRemainsLimitParser extends BatchParser {
         if (localName.equals("limit")) {
         } else if (localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value", new BaseEntityDoubleValue(-1, batch, index,
-                    new Double(event.asCharacters().getData())));
+            currentBaseEntity.put("value", new BaseEntityDoubleValue(0, -1, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
         } else if (localName.equals("value_currency")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value_currency", new BaseEntityDoubleValue(-1, batch, index,
-                    new Double(event.asCharacters().getData())));
+            currentBaseEntity.put("value_currency", new BaseEntityDoubleValue(0, -1, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
         } else if (localName.equals("balance_account")) {
             event = (XMLEvent) xmlReader.next();
             BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"), batch.getRepDate());
-            baseEntity.put("no_", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
-            currentBaseEntity.put("balance_account", new BaseEntityComplexValue(-1, batch, index, baseEntity));
+            baseEntity.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            currentBaseEntity.put("balance_account", new BaseEntityComplexValue(0, -1, batch.getRepDate(), baseEntity, false, true));
         } else {
             throw new UnknownTagException(localName);
         }

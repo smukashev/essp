@@ -32,17 +32,17 @@ public class SubjectOrganizationDocsParser extends BatchParser {
             BaseEntity organizationDoc = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
                     batch.getRepDate());
 
-            organizationDoc.put("code", new BaseEntityStringValue(-1, batch, index,
-                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
+            organizationDoc.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue(), false, true));
 
-            currentBaseEntity.put("doc_type", new BaseEntityComplexValue(-1, batch, index, organizationDoc));
+            currentBaseEntity.put("doc_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), organizationDoc, false, true));
 
         } else if (localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("name", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
+            currentBaseEntity.put("name", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
         } else if (localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("no", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
+            currentBaseEntity.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
         } else {
             throw new UnknownTagException(localName);
         }

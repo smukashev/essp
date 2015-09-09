@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -110,5 +111,27 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
         }
 
         return null;
+    }
+
+    @Override
+    public List<EavGlobal> getAll() {
+        List<EavGlobal> eavGlobals = new ArrayList<>();
+
+        Select select = context.selectFrom(EAV_GLOBAL);
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        for (Map<String, Object> row : rows) {
+            EavGlobal eavGlobal = new EavGlobal();
+            eavGlobal.setId(((BigDecimal) row.get(EAV_GLOBAL.ID.getName())).longValue());
+            eavGlobal.setCode((String) row.get(EAV_GLOBAL.CODE.getName()));
+            eavGlobal.setType((String) row.get(EAV_GLOBAL.TYPE.getName()));
+            eavGlobal.setValue((String) row.get(EAV_GLOBAL.VALUE.getName()));
+            eavGlobal.setDescription((String) row.get(EAV_GLOBAL.DESCRIPTION.getName()));
+
+            eavGlobals.add(eavGlobal);
+        }
+
+        return eavGlobals;
     }
 }

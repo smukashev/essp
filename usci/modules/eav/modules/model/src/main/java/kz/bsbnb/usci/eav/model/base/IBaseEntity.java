@@ -38,4 +38,12 @@ public interface IBaseEntity extends IBaseContainer {
     void calculateValueCount();
 
     UUID getUuid();
+
+    void setBatchId(Long batchId);
+
+    void setIndex(Long index);
+
+    Long getBatchId();
+
+    Long getBatchIndex();
 }

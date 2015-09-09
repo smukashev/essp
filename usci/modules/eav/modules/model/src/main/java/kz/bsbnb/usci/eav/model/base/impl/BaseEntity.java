@@ -32,23 +32,19 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     private UUID uuid = UUID.randomUUID();
 
-    /**
-     * Holds data about entity structure
-     *
-     * @see MetaClass
-     */
     private MetaClass meta;
 
     OperationType operationType;
 
     private IBaseEntityReportDate baseEntityReportDate;
 
-    /**
-     * Holds attributes values
-     */
-    private HashMap<String, IBaseValue> values = new HashMap<String, IBaseValue>();
+    private HashMap<String, IBaseValue> values = new HashMap<>();
 
-    private Set<String> validationErrors = new HashSet<String>();
+    private Set<String> validationErrors = new HashSet<>();
+
+    private Long batchId;
+
+    private Long index;
 
     @Override
     public OperationType getOperation() {
@@ -59,9 +55,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         operationType = type;
     }
 
-    /**
-     * Initializes entity.
-     */
     public BaseEntity() {
         super(BaseContainerType.BASE_ENTITY);
     }
@@ -88,11 +81,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         this.baseEntityReportDate = thisBaseEntityReportDate;
     }
 
-    /**
-     * Initializes entity with a class name.
-     *
-     * @param meta MetaClass of the entity..
-     */
     public BaseEntity(MetaClass meta, Date reportDate) {
         super(BaseContainerType.BASE_ENTITY);
 
@@ -1147,31 +1135,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return false;
     }
 
-    public long getBatchId() {
-        for (IBaseValue v : values.values()) {
-            return v.getBatch().getId();
-        }
-
-        return 0;
-    }
-
-    public long getBatchIndex() {
-        for (IBaseValue v : values.values()) {
-            return v.getIndex();
-        }
-
-        return 0;
-    }
-
     @Override
     public boolean isSet() {
         return false;
-    }
-
-    public void setIndex(long index) {
-        for (IBaseValue value : values.values()) {
-            value.setIndex(index);
-        }
     }
 
     public int getSearchableChildrenCount() {
@@ -1229,4 +1195,23 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return uuid;
     }
 
+    @Override
+    public void setBatchId(Long batchId) {
+        this.batchId = batchId;
+    }
+
+    @Override
+    public void setIndex(Long index) {
+        this.index = index;
+    }
+
+    @Override
+    public Long getBatchId() {
+        return batchId;
+    }
+
+    @Override
+    public Long getBatchIndex() {
+        return index;
+    }
 }

@@ -98,13 +98,13 @@ public class CreditUtilsImpl implements ICreditUtils {
                 if (code.equals("15"))
                     creditor.setBIK(no);
 
-                docType.put("code", new BaseValue(-1, batch, 0, code));
-                doc.put("no", new BaseValue(-1, batch, 0, no));
-                doc.put("doc_type", new BaseValue(-1, batch, 0, docType));
-                baseSet.put(new BaseValue(-1, batch, 0, doc));
+                docType.put("code", new BaseValue(-1, batch.getRepDate(), code));
+                doc.put("no", new BaseValue(-1, batch.getRepDate(), no));
+                doc.put("doc_type", new BaseValue(-1, batch.getRepDate(), docType));
+                baseSet.put(new BaseValue(-1, batch.getRepDate(), doc));
             }
 
-            baseEntity.put("docs", new BaseValue(-1, batch, 0, baseSet));
+            baseEntity.put("docs", new BaseValue(-1, batch.getRepDate(), baseSet));
             creditors.put(creditorId, baseEntity);
             crCreditors.put(creditorId, creditor);
             return baseEntity;
@@ -135,8 +135,8 @@ public class CreditUtilsImpl implements ICreditUtils {
         IBaseEntity primaryContract = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"),
                 new Date());
 
-        primaryContract.put("no", new BaseValue(-1, batch, 0, contractNo));
-        primaryContract.put("date", new BaseValue(-1, batch, 0, contractDate));
+        primaryContract.put("no", new BaseValue(-1, batch.getRepDate(), contractNo));
+        primaryContract.put("date", new BaseValue(-1, batch.getRepDate(), contractDate));
 
         IBaseEntity creditor = getCreditor(connection, creditorId);
 
@@ -144,8 +144,8 @@ public class CreditUtilsImpl implements ICreditUtils {
             throw new CreditorNotFoundException();
         }
 
-        credit.put("primary_contract", new BaseValue(-1, batch, 0, primaryContract));
-        credit.put("creditor", new BaseValue(-1, batch, 0, creditor));
+        credit.put("primary_contract", new BaseValue(0, -1, batch.getRepDate(), primaryContract));
+        credit.put("creditor", new BaseValue(0, -1, batch.getRepDate(), creditor));
 
         return credit;
     }

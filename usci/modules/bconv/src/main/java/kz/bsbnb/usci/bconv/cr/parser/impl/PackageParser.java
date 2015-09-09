@@ -8,7 +8,6 @@ import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexSet;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseSetComplexValue;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -54,14 +53,15 @@ public class PackageParser extends BatchParser {
         if (localName.equals("packages")) {
         } else if (localName.equals("package")) {
             currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit"), batch.getRepDate());
-            currentBaseEntity.setIndex(Long.parseLong(event.asStartElement().
-                    getAttributeByName(new QName("no")).getValue()));
+            // TODO: set index
+            /*currentBaseEntity.setIndex(Long.parseLong(event.asStartElement().
+                    getAttributeByName(new QName("no")).getValue()));*/
 
             creditParser.setCurrentBaseEntity(currentBaseEntity);
         } else if (localName.equals("primary_contract")) {
             primaryContractParser.parse(xmlReader, batch, index);
             BaseEntity primaryContract = primaryContractParser.getCurrentBaseEntity();
-            currentBaseEntity.put("primary_contract", new BaseEntityComplexValue(-1, batch, index, primaryContract));
+            currentBaseEntity.put("primary_contract", new BaseEntityComplexValue(0, -1, batch.getRepDate(), primaryContract, false, true));
             for (String e : primaryContractParser.getCurrentBaseEntity().getValidationErrors()) {
                 getCurrentBaseEntity().addValidationError(e);
             }
@@ -73,11 +73,10 @@ public class PackageParser extends BatchParser {
             BaseEntity creditType = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_type"),
                     batch.getRepDate());
 
-            creditType.put("code", new BaseEntityStringValue(-1, batch, index,
-                    event.asStartElement().getAttributeByName(new QName("credit_type")).getValue()));
+            creditType.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asStartElement().getAttributeByName(new QName("credit_type")).getValue(), false, true));
 
-            credit.put("credit_type", new BaseEntityComplexValue(-1, batch, index,
-                    creditType));
+            credit.put("credit_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), creditType, false, true));
         } else if (localName.equals("subjects")) {
             BaseSet organizations = new BaseSet(metaClassRepository.getMetaClass("organization"));
             BaseSet persons = new BaseSet(metaClassRepository.getMetaClass("person"));
@@ -90,13 +89,13 @@ public class PackageParser extends BatchParser {
                     if (subject != null) {
                         if (subject.getMeta().getClassName().equals("person")) {
                             persons.put(subject.getMeta().getClassName(),
-                                    new BaseSetComplexValue(-1, batch, index, subject));
-                        } else if(subject.getMeta().getClassName().equals("organization")) {
+                                    new BaseSetComplexValue(0, -1, batch.getRepDate(), subject, false, true));
+                        } else if (subject.getMeta().getClassName().equals("organization")) {
                             organizations.put(subject.getMeta().getClassName(),
-                                    new BaseSetComplexValue(-1, batch, index, subject));
-                        } else if(subject.getMeta().getClassName().equals("creditor")) {
+                                    new BaseSetComplexValue(0, -1, batch.getRepDate(), subject, false, true));
+                        } else if (subject.getMeta().getClassName().equals("creditor")) {
                             creditors.put(subject.getMeta().getClassName(),
-                                    new BaseSetComplexValue(-1, batch, index, subject));
+                                    new BaseSetComplexValue(0, -1, batch.getRepDate(), subject, false, true));
                         } else {
                             throw new IllegalStateException("Тип субъекта не определен(" +
                                     subject.getMeta().getClassName() + ");");
@@ -108,27 +107,26 @@ public class PackageParser extends BatchParser {
             }
 
             if (organizations.get().size() > 0)
-                currentBaseEntity.put("organizations", new BaseEntityComplexSet(-1, batch, index, organizations));
+                currentBaseEntity.put("organizations", new BaseEntityComplexSet(0, -1, batch.getRepDate(), organizations, false, true));
 
             if (persons.get().size() > 0)
-                currentBaseEntity.put("persons", new BaseEntityComplexSet(-1, batch, index, persons));
+                currentBaseEntity.put("persons", new BaseEntityComplexSet(0, -1, batch.getRepDate(), persons, false, true));
 
             if (creditors.get().size() > 0)
-                currentBaseEntity.put("creditors", new BaseEntityComplexSet(-1, batch, index, creditors));
+                currentBaseEntity.put("creditors", new BaseEntityComplexSet(0, -1, batch.getRepDate(), creditors, false, true));
         } else if (localName.equals("pledges")) {
             BaseSet pledges = new BaseSet(metaClassRepository.getMetaClass("pledge"));
             while (true) {
                 pledgesParser.parse(xmlReader, batch, index);
                 if (pledgesParser.hasMore()) {
-                    pledges.put(new BaseSetComplexValue(-1, batch, index, pledgesParser.getCurrentBaseEntity()));
+                    pledges.put(new BaseSetComplexValue(0, -1, batch.getRepDate(), pledgesParser.getCurrentBaseEntity(), false, true));
                 } else break;
             }
-            currentBaseEntity.put("pledges", new BaseEntityComplexSet(-1, batch, index, pledges));
+            currentBaseEntity.put("pledges", new BaseEntityComplexSet(0, -1, batch.getRepDate(), pledges, false, true));
 
         } else if (localName.equals("change")) {
             changeParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("change", new BaseEntityComplexValue(-1, batch, index,
-                    changeParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("change", new BaseEntityComplexValue(0, -1, batch.getRepDate(), changeParser.getCurrentBaseEntity(), false, true));
 
             for (String e : changeParser.getCurrentBaseEntity().getValidationErrors()) {
                 getCurrentBaseEntity().addValidationError(e);

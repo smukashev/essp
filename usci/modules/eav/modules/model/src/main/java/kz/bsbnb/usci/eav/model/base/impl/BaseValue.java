@@ -31,10 +31,6 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
 
     private IBaseValue newBaseValue = null;
 
-    private long index;
-
-    private Batch batch;
-
     private T value;
 
     private Date reportDate;
@@ -43,38 +39,21 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
 
     private boolean closed = DEFAULT_CLOSED;
 
-    public BaseValue(long creditorId, Batch batch, long index, Date reportDate, T value) {
-        this(DEFAULT_ID, creditorId, batch, index, reportDate, value, DEFAULT_CLOSED, DEFAULT_LAST);
+    public BaseValue(long creditorId, Date reportDate, T value) {
+        this(DEFAULT_ID, creditorId, reportDate, value, DEFAULT_CLOSED, DEFAULT_LAST);
     }
 
-    public BaseValue(long creditorId, Batch batch, long index, Date reportDate, T value, boolean closed, boolean last) {
-        this(DEFAULT_ID, creditorId, batch, index, reportDate, value, closed, last);
+    public BaseValue(long creditorId, Date reportDate, T value, boolean closed, boolean last) {
+        this(DEFAULT_ID, creditorId, reportDate, value, closed, last);
     }
 
-    public BaseValue(long id, long creditorId, Batch batch, long index, Date reportDate, T value) {
-        this(id, creditorId, batch, index, reportDate, value, DEFAULT_CLOSED, DEFAULT_LAST);
+    public BaseValue(long id, long creditorId, Date reportDate, T value) {
+        this(id, creditorId, reportDate, value, DEFAULT_CLOSED, DEFAULT_LAST);
     }
 
-    public BaseValue(long creditorId, Batch batch, long index, T value) {
-        this(DEFAULT_ID, creditorId, batch, index, batch.getRepDate(), value, DEFAULT_CLOSED, DEFAULT_LAST);
-    }
-
-    //used in rules
-    public BaseValue(Batch batch, long index, T value) {
-        this(0L, batch, index, value);
-    }
-
-    public BaseValue(long id, long creditorId, Batch batch, long index, Date reportDate, T value, boolean closed,
+    public BaseValue(long id, long creditorId, Date reportDate, T value, boolean closed,
                      boolean last) {
         super(id);
-
-        if (batch == null)
-            throw new IllegalArgumentException
-                    ("Batch is null. Initialization of the BaseValue ​​is not possible.");
-
-        if (batch.getId() < 1)
-            throw new IllegalArgumentException
-                    ("Batch has no id. Initialization of the BaseValue ​​is not possible.");
 
         if (reportDate == null)
             throw new IllegalArgumentException
@@ -84,8 +63,6 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         DataUtils.toBeginningOfTheDay(newReportDate);
 
         this.creditorId = creditorId;
-        this.batch = batch;
-        this.index = index;
         this.value = value;
         this.reportDate = newReportDate;
         this.closed = closed;
@@ -120,26 +97,6 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
     @Override
     public void setMetaAttribute(IMetaAttribute metaAttribute) {
         this.metaAttribute = metaAttribute;
-    }
-
-    @Override
-    public Batch getBatch() {
-        return batch;
-    }
-
-    @Override
-    public void setBatch(Batch batch) {
-        this.batch = batch;
-    }
-
-    @Override
-    public long getIndex() {
-        return index;
-    }
-
-    @Override
-    public void setIndex(long index) {
-        this.index = index;
     }
 
     @Override
@@ -217,8 +174,6 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + (int) (index ^ (index >>> 32));
-        result = 31 * result + batch.hashCode();
         result = 31 * result + (value != null ? value.hashCode() : 0);
         result = 31 * result + reportDate.hashCode();
         return result;
@@ -228,41 +183,38 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         IMetaAttribute thisMetaAttribute = this.getMetaAttribute();
         IMetaAttribute thatMetaAttribute = baseValue.getMetaAttribute();
 
-        if (thisMetaAttribute == null || thatMetaAttribute == null) {
-            throw new RuntimeException("Comparison values of two instances of BaseValue without meta data is not possible.");
-        }
+        if (thisMetaAttribute == null || thatMetaAttribute == null)
+            throw new IllegalStateException("Comparison values of two instances of BaseValue " +
+                    "without meta data is not possible.");
 
-        if (thisMetaAttribute.getId() == thatMetaAttribute.getId()) {
-            return this.equalsByValue(thisMetaAttribute.getMetaType(), baseValue);
-        }
+        return thisMetaAttribute.getId() == thatMetaAttribute.getId() &&
+                this.equalsByValue(thisMetaAttribute.getMetaType(), baseValue);
 
-        return false;
     }
 
     public boolean equalsByValue(IMetaType metaType, IBaseValue baseValue) {
         Object thisValue = this.getValue();
         Object thatValue = baseValue.getValue();
 
-        if (thisValue == null || thatValue == null) {
-            throw new RuntimeException("Comparison values of two instances of BaseValue with null values is not possible.");
-        }
+        if (thisValue == null || thatValue == null)
+            throw new RuntimeException("Comparison values of two instances of BaseValue " +
+                    "with null values is not possible.");
 
-        if (metaType.isSetOfSets()) {
+        if (metaType.isSetOfSets())
             throw new UnsupportedOperationException("Not yet implemented");
-        }
 
         if (metaType.isComplex()) {
             if (metaType.isSet()) {
                 IBaseSet thisBaseSet = (IBaseSet) thisValue;
                 IBaseSet thatBaseSet = (IBaseSet) thatValue;
 
-                List<Long> thisIds = new ArrayList<Long>();
+                List<Long> thisIds = new ArrayList<>();
                 for (IBaseValue thisChildBaseValue : thisBaseSet.get()) {
                     IBaseEntity thisBaseEntity = (IBaseEntity) thisChildBaseValue.getValue();
                     thisIds.add(thisBaseEntity.getId());
                 }
 
-                List<Long> thatIds = new ArrayList<Long>();
+                List<Long> thatIds = new ArrayList<>();
                 for (IBaseValue thatChildBaseValue : thatBaseSet.get()) {
                     BaseEntity thatBaseEntity = (BaseEntity) thatChildBaseValue.getValue();
                     thatIds.add(thatBaseEntity.getId());
@@ -289,7 +241,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
                 IBaseSet thatBaseSet = (IBaseSet) thatValue;
 
                 boolean baseValueNotFound;
-                Set<UUID> processedUuids = new HashSet<UUID>();
+                Set<UUID> processedUuids = new HashSet<>();
                 for (IBaseValue thisBaseValue : thisBaseSet.get()) {
                     baseValueNotFound = true;
                     for (IBaseValue thatBaseValue : thatBaseSet.get()) {

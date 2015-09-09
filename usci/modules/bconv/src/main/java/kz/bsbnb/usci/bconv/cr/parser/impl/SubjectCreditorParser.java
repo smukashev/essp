@@ -36,21 +36,21 @@ public class SubjectCreditorParser extends BatchParser {
         if (localName.equals("creditor")) {
         } else if (localName.equals("code")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("code", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
+            currentBaseEntity.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
         } else if (localName.equals("docs")) {
             docs = new BaseSet(metaClassRepository.getMetaClass("document"));
         } else if (localName.equals("doc")) {
             currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"), batch.getRepDate());
             BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), batch.getRepDate());
-            docType.put("code", new BaseEntityStringValue(-1, batch, index,
-                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
-            currentDoc.put("doc_type", new BaseEntityComplexValue(-1, batch, index, docType));
+            docType.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue(), false, true));
+            currentDoc.put("doc_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), docType, false, true));
         } else if (localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("name", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
+            currentDoc.put("name", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
         } else if (localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("no", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
+            currentDoc.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
         } else {
             throw new UnknownTagException(localName);
         }
@@ -64,9 +64,9 @@ public class SubjectCreditorParser extends BatchParser {
             return true;
         } else if (localName.equals("code")) {
         } else if (localName.equals("docs")) {
-            currentBaseEntity.put("docs", new BaseEntityComplexSet(-1, batch, index, docs));
+            currentBaseEntity.put("docs", new BaseEntityComplexSet(0, -1, batch.getRepDate(), docs, false, true));
         } else if (localName.equals("doc")) {
-            docs.put(new BaseSetComplexValue(-1, batch, index, currentDoc));
+            docs.put(new BaseSetComplexValue(0, -1, batch.getRepDate(), currentDoc, false, true));
         } else if (localName.equals("name")) {
         } else if (localName.equals("no")) {
         } else {

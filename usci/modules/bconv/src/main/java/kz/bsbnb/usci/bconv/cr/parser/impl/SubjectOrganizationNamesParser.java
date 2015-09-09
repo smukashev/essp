@@ -25,10 +25,10 @@ public class SubjectOrganizationNamesParser extends BatchParser {
         } else if (localName.equals("name")) {
             currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("organization_name"),
                     batch.getRepDate());
-            currentBaseEntity.put("lang", new BaseEntityStringValue(-1, batch, index,
-                    event.asStartElement().getAttributeByName(new QName("lang")).getValue()));
+            currentBaseEntity.put("lang", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asStartElement().getAttributeByName(new QName("lang")).getValue(), false, true));
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("name", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
+            currentBaseEntity.put("name", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
         } else {
             throw new UnknownTagException(localName);
         }

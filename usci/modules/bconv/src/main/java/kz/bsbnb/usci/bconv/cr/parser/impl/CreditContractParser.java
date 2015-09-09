@@ -32,12 +32,12 @@ public class CreditContractParser extends BatchParser {
             if (localName.equals("contract")) {
             } else if (localName.equals("no")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("no", new BaseEntityStringValue(-1, batch, index,
-                        event.asCharacters().getData()));
+                currentBaseEntity.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                        event.asCharacters().getData(), false, true));
             } else if (localName.equals("date")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("date", new BaseEntityDateValue(-1, batch, index,
-                        dateFormat.parse(event.asCharacters().getData())));
+                currentBaseEntity.put("date", new BaseEntityDateValue(0, -1, batch.getRepDate(),
+                        dateFormat.parse(event.asCharacters().getData()), false, true));
             } else {
                 throw new UnknownTagException(localName);
             }

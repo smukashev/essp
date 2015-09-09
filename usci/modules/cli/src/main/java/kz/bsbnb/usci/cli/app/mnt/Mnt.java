@@ -231,8 +231,6 @@ public class Mnt {
                                 primaryContract.getMemberType("no"),
                                 0,
                                 -1,
-                                batch,
-                                0,
                                 batch.getRepDate(),
                                 contractNo,
                                 false,
@@ -244,8 +242,6 @@ public class Mnt {
                                     primaryContract.getMemberType("no"),
                                     0,
                                     -1,
-                                    batch,
-                                    0,
                                     batch.getRepDate(),
                                     contractNoNew,
                                     false,
@@ -256,8 +252,6 @@ public class Mnt {
                                 primaryContract.getMemberType("date"),
                                 0,
                                 -1,
-                                batch,
-                                0,
                                 batch.getRepDate(),
                                 contractDate,
                                 false,
@@ -269,8 +263,6 @@ public class Mnt {
                                     primaryContract.getMemberType("date"),
                                     0,
                                     -1,
-                                    batch,
-                                    0,
                                     batch.getRepDate(),
                                     contractDateNew,
                                     false,
@@ -288,8 +280,8 @@ public class Mnt {
                             continue;
                         }
 
-                        credit.put("primary_contract", new BaseValue(-1, batch, 0, primaryContract));
-                        credit.put("creditor", new BaseValue(-1, batch, 0, creditor));
+                        credit.put("primary_contract", new BaseValue(-1, batch.getRepDate(), primaryContract));
+                        credit.put("creditor", new BaseValue(-1, batch.getRepDate(), creditor));
 
                         baseEntityProcessorDao.prepare(credit, creditorId);
 

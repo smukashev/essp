@@ -30,8 +30,6 @@ import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Component
 public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEntitySearcher {
-    private final Logger logger = LoggerFactory.getLogger(ImprovedBaseEntitySearcher.class);
-
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
@@ -59,7 +57,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                     select.getBindValues().toArray());
 
             if (rows.size() > 1)
-                throw new IllegalStateException("Found more than one row(" +
+                throw new IllegalStateException("Найдено больше одной записи(" +
                         entity.getMeta().getClassName() + "), " + entity);
 
             if (rows.size() < 1)
@@ -98,8 +96,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                 if ((baseValue == null || baseValue.getValue() == null) && (metaClass.getComplexKeyType() ==
                         ComplexKeyTypes.ALL))
-                    throw new IllegalArgumentException("Key attribute " + name + " can't be null. MetaClass: " +
-                            entity.getMeta().getClassName());
+                    throw new IllegalArgumentException("Ключевой атрибут(" + name + ") не может быть пустым. " +
+                            "Мета класс: " + entity.getMeta().getClassName());
 
 
                 if ((baseValue == null || baseValue.getValue() == null) &&
@@ -226,8 +224,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                 }
                                 break;
                             default:
-                                throw new IllegalStateException("Unknown data type: " + metaValue.getTypeCode() +
-                                        " for attribute: " + name);
+                                throw new IllegalStateException("Неизвестный тип данных: " + metaValue.getTypeCode() +
+                                        " для атрибута: " + name);
                         }
                     } else {
                         BaseEntity childBaseEntity = (BaseEntity) baseValue.getValue();
@@ -270,7 +268,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         } else {
 
                             MetaClass childMetaClass = (MetaClass) metaSet.getMemberType();
-                            List<Long> childBaseEntityIds = new ArrayList<Long>();
+                            List<Long> childBaseEntityIds = new ArrayList<>();
                             for (IBaseValue childBaseValue : baseSet.get()) {
                                 BaseEntity childBaseEntity = (BaseEntity) childBaseValue.getValue();
                                 Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().
@@ -287,11 +285,9 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                             if (childBaseEntityIds.size() > 0) {
                                 String className = childMetaClass.getClassName();
-                                String childEntityAlias = "e_" + className;
                                 String setValueAlias = "sv_" + className;
-                                String setAlias = "s_" + className;
                                 String entitySetAlias = "es_" + className;
-                                Select select = null;
+                                Select select;
 
                                 if (metaSet.getArrayKeyType() == ComplexKeyTypes.ANY) {
                                     select = context.select(
@@ -313,24 +309,24 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                                     condition.or(DSL.exists(select));
                                 } else {
                                     Collections.sort(childBaseEntityIds);
-                                    String sChildBaseEntityIds =  StringUtils.arrayToDelimitedString(childBaseEntityIds.toArray(), "',' ");
 
                                     select = context.select(
                                             EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID
                                     ).from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
                                     .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
-                                    .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.eq(metaAttribute.getId()))
+                                    .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).
+                                            ATTRIBUTE_ID.eq(metaAttribute.getId()))
                                     .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.
                                             eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
                                     .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.
                                             eq(EAV_BE_ENTITIES.as(entityAlias).ID)
-                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds)) );
-
-                                    //Condition setCondition = ;
+                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).
+                                            ENTITY_VALUE_ID.in(childBaseEntityIds)) );
 
                                     condition = condition == null ? DSL.exists(select) :
                                             metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
-                                                    condition.and(DSL.exists(select)) : condition.or(DSL.exists(select));
+                                                    condition.and(DSL.exists(select)) :
+                                                    condition.or(DSL.exists(select));
                                 }
                             }
                         }
@@ -402,8 +398,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                                 equal(attribute.getId())));
                         break;
                     default:
-                        throw new IllegalStateException("Unknown data type: " + metaValue.getTypeCode() +
-                                " for attribute: " + name);
+                        throw new IllegalStateException("Неизвестный тип данных: " + metaValue.getTypeCode() +
+                                " для атрибута: " + name);
                 }
             } else {
                 joins = joins.join(EAV_BE_COMPLEX_VALUES.as(valueAlias)).
