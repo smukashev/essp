@@ -43,7 +43,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public Long findSingle(BaseEntity entity, long creditorId) {
+    public Long findSingle(BaseEntity entity, Long creditorId) {
         if (entity.getId() > 0)
             return entity.getId();
 
@@ -69,11 +69,11 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         return null;
     }
 
-    public SelectConditionStep generateSQL(IBaseEntity entity, long creditorId, String entityName) {
+    public SelectConditionStep generateSQL(IBaseEntity entity, Long creditorId, String entityName) {
         return generateSQL(entity, creditorId, entityName, null);
     }
 
-    public SelectConditionStep generateSQL(IBaseEntity entity, long creditorId, String entityName,
+    public SelectConditionStep generateSQL(IBaseEntity entity, Long creditorId, String entityName,
                                            HashMap<String, ArrayList<String>> arrayKeyFilter) {
         MetaClass metaClass = entity.getMeta();
         String entityAlias = (entityName == null ? "root" : "e_" + entityName);
@@ -348,7 +348,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
     }
 
     private SelectJoinStep generateJoins(SelectJoinStep joins, String entityAlias, String name, IMetaType type,
-                                         long creditorId, IMetaAttribute attribute) {
+                                         Long creditorId, IMetaAttribute attribute) {
         String valueAlias = "v_" + name;
         if (!type.isSet()) {
             if (!type.isComplex()) {
@@ -412,7 +412,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public ArrayList<Long> findAll(BaseEntity baseEntity, long creditorId) {
+    public ArrayList<Long> findAll(BaseEntity baseEntity, Long creditorId) {
         ArrayList<Long> result = new ArrayList<>();
 
         if (baseEntity.getValueCount() == 0)
